@@ -1,0 +1,163 @@
+{
+  "meta": {
+    "produto": "Ótica Sem Improviso",
+    "objetivo": "Roteiros para vídeos (VSL curto, Reels, YouTube Shorts)",
+    "tom": "Conversacional, direto, ritmo rápido. Como se falasse com um colega de profissão.",
+    "data": "2026-04-30"
+  },
+  "videos": [
+    {
+      "id": "vsl_2min",
+      "tipo": "VSL Curto",
+      "duracao": "2 minutos",
+      "formato": "Vertical (9:16) ou Horizontal (16:9)",
+      "objetivo": "Explicar o produto e levar para a compra",
+      "roteiro": [
+        {
+          "tempo": "0:00-0:05",
+          "fase": "Hook",
+          "texto": "Se você trabalha em ótica e sente que seu atendimento tá no automático... fica comigo por 2 minutos.",
+          "nota_visual": "Close no rosto ou texto na tela"
+        },
+        {
+          "tempo": "0:05-0:25",
+          "fase": "Problema",
+          "texto": "O cliente pergunta preço antes de ouvir valor. Você dá desconto porque não sabe sustentar. O orçamento morre no WhatsApp. E todo dia parece a mesma coisa — sem direção, sem método.",
+          "nota_visual": "Cortes rápidos. Pode usar texto sobreposto com cada dor."
+        },
+        {
+          "tempo": "0:25-0:40",
+          "fase": "Virada",
+          "texto": "O problema não é falta de boa vontade. É falta de método. E é exatamente isso que o Ótica Sem Improviso resolve.",
+          "nota_visual": "Transição para visual do produto (mockup manual/app)"
+        },
+        {
+          "tempo": "0:40-1:10",
+          "fase": "Solução",
+          "texto": "É um manual visual com 5 Movimentos: Sair do Automático, Ler o Cliente, Indicar com Segurança, Sustentar Valor e WhatsApp que Converte. Você recebe em PDF pra imprimir e em app pra estudar no celular. Aplica em 3 dias.",
+          "nota_visual": "Mostrar os 5 Movimentos na tela. Mockup do PDF e app."
+        },
+        {
+          "tempo": "1:10-1:30",
+          "fase": "Autoridade",
+          "texto": "Foi revisado pela Tatiana Camargo — mais de 40 anos de experiência real no balcão de ótica. Não é teoria de guru. É método validado na prática.",
+          "nota_visual": "Foto ou citação da Taty"
+        },
+        {
+          "tempo": "1:30-1:50",
+          "fase": "Oferta",
+          "texto": "Tá em oferta de lançamento: de 97 por 48 e 50. Compra única. Sem assinatura. Ainda vem com 90 dias de apoio complementar na Nexus.",
+          "nota_visual": "Preço na tela com badge 50% off"
+        },
+        {
+          "tempo": "1:50-2:00",
+          "fase": "CTA",
+          "texto": "Se você quer parar de atender no improviso, o link tá aqui embaixo. Em 72 horas, você sai do automático.",
+          "nota_visual": "Apontar para link / botão. Texto: 'Link na bio' ou 'Link abaixo'."
+        }
+      ]
+    },
+    {
+      "id": "reels_dor_desconto",
+      "tipo": "Reels/Short",
+      "duracao": "15-30 segundos",
+      "formato": "Vertical (9:16)",
+      "objetivo": "Gerar identificação e tráfego",
+      "roteiro": [
+        {
+          "tempo": "0:00-0:03",
+          "fase": "Hook",
+          "texto": "Você dá desconto antes de argumentar?"
+        },
+        {
+          "tempo": "0:03-0:08",
+          "fase": "Dor",
+          "texto": "O cliente fala 'tá caro' e você já oferece 10% off. Não por generosidade. Por falta de preparo pra sustentar o valor."
+        },
+        {
+          "tempo": "0:08-0:13",
+          "fase": "Método",
+          "texto": "Movimento 4 do Ótica Sem Improviso: Sustentar Valor. Você aprende a defender o preço antes de falar o número."
+        },
+        {
+          "tempo": "0:13-0:18",
+          "fase": "CTA",
+          "texto": "Manual visual. Resultados em 72 horas. Link na bio."
+        }
+      ]
+    },
+    {
+      "id": "reels_whatsapp",
+      "tipo": "Reels/Short",
+      "duracao": "15-30 segundos",
+      "formato": "Vertical (9:16)",
+      "objetivo": "Dor do WhatsApp → Método",
+      "roteiro": [
+        {
+          "tempo": "0:00-0:03",
+          "fase": "Hook",
+          "texto": "Mandou o orçamento e o cliente sumiu?"
+        },
+        {
+          "tempo": "0:03-0:08",
+          "fase": "Dor",
+          "texto": "Você manda preço, ele visualiza, e... silêncio. Sem retorno, sem contexto, sem fechamento."
+        },
+        {
+          "tempo": "0:08-0:13",
+          "fase": "Método",
+          "texto": "Movimento 5: WhatsApp que Converte. Retomada com contexto — sem parecer cobrança. Scripts prontos pra adaptar."
+        },
+        {
+          "tempo": "0:13-0:18",
+          "fase": "CTA",
+          "texto": "Manual + App. R$ 48,50. Link na bio."
+        }
+      ]
+    },
+    {
+      "id": "reels_5_movimentos",
+      "tipo": "Reels/Short",
+      "duracao": "30-45 segundos",
+      "formato": "Vertical (9:16)",
+      "objetivo": "Apresentar o método completo",
+      "roteiro": [
+        {
+          "tempo": "0:00-0:03",
+          "fase": "Hook",
+          "texto": "5 Movimentos pra nunca mais atender no improviso."
+        },
+        {
+          "tempo": "0:03-0:08",
+          "fase": "Movimento 1",
+          "texto": "Primeiro: Sair do Automático. Parar de repetir o mesmo script morto."
+        },
+        {
+          "tempo": "0:08-0:13",
+          "fase": "Movimento 2",
+          "texto": "Segundo: Ler o Cliente. Perguntar melhor antes de indicar."
+        },
+        {
+          "tempo": "0:13-0:18",
+          "fase": "Movimento 3",
+          "texto": "Terceiro: Indicar com Segurança. Sem travar, sem insegurança."
+        },
+        {
+          "tempo": "0:18-0:23",
+          "fase": "Movimento 4",
+          "texto": "Quarto: Sustentar Valor. Defender preço sem correr pro desconto."
+        },
+        {
+          "tempo": "0:23-0:28",
+          "fase": "Movimento 5",
+          "texto": "Quinto: WhatsApp que Converte. Retomar orçamento com método."
+        },
+        {
+          "tempo": "0:28-0:35",
+          "fase": "CTA",
+          "texto": "Tudo isso num manual visual que você aplica em 72 horas. Link na bio."
+        }
+      ]
+    }
+  ]
+}

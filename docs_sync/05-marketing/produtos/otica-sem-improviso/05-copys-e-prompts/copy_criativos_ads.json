@@ -1,0 +1,100 @@
+{
+  "meta": {
+    "produto": "Ótica Sem Improviso",
+    "objetivo": "Criativos para tráfego pago (Meta Ads, Google)",
+    "tom": "Direto, empático, sem hype. Fala com quem está no balcão.",
+    "publico": "Vendedores, consultores ópticos, atendentes e gestores de ótica",
+    "data": "2026-04-30"
+  },
+  "criativos": [
+    {
+      "id": "ad_dor_preco",
+      "formato": "Feed (1:1)",
+      "angulo": "Dor - cliente pergunta preço",
+      "headline": "O cliente pergunta preço antes de ouvir o valor?",
+      "corpo": "Se você já perdeu uma venda porque não sabia sustentar o argumento antes do número... o problema não é o cliente. É falta de método.",
+      "cta": "Conheça Os 5 Movimentos",
+      "texto_imagem": "\"Quanto custa?\"\nSe essa pergunta te trava, o problema não é o cliente.",
+      "nota_visual": "Fundo neutro, tipografia editorial, sem foto genérica. Usar cor #406863 no CTA."
+    },
+    {
+      "id": "ad_dor_desconto",
+      "formato": "Feed (1:1)",
+      "angulo": "Dor - reflexo de desconto",
+      "headline": "Você dá desconto antes de argumentar?",
+      "corpo": "O desconto cedo demais não é generosidade. É falta de preparo para sustentar valor. Em 3 dias, você muda isso.",
+      "cta": "Ver o método",
+      "texto_imagem": "Desconto não é estratégia.\nÉ sintoma de quem não sabe sustentar valor.",
+      "nota_visual": "Card editorial, fundo warm-100, destaque na frase em bold."
+    },
+    {
+      "id": "ad_dor_whatsapp",
+      "formato": "Stories (9:16)",
+      "angulo": "Dor - orçamento morre no WhatsApp",
+      "headline": "Seu orçamento morre no WhatsApp?",
+      "corpo": "Você manda o preço, o cliente some. Sem retomada, sem contexto, sem fechamento. Tem um jeito melhor.",
+      "cta": "Aprenda a retomar",
+      "texto_imagem": "Slide 1: \"Mandou o orçamento...\"\nSlide 2: \"...e o cliente sumiu.\"\nSlide 3: \"Tem um método pra isso.\"",
+      "nota_visual": "3 slides sequenciais, transição rápida. Fundo escuro (warm-800), texto branco."
+    },
+    {
+      "id": "ad_solucao_metodo",
+      "formato": "Feed (1:1)",
+      "angulo": "Solução - Os 5 Movimentos",
+      "headline": "5 Movimentos. 3 Dias. Atendimento sem improviso.",
+      "corpo": "Um manual visual com método para quem atende no balcão e no WhatsApp. Sem curso longo. Sem teoria. Aplicação direta.",
+      "cta": "Quero parar de atender no improviso",
+      "texto_imagem": "Os 5 Movimentos:\n1. Sair do Automático\n2. Ler o Cliente\n3. Indicar com Segurança\n4. Sustentar Valor\n5. WhatsApp que Converte",
+      "nota_visual": "Lista numerada com cores dos módulos. Fundo branco, borda sutil."
+    },
+    {
+      "id": "ad_solucao_72h",
+      "formato": "Feed (4:5)",
+      "angulo": "Solução - Resultado em 72h",
+      "headline": "Em 72 horas, você sai do improviso.",
+      "corpo": "Dia 1: Diagnóstico. Dia 2: Aplicação no balcão. Dia 3: WhatsApp com método. Sem promessa inflada — aplicação real.",
+      "cta": "Quero o método",
+      "texto_imagem": "Dia 1 → Diagnóstico\nDia 2 → Balcão\nDia 3 → WhatsApp\n\nResultado em 72h.",
+      "nota_visual": "Timeline visual vertical. Cores #9E8632, #3A7D5C, #128C7E para cada dia."
+    },
+    {
+      "id": "ad_autoridade_taty",
+      "formato": "Feed (1:1)",
+      "angulo": "Autoridade - Taty",
+      "headline": "Criado por quem vive o balcão há mais de 40 anos.",
+      "corpo": "Tatiana Camargo revisou cada página deste manual. Não é teoria de guru. É método validado com cliente real, objeção real e decisão real.",
+      "cta": "Ver o manual",
+      "texto_imagem": "\"Você não precisa parecer ensaiado.\nPrecisa ler melhor, perguntar melhor\ne conduzir melhor.\"\n— Tatiana Camargo",
+      "nota_visual": "Foto da Taty (se autorizada) ou citação em card editorial. Tipografia Caladea."
+    },
+    {
+      "id": "ad_oferta_lancamento",
+      "formato": "Feed (1:1)",
+      "angulo": "Oferta - Lançamento 50% off",
+      "headline": "Manual + App + 90 dias de apoio. R$ 48,50.",
+      "corpo": "Oferta de lançamento com 50% de desconto. Compra única, sem assinatura. O método que transforma atendimento de ótica em 72 horas.",
+      "cta": "Aproveitar 50% off",
+      "texto_imagem": "De R$ 97\nPor R$ 48,50\n\nManual PDF + App + Nexus 90 dias\nOferta de lançamento",
+      "nota_visual": "Fundo warm-800, preço grande em branco, badge accent '50% off'."
+    },
+    {
+      "id": "ad_reels_identificacao",
+      "formato": "Reels/Short (9:16)",
+      "angulo": "Identificação - rotina do balcão",
+      "headline": "Se você se identificar com 3 dessas...",
+      "corpo": "Hook para reter atenção nos primeiros 3s com lista de dores do balcão.",
+      "cta": "Link na bio",
+      "roteiro": [
+        "Hook (0-3s): 'Se você trabalha em ótica e se identificar com 3 dessas, fica até o final.'",
+        "Dor 1 (3-5s): 'Cliente que só pergunta preço.'",
+        "Dor 2 (5-7s): 'Insegurança ao indicar lente.'",
+        "Dor 3 (7-9s): 'Desconto como primeiro recurso.'",
+        "Dor 4 (9-11s): 'Orçamento que morre no WhatsApp.'",
+        "Dor 5 (11-13s): 'Atendimento no piloto automático.'",
+        "Virada (13-16s): 'Isso tem nome: atender no improviso. E tem solução.'",
+        "CTA (16-18s): 'Link na bio. Manual visual + app. Resultados em 72h.'"
+      ],
+      "nota_visual": "Texto sobre fundo ou talking head. Ritmo rápido, cortes a cada dor."
+    }
+  ]
+}

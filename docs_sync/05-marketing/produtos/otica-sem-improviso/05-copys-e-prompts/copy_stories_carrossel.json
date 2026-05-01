@@ -1,0 +1,245 @@
+{
+  "meta": {
+    "produto": "Ótica Sem Improviso",
+    "objetivo": "Stories e Carrosséis para Instagram/WhatsApp Status",
+    "tom": "Direto, visual, ritmo rápido. Cada slide = 1 ideia.",
+    "data": "2026-04-30"
+  },
+  "carrosseis": [
+    {
+      "id": "carrossel_5_movimentos",
+      "formato": "Carrossel Instagram (1:1)",
+      "slides": 7,
+      "conteudo": [
+        {
+          "slide": 1,
+          "tipo": "capa",
+          "texto_principal": "Os 5 Movimentos para atender sem improviso na ótica",
+          "texto_secundario": "Salva pra depois →"
+        },
+        {
+          "slide": 2,
+          "tipo": "movimento",
+          "numero": "01",
+          "titulo": "Sair do Automático",
+          "texto": "Pare de repetir o mesmo script morto. Atenda com presença e intenção.",
+          "cor": "#9E8632"
+        },
+        {
+          "slide": 3,
+          "tipo": "movimento",
+          "numero": "02",
+          "titulo": "Ler o Cliente",
+          "texto": "Pergunte melhor antes de indicar. Cada cliente é diferente.",
+          "cor": "#3A7D5C"
+        },
+        {
+          "slide": 4,
+          "tipo": "movimento",
+          "numero": "03",
+          "titulo": "Indicar com Segurança",
+          "texto": "Indicar sem travar. Traduzir o técnico em linguagem de cliente.",
+          "cor": "#C86D58"
+        },
+        {
+          "slide": 5,
+          "tipo": "movimento",
+          "numero": "04",
+          "titulo": "Sustentar Valor",
+          "texto": "Defender valor antes do preço. Parar de dar desconto por reflexo.",
+          "cor": "#2C5A7E"
+        },
+        {
+          "slide": 6,
+          "tipo": "movimento",
+          "numero": "05",
+          "titulo": "WhatsApp que Converte",
+          "texto": "Retomar orçamento com contexto. Fechar sem parecer cobrança.",
+          "cor": "#128C7E"
+        },
+        {
+          "slide": 7,
+          "tipo": "cta",
+          "texto_principal": "Manual visual + App\nResultados em 72 horas",
+          "texto_secundario": "Link na bio",
+          "preco": "R$ 48,50"
+        }
+      ]
+    },
+    {
+      "id": "carrossel_7_dores",
+      "formato": "Carrossel Instagram (1:1)",
+      "slides": 9,
+      "conteudo": [
+        {
+          "slide": 1,
+          "tipo": "capa",
+          "texto_principal": "7 sinais de que você atende no improviso",
+          "texto_secundario": "Se identificou com 3? Fica até o final."
+        },
+        {
+          "slide": 2,
+          "tipo": "dor",
+          "numero": "1",
+          "texto": "Cliente pergunta preço antes de entender o valor."
+        },
+        {
+          "slide": 3,
+          "tipo": "dor",
+          "numero": "2",
+          "texto": "Atendimento começa sem direção e fica solto até o fim."
+        },
+        {
+          "slide": 4,
+          "tipo": "dor",
+          "numero": "3",
+          "texto": "Indicação insegura que enfraquece a recomendação."
+        },
+        {
+          "slide": 5,
+          "tipo": "dor",
+          "numero": "4",
+          "texto": "Insegurança ao explicar antirreflexo, bluecut, multifocal."
+        },
+        {
+          "slide": 6,
+          "tipo": "dor",
+          "numero": "5",
+          "texto": "Desconto usado cedo demais por falta de argumento."
+        },
+        {
+          "slide": 7,
+          "tipo": "dor",
+          "numero": "6",
+          "texto": "Orçamento que morre no WhatsApp sem retomada."
+        },
+        {
+          "slide": 8,
+          "tipo": "dor",
+          "numero": "7",
+          "texto": "Todo atendimento é no piloto automático, sem método."
+        },
+        {
+          "slide": 9,
+          "tipo": "cta",
+          "texto_principal": "Isso tem solução.\nOs 5 Movimentos. Resultados em 72h.",
+          "texto_secundario": "Link na bio"
+        }
+      ]
+    },
+    {
+      "id": "carrossel_plano_72h",
+      "formato": "Carrossel Instagram (1:1)",
+      "slides": 5,
+      "conteudo": [
+        {
+          "slide": 1,
+          "tipo": "capa",
+          "texto_principal": "Plano de 72 horas para sair do improviso",
+          "texto_secundario": "Aplicação real. Sem teoria longa."
+        },
+        {
+          "slide": 2,
+          "tipo": "dia",
+          "dia": "1",
+          "titulo": "Diagnóstico + Base",
+          "itens": [
+            "Diagnóstico do atendimento atual",
+            "Movimentos 1 e 2",
+            "Identificar gaps"
+          ],
+          "cor": "#9E8632"
+        },
+        {
+          "slide": 3,
+          "tipo": "dia",
+          "dia": "2",
+          "titulo": "Indicação + Valor",
+          "itens": [
+            "Aplicar Movimento 3 no balcão",
+            "Escolher respostas para objeções",
+            "Traduzir termos técnicos"
+          ],
+          "cor": "#3A7D5C"
+        },
+        {
+          "slide": 4,
+          "tipo": "dia",
+          "dia": "3",
+          "titulo": "WhatsApp + Consolidação",
+          "itens": [
+            "Adaptar scripts",
+            "Retomar 3 conversas",
+            "Revisar resultados"
+          ],
+          "cor": "#128C7E"
+        },
+        {
+          "slide": 5,
+          "tipo": "cta",
+          "texto_principal": "Em 72h você sai do improviso.\nR$ 48,50 — Manual + App + Nexus",
+          "texto_secundario": "Link na bio"
+        }
+      ]
+    }
+  ],
+  "stories": [
+    {
+      "id": "story_sequencia_dor",
+      "nome": "Sequência de Stories - Dor",
+      "total_stories": 5,
+      "conteudo": [
+        {
+          "story": 1,
+          "texto": "Pergunta rápida pra quem trabalha em ótica:",
+          "interacao": "Enquete: 'Você atende no improviso? Sim / Às vezes'"
+        },
+        {
+          "story": 2,
+          "texto": "Se você já deu desconto porque não sabia sustentar o valor...\n\n...você não está sozinho(a)."
+        },
+        {
+          "story": 3,
+          "texto": "Se o orçamento morre no WhatsApp e você não sabe retomar...\n\n...não é falta de boa vontade. É falta de método."
+        },
+        {
+          "story": 4,
+          "texto": "Existe um manual visual com 5 Movimentos que você aplica em 72 horas.\n\nSem curso longo. Sem plataforma.",
+          "interacao": "Enquete: 'Quer saber mais? Sim / Depois'"
+        },
+        {
+          "story": 5,
+          "texto": "Ótica Sem Improviso\nManual + App + 90 dias de apoio\nR$ 48,50",
+          "cta": "Link para LP",
+          "sticker": "Link"
+        }
+      ]
+    },
+    {
+      "id": "story_resultado_72h",
+      "nome": "Sequência de Stories - Resultado",
+      "total_stories": 4,
+      "conteudo": [
+        {
+          "story": 1,
+          "texto": "E se em 3 dias você pudesse mudar a forma como atende?"
+        },
+        {
+          "story": 2,
+          "texto": "Dia 1: Diagnóstico\nDia 2: Aplicação no balcão\nDia 3: WhatsApp com método"
+        },
+        {
+          "story": 3,
+          "texto": "Não é promessa inflada.\nÉ aplicação direta na rotina.",
+          "interacao": "Slider: 'Quanto improviso tem no seu atendimento?'"
+        },
+        {
+          "story": 4,
+          "texto": "Os 5 Movimentos.\nR$ 48,50.\nLink aqui embaixo.",
+          "cta": "Link para LP",
+          "sticker": "Link"
+        }
+      ]
+    }
+  ]
+}

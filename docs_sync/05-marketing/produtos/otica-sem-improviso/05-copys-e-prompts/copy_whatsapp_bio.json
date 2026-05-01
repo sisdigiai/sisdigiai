@@ -1,0 +1,49 @@
+{
+  "meta": {
+    "produto": "Ótica Sem Improviso",
+    "objetivo": "Copy para WhatsApp (mensagens de venda, broadcast, status) e Bio de Instagram",
+    "tom": "Direto, curto, conversacional. Sem emoji excessivo.",
+    "data": "2026-04-30"
+  },
+  "bio_instagram": {
+    "opcao_1": "Manual visual para quem atende em ótica.\nOs 5 Movimentos. Resultados em 72h.\nPDF + App + 90 dias de apoio.\n↓ Acesse o método",
+    "opcao_2": "Pare de atender no improviso na ótica.\n5 Movimentos. 3 Dias. Sem curso longo.\nManual + App por R$ 48,50.\n↓ Link abaixo",
+    "opcao_3": "Atendimento de ótica sem improviso.\nMétodo visual em 5 Movimentos.\nAplicação em 72 horas.\n↓ Saiba mais"
+  },
+  "whatsapp_broadcast": [
+    {
+      "id": "msg_lancamento_1",
+      "contexto": "Primeiro contato — anúncio do produto",
+      "mensagem": "Oi! Tudo bem?\n\nQueria te contar sobre algo que criei pra quem trabalha em ótica.\n\nÉ um manual visual chamado Ótica Sem Improviso.\n\nEle tem 5 movimentos práticos pra você sair do atendimento automático e começar a conduzir melhor a venda — no balcão e no WhatsApp.\n\nAplicação em 3 dias. Sem curso longo.\n\nSe quiser dar uma olhada: [LINK]\n\nQualquer dúvida, me chama aqui."
+    },
+    {
+      "id": "msg_lancamento_2",
+      "contexto": "Destaque de oferta",
+      "mensagem": "Só passando pra avisar:\n\nO Ótica Sem Improviso tá com 50% off de lançamento.\n\nManual completo + App + 90 dias de apoio por R$ 48,50.\n\nCompra única, sem assinatura.\n\n[LINK]\n\nSe já viu e ficou com dúvida, pode mandar aqui."
+    },
+    {
+      "id": "msg_prova_social",
+      "contexto": "Após depoimento recebido",
+      "mensagem": "Uma vendedora que usa o método me mandou isso:\n\n\"Antes eu ficava insegura na hora de indicar lente. Depois do manual, passei a fazer as perguntas certas e o cliente percebe que eu sei o que estou fazendo.\"\n\nSe você também quer mais segurança no balcão: [LINK]"
+    },
+    {
+      "id": "msg_lembrete_final",
+      "contexto": "Último lembrete antes de encerrar oferta",
+      "mensagem": "Oi! Último aviso sobre o Ótica Sem Improviso.\n\nSe faz sentido pra você ter um método de atendimento que funciona em 72 horas — sem depender de improviso ou desconto cedo demais — o link tá aqui: [LINK]\n\nR$ 48,50. Compra única.\n\nSe não fizer sentido, sem problema. Só quis garantir que você soubesse."
+    }
+  ],
+  "whatsapp_status": [
+    {
+      "id": "status_dor",
+      "texto": "Se o seu orçamento morre no WhatsApp...\n\nTem um método pra retomar com contexto — sem parecer cobrança.\n\nMe chama que explico."
+    },
+    {
+      "id": "status_metodo",
+      "texto": "5 Movimentos pra atender sem improviso na ótica:\n\n1. Sair do Automático\n2. Ler o Cliente\n3. Indicar com Segurança\n4. Sustentar Valor\n5. WhatsApp que Converte\n\nManual visual. Resultados em 72h."
+    },
+    {
+      "id": "status_oferta",
+      "texto": "Manual + App + 90 dias de apoio\nR$ 48,50 (50% off de lançamento)\n\nPra quem trabalha em ótica e quer parar de atender no improviso.\n\nMe chama ou acessa: [LINK]"
+    }
+  ]
+}

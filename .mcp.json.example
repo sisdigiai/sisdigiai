@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "supabase-digiai-app": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--project-ref=hswyopqvnolqpmprqvzh"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "sbp_SEU_PERSONAL_ACCESS_TOKEN_AQUI"
+      }
+    }
+  }
+}

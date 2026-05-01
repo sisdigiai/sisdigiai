@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "produto": "Ótica Sem Improviso",
+    "descricao": "Índice mestre de todos os arquivos de copy disponíveis para o agent visual",
+    "data": "2026-04-30",
+    "total_arquivos": 10
+  },
+  "arquivos": {
+    "analise": [
+      {
+        "arquivo": "analise_padrao_vs_landing.md",
+        "tipo": "markdown",
+        "conteudo": "Checklist de conformidade da LP vs padrão original. Gaps e ações."
+      }
+    ],
+    "landing_page": [
+      {
+        "arquivo": "copy_landing_page.json",
+        "tipo": "json",
+        "conteudo": "Copy completa da landing page em formato estruturado. Todas as seções, CTAs, textos."
+      },
+      {
+        "arquivo": "copy_landing_page_completa.md",
+        "tipo": "markdown",
+        "conteudo": "Versão legível (humana) da copy da landing page."
+      },
+      {
+        "arquivo": "ajustes_pontuais_lp.md",
+        "tipo": "markdown",
+        "conteudo": "Lista de ajustes antes/depois aplicados na LP."
+      },
+      {
+        "arquivo": "secao_nova_plano_72h.md",
+        "tipo": "markdown",
+        "conteudo": "Documentação da seção Plano de 72h (nova)."
+      }
+    ],
+    "criativos": [
+      {
+        "arquivo": "copy_criativos_ads.json",
+        "tipo": "json",
+        "conteudo": "8 criativos para Meta Ads: dores, solução, autoridade, oferta. Feed + Stories + Reels."
+      },
+      {
+        "arquivo": "copy_stories_carrossel.json",
+        "tipo": "json",
+        "conteudo": "3 carrosséis + 2 sequências de stories com copy slide a slide."
+      },
+      {
+        "arquivo": "copy_video_scripts.json",
+        "tipo": "json",
+        "conteudo": "4 roteiros de vídeo: VSL 2min + 3 Reels/Shorts com timestamps."
+      }
+    ],
+    "canais": [
+      {
+        "arquivo": "copy_email_sequences.json",
+        "tipo": "json",
+        "conteudo": "3 sequências de e-mail: captação (4 emails), pós-compra (4 emails), abandono (2 emails)."
+      },
+      {
+        "arquivo": "copy_whatsapp_bio.json",
+        "tipo": "json",
+        "conteudo": "Bio Instagram (3 opções) + WhatsApp broadcast (4 msgs) + Status (3 textos)."
+      }
+    ],
+    "visual": [
+      {
+        "arquivo": "copy_design_system.json",
+        "tipo": "json",
+        "conteudo": "Design system completo: cores, tipografia, componentes, diretrizes criativas, formatos de peças."
+      },
+      {
+        "arquivo": "copy_pagina_obrigado.json",
+        "tipo": "json",
+        "conteudo": "Thank You Page pós-compra: acessos, plano rápido, suporte."
+      }
+    ]
+  },
+  "instrucoes_agent": {
+    "como_usar": "Cada JSON está estruturado para ser consumido diretamente pelo agent visual. O campo 'meta' contém contexto, tom e objetivo. Os campos de conteúdo trazem texto exato para as peças.",
+    "design_system": "Sempre consulte copy_design_system.json antes de criar qualquer peça. Ele define cores, tipografia, componentes e o que NÃO fazer.",
+    "tom_geral": "Prático, empático, firme (como uma mentora experiente). Sem hype, sem urgência falsa, sem emoji excessivo. Editorial, não panfletário.",
+    "palavras_chave": [
+      "Os 5 Movimentos",
+      "72 horas",
+      "Pare de atender no improviso",
+      "Sem curso longo",
+      "Método visual",
+      "Balcão e WhatsApp",
+      "Sustentar valor",
+      "Tatiana Camargo"
+    ]
+  }
+}

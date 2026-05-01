@@ -1,0 +1,58 @@
+{
+  "meta": {
+    "produto": "Ótica Sem Improviso",
+    "objetivo": "Página de Obrigado (Thank You Page) pós-compra",
+    "tom": "Acolhedor, direto, orientador. Próximo passo claro.",
+    "data": "2026-04-30"
+  },
+  "pagina": {
+    "titulo": "Compra confirmada. Seu método está pronto.",
+    "subtitulo": "Obrigado por escolher parar de atender no improviso.",
+    "mensagem": "Em instantes você recebe o e-mail com os acessos. Enquanto isso, aqui está seu plano de ação.",
+    "plano_rapido": {
+      "titulo": "Seus próximos 72 horas",
+      "passos": [
+        {
+          "dia": "Hoje",
+          "acao": "Baixe o PDF e abra o app. Leia os Movimentos 1 e 2.",
+          "icone": "Download"
+        },
+        {
+          "dia": "Amanhã",
+          "acao": "Aplique o Movimento 3 no primeiro atendimento do dia.",
+          "icone": "Target"
+        },
+        {
+          "dia": "Dia 3",
+          "acao": "Use os scripts de WhatsApp para retomar 3 orçamentos parados.",
+          "icone": "MessageCircle"
+        }
+      ]
+    },
+    "acessos": {
+      "titulo": "Seus acessos",
+      "itens": [
+        {
+          "label": "Manual em PDF",
+          "descricao": "Baixe, imprima, use como material da loja.",
+          "link_placeholder": "[LINK_PDF]"
+        },
+        {
+          "label": "App leitor",
+          "descricao": "Estude pelo celular, navegue por módulos.",
+          "link_placeholder": "[LINK_APP]"
+        },
+        {
+          "label": "Nexus (90 dias)",
+          "descricao": "Apoio complementar para manter o método vivo.",
+          "link_placeholder": "[LINK_NEXUS]"
+        }
+      ]
+    },
+    "citacao": {
+      "texto": "Você não precisa parecer ensaiado. Precisa ler melhor, perguntar melhor e conduzir melhor.",
+      "autor": "Tatiana Camargo"
+    },
+    "suporte": "Algum problema com o acesso? Fale com o suporte: [LINK_WHATSAPP]"
+  }
+}

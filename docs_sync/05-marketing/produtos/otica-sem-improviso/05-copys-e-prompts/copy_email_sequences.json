@@ -1,0 +1,102 @@
+{
+  "meta": {
+    "produto": "Ótica Sem Improviso",
+    "objetivo": "Sequências de e-mail para captação, nutrição e conversão",
+    "tom": "Direto, empático, mentora experiente. Sem hype, sem urgência falsa.",
+    "data": "2026-04-30"
+  },
+  "sequencias": [
+    {
+      "id": "seq_captacao",
+      "nome": "Sequência de Captação (Lead → Venda)",
+      "gatilho": "Lead entrou pela LP mas não comprou",
+      "emails": [
+        {
+          "dia": 0,
+          "assunto": "Você atende no improviso?",
+          "preview": "Se a resposta for 'às vezes sim'... leia isso.",
+          "corpo": "Oi, [Nome].\n\nSe você trabalha em ótica e já teve aquele momento em que o cliente pergunta preço, você trava, e acaba dando desconto por falta de argumento...\n\n...você não está sozinho(a).\n\nIsso tem nome: atender no improviso.\n\nE tem solução: um método visual em 5 movimentos que você aplica em 72 horas.\n\nSem curso longo. Sem plataforma. Um manual direto ao ponto.\n\nSe quiser saber mais: [LINK LP]",
+          "cta": "Ver o método"
+        },
+        {
+          "dia": 1,
+          "assunto": "O problema não é falta de boa vontade",
+          "preview": "Muita venda se perde antes do preço.",
+          "corpo": "Oi, [Nome].\n\nMuita venda não se perde porque o produto é ruim.\n\nEla se perde porque:\n- A conversa começa solta\n- A indicação não fica clara\n- O valor aparece antes do cliente entender por que aquela escolha faz sentido\n\nO Ótica Sem Improviso resolve isso com Os 5 Movimentos:\n\n1. Sair do Automático\n2. Ler o Cliente\n3. Indicar com Segurança\n4. Sustentar Valor\n5. WhatsApp que Converte\n\nVocê aplica em 3 dias. Resultados em 72 horas.\n\n[LINK LP]",
+          "cta": "Quero parar de atender no improviso"
+        },
+        {
+          "dia": 3,
+          "assunto": "Quem criou esse método vive o balcão há 40+ anos",
+          "preview": "Tatiana Camargo revisou cada página.",
+          "corpo": "Oi, [Nome].\n\nO Ótica Sem Improviso não foi criado por um guru de marketing.\n\nFoi revisado e validado por Tatiana Camargo — mais de 4 décadas de experiência real no balcão de óticas.\n\nCada página passou pelo crivo de quem já enfrentou:\n- Cliente que só quer preço\n- Objeção que trava a venda\n- Orçamento que morre no WhatsApp\n\nÉ método validado no balcão real.\n\n\"Você não precisa parecer ensaiado. Precisa ler melhor, perguntar melhor e conduzir melhor.\" — Taty\n\n[LINK LP]",
+          "cta": "Ver o manual"
+        },
+        {
+          "dia": 5,
+          "assunto": "R$ 48,50 para sair do improviso em 3 dias",
+          "preview": "Oferta de lançamento com 50% off.",
+          "corpo": "Oi, [Nome].\n\nÚltimo e-mail sobre isso.\n\nO Ótica Sem Improviso está em oferta de lançamento:\n\n- Manual visual completo (Os 5 Movimentos)\n- PDF para imprimir + App para celular\n- 90 dias de apoio na Nexus\n- Plano de ação de 72 horas\n\nDe R$ 97 por R$ 48,50 (50% off).\n\nCompra única. Sem assinatura.\n\nSe faz sentido pra você: [LINK CHECKOUT]\n\nSe não faz, sem problema. Só quis garantir que você soubesse que existe.",
+          "cta": "Aproveitar 50% off"
+        }
+      ]
+    },
+    {
+      "id": "seq_pos_compra",
+      "nome": "Sequência Pós-Compra (Onboarding)",
+      "gatilho": "Compra confirmada",
+      "emails": [
+        {
+          "dia": 0,
+          "assunto": "Seu manual chegou. Começa aqui.",
+          "preview": "PDF + App + seu plano de 72 horas.",
+          "corpo": "Oi, [Nome]!\n\nSua compra foi confirmada. Bem-vindo(a) ao Ótica Sem Improviso.\n\nAqui está o que você recebe agora:\n\n1. PDF do manual — [LINK DOWNLOAD]\n2. App leitor — [LINK APP]\n3. Nexus (apoio 90 dias) — [LINK NEXUS]\n\nSeu plano de ação:\n\nDIA 1 (hoje): Leia os Movimentos 1 e 2. Faça o diagnóstico.\nDIA 2 (amanhã): Aplique o Movimento 3 no balcão.\nDIA 3: Adapte os scripts de WhatsApp.\n\nEm 72 horas, você sai do improviso.\n\nQualquer dúvida, responda este e-mail.",
+          "cta": "Acessar o manual"
+        },
+        {
+          "dia": 1,
+          "assunto": "Dia 2: hora de aplicar no balcão",
+          "preview": "Movimento 3 — Indicar com Segurança.",
+          "corpo": "Oi, [Nome].\n\nSe ontem você leu os Movimentos 1 e 2 e fez o diagnóstico, hoje é o dia de aplicar.\n\nMovimento 3: Indicar com Segurança\n\nNo seu próximo atendimento:\n- Use o perfil do cliente para escolher a indicação\n- Traduza o termo técnico em benefício\n- Transmita critério, não insegurança\n\nMovimento 4: Sustentar Valor\n- Escolha 2 respostas para objeções comuns\n- Pratique sustentando valor ANTES de falar preço\n\nAmanhã: WhatsApp.\n\nVocê está no caminho.",
+          "cta": "Revisar no app"
+        },
+        {
+          "dia": 2,
+          "assunto": "Dia 3: retome 3 conversas no WhatsApp",
+          "preview": "Scripts prontos para adaptar.",
+          "corpo": "Oi, [Nome].\n\nHoje é o último dia do plano de 72 horas.\n\nMovimento 5: WhatsApp que Converte\n\n1. Abra 3 orçamentos parados\n2. Use os scripts do manual (adapte com o nome do cliente)\n3. Retome com contexto — não com cobrança\n\nDepois de hoje, você terá aplicado Os 5 Movimentos na prática.\n\nSe precisar de apoio, a Nexus está lá pra isso.\n\nBom fechamento.",
+          "cta": "Acessar scripts"
+        },
+        {
+          "dia": 7,
+          "assunto": "Como foram seus primeiros 7 dias?",
+          "preview": "Checklist rápido de evolução.",
+          "corpo": "Oi, [Nome].\n\nFaz uma semana que você tem o Ótica Sem Improviso.\n\nChecklist rápido:\n\n✓ Leu os 5 Movimentos?\n✓ Aplicou pelo menos 1 no balcão?\n✓ Retomou conversas no WhatsApp?\n✓ Usou a Nexus para tirar alguma dúvida?\n\nSe marcou pelo menos 2: você já está à frente de quem ainda atende no improviso.\n\nSe ainda não começou: sem julgamento. O material é seu. Comece quando fizer sentido.\n\nEstamos aqui.",
+          "cta": "Revisar no app"
+        }
+      ]
+    },
+    {
+      "id": "seq_abandono_checkout",
+      "nome": "Abandono de Checkout",
+      "gatilho": "Iniciou checkout mas não finalizou",
+      "emails": [
+        {
+          "dia": 0,
+          "delay_horas": 1,
+          "assunto": "Você estava quase lá",
+          "preview": "Seu acesso ao manual ficou pendente.",
+          "corpo": "Oi, [Nome].\n\nVi que você começou a compra do Ótica Sem Improviso mas não finalizou.\n\nSem pressão — só queria garantir que não foi um problema técnico.\n\nSe quiser continuar: [LINK CHECKOUT]\n\nSe tiver alguma dúvida antes de decidir, pode responder este e-mail.\n\nO manual + app + 90 dias de Nexus continuam a R$ 48,50 (50% off de lançamento).",
+          "cta": "Finalizar compra"
+        },
+        {
+          "dia": 1,
+          "assunto": "Uma dúvida comum antes de comprar",
+          "preview": "Isso é curso? Plataforma? Assinatura?",
+          "corpo": "Oi, [Nome].\n\nA dúvida mais comum de quem chega até a compra e para:\n\n\"Isso é mais um curso?\" — Não. É um manual visual direto ao ponto.\n\"Tem assinatura?\" — Não. Compra única.\n\"A Nexus é obrigatória?\" — Não. É complemento por 90 dias. O manual é seu para sempre.\n\nSe fizer sentido: [LINK CHECKOUT]\n\nR$ 48,50. Os 5 Movimentos. Resultados em 72 horas.",
+          "cta": "Quero parar de atender no improviso"
+        }
+      ]
+    }
+  ]
+}

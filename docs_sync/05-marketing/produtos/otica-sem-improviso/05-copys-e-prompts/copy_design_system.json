@@ -1,0 +1,129 @@
+{
+  "meta": {
+    "produto": "Ótica Sem Improviso",
+    "objetivo": "Design system e diretrizes visuais para o agent criar peças",
+    "data": "2026-04-30"
+  },
+  "identidade_visual": {
+    "nome_produto": "Ótica Sem Improviso",
+    "metodologia": "Os 5 Movimentos",
+    "tagline": "Pare de atender no improviso na ótica."
+  },
+  "cores": {
+    "primarias": {
+      "accent": "#406863",
+      "accent_dark": "#2D4A47",
+      "warm_50": "#FDFBF7",
+      "warm_100": "#F7F3ED",
+      "warm_200": "#E8E2D9",
+      "warm_800": "#1A1814"
+    },
+    "modulos": {
+      "movimento_1_sair_automatico": "#9E8632",
+      "movimento_2_ler_cliente": "#3A7D5C",
+      "movimento_3_indicar_seguranca": "#C86D58",
+      "movimento_4_sustentar_valor": "#2C5A7E",
+      "movimento_5_whatsapp_converte": "#128C7E"
+    },
+    "uso": {
+      "fundo_principal": "warm_50 (#FDFBF7)",
+      "fundo_cards": "white com borda warm_200",
+      "fundo_destaque": "warm_100 (#F7F3ED)",
+      "fundo_escuro": "warm_800 (#1A1814) para seção de oferta",
+      "texto_principal": "warm_600",
+      "texto_titulo": "warm_800",
+      "texto_sutil": "warm_400",
+      "cta_fundo": "accent (#406863)",
+      "cta_texto": "white"
+    }
+  },
+  "tipografia": {
+    "display": {
+      "familia": "Caladea",
+      "tipo": "Serif",
+      "uso": "Headlines, títulos de seção, nomes de módulos"
+    },
+    "body": {
+      "familia": "Lato",
+      "tipo": "Sans-serif",
+      "uso": "Corpo de texto, descrições, CTAs"
+    },
+    "hierarquia": {
+      "h1": "Caladea Bold, 60-72px, leading 1.05",
+      "h2": "Caladea Bold, 36-40px, leading tight",
+      "h3": "Caladea Bold, 24-28px",
+      "eyebrow": "Lato Bold, 12px, uppercase, tracking 0.2em, cor accent",
+      "body": "Lato Light, 18px, leading relaxed",
+      "body_sm": "Lato Regular, 14px, leading relaxed",
+      "cta": "Lato Bold, 14px, uppercase, tracking widest"
+    }
+  },
+  "componentes": {
+    "cards": {
+      "borda": "1px solid warm_200",
+      "radius": "12px (xl) ou 16px (2xl)",
+      "padding": "24-40px",
+      "sombra": "shadow-sm (sutil)"
+    },
+    "badges": {
+      "fundo": "warm_100",
+      "borda": "1px solid warm_200",
+      "texto": "warm_500",
+      "radius": "full (pill)",
+      "padding": "6px 12px"
+    },
+    "botoes_cta": {
+      "primario": {
+        "fundo": "accent",
+        "texto": "white",
+        "hover": "accent_dark",
+        "padding": "16px 32px",
+        "radius": "6px (md)",
+        "estilo_texto": "uppercase, bold, tracking widest"
+      },
+      "secundario": {
+        "fundo": "transparent",
+        "borda": "1px solid warm_200",
+        "texto": "warm_600",
+        "hover_borda": "accent/40",
+        "hover_texto": "accent"
+      }
+    },
+    "modulo_card": {
+      "barra_topo": "4px height, cor do módulo, full width",
+      "badge_numero": "fundo = cor do módulo, texto branco, bold, 12px",
+      "layout": "vertical stack"
+    }
+  },
+  "diretrizes_criativas": {
+    "estilo_geral": "Editorial, limpo, profissional. Nada genérico ou 'marketeiro'.",
+    "fotografias": "Se usar foto, preferir contexto real de ótica. Evitar stock genérico.",
+    "icones": "Lucide React (outline style). Tamanho: 16-24px.",
+    "animacoes": "Fade-in on scroll (Framer Motion). Sutis, não exageradas.",
+    "espacamento": "Generoso. Seções com py-16 (mobile) a py-24 (desktop).",
+    "nao_usar": [
+      "Fotos genéricas de banco de imagem",
+      "Gradientes chamativos",
+      "Emojis no texto principal",
+      "Urgência falsa (últimas vagas, timer fake)",
+      "Linguagem de guru ou coach",
+      "Cores neon ou muito saturadas"
+    ],
+    "preferir": [
+      "Tipografia como elemento visual",
+      "Espaço em branco",
+      "Hierarquia visual clara",
+      "Cores do sistema de módulos para diferenciação",
+      "Cards com bordas sutis",
+      "Tom editorial (como revista, não como panfleto)"
+    ]
+  },
+  "formatos_pecas": {
+    "feed_instagram": "1080x1080 (1:1)",
+    "stories_reels": "1080x1920 (9:16)",
+    "feed_vertical": "1080x1350 (4:5)",
+    "banner_email": "600px width, max",
+    "thumbnail_youtube": "1280x720 (16:9)",
+    "og_image": "1200x630"
+  }
+}

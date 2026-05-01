@@ -1,0 +1,451 @@
+{
+  "meta": {
+    "produto": "Ótica Sem Improviso",
+    "tipo": "Landing Page de Conversão",
+    "ticket": "R$ 48,50 (50% off de R$ 97)",
+    "tom": "Prático, empático, firme (mentora experiente), focado em segurança comercial",
+    "metodologia": "Os 5 Movimentos",
+    "autoridade": "Tatiana Camargo — mais de 4 décadas no balcão",
+    "versao": "2.0-alinhada-padrao",
+    "data": "2026-04-30"
+  },
+  "secoes": [
+    {
+      "id": "navbar",
+      "tipo": "navegacao",
+      "elementos": {
+        "logo": "Ótica Sem Improviso",
+        "cta": "Quero parar de atender no improviso",
+        "cta_link": "#oferta"
+      }
+    },
+    {
+      "id": "hero",
+      "tipo": "hero",
+      "elementos": {
+        "badges": [
+          "PDF para imprimir",
+          "App para estudar",
+          "Resultados em 72 horas"
+        ],
+        "eyebrow": "Manual Visual para Óticas",
+        "headline": "Pare de atender no improviso na ótica.",
+        "sub_headline": "Saia do modo vendedor automático e vire o especialista que o cliente respeita — com um método visual que você aplica em 3 dias e sustenta valor sem depender de desconto.",
+        "cta_primario": {
+          "texto": "Quero parar de atender no improviso",
+          "link": "#oferta"
+        },
+        "cta_secundario": {
+          "texto": "Ver o que recebo",
+          "link": "#conteudo"
+        },
+        "nota_confianca": "Compra segura via Hotmart ou Kiwify.",
+        "card_hero": {
+          "titulo": "O que você recebe",
+          "itens": [
+            {
+              "icone": "FileText",
+              "titulo": "Manual em PDF",
+              "descricao": "Para baixar, imprimir, consultar e usar como material de treinamento."
+            },
+            {
+              "icone": "Smartphone",
+              "titulo": "App leitor",
+              "descricao": "Para estudar no celular, navegar por módulos e revisar no dia a dia."
+            },
+            {
+              "icone": "Target",
+              "titulo": "Os 5 Movimentos",
+              "descricao": "Método completo: atendimento, leitura, indicação, objeções e WhatsApp."
+            },
+            {
+              "icone": "ShieldCheck",
+              "titulo": "90 dias de Nexus",
+              "descricao": "Apoio complementar para manter o método vivo na rotina."
+            }
+          ],
+          "fechamento": "O mesmo conteúdo, do jeito que funcionar melhor para você."
+        }
+      }
+    },
+    {
+      "id": "video",
+      "tipo": "video",
+      "elementos": {
+        "eyebrow": "Veja em 2 minutos",
+        "titulo": "Entenda o que é o Ótica Sem Improviso.",
+        "plataforma": "YouTube",
+        "formato": "Vertical (9:16 - Short)"
+      }
+    },
+    {
+      "id": "dores",
+      "tipo": "identificacao",
+      "elementos": {
+        "titulo": "O problema não é falta de boa vontade.",
+        "descricao": "Muita venda não se perde porque o produto é ruim. Ela se perde porque a conversa começa solta, a indicação não fica clara e o valor aparece antes do cliente entender por que aquela escolha faz sentido.",
+        "dores": [
+          "Cliente que só pergunta preço antes de entender o valor.",
+          "Atendimento que começa sem direção e fica solto até o fim.",
+          "Indicação insegura que enfraquece a recomendação.",
+          "Insegurança ao explicar lentes técnicas — antirreflexo, bluecut, multifocal — sem travar.",
+          "Desconto usado cedo demais por falta de argumento.",
+          "Orçamento que morre no WhatsApp sem retomada.",
+          "Sensação de que todo atendimento é no piloto automático, sem método."
+        ]
+      }
+    },
+    {
+      "id": "transformacao",
+      "tipo": "beneficios",
+      "elementos": {
+        "eyebrow": "O que muda na prática",
+        "titulo": "Em 3 dias, você reorganiza sua forma de atender.",
+        "subtitulo": "Sem teoria longa. Sem promessa inflada. Aplicação direta na rotina.",
+        "beneficios": [
+          "Começar conversas com mais direção e presença.",
+          "Perguntar melhor antes de indicar qualquer produto.",
+          "Traduzir termos técnicos em linguagem que o cliente entende.",
+          "Sustentar valor antes de falar de preço.",
+          "Responder objeções sem se encolher ou correr para desconto.",
+          "Retomar conversas no WhatsApp com contexto, não com cobrança."
+        ]
+      }
+    },
+    {
+      "id": "plano_72h",
+      "tipo": "jornada",
+      "elementos": {
+        "eyebrow": "Jornada de evolução",
+        "titulo": "Em 3 dias, você sai do improviso.",
+        "subtitulo": "Não é curso de semanas. É aplicação real na sua próxima segunda-feira.",
+        "dias": [
+          {
+            "dia": 1,
+            "titulo": "Diagnóstico e Base",
+            "foco": "Entender onde você está e absorver os fundamentos.",
+            "tarefas": [
+              "Faça o diagnóstico rápido do seu atendimento atual",
+              "Leia os Movimentos 1 e 2 (Sair do Automático + Ler o Cliente)",
+              "Identifique seus 3 maiores gaps no balcão"
+            ],
+            "resultado": "Você sabe exatamente o que precisa mudar."
+          },
+          {
+            "dia": 2,
+            "titulo": "Indicação e Argumentação",
+            "foco": "Aplicar no atendimento real.",
+            "tarefas": [
+              "Aplique o Movimento 3 (Indicar com Segurança) no próximo atendimento",
+              "Estude o Movimento 4 (Sustentar Valor) e escolha 2 respostas para objeções",
+              "Treine a tradução de termos técnicos em linguagem de cliente"
+            ],
+            "resultado": "Você indica com mais critério e sustenta valor sem dar desconto cedo."
+          },
+          {
+            "dia": 3,
+            "titulo": "WhatsApp e Consolidação",
+            "foco": "Recuperar vendas e consolidar o método.",
+            "tarefas": [
+              "Adapte os scripts do Movimento 5 para seus orçamentos parados",
+              "Retome pelo menos 3 conversas no WhatsApp com o novo modelo",
+              "Revise seus resultados e ajuste o que precisar"
+            ],
+            "resultado": "Você retoma conversas paradas com método — sem parecer cobrança."
+          }
+        ],
+        "fechamento": "Ao final de 72 horas, você não vai ser outro profissional. Vai ser o mesmo — com método, clareza e segurança para conduzir a venda sem improviso."
+      }
+    },
+    {
+      "id": "o_que_e",
+      "tipo": "explicacao",
+      "elementos": {
+        "titulo": "Não é curso longo. Não é plataforma. É um manual visual direto ao ponto.",
+        "corpo": "Ótica Sem Improviso não é um curso longo nem uma plataforma vendida separadamente. É um manual visual criado para consulta e aplicação na rotina da ótica. O conteúdo é entregue em dois formatos: PDF para baixar e imprimir e app leitor para estudar no celular. O método se chama Os 5 Movimentos — e você aplica em 72 horas."
+      }
+    },
+    {
+      "id": "entrega",
+      "tipo": "lista_entrega",
+      "elementos": {
+        "eyebrow": "O que você recebe",
+        "titulo": "Tudo isso numa compra única.",
+        "subtitulo": "Sem assinatura obrigatória. Sem surpresa. Você compra uma vez e recebe acesso completo.",
+        "itens": [
+          "Manual visual completo (Os 5 Movimentos)",
+          "Versão PDF para baixar e imprimir",
+          "Acesso ao app leitor para celular e desktop",
+          "Os 5 Movimentos — método completo de aplicação",
+          "Diagnóstico rápido de atendimento",
+          "Scripts de WhatsApp prontos para adaptar",
+          "Respostas-base para objeções comuns",
+          "Plano de ação de 72 horas",
+          "90 dias de apoio complementar na Nexus"
+        ]
+      }
+    },
+    {
+      "id": "dois_formatos",
+      "tipo": "comparativo",
+      "elementos": {
+        "eyebrow": "Dois formatos, mesmo conteúdo",
+        "titulo": "O mesmo manual, do jeito que funcionar melhor para você.",
+        "subtitulo": "Impresso no balcão ou no celular entre atendimentos. Você escolhe como usar.",
+        "formatos": [
+          {
+            "nome": "PDF",
+            "icone": "Printer",
+            "descricao": "O formato ideal para quem quer ter o material na mão, na loja ou no treinamento.",
+            "vantagens": [
+              "Ideal para imprimir",
+              "Consultar offline",
+              "Guardar como material da loja",
+              "Usar em treinamento interno"
+            ]
+          },
+          {
+            "nome": "App leitor",
+            "icone": "Smartphone",
+            "descricao": "O formato ideal para estudar no celular e voltar rapidamente aos módulos.",
+            "vantagens": [
+              "Ideal para celular e desktop",
+              "Leitura por módulos",
+              "Revisão mais rápida",
+              "Experiência mais confortável"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "modulos",
+      "tipo": "metodologia",
+      "elementos": {
+        "eyebrow": "Os 5 Movimentos",
+        "titulo": "5 movimentos práticos para balcão e WhatsApp.",
+        "subtitulo": "Cada módulo foi desenhado para resolver um problema específico da rotina da ótica.",
+        "movimentos": [
+          {
+            "numero": 1,
+            "nome": "Sair do Automático",
+            "descricao": "Saída do modo repetitivo para um atendimento com mais presença, leitura e intenção.",
+            "cor": "#9E8632"
+          },
+          {
+            "numero": 2,
+            "nome": "Ler o Cliente",
+            "descricao": "Perguntas mais úteis, perfis diferentes e condução personalizada sem perder identidade.",
+            "cor": "#3A7D5C"
+          },
+          {
+            "numero": 3,
+            "nome": "Indicar com Segurança",
+            "descricao": "Indicar sem travar, traduzir melhor a fala e transmitir critério na recomendação.",
+            "cor": "#C86D58"
+          },
+          {
+            "numero": 4,
+            "nome": "Sustentar Valor",
+            "descricao": "Defesa de valor antes do preço, respostas para objeções e fim do reflexo de desconto.",
+            "cor": "#2C5A7E"
+          },
+          {
+            "numero": 5,
+            "nome": "WhatsApp que Converte",
+            "descricao": "Retomada com contexto, reagendamento e mensagens que conduzem sem parecer cobrança.",
+            "cor": "#128C7E"
+          }
+        ]
+      }
+    },
+    {
+      "id": "depoimentos",
+      "tipo": "prova_social",
+      "elementos": {
+        "eyebrow": "Quem já usa na prática",
+        "titulo": "O que muda quando o atendimento deixa de ser no improviso.",
+        "subtitulo": "Profissionais reais, resultados reais. Veja o que mudou para quem aplicou o método.",
+        "depoimentos": [
+          {
+            "nome": "[Nome real]",
+            "cargo": "Vendedora há 6 anos",
+            "destaque": "Indicação com mais segurança",
+            "texto": "Antes eu ficava insegura na hora de indicar lente. Depois do manual, passei a fazer as perguntas certas e o cliente percebe que eu sei o que estou fazendo."
+          },
+          {
+            "nome": "[Nome real]",
+            "cargo": "Consultor óptico",
+            "destaque": "Recuperação no WhatsApp",
+            "texto": "O módulo de WhatsApp mudou meu jogo. Eu perdia quase todo orçamento enviado. Agora retomo com contexto e fecho muito mais."
+          },
+          {
+            "nome": "[Nome real]",
+            "cargo": "Gerente de ótica",
+            "destaque": "Treinamento da equipe",
+            "texto": "Usei como material de treinamento para a equipe inteira. Em uma semana, o atendimento ficou mais uniforme e profissional."
+          },
+          {
+            "nome": "[Nome real]",
+            "cargo": "Atendente de balcão",
+            "destaque": "Menos desconto, mais valor",
+            "texto": "Antes eu dava desconto logo no começo porque não sabia sustentar o valor. Agora consigo explicar melhor e o cliente entende por que vale a pena."
+          }
+        ],
+        "cta": "Quero parar de atender no improviso"
+      }
+    },
+    {
+      "id": "autoridade",
+      "tipo": "autoridade",
+      "elementos": {
+        "eyebrow": "Construído com quem vive o balcão",
+        "nome": "Tatiana Camargo",
+        "bio": "Tatiana Camargo construiu sua força no atendimento ao longo de mais de 4 décadas de experiência real no balcão de óticas — unindo leitura de pessoas, anamnese comercial e condução segura de conversa. Ela revisou cada página deste manual para garantir que funcione na vida real — no balcão, com cliente real, objeção real e decisão real.",
+        "contribuicoes": [
+          "Leitura mais humana do cliente",
+          "Perguntas que destravam a conversa",
+          "Anamnese comercial mais útil",
+          "Condução com mais firmeza e naturalidade"
+        ],
+        "citacao": "Você não precisa parecer ensaiado. Precisa ler melhor, perguntar melhor e conduzir melhor.",
+        "imagem": "/images/taty.png"
+      }
+    },
+    {
+      "id": "nexus",
+      "tipo": "complemento",
+      "elementos": {
+        "eyebrow": "Apoio complementar",
+        "titulo": "Nexus por 90 dias: para manter o método vivo.",
+        "descricao": "Depois da compra, você também conta com 90 dias de apoio complementar na Nexus para revisar, aplicar e manter o método vivo na rotina. A Nexus não substitui o manual. Ela ajuda você a continuar usando melhor o que aprendeu.",
+        "features": [
+          {
+            "icone": "BookOpen",
+            "titulo": "Revisão guiada",
+            "descricao": "Resumos inteligentes do manual para consultar rapidamente."
+          },
+          {
+            "icone": "LayoutGrid",
+            "titulo": "Consulta por situação",
+            "descricao": "Ache o script certo pelo problema que está enfrentando."
+          },
+          {
+            "icone": "Clock",
+            "titulo": "Aplicação contínua",
+            "descricao": "Manter o que aprendeu ativo na rotina, não só na leitura."
+          }
+        ],
+        "nota": "A Nexus é complemento, não produto principal. Após os 90 dias, você decide se quer continuar. O manual PDF e o app continuam seus para sempre."
+      }
+    },
+    {
+      "id": "audiencia",
+      "tipo": "filtro",
+      "elementos": {
+        "para_quem_e": [
+          "Vendedor de ótica que quer ganhar segurança no atendimento.",
+          "Atendente que responde no WhatsApp e sente a conversa esfriar.",
+          "Consultor óptico que quer evoluir de forma prática.",
+          "Gestor que quer treinar a equipe com material objetivo.",
+          "Profissional que atende no balcão e no WhatsApp."
+        ],
+        "para_quem_nao_e": [
+          "Quem busca curso longo e teórico com pouca aplicação.",
+          "Quem procura uma plataforma como produto principal.",
+          "Quem não pretende aplicar nada na rotina de atendimento.",
+          "Quem acha que o problema da loja é só preço e não atendimento."
+        ]
+      }
+    },
+    {
+      "id": "oferta",
+      "tipo": "oferta",
+      "elementos": {
+        "eyebrow": "Oferta de lançamento",
+        "titulo": "Ótica Sem Improviso",
+        "subtitulo": "Manual Visual de Atendimento e Conversão para Óticas",
+        "nota": "PDF para imprimir + App para estudar + 90 dias de Nexus",
+        "preco_original": "R$ 97,00",
+        "desconto": "50% off",
+        "preco_final": "R$ 48,50",
+        "bullets": [
+          "Aplicação em 3 dias (Os 5 Movimentos)",
+          "PDF + App",
+          "90 dias de Nexus"
+        ],
+        "suporte": "Dúvidas? Fale com o suporte.",
+        "cta": "Quero parar de atender no improviso",
+        "nota_checkout": "O pagamento acontece no marketplace. O manual e o acesso são liberados após a confirmação."
+      }
+    },
+    {
+      "id": "faq",
+      "tipo": "faq",
+      "elementos": {
+        "titulo": "Perguntas frequentes",
+        "perguntas": [
+          {
+            "pergunta": "Isso é PDF, app ou curso?",
+            "resposta": "É um manual visual entregue em dois formatos: PDF para baixar e imprimir, e app leitor para estudar pelo celular."
+          },
+          {
+            "pergunta": "O conteúdo do PDF e do app é o mesmo?",
+            "resposta": "Sim. O conteúdo central é o mesmo. O que muda é a forma de uso: o PDF é melhor para imprimir e consultar; o app é melhor para estudar no celular e navegar por módulos."
+          },
+          {
+            "pergunta": "Posso imprimir?",
+            "resposta": "Sim. O PDF foi pensado para baixar, guardar e imprimir."
+          },
+          {
+            "pergunta": "Funciona no celular?",
+            "resposta": "Sim. O app leitor foi pensado para uso em celular e desktop."
+          },
+          {
+            "pergunta": "O que é a Nexus?",
+            "resposta": "A Nexus é um apoio complementar por 90 dias para revisar e aplicar melhor o conteúdo do manual."
+          },
+          {
+            "pergunta": "E depois dos 90 dias?",
+            "resposta": "Após 90 dias, você decide se quer continuar. O manual PDF e o app continuam seus para sempre."
+          },
+          {
+            "pergunta": "A Nexus é o produto principal?",
+            "resposta": "Não. O produto principal é o manual Ótica Sem Improviso (Os 5 Movimentos). A Nexus entra como continuidade complementar."
+          },
+          {
+            "pergunta": "Onde a compra acontece?",
+            "resposta": "A compra acontece pela Hotmart ou Kiwify. Após a aprovação, você recebe as instruções de acesso."
+          },
+          {
+            "pergunta": "Serve para quem já atende há anos?",
+            "resposta": "Sim. O material ajuda tanto quem está formando base quanto quem já atende, mas quer mais segurança em objeções, condução e WhatsApp."
+          },
+          {
+            "pergunta": "O que são Os 5 Movimentos?",
+            "resposta": "São os 5 pilares do método: Sair do Automático, Ler o Cliente, Indicar com Segurança, Sustentar Valor e WhatsApp que Converte. Você aplica em 72 horas."
+          }
+        ]
+      }
+    },
+    {
+      "id": "cta_final",
+      "tipo": "fechamento",
+      "elementos": {
+        "headline": "Você pode continuar no improviso.",
+        "headline_destaque": "Ou virar o especialista que conduz a venda.",
+        "descricao": "Em 3 dias, você organiza sua forma de atender, indicar e responder no WhatsApp com mais segurança — sem depender de improviso ou desconto cedo demais. O método são Os 5 Movimentos. O resultado é em 72 horas.",
+        "cta": "Quero parar de atender no improviso"
+      }
+    },
+    {
+      "id": "footer",
+      "tipo": "rodape",
+      "elementos": {
+        "logo": "Ótica Sem Improviso",
+        "copyright": "© 2026 DIGIAI Tech Holding. Todos os direitos reservados.",
+        "links": ["Termos", "Privacidade"]
+      }
+    }
+  ]
+}
