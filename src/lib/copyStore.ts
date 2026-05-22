@@ -28,6 +28,11 @@ export type CopyContent = {
   [key: string]: unknown;
 };
 
+export type CopyImage = {
+  url: string;
+  path: string;
+};
+
 export type CopyAsset = {
   id: string;
   category: CopyCategory;
@@ -36,6 +41,7 @@ export type CopyAsset = {
   angulo?: string;
   content: CopyContent;
   status: CopyStatus;
+  images: CopyImage[];
   image_url: string | null;
   image_path: string | null;
   source_file: string;
@@ -44,6 +50,15 @@ export type CopyAsset = {
   created_at: string;
   updated_at: string;
 };
+
+export const MULTI_IMAGE_CATEGORIES: ReadonlySet<CopyCategory> = new Set([
+  'stories_carrossel',
+  'ads',
+]);
+
+export function supportsMultipleImages(category: CopyCategory): boolean {
+  return MULTI_IMAGE_CATEGORIES.has(category);
+}
 
 export type CopyWorkspace = {
   version: 1;
@@ -91,6 +106,17 @@ function readLocal(): CopyWorkspace {
     if (!raw) return createEmpty();
     const parsed = JSON.parse(raw) as CopyWorkspace;
     if (!parsed.assets) return createEmpty();
+    // Migra assets que não têm images[] (workspaces antigos do localStorage)
+    let mutated = false;
+    for (const a of parsed.assets) {
+      if (!Array.isArray(a.images)) {
+        a.images = a.image_url && a.image_path
+          ? [{ url: a.image_url, path: a.image_path }]
+          : [];
+        mutated = true;
+      }
+    }
+    if (mutated) writeLocal(parsed);
     return parsed;
   } catch {
     return createEmpty();
@@ -103,6 +129,15 @@ function writeLocal(data: CopyWorkspace): void {
 
 function createEmpty(): CopyWorkspace {
   return { version: 1, updated_at: now(), assets: [], seeded: false };
+}
+
+async function syncAssetImagesToRemote(asset: CopyAsset): Promise<void> {
+  if (!isSupabaseReady()) return;
+  const { error } = await supabase
+    .from('v_copy_assets')
+    .update({ images: asset.images, updated_at: asset.updated_at })
+    .eq('source_id', asset.id);
+  if (error) console.warn('[copyStore] sync images failed:', error.message);
 }
 
 /* ─── Store ─── */
@@ -161,11 +196,12 @@ export const copyStore = {
     }
 
     const ext = file.name.split('.').pop() || 'webp';
-    const path = `${asset.category}/${assetId}-${Date.now()}.${ext}`;
+    const rand = Math.random().toString(36).slice(2, 8);
+    const path = `${asset.category}/${assetId}-${Date.now()}-${rand}.${ext}`;
 
     const { error: uploadError } = await supabase.storage
       .from(STORAGE_BUCKET)
-      .upload(path, file, { upsert: true, contentType: file.type });
+      .upload(path, file, { upsert: false, contentType: file.type });
 
     if (uploadError) {
       console.error('[copyStore] upload failed:', uploadError.message);
@@ -173,37 +209,75 @@ export const copyStore = {
     }
 
     const { data: urlData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+    const newImage: CopyImage = { url: urlData.publicUrl, path };
 
-    asset.image_url = urlData.publicUrl;
-    asset.image_path = path;
+    if (supportsMultipleImages(asset.category)) {
+      // Carrosséis e ads: append no array
+      asset.images = [...asset.images, newImage];
+    } else {
+      // Single-image: substitui (limpa anteriores do storage)
+      const oldPaths = asset.images.map((img) => img.path).filter(Boolean);
+      if (oldPaths.length > 0) {
+        await supabase.storage.from(STORAGE_BUCKET).remove(oldPaths);
+      }
+      asset.images = [newImage];
+    }
+
+    asset.image_url = asset.images[0]?.url ?? null;
+    asset.image_path = asset.images[0]?.path ?? null;
     asset.updated_at = now();
     ws.updated_at = now();
     writeLocal(ws);
 
-    if (isSupabaseReady()) {
-      await supabase
-        .from('v_copy_assets')
-        .update({ image_url: asset.image_url, image_path: asset.image_path, updated_at: asset.updated_at })
-        .eq('source_id', assetId);
-    }
+    await syncAssetImagesToRemote(asset);
 
     return ws;
   },
 
-  async removeImage(assetId: string): Promise<CopyWorkspace> {
+  async removeImage(assetId: string, index = 0): Promise<CopyWorkspace> {
     const ws = readLocal();
     const asset = ws.assets.find((a) => a.id === assetId);
-    if (!asset || !asset.image_path) return ws;
+    if (!asset || index < 0 || index >= asset.images.length) return ws;
 
-    if (isSupabaseReady()) {
-      await supabase.storage.from(STORAGE_BUCKET).remove([asset.image_path]);
+    const removed = asset.images[index];
+
+    if (isSupabaseReady() && removed.path) {
+      await supabase.storage.from(STORAGE_BUCKET).remove([removed.path]);
     }
 
-    asset.image_url = null;
-    asset.image_path = null;
+    asset.images = asset.images.filter((_, i) => i !== index);
+    asset.image_url = asset.images[0]?.url ?? null;
+    asset.image_path = asset.images[0]?.path ?? null;
     asset.updated_at = now();
     ws.updated_at = now();
     writeLocal(ws);
+
+    await syncAssetImagesToRemote(asset);
+
+    return ws;
+  },
+
+  async reorderImages(assetId: string, newOrder: CopyImage[]): Promise<CopyWorkspace> {
+    const ws = readLocal();
+    const asset = ws.assets.find((a) => a.id === assetId);
+    if (!asset) return ws;
+
+    // Validação: novo array deve conter exatamente os mesmos paths
+    const oldPaths = new Set(asset.images.map((i) => i.path));
+    const newPaths = new Set(newOrder.map((i) => i.path));
+    if (oldPaths.size !== newPaths.size || ![...oldPaths].every((p) => newPaths.has(p))) {
+      console.warn('[copyStore] reorderImages rejected: path set mismatch');
+      return ws;
+    }
+
+    asset.images = [...newOrder];
+    asset.image_url = asset.images[0]?.url ?? null;
+    asset.image_path = asset.images[0]?.path ?? null;
+    asset.updated_at = now();
+    ws.updated_at = now();
+    writeLocal(ws);
+
+    await syncAssetImagesToRemote(asset);
 
     return ws;
   },
@@ -224,8 +298,7 @@ export const copyStore = {
             angulo: asset.angulo || null,
             content: asset.content,
             status: asset.status,
-            image_url: asset.image_url,
-            image_path: asset.image_path,
+            images: asset.images,
             source_file: asset.source_file,
             sort_order: asset.sort_order,
           },

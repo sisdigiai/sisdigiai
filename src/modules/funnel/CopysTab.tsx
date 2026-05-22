@@ -5,6 +5,7 @@ import {
   CATEGORY_LABELS,
   type CopyAsset,
   type CopyCategory,
+  type CopyImage,
   type CopyStatus,
   type CopyWorkspace,
 } from '../../lib/copyStore';
@@ -57,8 +58,13 @@ export default function CopysTab() {
     setWorkspace({ ...next });
   };
 
-  const handleRemoveImage = async (id: string) => {
-    const next = await copyStore.removeImage(id);
+  const handleRemoveImage = async (id: string, index: number) => {
+    const next = await copyStore.removeImage(id, index);
+    setWorkspace({ ...next });
+  };
+
+  const handleReorderImages = async (id: string, images: CopyImage[]) => {
+    const next = await copyStore.reorderImages(id, images);
     setWorkspace({ ...next });
   };
 
@@ -149,6 +155,7 @@ export default function CopysTab() {
                     onStatusChange={handleStatusChange}
                     onUpload={handleUpload}
                     onRemoveImage={handleRemoveImage}
+                    onReorderImages={handleReorderImages}
                     onExpand={setExpandedModal}
                   />
                 ))}
@@ -161,7 +168,10 @@ export default function CopysTab() {
       {/* Modal */}
       {expandedModal && (
         <CopyModal
-          asset={expandedModal}
+          asset={
+            // mantém o modal sincronizado com o workspace após cada mutação
+            workspace.assets.find((a) => a.id === expandedModal.id) ?? expandedModal
+          }
           onClose={() => setExpandedModal(null)}
           onStatusChange={(id, status) => {
             handleStatusChange(id, status);
@@ -170,6 +180,7 @@ export default function CopysTab() {
           }}
           onUpload={handleUpload}
           onRemoveImage={handleRemoveImage}
+          onReorderImages={handleReorderImages}
         />
       )}
     </div>

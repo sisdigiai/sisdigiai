@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import { X, Check, Copy } from 'lucide-react';
 import { useState } from 'react';
-import type { CopyAsset, CopyStatus } from '../../lib/copyStore';
+import type { CopyAsset, CopyImage, CopyStatus } from '../../lib/copyStore';
+import { supportsMultipleImages } from '../../lib/copyStore';
 import StatusSelector from './StatusSelector';
 import ImageUploader from './ImageUploader';
+import ImageGallery from './ImageGallery';
 import CopyButton, { copyFieldToClipboard } from './CopyButton';
 
 type Props = {
@@ -11,7 +13,8 @@ type Props = {
   onClose: () => void;
   onStatusChange: (id: string, status: CopyStatus) => void;
   onUpload: (id: string, file: File) => Promise<void>;
-  onRemoveImage: (id: string) => Promise<void>;
+  onRemoveImage: (id: string, index: number) => Promise<void>;
+  onReorderImages: (id: string, next: CopyImage[]) => Promise<void>;
 };
 
 function FieldRow({ label, value }: { label: string; value: string }) {
@@ -42,8 +45,16 @@ function FieldRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-export default function CopyModal({ asset, onClose, onStatusChange, onUpload, onRemoveImage }: Props) {
+export default function CopyModal({
+  asset,
+  onClose,
+  onStatusChange,
+  onUpload,
+  onRemoveImage,
+  onReorderImages,
+}: Props) {
   const { content } = asset;
+  const isMulti = supportsMultipleImages(asset.category);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -122,8 +133,20 @@ export default function CopyModal({ asset, onClose, onStatusChange, onUpload, on
           </div>
 
           {/* Image side */}
-          <div className="shrink-0 w-40">
-            {asset.image_url ? (
+          <div className={`shrink-0 ${isMulti ? 'w-72' : 'w-40'}`}>
+            {isMulti ? (
+              <div className="space-y-3">
+                <div className="text-[10px] font-bold text-white/30 uppercase tracking-wider">
+                  Galeria · carrossel
+                </div>
+                <ImageGallery
+                  images={asset.images}
+                  onUpload={(file) => onUpload(asset.id, file)}
+                  onRemove={(index) => onRemoveImage(asset.id, index)}
+                  onReorder={(next) => onReorderImages(asset.id, next)}
+                />
+              </div>
+            ) : asset.image_url ? (
               <div className="space-y-2">
                 <img
                   src={asset.image_url}
@@ -133,14 +156,14 @@ export default function CopyModal({ asset, onClose, onStatusChange, onUpload, on
                 <ImageUploader
                   imageUrl={asset.image_url}
                   onUpload={(file) => onUpload(asset.id, file)}
-                  onRemove={() => onRemoveImage(asset.id)}
+                  onRemove={() => onRemoveImage(asset.id, 0)}
                 />
               </div>
             ) : (
               <ImageUploader
                 imageUrl={null}
                 onUpload={(file) => onUpload(asset.id, file)}
-                onRemove={() => onRemoveImage(asset.id)}
+                onRemove={() => onRemoveImage(asset.id, 0)}
               />
             )}
           </div>

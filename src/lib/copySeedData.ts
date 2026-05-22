@@ -30,6 +30,7 @@ function makeAsset(
     angulo,
     content,
     status: 'pendente',
+    images: [],
     image_url: null,
     image_path: null,
     source_file: sourceFile,
