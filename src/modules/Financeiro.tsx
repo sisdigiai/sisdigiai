@@ -93,6 +93,7 @@ function DashboardTab() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterProduct, setFilterProduct] = useState<string>('all');
+  const [excludeAporte, setExcludeAporte] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -113,13 +114,25 @@ function DashboardTab() {
 
   useEffect(() => { load(); }, [load]);
 
-  // Filter by product
+  // Filters: aporte intelectual + projeto
+  const APORTE_SLUG = 'aporte-fundador';
+  const baseExpenses = excludeAporte
+    ? allExpenses.filter(e => e.vendor_slug !== APORTE_SLUG)
+    : allExpenses;
   const expenses = filterProduct === 'all'
-    ? allExpenses
-    : allExpenses.filter(e => e.product_id === filterProduct);
+    ? baseExpenses
+    : baseExpenses.filter(e => e.product_id === filterProduct);
+
+  const baseSubs = excludeAporte
+    ? allSubs.filter(s => s.vendor_slug !== APORTE_SLUG)
+    : allSubs;
   const subs = filterProduct === 'all'
-    ? allSubs
-    : allSubs.filter(s => s.product_id === filterProduct);
+    ? baseSubs
+    : baseSubs.filter(s => s.product_id === filterProduct);
+
+  const aporteTotal = allExpenses
+    .filter(e => e.vendor_slug === APORTE_SLUG)
+    .reduce((a, e) => a + Number(e.amount_brl), 0);
 
   // KPIs
   const total12m = expenses.reduce((a, e) => a + Number(e.amount_brl), 0);
@@ -168,30 +181,44 @@ function DashboardTab() {
 
   return (
     <div className="space-y-8">
-      {/* Product filter */}
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-slate-500 uppercase tracking-wide">Projeto:</span>
-        <div className="flex gap-1 flex-wrap">
-          <button
-            onClick={() => setFilterProduct('all')}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-              filterProduct === 'all' ? 'bg-[#2563EB]/20 text-white border border-[#2563EB]/40' : 'bg-slate-800 text-slate-400 hover:text-white'
-            }`}
-          >
-            Todos
-          </button>
-          {products.map(p => (
+      {/* Filtros: projeto + aporte */}
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-slate-500 uppercase tracking-wide">Projeto:</span>
+          <div className="flex gap-1 flex-wrap">
             <button
-              key={p.id}
-              onClick={() => setFilterProduct(p.id)}
+              onClick={() => setFilterProduct('all')}
               className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                filterProduct === p.id ? 'bg-[#2563EB]/20 text-white border border-[#2563EB]/40' : 'bg-slate-800 text-slate-400 hover:text-white'
+                filterProduct === 'all' ? 'bg-[#2563EB]/20 text-white border border-[#2563EB]/40' : 'bg-slate-800 text-slate-400 hover:text-white'
               }`}
             >
-              {p.id === 'clearix' ? 'Clearix' : p.id === 'digiai' ? 'DigiAI' : p.id === 'compartilhado' ? 'Compartilhado' : p.name.split(' ')[0]}
+              Todos
             </button>
-          ))}
+            {products.map(p => (
+              <button
+                key={p.id}
+                onClick={() => setFilterProduct(p.id)}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                  filterProduct === p.id ? 'bg-[#2563EB]/20 text-white border border-[#2563EB]/40' : 'bg-slate-800 text-slate-400 hover:text-white'
+                }`}
+              >
+                {p.id === 'clearix' ? 'Clearix' : p.id === 'digiai' ? 'DigiAI' : p.id === 'compartilhado' ? 'Compartilhado' : p.name.split(' ')[0]}
+              </button>
+            ))}
+          </div>
         </div>
+
+        <button
+          onClick={() => setExcludeAporte(v => !v)}
+          title={`Aporte intelectual do fundador: ${brl(aporteTotal)} em despesas valoradas — clique para ocultar/mostrar`}
+          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors border ${
+            excludeAporte
+              ? 'bg-orange-500/15 text-orange-300 border-orange-500/40'
+              : 'bg-slate-800 text-slate-400 hover:text-white border-transparent'
+          }`}
+        >
+          {excludeAporte ? `Aporte oculto (−${brl(aporteTotal)})` : `Ocultar aporte intelectual (${brl(aporteTotal)})`}
+        </button>
       </div>
 
       {/* KPI Cards */}
