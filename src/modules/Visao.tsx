@@ -14,7 +14,7 @@ const VERDADES_CANONICAS = [
   { texto: 'DIGIAI é a marca-mãe de todo o ecossistema', nível: 'máximo' },
   { texto: 'Academy fortalece DIGIAI e Clearix — não compete', nível: 'máximo' },
   { texto: 'Nexus apoia treinamento sem consumir foco comercial agora', nível: 'alto' },
-  { texto: 'Lumina entra como upsell no momento comercial certo', nível: 'alto' },
+  { texto: 'Lumina já valida uso interno, próxima fase é monetização externa', nível: 'alto' },
   { texto: 'Pulso trabalha primeiro a favor da DIGIAI', nível: 'médio' },
   { texto: 'Polapetit e Qual a Foto são segunda vertical futura', nível: 'baixo' },
   { texto: 'Nipo School é frente institucional e filantrópica', nível: 'baixo' },
