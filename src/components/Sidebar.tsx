@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Eye, LayoutGrid, Map, List, Zap, TrendingUp,
   BookOpen, DollarSign, GitBranch, Library, Palette, Building2, Network,
-  Compass, ExternalLink, Flame
+  Compass, ExternalLink, Flame, Megaphone
 } from 'lucide-react';
 import { Logo } from './Logo';
 
@@ -10,7 +10,7 @@ export type ModuleId =
   | 'visao' | 'portfolio' | 'trilha' | 'lista-mestra'
   | 'backlog' | 'comercial' | 'academy' | 'funil' | 'financeiro'
   | 'decisoes' | 'biblioteca' | 'brand' | 'cadastro-empresa'
-  | 'clearix';
+  | 'clearix' | 'referencias-design' | 'mock-estilos' | 'marketing';
 
 interface NavItem {
   id: ModuleId | string;
@@ -34,10 +34,13 @@ const navItems: NavItem[] = [
   { id: 'comercial', label: 'Comercial', icon: <TrendingUp className="w-4 h-4" />, group: 'apoio' },
   { id: 'academy', label: 'Academy', icon: <BookOpen className="w-4 h-4" />, group: 'apoio' },
   { id: 'funil', label: 'Funil OSI', icon: <Flame className="w-4 h-4" />, group: 'apoio' },
+  { id: 'marketing', label: 'Marketing', icon: <Megaphone className="w-4 h-4" />, group: 'apoio' },
   { id: 'financeiro', label: 'Financeiro', icon: <DollarSign className="w-4 h-4" />, group: 'apoio' },
   { id: 'decisoes', label: 'Decisões', icon: <GitBranch className="w-4 h-4" />, group: 'apoio' },
   { id: 'biblioteca', label: 'Biblioteca', icon: <Library className="w-4 h-4" />, group: 'apoio' },
   { id: 'brand', label: 'Brand Guidelines', icon: <Palette className="w-4 h-4" />, group: 'outros' },
+  { id: 'referencias-design', label: 'Referências Design', icon: <Palette className="w-4 h-4" />, group: 'outros' },
+  { id: 'mock-estilos', label: 'Mock Vendas (4 estilos)', icon: <Palette className="w-4 h-4" />, group: 'outros' },
 ];
 
 interface SidebarProps {

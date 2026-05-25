@@ -13,6 +13,9 @@ import Decisoes from './modules/Decisoes';
 import Financeiro from './modules/Financeiro';
 import Academy from './modules/Academy';
 import Funil from './modules/Funil';
+import Marketing from './modules/Marketing';
+import ReferenciasDesign from './modules/ReferenciasDesign';
+import MockClearixEstilos from './modules/MockClearixEstilos';
 import { ModuleStub } from './modules/Stub';
 import { useAuth } from './contexts/AuthContext';
 
@@ -77,6 +80,9 @@ export default function App() {
       case 'financeiro': return <Financeiro />;
       case 'academy': return <Academy />;
       case 'funil': return <Funil />;
+      case 'marketing': return <Marketing />;
+      case 'referencias-design': return <ReferenciasDesign />;
+      case 'mock-estilos': return <MockClearixEstilos />;
       default: {
         const stub = STUBS[activeModule];
         if (stub) {
