@@ -1,22 +1,27 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Calendar, CheckCircle2, Clock, ExternalLink, Filter, RefreshCw, X } from 'lucide-react';
-import { marketingStore, type CalendarPost, type CalendarStatus, type ContentPillar } from '../../lib/marketingStore';
+import { Calendar, CheckCircle2, Clock, ExternalLink, Filter, RefreshCw, X, Pencil } from 'lucide-react';
+import { marketingStore, type CalendarPost, type CalendarStatus, type ContentPillar, type Platform } from '../../lib/marketingStore';
+import { PostDrawer } from './PostDrawer';
 
 export function CalendarioEditorial() {
   const [posts, setPosts] = useState<CalendarPost[]>([]);
   const [pillars, setPillars] = useState<ContentPillar[]>([]);
+  const [platforms, setPlatforms] = useState<Platform[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [pillarFilter, setPillarFilter] = useState<string>('all');
+  const [editing, setEditing] = useState<CalendarPost | null>(null);
 
   const refresh = async () => {
     setLoading(true);
-    const [postsData, pillarsData] = await Promise.all([
+    const [postsData, pillarsData, platformsData] = await Promise.all([
       marketingStore.listCalendar(),
       marketingStore.listPillars(),
+      marketingStore.listPlatforms(),
     ]);
     setPosts(postsData);
     setPillars(pillarsData);
+    setPlatforms(platformsData);
     setLoading(false);
   };
 
@@ -141,9 +146,20 @@ export function CalendarioEditorial() {
               date={date}
               posts={items}
               onAdvance={handleAdvanceStatus}
+              onEdit={setEditing}
             />
           ))}
         </div>
+      )}
+
+      {editing && (
+        <PostDrawer
+          post={editing}
+          pillars={pillars}
+          platforms={platforms}
+          onClose={() => setEditing(null)}
+          onSaved={refresh}
+        />
       )}
     </div>
   );
@@ -160,7 +176,7 @@ function StatCard({ label, value, color }: { label: string; value: number; color
   );
 }
 
-function DateGroup({ date, posts, onAdvance }: { date: string; posts: CalendarPost[]; onAdvance: (p: CalendarPost) => void }) {
+function DateGroup({ date, posts, onAdvance, onEdit }: { date: string; posts: CalendarPost[]; onAdvance: (p: CalendarPost) => void; onEdit: (p: CalendarPost) => void }) {
   const formatted = useMemo(() => {
     const d = new Date(date + 'T00:00:00');
     const wday = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'][d.getDay()];
@@ -190,14 +206,14 @@ function DateGroup({ date, posts, onAdvance }: { date: string; posts: CalendarPo
       </div>
       <div className="space-y-2">
         {posts.map((p) => (
-          <PostCard key={p.id} post={p} onAdvance={onAdvance} />
+          <PostCard key={p.id} post={p} onAdvance={onAdvance} onEdit={onEdit} />
         ))}
       </div>
     </div>
   );
 }
 
-function PostCard({ post, onAdvance }: { post: CalendarPost; onAdvance: (p: CalendarPost) => void }) {
+function PostCard({ post, onAdvance, onEdit }: { post: CalendarPost; onAdvance: (p: CalendarPost) => void; onEdit: (p: CalendarPost) => void }) {
   const statusColors: Record<CalendarStatus, string> = {
     planned: '#06B6D4',
     in_production: '#F59E0B',
@@ -260,15 +276,24 @@ function PostCard({ post, onAdvance }: { post: CalendarPost; onAdvance: (p: Cale
           >
             {statusLabels[post.status]}
           </span>
-          {post.status !== 'published' && post.status !== 'cancelled' && (
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => onAdvance(post)}
+              onClick={() => onEdit(post)}
               className="flex items-center gap-1 text-[11px] text-white/50 hover:text-white"
             >
-              <CheckCircle2 className="w-3 h-3" />
-              Avançar
+              <Pencil className="w-3 h-3" />
+              Editar
             </button>
-          )}
+            {post.status !== 'published' && post.status !== 'cancelled' && (
+              <button
+                onClick={() => onAdvance(post)}
+                className="flex items-center gap-1 text-[11px] text-white/50 hover:text-white"
+              >
+                <CheckCircle2 className="w-3 h-3" />
+                Avançar
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -1,13 +1,17 @@
 import { useState } from 'react';
-import { Calendar as CalendarIcon, Lightbulb, Megaphone } from 'lucide-react';
+import { Calendar as CalendarIcon, Lightbulb, Megaphone, Package, Users } from 'lucide-react';
 import { CalendarioEditorial } from './marketing/CalendarioEditorial';
 import { BancoIdeias } from './marketing/BancoIdeias';
+import { MateriaisAfiliados } from './marketing/MateriaisAfiliados';
+import { Afiliados } from './marketing/Afiliados';
 
-type SubTab = 'calendario' | 'banco';
+type SubTab = 'calendario' | 'banco' | 'materiais' | 'afiliados';
 
 const SUBTABS: { id: SubTab; label: string; icon: typeof CalendarIcon }[] = [
   { id: 'calendario', label: 'Calendário Editorial', icon: CalendarIcon },
   { id: 'banco', label: 'Banco de Ideias', icon: Lightbulb },
+  { id: 'materiais', label: 'Materiais (afiliados)', icon: Package },
+  { id: 'afiliados', label: 'Afiliados', icon: Users },
 ];
 
 export default function Marketing() {
@@ -15,20 +19,18 @@ export default function Marketing() {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
       <div className="border-b border-white/5 px-8 py-5">
         <div className="flex items-center gap-3 mb-1">
           <Megaphone className="w-5 h-5 text-[#06B6D4]" />
           <h1 className="text-xl font-semibold">Marketing</h1>
         </div>
         <p className="text-xs text-white/40">
-          Calendário editorial + banco de ideias orgânicas para Ótica Sem Improviso. Postar sempre, com método.
+          Calendário editorial + banco de ideias + materiais de afiliados + CRM de afiliados. Tudo num lugar só.
         </p>
       </div>
 
-      {/* Tabs */}
       <div className="border-b border-white/5 px-8">
-        <div className="flex gap-1">
+        <div className="flex gap-1 overflow-x-auto">
           {SUBTABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = active === tab.id;
@@ -36,7 +38,7 @@ export default function Marketing() {
               <button
                 key={tab.id}
                 onClick={() => setActive(tab.id)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap
                   ${isActive
                     ? 'border-[#06B6D4] text-white'
                     : 'border-transparent text-white/40 hover:text-white/70'
@@ -50,10 +52,11 @@ export default function Marketing() {
         </div>
       </div>
 
-      {/* Conteúdo */}
       <div className="flex-1 overflow-y-auto">
         {active === 'calendario' && <CalendarioEditorial />}
         {active === 'banco' && <BancoIdeias />}
+        {active === 'materiais' && <MateriaisAfiliados />}
+        {active === 'afiliados' && <Afiliados />}
       </div>
     </div>
   );
