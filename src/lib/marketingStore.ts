@@ -93,41 +93,33 @@ export const marketingStore = {
     return (data ?? []) as ContentIdea[];
   },
 
-  async createIdea(input: Omit<ContentIdea, 'id' | 'used_count' | 'last_used_at' | 'created_at' | 'pillar_code' | 'pillar_name' | 'pillar_color' | 'pillar_icon'>): Promise<ContentIdea | null> {
-    const { data, error } = await supabase
-      .schema('marketing')
-      .from('content_ideas')
-      .insert({
-        pillar_id: input.pillar_id,
-        hook: input.hook,
-        narrative: input.narrative,
-        target_audience: input.target_audience,
-        suggested_format: input.suggested_format,
-        cta_suggestion: input.cta_suggestion,
-        status: input.status ?? 'available',
-        notes: input.notes,
-        metadata: input.metadata ?? {},
-      })
-      .select()
-      .single();
+  async createIdea(input: Omit<ContentIdea, 'id' | 'used_count' | 'last_used_at' | 'created_at' | 'pillar_code' | 'pillar_name' | 'pillar_color' | 'pillar_icon'>): Promise<string | null> {
+    const { data, error } = await supabase.rpc('marketing_create_idea', {
+      p_pillar_id: input.pillar_id,
+      p_hook: input.hook,
+      p_narrative: input.narrative ?? null,
+      p_target_audience: input.target_audience ?? null,
+      p_suggested_format: input.suggested_format ?? null,
+      p_cta_suggestion: input.cta_suggestion ?? null,
+      p_notes: input.notes ?? null,
+    });
     if (error) {
       console.error('[marketingStore] createIdea error:', error.message);
       return null;
     }
-    return data as ContentIdea;
+    return data as string;
   },
 
   async updateIdea(id: string, patch: Partial<ContentIdea>): Promise<boolean> {
-    const { error } = await supabase
-      .schema('marketing')
-      .from('content_ideas')
-      .update(patch)
-      .eq('id', id);
+    const { data, error } = await supabase.rpc('marketing_update_idea', {
+      p_id: id,
+      p_patch: patch as Record<string, unknown>,
+    });
     if (error) {
       console.error('[marketingStore] updateIdea error:', error.message);
       return false;
     }
-    return true;
+    return data === true;
   },
 
   // ── Calendar ──
@@ -159,73 +151,57 @@ export const marketingStore = {
     media_external_url?: string | null;
     status?: CalendarStatus;
     notes?: string | null;
-  }): Promise<CalendarPost | null> {
-    const { data, error } = await supabase
-      .schema('marketing')
-      .from('content_calendar')
-      .insert({
-        ...input,
-        status: input.status ?? 'planned',
-        performance_data: {},
-      })
-      .select()
-      .single();
+  }): Promise<string | null> {
+    const { data, error } = await supabase.rpc('marketing_create_calendar_post', {
+      p_scheduled_date: input.scheduled_date,
+      p_scheduled_time: input.scheduled_time ?? null,
+      p_idea_id: input.idea_id ?? null,
+      p_pillar_id: input.pillar_id ?? null,
+      p_platform: input.platform ?? null,
+      p_content_type: input.content_type ?? null,
+      p_hook: input.hook ?? null,
+      p_narrative: input.narrative ?? null,
+      p_cta: input.cta ?? null,
+      p_hashtags: input.hashtags ?? null,
+      p_media_external_url: input.media_external_url ?? null,
+      p_status: input.status ?? 'planned',
+      p_notes: input.notes ?? null,
+    });
     if (error) {
       console.error('[marketingStore] createCalendarPost error:', error.message);
       return null;
     }
-    return data as CalendarPost;
+    return data as string;
   },
 
   async updateCalendarPost(id: string, patch: Partial<CalendarPost>): Promise<boolean> {
-    const { error } = await supabase
-      .schema('marketing')
-      .from('content_calendar')
-      .update(patch)
-      .eq('id', id);
+    const { data, error } = await supabase.rpc('marketing_update_calendar_post', {
+      p_id: id,
+      p_patch: patch as Record<string, unknown>,
+    });
     if (error) {
       console.error('[marketingStore] updateCalendarPost error:', error.message);
       return false;
     }
-    return true;
+    return data === true;
   },
 
   /**
    * Agenda uma ideia para uma data específica.
-   * Cria entry no calendar + marca a idea como 'scheduled' + incrementa used_count.
+   * RPC atômica: cria entry no calendar + marca a idea como 'scheduled' + incrementa used_count.
    */
-  async scheduleIdea(ideaId: string, scheduledDate: string, extras?: { platform?: string; content_type?: string; notes?: string }): Promise<CalendarPost | null> {
-    // Busca a idea para copiar dados
-    const { data: idea, error: ideaErr } = await supabase
-      .from('v_marketing_ideas')
-      .select('*')
-      .eq('id', ideaId)
-      .single();
-    if (ideaErr || !idea) {
-      console.error('[marketingStore] scheduleIdea: idea not found', ideaErr?.message);
+  async scheduleIdea(ideaId: string, scheduledDate: string, extras?: { platform?: string; content_type?: string; notes?: string }): Promise<string | null> {
+    const { data, error } = await supabase.rpc('marketing_schedule_idea', {
+      p_idea_id: ideaId,
+      p_scheduled_date: scheduledDate,
+      p_platform: extras?.platform ?? null,
+      p_content_type: extras?.content_type ?? null,
+      p_notes: extras?.notes ?? null,
+    });
+    if (error) {
+      console.error('[marketingStore] scheduleIdea error:', error.message);
       return null;
     }
-
-    const post = await this.createCalendarPost({
-      scheduled_date: scheduledDate,
-      idea_id: ideaId,
-      pillar_id: idea.pillar_id,
-      platform: extras?.platform ?? null,
-      content_type: extras?.content_type ?? idea.suggested_format,
-      hook: idea.hook,
-      cta: idea.cta_suggestion,
-      notes: extras?.notes ?? null,
-      status: 'planned',
-    });
-
-    if (post) {
-      await this.updateIdea(ideaId, {
-        status: 'scheduled',
-        used_count: (idea.used_count ?? 0) + 1,
-        last_used_at: new Date().toISOString(),
-      });
-    }
-
-    return post;
+    return data as string;
   },
 };
