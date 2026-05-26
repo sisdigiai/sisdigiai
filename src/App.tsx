@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Sidebar, { ModuleId } from './components/Sidebar';
 import BrandGuidelines from './components/BrandGuidelines';
 import Login from './components/Login';
+import TestimonialPublicForm from './components/TestimonialPublicForm';
 import Visao from './modules/Visao';
 import Portfolio from './modules/Portfolio';
 import Trilha from './modules/Trilha';
@@ -45,6 +46,9 @@ const STUBS: Record<string, { numero: number; nome: string; descricao: string; e
   },
 };
 
+// Rotas públicas (não passam pelo gate de login)
+const PUBLIC_ROUTES = ['/osi/depoimento'];
+
 export default function App() {
   const { session, loading } = useAuth();
   const [activeModule, setActiveModule] = useState<ModuleId>('visao');
@@ -53,6 +57,12 @@ export default function App() {
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
   const authEnabled = !!supabaseUrl && !!supabaseKey && !supabaseUrl.includes('placeholder');
+
+  // Bypass de auth pra rotas públicas
+  const path = typeof window !== 'undefined' ? window.location.pathname : '';
+  if (PUBLIC_ROUTES.includes(path)) {
+    if (path === '/osi/depoimento') return <TestimonialPublicForm />;
+  }
 
   if (loading && authEnabled) {
     return (

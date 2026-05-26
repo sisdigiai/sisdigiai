@@ -126,6 +126,41 @@ export type AffiliateMaterial = {
   pillar_color?: string | null;
 };
 
+export type AiPromptCategory = 'text' | 'image' | 'video' | 'audio' | 'music';
+export type AiPromptTarget = 'chatgpt' | 'claude' | 'midjourney' | 'dalle' | 'gemini' | 'sora' | 'runway' | 'elevenlabs' | 'suno' | 'generic';
+
+export type AiPromptTemplate = {
+  id: string;
+  code: string;
+  name: string;
+  category: AiPromptCategory | string;
+  ai_target: AiPromptTarget | string;
+  description: string | null;
+  prompt_template: string;
+  output_hint: string | null;
+  locks: Record<string, unknown>;
+  placeholders: string[];
+  pillar_id: string | null;
+  pillar_code: string | null;
+  pillar_name: string | null;
+  pillar_color: string | null;
+  is_active: boolean;
+  sort_order: number;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type RenderedPrompt = {
+  template_id: string;
+  template_code: string;
+  template_name: string;
+  category: string;
+  ai_target: string;
+  output_hint: string | null;
+  rendered_prompt: string;
+  vars_used: Record<string, string>;
+};
+
 export type AffiliateStatus = 'pending' | 'active' | 'top' | 'inactive' | 'banned';
 export type AffiliateTier = 'bronze' | 'prata' | 'ouro';
 
@@ -312,5 +347,178 @@ export const marketingStore = {
     const { data, error } = await supabase.rpc('marketing_update_affiliate', { p_id: id, p_patch: patch as Record<string, unknown> });
     if (error) { console.error('[marketingStore] updateAffiliate:', error.message); return false; }
     return data === true;
+  },
+
+  // ── AI Prompt Templates ──
+  async listPromptTemplates(filters?: { category?: string; aiTarget?: string; pillarCode?: string }): Promise<AiPromptTemplate[]> {
+    let q = supabase.from('v_marketing_ai_prompts').select('*');
+    if (filters?.category) q = q.eq('category', filters.category);
+    if (filters?.aiTarget) q = q.eq('ai_target', filters.aiTarget);
+    if (filters?.pillarCode) q = q.eq('pillar_code', filters.pillarCode);
+    const { data, error } = await q;
+    if (error) { console.error('[marketingStore] listPromptTemplates:', error.message); return []; }
+    return (data ?? []).map(d => ({
+      ...d,
+      locks: d.locks ?? {},
+      placeholders: d.placeholders ?? [],
+    })) as AiPromptTemplate[];
+  },
+
+  async renderPrompt(input: {
+    templateId: string;
+    postId?: string | null;
+    ideaId?: string | null;
+    extraVars?: Record<string, string>;
+  }): Promise<RenderedPrompt | null> {
+    const { data, error } = await supabase.rpc('marketing_render_prompt', {
+      p_template_id: input.templateId,
+      p_post_id: input.postId ?? null,
+      p_idea_id: input.ideaId ?? null,
+      p_extra_vars: (input.extraVars ?? {}) as Record<string, unknown>,
+    });
+    if (error) { console.error('[marketingStore] renderPrompt:', error.message); return null; }
+    return data as RenderedPrompt;
+  },
+
+  async upsertPromptTemplate(patch: Partial<AiPromptTemplate>): Promise<string | null> {
+    const { data, error } = await supabase.rpc('marketing_upsert_prompt_template', { p_patch: patch as Record<string, unknown> });
+    if (error) { console.error('[marketingStore] upsertPromptTemplate:', error.message); return null; }
+    return data as string;
+  },
+
+  async deletePromptTemplate(id: string): Promise<boolean> {
+    const { data, error } = await supabase.rpc('marketing_delete_prompt_template', { p_id: id });
+    if (error) { console.error('[marketingStore] deletePromptTemplate:', error.message); return false; }
+    return data === true;
+  },
+
+  // ── Hotmart sales / attribution ──
+  async getPostSales(postId: string): Promise<{
+    sales_count: number;
+    revenue_cents: number;
+    commission_cents: number;
+    refunds_count: number;
+    chargebacks_count: number;
+    affiliate_sales_count: number;
+  } | null> {
+    const { data, error } = await supabase
+      .from('v_marketing_post_sales')
+      .select('sales_count,revenue_cents,commission_cents,refunds_count,chargebacks_count,affiliate_sales_count')
+      .eq('post_id', postId)
+      .maybeSingle();
+    if (error) { console.error('[marketingStore] getPostSales:', error.message); return null; }
+    return data as any;
+  },
+
+  async getHotmartStats(): Promise<{
+    sales_total: number;
+    revenue_cents_total: number;
+    refunds_total: number;
+    chargebacks_total: number;
+    attributed_sales: number;
+    affiliate_only_sales: number;
+    unattributed_sales: number;
+    affiliate_sales: number;
+    unique_affiliates: number;
+    unique_buyers: number;
+    last_sale_at: string | null;
+  } | null> {
+    const { data, error } = await supabase.from('v_marketing_hotmart_stats').select('*').maybeSingle();
+    if (error) { console.error('[marketingStore] getHotmartStats:', error.message); return null; }
+    return data as any;
+  },
+
+  async getValidationRanking(): Promise<Array<{
+    pillar_code: string;
+    pillar_name: string;
+    pillar_color: string;
+    posts_count: number;
+    sales_count: number;
+    revenue_cents: number;
+    sales_per_post: number;
+  }>> {
+    const { data, error } = await supabase.from('v_marketing_validation_ranking').select('*');
+    if (error) { console.error('[marketingStore] getValidationRanking:', error.message); return []; }
+    return (data ?? []) as any;
+  },
+
+  // ── Promote post → affiliate material ──
+  async getPostPromotion(postId: string): Promise<string | null> {
+    const { data, error } = await supabase.rpc('marketing_get_post_promotion', { p_post_id: postId });
+    if (error) { console.error('[marketingStore] getPostPromotion:', error.message); return null; }
+    return (data as string | null) ?? null;
+  },
+
+  // ── Testimonials ──
+  async submitTestimonial(payload: {
+    full_name: string;
+    optica_name?: string;
+    city?: string;
+    state?: string;
+    whatsapp?: string;
+    whatsapp_consent?: boolean;
+    hook_applied?: string;
+    story: string;
+    sale_value_cents?: number;
+    photo_url?: string;
+    rating?: number;
+    hotmart_transaction?: string;
+    user_agent?: string;
+  }): Promise<string | null> {
+    const { data, error } = await supabase.rpc('marketing_submit_testimonial', { p_payload: payload as Record<string, unknown> });
+    if (error) { console.error('[marketingStore] submitTestimonial:', error.message); return null; }
+    return data as string;
+  },
+
+  async listTestimonials(): Promise<Array<{
+    id: string;
+    full_name: string;
+    optica_name: string | null;
+    city: string | null;
+    state: string | null;
+    whatsapp: string | null;
+    whatsapp_consent: boolean;
+    hook_applied: string | null;
+    story: string;
+    sale_value_cents: number | null;
+    photo_url: string | null;
+    rating: number | null;
+    status: string;
+    source: string;
+    hotmart_transaction: string | null;
+    promoted_idea_id: string | null;
+    promoted_idea_hook: string | null;
+    reviewer_notes: string | null;
+    reviewed_at: string | null;
+    created_at: string;
+  }>> {
+    const { data, error } = await supabase.from('v_marketing_testimonials').select('*');
+    if (error) { console.error('[marketingStore] listTestimonials:', error.message); return []; }
+    return (data ?? []) as any;
+  },
+
+  async reviewTestimonial(id: string, status: 'pending'|'approved'|'rejected'|'used'|'spam', notes?: string): Promise<boolean> {
+    const { data, error } = await supabase.rpc('marketing_review_testimonial', { p_id: id, p_status: status, p_notes: notes ?? null });
+    if (error) { console.error('[marketingStore] reviewTestimonial:', error.message); return false; }
+    return data === true;
+  },
+
+  async promoteTestimonialToIdea(id: string, pillarId?: string): Promise<string | null> {
+    const { data, error } = await supabase.rpc('marketing_promote_testimonial_to_idea', { p_id: id, p_pillar_id: pillarId ?? null });
+    if (error) { console.error('[marketingStore] promoteTestimonialToIdea:', error.message); return null; }
+    return data as string;
+  },
+
+  async getTestimonialsStats(): Promise<{ pending: number; approved: number; used: number; rejected: number; spam: number; total: number } | null> {
+    const { data, error } = await supabase.from('v_marketing_testimonials_stats').select('*').maybeSingle();
+    if (error) { console.error('[marketingStore] getTestimonialsStats:', error.message); return null; }
+    return data as any;
+  },
+
+  async promotePostToMaterial(postId: string): Promise<{ materialId: string; alreadyPromoted: boolean } | null> {
+    const { data, error } = await supabase.rpc('marketing_promote_post_to_material', { p_post_id: postId });
+    if (error) { console.error('[marketingStore] promotePostToMaterial:', error.message); return null; }
+    const r = data as { material_id: string; already_promoted: boolean };
+    return { materialId: r.material_id, alreadyPromoted: r.already_promoted };
   },
 };

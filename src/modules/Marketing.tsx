@@ -1,15 +1,21 @@
 import { useState } from 'react';
-import { Calendar as CalendarIcon, Lightbulb, Megaphone, Package, Users } from 'lucide-react';
+import { Calendar as CalendarIcon, Lightbulb, Megaphone, MessageSquareQuote, Package, Sparkles, TrendingUp, Users } from 'lucide-react';
 import { CalendarioEditorial } from './marketing/CalendarioEditorial';
 import { BancoIdeias } from './marketing/BancoIdeias';
 import { MateriaisAfiliados } from './marketing/MateriaisAfiliados';
 import { Afiliados } from './marketing/Afiliados';
+import { PromptsIA } from './marketing/PromptsIA';
+import { Validacao } from './marketing/Validacao';
+import { Depoimentos } from './marketing/Depoimentos';
 
-type SubTab = 'calendario' | 'banco' | 'materiais' | 'afiliados';
+type SubTab = 'calendario' | 'banco' | 'prompts' | 'validacao' | 'depoimentos' | 'materiais' | 'afiliados';
 
 const SUBTABS: { id: SubTab; label: string; icon: typeof CalendarIcon }[] = [
   { id: 'calendario', label: 'Calendário Editorial', icon: CalendarIcon },
   { id: 'banco', label: 'Banco de Ideias', icon: Lightbulb },
+  { id: 'prompts', label: 'Prompts IA', icon: Sparkles },
+  { id: 'validacao', label: 'Validação', icon: TrendingUp },
+  { id: 'depoimentos', label: 'Depoimentos', icon: MessageSquareQuote },
   { id: 'materiais', label: 'Materiais (afiliados)', icon: Package },
   { id: 'afiliados', label: 'Afiliados', icon: Users },
 ];
@@ -55,6 +61,9 @@ export default function Marketing() {
       <div className="flex-1 overflow-y-auto">
         {active === 'calendario' && <CalendarioEditorial />}
         {active === 'banco' && <BancoIdeias />}
+        {active === 'prompts' && <PromptsIA />}
+        {active === 'validacao' && <Validacao />}
+        {active === 'depoimentos' && <Depoimentos />}
         {active === 'materiais' && <MateriaisAfiliados />}
         {active === 'afiliados' && <Afiliados />}
       </div>

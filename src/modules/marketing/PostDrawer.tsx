@@ -1,6 +1,25 @@
 import { useEffect, useMemo, useState } from 'react';
-import { X, Plus, Trash2, ExternalLink, Save, Loader2 } from 'lucide-react';
+import { X, Plus, Trash2, ExternalLink, Save, Loader2, Sparkles, Package, Check, DollarSign, Copy, Link as LinkIcon } from 'lucide-react';
 import { marketingStore, type CalendarPost, type CalendarStatus, type ContentPillar, type Platform, type CalendarArt } from '../../lib/marketingStore';
+import { PromptGeneratorModal } from './PromptGeneratorModal';
+
+const HOTMART_BASE = 'https://go.hotmart.com/B105515825L?dp=1';
+
+function brl(cents: number) {
+  return (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function buildHotmartUrl(post: CalendarPost): string {
+  const platform = (post.platforms?.[0] ?? post.platform ?? 'organic').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const pillarCode = post.pillar_code ?? 'sem-pilar';
+  const params = new URLSearchParams({
+    utm_source: 'osi',
+    utm_medium: platform,
+    utm_campaign: pillarCode,
+    utm_content: `post:${post.id}`,
+  });
+  return `${HOTMART_BASE}&${params.toString()}`;
+}
 
 interface Props {
   post: CalendarPost;
@@ -24,8 +43,47 @@ const TOOLS_SUGGESTIONS = ['Canva', 'CapCut', 'Photoshop', 'Figma', 'After Effec
 export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props) {
   const [draft, setDraft] = useState<CalendarPost>(post);
   const [saving, setSaving] = useState(false);
+  const [showPromptsModal, setShowPromptsModal] = useState(false);
+  const [promotedMaterialId, setPromotedMaterialId] = useState<string | null>(null);
+  const [promoting, setPromoting] = useState(false);
+  const [sales, setSales] = useState<Awaited<ReturnType<typeof marketingStore.getPostSales>>>(null);
+  const [copiedUrl, setCopiedUrl] = useState(false);
 
   useEffect(() => { setDraft(post); }, [post.id]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [promoId, salesData] = await Promise.all([
+        marketingStore.getPostPromotion(post.id),
+        marketingStore.getPostSales(post.id),
+      ]);
+      if (!cancelled) {
+        setPromotedMaterialId(promoId);
+        setSales(salesData);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [post.id]);
+
+  const hotmartUrl = useMemo(() => buildHotmartUrl(draft), [draft.id, draft.platforms, draft.platform, draft.pillar_code]);
+
+  const handleCopyUrl = () => {
+    navigator.clipboard.writeText(hotmartUrl);
+    setCopiedUrl(true);
+    setTimeout(() => setCopiedUrl(false), 2000);
+  };
+
+  const handlePromote = async () => {
+    if (!confirm('Promover este post para a biblioteca de Materiais (afiliados)?\nO copy, hook, artes e plataformas serão copiados.')) return;
+    setPromoting(true);
+    const r = await marketingStore.promotePostToMaterial(post.id);
+    setPromoting(false);
+    if (!r) { alert('Erro ao promover — veja console.'); return; }
+    setPromotedMaterialId(r.materialId);
+    if (r.alreadyPromoted) alert('Este post já tinha sido promovido. Material existente recuperado.');
+    else alert('Promovido! Disponível em Marketing → Materiais (afiliados).');
+  };
 
   const update = (patch: Partial<CalendarPost>) => setDraft({ ...draft, ...patch });
 
@@ -91,6 +149,22 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
             <p className="text-xs text-white/40 mt-0.5">{draft.scheduled_date}</p>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowPromptsModal(true)}
+              className="flex items-center gap-2 px-3 py-2 border border-[#06B6D4]/40 text-[#06B6D4] rounded-lg hover:bg-[#06B6D4]/10 text-sm"
+            >
+              <Sparkles className="w-4 h-4" />
+              Gerar prompts IA
+            </button>
+            <button
+              onClick={handlePromote}
+              disabled={promoting}
+              title={promotedMaterialId ? 'Já promovido — clique pra abrir' : 'Promover este post como material para afiliados'}
+              className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm disabled:opacity-50 ${promotedMaterialId ? 'border-[#10B981]/40 text-[#10B981] hover:bg-[#10B981]/10' : 'border-[#8B5CF6]/40 text-[#8B5CF6] hover:bg-[#8B5CF6]/10'}`}
+            >
+              {promoting ? <Loader2 className="w-4 h-4 animate-spin" /> : promotedMaterialId ? <Check className="w-4 h-4" /> : <Package className="w-4 h-4" />}
+              {promotedMaterialId ? 'Já é material' : 'Virar material afiliado'}
+            </button>
             <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-[#06B6D4] text-[#0A0F1E] font-medium rounded-lg hover:bg-[#06B6D4]/90 text-sm disabled:opacity-50">
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               Salvar
@@ -152,6 +226,51 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
                 );
               })}
             </div>
+          </Section>
+
+          {/* Link Hotmart com UTM + Vendas atribuídas */}
+          <Section title="Link de venda Hotmart (com UTM)">
+            <div className="bg-black/30 border border-white/10 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <LinkIcon className="w-3.5 h-3.5 text-[#06B6D4]" />
+                <span className="text-[10px] uppercase tracking-widest font-bold text-white/40">URL pronta pra colar na bio/stories/post</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <code className="flex-1 text-[11px] text-white/70 bg-black/40 border border-white/10 rounded px-2 py-1.5 font-mono break-all">{hotmartUrl}</code>
+                <button
+                  onClick={handleCopyUrl}
+                  className="flex items-center gap-1 text-[11px] bg-[#06B6D4] text-[#0A0F1E] font-medium px-3 py-1.5 rounded hover:bg-[#06B6D4]/90 shrink-0"
+                >
+                  {copiedUrl ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copiedUrl ? 'Copiado!' : 'Copiar'}
+                </button>
+              </div>
+              <p className="text-[10px] text-white/30 mt-2">
+                UTMs: source=osi · medium={(draft.platforms?.[0] ?? draft.platform ?? 'organic').toLowerCase()} · campaign={draft.pillar_code ?? 'sem-pilar'} · content=post:{draft.id.slice(0, 8)}…
+              </p>
+            </div>
+
+            {/* Vendas atribuídas */}
+            {sales && sales.sales_count > 0 ? (
+              <div className="mt-3 grid grid-cols-3 gap-2">
+                <StatPill label="Vendas" value={String(sales.sales_count)} color="#10B981" icon={<DollarSign className="w-3 h-3" />} />
+                <StatPill label="Receita" value={brl(sales.revenue_cents)} color="#10B981" />
+                <StatPill label="Comissão" value={brl(sales.commission_cents)} color="#06B6D4" />
+                {sales.refunds_count > 0 && (
+                  <StatPill label="Reembolsos" value={String(sales.refunds_count)} color="#F59E0B" />
+                )}
+                {sales.chargebacks_count > 0 && (
+                  <StatPill label="Chargebacks" value={String(sales.chargebacks_count)} color="#EF4444" />
+                )}
+                {sales.affiliate_sales_count > 0 && (
+                  <StatPill label="Via afiliado" value={String(sales.affiliate_sales_count)} color="#8B5CF6" />
+                )}
+              </div>
+            ) : (
+              <p className="text-[11px] text-white/30 mt-2">
+                Nenhuma venda atribuída a este post ainda. Vendas que entrarem pela URL acima aparecem aqui automaticamente.
+              </p>
+            )}
           </Section>
 
           {/* Brief criativo */}
@@ -239,6 +358,13 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
 
         </div>
       </div>
+
+      {showPromptsModal && (
+        <PromptGeneratorModal
+          source={{ kind: 'post', post: draft }}
+          onClose={() => setShowPromptsModal(false)}
+        />
+      )}
     </div>
   );
 }
@@ -259,6 +385,17 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div>
       <label className="text-[11px] text-white/50 block mb-1">{label}</label>
       {children}
+    </div>
+  );
+}
+
+function StatPill({ label, value, color, icon }: { label: string; value: string; color: string; icon?: React.ReactNode }) {
+  return (
+    <div className="bg-white/5 border border-white/10 rounded px-2 py-1.5">
+      <div className="flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold text-white/40">
+        {icon} {label}
+      </div>
+      <div className="text-sm font-semibold mt-0.5" style={{ color }}>{value}</div>
     </div>
   );
 }
