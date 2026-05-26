@@ -103,6 +103,7 @@ export type Tool = {
   moeda: 'BRL' | 'USD' | 'EUR';
   data_inicio?: string | null;
   proximo_vencimento?: string | null;
+  frequencia_cobranca: 'mensal' | 'bimestral' | 'trimestral' | 'semestral' | 'anual' | 'sob_demanda' | 'avulso';
   renovacao_automatica?: boolean;
   url_dashboard?: string | null;
   email_conta?: string | null;

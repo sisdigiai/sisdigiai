@@ -500,7 +500,7 @@ function FerramentasTab() {
   const load = () => companyStore.listTools().then(setTools);
   useEffect(() => { load(); }, []);
 
-  const newTool = (): Tool => ({ nome: '', categoria: 'infraestrutura', moeda: 'BRL', status: 'ativo' });
+  const newTool = (): Tool => ({ nome: '', categoria: 'infraestrutura', moeda: 'BRL', status: 'ativo', frequencia_cobranca: 'mensal' });
 
   const totalMensal = tools.filter((t) => t.status === 'ativo' && t.custo_mensal_brl)
     .reduce((s, t) => s + (t.custo_mensal_brl || 0), 0);
@@ -526,8 +526,10 @@ function FerramentasTab() {
           <tr className="text-left text-xs text-slate-400 border-b border-slate-800">
             <th className="py-2">Ferramenta</th>
             <th>Categoria</th>
+            <th>Produto</th>
             <th>Plano</th>
             <th>Custo mensal</th>
+            <th>Frequência</th>
             <th>Próx. venc.</th>
             <th>Status</th>
             <th></th>
@@ -538,8 +540,10 @@ function FerramentasTab() {
             <tr key={t.id} className="border-b border-slate-900 hover:bg-slate-900/50">
               <td className="py-3 font-medium">{t.nome}</td>
               <td className="text-[#06B6D4]">{t.categoria}</td>
+              <td className="text-slate-400">{t.owner_product || '—'}</td>
               <td className="text-slate-300">{t.plano || '—'}</td>
               <td>{t.custo_mensal_brl ? `${t.moeda} ${t.custo_mensal_brl}` : '—'}</td>
+              <td><span className="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300">{t.frequencia_cobranca || 'mensal'}</span></td>
               <td className="text-slate-400">{t.proximo_vencimento || '—'}</td>
               <td><span className={`text-xs px-2 py-0.5 rounded ${t.status === 'ativo' ? 'bg-green-500/20 text-green-400' : 'bg-slate-500/20 text-slate-400'}`}>{t.status}</span></td>
               <td className="flex gap-1 py-3">
@@ -596,6 +600,17 @@ function ToolForm({ tool, onSave, onCancel }: { tool: Tool; onSave: (t: Tool) =>
             <option value="BRL">BRL</option>
             <option value="USD">USD</option>
             <option value="EUR">EUR</option>
+          </select>
+        </Field>
+        <Field label="Frequência de cobrança">
+          <select className={selectClass} value={t.frequencia_cobranca || 'mensal'} onChange={(e) => setT({ ...t, frequencia_cobranca: e.target.value as any })}>
+            <option value="mensal">Mensal</option>
+            <option value="bimestral">Bimestral</option>
+            <option value="trimestral">Trimestral</option>
+            <option value="semestral">Semestral</option>
+            <option value="anual">Anual</option>
+            <option value="sob_demanda">Sob demanda (pay-per-use)</option>
+            <option value="avulso">Avulso (cobrança única)</option>
           </select>
         </Field>
         <Field label="Próximo vencimento">
