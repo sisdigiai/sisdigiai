@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DIGIAI Letterhead Template</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Source+Serif+4:opsz,wght@8..60,400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#c2c6db",
+                        "secondary-fixed-dim": "#adcebd",
+                        "on-primary-fixed-variant": "#414658",
+                        "primary-container": "#0a0f1e",
+                        "on-error": "#690005",
+                        "surface-container-lowest": "#080e1a",
+                        "on-tertiary": "#2e3132",
+                        "on-secondary-container": "#9fc0af",
+                        "on-secondary-fixed-variant": "#2f4d40",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#454748",
+                        "surface-container-high": "#242a36",
+                        "primary-fixed": "#dee1f7",
+                        "surface-container-low": "#161c27",
+                        "surface-container": "#1a202c",
+                        "surface-bright": "#333946",
+                        "surface-variant": "#2f3542",
+                        "secondary-fixed": "#c8ead8",
+                        "on-primary": "#2b3040",
+                        "inverse-primary": "#595e70",
+                        "tertiary-fixed": "#e1e3e4",
+                        "surface-dim": "#0d131f",
+                        "primary": "#c2c6db",
+                        "surface": "#0d131f",
+                        "on-primary-container": "#777b8e",
+                        "tertiary": "#c5c7c8",
+                        "error-container": "#93000a",
+                        "surface-container-highest": "#2f3542",
+                        "secondary-container": "#314f42",
+                        "on-surface-variant": "#c7c6cd",
+                        "on-background": "#dde2f3",
+                        "outline-variant": "#46464c",
+                        "on-surface": "#dde2f3",
+                        "outline": "#909097",
+                        "on-secondary-fixed": "#012116",
+                        "on-primary-fixed": "#161b2b",
+                        "background": "#0d131f",
+                        "on-secondary": "#18362a",
+                        "tertiary-container": "#0d1011",
+                        "secondary": "#adcebd",
+                        "primary-fixed-dim": "#c2c6db",
+                        "on-tertiary-container": "#7a7c7d",
+                        "inverse-surface": "#dde2f3",
+                        "on-tertiary-fixed": "#191c1d",
+                        "inverse-on-surface": "#2a303d",
+                        "error": "#ffb4ab"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "container-max": "1440px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Source Serif 4"],
+                        "display-lg": ["Source Serif 4"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Source Serif 4"],
+                        "headline-lg-mobile": ["Source Serif 4"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "label-md": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg": ["64px", { "lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface-container-lowest min-h-screen flex items-center justify-center py-12 antialiased selection:bg-secondary/30 selection:text-secondary-fixed">
+<!-- A4 Document Canvas -->
+<!-- Proportions set to A4 standard (210x297mm). Uses shadow and border to separate from web background -->
+<div class="w-[210mm] min-h-[297mm] bg-background shadow-2xl border border-outline-variant/10 flex flex-col relative box-border">
+<!-- Header Area -->
+<header class="pt-[20mm] pl-[25mm] pr-[20mm] pb-[6mm]">
+<div class="flex justify-between items-end mb-4">
+<!-- Brand Wordmark -->
+<div class="font-headline-md text-headline-md uppercase tracking-tighter text-on-background leading-none">
+                    DIGIAI
+                </div>
+<!-- Technical Metadata -->
+<div class="font-label-sm text-label-sm text-on-surface-variant text-right flex flex-col gap-1.5 opacity-90">
+<span>DIGIAI ÓTICA E TECNOLOGIA LTDA · CNPJ 12.549.582/0001-49</span>
+<span>Rua General Francisco Glicério, 940 · Jardim Guaio · Suzano-SP</span>
+<span>junior@digiai.com.br · (11) ____-____</span>
+</div>
+</div>
+<!-- Structural Divider -->
+<div class="w-full border-b border-secondary"></div>
+</header>
+<!-- Body Area (Editable Content Region) -->
+<main class="flex-grow pl-[25mm] pr-[20mm] py-[12mm]">
+<div class="font-body-md text-body-md text-on-surface opacity-85 space-y-6">
+<!-- Date/Salutation -->
+<p class="mb-12 text-on-surface-variant">São Paulo, 24 de Outubro de 2024</p>
+<p class="font-semibold text-on-background">Prezado(a) Cliente,</p>
+<!-- Lorem Ipsum Sample -->
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<p>Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Donec lobortis risus a elit. Etiam tempor. Ut ullamcorper, ligula eu tempor congue, eros est euismod turpis, id tincidunt sapien risus a quam.</p>
+<p>Aliquam erat volutpat. Aenean scelerisque. Curabitur vel quam mi. Nunc et dui sed est dignissim sagittis vel sit amet nisl. Vestibulum tristique eleifend diam sed vulputate. Vestibulum fringilla non nisi eu tristique. Pellentesque ut leo magna. Proin porta est sed turpis sodales, in malesuada mauris facilisis. Mauris consectetur est id nisl fringilla, eget bibendum odio molestie. Phasellus elementum tellus vitae imperdiet consequat.</p>
+<!-- Sign-off -->
+<div class="pt-16 mt-8 border-t border-outline-variant/10 inline-block">
+<p class="font-semibold text-on-background mb-1">Junior Silva</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Diretor de Tecnologia</p>
+</div>
+</div>
+</main>
+<!-- Footer Area -->
+<footer class="pb-[20mm] pl-[25mm] pr-[20mm] pt-[6mm] mt-auto">
+<!-- Structural Divider -->
+<div class="w-full border-t border-secondary mb-5"></div>
+<div class="flex items-center relative">
+<!-- Empty left div to balance grid -->
+<div class="flex-1"></div>
+<!-- Centered Page Indicator -->
+<div class="font-label-sm text-label-sm text-on-surface-variant absolute left-1/2 -translate-x-1/2 opacity-70">
+                    Página 1 de 1
+                </div>
+<!-- Right Small Wordmark -->
+<div class="font-label-sm text-label-sm font-bold tracking-widest uppercase text-on-background flex-1 text-right">
+                    DIGIAI
+                </div>
+</div>
+</footer>
+</div>
+</body></html>

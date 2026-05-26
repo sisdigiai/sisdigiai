@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DIGIAI Letterhead</title>
+<!-- Google Fonts: Source Serif 4, Inter, JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Source+Serif+4:opsz,wght@8..60,400;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#c2c6db",
+                        "secondary-fixed-dim": "#adcebd",
+                        "on-primary-fixed-variant": "#414658",
+                        "primary-container": "#0a0f1e",
+                        "on-error": "#690005",
+                        "surface-container-lowest": "#080e1a",
+                        "on-tertiary": "#2e3132",
+                        "on-secondary-container": "#9fc0af",
+                        "on-secondary-fixed-variant": "#2f4d40",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#454748",
+                        "surface-container-high": "#242a36",
+                        "primary-fixed": "#dee1f7",
+                        "surface-container-low": "#161c27",
+                        "surface-container": "#1a202c",
+                        "surface-bright": "#333946",
+                        "surface-variant": "#2f3542",
+                        "secondary-fixed": "#c8ead8",
+                        "on-primary": "#2b3040",
+                        "inverse-primary": "#595e70",
+                        "tertiary-fixed": "#e1e3e4",
+                        "surface-dim": "#0d131f",
+                        "primary": "#c2c6db",
+                        "surface": "#0d131f",
+                        "on-primary-container": "#777b8e",
+                        "tertiary": "#c5c7c8",
+                        "error-container": "#93000a",
+                        "surface-container-highest": "#2f3542",
+                        "secondary-container": "#314f42",
+                        "on-surface-variant": "#c7c6cd",
+                        "on-background": "#dde2f3",
+                        "outline-variant": "#46464c",
+                        "on-surface": "#dde2f3",
+                        "outline": "#909097",
+                        "on-secondary-fixed": "#012116",
+                        "on-primary-fixed": "#161b2b",
+                        "background": "#0d131f",
+                        "on-secondary": "#18362a",
+                        "tertiary-container": "#0d1011",
+                        "secondary": "#adcebd",
+                        "primary-fixed-dim": "#c2c6db",
+                        "on-tertiary-container": "#7a7c7d",
+                        "inverse-surface": "#dde2f3",
+                        "on-tertiary-fixed": "#191c1d",
+                        "inverse-on-surface": "#2a303d",
+                        "error": "#ffb4ab"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "container-max": "1440px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Source Serif 4"],
+                        "display-lg": ["Source Serif 4"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Source Serif 4"],
+                        "headline-lg-mobile": ["Source Serif 4"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "label-md": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg": ["64px", { "lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Print optimizations */
+        @media print {
+            body {
+                background: white !important;
+                padding: 0 !important;
+            }
+            .a4-container {
+                box-shadow: none !important;
+                margin: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen py-12 px-4 flex justify-center items-start">
+<!-- A4 Paper Container -->
+<div class="a4-container w-[210mm] min-h-[297mm] bg-white text-primary-container shadow-2xl flex flex-col relative" style="padding: 20mm;">
+<!-- Header -->
+<header class="flex justify-between items-end pb-6 border-b border-secondary-container">
+<!-- Wordmark -->
+<div class="font-headline-md text-headline-md font-bold tracking-tighter uppercase">
+                DIGIAI
+            </div>
+<!-- Metadata -->
+<div class="font-label-sm text-label-sm text-right space-y-1 opacity-80">
+<p>DIGIAI ÓTICA E TECNOLOGIA LTDA · CNPJ 12.549.582/0001-49</p>
+<p>Rua General Francisco Glicério, 940 · Jardim Guaio · Suzano-SP</p>
+<p>junior@digiai.com.br · (11) ____-____</p>
+</div>
+</header>
+<!-- Body / Editable Area -->
+<!-- Margins specified in prompt: Left 25mm, Right 20mm (applied to this specific container relative to the padding of the page) -->
+<main class="flex-grow pt-12" style="padding-left: 5mm; padding-right: 0mm;">
+<div class="font-body-md text-body-md space-y-6 leading-relaxed max-w-[150mm]">
+<p>
+<strong>À quem possa interessar,</strong>
+</p>
+<p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                </p>
+<p>
+                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Praesent elementum facilisis leo vel fringilla est ullamcorper eget.
+                </p>
+<p>
+                    Phasellus faucibus scelerisque eleifend donec pretium vulputate. Sapien faucibus et molestie ac feugiat sed lectus vestibulum. Urna cursus eget nunc scelerisque viverra mauris in aliquam. Et pharetra pharetra massa massa ultricies mi quis hendrerit dolor.
+                </p>
+<div class="pt-12">
+<p>Atenciosamente,</p>
+<div class="mt-8 border-t border-primary-container/20 w-48 pt-2">
+<strong>Nome do Signatário</strong><br/>
+<span class="font-label-sm text-label-sm opacity-70">Cargo / Função</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="pt-6 border-t border-secondary-container flex justify-between items-center mt-auto">
+<!-- Left spacer for balance -->
+<div class="w-24"></div>
+<!-- Center Pagination -->
+<div class="font-label-sm text-label-sm opacity-60">
+                Página 1 de 1
+            </div>
+<!-- Right Small Wordmark -->
+<div class="w-24 text-right font-headline-lg-mobile text-headline-lg-mobile !text-[16px] !leading-none font-bold uppercase tracking-tight">
+                DIGIAI
+            </div>
+</footer>
+</div>
+</body></html>

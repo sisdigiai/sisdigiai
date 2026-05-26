@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Slide 2 - Problema</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#0a0f1e",
+                        "primary-fixed-dim": "#c2c6db",
+                        "inverse-on-surface": "#2a303d",
+                        "tertiary-fixed": "#e1e3e4",
+                        "on-primary": "#2b3040",
+                        "surface-container-lowest": "#080e1a",
+                        "inverse-surface": "#dde2f3",
+                        "outline": "#909097",
+                        "on-error": "#690005",
+                        "on-background": "#dde2f3",
+                        "on-secondary": "#18362a",
+                        "on-surface": "#dde2f3",
+                        "error-container": "#93000a",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "surface-container": "#1a202c",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-container": "#9fc0af",
+                        "on-secondary-fixed": "#012116",
+                        "surface-container-high": "#242a36",
+                        "surface-bright": "#333946",
+                        "primary-fixed": "#dee1f7",
+                        "surface-tint": "#c2c6db",
+                        "on-tertiary-fixed-variant": "#454748",
+                        "secondary": "#adcebd",
+                        "on-tertiary-fixed": "#191c1d",
+                        "secondary-container": "#314f42",
+                        "tertiary-container": "#0d1011",
+                        "surface": "#0d131f",
+                        "on-surface-variant": "#c7c6cd",
+                        "tertiary": "#c5c7c8",
+                        "on-tertiary": "#2e3132",
+                        "on-primary-fixed": "#161b2b",
+                        "primary": "#c2c6db",
+                        "secondary-fixed-dim": "#adcebd",
+                        "on-tertiary-container": "#7a7c7d",
+                        "surface-dim": "#0d131f",
+                        "error": "#ffb4ab",
+                        "surface-container-low": "#161c27",
+                        "surface-container-highest": "#2f3542",
+                        "secondary-fixed": "#c8ead8",
+                        "inverse-primary": "#595e70",
+                        "on-primary-container": "#777b8e",
+                        "background": "#0d131f",
+                        "on-secondary-fixed-variant": "#2f4d40",
+                        "on-primary-fixed-variant": "#414658",
+                        "surface-variant": "#2f3542",
+                        "outline-variant": "#46464c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "unit": "4px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Source Serif 4"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Source Serif 4"],
+                        "headline-lg": ["Source Serif 4"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-lg-mobile": ["Source Serif 4"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["64px", { "lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            /* 16:9 aspect ratio enforcement for presentation slide feel */
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #0d131f; /* Dark Navy fallback */
+        }
+        .slide-container {
+            width: 100%;
+            max-width: 1920px;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            position: relative;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background selection:bg-secondary selection:text-on-secondary">
+<!-- Top Navigation (Contextual) -->
+<nav class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-desktop h-20 bg-surface dark:bg-surface border-b border-outline-variant dark:border-outline-variant">
+<div class="font-display-lg text-headline-md tracking-tighter text-on-surface dark:text-on-surface uppercase">
+            DIGIAI
+        </div>
+<div class="hidden md:flex gap-8">
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-secondary dark:hover:text-secondary transition-colors duration-200" href="#">Overview</a>
+<a class="font-label-md text-label-md text-on-surface dark:text-on-surface font-bold border-b-2 border-secondary hover:text-secondary dark:hover:text-secondary transition-colors duration-200" href="#">Analysis</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-secondary dark:hover:text-secondary transition-colors duration-200" href="#">Execution</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-secondary dark:hover:text-secondary transition-colors duration-200" href="#">Contact</a>
+</div>
+<div class="font-label-md text-label-md text-on-surface-variant">
+            Institutional V1.0
+        </div>
+</nav>
+<!-- Side Navigation (Contextual) -->
+<aside class="hidden lg:flex flex-col h-screen fixed left-0 top-0 py-8 w-64 bg-surface-container dark:bg-surface-container border-r border-outline-variant z-40 mt-20">
+<div class="flex flex-col gap-2 px-4 mt-8">
+<a class="flex items-center gap-4 px-4 py-3 rounded-none text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest dark:hover:bg-surface-container-highest Transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined text-secondary dark:text-secondary">title</span>
+<span class="font-label-md text-label-md">Cover</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-none bg-secondary-container dark:bg-secondary-container text-on-secondary-container dark:text-on-secondary-container border-l-4 border-secondary Transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined text-secondary dark:text-secondary" style="font-variation-settings: 'FILL' 1;">warning</span>
+<span class="font-label-md text-label-md">Problem</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-none text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest dark:hover:bg-surface-container-highest Transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined text-secondary dark:text-secondary">query_stats</span>
+<span class="font-label-md text-label-md">Metric</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-none text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest dark:hover:bg-surface-container-highest Transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined text-secondary dark:text-secondary">lightbulb</span>
+<span class="font-label-md text-label-md">Solution</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-none text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest dark:hover:bg-surface-container-highest Transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined text-secondary dark:text-secondary">groups</span>
+<span class="font-label-md text-label-md">Team</span>
+</a>
+</div>
+</aside>
+<!-- Main Presentation Area -->
+<main class="slide-container bg-background lg:ml-64 flex flex-col justify-center px-margin-desktop py-24 relative">
+<!-- Ambient Grid Background for Editorial Tech Feel -->
+<div class="absolute inset-0 pointer-events-none opacity-10" style="background-size: 32px 32px; background-image: linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px);"></div>
+<div class="max-w-container-max mx-auto w-full z-10 relative h-full flex flex-col">
+<!-- Headline -->
+<header class="mb-16 md:mb-24">
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface max-w-4xl text-balance">
+                    O varejo óptico brasileiro decide com palpites.
+                </h1>
+</header>
+<!-- Content Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 flex-grow items-center">
+<!-- Left: Bullet List -->
+<div class="space-y-8">
+<div class="flex gap-6 items-start group">
+<span class="font-label-sm text-label-sm text-secondary pt-2">01</span>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface-variant group-hover:text-on-surface transition-colors duration-300">
+                                Falta de integração de dados
+                            </p>
+</div>
+</div>
+<div class="h-px w-full bg-outline-variant/30"></div>
+<div class="flex gap-6 items-start group">
+<span class="font-label-sm text-label-sm text-secondary pt-2">02</span>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface-variant group-hover:text-on-surface transition-colors duration-300">
+                                Processos manuais ineficientes
+                            </p>
+</div>
+</div>
+<div class="h-px w-full bg-outline-variant/30"></div>
+<div class="flex gap-6 items-start group">
+<span class="font-label-sm text-label-sm text-secondary pt-2">03</span>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface-variant group-hover:text-on-surface transition-colors duration-300">
+                                Baixa previsibilidade de estoque
+                            </p>
+</div>
+</div>
+</div>
+<!-- Right: Giant Metric -->
+<div class="relative pl-12 md:pl-24 border-l-2 border-secondary h-full flex flex-col justify-center">
+<div class="absolute -left-[1px] top-1/2 -translate-y-1/2 w-1 h-32 bg-secondary blur-[2px] opacity-50"></div>
+<div class="flex flex-col gap-4">
+<h2 class="font-display-lg text-[120px] leading-none text-on-surface tracking-tighter drop-shadow-2xl">
+                            62<span class="text-secondary">%</span>
+</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-sm">
+                            das óticas independentes operam sem análise de dados estruturada.
+                        </p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer (Contextual) -->
+<footer class="fixed bottom-0 left-0 w-full px-margin-desktop py-6 flex justify-between items-center z-40 bg-surface dark:bg-surface border-t border-outline-variant">
+<div class="font-label-md text-label-md text-primary">
+            DIGIAI
+        </div>
+<div class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant dark:text-on-surface-variant">
+            © 2024 DIGIAI SYSTEMS. ALL RIGHTS RESERVED. CONFIDENTIAL.
+        </div>
+<div class="hidden md:flex gap-6 font-label-sm text-label-sm uppercase tracking-widest">
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-secondary dark:hover:text-secondary Standard link hover transition" href="#">Metadata</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-secondary dark:hover:text-secondary Standard link hover transition" href="#">Technical Specs</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-secondary dark:hover:text-secondary Standard link hover transition" href="#">Compliance</a>
+</div>
+</footer>
+</body></html>

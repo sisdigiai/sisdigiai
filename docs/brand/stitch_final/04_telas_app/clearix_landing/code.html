@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;family=Source+Serif+4:ital,wght@0,600;0,700;1,600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#161c27",
+                    "on-tertiary-container": "#7a7c7d",
+                    "on-tertiary": "#2e3132",
+                    "surface-container-highest": "#2f3542",
+                    "on-primary": "#2b3040",
+                    "on-tertiary-fixed": "#191c1d",
+                    "secondary-fixed-dim": "#adcebd",
+                    "on-primary-container": "#777b8e",
+                    "on-secondary-fixed-variant": "#2f4d40",
+                    "on-background": "#dde2f3",
+                    "on-primary-fixed-variant": "#414658",
+                    "inverse-on-surface": "#2a303d",
+                    "surface-container-high": "#242a36",
+                    "error": "#ffb4ab",
+                    "primary-fixed-dim": "#c2c6db",
+                    "secondary-container": "#314f42",
+                    "on-surface": "#dde2f3",
+                    "on-surface-variant": "#c7c6cd",
+                    "background": "#0d131f",
+                    "secondary-fixed": "#c8ead8",
+                    "primary-fixed": "#dee1f7",
+                    "on-error": "#690005",
+                    "secondary": "#adcebd",
+                    "tertiary": "#c5c7c8",
+                    "outline": "#909097",
+                    "tertiary-fixed": "#e1e3e4",
+                    "inverse-primary": "#595e70",
+                    "tertiary-container": "#0d1011",
+                    "primary-container": "#0a0f1e",
+                    "primary": "#c2c6db",
+                    "error-container": "#93000a",
+                    "on-primary-fixed": "#161b2b",
+                    "surface-container-lowest": "#080e1a",
+                    "tertiary-fixed-dim": "#c5c7c8",
+                    "inverse-surface": "#dde2f3",
+                    "surface": "#0d131f",
+                    "surface-variant": "#2f3542",
+                    "surface-container": "#1a202c",
+                    "surface-dim": "#0d131f",
+                    "on-tertiary-fixed-variant": "#454748",
+                    "outline-variant": "#46464c",
+                    "on-error-container": "#ffdad6",
+                    "surface-bright": "#333946",
+                    "on-secondary-container": "#9fc0af",
+                    "surface-tint": "#c2c6db",
+                    "on-secondary": "#18362a",
+                    "on-secondary-fixed": "#012116"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "64px",
+                    "margin-mobile": "16px",
+                    "unit": "4px",
+                    "gutter": "24px",
+                    "container-max": "1440px"
+            },
+            "fontFamily": {
+                    "label-md": ["JetBrains Mono"],
+                    "headline-lg": ["Source Serif 4"],
+                    "display-lg": ["Source Serif 4"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-md": ["Source Serif 4"],
+                    "label-sm": ["JetBrains Mono"],
+                    "headline-lg-mobile": ["Source Serif 4"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["64px", {"lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body {
+            background-color: #0d131f;
+            color: #dde2f3;
+        }
+        .editorial-grid {
+            background-image: linear-gradient(rgba(248, 249, 250, 0.03) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(248, 249, 250, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+<!-- TopAppBar Component -->
+<header class="w-full top-0 sticky z-50 bg-background border-b border-outline-variant/10">
+<div class="flex items-center justify-between px-margin-mobile py-4 max-w-container-max mx-auto md:px-margin-desktop">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="grid_view">grid_view</span>
+<span class="font-headline-md text-headline-md tracking-tighter uppercase text-on-background">DIGIAI Holding</span>
+</div>
+<div class="h-10 w-10 rounded-full bg-surface-container flex items-center justify-center border border-outline-variant/20 overflow-hidden">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="person">person</span>
+</div>
+</div>
+</header>
+<main class="flex-grow relative overflow-hidden editorial-grid">
+<!-- Hero Section -->
+<section class="relative pt-12 pb-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Content Column -->
+<div class="lg:col-span-7 flex flex-col justify-center space-y-8 z-10">
+<div class="inline-flex items-center space-x-2">
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-3 py-1 border-l-2 border-secondary">
+                            ANCHOR PRODUCT
+                        </span>
+<span class="text-on-tertiary-container font-label-sm text-label-sm uppercase tracking-widest">PRODUTO-NCORA 7 DIGIAI</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface max-w-2xl">
+                        Clearix: Precisão geométrica na gestão da sua ótica.
+                    </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
+                        O ecossistema SaaS operado por IA para varejistas que decidem com dados, não com palpites.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-4 pt-4">
+<button class="bg-secondary text-on-secondary px-8 py-4 font-label-md text-label-md flex items-center justify-center group transition-all duration-300 hover:opacity-90 active:scale-95">
+                            SOLICITAR DEMONSTRAÇÃO
+                            <span class="material-symbols-outlined ml-2 transition-transform group-hover:translate-x-1" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="border border-outline-variant/30 text-on-surface px-8 py-4 font-label-md text-label-md hover:bg-surface-container transition-colors">
+                            VER ECOSSISTEMA
+                        </button>
+</div>
+<!-- Trust Indicators -->
+<div class="pt-12 border-t border-outline-variant/10">
+<p class="font-label-sm text-label-sm text-on-tertiary-container mb-4 uppercase">INTEGRADO COM OS MAIORES FABRICANTES DE LENTES</p>
+<div class="flex flex-wrap gap-8 opacity-40 grayscale contrast-125">
+<span class="font-headline-md text-[20px] font-bold tracking-tighter">ZEISS</span>
+<span class="font-headline-md text-[20px] font-bold tracking-tighter">HOYA</span>
+<span class="font-headline-md text-[20px] font-bold tracking-tighter">ESSILOR</span>
+</div>
+</div>
+</div>
+<!-- Visual Column -->
+<div class="lg:col-span-5 relative mt-16 lg:mt-0">
+<div class="relative w-full aspect-square md:aspect-auto md:h-[600px] flex items-center justify-center">
+<!-- Geometric Background Element -->
+<div class="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent rounded-full blur-3xl -z-10 animate-pulse"></div>
+<!-- Main Visual: Abstract Lens Shape / Interface Mockup -->
+<div class="relative w-full h-full border border-outline-variant/20 bg-surface-container-lowest overflow-hidden group">
+<img class="w-full h-full object-cover opacity-60 mix-blend-luminosity group-hover:scale-105 transition-transform duration-1000" data-alt="A high-precision, architectural macro photograph of a sophisticated optical lens featuring intricate geometric light refractions. The aesthetic is clean, corporate, and technical, utilizing a deep midnight blue and charcoal palette with sharp forest green accents. Soft, clinical studio lighting highlights the flawless glass surface and mathematical precision of the lens design. The mood is authoritative and scientific, representing advanced AI-driven retail technology for independent opticians." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB742P9WqInGhaUXiUybTLGdcmrVF6XxrZ3lqe-TUxCpYnCDNB1q0cwdnNMQM0meoXaDuJiGwxCUem0qgYw9p5A55vjdegNfgcNfewY2O7RMm6HwCrVXy1toyUgU2xqKnHkP9H25la2HXvaT2fnJIDF-ociGjKwgPKp60E64n1UaWrZvlmpNKTdx1CAk1rqnSVx4AtBlkhXR-TAWqRUq4EdgKbuGYZh5u8XPIQyZqn6m1QOM32KmJemvv_DcDV_An1ow36mF7tGzmd7"/>
+<!-- UI Floating Overlay Elements -->
+<div class="absolute top-8 left-8 p-4 bg-surface-container border border-outline-variant/20 backdrop-blur-sm">
+<p class="font-label-sm text-label-sm text-secondary mb-1">MÉTRICA DE PRECISÃO</p>
+<p class="font-headline-md text-[24px] text-on-surface">99.8%</p>
+</div>
+<div class="absolute bottom-8 right-8 p-4 bg-surface-container border border-outline-variant/20 backdrop-blur-sm">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">IA Ativa</p>
+</div>
+<div class="space-y-2">
+<div class="h-1 w-24 bg-outline-variant/20 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-3/4"></div>
+</div>
+<div class="h-1 w-24 bg-outline-variant/20 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-1/2"></div>
+</div>
+</div>
+</div>
+<!-- Decorative Crosshairs -->
+<div class="absolute top-0 right-0 p-4">
+<span class="material-symbols-outlined text-outline-variant/40" data-icon="crosshair">double_arrow</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Product Ecosystem Drawer (Floating Preview for Page Layout) -->
+<aside class="hidden lg:flex flex-col fixed left-0 top-1/2 -translate-y-1/2 h-auto w-16 hover:w-64 bg-surface-container border-r border-outline-variant/10 transition-all duration-300 group overflow-hidden py-8 space-y-6 z-40">
+<div class="flex items-center px-4 space-x-4">
+<span class="material-symbols-outlined text-secondary" data-icon="insights">insights</span>
+<span class="font-label-md text-label-md font-bold text-on-surface whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Product Ecosystem</span>
+</div>
+<nav class="flex flex-col space-y-2">
+<a class="flex items-center px-4 py-3 bg-secondary-container text-on-secondary-container border-l-4 border-secondary space-x-4" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Clearix</span>
+</a>
+<a class="flex items-center px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all space-x-4" href="#">
+<span class="material-symbols-outlined" data-icon="lightbulb">lightbulb</span>
+<span class="font-label-md text-label-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Lumina</span>
+</a>
+<a class="flex items-center px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all space-x-4" href="#">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span class="font-label-md text-label-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Pulso</span>
+</a>
+</nav>
+</aside>
+</main>
+<!-- Footer Component -->
+<footer class="w-full mt-auto bg-background border-t border-outline-variant/10">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-mobile py-8 max-w-container-max mx-auto md:px-margin-desktop">
+<div class="flex flex-col items-center md:items-start space-y-2 mb-6 md:mb-0">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface">DIGIAI TECH HOLDING</span>
+<p class="font-label-sm text-label-sm text-on-tertiary-container">9 2024 DIGIAI Tech Holding 7 Brasil</p>
+</div>
+<nav class="flex space-x-8">
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-on-surface transition-colors" href="#">Architecture</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-on-surface transition-colors" href="#">Privacy</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-on-surface transition-colors" href="#">System Status</a>
+</nav>
+</div>
+</footer>
+<!-- Interactive Atmospheric Script -->
+<script>
+        document.addEventListener('mousemove', (e) => {
+            const grid = document.querySelector('.editorial-grid');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            grid.style.backgroundPosition = `${x * 10}px ${y * 10}px`;
+        });
+    </script>
+</body></html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Source+Serif+4:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0d131f;
+            color: #dde2f3;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1a202c;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #46464c;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#161c27",
+                        "on-tertiary-container": "#7a7c7d",
+                        "on-tertiary": "#2e3132",
+                        "surface-container-highest": "#2f3542",
+                        "on-primary": "#2b3040",
+                        "on-tertiary-fixed": "#191c1d",
+                        "secondary-fixed-dim": "#adcebd",
+                        "on-primary-container": "#777b8e",
+                        "on-secondary-fixed-variant": "#2f4d40",
+                        "on-background": "#dde2f3",
+                        "on-primary-fixed-variant": "#414658",
+                        "inverse-on-surface": "#2a303d",
+                        "surface-container-high": "#242a36",
+                        "error": "#ffb4ab",
+                        "primary-fixed-dim": "#c2c6db",
+                        "secondary-container": "#314f42",
+                        "on-surface": "#dde2f3",
+                        "on-surface-variant": "#c7c6cd",
+                        "background": "#0d131f",
+                        "secondary-fixed": "#c8ead8",
+                        "primary-fixed": "#dee1f7",
+                        "on-error": "#690005",
+                        "secondary": "#adcebd",
+                        "tertiary": "#c5c7c8",
+                        "outline": "#909097",
+                        "tertiary-fixed": "#e1e3e4",
+                        "inverse-primary": "#595e70",
+                        "tertiary-container": "#0d1011",
+                        "primary-container": "#0a0f1e",
+                        "primary": "#c2c6db",
+                        "error-container": "#93000a",
+                        "on-primary-fixed": "#161b2b",
+                        "surface-container-lowest": "#080e1a",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "inverse-surface": "#dde2f3",
+                        "surface": "#0d131f",
+                        "surface-variant": "#2f3542",
+                        "surface-container": "#1a202c",
+                        "surface-dim": "#0d131f",
+                        "on-tertiary-fixed-variant": "#454748",
+                        "outline-variant": "#46464c",
+                        "on-error-container": "#ffdad6",
+                        "surface-bright": "#333946",
+                        "on-secondary-container": "#9fc0af",
+                        "surface-tint": "#c2c6db",
+                        "on-secondary": "#18362a",
+                        "on-secondary-fixed": "#012116"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "64px",
+                        "margin-mobile": "16px",
+                        "unit": "4px",
+                        "gutter": "24px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["JetBrains Mono"],
+                        "headline-lg": ["Source Serif 4"],
+                        "display-lg": ["Source Serif 4"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Source Serif 4"],
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-lg-mobile": ["Source Serif 4"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["64px", {"lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-background border-b border-outline-variant/10 z-50">
+<div class="flex items-center justify-between px-margin-mobile py-4 max-w-container-max mx-auto md:px-margin-desktop">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary cursor-pointer">grid_view</span>
+<h1 class="font-headline-md text-headline-md tracking-tighter uppercase text-on-background">DIGIAI Holding</h1>
+</div>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/20">
+<img alt="Global Profile" class="w-full h-full object-cover" data-alt="A professional close-up portrait of a high-end corporate executive in a minimalist studio. The lighting is crisp and cool, casting soft shadows that emphasize a polished, technical aesthetic. The background is a clean, dark slate gray, maintaining the silent power and reliable atmosphere of the Swiss design movement. Every detail of the subject's professional attire is sharp and defined." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtmIUeyXdzZBiw4Df-2Q79Etn3cJEzERniJA7JTm68zDQ_YCJ5uIaKlZcvxU-HPHEeIQoHF9tue6oOiFrDgevK25usoLO4vHMc2HNjiaj9T0wdPZZtg--KdXOChFAgIoiZTNQWfmPB-t9MSebXd_s9HeaT3gUDiLlIqmvAGhwuxoGlGZ154QZ_FXvZqPY2pK4jHE8VHzTLR9UOlY4NLi36tvbOzm9FWowLJhUJw5r7GsfK5JHq8lqAVLw48YLk3vHQQzn7KZ8usclK"/>
+</div>
+</div>
+</header>
+<main class="flex-1 flex flex-col md:flex-row max-w-container-max mx-auto w-full relative">
+<!-- NavigationDrawer (Desktop Only) -->
+<aside class="hidden md:flex flex-col h-[calc(100vh-80px)] w-64 sticky top-20 py-8 space-y-2 bg-surface-container border-r border-outline-variant/10">
+<div class="px-6 mb-6">
+<h2 class="font-label-md text-label-md font-bold text-on-surface uppercase tracking-widest">Product Ecosystem</h2>
+</div>
+<nav class="flex flex-col">
+<a class="flex items-center gap-3 px-6 py-3 bg-secondary-container text-on-secondary-container border-l-4 border-secondary transition-transform Active:translate-x-1" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md text-label-md">Clearix</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">lightbulb</span>
+<span class="font-label-md text-label-md">Lumina</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span class="font-label-md text-label-md">Pulso</span>
+</a>
+</nav>
+</aside>
+<!-- Content Canvas -->
+<div class="flex-1 px-margin-mobile md:px-margin-desktop py-12 space-y-16">
+<!-- Portfolio Section -->
+<section>
+<header class="mb-8 border-l-2 border-secondary pl-4">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest">Portfólio de Ativos</span>
+<h2 class="font-headline-md text-headline-md text-on-surface mt-1">Ecossistema Financeiro</h2>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+<!-- Card 1: Clearix -->
+<div class="group bg-surface-container border border-outline-variant/10 p-6 flex flex-col justify-between transition-colors hover:border-secondary/30">
+<div class="flex justify-between items-start mb-12">
+<div>
+<span class="font-label-sm text-label-sm text-secondary block mb-1">DATA INTELLIGENCE</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Clearix</h3>
+</div>
+<span class="material-symbols-outlined text-secondary text-3xl">analytics</span>
+</div>
+<div class="space-y-4">
+<p class="font-body-md text-on-surface-variant max-w-xs">Análise preditiva de liquidez em tempo real para infraestruturas bancárias complexas.</p>
+<div class="flex items-center gap-4 pt-4 border-t border-outline-variant/10">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-tertiary-container">STATUS</span>
+<span class="font-label-md text-label-md text-secondary">OPERACIONAL</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-tertiary-container">TIER</span>
+<span class="font-label-md text-label-md text-on-surface">ALPHA-01</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2: Lumina -->
+<div class="group bg-surface-container border border-outline-variant/10 p-6 flex flex-col justify-between transition-colors hover:border-secondary/30">
+<div class="flex justify-between items-start mb-12">
+<div>
+<span class="font-label-sm text-label-sm text-secondary block mb-1">ASSET MANAGEMENT</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Lumina</h3>
+</div>
+<span class="material-symbols-outlined text-secondary text-3xl">lightbulb</span>
+</div>
+<div class="space-y-4">
+<p class="font-body-md text-on-surface-variant max-w-xs">Gestão autônoma de tesouraria digital com foco em preservação de capital institucional.</p>
+<div class="flex items-center gap-4 pt-4 border-t border-outline-variant/10">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-tertiary-container">STATUS</span>
+<span class="font-label-md text-label-md text-secondary">OPERACIONAL</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-tertiary-container">TIER</span>
+<span class="font-label-md text-label-md text-on-surface">BETA-04</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Data Table Section -->
+<section>
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+<div class="border-l-2 border-primary pl-4">
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-widest">Inventário Digital</span>
+<h2 class="font-headline-md text-headline-md text-on-surface mt-1">22 Ativos Listados</h2>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 border border-outline-variant/20 font-label-sm text-label-sm uppercase hover:bg-surface-container-high transition-colors">Exportar CSV</button>
+<button class="px-4 py-2 bg-secondary text-on-secondary font-label-sm text-label-sm uppercase font-bold transition-opacity Active:opacity-80">Novo Ativo</button>
+</div>
+</div>
+<div class="w-full overflow-x-auto custom-scrollbar border border-outline-variant/10">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant/20">
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-tertiary-container uppercase">Ativo</th>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-tertiary-container uppercase">Status</th>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-tertiary-container uppercase">Categoria</th>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-tertiary-container uppercase text-right">Volatilidade</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Dynamic Row Generation -->
+<script>
+                                const assets = [
+                                    { name: "DIGI-ETH-01", status: "Ativo", category: "Core Layer", vol: "0.22%" },
+                                    { name: "QUANT-FIN-X", status: "Ativo", category: "Liquidity", vol: "1.05%" },
+                                    { name: "NEURO-TOKEN", status: "Pendente", category: "AI Weights", vol: "---" },
+                                    { name: "PRIME-NODE", status: "Ativo", category: "Infrastructure", vol: "0.04%" },
+                                    { name: "LUM-GOV-04", status: "Ativo", category: "Governance", vol: "0.89%" },
+                                    { name: "CLX-STAKE", status: "Pendente", category: "Protocol", vol: "---" },
+                                    { name: "HEX-SHARD", status: "Ativo", category: "Security", vol: "0.15%" },
+                                    { name: "AXON-09", status: "Ativo", category: "Core Layer", vol: "2.41%" },
+                                    { name: "Z-PROOF-V1", status: "Ativo", category: "Privacy", vol: "0.08%" },
+                                    { name: "FLOW-STRE", status: "Ativo", category: "Liquidity", vol: "1.12%" }
+                                ];
+                                
+                                // Filling to 22 items conceptually
+                                for(let i=0; i<22; i++) {
+                                    const asset = assets[i % assets.length];
+                                    const statusClass = asset.status === 'Ativo' ? 'text-secondary' : 'text-on-tertiary-container';
+                                    document.write(`
+                                        <tr class="hover:bg-surface-container-lowest transition-colors">
+                                            <td class="px-6 py-4 font-label-md text-label-md text-on-surface">${asset.name}</td>
+                                            <td class="px-6 py-4">
+                                                <span class="flex items-center gap-2 font-label-sm text-label-sm ${statusClass}">
+                                                    <span class="w-1.5 h-1.5 rounded-full ${asset.status === 'Ativo' ? 'bg-secondary' : 'bg-on-tertiary-container'}"></span>
+                                                    ${asset.status}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-tighter">${asset.category}</td>
+                                            <td class="px-6 py-4 font-label-md text-label-md text-on-surface text-right">${asset.vol}</td>
+                                        </tr>
+                                    `);
+                                }
+                            </script>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full mt-auto border-t border-outline-variant/10 bg-background">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop py-12 max-w-container-max mx-auto gap-8">
+<div class="flex flex-col items-center md:items-start gap-2">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface">DIGIAI Tech Holding</span>
+<p class="font-label-sm text-label-sm text-on-tertiary-container">© 2024 DIGIAI Tech Holding. Precision Intelligence.</p>
+</div>
+<nav class="flex gap-8">
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-on-surface transition-colors" href="#">Architecture</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-on-surface transition-colors" href="#">Privacy</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-on-surface transition-colors" href="#">System Status</a>
+</nav>
+</div>
+</footer>
+<!-- FAB (Suppressed for List/Table view per logic, but here as reference for "Primary Action" screens) -->
+<!-- <button class="fixed bottom-8 right-8 w-14 h-14 bg-secondary text-on-secondary rounded-full flex items-center justify-center shadow-xl md:hidden">
+        <span class="material-symbols-outlined">add</span>
+    </button> -->
+<script>
+        // Micro-interaction for row highlighting
+        document.querySelectorAll('tr').forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                row.style.borderLeft = '2px solid var(--secondary)';
+            });
+            row.addEventListener('mouseleave', () => {
+                row.style.borderLeft = 'none';
+            });
+        });
+    </script>
+</body></html>

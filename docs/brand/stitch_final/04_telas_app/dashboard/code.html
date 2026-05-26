@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DIGIAI Holding - Painel Interno</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Source+Serif+4:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#161c27",
+                      "on-tertiary-container": "#7a7c7d",
+                      "on-tertiary": "#2e3132",
+                      "surface-container-highest": "#2f3542",
+                      "on-primary": "#2b3040",
+                      "on-tertiary-fixed": "#191c1d",
+                      "secondary-fixed-dim": "#adcebd",
+                      "on-primary-container": "#777b8e",
+                      "on-secondary-fixed-variant": "#2f4d40",
+                      "on-background": "#dde2f3",
+                      "on-primary-fixed-variant": "#414658",
+                      "inverse-on-surface": "#2a303d",
+                      "surface-container-high": "#242a36",
+                      "error": "#ffb4ab",
+                      "primary-fixed-dim": "#c2c6db",
+                      "secondary-container": "#314f42",
+                      "on-surface": "#dde2f3",
+                      "on-surface-variant": "#c7c6cd",
+                      "background": "#0d131f",
+                      "secondary-fixed": "#c8ead8",
+                      "primary-fixed": "#dee1f7",
+                      "on-error": "#690005",
+                      "secondary": "#adcebd",
+                      "tertiary": "#c5c7c8",
+                      "outline": "#909097",
+                      "tertiary-fixed": "#e1e3e4",
+                      "inverse-primary": "#595e70",
+                      "tertiary-container": "#0d1011",
+                      "primary-container": "#0a0f1e",
+                      "primary": "#c2c6db",
+                      "error-container": "#93000a",
+                      "on-primary-fixed": "#161b2b",
+                      "surface-container-lowest": "#080e1a",
+                      "tertiary-fixed-dim": "#c5c7c8",
+                      "inverse-surface": "#dde2f3",
+                      "surface": "#0d131f",
+                      "surface-variant": "#2f3542",
+                      "surface-container": "#1a202c",
+                      "surface-dim": "#0d131f",
+                      "on-tertiary-fixed-variant": "#454748",
+                      "outline-variant": "#46464c",
+                      "on-error-container": "#ffdad6",
+                      "surface-bright": "#333946",
+                      "on-secondary-container": "#9fc0af",
+                      "surface-tint": "#c2c6db",
+                      "on-secondary": "#18362a",
+                      "on-secondary-fixed": "#012116"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-desktop": "64px",
+                      "margin-mobile": "16px",
+                      "unit": "4px",
+                      "gutter": "24px",
+                      "container-max": "1440px"
+              },
+              "fontFamily": {
+                      "label-md": ["JetBrains Mono"],
+                      "headline-lg": ["Source Serif 4"],
+                      "display-lg": ["Source Serif 4"],
+                      "body-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-md": ["Source Serif 4"],
+                      "label-sm": ["JetBrains Mono"],
+                      "headline-lg-mobile": ["Source Serif 4"]
+              },
+              "fontSize": {
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "headline-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "display-lg": ["64px", {"lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "500"}],
+                      "headline-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #0d131f; }
+        ::-webkit-scrollbar-thumb { background: #2f3542; border-radius: 10px; }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col overflow-x-hidden">
+<!-- Sidebar / Navigation Drawer -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-surface-container border-r border-outline-variant/10 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out md:translate-x-0" id="nav-drawer">
+<div class="flex flex-col h-full py-8 space-y-2">
+<div class="px-6 mb-8">
+<span class="font-label-md text-label-md font-bold text-on-surface">Product Ecosystem</span>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center px-6 py-4 bg-secondary-container text-on-secondary-container border-l-4 border-secondary transition-transform Active: translate-x-1" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md">Clearix</span>
+</a>
+<a class="flex items-center px-6 py-4 text-on-surface-variant hover:bg-surface-container-highest transition-all" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="lightbulb">lightbulb</span>
+<span class="font-label-md text-label-md">Lumina</span>
+</a>
+<a class="flex items-center px-6 py-4 text-on-surface-variant hover:bg-surface-container-highest transition-all" href="#">
+<span class="material-symbols-outlined mr-3" data-icon="insights">insights</span>
+<span class="font-label-md text-label-md">Pulso</span>
+</a>
+</nav>
+<div class="px-6 mt-auto pt-8 border-t border-outline-variant/10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="account_circle">account_circle</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface">Admin Global</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter">Verified Node</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Overlay for mobile drawer -->
+<div class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity duration-300" id="drawer-overlay"></div>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col md:pl-64">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky z-30 bg-background/80 backdrop-blur-md border-b border-outline-variant/10">
+<div class="flex items-center justify-between px-4 md:px-margin-desktop py-4 max-w-container-max mx-auto">
+<button class="md:hidden text-primary" id="menu-toggle">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+</button>
+<h1 class="font-headline-md text-[20px] md:text-headline-md tracking-tighter uppercase text-on-background">DIGIAI Holding</h1>
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden border border-outline-variant/20">
+<img alt="Global Profile" class="w-full h-full object-cover grayscale" data-alt="A close-up, high-fashion portrait of a sophisticated executive in a dark minimalist studio setting. The lighting is low-key with dramatic shadows, emphasizing sharp features and a serious, focused expression. The color palette is strictly monochrome with deep blacks and subtle gray tones, fitting a quiet luxury tech aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1ONbPXfw9LmBnKmcB4ZmdAc-3Ylm_Wbxx1yw6im7e_HwUDVoP8gjJAyoqR_ONl2TYTrev3JN4lMVYQdWMmwIQ6fh2nHKtiBhMSboUEhUSux2zJuNRX5R6r3aIWV6yJZlm09jHbUhEu08zs0cKEezlQoO9SHDPUZcKRFitMT6pjgHD4ofBGnees8DArtgZDFc5GIPQtOiEhLzcZ0VkGTpvLFZmJq06MMqmEo8NkxMrHGyD-L7ecnEfHgmmx5uFODEY4w80wQ9K3Rvd"/>
+</div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 px-4 md:px-margin-desktop py-8 max-w-container-max mx-auto w-full">
+<!-- Page Header -->
+<section class="mb-12">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em] mb-2 block">Dashboard Interno</span>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface">Visão Geral do Ecossistema</h2>
+<div class="h-px w-24 bg-secondary mt-4"></div>
+</section>
+<!-- Section 2: Core Metrics (Geometric Data) -->
+<section class="mb-16">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Metric Card 1 -->
+<div class="bg-surface-container-low border border-outline-variant/10 p-6 flex flex-col justify-between h-48">
+<div>
+<p class="font-label-sm text-label-sm text-on-tertiary-container uppercase">Latência de Rede</p>
+<h3 class="font-headline-md text-headline-md text-on-surface mt-2">14ms</h3>
+</div>
+<div class="h-8 w-full flex items-end space-x-1">
+<div class="bg-secondary/20 w-full h-1/2"></div>
+<div class="bg-secondary/40 w-full h-3/4"></div>
+<div class="bg-secondary w-full h-1/2"></div>
+<div class="bg-secondary w-full h-full"></div>
+<div class="bg-secondary/60 w-full h-2/3"></div>
+</div>
+</div>
+<!-- Metric Card 2 -->
+<div class="bg-surface-container-low border border-outline-variant/10 p-6 flex flex-col justify-between h-48">
+<div>
+<p class="font-label-sm text-label-sm text-on-tertiary-container uppercase">Nodos Ativos</p>
+<h3 class="font-headline-md text-headline-md text-on-surface mt-2">1.242</h3>
+</div>
+<div class="flex items-center space-x-2">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-secondary">Sistema Estável</span>
+</div>
+</div>
+<!-- Metric Card 3 -->
+<div class="bg-surface-container-low border border-outline-variant/10 p-6 flex flex-col justify-between h-48">
+<div>
+<p class="font-label-sm text-label-sm text-on-tertiary-container uppercase">Taxa de Conversão</p>
+<h3 class="font-headline-md text-headline-md text-on-surface mt-2">94.8%</h3>
+</div>
+<div class="relative w-full h-1 bg-outline-variant/20">
+<div class="absolute left-0 top-0 h-full bg-secondary w-[94.8%]"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 1: Portfolio Overview (Bento Grid) -->
+<section class="mb-16">
+<div class="flex items-center justify-between mb-8">
+<h4 class="font-label-md text-label-md text-on-surface uppercase font-bold tracking-widest">Portfólio de Produtos</h4>
+<span class="font-label-sm text-label-sm text-on-tertiary-container">10 Ativos Selecionados</span>
+</div>
+<div class="grid grid-cols-2 lg:grid-cols-5 gap-4"><!-- Product Card 1: Clearix -->
+<div class="group bg-surface-container border border-outline-variant/10 p-4 hover:border-secondary/40 transition-colors cursor-pointer">
+<div class="aspect-square bg-surface-container-highest mb-4 overflow-hidden">
+<img class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 grayscale" data-alt="Sophisticated dark abstract fluid texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBW1FqZcOsQbWaZkARRpzUhZqTQefUv3wx_OQwYhiiAbc6F7IOceLLucJYX6oa6XVU_Q0NaWme8SXaPkaTnjjvSoxQkjRFbaUVEsOwR1G1ZTmM4AQ66jjivXkNDXA25rRkGtR87sSh__T6DQD-GByzRQHKcOumQyefTapsYcsA9QaFQTIHrya1U6VO61wgXUasYeeCnzrXBt4YID6Q8jGOf2lETf3tspuvHSVUeYK48eJHAIyrESxRMmQtQOkGZabOQyoMobStOqHRf"/>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface mb-1">Clearix</p>
+<p class="text-[10px] text-on-tertiary-container uppercase">ECOSSISTEMA ÓPTICO</p>
+</div>
+<!-- Product Card 2: Clearix Academy -->
+<div class="group bg-surface-container border border-outline-variant/10 p-4 hover:border-secondary/40 transition-colors cursor-pointer">
+<div class="aspect-square bg-surface-container-highest mb-4 overflow-hidden">
+<img class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 grayscale" data-alt="Unique dark abstract texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCiCEjKlRodRU8cndgnYUo4UCnj7bmSU62NhKwXqUXqM2oX6UZAusROM04yqfGCfY2nhILGq5rTPPl2ZTs9ESfuRvVgIHU1EFyIoB048pJ5Ke3mD4zwJi-lupm-tmD9uSUsJsxc53L-LYA4LttM8VBKooDenB2ypoPiJlYX_SMdyS0y5fp-RBoiheTmaHpKDK2Y-Rm0Iel2aW9pX9T2zdVGkvgg6MulKU007MGPzm_-bnGSylIM3ETxT_4KpuTlW9zC5DpV6jfFQ06"/>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface mb-1">Clearix Academy</p>
+<p class="text-[10px] text-on-tertiary-container uppercase">CONTEÚDO LOW-TICKET</p>
+</div>
+<!-- Product Card 3: Ótica Sem Improviso -->
+<div class="group bg-surface-container border border-outline-variant/10 p-4 hover:border-secondary/40 transition-colors cursor-pointer">
+<div class="aspect-square bg-surface-container-highest mb-4 overflow-hidden">
+<img class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 grayscale" data-alt="Neutral dark abstract texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6LhhTtD1wLOvWy4xnF-5wBM8eo5XJ165BUGQmoJK5ufupmjll-IXvRcyjFE_6gxTw-HcpEFM6uU0DDH0TV8KhO3ZyspsW1kWh5yzycs3_O5XD2JrK7eOYmFUmyImu-vSrAbSAgk4F4XBiLYpMNt9C6VTPU1uhRZWrseVcZSH3uKUqSHE5ftscoO9AjqzD1K4fRivn-gLqTD19uZYAVdky1iuWUQUgJ6kBmNJZCey4_qPnkG-ln_29yjoRBVbAyBAPrNXTog_p0m5q"/>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface mb-1">Ótica Sem Improviso</p>
+<p class="text-[10px] text-on-tertiary-container uppercase">ISCA PAGA</p>
+</div>
+<!-- Product Card 4: Nexus -->
+<div class="group bg-surface-container border border-outline-variant/10 p-4 hover:border-secondary/40 transition-colors cursor-pointer">
+<div class="aspect-square bg-surface-container-highest mb-4 overflow-hidden">
+<img class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 grayscale" data-alt="Neutral dark abstract texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1e2CJmOpbF6PnV6Jofgi6BBNt0mGL0Zu0kp6T3GWr3WjtCOyAzw_MFaWQEWNfg0_guzf5v8hRPkWwScyHpexkld50qGWMeUe7PYaRNc2pvuWfG3mvyOfL-0iJ0-G-aEXCaieDnqfGh6kQQ25oRDooZ8qbljkjjg4Dsuk_99Piq6pZz4Pm4aFenPkn4-MeFWgzI11IDU1j0eSV07LBmHN-Cse_qDyGnQLRYmFThVDQpoUEo9yEE5XUrbLyMkD40ePkrWzjNlMC2bu_"/>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface mb-1">Nexus</p>
+<p class="text-[10px] text-on-tertiary-container uppercase">UNIVERSIDADE / LMS</p>
+</div>
+<!-- Product Card 5: Lumina -->
+<div class="group bg-surface-container border border-outline-variant/10 p-4 hover:border-secondary/40 transition-colors cursor-pointer">
+<div class="aspect-square bg-surface-container-highest mb-4 overflow-hidden">
+<img class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 grayscale" data-alt="Neutral dark abstract texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPnthZ8AjtyEL0FKONEkr3V-K9XpcTj1FrXgGzM-tRC7uH-OArf9Q9mkvh-g5qSssZBdY5sjsAYDGnrv90ANSW8UTEx1eANcb2XgjSWQ8FYuMJU_8IZPPrnpZ0qllxEAAb03Qnc9AaZ2R0HrOzHuPeEamcNikChM9CrFO-aH3VaU-ForoKJ8DmbkmcVlawnHpU1nRtjJwFtqfcm5xMMlLJQTwd2KSUIpeq6iJCjaR9iIA3UXfeJSvuW95JlLPpP89ZyNnnc_bV61si"/>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface mb-1">Lumina</p>
+<p class="text-[10px] text-on-tertiary-container uppercase">DIGITAL SIGNAGE</p>
+</div>
+<!-- Product Card 6: Pulso -->
+<div class="group bg-surface-container border border-outline-variant/10 p-4 hover:border-secondary/40 transition-colors cursor-pointer">
+<div class="aspect-square bg-surface-container-highest mb-4 overflow-hidden">
+<div class="w-full h-full bg-gradient-to-br from-surface-variant to-background flex items-center justify-center p-8">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant/30">movie</span>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface mb-1">Pulso</p>
+<p class="text-[10px] text-on-tertiary-container uppercase">SO EDITORIAL DE VÍDEO</p>
+</div>
+<!-- Product Card 7: Polapetit -->
+<div class="group bg-surface-container border border-outline-variant/10 p-4 hover:border-secondary/40 transition-colors cursor-pointer">
+<div class="aspect-square bg-surface-container-highest mb-4 overflow-hidden">
+<div class="w-full h-full bg-gradient-to-tr from-surface-container-high to-surface-container-low flex items-center justify-center p-8">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant/30">event</span>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface mb-1">Polapetit</p>
+<p class="text-[10px] text-on-tertiary-container uppercase">SAAS DE EVENTOS</p>
+</div>
+<!-- Product Card 8: Qual a Foto -->
+<div class="group bg-surface-container border border-outline-variant/10 p-4 hover:border-secondary/40 transition-colors cursor-pointer">
+<div class="aspect-square bg-surface-container-highest mb-4 overflow-hidden">
+<div class="w-full h-full bg-surface-container-highest flex items-center justify-center p-8">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant/30">add_a_photo</span>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface mb-1">Qual a Foto</p>
+<p class="text-[10px] text-on-tertiary-container uppercase">APROVAÇÃO DE FOTOS</p>
+</div>
+<!-- Product Card 9: Nipo School -->
+<div class="group bg-surface-container border border-outline-variant/10 p-4 hover:border-secondary/40 transition-colors cursor-pointer">
+<div class="aspect-square bg-surface-container-highest mb-4 overflow-hidden">
+<div class="w-full h-full bg-gradient-to-b from-surface-variant/10 to-surface-variant/40 flex items-center justify-center p-8">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant/30">music_note</span>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface mb-1">Nipo School</p>
+<p class="text-[10px] text-on-tertiary-container uppercase">EDUCACIONAL MUSICAL</p>
+</div>
+<!-- Product Card 10: DIGIAI App -->
+<div class="group bg-surface-container border border-outline-variant/10 p-4 hover:border-secondary/40 transition-colors cursor-pointer">
+<div class="aspect-square bg-surface-container-highest mb-4 overflow-hidden">
+<div class="w-full h-full bg-surface-container flex items-center justify-center p-8">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant/30">dashboard_customize</span>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface mb-1">DIGIAI App</p>
+<p class="text-[10px] text-on-tertiary-container uppercase">PAINEL INTERNO</p>
+</div></div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full mt-auto border-t border-outline-variant/10">
+<div class="flex flex-col md:flex-row justify-between items-center px-4 md:px-margin-desktop py-12 max-w-container-max mx-auto">
+<div class="mb-8 md:mb-0">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface">DIGIAI Tech Holding</span>
+<p class="font-label-sm text-label-sm text-on-tertiary-container mt-2">© 2024 DIGIAI Tech Holding. Precision Intelligence.</p>
+</div>
+<div class="flex space-x-8">
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-on-surface transition-colors" href="#">Architecture</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-on-surface transition-colors" href="#">Privacy</a>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-on-surface transition-colors" href="#">System Status</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+        // Micro-interactions and UI logic
+        const menuToggle = document.getElementById('menu-toggle');
+        const navDrawer = document.getElementById('nav-drawer');
+        const overlay = document.getElementById('drawer-overlay');
+
+        function toggleDrawer() {
+            const isOpen = navDrawer.classList.contains('translate-x-0');
+            if (isOpen) {
+                navDrawer.classList.remove('translate-x-0');
+                navDrawer.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            } else {
+                navDrawer.classList.add('translate-x-0');
+                navDrawer.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            }
+        }
+
+        menuToggle.addEventListener('click', toggleDrawer);
+        overlay.addEventListener('click', toggleDrawer);
+
+        // Chart animation effect for the background or cards
+        document.querySelectorAll('.bg-surface-container-low').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+                card.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body></html>

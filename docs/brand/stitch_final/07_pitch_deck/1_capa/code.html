@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DIGIAI - Series A Pitch</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;family=Material+Symbols+Outlined:wght,FILL,GRAD,opsz@100..700,0..1,-50..200,20..48&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-container": "#0a0f1e",
+                      "primary-fixed-dim": "#c2c6db",
+                      "inverse-on-surface": "#2a303d",
+                      "tertiary-fixed": "#e1e3e4",
+                      "on-primary": "#2b3040",
+                      "surface-container-lowest": "#080e1a",
+                      "inverse-surface": "#dde2f3",
+                      "outline": "#909097",
+                      "on-error": "#690005",
+                      "on-background": "#dde2f3",
+                      "on-secondary": "#18362a",
+                      "on-surface": "#dde2f3",
+                      "error-container": "#93000a",
+                      "tertiary-fixed-dim": "#c5c7c8",
+                      "surface-container": "#1a202c",
+                      "on-error-container": "#ffdad6",
+                      "on-secondary-container": "#9fc0af",
+                      "on-secondary-fixed": "#012116",
+                      "surface-container-high": "#242a36",
+                      "surface-bright": "#333946",
+                      "primary-fixed": "#dee1f7",
+                      "surface-tint": "#c2c6db",
+                      "on-tertiary-fixed-variant": "#454748",
+                      "secondary": "#adcebd",
+                      "on-tertiary-fixed": "#191c1d",
+                      "secondary-container": "#314f42",
+                      "tertiary-container": "#0d1011",
+                      "surface": "#0d131f",
+                      "on-surface-variant": "#c7c6cd",
+                      "tertiary": "#c5c7c8",
+                      "on-tertiary": "#2e3132",
+                      "on-primary-fixed": "#161b2b",
+                      "primary": "#c2c6db",
+                      "secondary-fixed-dim": "#adcebd",
+                      "on-tertiary-container": "#7a7c7d",
+                      "surface-dim": "#0d131f",
+                      "error": "#ffb4ab",
+                      "surface-container-low": "#161c27",
+                      "surface-container-highest": "#2f3542",
+                      "secondary-fixed": "#c8ead8",
+                      "inverse-primary": "#595e70",
+                      "on-primary-container": "#777b8e",
+                      "background": "#0d131f",
+                      "on-secondary-fixed-variant": "#2f4d40",
+                      "on-primary-fixed-variant": "#414658",
+                      "surface-variant": "#2f3542",
+                      "outline-variant": "#46464c"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "unit": "4px",
+                      "margin-desktop": "64px",
+                      "gutter": "24px",
+                      "container-max": "1440px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Source Serif 4"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "JetBrains Mono"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Source Serif 4"
+                      ],
+                      "headline-lg": [
+                              "Source Serif 4"
+                      ],
+                      "label-md": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-lg-mobile": [
+                              "Source Serif 4"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "120px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "-0.04em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.08em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface antialiased flex flex-col min-h-screen font-body-md overflow-hidden selection:bg-secondary selection:text-on-secondary">
+<!-- Grid Background -->
+<div class="fixed inset-0 pointer-events-none z-0 opacity-5" style="background-image: linear-gradient(to right, rgba(255, 255, 255, 0.5) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.5) 1px, transparent 1px); background-size: 64px 64px;">
+</div>
+<!-- Presentation Container (16:9 Aspect Ratio) -->
+<main class="flex-grow flex items-center justify-center p-4 z-10 w-full h-screen">
+<div class="relative w-full max-w-[1920px] aspect-video bg-primary-container border border-outline-variant/30 flex flex-col justify-between p-16 md:p-24 overflow-hidden shadow-2xl">
+<!-- Top Right Graphic Element -->
+<div class="absolute top-0 right-0 w-64 h-64 border-l border-b border-outline-variant/10 opacity-20 pointer-events-none">
+<div class="absolute bottom-0 left-0 w-2 h-2 bg-secondary transform -translate-x-1/2 translate-y-1/2"></div>
+</div>
+<!-- Subtle Radial Gradient Glow -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-secondary/5 rounded-full blur-[100px] pointer-events-none z-0"></div>
+<!-- Content Area -->
+<div class="flex-grow flex flex-col items-center justify-center relative z-10">
+<h1 class="font-display-lg text-display-lg text-on-surface tracking-tighter mb-6 transition-all duration-700 ease-out translate-y-0 opacity-100" id="hero-title">
+                    DIGIAI
+                </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl text-center opacity-100 transition-all duration-700 delay-300 ease-out" id="hero-subtitle">
+                    Infraestrutura tech operada por IA
+                </p>
+<div class="mt-12 opacity-100 transition-all duration-700 delay-500 ease-out" id="hero-divider">
+<div class="w-16 h-px bg-secondary"></div>
+</div>
+</div>
+<!-- Footer / Metadata Area -->
+<div class="flex justify-between items-end w-full relative z-10 pt-16 mt-auto border-t border-outline-variant/20">
+<div class="flex flex-col gap-2">
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-widest flex items-center gap-2">
+<span aria-hidden="true" class="material-symbols-outlined text-[16px]" data-icon="terminal">terminal</span>
+                        SERIES A PITCH
+                    </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">
+                        VERSION 1.0.4
+                    </span>
+</div>
+<div class="flex flex-col items-end gap-2 text-right">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">
+                        OUTUBRO 2024 · GILBERTO C. SILVA JR
+                    </span>
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-widest">
+                        CONFIDENTIAL · ALL RIGHTS RESERVED
+                    </span>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Simple entry animation
+        document.addEventListener("DOMContentLoaded", () => {
+            const title = document.getElementById('hero-title');
+            const subtitle = document.getElementById('hero-subtitle');
+            const divider = document.getElementById('hero-divider');
+            
+            // Initial state for animation
+            title.style.transform = 'translateY(20px)';
+            title.style.opacity = '0';
+            subtitle.style.transform = 'translateY(10px)';
+            subtitle.style.opacity = '0';
+            divider.style.transform = 'scaleX(0)';
+            divider.style.opacity = '0';
+            divider.style.transformOrigin = 'center';
+
+            // Trigger animation slightly after load
+            setTimeout(() => {
+                title.style.transform = 'translateY(0)';
+                title.style.opacity = '1';
+                
+                setTimeout(() => {
+                    subtitle.style.transform = 'translateY(0)';
+                    subtitle.style.opacity = '1';
+                    
+                    setTimeout(() => {
+                        divider.style.transform = 'scaleX(1)';
+                        divider.style.opacity = '1';
+                    }, 200);
+                }, 200);
+            }, 100);
+        });
+    </script>
+</body></html>

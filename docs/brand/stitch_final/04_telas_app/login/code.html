@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Source+Serif+4:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0d131f;
+        }
+        .editorial-line {
+            height: 1px;
+            background: linear-gradient(90deg, rgba(248, 249, 250, 0.1) 0%, rgba(248, 249, 250, 0) 100%);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#161c27",
+                        "on-tertiary-container": "#7a7c7d",
+                        "on-tertiary": "#2e3132",
+                        "surface-container-highest": "#2f3542",
+                        "on-primary": "#2b3040",
+                        "on-tertiary-fixed": "#191c1d",
+                        "secondary-fixed-dim": "#adcebd",
+                        "on-primary-container": "#777b8e",
+                        "on-secondary-fixed-variant": "#2f4d40",
+                        "on-background": "#dde2f3",
+                        "on-primary-fixed-variant": "#414658",
+                        "inverse-on-surface": "#2a303d",
+                        "surface-container-high": "#242a36",
+                        "error": "#ffb4ab",
+                        "primary-fixed-dim": "#c2c6db",
+                        "secondary-container": "#314f42",
+                        "on-surface": "#dde2f3",
+                        "on-surface-variant": "#c7c6cd",
+                        "background": "#0d131f",
+                        "secondary-fixed": "#c8ead8",
+                        "primary-fixed": "#dee1f7",
+                        "on-error": "#690005",
+                        "secondary": "#adcebd",
+                        "tertiary": "#c5c7c8",
+                        "outline": "#909097",
+                        "tertiary-fixed": "#e1e3e4",
+                        "inverse-primary": "#595e70",
+                        "tertiary-container": "#0d1011",
+                        "primary-container": "#0a0f1e",
+                        "primary": "#c2c6db",
+                        "error-container": "#93000a",
+                        "on-primary-fixed": "#161b2b",
+                        "surface-container-lowest": "#080e1a",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "inverse-surface": "#dde2f3",
+                        "surface": "#0d131f",
+                        "surface-variant": "#2f3542",
+                        "surface-container": "#1a202c",
+                        "surface-dim": "#0d131f",
+                        "on-tertiary-fixed-variant": "#454748",
+                        "outline-variant": "#46464c",
+                        "on-error-container": "#ffdad6",
+                        "surface-bright": "#333946",
+                        "on-secondary-container": "#9fc0af",
+                        "surface-tint": "#c2c6db",
+                        "on-secondary": "#18362a",
+                        "on-secondary-fixed": "#012116"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "64px",
+                        "margin-mobile": "16px",
+                        "unit": "4px",
+                        "gutter": "24px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["JetBrains Mono"],
+                        "headline-lg": ["Source Serif 4"],
+                        "display-lg": ["Source Serif 4"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Source Serif 4"],
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-lg-mobile": ["Source Serif 4"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["64px", {"lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="flex flex-col min-h-screen font-body-md text-on-surface selection:bg-secondary/30">
+<!-- Subtle atmospheric background effect -->
+<div class="fixed inset-0 pointer-events-none opacity-20 overflow-hidden">
+<div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-secondary/10 blur-[120px] rounded-full"></div>
+</div>
+<!-- Main Content Wrapper -->
+<main class="flex-grow flex flex-col items-center justify-center px-margin-mobile py-20 relative z-10">
+<!-- Identity Section -->
+<div class="w-full max-w-[320px] mb-12">
+<div class="mb-8 flex justify-start">
+<img alt="DIGIAI Logo" class="h-12 w-auto object-contain" src="data:image/png;base64,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"/>
+</div>
+<div class="editorial-line mb-6"></div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background mb-4 leading-tight">
+                Infraestrutura interna DIGIAI.
+            </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant opacity-80">
+                Transformando Informação em Decisão.
+            </p>
+</div>
+<!-- Login Form Container -->
+<div class="w-full max-w-[320px]">
+<form class="space-y-6" id="loginForm">
+<!-- Email Field -->
+<div class="relative group">
+<label class="font-label-sm text-label-sm uppercase text-outline-variant mb-2 block tracking-widest" for="email">
+                        Identificador corporativo
+                    </label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant/30 py-3 px-0 font-body-md text-on-surface focus:ring-0 focus:border-secondary transition-colors placeholder:text-on-tertiary-container/40" id="email" name="email" placeholder="nome.sobrenome@digiai.com" required="" type="email"/>
+</div>
+<!-- Password Field -->
+<div class="relative group">
+<label class="font-label-sm text-label-sm uppercase text-outline-variant mb-2 block tracking-widest" for="password">
+                        Chave de acesso
+                    </label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant/30 py-3 px-0 font-body-md text-on-surface focus:ring-0 focus:border-secondary transition-colors placeholder:text-on-tertiary-container/40" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+</div>
+<!-- Action Section -->
+<div class="pt-8 space-y-4">
+<button class="w-full h-14 bg-secondary text-on-secondary font-label-md text-label-md uppercase tracking-widest flex items-center justify-center gap-3 active:scale-[0.98] transition-all hover:opacity-90" type="submit">
+<span>Autenticar</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+<div class="flex items-center justify-between">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-secondary transition-colors border-b border-transparent hover:border-secondary" href="#">
+                            Redefinir chave
+                        </a>
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+<span class="font-label-sm text-label-sm text-on-tertiary-container">Sistemas Ativos</span>
+</div>
+</div>
+</div>
+</form>
+</div>
+</main>
+<!-- Footer Segment (Based on Shared Components Footer Logic) -->
+<footer class="w-full border-t border-outline-variant/10 mt-auto bg-background">
+<div class="max-w-[320px] mx-auto px-0 py-8 flex flex-col gap-4">
+<div class="flex justify-between items-center opacity-60">
+<span class="font-label-sm text-label-sm text-on-tertiary-container">PRECISION INTEL</span>
+<span class="font-label-sm text-label-sm text-on-tertiary-container">VER: 2.4.0-R</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-tertiary-container text-center">
+                © 2024 DIGIAI Tech Holding. Precision Intelligence.
+            </p>
+<div class="flex justify-center gap-4">
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-on-surface transition-colors" href="#">Architecture</a>
+<span class="text-outline-variant/30">|</span>
+<a class="font-label-sm text-label-sm text-on-tertiary-container hover:text-on-surface transition-colors" href="#">Privacy</a>
+</div>
+</div>
+</footer>
+<!-- Micro-interactions Script -->
+<script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button');
+            const originalText = btn.innerHTML;
+            
+            // Interaction visual feedback
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span>';
+            btn.classList.add('opacity-80', 'pointer-events-none');
+            
+            setTimeout(() => {
+                btn.innerHTML = '<span class="material-symbols-outlined">check</span> <span>Acesso Autorizado</span>';
+                btn.classList.remove('bg-secondary');
+                btn.classList.add('bg-surface-container-highest', 'text-secondary');
+            }, 1200);
+        });
+
+        // Simple mouse/touch parallax for atmospheric glow
+        document.addEventListener('mousemove', (e) => {
+            const glow = document.querySelector('.bg-secondary\\/10');
+            if (glow) {
+                const moveX = (e.clientX - window.innerWidth / 2) * 0.05;
+                const moveY = (e.clientY - window.innerHeight / 2) * 0.05;
+                glow.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            }
+        });
+    </script>
+</body></html>

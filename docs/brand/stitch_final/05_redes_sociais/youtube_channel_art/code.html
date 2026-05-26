@@ -1,0 +1,53 @@
+<svg width="2560" height="1440" viewBox="0 0 2560 1440" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fundo Dark Navy com gradiente sutil para Surface -->
+  <defs>
+    <linearGradient id="bg_gradient" x1="1280" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1A202C"/>
+      <stop offset="1" stop-color="#0A0F1E"/>
+    </linearGradient>
+    
+    <!-- Pattern de Grid sutil para consistência de marca -->
+    <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M 80 0 L 0 0 0 80" fill="none" stroke="#F8F9FA" stroke-width="1" stroke-opacity="0.03"/>
+    </pattern>
+  </defs>
+  
+  <rect width="2560" height="1440" fill="url(#bg_gradient)"/>
+  <rect width="2560" height="1440" fill="url(#grid)"/>
+
+  <!-- Safe Area Central (YouTube Safe Area: 1546x423 no centro de 2560x1440) -->
+  <g transform="translate(1280, 720)">
+    <!-- Wordmark GIGANTE (50% da largura = ~1280px) -->
+    <text y="-20" fill="#F8F9FA" font-family="Source Serif 4, serif" font-size="240" font-weight="700" text-anchor="middle" letter-spacing="0.05em">DIGIAI</text>
+    
+    <!-- Tagline -->
+    <text y="80" fill="#F8F9FA" font-family="Inter, sans-serif" font-size="42" font-weight="500" text-anchor="middle" letter-spacing="0.02em">Infraestrutura tech operada por IA</text>
+    
+    <!-- Linha sutil Forest Green -->
+    <rect x="-350" y="110" width="700" height="1" fill="#2D4B3E"/>
+  </g>
+
+  <!-- Canto Inferior Direito: Redes Sociais (Dentro da safe area de desktop/TV) -->
+  <g transform="translate(2480, 1360)">
+    <text x="0" y="0" fill="#F8F9FA" font-family="JetBrains Mono, monospace" font-size="24" font-weight="500" text-anchor="end" letter-spacing="0.1em">@SISDIGIAI</text>
+    
+    <!-- Ícones Monoline (Simulados via formas básicas para precisão geométrica) -->
+    <g transform="translate(-240, -28)" opacity="0.8">
+      <!-- Instagram -->
+      <rect x="0" y="0" width="24" height="24" rx="6" stroke="#F8F9FA" stroke-width="1.5"/>
+      <circle cx="12" cy="12" r="5" stroke="#F8F9FA" stroke-width="1.5"/>
+      <circle cx="18" cy="6" r="1" fill="#F8F9FA"/>
+      
+      <!-- LinkedIn -->
+      <g transform="translate(40, 0)">
+        <rect x="0" y="0" width="24" height="24" rx="3" fill="#F8F9FA"/>
+        <text x="12" y="18" fill="#0A0F1E" font-family="Inter, sans-serif" font-size="14" font-weight="900" text-anchor="middle">in</text>
+      </g>
+      
+      <!-- TikTok -->
+      <g transform="translate(80, 0)">
+        <path d="M18 6C16.5 6 15 5 15 3H12V16.5C12 18.4 10.4 20 8.5 20C6.6 20 5 18.4 5 16.5C5 14.6 6.6 13 8.5 13C9 13 9.5 13.1 10 13.3V10.3C9.5 10.1 9 10 8.5 10C4.9 10 2 12.9 2 16.5C2 20.1 4.9 23 8.5 23C12.1 23 15 20.1 15 16.5V9C17 10.5 19 11 21 11V8C19.5 8 18 7.2 18 6Z" fill="#F8F9FA"/>
+      </g>
+    </g>
+  </g>
+</svg>

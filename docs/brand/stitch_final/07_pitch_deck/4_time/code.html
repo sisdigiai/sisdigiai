@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DIGIAI - Series A Pitch - Team</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&amp;family=JetBrains+Mono:wght@500&amp;family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#0a0f1e",
+                        "primary-fixed-dim": "#c2c6db",
+                        "inverse-on-surface": "#2a303d",
+                        "tertiary-fixed": "#e1e3e4",
+                        "on-primary": "#2b3040",
+                        "surface-container-lowest": "#080e1a",
+                        "inverse-surface": "#dde2f3",
+                        "outline": "#909097",
+                        "on-error": "#690005",
+                        "on-background": "#dde2f3",
+                        "on-secondary": "#18362a",
+                        "on-surface": "#dde2f3",
+                        "error-container": "#93000a",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "surface-container": "#1a202c",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-container": "#9fc0af",
+                        "on-secondary-fixed": "#012116",
+                        "surface-container-high": "#242a36",
+                        "surface-bright": "#333946",
+                        "primary-fixed": "#dee1f7",
+                        "surface-tint": "#c2c6db",
+                        "on-tertiary-fixed-variant": "#454748",
+                        "secondary": "#adcebd",
+                        "on-tertiary-fixed": "#191c1d",
+                        "secondary-container": "#314f42",
+                        "tertiary-container": "#0d1011",
+                        "surface": "#0d131f",
+                        "on-surface-variant": "#c7c6cd",
+                        "tertiary": "#c5c7c8",
+                        "on-tertiary": "#2e3132",
+                        "on-primary-fixed": "#161b2b",
+                        "primary": "#c2c6db",
+                        "secondary-fixed-dim": "#adcebd",
+                        "on-tertiary-container": "#7a7c7d",
+                        "surface-dim": "#0d131f",
+                        "error": "#ffb4ab",
+                        "surface-container-low": "#161c27",
+                        "surface-container-highest": "#2f3542",
+                        "secondary-fixed": "#c8ead8",
+                        "inverse-primary": "#595e70",
+                        "on-primary-container": "#777b8e",
+                        "background": "#0d131f",
+                        "on-secondary-fixed-variant": "#2f4d40",
+                        "on-primary-fixed-variant": "#414658",
+                        "surface-variant": "#2f3542",
+                        "outline-variant": "#46464c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "unit": "4px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Source Serif 4"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Source Serif 4"],
+                        "headline-lg": ["Source Serif 4"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-lg-mobile": ["Source Serif 4"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["64px", { "lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .grid-pattern {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(248, 249, 250, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(248, 249, 250, 0.03) 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col font-body-md overflow-x-hidden">
+<!-- TopAppBar (Mobile Only based on layout logic, but JSON says top nav links. Using as mobile fallback for side nav) -->
+<header class="md:hidden bg-surface flex justify-between items-center w-full px-margin-mobile h-20 border-b border-outline-variant sticky top-0 z-50">
+<div class="font-display-lg text-headline-md tracking-tighter text-on-surface uppercase">DIGIAI</div>
+<span class="material-symbols-outlined text-primary cursor-pointer">menu</span>
+</header>
+<div class="flex flex-1 w-full max-w-[container-max] mx-auto">
+<!-- SideNavBar (Desktop) -->
+<nav class="hidden md:flex flex-col h-screen fixed left-0 top-0 py-8 w-64 bg-surface-container border-r border-outline-variant z-40">
+<div class="px-8 mb-12">
+<div class="font-display-lg text-headline-md text-on-surface mb-2 uppercase">DIGIAI</div>
+<div class="font-label-md text-label-md text-secondary">Series A Pitch</div>
+</div>
+<ul class="flex-1 px-4 space-y-2">
+<li>
+<a class="flex items-center space-x-4 px-4 py-3 rounded-none text-on-surface-variant hover:bg-surface-container-high transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">title</span>
+<span class="font-label-md text-label-md">Cover</span>
+</a>
+</li>
+<li>
+<a class="flex items-center space-x-4 px-4 py-3 rounded-none text-on-surface-variant hover:bg-surface-container-high transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">warning</span>
+<span class="font-label-md text-label-md">Problem</span>
+</a>
+</li>
+<li>
+<a class="flex items-center space-x-4 px-4 py-3 rounded-none text-on-surface-variant hover:bg-surface-container-high transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">query_stats</span>
+<span class="font-label-md text-label-md">Metric</span>
+</a>
+</li>
+<li>
+<a class="flex items-center space-x-4 px-4 py-3 rounded-none text-on-surface-variant hover:bg-surface-container-high transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">lightbulb</span>
+<span class="font-label-md text-label-md">Solution</span>
+</a>
+</li>
+<li>
+<a class="flex items-center space-x-4 px-4 py-3 rounded-none bg-secondary-container text-on-secondary-container border-l-4 border-secondary transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">groups</span>
+<span class="font-label-md text-label-md">Team</span>
+</a>
+</li>
+</ul>
+<div class="px-4 mt-auto space-y-2">
+<a class="flex items-center space-x-4 px-4 py-2 text-on-surface-variant hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">security</span>
+<span class="font-label-md text-label-md">Privacy</span>
+</a>
+<a class="flex items-center space-x-4 px-4 py-2 text-on-surface-variant hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">gavel</span>
+<span class="font-label-md text-label-md">Legal</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 relative min-h-screen grid-pattern">
+<!-- Content Wrapper to enforce aspect ratio and spacing -->
+<div class="flex flex-col justify-center items-center h-full min-h-[calc(100vh-80px)] px-margin-mobile md:px-margin-desktop py-20">
+<!-- Slide Header -->
+<div class="w-full max-w-5xl mb-16 text-left">
+<div class="inline-flex items-center space-x-2 px-3 py-1 border border-outline-variant rounded-none mb-6">
+<span class="material-symbols-outlined text-secondary text-sm">groups</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Time/Empresa</span>
+</div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Operação enxuta por design.</h1>
+</div>
+<!-- Centralized Minimalist Card -->
+<div class="relative w-full max-w-md bg-surface-container border border-secondary p-8 md:p-12 flex flex-col items-center text-center group transition-all duration-500 hover:bg-surface-container-high">
+<!-- Geometric Accent Lines -->
+<div class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-secondary opacity-50"></div>
+<div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-secondary opacity-50"></div>
+<!-- Avatar Placeholder -->
+<div class="w-32 h-32 mb-8 relative border border-outline-variant overflow-hidden group-hover:border-secondary transition-colors duration-500">
+<!-- Abstract geometric placeholder image -->
+<div class="w-full h-full bg-surface-container-highest" data-alt="A stark, minimalist black and white portrait of a professional man in his late 30s. The lighting is dramatic and architectural, casting sharp geometric shadows across half his face. He is wearing a simple dark turtleneck. The background is a flat, untextured dark navy blue void, emphasizing the subject's serious, focused expression. The overall composition feels clinical, corporate, and highly editorial, echoing Swiss design principles." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBCMOkRD_33loxBNRLE3zUSezc92rm7Dknj4y71bTcLWbiT_4ayaydMeJ9d04yD9Wq1DMbcKtaP6Zhl1zlTPfkM_kKILDaU1GzfrQpkTcolR_J83osxct36Qz6A_Yi3B1DIgHjl1P_lhzBztPjWoHzB4pFowl1yUy9AYGSRm2DLnVEzeswaOv55Yxhy9LvCh9k3Pe1b8FEcLBegBn0ddFDq2NBhTKBBRVsIFAl1K7RhPlVvuubao03eX9JrDr4hhV41t6JjMX8HQ4TE'); background-size: cover; background-position: center; filter: grayscale(100%) contrast(1.2);">
+</div>
+</div>
+<!-- Profile Info -->
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">Gilberto C. Silva Jr.</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-8">Fundador &amp; Sócio-administrador</p>
+<!-- Technical Metrics -->
+<div class="w-full pt-6 border-t border-outline-variant flex justify-between items-center px-4">
+<div class="font-label-sm text-label-sm text-secondary uppercase tracking-widest">
+                            100% DAS QUOTAS
+                        </div>
+<div class="h-1 w-1 bg-outline-variant rounded-full"></div>
+<div class="font-label-sm text-label-sm text-secondary uppercase tracking-widest">
+                            2026
+                        </div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
