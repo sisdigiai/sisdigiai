@@ -442,6 +442,64 @@ export const marketingStore = {
     return (data ?? []) as any;
   },
 
+  // ── Community (membros do Hotmart) ──
+  async listCommunityMembers(): Promise<Array<{
+    id: string;
+    full_name: string;
+    email: string;
+    whatsapp: string | null;
+    city: string | null;
+    state: string | null;
+    hotmart_transaction: string | null;
+    joined_at: string;
+    status: string;
+    tier: string;
+    last_active_at: string | null;
+    testimonials_count: number;
+    utm_source: string | null;
+    utm_medium: string | null;
+    utm_campaign: string | null;
+    attributed_post_id: string | null;
+    attributed_pillar_id: string | null;
+    whatsapp_consent: boolean;
+    email_consent: boolean;
+    notes: string | null;
+    pillar_code: string | null;
+    pillar_name: string | null;
+    pillar_color: string | null;
+    attributed_post_hook: string | null;
+    attributed_post_date: string | null;
+    hotmart_value_cents: number | null;
+    hotmart_commission_cents: number | null;
+  }>> {
+    const { data, error } = await supabase.from('v_marketing_community').select('*');
+    if (error) { console.error('[marketingStore] listCommunityMembers:', error.message); return []; }
+    return (data ?? []) as any;
+  },
+
+  async getCommunityStats(): Promise<{
+    total: number; active: number; vip: number; inactive: number; refunded: number;
+    new_last_7d: number; new_last_30d: number; active_last_30d: number;
+    whatsapp_optin: number; email_optin: number; attributed_to_post: number;
+    first_member_at: string | null; last_member_at: string | null;
+  } | null> {
+    const { data, error } = await supabase.from('v_marketing_community_stats').select('*').maybeSingle();
+    if (error) { console.error('[marketingStore] getCommunityStats:', error.message); return null; }
+    return data as any;
+  },
+
+  async updateCommunityMember(id: string, patch: Record<string, unknown>): Promise<boolean> {
+    const { data, error } = await supabase.rpc('marketing_update_community_member', { p_id: id, p_patch: patch });
+    if (error) { console.error('[marketingStore] updateCommunityMember:', error.message); return false; }
+    return data === true;
+  },
+
+  async createCommunityMember(payload: { full_name: string; email: string; whatsapp?: string; city?: string; state?: string; tier?: string; notes?: string; whatsapp_consent?: boolean }): Promise<string | null> {
+    const { data, error } = await supabase.rpc('marketing_create_community_member', { p_payload: payload as Record<string, unknown> });
+    if (error) { console.error('[marketingStore] createCommunityMember:', error.message); return null; }
+    return data as string;
+  },
+
   // ── Bulk schedule (Planejador) ──
   async bulkSchedule(input: {
     startDate: string;
