@@ -442,6 +442,52 @@ export const marketingStore = {
     return (data ?? []) as any;
   },
 
+  // ── Post AI Outputs (sistema de produção) ──
+  async listPostOutputs(postId: string): Promise<Array<{
+    id: string; post_id: string; template_id: string | null;
+    template_code: string | null; template_name: string | null;
+    ai_target: string | null; ai_provider: string | null; category: string | null;
+    prompt_rendered: string; output_text: string | null; output_url: string | null;
+    output_storage_path: string | null; notes: string | null;
+    status: string; generated_at: string;
+  }>> {
+    const { data, error } = await supabase
+      .from('v_marketing_post_outputs')
+      .select('*')
+      .eq('post_id', postId)
+      .neq('status', 'superseded');
+    if (error) { console.error('[marketingStore] listPostOutputs:', error.message); return []; }
+    return (data ?? []) as any;
+  },
+
+  async savePostOutput(payload: {
+    post_id: string; template_id?: string; ai_provider?: string;
+    prompt_rendered: string; output_text?: string; output_url?: string;
+    output_storage_path?: string; format?: string; notes?: string;
+  }): Promise<string | null> {
+    const { data, error } = await supabase.rpc('marketing_save_post_output', { p_payload: payload as Record<string, unknown> });
+    if (error) { console.error('[marketingStore] savePostOutput:', error.message); return null; }
+    return data as string;
+  },
+
+  async deletePostOutput(id: string): Promise<boolean> {
+    const { data, error } = await supabase.rpc('marketing_delete_post_output', { p_id: id });
+    if (error) { console.error('[marketingStore] deletePostOutput:', error.message); return false; }
+    return data === true;
+  },
+
+  async uploadAsset(postId: string, file: File): Promise<{ url: string; path: string } | null> {
+    const ext = file.name.split('.').pop() || 'bin';
+    const path = `posts/${postId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error } = await supabase.storage.from('marketing-assets').upload(path, file, {
+      contentType: file.type,
+      upsert: false,
+    });
+    if (error) { console.error('[marketingStore] uploadAsset:', error.message); return null; }
+    const { data } = supabase.storage.from('marketing-assets').getPublicUrl(path);
+    return { url: data.publicUrl, path };
+  },
+
   // ── Challenges (desafios mensais) ──
   async listChallenges(): Promise<Array<{
     id: string; code: string; name: string; description: string | null;

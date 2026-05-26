@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { X, Plus, Trash2, ExternalLink, Save, Loader2, Sparkles, Package, Check, DollarSign, Copy, Link as LinkIcon } from 'lucide-react';
+import { X, Plus, Trash2, ExternalLink, Save, Loader2, Sparkles, Package, Check, DollarSign, Copy, Link as LinkIcon, Wand2 } from 'lucide-react';
 import { marketingStore, type CalendarPost, type CalendarStatus, type ContentPillar, type Platform, type CalendarArt } from '../../lib/marketingStore';
 import { PromptGeneratorModal } from './PromptGeneratorModal';
+import { ProduzirPostWizard } from './ProduzirPostWizard';
 
 const HOTMART_BASE = 'https://go.hotmart.com/B105515825L?dp=1';
 
@@ -44,6 +45,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
   const [draft, setDraft] = useState<CalendarPost>(post);
   const [saving, setSaving] = useState(false);
   const [showPromptsModal, setShowPromptsModal] = useState(false);
+  const [showWizard, setShowWizard] = useState(false);
   const [promotedMaterialId, setPromotedMaterialId] = useState<string | null>(null);
   const [promoting, setPromoting] = useState(false);
   const [sales, setSales] = useState<Awaited<ReturnType<typeof marketingStore.getPostSales>>>(null);
@@ -150,11 +152,20 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
           </div>
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setShowWizard(true)}
+              className="flex items-center gap-2 px-3 py-2 bg-[#10B981] text-[#0A0F1E] font-medium rounded-lg hover:bg-[#10B981]/90 text-sm"
+              title="Wizard 4 steps: roteiro / capa / voz / vídeo. Salva tudo no banco."
+            >
+              <Wand2 className="w-4 h-4" />
+              Produzir post
+            </button>
+            <button
               onClick={() => setShowPromptsModal(true)}
               className="flex items-center gap-2 px-3 py-2 border border-[#06B6D4]/40 text-[#06B6D4] rounded-lg hover:bg-[#06B6D4]/10 text-sm"
+              title="Gerar prompt avulso (sem o wizard)"
             >
               <Sparkles className="w-4 h-4" />
-              Gerar prompts IA
+              Prompts IA
             </button>
             <button
               onClick={handlePromote}
@@ -372,6 +383,14 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
         <PromptGeneratorModal
           source={{ kind: 'post', post: draft }}
           onClose={() => setShowPromptsModal(false)}
+        />
+      )}
+
+      {showWizard && (
+        <ProduzirPostWizard
+          post={draft}
+          onClose={() => setShowWizard(false)}
+          onChanged={() => { onSaved(); }}
         />
       )}
     </div>
