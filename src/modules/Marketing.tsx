@@ -3,7 +3,7 @@ import { Calendar as CalendarIcon, Crown, Lightbulb, Megaphone, MessageSquareQuo
 import { CalendarioEditorial } from './marketing/CalendarioEditorial';
 import { BancoIdeias } from './marketing/BancoIdeias';
 import { MateriaisAfiliados } from './marketing/MateriaisAfiliados';
-import { Afiliados } from './marketing/Afiliados';
+import { AfiliadosDashboard } from './marketing/AfiliadosDashboard';
 import { PromptsIA } from './marketing/PromptsIA';
 import { Validacao } from './marketing/Validacao';
 import { Depoimentos } from './marketing/Depoimentos';
@@ -74,7 +74,7 @@ export default function Marketing() {
         {active === 'comunidade' && <Comunidade />}
         {active === 'desafios' && <Desafios />}
         {active === 'materiais' && <MateriaisAfiliados />}
-        {active === 'afiliados' && <Afiliados />}
+        {active === 'afiliados' && <AfiliadosDashboard />}
       </div>
     </div>
   );

@@ -442,6 +442,62 @@ export const marketingStore = {
     return (data ?? []) as any;
   },
 
+  // ── Affiliates ATIVO (dashboard + payouts + link) ──
+  async listAffiliatesDashboard(): Promise<Array<Affiliate & {
+    hotmart_code: string | null;
+    commission_rate_percent: number | null;
+    commission_paid_total_cents: number;
+    commission_due_cents: number;
+    last_payout_at: string | null;
+    payouts_count: number;
+    first_sale_at: string | null;
+    last_sale_at: string | null;
+  }>> {
+    const { data, error } = await supabase.from('v_marketing_affiliates_dashboard').select('*');
+    if (error) { console.error('[marketingStore] listAffiliatesDashboard:', error.message); return []; }
+    return (data ?? []) as any;
+  },
+
+  async getAffiliatesStats(): Promise<{
+    total_affiliates: number; active: number; top: number; pending: number; with_sales: number;
+    sales_total: number; commission_total_cents: number; commission_paid_cents: number; commission_due_total_cents: number;
+  } | null> {
+    const { data, error } = await supabase.from('v_marketing_affiliates_stats').select('*').maybeSingle();
+    if (error) { console.error('[marketingStore] getAffiliatesStats:', error.message); return null; }
+    return data as any;
+  },
+
+  async getAffiliateLeaderboard(): Promise<Array<{
+    rank: number; id: string; full_name: string; email: string; whatsapp: string | null;
+    tier: string; status: string; hotmart_code: string | null;
+    total_sales: number; total_commission_cents: number;
+    first_sale_at: string | null; last_sale_at: string | null;
+  }>> {
+    const { data, error } = await supabase.from('v_marketing_affiliates_leaderboard').select('*');
+    if (error) { console.error('[marketingStore] getAffiliateLeaderboard:', error.message); return []; }
+    return (data ?? []) as any;
+  },
+
+  async getAffiliateHotmartLink(affiliateId: string): Promise<string | null> {
+    const { data, error } = await supabase.rpc('marketing_get_affiliate_hotmart_link', { p_affiliate_id: affiliateId });
+    if (error) { console.error('[marketingStore] getAffiliateHotmartLink:', error.message); return null; }
+    return data as string | null;
+  },
+
+  async registerPayout(payload: { affiliate_id: string; amount_cents: number; payout_date?: string; method?: string; reference?: string; notes?: string }): Promise<string | null> {
+    const { data, error } = await supabase.rpc('marketing_register_affiliate_payout', { p_payload: payload as Record<string, unknown> });
+    if (error) { console.error('[marketingStore] registerPayout:', error.message); return null; }
+    return data as string;
+  },
+
+  async listAffiliatePayouts(affiliateId?: string): Promise<Array<{ id: string; affiliate_id: string; amount_cents: number; payout_date: string; method: string; reference: string | null; notes: string | null; affiliate_name: string; affiliate_email: string }>> {
+    let q = supabase.from('v_marketing_affiliate_payouts').select('*');
+    if (affiliateId) q = q.eq('affiliate_id', affiliateId);
+    const { data, error } = await q;
+    if (error) { console.error('[marketingStore] listAffiliatePayouts:', error.message); return []; }
+    return (data ?? []) as any;
+  },
+
   // ── Post AI Outputs (sistema de produção) ──
   async listPostOutputs(postId: string): Promise<Array<{
     id: string; post_id: string; template_id: string | null;
