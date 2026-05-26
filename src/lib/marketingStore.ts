@@ -442,6 +442,40 @@ export const marketingStore = {
     return (data ?? []) as any;
   },
 
+  // ── Bulk schedule (Planejador) ──
+  async bulkSchedule(input: {
+    startDate: string;
+    weeks: number;
+    perWeek: number;
+    channels?: string[];
+    dryRun?: boolean;
+  }): Promise<{
+    posts_created: number;
+    dry_run: boolean;
+    first_date: string | null;
+    last_date: string | null;
+    by_pillar: Record<string, number>;
+    channels: string[];
+    channels_count: number;
+    preview: Array<{ date: string; idea_id: string; content_type: string; hook: string }> | null;
+  } | null> {
+    const { data, error } = await supabase.rpc('marketing_bulk_schedule', {
+      p_start_date: input.startDate,
+      p_weeks: input.weeks,
+      p_per_week: input.perWeek,
+      p_channels: input.channels ?? null,
+      p_dry_run: input.dryRun ?? false,
+    });
+    if (error) { console.error('[marketingStore] bulkSchedule:', error.message); return null; }
+    return data as any;
+  },
+
+  async unschedulePlanned(fromDate?: string): Promise<{ ideas_freed: number; posts_deleted: number } | null> {
+    const { data, error } = await supabase.rpc('marketing_unschedule_planned', { p_from_date: fromDate ?? null });
+    if (error) { console.error('[marketingStore] unschedulePlanned:', error.message); return null; }
+    return data as any;
+  },
+
   // ── Promote post → affiliate material ──
   async getPostPromotion(postId: string): Promise<string | null> {
     const { data, error } = await supabase.rpc('marketing_get_post_promotion', { p_post_id: postId });

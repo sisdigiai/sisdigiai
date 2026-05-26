@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar as CalendarIcon, Lightbulb, Megaphone, MessageSquareQuote, Package, Sparkles, TrendingUp, Users } from 'lucide-react';
+import { Calendar as CalendarIcon, Lightbulb, Megaphone, MessageSquareQuote, Package, Sparkles, TrendingUp, Users, Wand2 } from 'lucide-react';
 import { CalendarioEditorial } from './marketing/CalendarioEditorial';
 import { BancoIdeias } from './marketing/BancoIdeias';
 import { MateriaisAfiliados } from './marketing/MateriaisAfiliados';
@@ -7,11 +7,13 @@ import { Afiliados } from './marketing/Afiliados';
 import { PromptsIA } from './marketing/PromptsIA';
 import { Validacao } from './marketing/Validacao';
 import { Depoimentos } from './marketing/Depoimentos';
+import { Planejador } from './marketing/Planejador';
 
-type SubTab = 'calendario' | 'banco' | 'prompts' | 'validacao' | 'depoimentos' | 'materiais' | 'afiliados';
+type SubTab = 'calendario' | 'planejador' | 'banco' | 'prompts' | 'validacao' | 'depoimentos' | 'materiais' | 'afiliados';
 
 const SUBTABS: { id: SubTab; label: string; icon: typeof CalendarIcon }[] = [
   { id: 'calendario', label: 'Calendário Editorial', icon: CalendarIcon },
+  { id: 'planejador', label: 'Planejador', icon: Wand2 },
   { id: 'banco', label: 'Banco de Ideias', icon: Lightbulb },
   { id: 'prompts', label: 'Prompts IA', icon: Sparkles },
   { id: 'validacao', label: 'Validação', icon: TrendingUp },
@@ -60,6 +62,7 @@ export default function Marketing() {
 
       <div className="flex-1 overflow-y-auto">
         {active === 'calendario' && <CalendarioEditorial />}
+        {active === 'planejador' && <Planejador />}
         {active === 'banco' && <BancoIdeias />}
         {active === 'prompts' && <PromptsIA />}
         {active === 'validacao' && <Validacao />}

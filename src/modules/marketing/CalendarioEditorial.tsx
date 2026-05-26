@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Calendar, CheckCircle2, Clock, ExternalLink, Filter, RefreshCw, X, Pencil } from 'lucide-react';
+import { Calendar, CheckCircle2, Clock, ExternalLink, Filter, RefreshCw, X, Pencil, List, LayoutGrid, ChevronLeft, ChevronRight } from 'lucide-react';
 import { marketingStore, type CalendarPost, type CalendarStatus, type ContentPillar, type Platform } from '../../lib/marketingStore';
 import { PostDrawer } from './PostDrawer';
 
@@ -11,6 +11,12 @@ export function CalendarioEditorial() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [pillarFilter, setPillarFilter] = useState<string>('all');
   const [editing, setEditing] = useState<CalendarPost | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'month'>('month');
+  const [monthCursor, setMonthCursor] = useState(() => {
+    const d = new Date();
+    d.setDate(1);
+    return d;
+  });
 
   const refresh = async () => {
     setLoading(true);
@@ -83,6 +89,22 @@ export function CalendarioEditorial() {
 
         <div className="flex-1" />
 
+        {/* View toggle */}
+        <div className="flex border border-white/10 rounded-lg overflow-hidden">
+          <button
+            onClick={() => setViewMode('month')}
+            className={`flex items-center gap-1 px-3 py-1.5 text-xs ${viewMode === 'month' ? 'bg-[#06B6D4] text-[#0A0F1E] font-medium' : 'text-white/60 hover:bg-white/5'}`}
+          >
+            <LayoutGrid className="w-3.5 h-3.5" /> Mês
+          </button>
+          <button
+            onClick={() => setViewMode('list')}
+            className={`flex items-center gap-1 px-3 py-1.5 text-xs ${viewMode === 'list' ? 'bg-[#06B6D4] text-[#0A0F1E] font-medium' : 'text-white/60 hover:bg-white/5'}`}
+          >
+            <List className="w-3.5 h-3.5" /> Lista
+          </button>
+        </div>
+
         <select
           value={pillarFilter}
           onChange={(e) => setPillarFilter(e.target.value)}
@@ -135,9 +157,16 @@ export function CalendarioEditorial() {
             Nenhuma postagem agendada ainda.
           </p>
           <p className="text-xs mt-2 text-white/30">
-            Vá para "Banco de Ideias" e use o botão "Agendar" para começar.
+            Vá pra "Planejador" pra gerar uma agenda completa, ou "Banco de Ideias" pra agendar uma por vez.
           </p>
         </div>
+      ) : viewMode === 'month' ? (
+        <MonthView
+          monthCursor={monthCursor}
+          onMonthChange={setMonthCursor}
+          posts={filtered}
+          onEdit={setEditing}
+        />
       ) : (
         <div className="space-y-6">
           {byDate.map(([date, items]) => (
@@ -295,6 +324,125 @@ function PostCard({ post, onAdvance, onEdit }: { post: CalendarPost; onAdvance: 
             )}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── MonthView: grid 7×N do mês com mini-cards por dia ───
+const MONTH_NAMES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+const WEEKDAY_NAMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+function MonthView({ monthCursor, onMonthChange, posts, onEdit }: {
+  monthCursor: Date;
+  onMonthChange: (d: Date) => void;
+  posts: CalendarPost[];
+  onEdit: (p: CalendarPost) => void;
+}) {
+  const year = monthCursor.getFullYear();
+  const month = monthCursor.getMonth();
+
+  // Gera 6 semanas (42 dias) começando no domingo da semana que contém o dia 1
+  const cells = useMemo(() => {
+    const first = new Date(year, month, 1);
+    const firstDow = first.getDay();
+    const start = new Date(year, month, 1 - firstDow);
+    return Array.from({ length: 42 }, (_, i) => {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      return d;
+    });
+  }, [year, month]);
+
+  const postsByDate = useMemo(() => {
+    const map = new Map<string, CalendarPost[]>();
+    for (const p of posts) {
+      if (!map.has(p.scheduled_date)) map.set(p.scheduled_date, []);
+      map.get(p.scheduled_date)!.push(p);
+    }
+    return map;
+  }, [posts]);
+
+  const today = new Date().toISOString().slice(0, 10);
+  const totalPostsInMonth = cells
+    .filter(d => d.getMonth() === month)
+    .reduce((acc, d) => acc + (postsByDate.get(d.toISOString().slice(0, 10))?.length ?? 0), 0);
+
+  const goPrev = () => onMonthChange(new Date(year, month - 1, 1));
+  const goNext = () => onMonthChange(new Date(year, month + 1, 1));
+  const goToday = () => { const d = new Date(); d.setDate(1); onMonthChange(d); };
+
+  return (
+    <div>
+      {/* Header do mês */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <h3 className="text-base font-semibold">
+            {MONTH_NAMES[month]} {year}
+          </h3>
+          <span className="text-xs text-white/40">· {totalPostsInMonth} posts</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <button onClick={goPrev} className="p-1.5 hover:bg-white/5 rounded text-white/60 hover:text-white">
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button onClick={goToday} className="px-2 py-1 text-xs text-white/60 hover:text-white border border-white/10 rounded hover:bg-white/5">
+            Hoje
+          </button>
+          <button onClick={goNext} className="p-1.5 hover:bg-white/5 rounded text-white/60 hover:text-white">
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Header dias da semana */}
+      <div className="grid grid-cols-7 gap-1 mb-1">
+        {WEEKDAY_NAMES.map(w => (
+          <div key={w} className="text-[10px] uppercase tracking-widest font-bold text-white/30 text-center py-1">{w}</div>
+        ))}
+      </div>
+
+      {/* Grid */}
+      <div className="grid grid-cols-7 gap-1">
+        {cells.map((d, i) => {
+          const iso = d.toISOString().slice(0, 10);
+          const inMonth = d.getMonth() === month;
+          const isToday = iso === today;
+          const dayPosts = postsByDate.get(iso) ?? [];
+          return (
+            <div
+              key={i}
+              className={`min-h-[100px] border rounded p-1.5 ${
+                inMonth ? 'bg-white/[0.03] border-white/10' : 'bg-transparent border-white/5 opacity-40'
+              } ${isToday ? 'ring-1 ring-[#06B6D4]' : ''}`}
+            >
+              <div className={`text-[10px] mb-1 ${isToday ? 'text-[#06B6D4] font-bold' : 'text-white/40'}`}>
+                {d.getDate()}
+              </div>
+              <div className="space-y-0.5">
+                {dayPosts.slice(0, 4).map(p => (
+                  <button
+                    key={p.id}
+                    onClick={() => onEdit(p)}
+                    className="w-full text-left text-[10px] truncate px-1 py-0.5 rounded hover:brightness-125 transition-all"
+                    style={{
+                      background: `${p.pillar_color ?? '#06B6D4'}25`,
+                      color: p.pillar_color ?? '#06B6D4',
+                      borderLeft: `2px solid ${p.pillar_color ?? '#06B6D4'}`,
+                    }}
+                    title={`${p.content_type ?? 'post'}: ${p.hook ?? ''}`}
+                  >
+                    <span className="opacity-60 uppercase text-[8px] mr-1">{p.content_type?.slice(0, 4)}</span>
+                    {p.hook?.slice(0, 40) ?? '(sem hook)'}
+                  </button>
+                ))}
+                {dayPosts.length > 4 && (
+                  <div className="text-[9px] text-white/40 px-1">+{dayPosts.length - 4} mais</div>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

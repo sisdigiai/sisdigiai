@@ -213,19 +213,28 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
             </div>
           </Section>
 
-          {/* Plataformas */}
-          <Section title="Onde postar (múltiplas)">
-            <div className="grid grid-cols-2 gap-2">
+          {/* Plataformas + adaptador por canal */}
+          <Section title={`Onde postar (${(draft.platforms ?? []).length} de ${platforms.length} canais)`}>
+            <div className="grid grid-cols-3 gap-2">
               {platforms.map(p => {
                 const checked = (draft.platforms ?? []).includes(p.code);
                 return (
-                  <label key={p.code} className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer ${checked ? 'border-[#06B6D4]/50 bg-[#06B6D4]/10' : 'border-white/10 hover:border-white/20'}`}>
+                  <label key={p.code} className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer text-xs ${checked ? 'border-[#06B6D4]/50 bg-[#06B6D4]/10' : 'border-white/10 hover:border-white/20'}`}>
                     <input type="checkbox" checked={checked} onChange={() => togglePlatform(p.code)} className="accent-[#06B6D4]" />
-                    <span className="text-sm" style={{ color: p.color ?? '#fff' }}>{p.name}</span>
+                    <span style={{ color: p.color ?? '#fff' }}>{p.name}</span>
                   </label>
                 );
               })}
             </div>
+            {(draft.platforms ?? []).length > 1 && (
+              <div className="mt-3 bg-[#8B5CF6]/5 border border-[#8B5CF6]/20 rounded p-2 text-[11px] text-white/70 flex items-start gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0 mt-0.5" />
+                <span>
+                  <strong className="text-[#8B5CF6]">Estratégia inundação:</strong> esse post vai em {(draft.platforms ?? []).length} canais.
+                  Use "Gerar prompts IA" no topo pra criar a copy adaptada de cada formato (feed/reel/story/carrossel/email/etc) com mesmo nucleus.
+                </span>
+              </div>
+            )}
           </Section>
 
           {/* Link Hotmart com UTM + Vendas atribuídas */}

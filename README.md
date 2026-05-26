@@ -2,7 +2,7 @@
 
 Painel operacional interno da **DIGIAI ÓTICA E TECNOLOGIA LTDA**. Orquestra Verdades Canônicas, Roadmap de 8 fases, Decisões, Backlog, Cadastro da Empresa, Funil OSI, Financeiro, Academy, Biblioteca, Comercial, Brand Guidelines e a central do ecossistema Clearix.
 
-> **Posição estratégica:** infraestrutura interna, **não é produto de mercado**. Ver [Spec/digiai.md](../Spec/digiai.md) para a versão canônica e [Verdades Canônicas](../Spec/digiai.md#3-verdades-canônicas-regras-imutáveis-do-produto).
+> **Posição estratégica:** infraestrutura interna, **não é produto de mercado**. Ver [Spec/digiai.md](../Cockpit/Spec/digiai.md) para a versão canônica e [Verdades Canônicas](../Cockpit/Spec/digiai.md#3-verdades-canônicas-regras-imutáveis-do-produto).
 
 ## Stack
 
@@ -91,7 +91,7 @@ digiai/
 
 ## Banco de dados
 
-Schema separado por contexto, em **projeto Supabase próprio** (`hswyopqvnolqpmprqvzh`) — **isolado do banco Clearix** por decisão arquitetural ([ADR-0001](../ADR/ADR-0001-clearix-db-isolamento.md)):
+Schema separado por contexto, em **projeto Supabase próprio** (`hswyopqvnolqpmprqvzh`) — **isolado do banco Clearix** por decisão arquitetural ([ADR-0001](../Cockpit/ADR/ADR-0001-clearix-db-isolamento.md)):
 
 - `company.*` — identidade legal, contatos, ativos digitais, ferramentas, snapshots financeiros, status LGPD
 - `finance.*` — produtos, vendors, despesas, subscriptions, infra costs, revenue, founder time
@@ -105,8 +105,8 @@ A central **Clearix** dentro do app usa **auth super_admin separado** contra out
 | Onde | O quê |
 |------|-------|
 | [`docs/`](docs/) | Documentação humana: treinamentos, aulas, divulgação, [changelog](docs/changelog.md) |
-| [`../Spec/digiai.md`](../Spec/digiai.md) | **Spec canônica** — verdade do produto |
-| [`../ADR/`](../ADR/) | Decisões arquiteturais datadas e imutáveis |
+| [`../Cockpit/Spec/digiai.md`](../Cockpit/Spec/digiai.md) | **Spec canônica** — verdade do produto |
+| [`../Cockpit/ADR/`](../Cockpit/ADR/) | Decisões arquiteturais datadas e imutáveis |
 | [`../CLAUDE.md`](../CLAUDE.md) | Regras duras do workspace DIGIAI |
 | [`supabase/README.md`](supabase/README.md) | Notas do banco |
 
@@ -120,5 +120,5 @@ A central **Clearix** dentro do app usa **auth super_admin separado** contra out
 ## Onde reportar
 
 - Issues: [github.com/sisdigiai/sisdigiai/issues](https://github.com/sisdigiai/sisdigiai/issues)
-- Decisões arquiteturais novas → criar `ADR-NNNN-titulo.md` em [`../ADR/`](../ADR/)
+- Decisões arquiteturais novas → criar `ADR-NNNN-titulo.md` em [`../Cockpit/ADR/`](../Cockpit/ADR/)
 - Mudança de Verdade Canônica → exige ADR + atualização em `Spec/digiai.md` §3
