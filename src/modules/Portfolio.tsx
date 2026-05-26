@@ -126,11 +126,12 @@ const PRODUTOS: Produto[] = [
     subtitulo: 'Painel de comando interno da DIGIAI',
     categoria: 'infraestrutura',
     prioridade: 'alta',
-    status: 'Designer system pronto Â· App operacional em construÃ§Ã£o',
-    faseAtual: 'Fase 1 â€” em implementaÃ§Ã£o',
+    status: 'Operacional · 15 módulos funcionais · schema company 100% populado · finanças reconciliadas via OFX · 4 agents AI travados como consultoria interna',
+    faseAtual: 'Fase 1 → 2 — operação interna ativa',
     repo: 'D:\\projetos\\digiai',
-    stack: 'React 19 Â· Vite Â· TypeScript Â· TailwindCSS 4 Â· Motion',
-    proximo: 'Implementar mÃ³dulos 1â†’5 (VisÃ£o, PortfÃ³lio, Trilha, Lista Mestra, Backlog)',
+    stack: 'React 19 · Vite · TypeScript · TailwindCSS 4 · Motion · Supabase · Google GenAI · Chart.js',
+    proximo: 'Publicar drafts legais (Política, MSA, DPA) · Integrar com central Clearix · Confirmar Anexo III com Konsep · Validar criptografia repouso',
+    bloqueio: 'CNPJ em transição na RFB · Domínio próprio pendente · DPO formal não nomeado',
   },
 ];
 
