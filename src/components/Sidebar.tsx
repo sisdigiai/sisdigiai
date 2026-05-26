@@ -2,9 +2,10 @@ import React from 'react';
 import {
   Eye, LayoutGrid, Map, List, Zap, TrendingUp,
   BookOpen, DollarSign, GitBranch, Library, Palette, Building2, Network,
-  Compass, ExternalLink, Flame, Megaphone
+  Compass, ExternalLink, Flame, Megaphone, LogOut
 } from 'lucide-react';
 import { Logo } from './Logo';
+import { useAuth } from '../contexts/AuthContext';
 
 export type ModuleId =
   | 'visao' | 'portfolio' | 'trilha' | 'lista-mestra'
@@ -49,6 +50,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ active, onSelect }: SidebarProps) {
+  const { user, signOut } = useAuth();
   const operacional = navItems.filter(i => i.group === 'operacional');
   const ecossistemas = navItems.filter(i => i.group === 'ecossistemas');
   const apoio = navItems.filter(i => i.group === 'apoio');
@@ -121,8 +123,23 @@ export default function Sidebar({ active, onSelect }: SidebarProps) {
         </div>
       </nav>
 
-      <div className="p-4 border-t border-white/5">
-        <div className="text-[10px] font-mono text-white/20 text-center">
+      <div className="p-3 border-t border-white/5 space-y-2">
+        {user && (
+          <div className="px-3 py-2 rounded-lg bg-white/[0.03] border border-white/5">
+            <div className="text-[10px] font-mono text-white/40 uppercase tracking-widest">Logado</div>
+            <div className="text-xs text-white/70 truncate" title={user.email ?? ''}>
+              {user.email}
+            </div>
+          </div>
+        )}
+        <button
+          onClick={() => signOut()}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-white/50 hover:text-white hover:bg-red-500/10 hover:border-red-500/30 border border-transparent transition-all duration-150"
+        >
+          <LogOut className="w-4 h-4" />
+          Sair
+        </button>
+        <div className="text-[10px] font-mono text-white/20 text-center pt-1">
           Fase 0–1 de 8 · Zero aos Milhões
         </div>
       </div>
