@@ -442,6 +442,69 @@ export const marketingStore = {
     return (data ?? []) as any;
   },
 
+  // ── Challenges (desafios mensais) ──
+  async listChallenges(): Promise<Array<{
+    id: string; code: string; name: string; description: string | null;
+    movement: number | null; start_date: string | null; end_date: string | null;
+    status: string; prize_description: string | null; rules: string | null;
+    max_participants: number | null; hashtag: string | null; banner_url: string | null;
+    participants_count: number; submissions_count: number; winners_count: number;
+    total_sales_cents: number | null; closed_at: string | null; created_at: string;
+  }>> {
+    const { data, error } = await supabase.from('v_marketing_challenges').select('*');
+    if (error) { console.error('[marketingStore] listChallenges:', error.message); return []; }
+    return (data ?? []) as any;
+  },
+
+  async getChallengesStats(): Promise<{ active: number; draft: number; closed: number; cancelled: number; total_participations: number; total_winners: number } | null> {
+    const { data, error } = await supabase.from('v_marketing_challenges_stats').select('*').maybeSingle();
+    if (error) { console.error('[marketingStore] getChallengesStats:', error.message); return null; }
+    return data as any;
+  },
+
+  async getChallengeLeaderboard(challengeId: string): Promise<Array<{
+    id: string; challenge_id: string; member_id: string | null;
+    participant_name: string; participant_email: string | null; participant_whatsapp: string | null;
+    city: string | null; state: string | null; status: string;
+    submission_text: string | null; submission_url: string | null; submission_at: string | null;
+    sales_amount_cents: number | null; score: number | null; ranking: number | null;
+    prize_awarded: string | null; joined_at: string;
+  }>> {
+    const { data, error } = await supabase.from('v_marketing_challenge_leaderboard').select('*').eq('challenge_id', challengeId);
+    if (error) { console.error('[marketingStore] getChallengeLeaderboard:', error.message); return []; }
+    return (data ?? []) as any;
+  },
+
+  async createChallenge(payload: { name: string; description?: string; movement?: number; start_date?: string; end_date?: string; status?: string; prize_description?: string; rules?: string; hashtag?: string; max_participants?: number; banner_url?: string; code?: string }): Promise<string | null> {
+    const { data, error } = await supabase.rpc('marketing_create_challenge', { p_payload: payload as Record<string, unknown> });
+    if (error) { console.error('[marketingStore] createChallenge:', error.message); return null; }
+    return data as string;
+  },
+
+  async updateChallenge(id: string, patch: Record<string, unknown>): Promise<boolean> {
+    const { data, error } = await supabase.rpc('marketing_update_challenge', { p_id: id, p_patch: patch });
+    if (error) { console.error('[marketingStore] updateChallenge:', error.message); return false; }
+    return data === true;
+  },
+
+  async addChallengeParticipation(payload: { challenge_id: string; member_id?: string; participant_name?: string; participant_email?: string; participant_whatsapp?: string }): Promise<string | null> {
+    const { data, error } = await supabase.rpc('marketing_add_challenge_participation', { p_payload: payload as Record<string, unknown> });
+    if (error) { console.error('[marketingStore] addChallengeParticipation:', error.message); return null; }
+    return data as string;
+  },
+
+  async updateParticipation(id: string, patch: Record<string, unknown>): Promise<boolean> {
+    const { data, error } = await supabase.rpc('marketing_update_participation', { p_id: id, p_patch: patch });
+    if (error) { console.error('[marketingStore] updateParticipation:', error.message); return false; }
+    return data === true;
+  },
+
+  async finalizeChallenge(id: string): Promise<{ ranked: number } | null> {
+    const { data, error } = await supabase.rpc('marketing_finalize_challenge', { p_id: id });
+    if (error) { console.error('[marketingStore] finalizeChallenge:', error.message); return null; }
+    return data as any;
+  },
+
   // ── Community (membros do Hotmart) ──
   async listCommunityMembers(): Promise<Array<{
     id: string;

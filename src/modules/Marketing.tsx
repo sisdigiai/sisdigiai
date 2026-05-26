@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar as CalendarIcon, Crown, Lightbulb, Megaphone, MessageSquareQuote, Package, Sparkles, TrendingUp, Users, Wand2 } from 'lucide-react';
+import { Calendar as CalendarIcon, Crown, Lightbulb, Megaphone, MessageSquareQuote, Package, Sparkles, TrendingUp, Trophy, Users, Wand2 } from 'lucide-react';
 import { CalendarioEditorial } from './marketing/CalendarioEditorial';
 import { BancoIdeias } from './marketing/BancoIdeias';
 import { MateriaisAfiliados } from './marketing/MateriaisAfiliados';
@@ -9,8 +9,9 @@ import { Validacao } from './marketing/Validacao';
 import { Depoimentos } from './marketing/Depoimentos';
 import { Planejador } from './marketing/Planejador';
 import { Comunidade } from './marketing/Comunidade';
+import { Desafios } from './marketing/Desafios';
 
-type SubTab = 'calendario' | 'planejador' | 'banco' | 'prompts' | 'validacao' | 'depoimentos' | 'comunidade' | 'materiais' | 'afiliados';
+type SubTab = 'calendario' | 'planejador' | 'banco' | 'prompts' | 'validacao' | 'depoimentos' | 'comunidade' | 'desafios' | 'materiais' | 'afiliados';
 
 const SUBTABS: { id: SubTab; label: string; icon: typeof CalendarIcon }[] = [
   { id: 'calendario', label: 'Calendário Editorial', icon: CalendarIcon },
@@ -20,6 +21,7 @@ const SUBTABS: { id: SubTab; label: string; icon: typeof CalendarIcon }[] = [
   { id: 'validacao', label: 'Validação', icon: TrendingUp },
   { id: 'depoimentos', label: 'Depoimentos', icon: MessageSquareQuote },
   { id: 'comunidade', label: 'Comunidade OSI', icon: Crown },
+  { id: 'desafios', label: 'Desafios', icon: Trophy },
   { id: 'materiais', label: 'Materiais (afiliados)', icon: Package },
   { id: 'afiliados', label: 'Afiliados', icon: Users },
 ];
@@ -70,6 +72,7 @@ export default function Marketing() {
         {active === 'validacao' && <Validacao />}
         {active === 'depoimentos' && <Depoimentos />}
         {active === 'comunidade' && <Comunidade />}
+        {active === 'desafios' && <Desafios />}
         {active === 'materiais' && <MateriaisAfiliados />}
         {active === 'afiliados' && <Afiliados />}
       </div>
