@@ -2,46 +2,74 @@ import React from 'react';
 import {
   Eye, LayoutGrid, Map, List, Zap, TrendingUp,
   BookOpen, DollarSign, GitBranch, Library, Palette, Building2, Network,
-  Compass, ExternalLink, Flame, Megaphone, LogOut
+  Compass, Flame, Megaphone, LogOut, Store, Sparkles, Music2, Activity,
+  Camera, Wand2, Boxes, Search
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
+import EcossistemaLink, { EcossistemaStatus } from './EcossistemaLink';
 
 export type ModuleId =
   | 'visao' | 'portfolio' | 'trilha' | 'lista-mestra'
   | 'backlog' | 'comercial' | 'academy' | 'funil' | 'financeiro'
   | 'decisoes' | 'biblioteca' | 'brand' | 'cadastro-empresa'
-  | 'clearix' | 'referencias-design' | 'mock-estilos' | 'marketing';
+  | 'clearix' | 'referencias-design' | 'mock-estilos' | 'marketing'
+  | 'marketing-seo';
 
 interface NavItem {
-  id: ModuleId | string;
+  id: ModuleId;
   label: string;
   icon: React.ReactNode;
-  group: 'operacional' | 'ecossistemas' | 'apoio' | 'outros';
-  href?: string;
 }
 
-const ATLAS_URL = import.meta.env.VITE_ATLAS_URL || 'https://digiaiatlas.netlify.app';
+interface Ecossistema {
+  key: string;
+  icone: React.ReactNode;
+  nome: string;
+  url?: string;
+  status: EcossistemaStatus;
+}
 
-const navItems: NavItem[] = [
-  { id: 'visao', label: 'Visão', icon: <Eye className="w-4 h-4" />, group: 'operacional' },
-  { id: 'portfolio', label: 'Portfólio', icon: <LayoutGrid className="w-4 h-4" />, group: 'operacional' },
-  { id: 'trilha', label: 'Roadmap', icon: <Map className="w-4 h-4" />, group: 'operacional' },
-  { id: 'lista-mestra', label: 'Lista Mestra', icon: <List className="w-4 h-4" />, group: 'operacional' },
-  { id: 'backlog', label: 'Backlog Executivo', icon: <Zap className="w-4 h-4" />, group: 'operacional' },
-  { id: 'cadastro-empresa', label: 'Cadastro Empresa', icon: <Building2 className="w-4 h-4" />, group: 'operacional' },
-  { id: 'clearix', label: 'Clearix', icon: <Network className="w-4 h-4" />, group: 'ecossistemas' },
-  { id: 'atlas', label: 'Atlas', icon: <Compass className="w-4 h-4" />, group: 'ecossistemas', href: ATLAS_URL },
-  { id: 'comercial', label: 'Comercial', icon: <TrendingUp className="w-4 h-4" />, group: 'apoio' },
-  { id: 'academy', label: 'Academy', icon: <BookOpen className="w-4 h-4" />, group: 'apoio' },
-  { id: 'funil', label: 'Funil OSI', icon: <Flame className="w-4 h-4" />, group: 'apoio' },
-  { id: 'marketing', label: 'Marketing', icon: <Megaphone className="w-4 h-4" />, group: 'apoio' },
-  { id: 'financeiro', label: 'Financeiro', icon: <DollarSign className="w-4 h-4" />, group: 'apoio' },
-  { id: 'decisoes', label: 'Decisões', icon: <GitBranch className="w-4 h-4" />, group: 'apoio' },
-  { id: 'biblioteca', label: 'Biblioteca', icon: <Library className="w-4 h-4" />, group: 'apoio' },
-  { id: 'brand', label: 'Brand Guidelines', icon: <Palette className="w-4 h-4" />, group: 'outros' },
-  { id: 'referencias-design', label: 'Referências Design', icon: <Palette className="w-4 h-4" />, group: 'outros' },
-  { id: 'mock-estilos', label: 'Mock Vendas (4 estilos)', icon: <Palette className="w-4 h-4" />, group: 'outros' },
+// URLs externas dos ecossistemas (override via .env quando aplicavel)
+const ATLAS_URL    = import.meta.env.VITE_ATLAS_URL    || 'https://digiaiatlas.netlify.app';
+const OSI_URL      = import.meta.env.VITE_OSI_URL      || 'https://oticasemimproviso.netlify.app';
+const CLEARIX_HUB_URL = import.meta.env.VITE_CLEARIX_HUB_URL || ''; // ainda nao deployado
+
+const operacional: NavItem[] = [
+  { id: 'visao',            label: 'Visão',             icon: <Eye className="w-4 h-4" /> },
+  { id: 'portfolio',        label: 'Portfólio',         icon: <LayoutGrid className="w-4 h-4" /> },
+  { id: 'trilha',           label: 'Roadmap',           icon: <Map className="w-4 h-4" /> },
+  { id: 'lista-mestra',     label: 'Lista Mestra',      icon: <List className="w-4 h-4" /> },
+  { id: 'backlog',          label: 'Backlog Executivo', icon: <Zap className="w-4 h-4" /> },
+  { id: 'cadastro-empresa', label: 'Cadastro Empresa',  icon: <Building2 className="w-4 h-4" /> },
+  { id: 'financeiro',       label: 'Financeiro',        icon: <DollarSign className="w-4 h-4" /> },
+  { id: 'comercial',        label: 'Comercial',         icon: <TrendingUp className="w-4 h-4" /> },
+  { id: 'academy',          label: 'Academy',           icon: <BookOpen className="w-4 h-4" /> },
+  { id: 'funil',            label: 'Funil OSI',         icon: <Flame className="w-4 h-4" /> },
+  { id: 'marketing',        label: 'Marketing',         icon: <Megaphone className="w-4 h-4" /> },
+  { id: 'marketing-seo',    label: 'Marketing & SEO',   icon: <Search className="w-4 h-4" /> },
+  { id: 'clearix',          label: 'Central Clearix',   icon: <Network className="w-4 h-4" /> },
+];
+
+// Ecossistemas (links externos — ADR-0029)
+// Ordem: ativos primeiro, depois em_construcao, depois em_concepcao
+const ecossistemas: Ecossistema[] = [
+  { key: 'clearix-hub',  icone: <Boxes    className="w-4 h-4" />, nome: 'Clearix Hub',    url: CLEARIX_HUB_URL || undefined, status: CLEARIX_HUB_URL ? 'ativo' : 'em_construcao' },
+  { key: 'atlas',        icone: <Compass  className="w-4 h-4" />, nome: 'Clearix Atlas',  url: ATLAS_URL,                    status: 'ativo' },
+  { key: 'osi',          icone: <Store    className="w-4 h-4" />, nome: 'OSI',            url: OSI_URL,                      status: 'ativo' },
+  { key: 'polapetit',    icone: <Sparkles className="w-4 h-4" />, nome: 'Polapetit',                                          status: 'em_concepcao' },
+  { key: 'niposchool',   icone: <Music2   className="w-4 h-4" />, nome: 'Nipo School',                                        status: 'em_concepcao' },
+  { key: 'pulsocontrol', icone: <Activity className="w-4 h-4" />, nome: 'Pulso Control',                                      status: 'em_concepcao' },
+  { key: 'qualafoto',    icone: <Camera   className="w-4 h-4" />, nome: 'Qual a Foto',                                        status: 'em_concepcao' },
+  { key: 'lumina',       icone: <Wand2    className="w-4 h-4" />, nome: 'Lumina',                                             status: 'em_concepcao' },
+];
+
+const sistema: NavItem[] = [
+  { id: 'decisoes',           label: 'Decisões',            icon: <GitBranch className="w-4 h-4" /> },
+  { id: 'biblioteca',         label: 'Biblioteca',          icon: <Library className="w-4 h-4" /> },
+  { id: 'brand',              label: 'Brand Guidelines',    icon: <Palette className="w-4 h-4" /> },
+  { id: 'referencias-design', label: 'Referências Design',  icon: <Palette className="w-4 h-4" /> },
+  { id: 'mock-estilos',       label: 'Mock Vendas',         icon: <Palette className="w-4 h-4" /> },
 ];
 
 interface SidebarProps {
@@ -51,40 +79,20 @@ interface SidebarProps {
 
 export default function Sidebar({ active, onSelect }: SidebarProps) {
   const { user, signOut } = useAuth();
-  const operacional = navItems.filter(i => i.group === 'operacional');
-  const ecossistemas = navItems.filter(i => i.group === 'ecossistemas');
-  const apoio = navItems.filter(i => i.group === 'apoio');
-  const outros = navItems.filter(i => i.group === 'outros');
 
-  const NavButton = ({ item }: { item: NavItem }) => {
-    if (item.href) {
-      return (
-        <a
-          href={item.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 text-left text-white/50 hover:text-white/80 hover:bg-white/5"
-        >
-          <span>{item.icon}</span>
-          <span className="flex-1">{item.label}</span>
-          <ExternalLink className="w-3 h-3 text-white/30" />
-        </a>
-      );
-    }
-    return (
-      <button
-        onClick={() => onSelect(item.id as ModuleId)}
-        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 text-left
-          ${active === item.id
-            ? 'bg-[#2563EB]/20 text-white border border-[#2563EB]/40'
-            : 'text-white/50 hover:text-white/80 hover:bg-white/5'
-          }`}
-      >
-        <span className={active === item.id ? 'text-[#06B6D4]' : ''}>{item.icon}</span>
-        {item.label}
-      </button>
-    );
-  };
+  const NavButton = ({ item }: { item: NavItem }) => (
+    <button
+      onClick={() => onSelect(item.id)}
+      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 text-left
+        ${active === item.id
+          ? 'bg-[#2563EB]/20 text-white border border-[#2563EB]/40'
+          : 'text-white/50 hover:text-white/80 hover:bg-white/5'
+        }`}
+    >
+      <span className={active === item.id ? 'text-[#06B6D4]' : ''}>{item.icon}</span>
+      {item.label}
+    </button>
+  );
 
   return (
     <div className="w-60 shrink-0 h-screen sticky top-0 bg-[#0A0F1E] border-r border-white/5 flex flex-col">
@@ -104,21 +112,25 @@ export default function Sidebar({ active, onSelect }: SidebarProps) {
         <div>
           <div className="px-3 mb-2 text-[10px] font-mono text-white/25 uppercase tracking-widest">Ecossistemas</div>
           <div className="space-y-0.5">
-            {ecossistemas.map(item => <NavButton key={item.id} item={item} />)}
+            {ecossistemas.map(e => (
+              <EcossistemaLink
+                key={e.key}
+                icone={e.icone}
+                nome={e.nome}
+                url={e.url}
+                status={e.status}
+              />
+            ))}
           </div>
-        </div>
-
-        <div>
-          <div className="px-3 mb-2 text-[10px] font-mono text-white/25 uppercase tracking-widest">Apoio</div>
-          <div className="space-y-0.5">
-            {apoio.map(item => <NavButton key={item.id} item={item} />)}
+          <div className="px-3 mt-2 text-[9px] font-mono text-white/20 leading-relaxed">
+            Links externos · cada ecossistema tem banco e auth próprios (ADR-0029)
           </div>
         </div>
 
         <div>
           <div className="px-3 mb-2 text-[10px] font-mono text-white/25 uppercase tracking-widest">Sistema</div>
           <div className="space-y-0.5">
-            {outros.map(item => <NavButton key={item.id} item={item} />)}
+            {sistema.map(item => <NavButton key={item.id} item={item} />)}
           </div>
         </div>
       </nav>
