@@ -1,0 +1,3 @@
+# Cloudflare Pages SPA fallback
+# Sem isto, rotas client-side (ex: /osi/depoimento) retornam 404 ao recarregar
+/*    /index.html   200
