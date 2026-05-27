@@ -39,8 +39,16 @@
   - **R-010** — Pergunta de Ouro filtra toda decisão
   - **R-011** — Cotrabalho AI/humano (digiai contém Financeiro/Cadastro Empresa — dados sensíveis)
   - **R-013** — schema obrigatório de cadastros de pessoa (USUUID + BSUID)
+  - **R-024** — Baseline AppSec (OWASP Top 10): RLS · parametrized queries · webhooks com signature · headers de segurança · `dangerouslySetInnerHTML` e `execute_sql` interpolado bloqueados por hook T-005
 - **NÃO se aplica:** R-014 (clearix_design). digiai **não** é Clearix — tem identidade visual própria funcional.
 - **Documentação do app:** [`docs/README.md`](docs/README.md) + [`docs/changelog.md`](docs/changelog.md) + `docs/treinamentos/`, `docs/aulas/`, `docs/divulgacao/`
+- **🏢 Brand da DIGIAI mãe (institucional):** [`docs/brand/`](docs/brand/) — **fonte canônica** da identidade visual da holding DIGIAI (Editorial Forest Green / Convergence Grid · Stitch v2 ativo desde 2026-05-26)
+  - [`docs/brand/README.md`](docs/brand/README.md) — visão geral
+  - [`docs/brand/prompts-stitch-rebrand-v2.md`](docs/brand/prompts-stitch-rebrand-v2.md) — 603 linhas, prompts sequenciais v2
+  - [`docs/brand/GUIA-aplicar-nas-redes-sociais.md`](docs/brand/GUIA-aplicar-nas-redes-sociais.md) — aplicação prática
+  - [`docs/brand/stitch_final/`](docs/brand/stitch_final/) — 8 subpastas (design system, logo, lockups, telas, redes, papelaria, pitch deck, sub-produtos)
+  - **Mapa cross-app** das identidades em [`../Cockpit/marca-institucional.md`](../Cockpit/marca-institucional.md) §"Mapa cross-app de identidades visuais"
+  - **Princípio:** brand DIGIAI mãe ≠ brand Clearix. Clearix tem `Cockpit/clearix_design/` (R-014). digiai App é dono da brand DIGIAI **institucional** (holding).
 
 ## 4. Stack + dev
 
@@ -105,6 +113,8 @@
 - Apagar Decisões registradas (14 decisões formais, base auditável)
 - Modificar gate super_admin do módulo Central Clearix (vazaria acesso Clearix a usuário digiai)
 - Deploy produção (afeta gestão central diária do dono)
+- `dangerouslySetInnerHTML` sem DOMPurify (hook T-005 bloqueia — R-024)
+- `execute_sql` com template literal interpolado (hook T-005 bloqueia — R-024)
 
 ## 7. Módulos do painel
 
