@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lumina Control Room - Component Library</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed-variant": "#653e00",
+                        "surface-container-high": "#2a2a2d",
+                        "on-tertiary-fixed-variant": "#5a00c6",
+                        "error-container": "#93000a",
+                        "on-tertiary": "#3f008e",
+                        "on-surface-variant": "#c7c4d8",
+                        "secondary-fixed-dim": "#ffb95f",
+                        "on-primary-fixed": "#0f0069",
+                        "surface-tint": "#c3c0ff",
+                        "surface-container": "#1f1f22",
+                        "surface-container-lowest": "#0e0e11",
+                        "inverse-primary": "#4d44e3",
+                        "inverse-on-surface": "#303033",
+                        "primary-fixed": "#e2dfff",
+                        "on-error": "#690005",
+                        "on-surface": "#e4e1e6",
+                        "tertiary": "#d2bbff",
+                        "on-tertiary-container": "#e4d4ff",
+                        "secondary": "#ffb95f",
+                        "primary": "#c3c0ff",
+                        "surface-container-low": "#1b1b1e",
+                        "on-background": "#e4e1e6",
+                        "tertiary-fixed-dim": "#d2bbff",
+                        "surface-bright": "#39393c",
+                        "on-secondary": "#472a00",
+                        "on-primary": "#1d00a5",
+                        "surface": "#131316",
+                        "on-secondary-container": "#5b3800",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#25005a",
+                        "background": "#131316",
+                        "outline-variant": "#464555",
+                        "secondary-container": "#ee9800",
+                        "tertiary-fixed": "#eaddff",
+                        "primary-container": "#4f46e5",
+                        "error": "#ffb4ab",
+                        "secondary-fixed": "#ffddb8",
+                        "on-secondary-fixed": "#2a1700",
+                        "tertiary-container": "#7531e6",
+                        "surface-variant": "#353438",
+                        "inverse-surface": "#e4e1e6",
+                        "on-primary-container": "#dad7ff",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "surface-container-highest": "#353438",
+                        "surface-dim": "#131316",
+                        "outline": "#918fa1"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "margin-desktop": "32px",
+                        "unit": "4px",
+                        "margin-tv": "64px",
+                        "gutter": "16px",
+                        "margin-mobile": "16px"
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "title-md": ["Inter"],
+                        "status-label": ["Inter"],
+                        "label-mono": ["JetBrains Mono"]
+                    },
+                    fontSize: {
+                        "headline-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg": ["72px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "status-label": ["12px", { "lineHeight": "16px", "fontWeight": "700" }],
+                        "label-mono": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+                    },
+                    boxShadow: {
+                        'spotlight': '0 0 40px 2px rgba(245, 158, 11, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill-1 {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Custom Scrollbar for better appearance in dark mode */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #131316;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #353438;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #464555;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- Top Navigation Shell -->
+<header class="bg-surface border-b border-outline-variant docked full-width top-0 sticky z-40">
+<div class="flex justify-between items-center w-full px-margin-desktop py-4 h-16">
+<div class="flex items-center gap-8">
+<span class="font-display-lg text-title-md font-bold text-on-surface">Lumina Control Room</span>
+<nav class="hidden md:flex gap-6">
+<a class="text-primary border-b-2 border-primary pb-1 font-title-md text-title-md" href="#">Component Library</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high p-2 rounded transition-all duration-300">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<button class="bg-primary-container text-white px-4 py-2 rounded font-status-label hover:bg-primary-container/90 transition-colors">
+                    Deploy Content
+                </button>
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-on-surface px-3 py-2 border border-outline-variant rounded transition-colors">
+                    System Status
+                </button>
+<div class="flex gap-2">
+<button class="text-on-surface-variant hover:text-on-surface p-2 rounded hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-on-surface p-2 rounded hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</div>
+</header>
+<main class="p-margin-desktop space-y-12 max-w-[1920px] mx-auto">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-margin-desktop">
+<!-- Quadrant 1: Media Card -->
+<section class="flex flex-col gap-8 bg-surface-container-lowest p-8 rounded-xl border border-outline-variant">
+<h2 class="font-title-md text-title-md text-on-surface border-b border-outline-variant pb-4">Media Card Variants</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Light Variant (Mocked as Dark for this theme, as we are in strict dark mode, but demonstrating state) -->
+<div class="flex flex-col gap-6 items-center">
+<h3 class="font-status-label text-on-surface-variant uppercase tracking-wider">A) Active Use</h3>
+<div class="w-[280px] bg-surface-container-low border border-outline-variant rounded-lg overflow-hidden flex flex-col group">
+<div class="relative h-[158px] bg-surface-container-high w-full">
+<img alt="Hickmann Eyewear Campaign" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/ADBb0ugZtFWnHd89GUH0og2f_a-EoFS9hFrJLF9bRtX44LF_QXsFKVY1w3uaLe5OORJa2xpuUeCyyJXlQkdfVZKtMtwoVSzUfGBDhQQWjdNGoEVsS6dKWJ2_J2QYnxsQeo2GJx-uKIDkiVKeKrQKM78KTt0koy_ozqaKhD5JIkK3EpTSBSYXWp8DWXMsQyg2sv0irMUdQ8L7aQJsYoQWY2pU4-X9SWdUY22Y4awi1tS85NVqnxMWXEVvQwYp2i0L"/>
+<div class="absolute top-2 right-2 bg-amber-500/20 text-amber-500 border border-amber-500/50 px-2 py-1 rounded font-status-label flex items-center gap-1 backdrop-blur-sm">
+<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                                    EM USO
+                                </div>
+</div>
+<div class="p-4 flex flex-col gap-2">
+<span class="font-title-md text-[16px] text-on-surface truncate">Campanha Inverno 24</span>
+<div class="flex justify-between items-center text-on-surface-variant font-status-label">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span> 15s</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]" data-icon="crop_16_9">crop_16_9</span> 1920x1080</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Dark Variant -->
+<div class="flex flex-col gap-6 items-center">
+<h3 class="font-status-label text-on-surface-variant uppercase tracking-wider">B) Orphan / C) Selected</h3>
+<!-- Orphan -->
+<div class="w-[280px] bg-surface-container-low border border-outline-variant rounded-lg overflow-hidden flex flex-col opacity-75">
+<div class="relative h-[158px] bg-surface-container-high w-full flex items-center justify-center">
+<img alt="Hickmann Eyewear Product" class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida/ADBb0ugZtFWnHd89GUH0og2f_a-EoFS9hFrJLF9bRtX44LF_QXsFKVY1w3uaLe5OORJa2xpuUeCyyJXlQkdfVZKtMtwoVSzUfGBDhQQWjdNGoEVsS6dKWJ2_J2QYnxsQeo2GJx-uKIDkiVKeKrQKM78KTt0koy_ozqaKhD5JIkK3EpTSBSYXWp8DWXMsQyg2sv0irMUdQ8L7aQJsYoQWY2pU4-X9SWdUY22Y4awi1tS85NVqnxMWXEVvQwYp2i0L"/>
+<div class="absolute inset-0 bg-background/50 flex flex-col items-center justify-center">
+<span class="material-symbols-outlined text-error text-3xl mb-2" data-icon="warning">warning</span>
+<span class="bg-error/20 text-error border border-error/50 px-2 py-1 rounded font-status-label backdrop-blur-sm">
+                                        SEM PLAYLIST
+                                    </span>
+</div>
+</div>
+<div class="p-4 flex flex-col gap-2">
+<span class="font-title-md text-[16px] text-on-surface truncate">Promocional_Antigo.mp4</span>
+</div>
+</div>
+<!-- Selected Spotlight -->
+<div class="w-[280px] bg-surface-container-low border-2 border-amber-400 rounded-lg overflow-hidden flex flex-col shadow-spotlight transform scale-105 transition-transform">
+<div class="relative h-[158px] bg-surface-container-high w-full">
+<img alt="Hickmann Eyewear Focus" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/ADBb0ugZtFWnHd89GUH0og2f_a-EoFS9hFrJLF9bRtX44LF_QXsFKVY1w3uaLe5OORJa2xpuUeCyyJXlQkdfVZKtMtwoVSzUfGBDhQQWjdNGoEVsS6dKWJ2_J2QYnxsQeo2GJx-uKIDkiVKeKrQKM78KTt0koy_ozqaKhD5JIkK3EpTSBSYXWp8DWXMsQyg2sv0irMUdQ8L7aQJsYoQWY2pU4-X9SWdUY22Y4awi1tS85NVqnxMWXEVvQwYp2i0L"/>
+<div class="absolute top-2 left-2 bg-background/80 p-1 rounded backdrop-blur-sm">
+<span class="material-symbols-outlined text-amber-400 fill-1" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+<div class="p-4 flex flex-col gap-2">
+<span class="font-title-md text-[16px] text-on-surface truncate">Lançamento_Óculos_01.mp4</span>
+<div class="flex justify-between items-center text-amber-400/80 font-status-label">
+<span>Selecionado para Deploy</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Quadrant 2: Device Card -->
+<section class="flex flex-col gap-8 bg-surface-container-lowest p-8 rounded-xl border border-outline-variant">
+<h2 class="font-title-md text-title-md text-on-surface border-b border-outline-variant pb-4">Device Card Variants</h2>
+<div class="flex flex-col gap-6">
+<!-- A) Online -->
+<div class="w-[360px] bg-surface-container-low border border-outline-variant rounded-xl p-4 flex gap-4 items-center group hover:bg-surface-container transition-colors">
+<div class="w-[120px] h-[68px] bg-surface-container-high rounded bg-cover bg-center border border-outline-variant/50 relative overflow-hidden" style="background-image: url('https://lh3.googleusercontent.com/aida/ADBb0ugZtFWnHd89GUH0og2f_a-EoFS9hFrJLF9bRtX44LF_QXsFKVY1w3uaLe5OORJa2xpuUeCyyJXlQkdfVZKtMtwoVSzUfGBDhQQWjdNGoEVsS6dKWJ2_J2QYnxsQeo2GJx-uKIDkiVKeKrQKM78KTt0koy_ozqaKhD5JIkK3EpTSBSYXWp8DWXMsQyg2sv0irMUdQ8L7aQJsYoQWY2pU4-X9SWdUY22Y4awi1tS85NVqnxMWXEVvQwYp2i0L');">
+<div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
+<span class="absolute bottom-1 left-1 material-symbols-outlined text-[14px] text-white" data-icon="play_circle">play_circle</span>
+</div>
+<div class="flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-1">
+<span class="font-title-md text-[16px] text-on-surface truncate w-40">Lancaster Suzano — Vitrine</span>
+<div class="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+<span class="font-status-label text-[10px]">ONLINE</span>
+</div>
+</div>
+<span class="font-label-mono text-on-surface-variant text-[12px]">IP: 192.168.1.104</span>
+<span class="font-body-md text-on-surface-variant text-[12px] mt-1">Sincronizado há 2 min</span>
+</div>
+</div>
+<!-- B) Offline -->
+<div class="w-[360px] bg-surface-container-low border border-error/30 rounded-xl p-4 flex gap-4 items-center opacity-80">
+<div class="w-[120px] h-[68px] bg-surface-container-high rounded border border-outline-variant/50 flex items-center justify-center">
+<span class="material-symbols-outlined text-error/50 text-2xl" data-icon="wifi_off">wifi_off</span>
+</div>
+<div class="flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-1">
+<span class="font-title-md text-[16px] text-on-surface truncate w-40">Lancaster Suzano — Caixa</span>
+<div class="flex items-center gap-1.5 bg-error/10 text-error px-2 py-0.5 rounded-full border border-error/20">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+<span class="font-status-label text-[10px]">OFFLINE</span>
+</div>
+</div>
+<span class="font-label-mono text-on-surface-variant text-[12px]">IP: Desconhecido</span>
+<span class="font-body-md text-error/80 text-[12px] mt-1">Sem sinal há 4 horas</span>
+</div>
+</div>
+<!-- C) Pairing -->
+<div class="w-[360px] bg-surface-container-low border border-orange-500/30 rounded-xl p-4 flex gap-4 items-center relative overflow-hidden">
+<div class="absolute inset-0 bg-orange-500/5 animate-pulse"></div>
+<div class="w-[120px] h-[68px] bg-surface-container-highest rounded border border-orange-500/50 flex items-center justify-center z-10">
+<span class="font-label-mono text-xl text-orange-400 tracking-widest">A7X9</span>
+</div>
+<div class="flex flex-col flex-grow z-10">
+<div class="flex justify-between items-start mb-1">
+<span class="font-title-md text-[16px] text-on-surface truncate w-40">Novo Dispositivo</span>
+<div class="flex items-center gap-1.5 bg-orange-500/10 text-orange-400 px-2 py-0.5 rounded-full border border-orange-500/20">
+<span class="material-symbols-outlined text-[10px]" data-icon="link">link</span>
+<span class="font-status-label text-[10px]">PAREANDO</span>
+</div>
+</div>
+<span class="font-body-md text-on-surface-variant text-[12px]">Aguardando PIN...</span>
+<div class="w-full bg-surface-container-highest h-1 mt-2 rounded-full overflow-hidden">
+<div class="bg-orange-400 h-full w-1/3 animate-[slide_2s_ease-in-out_infinite]"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Quadrant 3: Media Upload Modal -->
+<section class="flex flex-col gap-8 bg-surface-container-lowest p-8 rounded-xl border border-outline-variant lg:col-span-1">
+<h2 class="font-title-md text-title-md text-on-surface border-b border-outline-variant pb-4">Media Upload Modal</h2>
+<div class="w-full max-w-[640px] bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl flex flex-col mx-auto">
+<!-- Modal Header -->
+<div class="flex justify-between items-center p-6 border-b border-outline-variant">
+<h3 class="font-title-md text-title-md text-on-surface">Upload de Mídia</h3>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<!-- Modal Body -->
+<div class="p-6 flex flex-col gap-6">
+<!-- Drop Area (Showing 'Uploading' state as primary, with visual cues for others) -->
+<div class="relative border-2 border-dashed border-amber-500/50 bg-amber-500/5 rounded-xl p-8 flex flex-col items-center justify-center text-center transition-colors">
+<!-- Idle state icon (hidden in this specific render, but structural) -->
+<!-- <span class="material-symbols-outlined text-4xl text-on-surface-variant mb-4" data-icon="cloud_upload">cloud_upload</span> -->
+<div class="w-full max-w-sm flex flex-col gap-4">
+<div class="flex items-center gap-4 bg-surface-container p-3 rounded-lg border border-outline-variant/50">
+<div class="w-10 h-10 bg-surface-container-high rounded flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary" data-icon="movie">movie</span>
+</div>
+<div class="flex flex-col flex-grow text-left">
+<span class="font-body-md text-sm text-on-surface truncate">video_institucional_final.mp4</span>
+<div class="flex justify-between items-center mt-1">
+<span class="font-status-label text-on-surface-variant">24.5 MB</span>
+<span class="font-label-mono text-amber-400 text-xs">47%</span>
+</div>
+</div>
+</div>
+<!-- Progress Bar -->
+<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
+<div class="bg-amber-400 h-full w-[47%] transition-all duration-300"></div>
+</div>
+<span class="font-status-label text-on-surface-variant">Fazendo upload... Por favor, aguarde.</span>
+</div>
+</div>
+<!-- Form Fields -->
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2 col-span-2">
+<label class="font-status-label text-on-surface-variant uppercase">Nome da Mídia</label>
+<input class="bg-background border border-outline-variant text-on-surface text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 outline-none transition-colors" type="text" value="Vídeo Institucional Final"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-status-label text-on-surface-variant uppercase">Orientação</label>
+<select class="bg-background border border-outline-variant text-on-surface text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 outline-none appearance-none">
+<option>Horizontal (16:9)</option>
+<option>Vertical (9:16)</option>
+</select>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-status-label text-on-surface-variant uppercase">Duração (seg)</label>
+<input class="bg-background border border-outline-variant text-on-surface text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 outline-none" type="number" value="30"/>
+</div>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="p-6 border-t border-outline-variant flex justify-end gap-4 bg-surface-container-lowest/50 rounded-b-xl">
+<button class="px-4 py-2 text-on-surface-variant border border-outline-variant rounded hover:bg-surface-container-high transition-colors font-status-label">
+                            Cancelar
+                        </button>
+<button class="px-4 py-2 bg-primary-container text-white rounded opacity-50 cursor-not-allowed font-status-label flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] animate-spin" data-icon="sync">sync</span>
+                            Processando
+                        </button>
+</div>
+</div>
+</section>
+<!-- Quadrant 4: Player Offline State -->
+<section class="flex flex-col gap-8 bg-surface-container-lowest p-8 rounded-xl border border-outline-variant lg:col-span-1 overflow-hidden">
+<h2 class="font-title-md text-title-md text-on-surface border-b border-outline-variant pb-4">Player Offline State</h2>
+<div class="flex flex-col xl:flex-row gap-8 items-center justify-center">
+<!-- Landscape 1920x1080 (Scaled down) -->
+<div class="relative w-[320px] h-[180px] bg-surface flex flex-col items-center justify-center border border-outline-variant/30 rounded shadow-lg overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-b from-background to-surface-container-lowest z-0"></div>
+<div class="z-10 flex flex-col items-center gap-4 text-center p-4">
+<div class="w-16 h-16 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant" data-icon="wifi_off">wifi_off</span>
+</div>
+<div>
+<h1 class="font-headline-lg-mobile text-on-surface mb-1">Sem conexão</h1>
+<p class="font-body-md text-on-surface-variant text-sm max-w-[250px]">O player perdeu comunicação com o servidor principal.</p>
+</div>
+<div class="bg-surface-container-low border border-outline-variant px-4 py-2 rounded-lg flex items-center gap-3 mt-2">
+<span class="material-symbols-outlined text-primary" data-icon="sd_storage">sd_storage</span>
+<div class="flex flex-col text-left">
+<span class="font-label-mono text-on-surface text-xs">Modo Offline Ativo</span>
+<span class="font-status-label text-on-surface-variant">47 mídias em cache local</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Portrait 1080x1920 (Scaled down) -->
+<div class="relative w-[180px] h-[320px] bg-surface flex flex-col items-center justify-center border border-outline-variant/30 rounded shadow-lg overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-b from-background to-surface-container-lowest z-0"></div>
+<div class="z-10 flex flex-col items-center gap-6 text-center p-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center mt-8">
+<span class="material-symbols-outlined text-2xl text-on-surface-variant" data-icon="wifi_off">wifi_off</span>
+</div>
+<div>
+<h1 class="font-title-md text-on-surface mb-2 leading-tight">Sem<br/>conexão</h1>
+</div>
+<div class="bg-surface-container-low border border-outline-variant p-3 rounded-lg flex flex-col items-center gap-2 mt-auto mb-4 w-full">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="sd_storage">sd_storage</span>
+<span class="font-status-label text-on-surface-variant text-center">47 mídias em cache</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>

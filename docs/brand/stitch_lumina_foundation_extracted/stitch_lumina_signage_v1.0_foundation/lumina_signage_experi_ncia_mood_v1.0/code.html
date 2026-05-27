@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lumina Signage - Player Boot &amp; Moodboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#918fa1",
+                        "on-tertiary": "#3f008e",
+                        "inverse-surface": "#e4e1e6",
+                        "on-background": "#e4e1e6",
+                        "surface-container-high": "#2a2a2d",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "surface-container": "#1f1f22",
+                        "surface-bright": "#39393c",
+                        "surface-container-low": "#1b1b1e",
+                        "surface-variant": "#353438",
+                        "secondary": "#ffb95f",
+                        "on-secondary": "#472a00",
+                        "outline-variant": "#464555",
+                        "tertiary-container": "#7531e6",
+                        "tertiary-fixed": "#eaddff",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "inverse-primary": "#4d44e3",
+                        "surface": "#131316",
+                        "surface-tint": "#c3c0ff",
+                        "on-secondary-fixed": "#2a1700",
+                        "on-secondary-container": "#5b3800",
+                        "on-primary": "#1d00a5",
+                        "surface-container-highest": "#353438",
+                        "on-surface-variant": "#c7c4d8",
+                        "on-secondary-fixed-variant": "#653e00",
+                        "error-container": "#93000a",
+                        "secondary-fixed": "#ffddb8",
+                        "primary-container": "#4f46e5",
+                        "on-error": "#690005",
+                        "background": "#131316",
+                        "on-tertiary-fixed": "#25005a",
+                        "on-surface": "#e4e1e6",
+                        "secondary-fixed-dim": "#ffb95f",
+                        "on-tertiary-container": "#e4d4ff",
+                        "primary": "#c3c0ff",
+                        "primary-fixed": "#e2dfff",
+                        "on-primary-fixed": "#0f0069",
+                        "on-primary-container": "#dad7ff",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#5a00c6",
+                        "secondary-container": "#ee9800",
+                        "surface-dim": "#131316",
+                        "tertiary-fixed-dim": "#d2bbff",
+                        "inverse-on-surface": "#303033",
+                        "surface-container-lowest": "#0e0e11",
+                        "tertiary": "#d2bbff",
+                        "error": "#ffb4ab",
+                        "amber": {
+                            400: "#fbbf24",
+                            500: "#f59e0b"
+                        }
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-desktop": "32px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px",
+                        "margin-tv": "64px"
+                    },
+                    "fontFamily": {
+                        "status-label": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "title-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-mono": ["JetBrains Mono"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "status-label": ["12px", { "lineHeight": "16px", "fontWeight": "700" }],
+                        "display-lg": ["72px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-mono": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "headline-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    },
+                    backgroundImage: {
+                        'dot-pattern': 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)'
+                    },
+                    backgroundSize: {
+                        'dot': '16px 16px'
+                    },
+                    boxShadow: {
+                        'spotlight': '0 0 40px 2px rgba(245, 158, 11, 0.3)',
+                        'spotlight-intense': '0 0 60px 5px rgba(245, 158, 11, 0.5)'
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Custom spinner animation */
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 2s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- Header Navigation (Hidden on mobile, showing only for structural context if needed, but per mandate suppressing for this specific focused flow) -->
+<!-- Suppressed navigation as this is a focused mobile presentation view -->
+<main class="flex-1 w-full max-w-md mx-auto">
+<!-- SEÇÃO 1: SPLASH BOOT DO PLAYER -->
+<section class="relative w-full h-[80vh] min-h-[600px] flex flex-col bg-[#09090B] overflow-hidden border-b border-surface-variant">
+<!-- Background Dotted Pattern -->
+<div class="absolute inset-0 bg-dot-pattern bg-dot opacity-30 pointer-events-none"></div>
+<div class="relative z-10 flex-1 flex flex-col items-center justify-center p-margin-mobile w-full">
+<h2 class="font-label-mono text-label-mono text-on-surface-variant uppercase mb-8 text-center tracking-widest">
+                    Inicialização do Player
+                </h2>
+<!-- Container for Orientations side-by-side -->
+<div class="flex flex-row items-center justify-center gap-6 w-full max-w-[320px] mx-auto">
+<!-- Portrait (9:16) Representation -->
+<div class="relative flex flex-col items-center justify-center bg-surface-container-low border border-surface-variant rounded-lg w-[120px] h-[213px] shadow-lg overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-b from-black/50 to-black/80 z-0"></div>
+<div class="relative z-10 flex flex-col items-center p-4 w-full h-full justify-center">
+<div class="relative w-3/4 flex items-center justify-center">
+<div class="absolute inset-0 rounded-full shadow-spotlight-intense blur-xl"></div>
+<img alt="Lumina Logo" class="relative z-20 w-full h-auto brightness-200 contrast-125 mix-blend-screen drop-shadow-[0_0_8px_rgba(252,211,77,0.8)]" src="https://lh3.googleusercontent.com/aida/ADBb0ui84_3aQIPwBaZUwSvxQYf45kXLge_a4dIP-c0CVK4FSzXnS_Fm1XqRmNfkdDE1rvWmxcf4nfS5djxb9NFmxtZcEgWYTBIcxUWb9lVQXQWUI3nMInEAAQL5urRl80Xb_kpAudSy9fEt-TdQBMZ7O8n3cBBD3PM3G7w80lIxggCJ5VMO0kMGHemqCipU5DHAED3K2ORuDzgFZj3eeXJJp2I1IDyV327UKWBrIZA1wBEUQuMsN7P3GMPhJJQ"/>
+</div>
+<div class="absolute bottom-4 flex flex-col items-center gap-2">
+<span class="material-symbols-outlined text-amber-500 text-[16px] animate-spin-slow opacity-80" data-weight="fill">sync</span>
+<p class="font-status-label text-status-label text-on-surface-variant text-[8px] uppercase tracking-wider opacity-60">
+                                    Carregando
+                                </p>
+</div>
+</div>
+</div>
+<!-- Landscape (16:9) Representation -->
+<div class="relative flex flex-col items-center justify-center bg-surface-container-low border border-surface-variant rounded-lg w-[180px] h-[101px] shadow-lg overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-r from-black/50 to-black/80 z-0"></div>
+<div class="relative z-10 flex flex-col items-center p-3 w-full h-full justify-center">
+<div class="relative w-1/2 flex items-center justify-center mb-1">
+<div class="absolute inset-0 rounded-full shadow-spotlight-intense blur-xl"></div>
+<img alt="Lumina Logo" class="relative z-20 w-full h-auto brightness-200 contrast-125 mix-blend-screen drop-shadow-[0_0_8px_rgba(252,211,77,0.8)]" src="https://lh3.googleusercontent.com/aida/ADBb0ui84_3aQIPwBaZUwSvxQYf45kXLge_a4dIP-c0CVK4FSzXnS_Fm1XqRmNfkdDE1rvWmxcf4nfS5djxb9NFmxtZcEgWYTBIcxUWb9lVQXQWUI3nMInEAAQL5urRl80Xb_kpAudSy9fEt-TdQBMZ7O8n3cBBD3PM3G7w80lIxggCJ5VMO0kMGHemqCipU5DHAED3K2ORuDzgFZj3eeXJJp2I1IDyV327UKWBrIZA1wBEUQuMsN7P3GMPhJJQ"/>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-amber-500 text-[14px] animate-spin-slow opacity-80" data-weight="fill">sync</span>
+<p class="font-status-label text-status-label text-on-surface-variant text-[8px] uppercase tracking-wider opacity-60">
+                                    Playlist
+                                </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Technical Footer -->
+<div class="relative z-10 p-margin-mobile flex justify-center w-full">
+<p class="font-label-mono text-label-mono text-on-surface-variant opacity-50 text-[10px]">
+                    Lumina Signage v0.1.0 · build 27/03/2026
+                </p>
+</div>
+</section>
+<!-- SEÇÃO 2: DIREÇÃO FOTOGRÁFICA / MOODBOARD -->
+<section class="w-full bg-background p-margin-mobile py-8 flex flex-col gap-6">
+<header class="mb-2">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-1">
+                    Direção Fotográfica
+                </h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    Moodboard operacional para implantação em loja física.
+                </p>
+</header>
+<div class="grid grid-cols-1 gap-6">
+<!-- Frame 1 -->
+<article class="bg-surface-container-low rounded-xl border border-surface-variant overflow-hidden flex flex-col shadow-sm">
+<div class="w-full aspect-[4/5] bg-surface relative overflow-hidden group">
+<img alt="Vitrine principal com TV vertical" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB961_hmKx1nyzXsgQTdaoV5Bbs0RJ0ogfUPovq2f4g4isNZLLHZ17pDva95AnoZHEfsOEj9fpafl5X0QaLwSXql4GL_KItRFH4OuvGd9n6t9llK50XOxc6wo7SMWGDGIU-WNIfe2ZSQuxVjfGMj80vC052ItNtZzg1zE7Pg4MeXYCbUUZni_xrmXHUQfKENZDkp9UMtI4jfZb1sf6vOe5oxpxl4XtYOv7QdIiWAdxuM25-CVxJ_aaQPycRHozSHhtKLZIOumn_pL82"/>
+<div class="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,0.3)] pointer-events-none"></div>
+</div>
+<div class="p-4 bg-surface-container-low border-t border-surface-variant flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-amber-500"></span>
+<h3 class="font-status-label text-status-label text-on-surface uppercase tracking-wider">Vitrine Principal</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">
+                            TV vertical 1080x1920 mostrando campanha sazonal da Hickmann Eyewear. Atrai pedestres no corredor do shopping.
+                        </p>
+</div>
+</article>
+<!-- Frame 2 -->
+<article class="bg-surface-container-low rounded-xl border border-surface-variant overflow-hidden flex flex-col shadow-sm">
+<div class="w-full aspect-video bg-surface relative overflow-hidden group">
+<img alt="TV horizontal no balcão de atendimento" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArbww4D5jwcvFBQxaZCM6nDCXqLVCIQP7xtAlh0W6oSurWcrcqL6OARUUppv6fYyacNIpnClTdNk6Q5MYb9QccVSuxRcLddUY9iX4S3TD9Y6XBcLNAfTGLunqGyK7dRdyLJRIlJthabUGN_n_iJ7bxHHC-1ui_ulAZpzIb27RG-x5tQrwSuY7yITVGvsFjWroJG2IDNZydYlsXKinTEgvcbILaeHa8TP9cdeRJds_1TrcddIe3xYIk9rDYjlBJSsi2-v1VBB6uTTzw"/>
+<div class="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,0.3)] pointer-events-none"></div>
+</div>
+<div class="p-4 bg-surface-container-low border-t border-surface-variant flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<h3 class="font-status-label text-status-label text-on-surface uppercase tracking-wider">TV de Balcão</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">
+                            Formato horizontal 1920x1080. Comunicação institucional + ofertas durante atendimento.
+                        </p>
+</div>
+</article>
+<!-- Frame 3 -->
+<article class="bg-surface-container-low rounded-xl border border-surface-variant overflow-hidden flex flex-col shadow-sm">
+<div class="w-full aspect-square bg-surface relative overflow-hidden group">
+<img alt="Tablet em display de mesa para eyewear" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABcpFZ2Gt8AMf5DF8QpwXkyhszxF7LejJDsL5sb7usAOduzww-EYlIyXMKT6_bZURygCFg5vfXdjWhPQcmm7Xq-5xRs4L4KAbW0oYl59VXGIAu-xMG_iGMgy7ADcbCODrsL4K7NiV925_UkRe6gTiIOesRiVudBAeGwfcQLtNXHVQjZRKxO-RIEbBY1ThL_rW-BiBRfHHAugDOfzbzzC9LQUSHKJfEuJ2LnBCOZvhoH7HE7FU7Weh1_pgzotA7sbVAuFEQMmXxEpzh"/>
+<div class="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,0.3)] pointer-events-none"></div>
+</div>
+<div class="p-4 bg-surface-container-low border-t border-surface-variant flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<h3 class="font-status-label text-status-label text-on-surface uppercase tracking-wider">Display de Mesa</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">
+                            Tablet em modo signage. Demonstra benefício do produto enquanto cliente prova óculos.
+                        </p>
+</div>
+</article>
+<!-- Frame 4 -->
+<article class="bg-surface-container-low rounded-xl border border-surface-variant overflow-hidden flex flex-col shadow-sm">
+<div class="w-full aspect-video bg-surface relative overflow-hidden group">
+<img alt="Loja inteira mostrando sincronização multi-tela" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_HGOv6QUTcr3Ag72ymZN1v-uB_uiYNXDYbXA1TeSPNbAiArzcOMPeK_MvcGlwrIpOLHoOjdTjHG-omqh6Lu0Mh_1t4ZWnQ2TJ65vznh0lRVaaZOAlmkCCXX7ut4Joxii1LzmSRplwGBaMnQJxCHsdtcUUH8mTI9hg2gzOW7hujoND3IsTFQdjFNGRWTQ9VmRXV95PgHi3D8cxW9D2q5wKHcqaGhZrD_WFApe0XNAb2AywVSQZlBdjsGzu2UdP08yFsj0IFwmcF2lI"/>
+<div class="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,0.3)] pointer-events-none"></div>
+</div>
+<div class="p-4 bg-surface-container-low border-t border-surface-variant flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+<h3 class="font-status-label text-status-label text-on-surface uppercase tracking-wider">Sincronização Multi-tela</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">
+                            3 dispositivos rodando a mesma playlist sob controle do painel admin. Garante consistência de mensagem em toda a loja.
+                        </p>
+</div>
+</article>
+</div>
+</section>
+</main>
+</body></html>

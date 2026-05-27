@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lumina Signage v1.0 - Documentação do Design System</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-lowest": "#0e0e11",
+                        "surface-container-low": "#1b1b1e",
+                        "tertiary-container": "#7531e6",
+                        "on-error-container": "#ffdad6",
+                        "on-surface": "#e4e1e6",
+                        "primary": "#c3c0ff",
+                        "outline": "#918fa1",
+                        "on-tertiary-container": "#e4d4ff",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "secondary-container": "#ee9800",
+                        "on-tertiary-fixed": "#25005a",
+                        "error": "#ffb4ab",
+                        "on-secondary": "#472a00",
+                        "surface-tint": "#c3c0ff",
+                        "outline-variant": "#464555",
+                        "tertiary-fixed-dim": "#d2bbff",
+                        "on-tertiary-fixed-variant": "#5a00c6",
+                        "on-secondary-fixed": "#2a1700",
+                        "surface-container-highest": "#353438",
+                        "tertiary": "#d2bbff",
+                        "on-primary-fixed": "#0f0069",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "on-primary-container": "#dad7ff",
+                        "on-background": "#e4e1e6",
+                        "surface-container": "#1f1f22",
+                        "on-surface-variant": "#c7c4d8",
+                        "error-container": "#93000a",
+                        "background": "#131316",
+                        "on-error": "#690005",
+                        "secondary": "#ffb95f",
+                        "surface-container-high": "#2a2a2d",
+                        "surface": "#131316",
+                        "secondary-fixed-dim": "#ffb95f",
+                        "inverse-surface": "#e4e1e6",
+                        "on-secondary-fixed-variant": "#653e00",
+                        "on-primary": "#1d00a5",
+                        "on-secondary-container": "#5b3800",
+                        "on-tertiary": "#3f008e",
+                        "surface-bright": "#39393c",
+                        "surface-variant": "#353438",
+                        "primary-container": "#4f46e5",
+                        "inverse-on-surface": "#303033",
+                        "primary-fixed": "#e2dfff",
+                        "inverse-primary": "#4d44e3",
+                        "tertiary-fixed": "#eaddff",
+                        "secondary-fixed": "#ffddb8",
+                        "surface-dim": "#131316"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "unit": "4px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "32px",
+                        "margin-tv": "64px",
+                        "gutter": "16px"
+                    },
+                    fontFamily: {
+                        "display-lg": ["Inter", "sans-serif"],
+                        "title-md": ["Inter", "sans-serif"],
+                        "body-md": ["Inter", "sans-serif"],
+                        "label-mono": ["JetBrains Mono", "monospace"],
+                        "headline-lg-mobile": ["Inter", "sans-serif"],
+                        "status-label": ["Inter", "sans-serif"],
+                        "headline-lg": ["Inter", "sans-serif"]
+                    },
+                    fontSize: {
+                        "display-lg": ["72px", { lineHeight: "1.1", letterSpacing: "-0.04em", fontWeight: "800" }],
+                        "title-md": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "label-mono": ["14px", { lineHeight: "20px", letterSpacing: "0.02em", fontWeight: "500" }],
+                        "headline-lg-mobile": ["32px", { lineHeight: "1.2", fontWeight: "700" }],
+                        "status-label": ["12px", { lineHeight: "16px", fontWeight: "700" }],
+                        "headline-lg": ["48px", { lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .pulse-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .5; transform: scale(0.8); }
+        }
+        .pattern-dots {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .amber-spotlight {
+            box-shadow: 0 0 40px 2px rgba(245, 158, 11, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen">
+<!-- Top Navigation (Required component context) -->
+<header class="bg-surface border-b border-outline-variant docked full-width top-0 sticky z-40 flex justify-between items-center w-full px-margin-desktop py-4 transition-all duration-300 ease-in-out">
+<div class="flex items-center gap-4">
+<span class="font-display-lg text-title-md font-bold text-on-surface">Lumina Control Room</span>
+</div>
+<nav class="hidden md:flex gap-6">
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Live View</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">History</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Audit Logs</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="bg-primary-container text-on-primary-container px-4 py-2 rounded-DEFAULT font-title-md text-[14px]">Deploy Content</button>
+<button class="border border-outline-variant text-on-surface px-4 py-2 rounded-DEFAULT font-title-md text-[14px] hover:bg-surface-container-high transition-colors">System Status</button>
+<div class="flex gap-2">
+<span class="material-symbols-outlined cursor-pointer text-on-surface-variant hover:text-on-surface transition-colors">notifications</span>
+<span class="material-symbols-outlined cursor-pointer text-on-surface-variant hover:text-on-surface transition-colors">account_circle</span>
+</div>
+</div>
+</header>
+<main class="max-w-[1920px] mx-auto px-margin-desktop py-margin-desktop space-y-24">
+<div class="text-center space-y-4 mb-16">
+<h1 class="font-headline-lg text-primary">Lumina Signage v1.0</h1>
+<p class="text-on-surface-variant font-title-md">Documentação do Design System - Componentes Principais</p>
+</div>
+<!-- Section 1: PLAYER OVERLAY -->
+<section class="space-y-8">
+<div class="border-b border-outline-variant pb-4">
+<h2 class="font-headline-lg-mobile text-on-surface flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">smart_display</span>
+                    1. Player Overlay (Toolbar Minimal)
+                </h2>
+<p class="text-on-surface-variant mt-2 max-w-3xl">Design voltado para compatibilidade máxima com Smart TVs antigas (Tizen/WebOS). O overlay utiliza um gradiente preto sólido (opacidade 0 a 1) para garantir legibilidade, dispensando efeitos de glassmorphism que degradam a performance em processadores fracos.</p>
+</div>
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+<!-- Estado 1: Idle -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant flex flex-col relative aspect-[16/9] bg-black">
+<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBeJkwjKOarx9o_V2KdKeSqiC938H7am0KPteyZcP_A25QXPtxAvDamnCipzQfHx3LTi7lFyHibmfjlcw0dn2ay0Lis8HR5G33uQ2FnxIi47kcQuV2tOQlPUuSUfJka1Z90661xkC1e8bOOo7aZK6STmKL_8_akTAdGL4TvJfFcttPZvQmVwWtkgW-kCaCFjbzxGDm0g92Fu8zqmTNPhVqEFY5fd6yXC26DqngHe5mhjLAyatXGcMAiBXwyg0V9X62XXbt6qvC1Ssa3');"></div>
+<div class="absolute top-4 left-4 bg-surface-container-low/80 px-3 py-1 rounded-DEFAULT">
+<span class="font-status-label text-on-surface uppercase tracking-wider">Estado: Idle (Fullscreen)</span>
+</div>
+</div>
+<!-- Estado 2: Active -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-primary amber-spotlight flex flex-col relative aspect-[16/9] bg-black">
+<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBeJkwjKOarx9o_V2KdKeSqiC938H7am0KPteyZcP_A25QXPtxAvDamnCipzQfHx3LTi7lFyHibmfjlcw0dn2ay0Lis8HR5G33uQ2FnxIi47kcQuV2tOQlPUuSUfJka1Z90661xkC1e8bOOo7aZK6STmKL_8_akTAdGL4TvJfFcttPZvQmVwWtkgW-kCaCFjbzxGDm0g92Fu8zqmTNPhVqEFY5fd6yXC26DqngHe5mhjLAyatXGcMAiBXwyg0V9X62XXbt6qvC1Ssa3');"></div>
+<div class="absolute top-4 left-4 bg-surface-container-low/80 px-3 py-1 rounded-DEFAULT z-10">
+<span class="font-status-label text-primary uppercase tracking-wider">Estado: Active (Overlay)</span>
+</div>
+<!-- Overlay Toolbar -->
+<div class="absolute bottom-0 left-0 right-0 h-[120px] bg-gradient-to-t from-black via-black/80 to-transparent flex flex-col justify-end px-8 pb-6">
+<!-- Progress Bar -->
+<div class="w-full h-1 bg-surface-variant rounded-full mb-4 overflow-hidden">
+<div class="h-full bg-secondary-fixed-dim w-[45%] rounded-full"></div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-6">
+<!-- Logo Placeholder (Text for simplicity) -->
+<div class="font-display-lg text-[24px] text-white font-bold tracking-tight">LUMINA</div>
+<div class="flex flex-col">
+<span class="font-status-label text-outline uppercase tracking-wider">LANCASTER SUZANO — VITRINE</span>
+<span class="font-title-md text-white">Hickmann Eyewear MIA 3 — Sabrina Sato</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 bg-surface-container-lowest/50 px-3 py-1 rounded-full border border-outline-variant/30">
+<div class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></div>
+<span class="font-status-label text-emerald-400">AO VIVO</span>
+</div>
+<div class="flex gap-4 text-white">
+<span class="material-symbols-outlined cursor-pointer hover:text-secondary-fixed-dim transition-colors">skip_previous</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-secondary-fixed-dim transition-colors" style="font-variation-settings: 'FILL' 1;">pause</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-secondary-fixed-dim transition-colors">skip_next</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: TELA DE PAREAMENTO POR PIN -->
+<section class="space-y-8">
+<div class="border-b border-outline-variant pb-4">
+<h2 class="font-headline-lg-mobile text-on-surface flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">pin</span>
+                    2. Tela de Pareamento por PIN
+                </h2>
+<p class="text-on-surface-variant mt-2 max-w-3xl">Padrão visual para registro de novos dispositivos. Utiliza alto contraste tipográfico e grid generoso. A fonte monospace garante alinhamento perfeito dos dígitos em qualquer orientação.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+<!-- Orientação LANDSCAPE (Ocupa 2 colunas) -->
+<div class="lg:col-span-2 bg-surface rounded-xl border border-outline-variant overflow-hidden aspect-[16/9] relative pattern-dots flex flex-col justify-center items-center text-center p-12">
+<div class="absolute top-4 left-4">
+<span class="font-status-label text-on-surface-variant bg-surface-container px-2 py-1 rounded-DEFAULT">Orientação: Landscape (16:9)</span>
+</div>
+<h3 class="font-display-lg text-[60px] text-on-surface mb-2 leading-tight">Pareie esta tela</h3>
+<p class="font-body-md text-on-surface-variant max-w-lg mb-12">Insira o código abaixo no seu painel Lumina Control Room para registrar este dispositivo.</p>
+<!-- PIN Grid -->
+<div class="flex gap-4 mb-16">
+<div class="w-20 h-28 flex items-center justify-center border-b-4 border-secondary-fixed-dim text-secondary-fixed-dim font-label-mono text-[120px] font-bold leading-none">8</div>
+<div class="w-20 h-28 flex items-center justify-center border-b-4 border-secondary-fixed-dim text-secondary-fixed-dim font-label-mono text-[120px] font-bold leading-none">4</div>
+<div class="w-20 h-28 flex items-center justify-center border-b-4 border-secondary-fixed-dim text-secondary-fixed-dim font-label-mono text-[120px] font-bold leading-none">9</div>
+<div class="w-8 flex items-center justify-center"></div> <!-- Espaço -->
+<div class="w-20 h-28 flex items-center justify-center border-b-4 border-secondary-fixed-dim text-secondary-fixed-dim font-label-mono text-[120px] font-bold leading-none">1</div>
+<div class="w-20 h-28 flex items-center justify-center border-b-4 border-secondary-fixed-dim text-secondary-fixed-dim font-label-mono text-[120px] font-bold leading-none">2</div>
+<div class="w-20 h-28 flex items-center justify-center border-b-4 border-secondary-fixed-dim text-secondary-fixed-dim font-label-mono text-[120px] font-bold leading-none">7</div>
+</div>
+<div class="absolute bottom-8 w-full px-12 flex justify-between items-center text-on-surface-variant font-status-label">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">timer</span> Expira em 04:32</span>
+<span>lumina.digiai.com.br</span>
+</div>
+</div>
+<!-- Orientação PORTRAIT (Ocupa 1 coluna) -->
+<div class="bg-surface rounded-xl border border-outline-variant overflow-hidden aspect-[9/16] relative pattern-dots flex flex-col justify-center items-center text-center p-8">
+<div class="absolute top-4 left-4">
+<span class="font-status-label text-on-surface-variant bg-surface-container px-2 py-1 rounded-DEFAULT">Portrait (9:16)</span>
+</div>
+<h3 class="font-display-lg text-[48px] text-on-surface mb-4 leading-tight mt-12">Pareie<br/>esta tela</h3>
+<p class="font-body-md text-on-surface-variant mb-16">Insira o código no painel.</p>
+<!-- PIN Grid Portrait (Stacked) -->
+<div class="flex flex-col gap-6 mb-auto">
+<div class="flex gap-4">
+<div class="w-24 h-32 flex items-center justify-center border-b-4 border-secondary-fixed-dim text-secondary-fixed-dim font-label-mono text-[140px] font-bold leading-none">8</div>
+<div class="w-24 h-32 flex items-center justify-center border-b-4 border-secondary-fixed-dim text-secondary-fixed-dim font-label-mono text-[140px] font-bold leading-none">4</div>
+<div class="w-24 h-32 flex items-center justify-center border-b-4 border-secondary-fixed-dim text-secondary-fixed-dim font-label-mono text-[140px] font-bold leading-none">9</div>
+</div>
+<div class="flex gap-4">
+<div class="w-24 h-32 flex items-center justify-center border-b-4 border-secondary-fixed-dim text-secondary-fixed-dim font-label-mono text-[140px] font-bold leading-none">1</div>
+<div class="w-24 h-32 flex items-center justify-center border-b-4 border-secondary-fixed-dim text-secondary-fixed-dim font-label-mono text-[140px] font-bold leading-none">2</div>
+<div class="w-24 h-32 flex items-center justify-center border-b-4 border-secondary-fixed-dim text-secondary-fixed-dim font-label-mono text-[140px] font-bold leading-none">7</div>
+</div>
+</div>
+<div class="mt-8 flex flex-col items-center gap-4 text-on-surface-variant font-status-label">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">timer</span> 04:32</span>
+<span>lumina.digiai.com.br</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: SIDEBAR ADMIN -->
+<section class="space-y-8">
+<div class="border-b border-outline-variant pb-4">
+<h2 class="font-headline-lg-mobile text-on-surface flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">dock_to_left</span>
+                    3. Sidebar Admin
+                </h2>
+<p class="text-on-surface-variant mt-2 max-w-3xl">O menu de navegação primário do sistema. Suporta estados expandido para operações complexas e colapsado para maximizar a área de trabalho (canvas). Baseado nas definições JSON de Shared Components.</p>
+</div>
+<div class="flex gap-8 items-start h-[800px] overflow-hidden bg-surface-container-highest p-8 rounded-xl border border-outline-variant">
+<!-- EXPANDIDA -->
+<div class="w-64 h-full bg-surface-container-lowest border-r border-outline-variant flex flex-col relative shadow-2xl">
+<div class="absolute -top-8 left-0">
+<span class="font-status-label text-on-surface-variant bg-surface-container px-2 py-1 rounded-DEFAULT">Expandida (240px)</span>
+</div>
+<!-- Header -->
+<div class="p-6 border-b border-outline-variant/50">
+<div class="font-display-lg text-[20px] text-primary tracking-tighter font-bold mb-4">Lumina Signage</div>
+<!-- Workspace Switcher -->
+<button class="w-full flex items-center justify-between bg-surface-container-low px-3 py-2 rounded-DEFAULT border border-outline-variant/50 hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-[18px]">store</span>
+<span class="font-title-md text-[14px] font-semibold">Ótica Mello</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">unfold_more</span>
+</button>
+</div>
+<!-- Nav Items -->
+<div class="flex-1 py-4 flex flex-col gap-1 overflow-y-auto">
+<a class="text-on-surface-variant hover:text-on-surface px-6 py-3 flex items-center gap-4 transition-colors hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md">Dashboard</span>
+</a>
+<!-- ATIVO -->
+<a class="text-primary border-l-4 border-secondary-fixed-dim bg-primary-container/10 font-bold px-5 py-3 flex items-center gap-4 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">tv</span>
+<span class="font-body-md">Telas &amp; Dispositivos</span>
+</a>
+<a class="text-on-surface-variant hover:text-on-surface px-6 py-3 flex items-center gap-4 transition-colors hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined">perm_media</span>
+<span class="font-body-md">Biblioteca</span>
+</a>
+<a class="text-on-surface-variant hover:text-on-surface px-6 py-3 flex items-center gap-4 transition-colors hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined">playlist_play</span>
+<span class="font-body-md">Playlists</span>
+</a>
+<a class="text-on-surface-variant hover:text-on-surface px-6 py-3 flex items-center gap-4 transition-colors hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-body-md">Agendamentos</span>
+</a>
+<a class="text-on-surface-variant hover:text-on-surface px-6 py-3 flex items-center gap-4 transition-colors hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md">Configurações</span>
+</a>
+</div>
+<!-- Footer -->
+<div class="p-6 border-t border-outline-variant/50 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-[14px]">
+                            JM
+                        </div>
+<div class="flex flex-col">
+<span class="font-title-md text-[14px] text-on-surface">Júnior Mello</span>
+<span class="font-status-label text-outline">Admin</span>
+</div>
+</div>
+</div>
+<!-- COLAPSADA -->
+<div class="w-20 h-full bg-surface-container-lowest border-r border-outline-variant flex flex-col relative shadow-2xl items-center">
+<div class="absolute -top-8 left-0 whitespace-nowrap">
+<span class="font-status-label text-on-surface-variant bg-surface-container px-2 py-1 rounded-DEFAULT">Colapsada (64px)</span>
+</div>
+<!-- Header -->
+<div class="py-6 border-b border-outline-variant/50 w-full flex justify-center">
+<div class="font-display-lg text-[24px] text-primary tracking-tighter font-bold">L</div>
+</div>
+<!-- Nav Items -->
+<div class="flex-1 py-4 flex flex-col gap-2 w-full items-center overflow-y-auto">
+<a class="w-12 h-12 rounded-lg text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-colors hover:bg-surface-container-high" href="#" title="Dashboard">
+<span class="material-symbols-outlined">dashboard</span>
+</a>
+<!-- ATIVO -->
+<a class="w-12 h-12 rounded-lg text-primary border-l-4 border-secondary-fixed-dim bg-primary-container/10 flex items-center justify-center transition-colors" href="#" title="Telas &amp; Dispositivos">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">tv</span>
+</a>
+<a class="w-12 h-12 rounded-lg text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-colors hover:bg-surface-container-high" href="#" title="Biblioteca">
+<span class="material-symbols-outlined">perm_media</span>
+</a>
+<a class="w-12 h-12 rounded-lg text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-colors hover:bg-surface-container-high" href="#" title="Playlists">
+<span class="material-symbols-outlined">playlist_play</span>
+</a>
+<a class="w-12 h-12 rounded-lg text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-colors hover:bg-surface-container-high" href="#" title="Agendamentos">
+<span class="material-symbols-outlined">calendar_today</span>
+</a>
+<a class="w-12 h-12 rounded-lg text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-colors hover:bg-surface-container-high" href="#" title="Configurações">
+<span class="material-symbols-outlined">settings</span>
+</a>
+</div>
+<!-- Footer -->
+<div class="py-6 border-t border-outline-variant/50 w-full flex justify-center">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-[14px] cursor-pointer" title="Júnior Mello">
+                            JM
+                        </div>
+</div>
+</div>
+<!-- Spacer to show they are side by side in a larger canvas context -->
+<div class="flex-1 h-full bg-surface border border-outline-variant/30 rounded-lg p-8 opacity-50 flex items-center justify-center">
+<span class="font-label-mono text-outline-variant">Canvas Area</span>
+</div>
+</div>
+</section>
+</main>
+</body></html>
