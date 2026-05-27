@@ -15,6 +15,7 @@ import Financeiro from './modules/Financeiro';
 import Academy from './modules/Academy';
 import Funil from './modules/Funil';
 import Marketing from './modules/Marketing';
+import MarketingSEO from './modules/MarketingSEO';
 import ReferenciasDesign from './modules/ReferenciasDesign';
 import MockClearixEstilos from './modules/MockClearixEstilos';
 import { ModuleStub } from './modules/Stub';
@@ -91,6 +92,7 @@ export default function App() {
       case 'academy': return <Academy />;
       case 'funil': return <Funil />;
       case 'marketing': return <Marketing />;
+      case 'marketing-seo': return <MarketingSEO />;
       case 'referencias-design': return <ReferenciasDesign />;
       case 'mock-estilos': return <MockClearixEstilos />;
       default: {
