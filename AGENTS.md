@@ -180,8 +180,8 @@ Roteamento real em `App.tsx` (`activeModule` por estado, não por URL). 16 cases
 - [x] ~~CSP em produção~~ — **validada 2026-05-28** (app + conexão Supabase OK sob a CSP)
 - [x] ~~hotmart-webhook fail-closed~~ — **deployado 2026-05-28** (GET → 405; ingest só com HOTTOK válido)
 - [ ] Monitor UptimeRobot no `/health` (keyword `"status":"ok"`)
-- [ ] DPO nomeado (Cadastro Empresa → LGPD) — marco pendente
-- [ ] Snapshot financeiro mensal agregado em `company.financial_snapshots` (granular já em `finance.expenses`: 220 lançamentos ativos)
+- [x] ~~DPO nomeado~~ — **Gilberto** registrado em `legal_status` 2026-05-28 (`dpo@digiai.app.br`, rota dedicada no Cloudflare + catch-all). Falta só publicar política/ToS (revisão jurídica humana).
+- [x] ~~Snapshot financeiro mensal~~ — **gerado 2026-05-28**: 13 meses em `company.financial_snapshots` (2025-05→2026-05; investimento acumulado R$ 547.293,37).
 - [ ] 1ª entrevista feita (Fase 0 do Roadmap — métrica única: 20 entrevistas + 3 cartas de intenção)
 - [ ] Resolver **65 tarefas atrasadas** do Roadmap + 13 itens críticos do Backlog
 - [ ] Rotacionar 3 credenciais Marketing & SEO até 2026-08-26 (R-021)
