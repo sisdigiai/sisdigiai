@@ -99,39 +99,39 @@ export default function TabRequests({ onSelectTenant }: Props) {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-lg font-medium text-white">Solicitações</div>
-          <div className="text-xs text-white/40 mt-0.5">
+          <div className="text-lg font-medium text-on-surface">Solicitações</div>
+          <div className="text-xs text-on-surface-variant mt-0.5">
             {addonRequests.length} add-on{addonRequests.length === 1 ? '' : 's'} em análise ·{' '}
             {pendingPkgRequests.length} mudança{pendingPkgRequests.length === 1 ? '' : 's'} de pacote pendente{pendingPkgRequests.length === 1 ? '' : 's'}
           </div>
         </div>
         <button
           onClick={load}
-          className="inline-flex items-center gap-1.5 text-xs rounded-md border border-white/10 bg-black/20 px-3 py-1.5 text-white/70 hover:text-white hover:border-white/20"
+          className="inline-flex items-center gap-1.5 text-xs border border-outline/10 bg-surface-lowest px-3 py-1.5 text-on-surface-variant hover:text-on-surface hover:border-outline/30"
         >
           <RefreshCw size={12} /> Atualizar
         </button>
       </div>
 
       {error && (
-        <div className="rounded-md border border-rose-500/30 bg-rose-500/5 p-3 text-sm text-rose-300">{error}</div>
+        <div className="border border-rose-500/30 bg-rose-500/5 p-3 text-sm text-rose-300">{error}</div>
       )}
 
       <section className="space-y-3">
-        <div className="text-[10px] font-mono uppercase tracking-widest text-white/40">
+        <div className="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant">
           Add-ons pendentes de aprovação
         </div>
         {loading ? (
-          <div className="text-sm text-white/40">Carregando…</div>
+          <div className="text-sm text-on-surface-variant">Carregando…</div>
         ) : addonRequests.length === 0 ? (
-          <div className="rounded-md border border-white/10 bg-white/[0.02] p-6 text-center text-sm text-white/40">
+          <div className="border border-outline/10 bg-surface-low p-6 text-center text-sm text-on-surface-variant">
             Nada pendente.
           </div>
         ) : (
-          <div className="rounded-lg border border-white/10 overflow-hidden">
+          <div className="border border-outline/10 overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-white/[0.03] text-[10px] uppercase tracking-widest text-white/40 font-mono">
+                <tr className="bg-surface-low text-[10px] uppercase tracking-widest text-on-surface-variant font-mono">
                   <th className="text-left px-3 py-2">Tenant</th>
                   <th className="text-left px-3 py-2">Add-on</th>
                   <th className="text-left px-3 py-2">Observações do tenant</th>
@@ -143,34 +143,34 @@ export default function TabRequests({ onSelectTenant }: Props) {
                   const key = `${r.tenant_id}:${r.addon_slug}`;
                   const isBusy = busy === key;
                   return (
-                    <tr key={key} className="border-t border-white/5">
+                    <tr key={key} className="border-t border-outline/10">
                       <td className="px-3 py-2.5">
                         <button
                           onClick={() => onSelectTenant(r.tenant_id)}
-                          className="text-white hover:text-[#06B6D4] text-left"
+                          className="text-on-surface hover:text-secondary text-left"
                         >
                           {r.tenant_name}
                         </button>
                       </td>
                       <td className="px-3 py-2.5">
-                        <div className="text-white">{r.addon_name}</div>
-                        <div className="text-[11px] font-mono text-white/40">{r.addon_slug}</div>
+                        <div className="text-on-surface">{r.addon_name}</div>
+                        <div className="text-[11px] font-mono text-muted">{r.addon_slug}</div>
                       </td>
-                      <td className="px-3 py-2.5 text-xs text-white/60 max-w-md">
-                        {r.notes || <span className="text-white/20 italic">—</span>}
+                      <td className="px-3 py-2.5 text-xs text-on-surface-variant max-w-md">
+                        {r.notes || <span className="text-muted italic">—</span>}
                       </td>
                       <td className="px-3 py-2.5 text-right space-x-1.5 whitespace-nowrap">
                         <button
                           onClick={() => wrapAction(key, () => approveTenantAddon(r.tenant_id, r.addon_slug))}
                           disabled={isBusy}
-                          className="inline-flex items-center gap-1 text-[11px] rounded-md border border-emerald-500/30 bg-emerald-500/5 px-2 py-1 text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-50"
+                          className="inline-flex items-center gap-1 text-[11px] border border-emerald-500/30 bg-emerald-500/5 px-2 py-1 text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-50"
                         >
                           <CheckCircle2 size={11} /> Aprovar
                         </button>
                         <button
                           onClick={() => wrapAction(key, () => cancelTenantAddon(r.tenant_id, r.addon_slug))}
                           disabled={isBusy}
-                          className="inline-flex items-center gap-1 text-[11px] rounded-md border border-rose-500/30 bg-rose-500/5 px-2 py-1 text-rose-300 hover:bg-rose-500/10 disabled:opacity-50"
+                          className="inline-flex items-center gap-1 text-[11px] border border-rose-500/30 bg-rose-500/5 px-2 py-1 text-rose-300 hover:bg-rose-500/10 disabled:opacity-50"
                         >
                           <XCircle size={11} /> Rejeitar
                         </button>
@@ -185,11 +185,11 @@ export default function TabRequests({ onSelectTenant }: Props) {
       </section>
 
       <section className="space-y-3">
-        <div className="text-[10px] font-mono uppercase tracking-widest text-white/40">
+        <div className="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant">
           Mudanças de pacote pendentes
         </div>
         {loading ? null : pendingPkgRequests.length === 0 ? (
-          <div className="rounded-md border border-white/10 bg-white/[0.02] p-6 text-center text-sm text-white/40">
+          <div className="border border-outline/10 bg-surface-low p-6 text-center text-sm text-on-surface-variant">
             Nada pendente.
           </div>
         ) : (
@@ -199,27 +199,27 @@ export default function TabRequests({ onSelectTenant }: Props) {
               const isBusy = busy === busyKey;
               const note = notesDraft[r.id] ?? '';
               return (
-                <div key={r.id} className="rounded-lg border border-white/10 bg-white/[0.02] p-4">
+                <div key={r.id} className="border border-outline/10 bg-surface-low p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <button
                         onClick={() => onSelectTenant(r.tenant_id)}
-                        className="text-sm text-white hover:text-[#06B6D4]"
+                        className="text-sm text-on-surface hover:text-secondary"
                       >
                         {r.tenant_name}
                       </button>
-                      <div className="flex items-center gap-2 mt-1 text-xs text-white/60">
-                        <span className="font-mono text-white/40">{r.current_package_slug ?? '—'}</span>
-                        <ArrowRight size={12} className="text-white/30" />
-                        <span className="text-white">{r.requested_package_name}</span>
-                        <span className="text-white/40">({r.requested_package_slug})</span>
+                      <div className="flex items-center gap-2 mt-1 text-xs text-on-surface-variant">
+                        <span className="font-mono text-muted">{r.current_package_slug ?? '—'}</span>
+                        <ArrowRight size={12} className="text-muted" />
+                        <span className="text-on-surface">{r.requested_package_name}</span>
+                        <span className="text-muted">({r.requested_package_slug})</span>
                       </div>
                       {r.reason && (
-                        <div className="mt-2 text-xs text-white/60 max-w-2xl">
-                          <span className="text-white/40">Motivo:</span> {r.reason}
+                        <div className="mt-2 text-xs text-on-surface-variant max-w-2xl">
+                          <span className="text-muted">Motivo:</span> {r.reason}
                         </div>
                       )}
-                      <div className="mt-1 text-[11px] text-white/30">
+                      <div className="mt-1 text-[11px] text-muted">
                         Solicitado em {formatDate(r.created_at)}
                       </div>
                     </div>
@@ -228,20 +228,20 @@ export default function TabRequests({ onSelectTenant }: Props) {
                         value={note}
                         onChange={(e) => setNotesDraft((d) => ({ ...d, [r.id]: e.target.value }))}
                         placeholder="Observações (opcional)"
-                        className="w-full bg-slate-900 border border-slate-700 rounded-md px-2 py-1 text-xs text-white focus:outline-none focus:border-[#06B6D4]"
+                        className="w-full bg-surface-lowest border border-outline/30 px-2 py-1 text-xs text-on-surface focus:outline-none focus:border-secondary/40"
                       />
                       <div className="flex gap-1.5">
                         <button
                           onClick={() => wrapAction(busyKey, () => approvePackageChangeRequest(r.id, note || null))}
                           disabled={isBusy}
-                          className="flex-1 inline-flex items-center justify-center gap-1 text-[11px] rounded-md border border-emerald-500/30 bg-emerald-500/5 px-2 py-1 text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-50"
+                          className="flex-1 inline-flex items-center justify-center gap-1 text-[11px] border border-emerald-500/30 bg-emerald-500/5 px-2 py-1 text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-50"
                         >
                           <CheckCircle2 size={11} /> Aprovar
                         </button>
                         <button
                           onClick={() => wrapAction(busyKey, () => rejectPackageChangeRequest(r.id, note || null))}
                           disabled={isBusy}
-                          className="flex-1 inline-flex items-center justify-center gap-1 text-[11px] rounded-md border border-rose-500/30 bg-rose-500/5 px-2 py-1 text-rose-300 hover:bg-rose-500/10 disabled:opacity-50"
+                          className="flex-1 inline-flex items-center justify-center gap-1 text-[11px] border border-rose-500/30 bg-rose-500/5 px-2 py-1 text-rose-300 hover:bg-rose-500/10 disabled:opacity-50"
                         >
                           <XCircle size={11} /> Rejeitar
                         </button>
@@ -257,13 +257,13 @@ export default function TabRequests({ onSelectTenant }: Props) {
 
       {historyPkgRequests.length > 0 && (
         <section className="space-y-3">
-          <div className="text-[10px] font-mono uppercase tracking-widest text-white/40">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant">
             Histórico de mudanças de pacote
           </div>
-          <div className="rounded-lg border border-white/10 overflow-hidden">
+          <div className="border border-outline/10 overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-white/[0.03] text-[10px] uppercase tracking-widest text-white/40 font-mono">
+                <tr className="bg-surface-low text-[10px] uppercase tracking-widest text-on-surface-variant font-mono">
                   <th className="text-left px-3 py-2">Tenant</th>
                   <th className="text-left px-3 py-2">De → Para</th>
                   <th className="text-left px-3 py-2">Status</th>
@@ -273,18 +273,18 @@ export default function TabRequests({ onSelectTenant }: Props) {
               </thead>
               <tbody>
                 {historyPkgRequests.slice(0, 30).map((r) => (
-                  <tr key={r.id} className="border-t border-white/5">
-                    <td className="px-3 py-2.5 text-white">{r.tenant_name}</td>
-                    <td className="px-3 py-2.5 text-xs text-white/60 font-mono">
+                  <tr key={r.id} className="border-t border-outline/10">
+                    <td className="px-3 py-2.5 text-on-surface">{r.tenant_name}</td>
+                    <td className="px-3 py-2.5 text-xs text-on-surface-variant font-mono">
                       {r.current_package_slug ?? '—'} → {r.requested_package_slug}
                     </td>
                     <td className="px-3 py-2.5">
-                      <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded border border-white/10 text-white/60">
+                      <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 border border-outline/10 text-on-surface-variant">
                         {r.status}
                       </span>
                     </td>
-                    <td className="px-3 py-2.5 text-xs text-white/50">{formatDate(r.reviewed_at)}</td>
-                    <td className="px-3 py-2.5 text-xs text-white/60 max-w-sm">{r.reviewer_notes ?? ''}</td>
+                    <td className="px-3 py-2.5 text-xs text-on-surface-variant">{formatDate(r.reviewed_at)}</td>
+                    <td className="px-3 py-2.5 text-xs text-on-surface-variant max-w-sm">{r.reviewer_notes ?? ''}</td>
                   </tr>
                 ))}
               </tbody>

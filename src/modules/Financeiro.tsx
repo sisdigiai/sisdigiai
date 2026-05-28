@@ -27,7 +27,7 @@ const TABS: Array<{ id: TabId; label: string; icon: typeof BarChart3 }> = [
   { id: 'relatorio', label: 'Relatório', icon: FileDown },
 ];
 
-const inputClass = 'w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-[#06B6D4]';
+const inputClass = 'w-full bg-surface-lowest border border-outline/30 px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-secondary';
 
 function brl(v: number | null | undefined): string {
   if (v == null) return 'R$ 0,00';
@@ -47,12 +47,12 @@ export default function Financeiro() {
   return (
     <div className="max-w-7xl mx-auto p-8">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold">Financeiro</h1>
-        <p className="text-slate-400 mt-1">
+        <h1 className="text-3xl font-serif font-bold">Financeiro</h1>
+        <p className="text-muted mt-1">
           Investimento real da DigiAI — segmentado por produto, categoria e vendor.
         </p>
 
-        <nav className="flex gap-1 border-b border-slate-800 mt-6">
+        <nav className="flex gap-1 border-b border-outline/10 mt-6">
           {TABS.map((t) => {
             const Icon = t.icon;
             return (
@@ -61,8 +61,8 @@ export default function Financeiro() {
                 onClick={() => setTab(t.id)}
                 className={`px-4 py-3 text-sm font-medium flex items-center gap-2 border-b-2 transition-colors ${
                   tab === t.id
-                    ? 'border-[#06B6D4] text-white'
-                    : 'border-transparent text-slate-400 hover:text-white'
+                    ? 'border-secondary text-on-surface'
+                    : 'border-transparent text-muted hover:text-on-surface'
                 }`}
               >
                 <Icon size={16} /> {t.label}
@@ -175,7 +175,7 @@ function DashboardTab() {
   const topVendors = Object.values(vendorTotals).sort((a, b) => b.total - a.total).slice(0, 10);
   const maxVendor = topVendors[0]?.total || 1;
 
-  if (loading) return <div className="text-slate-400 py-8">Carregando...</div>;
+  if (loading) return <div className="text-muted py-8">Carregando...</div>;
 
   const filterLabel = filterProduct === 'all' ? 'Todos' : products.find(p => p.id === filterProduct)?.name || filterProduct;
 
@@ -184,12 +184,12 @@ function DashboardTab() {
       {/* Filtros: projeto + aporte */}
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-500 uppercase tracking-wide">Projeto:</span>
+          <span className="text-xs text-muted uppercase tracking-wide">Projeto:</span>
           <div className="flex gap-1 flex-wrap">
             <button
               onClick={() => setFilterProduct('all')}
               className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                filterProduct === 'all' ? 'bg-[#2563EB]/20 text-white border border-[#2563EB]/40' : 'bg-slate-800 text-slate-400 hover:text-white'
+                filterProduct === 'all' ? 'bg-secondary-container/40 text-on-surface border border-secondary/40' : 'bg-surface-high text-muted hover:text-on-surface'
               }`}
             >
               Todos
@@ -199,7 +199,7 @@ function DashboardTab() {
                 key={p.id}
                 onClick={() => setFilterProduct(p.id)}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                  filterProduct === p.id ? 'bg-[#2563EB]/20 text-white border border-[#2563EB]/40' : 'bg-slate-800 text-slate-400 hover:text-white'
+                  filterProduct === p.id ? 'bg-secondary-container/40 text-on-surface border border-secondary/40' : 'bg-surface-high text-muted hover:text-on-surface'
                 }`}
               >
                 {p.id === 'clearix' ? 'Clearix' : p.id === 'digiai' ? 'DigiAI' : p.id === 'compartilhado' ? 'Compartilhado' : p.name.split(' ')[0]}
@@ -214,7 +214,7 @@ function DashboardTab() {
           className={`px-3 py-1 rounded-full text-xs font-medium transition-colors border ${
             excludeAporte
               ? 'bg-orange-500/15 text-orange-300 border-orange-500/40'
-              : 'bg-slate-800 text-slate-400 hover:text-white border-transparent'
+              : 'bg-surface-high text-muted hover:text-on-surface border-transparent'
           }`}
         >
           {excludeAporte ? `Aporte oculto (−${brl(aporteTotal)})` : `Ocultar aporte intelectual (${brl(aporteTotal)})`}
@@ -231,8 +231,8 @@ function DashboardTab() {
 
       {/* Stacked bar chart */}
       {last12Months.length > 0 && (
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
-          <h3 className="text-sm font-semibold text-slate-300 mb-4">Despesas Mensais por Categoria</h3>
+        <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+          <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Despesas Mensais por Categoria</h3>
           <div className="h-72">
             <Bar
               data={chartData}
@@ -257,19 +257,19 @@ function DashboardTab() {
 
       {/* Top vendors */}
       {topVendors.length > 0 && (
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
-          <h3 className="text-sm font-semibold text-slate-300 mb-4">Top 10 Vendors por Gasto</h3>
+        <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+          <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Top 10 Vendors por Gasto</h3>
           <div className="space-y-3">
             {topVendors.map((v) => (
               <div key={v.name} className="flex items-center gap-3">
-                <div className="w-32 text-sm text-slate-300 truncate">{v.name}</div>
-                <div className="flex-1 h-5 bg-slate-800 rounded-full overflow-hidden">
+                <div className="w-32 text-sm text-on-surface-variant truncate">{v.name}</div>
+                <div className="flex-1 h-5 bg-surface-high rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"
+                    className="h-full bg-secondary rounded-full"
                     style={{ width: `${(v.total / maxVendor) * 100}%` }}
                   />
                 </div>
-                <div className="w-28 text-right text-sm font-mono text-slate-300">{brl(v.total)}</div>
+                <div className="w-28 text-right text-sm font-mono text-on-surface-variant">{brl(v.total)}</div>
               </div>
             ))}
           </div>
@@ -278,12 +278,12 @@ function DashboardTab() {
 
       {/* Recent expenses */}
       {expenses.length > 0 && (
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
-          <h3 className="text-sm font-semibold text-slate-300 mb-4">Últimos Lançamentos</h3>
+        <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+          <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Últimos Lançamentos</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-slate-500 text-xs uppercase">
+                <tr className="text-muted text-xs uppercase">
                   <th className="text-left pb-3">Mês</th>
                   <th className="text-left pb-3">Descrição</th>
                   <th className="text-left pb-3">Produto</th>
@@ -293,16 +293,16 @@ function DashboardTab() {
               </thead>
               <tbody>
                 {expenses.slice(0, 20).map((e) => (
-                  <tr key={e.id} className="border-t border-slate-800/50">
-                    <td className="py-2 text-slate-400">{monthLabel(e.month)}</td>
-                    <td className="py-2 text-white">{e.description}</td>
-                    <td className="py-2 text-slate-400">{e.product_name}</td>
+                  <tr key={e.id} className="border-t border-outline/10">
+                    <td className="py-2 text-muted">{monthLabel(e.month)}</td>
+                    <td className="py-2 text-on-surface">{e.description}</td>
+                    <td className="py-2 text-muted">{e.product_name}</td>
                     <td className="py-2">
-                      <span className="px-2 py-0.5 rounded-full text-xs bg-slate-800 text-slate-300">
+                      <span className="px-2 py-0.5 rounded-full text-xs bg-surface-high text-on-surface-variant">
                         {e.category_label}
                       </span>
                     </td>
-                    <td className="py-2 text-right font-mono text-white">{brl(Number(e.amount_brl))}</td>
+                    <td className="py-2 text-right font-mono text-on-surface">{brl(Number(e.amount_brl))}</td>
                   </tr>
                 ))}
               </tbody>
@@ -312,7 +312,7 @@ function DashboardTab() {
       )}
 
       {expenses.length === 0 && (
-        <div className="text-center py-16 text-slate-500">
+        <div className="text-center py-16 text-muted">
           Nenhuma despesa registrada. Use a aba "Lançar Despesa" para começar.
         </div>
       )}
@@ -322,13 +322,13 @@ function DashboardTab() {
 
 function KpiCard({ label, value, sub, icon, color }: { label: string; value: string; sub?: string; icon: React.ReactNode; color: string }) {
   return (
-    <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-5">
+    <div className="bg-surface-lowest/50 border border-outline/10 p-5">
       <div className="flex items-center gap-2 mb-2">
         <span className={color}>{icon}</span>
-        <span className="text-xs text-slate-400 uppercase tracking-wide">{label}</span>
+        <span className="text-xs text-muted uppercase tracking-wide">{label}</span>
       </div>
-      <div className="text-2xl font-bold text-white">{value}</div>
-      {sub && <div className="text-xs text-slate-500 mt-1">{sub}</div>}
+      <div className="text-2xl font-bold text-on-surface">{value}</div>
+      {sub && <div className="text-xs text-muted mt-1">{sub}</div>}
     </div>
   );
 }
@@ -443,17 +443,17 @@ function LancarTab() {
     setSaving(false);
   }
 
-  if (loading) return <div className="text-slate-400 py-8">Carregando...</div>;
+  if (loading) return <div className="text-muted py-8">Carregando...</div>;
 
   return (
     <div className="space-y-6">
       {/* Form */}
-      <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
+      <div className="bg-surface-lowest/50 border border-outline/10 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-slate-300">Nova Despesa</h3>
+          <h3 className="text-sm font-semibold text-on-surface-variant">Nova Despesa</h3>
           <button
             onClick={() => setShowCsv(!showCsv)}
-            className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
+            className="text-xs text-secondary hover:text-secondary/90 flex items-center gap-1"
           >
             {showCsv ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             Importar CSV
@@ -462,7 +462,7 @@ function LancarTab() {
 
         {showCsv && (
           <div className="mb-4 space-y-2">
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted">
               Formato: product_id,category,kind,description,month,amount_brl (uma linha por despesa, com header)
             </p>
             <textarea
@@ -474,7 +474,7 @@ function LancarTab() {
             <button
               onClick={handleCsvImport}
               disabled={saving}
-              className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 rounded-md text-sm disabled:opacity-50"
+              className="px-4 py-2 bg-secondary hover:bg-secondary/90 text-sm disabled:opacity-50"
             >
               {saving ? 'Importando...' : 'Importar'}
             </button>
@@ -483,45 +483,45 @@ function LancarTab() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs text-slate-400 mb-1">Produto</label>
+            <label className="block text-xs text-muted mb-1">Produto</label>
             <select className={inputClass} value={draft.product_id} onChange={e => setDraft({ ...draft, product_id: e.target.value })}>
               {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1">Vendor</label>
+            <label className="block text-xs text-muted mb-1">Vendor</label>
             <select className={inputClass} value={draft.vendor_id} onChange={e => setDraft({ ...draft, vendor_id: e.target.value })}>
               <option value="">(sem vendor)</option>
               {vendors.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1">Categoria</label>
+            <label className="block text-xs text-muted mb-1">Categoria</label>
             <select className={inputClass} value={draft.category} onChange={e => setDraft({ ...draft, category: e.target.value as ExpenseCategory })}>
               {Object.entries(CATEGORY_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1">Tipo</label>
+            <label className="block text-xs text-muted mb-1">Tipo</label>
             <select className={inputClass} value={draft.kind} onChange={e => setDraft({ ...draft, kind: e.target.value as any })}>
               <option value="one_time">One-time</option>
               <option value="subscription">Subscription</option>
             </select>
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1">Mês de competência</label>
+            <label className="block text-xs text-muted mb-1">Mês de competência</label>
             <input type="month" className={inputClass} value={draft.month.slice(0, 7)} onChange={e => setDraft({ ...draft, month: e.target.value + '-01' })} />
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1">Valor BRL</label>
+            <label className="block text-xs text-muted mb-1">Valor BRL</label>
             <input type="number" step="0.01" min="0" className={inputClass} value={draft.amount_brl || ''} onChange={e => setDraft({ ...draft, amount_brl: parseFloat(e.target.value) || 0 })} />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-xs text-slate-400 mb-1">Descrição</label>
+            <label className="block text-xs text-muted mb-1">Descrição</label>
             <input type="text" className={inputClass} value={draft.description} onChange={e => setDraft({ ...draft, description: e.target.value })} placeholder="Supabase Pro plan / MacBook Pro 14 / Figma Professional" />
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1">Moeda original</label>
+            <label className="block text-xs text-muted mb-1">Moeda original</label>
             <select className={inputClass} value={draft.original_currency} onChange={e => setDraft({ ...draft, original_currency: e.target.value })}>
               <option value="">BRL (sem conversão)</option>
               <option value="USD">USD</option>
@@ -531,21 +531,21 @@ function LancarTab() {
           {draft.original_currency && (
             <>
               <div>
-                <label className="block text-xs text-slate-400 mb-1">Valor original ({draft.original_currency})</label>
+                <label className="block text-xs text-muted mb-1">Valor original ({draft.original_currency})</label>
                 <input type="number" step="0.01" min="0" className={inputClass} value={draft.amount_original || ''} onChange={e => setDraft({ ...draft, amount_original: parseFloat(e.target.value) || undefined })} />
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1">Cotação</label>
+                <label className="block text-xs text-muted mb-1">Cotação</label>
                 <input type="number" step="0.0001" min="0" className={inputClass} value={draft.exchange_rate || ''} onChange={e => setDraft({ ...draft, exchange_rate: parseFloat(e.target.value) || undefined })} />
               </div>
             </>
           )}
           <div>
-            <label className="block text-xs text-slate-400 mb-1">Nota fiscal / ref</label>
+            <label className="block text-xs text-muted mb-1">Nota fiscal / ref</label>
             <input type="text" className={inputClass} value={draft.invoice_ref} onChange={e => setDraft({ ...draft, invoice_ref: e.target.value })} />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-xs text-slate-400 mb-1">Observações</label>
+            <label className="block text-xs text-muted mb-1">Observações</label>
             <input type="text" className={inputClass} value={draft.notes} onChange={e => setDraft({ ...draft, notes: e.target.value })} />
           </div>
         </div>
@@ -554,7 +554,7 @@ function LancarTab() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-5 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm font-medium disabled:opacity-50"
+            className="px-5 py-2 bg-secondary hover:bg-secondary/90 text-sm font-medium disabled:opacity-50"
           >
             {saving ? 'Salvando...' : 'Salvar Despesa'}
           </button>
@@ -564,12 +564,12 @@ function LancarTab() {
 
       {/* Recent list */}
       {expenses.length > 0 && (
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
-          <h3 className="text-sm font-semibold text-slate-300 mb-4">Últimas Despesas</h3>
+        <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+          <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Últimas Despesas</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-slate-500 text-xs uppercase">
+                <tr className="text-muted text-xs uppercase">
                   <th className="text-left pb-3">Mês</th>
                   <th className="text-left pb-3">Descrição</th>
                   <th className="text-left pb-3">Produto</th>
@@ -581,17 +581,17 @@ function LancarTab() {
               </thead>
               <tbody>
                 {expenses.map((e) => (
-                  <tr key={e.id} className="border-t border-slate-800/50">
-                    <td className="py-2 text-slate-400">{monthLabel(e.month)}</td>
-                    <td className="py-2 text-white">{e.description}</td>
-                    <td className="py-2 text-slate-400">{e.product_name}</td>
+                  <tr key={e.id} className="border-t border-outline/10">
+                    <td className="py-2 text-muted">{monthLabel(e.month)}</td>
+                    <td className="py-2 text-on-surface">{e.description}</td>
+                    <td className="py-2 text-muted">{e.product_name}</td>
                     <td className="py-2">
-                      <span className="px-2 py-0.5 rounded-full text-xs bg-slate-800 text-slate-300">{e.category_label}</span>
+                      <span className="px-2 py-0.5 rounded-full text-xs bg-surface-high text-on-surface-variant">{e.category_label}</span>
                     </td>
-                    <td className="py-2 text-slate-400">{e.kind === 'subscription' ? 'Sub' : 'One-time'}</td>
-                    <td className="py-2 text-right font-mono text-white">{brl(Number(e.amount_brl))}</td>
+                    <td className="py-2 text-muted">{e.kind === 'subscription' ? 'Sub' : 'One-time'}</td>
+                    <td className="py-2 text-right font-mono text-on-surface">{brl(Number(e.amount_brl))}</td>
                     <td className="py-2 text-right">
-                      <button onClick={() => handleDelete(e.id)} className="text-slate-600 hover:text-red-400 transition-colors">
+                      <button onClick={() => handleDelete(e.id)} className="text-muted hover:text-red-400 transition-colors">
                         <Trash2 size={14} />
                       </button>
                     </td>
@@ -683,21 +683,21 @@ function SubscriptionsTab() {
   const inactiveSubs = subs.filter(s => !s.is_active);
   const monthlyTotal = activeSubs.reduce((a, s) => a + Number(s.monthly_amount_brl), 0);
 
-  if (loading) return <div className="text-slate-400 py-8">Carregando...</div>;
+  if (loading) return <div className="text-muted py-8">Carregando...</div>;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <span className="text-slate-400 text-sm">{activeSubs.length} ativas</span>
-          <span className="text-slate-600 mx-2">·</span>
-          <span className="text-sm font-mono text-white">{brl(monthlyTotal)}/mês</span>
+          <span className="text-muted text-sm">{activeSubs.length} ativas</span>
+          <span className="text-muted mx-2">·</span>
+          <span className="text-sm font-mono text-on-surface">{brl(monthlyTotal)}/mês</span>
         </div>
         <div className="flex gap-2">
-          <button onClick={handleGenerate} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-md text-sm flex items-center gap-2">
+          <button onClick={handleGenerate} className="px-4 py-2 bg-surface-high hover:bg-surface-highest text-sm flex items-center gap-2">
             <RefreshCw size={14} /> Gerar despesas do mês
           </button>
-          <button onClick={() => setShowForm(!showForm)} className="px-4 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm flex items-center gap-2">
+          <button onClick={() => setShowForm(!showForm)} className="px-4 py-2 bg-secondary hover:bg-secondary/90 text-sm flex items-center gap-2">
             <PlusCircle size={14} /> Nova Subscription
           </button>
         </div>
@@ -706,57 +706,57 @@ function SubscriptionsTab() {
       {msg && <div className={`text-sm ${msg.startsWith('Erro') ? 'text-red-400' : 'text-green-400'}`}>{msg}</div>}
 
       {showForm && (
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
+        <div className="bg-surface-lowest/50 border border-outline/10 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-slate-300">Nova Subscription</h3>
-            <button onClick={() => setShowForm(false)} className="text-slate-500 hover:text-white"><X size={16} /></button>
+            <h3 className="text-sm font-semibold text-on-surface-variant">Nova Subscription</h3>
+            <button onClick={() => setShowForm(false)} className="text-muted hover:text-on-surface"><X size={16} /></button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs text-slate-400 mb-1">Vendor</label>
+              <label className="block text-xs text-muted mb-1">Vendor</label>
               <select className={inputClass} value={draft.vendor_id} onChange={e => setDraft({ ...draft, vendor_id: e.target.value })}>
                 <option value="">Selecione...</option>
                 {vendors.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs text-slate-400 mb-1">Produto</label>
+              <label className="block text-xs text-muted mb-1">Produto</label>
               <select className={inputClass} value={draft.product_id} onChange={e => setDraft({ ...draft, product_id: e.target.value })}>
                 {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs text-slate-400 mb-1">Plano</label>
+              <label className="block text-xs text-muted mb-1">Plano</label>
               <input type="text" className={inputClass} value={draft.plan_name} onChange={e => setDraft({ ...draft, plan_name: e.target.value })} placeholder="Pro / Team / Professional" />
             </div>
             <div>
-              <label className="block text-xs text-slate-400 mb-1">Valor Mensal (BRL)</label>
+              <label className="block text-xs text-muted mb-1">Valor Mensal (BRL)</label>
               <input type="number" step="0.01" min="0" className={inputClass} value={draft.monthly_amount_brl || ''} onChange={e => setDraft({ ...draft, monthly_amount_brl: parseFloat(e.target.value) || 0 })} />
             </div>
             <div>
-              <label className="block text-xs text-slate-400 mb-1">Início</label>
+              <label className="block text-xs text-muted mb-1">Início</label>
               <input type="date" className={inputClass} value={draft.started_on} onChange={e => setDraft({ ...draft, started_on: e.target.value })} />
             </div>
             <div>
-              <label className="block text-xs text-slate-400 mb-1">Notas</label>
+              <label className="block text-xs text-muted mb-1">Notas</label>
               <input type="text" className={inputClass} value={draft.notes} onChange={e => setDraft({ ...draft, notes: e.target.value })} />
             </div>
           </div>
-          <button onClick={handleAdd} className="mt-4 px-5 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm font-medium">
+          <button onClick={handleAdd} className="mt-4 px-5 py-2 bg-secondary hover:bg-secondary/90 text-sm font-medium">
             Salvar
           </button>
         </div>
       )}
 
       {/* Active subs */}
-      <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
-        <h3 className="text-sm font-semibold text-slate-300 mb-4">Ativas</h3>
+      <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+        <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Ativas</h3>
         {activeSubs.length === 0 ? (
-          <div className="text-slate-500 text-sm">Nenhuma subscription ativa.</div>
+          <div className="text-muted text-sm">Nenhuma subscription ativa.</div>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-slate-500 text-xs uppercase">
+              <tr className="text-muted text-xs uppercase">
                 <th className="text-left pb-3">Vendor</th>
                 <th className="text-left pb-3">Plano</th>
                 <th className="text-left pb-3">Produto</th>
@@ -767,16 +767,16 @@ function SubscriptionsTab() {
             </thead>
             <tbody>
               {activeSubs.map((s) => (
-                <tr key={s.id} className="border-t border-slate-800/50">
-                  <td className="py-2 text-white">{s.vendor_name}</td>
-                  <td className="py-2 text-slate-300">{s.plan_name}</td>
-                  <td className="py-2 text-slate-400">{s.product_name}</td>
-                  <td className="py-2 text-right font-mono text-white">{brl(Number(s.monthly_amount_brl))}</td>
-                  <td className="py-2 text-slate-400">{s.started_on}</td>
+                <tr key={s.id} className="border-t border-outline/10">
+                  <td className="py-2 text-on-surface">{s.vendor_name}</td>
+                  <td className="py-2 text-on-surface-variant">{s.plan_name}</td>
+                  <td className="py-2 text-muted">{s.product_name}</td>
+                  <td className="py-2 text-right font-mono text-on-surface">{brl(Number(s.monthly_amount_brl))}</td>
+                  <td className="py-2 text-muted">{s.started_on}</td>
                   <td className="py-2 text-right">
                     <button
                       onClick={() => handleClose(s.id)}
-                      className="text-xs text-slate-500 hover:text-red-400 flex items-center gap-1 ml-auto"
+                      className="text-xs text-muted hover:text-red-400 flex items-center gap-1 ml-auto"
                     >
                       <XCircle size={14} /> Encerrar
                     </button>
@@ -790,17 +790,17 @@ function SubscriptionsTab() {
 
       {/* Inactive subs */}
       {inactiveSubs.length > 0 && (
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 opacity-60">
-          <h3 className="text-sm font-semibold text-slate-500 mb-4">Encerradas</h3>
+        <div className="bg-surface-lowest/50 border border-outline/10 p-6 opacity-60">
+          <h3 className="text-sm font-semibold text-muted mb-4">Encerradas</h3>
           <table className="w-full text-sm">
             <tbody>
               {inactiveSubs.map((s) => (
-                <tr key={s.id} className="border-t border-slate-800/50">
-                  <td className="py-2 text-slate-500">{s.vendor_name}</td>
-                  <td className="py-2 text-slate-600">{s.plan_name}</td>
-                  <td className="py-2 text-slate-600">{s.product_name}</td>
-                  <td className="py-2 text-right font-mono text-slate-500">{brl(Number(s.monthly_amount_brl))}</td>
-                  <td className="py-2 text-slate-600">{s.started_on} → {s.ended_on}</td>
+                <tr key={s.id} className="border-t border-outline/10">
+                  <td className="py-2 text-muted">{s.vendor_name}</td>
+                  <td className="py-2 text-muted">{s.plan_name}</td>
+                  <td className="py-2 text-muted">{s.product_name}</td>
+                  <td className="py-2 text-right font-mono text-muted">{brl(Number(s.monthly_amount_brl))}</td>
+                  <td className="py-2 text-muted">{s.started_on} → {s.ended_on}</td>
                 </tr>
               ))}
             </tbody>
@@ -883,18 +883,18 @@ function RelatorioTab() {
     setExporting(false);
   }
 
-  if (loading) return <div className="text-slate-400 py-8">Carregando...</div>;
+  if (loading) return <div className="text-muted py-8">Carregando...</div>;
 
   return (
     <div className="space-y-6">
       {/* Product filter */}
       <div className="flex items-center gap-2">
-        <span className="text-xs text-slate-500 uppercase tracking-wide">Projeto:</span>
+        <span className="text-xs text-muted uppercase tracking-wide">Projeto:</span>
         <div className="flex gap-1 flex-wrap">
           <button
             onClick={() => setFilterProduct('all')}
             className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-              filterProduct === 'all' ? 'bg-[#2563EB]/20 text-white border border-[#2563EB]/40' : 'bg-slate-800 text-slate-400 hover:text-white'
+              filterProduct === 'all' ? 'bg-secondary-container/40 text-on-surface border border-secondary/40' : 'bg-surface-high text-muted hover:text-on-surface'
             }`}
           >
             Todos
@@ -904,7 +904,7 @@ function RelatorioTab() {
               key={p.id}
               onClick={() => setFilterProduct(p.id)}
               className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                filterProduct === p.id ? 'bg-[#2563EB]/20 text-white border border-[#2563EB]/40' : 'bg-slate-800 text-slate-400 hover:text-white'
+                filterProduct === p.id ? 'bg-secondary-container/40 text-on-surface border border-secondary/40' : 'bg-surface-high text-muted hover:text-on-surface'
               }`}
             >
               {p.id === 'clearix' ? 'Clearix' : p.id === 'digiai' ? 'DigiAI' : p.id === 'compartilhado' ? 'Compartilhado' : p.name.split(' ')[0]}
@@ -914,10 +914,10 @@ function RelatorioTab() {
       </div>
 
       {/* Hero card */}
-      <div className="bg-gradient-to-br from-blue-900/30 to-cyan-900/20 border border-blue-500/20 rounded-xl p-8 text-center">
-        <div className="text-xs text-slate-400 uppercase tracking-widest mb-2">Investimento Total — {filterLabel}</div>
-        <div className="text-5xl font-bold text-white mb-1">{brl(totalFiltered)}</div>
-        <div className="text-sm text-slate-400">
+      <div className="bg-secondary-container/40 border border-secondary/40 p-8 text-center">
+        <div className="text-xs text-muted uppercase tracking-widest mb-2">Investimento Total — {filterLabel}</div>
+        <div className="text-5xl font-bold text-on-surface mb-1">{brl(totalFiltered)}</div>
+        <div className="text-sm text-muted">
           {filtered.length} lançamentos
           {sortedMonths.length > 0 && ` · ${monthLabel(sortedMonths[0][0])} a ${monthLabel(sortedMonths[sortedMonths.length - 1][0])}`}
         </div>
@@ -926,22 +926,22 @@ function RelatorioTab() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* By category */}
         {sortedCats.length > 0 && (
-          <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
-            <h3 className="text-sm font-semibold text-slate-300 mb-4">Por Categoria</h3>
+          <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+            <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Por Categoria</h3>
             <div className="space-y-3">
               {sortedCats.map(([cat, total]) => {
                 const pct = totalFiltered > 0 ? (total / totalFiltered) * 100 : 0;
                 return (
                   <div key={cat} className="flex items-center gap-3">
-                    <div className="w-36 text-sm text-slate-300 truncate">{CATEGORY_LABELS[cat as ExpenseCategory] || cat}</div>
-                    <div className="flex-1 h-4 bg-slate-800 rounded-full overflow-hidden">
+                    <div className="w-36 text-sm text-on-surface-variant truncate">{CATEGORY_LABELS[cat as ExpenseCategory] || cat}</div>
+                    <div className="flex-1 h-4 bg-surface-high rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full"
                         style={{ width: `${pct}%`, backgroundColor: CATEGORY_COLORS[cat as ExpenseCategory] || '#64748b' }}
                       />
                     </div>
-                    <div className="w-24 text-right text-sm font-mono text-slate-300">{brl(total)}</div>
-                    <div className="w-12 text-right text-xs text-slate-500">{pct.toFixed(1)}%</div>
+                    <div className="w-24 text-right text-sm font-mono text-on-surface-variant">{brl(total)}</div>
+                    <div className="w-12 text-right text-xs text-muted">{pct.toFixed(1)}%</div>
                   </div>
                 );
               })}
@@ -951,19 +951,19 @@ function RelatorioTab() {
 
         {/* By vendor */}
         {sortedVendors.length > 0 && (
-          <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
-            <h3 className="text-sm font-semibold text-slate-300 mb-4">Por Vendor</h3>
+          <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+            <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Por Vendor</h3>
             <div className="space-y-3">
               {sortedVendors.map((v) => {
                 const pct = totalFiltered > 0 ? (v.total / totalFiltered) * 100 : 0;
                 return (
                   <div key={v.name} className="flex items-center gap-3">
-                    <div className="w-36 text-sm text-slate-300 truncate">{v.name}</div>
-                    <div className="flex-1 h-4 bg-slate-800 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-500" style={{ width: `${pct}%` }} />
+                    <div className="w-36 text-sm text-on-surface-variant truncate">{v.name}</div>
+                    <div className="flex-1 h-4 bg-surface-high rounded-full overflow-hidden">
+                      <div className="h-full rounded-full bg-secondary" style={{ width: `${pct}%` }} />
                     </div>
-                    <div className="w-24 text-right text-sm font-mono text-slate-300">{brl(v.total)}</div>
-                    <div className="w-12 text-right text-xs text-slate-500">{v.count}x</div>
+                    <div className="w-24 text-right text-sm font-mono text-on-surface-variant">{brl(v.total)}</div>
+                    <div className="w-12 text-right text-xs text-muted">{v.count}x</div>
                   </div>
                 );
               })}
@@ -974,13 +974,13 @@ function RelatorioTab() {
 
       {/* Monthly breakdown */}
       {sortedMonths.length > 0 && (
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
-          <h3 className="text-sm font-semibold text-slate-300 mb-4">Por Mês</h3>
+        <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+          <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Por Mês</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {sortedMonths.map(([month, total]) => (
-              <div key={month} className="bg-slate-800/50 rounded-lg p-3 text-center">
-                <div className="text-xs text-slate-500">{monthLabel(month)}</div>
-                <div className="text-sm font-mono text-white mt-1">{brl(total)}</div>
+              <div key={month} className="bg-surface-high p-3 text-center">
+                <div className="text-xs text-muted">{monthLabel(month)}</div>
+                <div className="text-sm font-mono text-on-surface mt-1">{brl(total)}</div>
               </div>
             ))}
           </div>
@@ -992,7 +992,7 @@ function RelatorioTab() {
         <button
           onClick={handleExport}
           disabled={exporting || filtered.length === 0}
-          className="px-6 py-3 bg-[#2563EB] hover:bg-blue-600 rounded-lg text-sm font-medium flex items-center gap-2 disabled:opacity-50"
+          className="px-6 py-3 bg-secondary hover:bg-secondary/90 text-sm font-medium flex items-center gap-2 disabled:opacity-50"
         >
           <Download size={16} />
           {exporting ? 'Exportando...' : 'Exportar CSV'}
@@ -1000,7 +1000,7 @@ function RelatorioTab() {
       </div>
 
       {filtered.length === 0 && (
-        <div className="text-center text-slate-500 text-sm py-4">
+        <div className="text-center text-muted text-sm py-4">
           Nenhuma despesa registrada{filterProduct !== 'all' ? ' para este projeto' : ''}.
         </div>
       )}

@@ -8,7 +8,7 @@ type Props = {
 };
 
 const inputClass =
-  'w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-[#06B6D4]';
+  'w-full bg-surface-lowest border border-outline/30 px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-secondary/40';
 
 function formatPrice(n: number | null | undefined) {
   if (n === null || n === undefined) return '—';
@@ -65,23 +65,23 @@ export default function TabNewTenant({ onCreated }: Props) {
   if (success) {
     return (
       <div className="p-6 max-w-xl">
-        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-5 space-y-3">
+        <div className="border border-emerald-500/30 bg-emerald-500/5 p-5 space-y-3">
           <div className="flex items-center gap-2 text-emerald-300">
             <CheckCircle2 size={18} />
             <div className="font-medium">Tenant criado</div>
           </div>
-          <div className="text-sm text-white/80">{success.name}</div>
-          <div className="text-[11px] font-mono text-white/40">{success.tenant_id}</div>
+          <div className="text-sm text-on-surface">{success.name}</div>
+          <div className="text-[11px] font-mono text-muted">{success.tenant_id}</div>
           <div className="flex gap-2 pt-2">
             <button
               onClick={() => onCreated(success.tenant_id)}
-              className="rounded-md bg-[#2563EB] text-white text-sm px-3 py-1.5 hover:bg-[#1D4ED8]"
+              className="bg-secondary text-surface text-sm px-3 py-1.5 hover:bg-secondary/90"
             >
               Abrir detalhe
             </button>
             <button
               onClick={() => setSuccess(null)}
-              className="rounded-md border border-white/10 bg-black/20 text-sm px-3 py-1.5 text-white/70 hover:text-white hover:border-white/20"
+              className="border border-outline/10 bg-surface-lowest text-sm px-3 py-1.5 text-on-surface-variant hover:text-on-surface hover:border-outline/30"
             >
               Criar outro
             </button>
@@ -94,13 +94,13 @@ export default function TabNewTenant({ onCreated }: Props) {
   return (
     <div className="p-6 max-w-2xl">
       <div className="flex items-center gap-2 mb-5">
-        <Building2 size={16} className="text-[#06B6D4]" />
-        <div className="text-lg font-medium text-white">Novo tenant</div>
+        <Building2 size={16} className="text-secondary" />
+        <div className="text-lg font-medium text-on-surface">Novo tenant</div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="text-[10px] font-mono uppercase tracking-widest text-white/50 block mb-1">
+          <label className="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant block mb-1">
             Razão social / Nome *
           </label>
           <input
@@ -113,7 +113,7 @@ export default function TabNewTenant({ onCreated }: Props) {
         </div>
 
         <div>
-          <label className="text-[10px] font-mono uppercase tracking-widest text-white/50 block mb-1">
+          <label className="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant block mb-1">
             CNPJ *
           </label>
           <input
@@ -123,13 +123,13 @@ export default function TabNewTenant({ onCreated }: Props) {
             placeholder="00.000.000/0000-00"
             required
           />
-          <div className="text-[10px] text-white/30 mt-1">
+          <div className="text-[10px] text-muted mt-1">
             Obrigatório na regra do banco (pontuação é removida automaticamente).
           </div>
         </div>
 
         <div>
-          <label className="text-[10px] font-mono uppercase tracking-widest text-white/50 block mb-1">
+          <label className="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant block mb-1">
             Pacote *
           </label>
           <select
@@ -146,10 +146,10 @@ export default function TabNewTenant({ onCreated }: Props) {
             ))}
           </select>
           {selectedPackage && (
-            <div className="mt-2 rounded-md border border-white/10 bg-white/[0.02] p-3">
-              <div className="text-xs text-white/70">{selectedPackage.tagline}</div>
-              <div className="text-[11px] text-white/40 mt-1">{selectedPackage.description}</div>
-              <div className="text-[11px] text-white/50 mt-2">
+            <div className="mt-2 border border-outline/10 bg-surface-low p-3">
+              <div className="text-xs text-on-surface-variant">{selectedPackage.tagline}</div>
+              <div className="text-[11px] text-muted mt-1">{selectedPackage.description}</div>
+              <div className="text-[11px] text-on-surface-variant mt-2">
                 max lojas: {selectedPackage.max_stores ?? '—'} · max usuários: {selectedPackage.max_users ?? '—'}
               </div>
               {selectedPackage.apps && selectedPackage.apps.length > 0 && (
@@ -157,7 +157,7 @@ export default function TabNewTenant({ onCreated }: Props) {
                   {selectedPackage.apps.map((a) => (
                     <span
                       key={a.slug}
-                      className="text-[10px] font-mono rounded border border-white/10 bg-black/20 px-1.5 py-0.5 text-white/60"
+                      className="text-[10px] font-mono border border-outline/10 bg-surface-lowest px-1.5 py-0.5 text-on-surface-variant"
                     >
                       {a.name}
                     </span>
@@ -168,18 +168,18 @@ export default function TabNewTenant({ onCreated }: Props) {
           )}
         </div>
 
-        <label className="flex items-center gap-2 text-sm text-white/70">
+        <label className="flex items-center gap-2 text-sm text-on-surface-variant">
           <input
             type="checkbox"
             checked={createDefaultStore}
             onChange={(e) => setCreateDefaultStore(e.target.checked)}
-            className="rounded border-slate-700"
+            className="border-outline/30"
           />
           Criar loja matriz padrão automaticamente
         </label>
 
         {error && (
-          <div className="rounded-md border border-rose-500/30 bg-rose-500/5 p-3 text-sm text-rose-300">
+          <div className="border border-rose-500/30 bg-rose-500/5 p-3 text-sm text-rose-300">
             {error}
           </div>
         )}
@@ -188,7 +188,7 @@ export default function TabNewTenant({ onCreated }: Props) {
           <button
             type="submit"
             disabled={submitting || !name.trim() || !cnpj.trim() || !packageSlug}
-            className="rounded-md bg-[#2563EB] text-white text-sm px-4 py-2 hover:bg-[#1D4ED8] disabled:opacity-50"
+            className="bg-secondary text-surface text-sm px-4 py-2 hover:bg-secondary/90 disabled:opacity-50"
           >
             {submitting ? 'Criando…' : 'Criar tenant'}
           </button>

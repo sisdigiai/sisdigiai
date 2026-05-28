@@ -50,17 +50,17 @@ export function Afiliados() {
       {/* Toolbar */}
       <div className="flex items-center gap-4 mb-6 flex-wrap">
         <div className="flex items-center gap-2 flex-1 min-w-[260px]">
-          <Search className="w-4 h-4 text-white/40" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar nome ou email..." className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-[#06B6D4]/50" />
+          <Search className="w-4 h-4 text-muted" />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar nome ou email..." className="flex-1 bg-surface-low border border-outline/10 px-3 py-1.5 text-sm focus:outline-none focus:border-secondary/40" />
         </div>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm">
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm">
           <option value="all">Todos status</option>
           {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
-        <button onClick={refresh} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-white/10 rounded-lg hover:bg-white/5">
+        <button onClick={refresh} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-outline/10 hover:bg-surface-highest">
           <RefreshCw className="w-4 h-4" /> Atualizar
         </button>
-        <button onClick={() => setShowNewForm(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#06B6D4] text-[#0A0F1E] rounded-lg hover:bg-[#06B6D4]/90 font-medium">
+        <button onClick={() => setShowNewForm(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-secondary text-surface hover:bg-secondary/90 font-medium">
           <Plus className="w-4 h-4" /> Novo afiliado
         </button>
       </div>
@@ -75,11 +75,11 @@ export function Afiliados() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-white/40 text-sm">Carregando...</div>
+        <div className="text-center py-12 text-muted text-sm">Carregando...</div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-12 text-white/40">
+        <div className="text-center py-12 text-muted">
           <p className="text-sm mb-2">Nenhum afiliado ainda.</p>
-          <button onClick={() => setShowNewForm(true)} className="text-xs text-[#06B6D4] hover:text-white">Cadastrar o primeiro</button>
+          <button onClick={() => setShowNewForm(true)} className="text-xs text-secondary hover:text-on-surface">Cadastrar o primeiro</button>
         </div>
       ) : (
         <div className="space-y-2">
@@ -102,9 +102,9 @@ export function Afiliados() {
 
 function StatCard({ label, value, color }: { label: string; value: number | string; color: string }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+    <div className="bg-surface-low border border-outline/10 p-4">
       <div className="text-2xl font-semibold" style={{ color }}>{value}</div>
-      <div className="text-[11px] text-white/40 mt-1">{label}</div>
+      <div className="text-[11px] text-muted mt-1">{label}</div>
     </div>
   );
 }
@@ -113,19 +113,19 @@ function AffiliateRow({ affiliate, onClick }: { affiliate: Affiliate; onClick: (
   const status = STATUS_OPTIONS.find(s => s.value === affiliate.status);
   const tier = TIER_OPTIONS.find(t => t.value === affiliate.tier);
   return (
-    <button onClick={onClick} className="w-full text-left bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/[0.07] transition-colors">
+    <button onClick={onClick} className="w-full text-left bg-surface-low border border-outline/10 p-4 hover:bg-surface-highest transition-colors">
       <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-semibold text-sm">{affiliate.full_name.charAt(0).toUpperCase()}</div>
+        <div className="w-10 h-10 rounded-full bg-surface-high flex items-center justify-center font-semibold text-sm">{affiliate.full_name.charAt(0).toUpperCase()}</div>
         <div className="flex-1 min-w-0">
           <div className="font-medium">{affiliate.full_name}</div>
-          <div className="text-xs text-white/40 flex items-center gap-3 mt-0.5">
+          <div className="text-xs text-muted flex items-center gap-3 mt-0.5">
             <span><Mail className="w-3 h-3 inline mr-1" />{affiliate.email}</span>
             {affiliate.whatsapp && <span><MessageCircle className="w-3 h-3 inline mr-1" />{affiliate.whatsapp}</span>}
             {affiliate.instagram_handle && <span><InstagramIcon className="w-3 h-3 inline mr-1" />@{affiliate.instagram_handle}</span>}
           </div>
         </div>
         <div className="text-right">
-          <div className="text-xs text-white/60">{affiliate.total_sales} vendas · R$ {((affiliate.total_commission_cents ?? 0) / 100).toFixed(2)}</div>
+          <div className="text-xs text-on-surface-variant">{affiliate.total_sales} vendas · R$ {((affiliate.total_commission_cents ?? 0) / 100).toFixed(2)}</div>
           <div className="flex items-center gap-2 mt-1 justify-end">
             {tier && <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: tier.color }}>{tier.label}</span>}
             {status && <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: status.color }}>{status.label}</span>}
@@ -157,15 +157,15 @@ function AffiliateForm({ affiliate, onClose, onSaved }: { affiliate: Affiliate |
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
-      <div className="bg-[#0F1729] border border-white/10 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-        <div className="sticky top-0 bg-[#0F1729] border-b border-white/10 px-6 py-4 flex items-center justify-between">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-lowest p-4" onClick={onClose}>
+      <div className="bg-surface-container border border-outline/10 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+        <div className="sticky top-0 bg-surface-container border-b border-outline/10 px-6 py-4 flex items-center justify-between">
           <h3 className="font-semibold">{affiliate ? 'Editar afiliado' : 'Novo afiliado'}</h3>
           <div className="flex items-center gap-2">
-            <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-1.5 bg-[#06B6D4] text-[#0A0F1E] font-medium rounded-lg hover:bg-[#06B6D4]/90 text-sm disabled:opacity-50">
+            <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-1.5 bg-secondary text-surface font-medium hover:bg-secondary/90 text-sm disabled:opacity-50">
               <Save className="w-4 h-4" /> Salvar
             </button>
-            <button onClick={onClose} className="p-2 text-white/60 hover:text-white"><X className="w-5 h-5" /></button>
+            <button onClick={onClose} className="p-2 text-on-surface-variant hover:text-on-surface"><X className="w-5 h-5" /></button>
           </div>
         </div>
         <div className="p-6 space-y-4">
@@ -202,12 +202,12 @@ function AffiliateForm({ affiliate, onClose, onSaved }: { affiliate: Affiliate |
   );
 }
 
-const inputCls = 'w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#06B6D4]/50 text-white placeholder:text-white/30';
+const inputCls = 'w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-secondary/40 text-on-surface placeholder:text-muted';
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-[11px] text-white/50 block mb-1">{label}</label>
+      <label className="text-[11px] text-on-surface-variant block mb-1">{label}</label>
       {children}
     </div>
   );

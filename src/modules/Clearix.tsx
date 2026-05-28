@@ -20,13 +20,13 @@ export default function Clearix() {
   return (
     <ClearixAuthGate>
       <div>
-        <header className="px-6 pt-6 pb-4 border-b border-white/5">
-          <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-white/40">
-            <Network size={10} className="text-[#06B6D4]" />
+        <header className="px-6 pt-6 pb-4 border-b border-outline/10">
+          <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-on-surface-variant">
+            <Network size={10} className="text-secondary" />
             Ecossistemas · Clearix
           </div>
-          <div className="mt-1 text-2xl font-semibold text-white">Central Clearix</div>
-          <div className="text-xs text-white/40 mt-0.5">
+          <div className="mt-1 text-2xl font-semibold text-on-surface font-serif">Central Clearix</div>
+          <div className="text-xs text-on-surface-variant mt-0.5">
             Comando operacional do ecossistema multi-tenant
           </div>
 
@@ -60,10 +60,10 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
   return (
     <button
       onClick={onClick}
-      className={`px-3 py-1.5 rounded-md transition-colors ${
+      className={`px-3 py-1.5 transition-colors ${
         active
-          ? 'bg-[#2563EB]/20 text-white border border-[#2563EB]/40'
-          : 'text-white/50 hover:text-white/80 hover:bg-white/5 border border-transparent'
+          ? 'bg-secondary-container/40 text-on-surface border border-secondary/40'
+          : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-highest border border-transparent'
       }`}
     >
       {children}

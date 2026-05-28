@@ -143,22 +143,22 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
 
   return (
     <div className="fixed inset-0 z-50 flex" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/60" />
-      <div className="relative ml-auto w-full max-w-3xl h-full bg-[#0F1729] border-l border-white/10 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="absolute inset-0 bg-surface-lowest" />
+      <div className="relative ml-auto w-full max-w-3xl h-full bg-surface-container border-l border-outline/10 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
 
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-[#0F1729] border-b border-white/10 px-6 py-4 flex items-center justify-between">
+        <div className="sticky top-0 z-10 bg-surface-container border-b border-outline/10 px-6 py-4 flex items-center justify-between">
           <div className="flex-1">
             <div className="text-[10px] uppercase tracking-widest font-bold" style={{ color: draft.pillar_color ?? '#06B6D4' }}>
               {draft.pillar_name ?? 'Sem pilar'}
             </div>
             <h2 className="text-lg font-semibold mt-1">{draft.hook ?? 'Sem hook'}</h2>
-            <p className="text-xs text-white/40 mt-0.5">{draft.scheduled_date}</p>
+            <p className="text-xs text-muted mt-0.5">{draft.scheduled_date}</p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowWizard(true)}
-              className="flex items-center gap-2 px-3 py-2 bg-[#10B981] text-[#0A0F1E] font-medium rounded-lg hover:bg-[#10B981]/90 text-sm"
+              className="flex items-center gap-2 px-3 py-2 bg-[#10B981] text-[#0A0F1E] font-medium hover:bg-[#10B981]/90 text-sm"
               title="Wizard 4 steps: roteiro / capa / voz / vídeo. Salva tudo no banco."
             >
               <Wand2 className="w-4 h-4" />
@@ -166,7 +166,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
             </button>
             <button
               onClick={() => setShowPromptsModal(true)}
-              className="flex items-center gap-2 px-3 py-2 border border-[#06B6D4]/40 text-[#06B6D4] rounded-lg hover:bg-[#06B6D4]/10 text-sm"
+              className="flex items-center gap-2 px-3 py-2 border border-secondary/40 text-secondary hover:bg-secondary/15 text-sm"
               title="Gerar prompt avulso (sem o wizard)"
             >
               <Sparkles className="w-4 h-4" />
@@ -176,16 +176,16 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
               onClick={handlePromote}
               disabled={promoting}
               title={promotedMaterialId ? 'Já promovido — clique pra abrir' : 'Promover este post como material para afiliados'}
-              className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm disabled:opacity-50 ${promotedMaterialId ? 'border-[#10B981]/40 text-[#10B981] hover:bg-[#10B981]/10' : 'border-[#8B5CF6]/40 text-[#8B5CF6] hover:bg-[#8B5CF6]/10'}`}
+              className={`flex items-center gap-2 px-3 py-2 border text-sm disabled:opacity-50 ${promotedMaterialId ? 'border-[#10B981]/40 text-[#10B981] hover:bg-[#10B981]/10' : 'border-[#8B5CF6]/40 text-[#8B5CF6] hover:bg-[#8B5CF6]/10'}`}
             >
               {promoting ? <Loader2 className="w-4 h-4 animate-spin" /> : promotedMaterialId ? <Check className="w-4 h-4" /> : <Package className="w-4 h-4" />}
               {promotedMaterialId ? 'Já é material' : 'Virar material afiliado'}
             </button>
-            <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-[#06B6D4] text-[#0A0F1E] font-medium rounded-lg hover:bg-[#06B6D4]/90 text-sm disabled:opacity-50">
+            <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-secondary text-surface font-medium hover:bg-secondary/90 text-sm disabled:opacity-50">
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               Salvar
             </button>
-            <button onClick={onClose} className="p-2 text-white/60 hover:text-white"><X className="w-5 h-5" /></button>
+            <button onClick={onClose} className="p-2 text-on-surface-variant hover:text-on-surface"><X className="w-5 h-5" /></button>
           </div>
         </div>
 
@@ -199,7 +199,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
                 <button
                   key={s.value}
                   onClick={() => update({ status: s.value })}
-                  className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest rounded ${draft.status === s.value ? 'text-[#0A0F1E]' : 'text-white/40 hover:text-white/70 border border-white/10'}`}
+                  className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest ${draft.status === s.value ? 'text-[#0A0F1E]' : 'text-muted hover:text-on-surface-variant border border-outline/10'}`}
                   style={draft.status === s.value ? { background: s.color } : {}}
                 >
                   {s.label}
@@ -212,13 +212,13 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
           </Section>
 
           {gateOpen && (
-            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4" onClick={(e) => { e.stopPropagation(); setGateOpen(false); }}>
-              <div className="w-full max-w-md rounded-2xl border border-amber-500/30 bg-[#0F1729] p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-surface-lowest p-4" onClick={(e) => { e.stopPropagation(); setGateOpen(false); }}>
+              <div className="w-full max-w-md border border-amber-500/30 bg-surface-container p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-5 h-5 text-amber-300" />
                   <h3 className="font-bold text-base">Travas de marketing — confirmar antes de publicar</h3>
                 </div>
-                <p className="text-xs text-white/50">Marcar como <b className="text-white/80">Publicado</b> exige confirmar as travas (R-011 / R-013). AI não publica sozinha.</p>
+                <p className="text-xs text-on-surface-variant">Marcar como <b className="text-on-surface">Publicado</b> exige confirmar as travas (R-011 / R-013). AI não publica sozinha.</p>
                 <div className="space-y-2">
                   {([
                     ['humano', 'Revisado e aprovado por humano (R-011)'],
@@ -226,18 +226,18 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
                     ['cta', 'CTA pro Clearix presente no conteúdo'],
                     ['template', 'Categoria / template correto (se WhatsApp ativo)'],
                   ] as const).map(([k, label]) => (
-                    <label key={k} className="flex items-start gap-2 text-sm text-white/75 cursor-pointer">
+                    <label key={k} className="flex items-start gap-2 text-sm text-on-surface-variant cursor-pointer">
                       <input type="checkbox" checked={gate[k]} onChange={e => setGate(g => ({ ...g, [k]: e.target.checked }))} className="mt-0.5" />
                       <span>{label}</span>
                     </label>
                   ))}
                 </div>
                 <div className="flex gap-2 justify-end pt-2">
-                  <button onClick={() => setGateOpen(false)} className="px-3 py-2 text-sm text-white/50 hover:text-white">Cancelar</button>
+                  <button onClick={() => setGateOpen(false)} className="px-3 py-2 text-sm text-on-surface-variant hover:text-on-surface">Cancelar</button>
                   <button
                     disabled={!gatePassed}
                     onClick={() => { setGateOpen(false); handleSave(); }}
-                    className="px-4 py-2 text-sm font-medium rounded-lg bg-[#10B981] text-[#0A0F1E] disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="px-4 py-2 text-sm font-medium bg-[#10B981] text-[#0A0F1E] disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     Confirmar e publicar
                   </button>
@@ -273,15 +273,15 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
               {platforms.map(p => {
                 const checked = (draft.platforms ?? []).includes(p.code);
                 return (
-                  <label key={p.code} className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer text-xs ${checked ? 'border-[#06B6D4]/50 bg-[#06B6D4]/10' : 'border-white/10 hover:border-white/20'}`}>
-                    <input type="checkbox" checked={checked} onChange={() => togglePlatform(p.code)} className="accent-[#06B6D4]" />
+                  <label key={p.code} className={`flex items-center gap-2 px-3 py-2 border cursor-pointer text-xs ${checked ? 'border-secondary/40 bg-secondary/15' : 'border-outline/10 hover:border-outline/30'}`}>
+                    <input type="checkbox" checked={checked} onChange={() => togglePlatform(p.code)} className="accent-secondary" />
                     <span style={{ color: p.color ?? '#fff' }}>{p.name}</span>
                   </label>
                 );
               })}
             </div>
             {(draft.platforms ?? []).length > 1 && (
-              <div className="mt-3 bg-[#8B5CF6]/5 border border-[#8B5CF6]/20 rounded p-2 text-[11px] text-white/70 flex items-start gap-2">
+              <div className="mt-3 bg-[#8B5CF6]/5 border border-[#8B5CF6]/20 p-2 text-[11px] text-on-surface-variant flex items-start gap-2">
                 <Sparkles className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0 mt-0.5" />
                 <span>
                   <strong className="text-[#8B5CF6]">Estratégia inundação:</strong> esse post vai em {(draft.platforms ?? []).length} canais.
@@ -293,22 +293,22 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
 
           {/* Link Hotmart com UTM + Vendas atribuídas */}
           <Section title="Link de venda Hotmart (com UTM)">
-            <div className="bg-black/30 border border-white/10 rounded-lg p-3">
+            <div className="bg-surface-lowest border border-outline/10 p-3">
               <div className="flex items-center gap-2 mb-2">
-                <LinkIcon className="w-3.5 h-3.5 text-[#06B6D4]" />
-                <span className="text-[10px] uppercase tracking-widest font-bold text-white/40">URL pronta pra colar na bio/stories/post</span>
+                <LinkIcon className="w-3.5 h-3.5 text-secondary" />
+                <span className="text-[10px] uppercase tracking-widest font-bold text-muted">URL pronta pra colar na bio/stories/post</span>
               </div>
               <div className="flex items-center gap-2">
-                <code className="flex-1 text-[11px] text-white/70 bg-black/40 border border-white/10 rounded px-2 py-1.5 font-mono break-all">{hotmartUrl}</code>
+                <code className="flex-1 text-[11px] text-on-surface-variant bg-surface-lowest border border-outline/10 px-2 py-1.5 font-mono break-all">{hotmartUrl}</code>
                 <button
                   onClick={handleCopyUrl}
-                  className="flex items-center gap-1 text-[11px] bg-[#06B6D4] text-[#0A0F1E] font-medium px-3 py-1.5 rounded hover:bg-[#06B6D4]/90 shrink-0"
+                  className="flex items-center gap-1 text-[11px] bg-secondary text-surface font-medium px-3 py-1.5 hover:bg-secondary/90 shrink-0"
                 >
                   {copiedUrl ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                   {copiedUrl ? 'Copiado!' : 'Copiar'}
                 </button>
               </div>
-              <p className="text-[10px] text-white/30 mt-2">
+              <p className="text-[10px] text-muted mt-2">
                 UTMs: source=osi · medium={(draft.platforms?.[0] ?? draft.platform ?? 'organic').toLowerCase()} · campaign={draft.pillar_code ?? 'sem-pilar'} · content=post:{draft.id.slice(0, 8)}…
               </p>
             </div>
@@ -330,7 +330,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
                 )}
               </div>
             ) : (
-              <p className="text-[11px] text-white/30 mt-2">
+              <p className="text-[11px] text-muted mt-2">
                 Nenhuma venda atribuída a este post ainda. Vendas que entrarem pela URL acima aparecem aqui automaticamente.
               </p>
             )}
@@ -363,17 +363,17 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
           <Section title="Artes (links externos — Canva, Drive, etc.)">
             <div className="space-y-2">
               {(draft.arts ?? []).map((art, idx) => (
-                <div key={idx} className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg p-2">
-                  <select value={art.type} onChange={e => updateArt(idx, { type: e.target.value })} className="bg-transparent text-xs border border-white/10 rounded px-2 py-1">
+                <div key={idx} className="flex items-center gap-2 bg-surface-low border border-outline/10 p-2">
+                  <select value={art.type} onChange={e => updateArt(idx, { type: e.target.value })} className="bg-transparent text-xs border border-outline/10 px-2 py-1">
                     {ART_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
-                  <input value={art.format ?? ''} onChange={e => updateArt(idx, { format: e.target.value })} placeholder="1080x1080" className="bg-transparent text-xs border border-white/10 rounded px-2 py-1 w-24" />
-                  <input value={art.url} onChange={e => updateArt(idx, { url: e.target.value })} placeholder="https://canva.com/..." className="flex-1 bg-transparent text-xs border border-white/10 rounded px-2 py-1" />
-                  {art.url && <a href={art.url} target="_blank" rel="noreferrer" className="text-white/40 hover:text-white"><ExternalLink className="w-3.5 h-3.5" /></a>}
-                  <button onClick={() => removeArt(idx)} className="text-white/40 hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
+                  <input value={art.format ?? ''} onChange={e => updateArt(idx, { format: e.target.value })} placeholder="1080x1080" className="bg-transparent text-xs border border-outline/10 px-2 py-1 w-24" />
+                  <input value={art.url} onChange={e => updateArt(idx, { url: e.target.value })} placeholder="https://canva.com/..." className="flex-1 bg-transparent text-xs border border-outline/10 px-2 py-1" />
+                  {art.url && <a href={art.url} target="_blank" rel="noreferrer" className="text-muted hover:text-on-surface"><ExternalLink className="w-3.5 h-3.5" /></a>}
+                  <button onClick={() => removeArt(idx)} className="text-muted hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               ))}
-              <button onClick={addArt} className="flex items-center gap-1 text-xs text-[#06B6D4] hover:text-white">
+              <button onClick={addArt} className="flex items-center gap-1 text-xs text-secondary hover:text-on-surface">
                 <Plus className="w-3.5 h-3.5" /> Adicionar arte
               </button>
             </div>
@@ -392,7 +392,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
             <Field label="Ferramentas (separadas por vírgula)">
               <input value={(draft.tools_used ?? []).join(', ')} onChange={e => update({ tools_used: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} placeholder="Canva, CapCut" className={inputCls + ' mt-2'} />
             </Field>
-            <p className="text-[11px] text-white/30 mt-1">Sugestões: {TOOLS_SUGGESTIONS.join(' · ')}</p>
+            <p className="text-[11px] text-muted mt-1">Sugestões: {TOOLS_SUGGESTIONS.join(' · ')}</p>
           </Section>
 
           {/* Pós-publicação */}
@@ -440,12 +440,12 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
   );
 }
 
-const inputCls = 'w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#06B6D4]/50 text-white placeholder:text-white/30';
+const inputCls = 'w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-secondary/40 text-on-surface placeholder:text-muted';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <div className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-2">{title}</div>
+      <div className="text-[10px] uppercase tracking-widest font-bold text-muted mb-2">{title}</div>
       {children}
     </div>
   );
@@ -454,7 +454,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-[11px] text-white/50 block mb-1">{label}</label>
+      <label className="text-[11px] text-on-surface-variant block mb-1">{label}</label>
       {children}
     </div>
   );
@@ -462,8 +462,8 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function StatPill({ label, value, color, icon }: { label: string; value: string; color: string; icon?: React.ReactNode }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded px-2 py-1.5">
-      <div className="flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold text-white/40">
+    <div className="bg-surface-low border border-outline/10 px-2 py-1.5">
+      <div className="flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold text-muted">
         {icon} {label}
       </div>
       <div className="text-sm font-semibold mt-0.5" style={{ color }}>{value}</div>

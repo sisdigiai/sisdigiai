@@ -2,8 +2,8 @@ import type { CopyStatus } from '../../lib/copyStore';
 import { STATUS_LABELS } from '../../lib/copyStore';
 
 const statusStyles: Record<CopyStatus, string> = {
-  pendente: 'border-white/10 bg-white/5 text-white/60',
-  criado: 'border-[#06B6D4]/30 bg-[#06B6D4]/10 text-[#06B6D4]',
+  pendente: 'border-outline/10 bg-surface-low text-on-surface-variant',
+  criado: 'border-secondary/40 bg-secondary/15 text-secondary',
   aprovado: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300',
 };
 
@@ -24,7 +24,7 @@ export default function StatusSelector({ status, onChange }: Props) {
   return (
     <button
       onClick={cycle}
-      className={`text-xs font-bold px-2.5 py-1 rounded-md border transition-colors cursor-pointer ${statusStyles[status]}`}
+      className={`text-xs font-bold px-2.5 py-1 border transition-colors cursor-pointer ${statusStyles[status]}`}
       title={`Clique para mudar status (atual: ${STATUS_LABELS[status]})`}
     >
       {STATUS_LABELS[status]}

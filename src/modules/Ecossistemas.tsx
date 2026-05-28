@@ -17,8 +17,8 @@ const OWNER_LABEL: Record<string, string> = {
 const STATUS_STYLE: Record<string, { label: string; cls: string }> = {
   ativo:              { label: 'Ativo',       cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
   a_registrar:        { label: 'A registrar', cls: 'bg-amber-500/15 text-amber-300 border-amber-500/30' },
-  registrado_sem_uso: { label: 'Sem uso',     cls: 'bg-white/10 text-white/50 border-white/10' },
-  arquivado:          { label: 'Arquivado',   cls: 'bg-white/5 text-white/30 border-white/5' },
+  registrado_sem_uso: { label: 'Sem uso',     cls: 'bg-surface-high text-on-surface-variant border-outline/10' },
+  arquivado:          { label: 'Arquivado',   cls: 'bg-surface-low text-muted border-outline/10' },
 };
 
 export default function Ecossistemas() {
@@ -41,23 +41,23 @@ export default function Ecossistemas() {
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-          <Boxes className="w-7 h-7 text-[#06B6D4]" /> Ecossistemas
+        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3 font-serif">
+          <Boxes className="w-7 h-7 text-secondary" /> Ecossistemas
         </h1>
-        <p className="text-white/50 mt-1">
+        <p className="text-on-surface-variant mt-1">
           {assets === null ? 'Carregando…' : `${sites.length} apps · ${ativos} ativos`} · cada ecossistema tem banco, auth e deploy próprios{' '}
-          <span className="font-mono text-white/30">(ADR-0029)</span>
+          <span className="font-mono text-muted">(ADR-0029)</span>
         </p>
       </div>
 
-      {assets === null && <div className="text-sm text-white/40">Carregando ecossistemas do banco…</div>}
+      {assets === null && <div className="text-sm text-muted">Carregando ecossistemas do banco…</div>}
       {assets !== null && sites.length === 0 && (
-        <div className="text-sm text-white/40">Nenhum app registrado em ativos digitais.</div>
+        <div className="text-sm text-muted">Nenhum app registrado em ativos digitais.</div>
       )}
 
       {orderedKeys.map(key => (
         <div key={key} className="space-y-2">
-          <div className="text-[10px] font-mono uppercase tracking-widest text-white/40 px-1">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant px-1">
             {OWNER_LABEL[key] || key}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -70,24 +70,24 @@ export default function Ecossistemas() {
                   href={clickable ? s.valor! : undefined}
                   target={clickable ? '_blank' : undefined}
                   rel="noopener noreferrer"
-                  className={`block rounded-xl border border-white/8 bg-white/[0.02] p-4 transition-all duration-150 ${
-                    clickable ? 'hover:border-[#2563EB]/40 hover:bg-[#2563EB]/5' : 'cursor-default'
+                  className={`block border border-outline/10 bg-surface-low p-4 transition-all duration-150 ${
+                    clickable ? 'hover:border-secondary/40 hover:bg-secondary/15' : 'cursor-default'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <div className="font-semibold text-sm flex items-center gap-2">
-                        <Globe className="w-3.5 h-3.5 text-white/30 shrink-0" /> {s.rotulo}
+                        <Globe className="w-3.5 h-3.5 text-muted shrink-0" /> {s.rotulo}
                       </div>
-                      <div className="text-xs font-mono text-white/40 truncate mt-1">{s.valor}</div>
+                      <div className="text-xs font-mono text-muted truncate mt-1">{s.valor}</div>
                     </div>
-                    {clickable && <ExternalLink className="w-3.5 h-3.5 text-white/30 shrink-0" />}
+                    {clickable && <ExternalLink className="w-3.5 h-3.5 text-muted shrink-0" />}
                   </div>
                   <div className="flex items-center gap-2 mt-3">
-                    <span className={`text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded border ${st.cls}`}>
+                    <span className={`text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 border ${st.cls}`}>
                       {st.label}
                     </span>
-                    {s.provider && <span className="text-[9px] font-mono text-white/30">{s.provider}</span>}
+                    {s.provider && <span className="text-[9px] font-mono text-muted">{s.provider}</span>}
                   </div>
                 </a>
               );
@@ -96,7 +96,7 @@ export default function Ecossistemas() {
         </div>
       ))}
 
-      <div className="text-[11px] text-white/30 border-t border-white/5 pt-4">
+      <div className="text-[11px] text-muted border-t border-outline/10 pt-4">
         Fonte: <span className="font-mono">company.digital_assets</span> (vivo). Monitoramento de uptime/health real
         via UptimeRobot é pendência (R-016).
       </div>

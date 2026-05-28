@@ -54,7 +54,7 @@ export default function ImageUploader({ imageUrl, onUpload, onRemove }: Props) {
 
   if (imageUrl) {
     return (
-      <div className="relative w-28 h-28 rounded-xl overflow-hidden border border-white/10 group shrink-0">
+      <div className="relative w-28 h-28 overflow-hidden border border-outline/10 group shrink-0">
         <img src={imageUrl} alt="Criativo" className="w-full h-full object-cover" />
         <button
           onClick={async () => {
@@ -65,7 +65,7 @@ export default function ImageUploader({ imageUrl, onUpload, onRemove }: Props) {
           className="absolute top-1 right-1 w-6 h-6 bg-black/70 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
           title="Remover imagem"
         >
-          {loading ? <Loader2 size={12} className="animate-spin text-white" /> : <X size={12} className="text-white" />}
+          {loading ? <Loader2 size={12} className="animate-spin text-on-surface" /> : <X size={12} className="text-on-surface" />}
         </button>
       </div>
     );
@@ -78,18 +78,18 @@ export default function ImageUploader({ imageUrl, onUpload, onRemove }: Props) {
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
-        className={`w-28 h-28 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-colors ${
+        className={`w-28 h-28 border-2 border-dashed flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-colors ${
           dragOver
-            ? 'border-[#06B6D4] bg-[#06B6D4]/10'
-            : 'border-white/15 hover:border-white/30 bg-white/3'
+            ? 'border-secondary bg-secondary/15'
+            : 'border-outline/30 hover:border-outline/30 bg-surface-low'
         }`}
       >
         {loading ? (
-          <Loader2 size={18} className="animate-spin text-white/50" />
+          <Loader2 size={18} className="animate-spin text-on-surface-variant" />
         ) : (
           <>
-            <Upload size={16} className="text-white/30" />
-            <span className="text-[10px] text-white/30 text-center leading-tight">Arraste ou<br />clique</span>
+            <Upload size={16} className="text-muted" />
+            <span className="text-[10px] text-muted text-center leading-tight">Arraste ou<br />clique</span>
           </>
         )}
       </div>

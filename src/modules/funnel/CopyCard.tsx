@@ -32,16 +32,16 @@ export default function CopyCard({
   const extraCount = Math.max(0, asset.images.length - 1);
 
   return (
-    <div className="bg-[#0A0F1E] border border-white/8 rounded-xl p-4 flex gap-4">
+    <div className="bg-surface border border-outline/10 p-4 flex gap-4">
       {/* Content */}
       <div className="flex-1 min-w-0 space-y-2">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-white truncate">{asset.title}</p>
+            <p className="text-sm font-semibold text-on-surface truncate">{asset.title}</p>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-[10px] text-white/30 font-mono">{asset.format}</span>
+              <span className="text-[10px] text-muted font-mono">{asset.format}</span>
               {asset.angulo && (
-                <span className="text-[10px] text-[#06B6D4]/70 bg-[#06B6D4]/10 px-1.5 py-0.5 rounded">
+                <span className="text-[10px] text-secondary/70 bg-secondary/15 px-1.5 py-0.5 rounded">
                   {asset.angulo}
                 </span>
               )}
@@ -53,16 +53,16 @@ export default function CopyCard({
         {/* Copy preview */}
         <div className="space-y-1.5">
           {mainText && mainText !== bodyText && (
-            <p className="text-xs font-bold text-white/80 line-clamp-1">{mainText}</p>
+            <p className="text-xs font-bold text-on-surface line-clamp-1">{mainText}</p>
           )}
           {bodyText && (
-            <p className="text-xs text-white/50 line-clamp-2 leading-relaxed">{bodyText}</p>
+            <p className="text-xs text-on-surface-variant line-clamp-2 leading-relaxed">{bodyText}</p>
           )}
           {ctaText && (
-            <p className="text-xs text-[#06B6D4] font-medium">CTA: {ctaText}</p>
+            <p className="text-xs text-secondary font-medium">CTA: {ctaText}</p>
           )}
           {content.roteiro && (
-            <p className="text-xs text-white/40 italic line-clamp-2">
+            <p className="text-xs text-muted italic line-clamp-2">
               {content.roteiro.slice(0, 2).join(' | ')}...
             </p>
           )}
@@ -73,7 +73,7 @@ export default function CopyCard({
           <CopyButton content={content} asset={asset} />
           <button
             onClick={() => onExpand(asset)}
-            className="flex items-center gap-1 text-xs text-white/40 hover:text-white/70 transition-colors cursor-pointer"
+            className="flex items-center gap-1 text-xs text-muted hover:text-on-surface-variant transition-colors cursor-pointer"
           >
             <Maximize2 size={12} /> Expandir
           </button>
@@ -85,22 +85,22 @@ export default function CopyCard({
         <button
           type="button"
           onClick={() => onExpand(asset)}
-          className="relative w-28 h-28 rounded-xl overflow-hidden border border-white/10 group shrink-0 cursor-pointer hover:border-white/30 transition-colors"
+          className="relative w-28 h-28 overflow-hidden border border-outline/10 group shrink-0 cursor-pointer hover:border-outline/30 transition-colors"
           title={`${asset.images.length} imagens — clique para gerenciar`}
         >
           {firstImageUrl ? (
             <>
               <img src={firstImageUrl} alt="Imagem 1" className="w-full h-full object-cover" />
               {extraCount > 0 && (
-                <div className="absolute bottom-1 right-1 bg-black/80 text-white text-[10px] font-mono px-1.5 py-0.5 rounded-md flex items-center gap-1">
+                <div className="absolute bottom-1 right-1 bg-black/80 text-on-surface text-[10px] font-mono px-1.5 py-0.5 flex items-center gap-1">
                   <Images size={10} /> +{extraCount}
                 </div>
               )}
             </>
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-white/3 border-2 border-dashed border-white/15">
-              <Images size={16} className="text-white/30" />
-              <span className="text-[10px] text-white/30 text-center leading-tight">
+            <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-surface-low border-2 border-dashed border-outline/30">
+              <Images size={16} className="text-muted" />
+              <span className="text-[10px] text-muted text-center leading-tight">
                 Adicionar<br />imagens
               </span>
             </div>

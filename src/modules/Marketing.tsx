@@ -32,12 +32,12 @@ export default function Marketing() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="border-b border-white/5 px-8 py-5">
+      <div className="border-b border-outline/10 px-8 py-5">
         <div className="flex items-center gap-3 mb-1">
-          <Megaphone className="w-5 h-5 text-[#06B6D4]" />
+          <Megaphone className="w-5 h-5 text-secondary" />
           <h1 className="text-xl font-semibold">Marketing</h1>
         </div>
-        <p className="text-xs text-white/40">
+        <p className="text-xs text-muted">
           Calendário editorial + banco de ideias + materiais de afiliados + CRM de afiliados. Tudo num lugar só.
         </p>
       </div>
@@ -46,7 +46,7 @@ export default function Marketing() {
         <TravasBanner />
       </div>
 
-      <div className="border-b border-white/5 px-8">
+      <div className="border-b border-outline/10 px-8">
         <div className="flex gap-1 overflow-x-auto">
           {SUBTABS.map((tab) => {
             const Icon = tab.icon;
@@ -57,8 +57,8 @@ export default function Marketing() {
                 onClick={() => setActive(tab.id)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap
                   ${isActive
-                    ? 'border-[#06B6D4] text-white'
-                    : 'border-transparent text-white/40 hover:text-white/70'
+                    ? 'border-secondary text-on-surface'
+                    : 'border-transparent text-muted hover:text-on-surface-variant'
                   }`}
               >
                 <Icon className="w-4 h-4" />

@@ -83,28 +83,28 @@ export function PromptGeneratorModal({ source, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/70" />
-      <div className="relative m-auto w-full max-w-5xl h-[85vh] bg-[#0F1729] border border-white/10 rounded-xl overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+      <div className="absolute inset-0 bg-surface-lowest" />
+      <div className="relative m-auto w-full max-w-5xl h-[85vh] bg-surface-container border border-outline/10 overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
 
-        <div className="border-b border-white/10 px-6 py-4 flex items-center justify-between">
+        <div className="border-b border-outline/10 px-6 py-4 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#06B6D4]" />
+              <Sparkles className="w-4 h-4 text-secondary" />
               <h2 className="text-lg font-semibold">Gerar prompts para IA</h2>
             </div>
-            <p className="text-xs text-white/40 mt-1">{sourceLabel}</p>
+            <p className="text-xs text-muted mt-1">{sourceLabel}</p>
           </div>
-          <button onClick={onClose} className="p-2 text-white/60 hover:text-white"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-2 text-on-surface-variant hover:text-on-surface"><X className="w-5 h-5" /></button>
         </div>
 
         <div className="flex-1 grid grid-cols-[280px_1fr] overflow-hidden">
           {/* Lista de templates */}
-          <div className="border-r border-white/10 overflow-y-auto">
-            <div className="p-3 border-b border-white/10">
+          <div className="border-r border-outline/10 overflow-y-auto">
+            <div className="p-3 border-b border-outline/10">
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-xs focus:outline-none"
+                className="w-full bg-surface-low border border-outline/10 px-2 py-1.5 text-xs focus:outline-none"
               >
                 <option value="all">Todas categorias</option>
                 <option value="text">Texto</option>
@@ -115,23 +115,23 @@ export function PromptGeneratorModal({ source, onClose }: Props) {
               </select>
             </div>
             {loading ? (
-              <div className="p-4 text-xs text-white/40">Carregando...</div>
+              <div className="p-4 text-xs text-muted">Carregando...</div>
             ) : filtered.length === 0 ? (
-              <div className="p-4 text-xs text-white/40">Nenhum template.</div>
+              <div className="p-4 text-xs text-muted">Nenhum template.</div>
             ) : (
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-outline/10">
                 {filtered.map(t => (
                   <button
                     key={t.id}
                     onClick={() => handleSelect(t)}
-                    className={`w-full text-left px-3 py-3 hover:bg-white/5 transition-colors ${selected?.id === t.id ? 'bg-[#06B6D4]/10 border-l-2 border-[#06B6D4]' : 'border-l-2 border-transparent'}`}
+                    className={`w-full text-left px-3 py-3 hover:bg-surface-highest transition-colors ${selected?.id === t.id ? 'bg-secondary/15 border-l-2 border-secondary' : 'border-l-2 border-transparent'}`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-[10px] uppercase tracking-widest font-bold text-white/40">{CATEGORY_LABEL[t.category] ?? t.category}</span>
-                      <span className="text-[10px] text-[#06B6D4]">{TARGET_LABEL[t.ai_target] ?? t.ai_target}</span>
+                      <span className="text-[10px] uppercase tracking-widest font-bold text-muted">{CATEGORY_LABEL[t.category] ?? t.category}</span>
+                      <span className="text-[10px] text-secondary">{TARGET_LABEL[t.ai_target] ?? t.ai_target}</span>
                     </div>
-                    <div className="text-sm font-medium text-white mt-1">{t.name}</div>
-                    {t.description && <div className="text-[11px] text-white/40 mt-1 line-clamp-2">{t.description}</div>}
+                    <div className="text-sm font-medium text-on-surface mt-1">{t.name}</div>
+                    {t.description && <div className="text-[11px] text-muted mt-1 line-clamp-2">{t.description}</div>}
                   </button>
                 ))}
               </div>
@@ -141,10 +141,10 @@ export function PromptGeneratorModal({ source, onClose }: Props) {
           {/* Render */}
           <div className="overflow-y-auto p-6">
             {!selected ? (
-              <div className="h-full flex flex-col items-center justify-center text-center text-white/40">
+              <div className="h-full flex flex-col items-center justify-center text-center text-muted">
                 <Sparkles className="w-10 h-10 mb-3 opacity-30" />
                 <p className="text-sm">Escolha um template à esquerda.</p>
-                <p className="text-xs mt-2 text-white/30 max-w-md">
+                <p className="text-xs mt-2 text-muted max-w-md">
                   O prompt é renderizado com os dados do post/ideia + travas da marca (tom, paleta, restrições). Cole o resultado direto na IA escolhida.
                 </p>
               </div>
@@ -153,7 +153,7 @@ export function PromptGeneratorModal({ source, onClose }: Props) {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h3 className="text-base font-semibold">{selected.name}</h3>
-                    <p className="text-xs text-white/40 mt-1">{selected.description}</p>
+                    <p className="text-xs text-muted mt-1">{selected.description}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {TARGET_LINK[selected.ai_target] && (
@@ -161,7 +161,7 @@ export function PromptGeneratorModal({ source, onClose }: Props) {
                         href={TARGET_LINK[selected.ai_target]}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center gap-1 text-xs text-white/60 hover:text-white border border-white/10 rounded px-2 py-1"
+                        className="flex items-center gap-1 text-xs text-on-surface-variant hover:text-on-surface border border-outline/10 px-2 py-1"
                       >
                         Abrir {TARGET_LABEL[selected.ai_target]} <ExternalLink className="w-3 h-3" />
                       </a>
@@ -169,7 +169,7 @@ export function PromptGeneratorModal({ source, onClose }: Props) {
                     <button
                       onClick={handleCopy}
                       disabled={!rendered}
-                      className="flex items-center gap-1 text-xs bg-[#06B6D4] text-[#0A0F1E] font-medium px-3 py-1.5 rounded hover:bg-[#06B6D4]/90 disabled:opacity-50"
+                      className="flex items-center gap-1 text-xs bg-secondary text-surface font-medium px-3 py-1.5 hover:bg-secondary/90 disabled:opacity-50"
                     >
                       {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                       {copied ? 'Copiado!' : 'Copiar prompt'}
@@ -178,30 +178,30 @@ export function PromptGeneratorModal({ source, onClose }: Props) {
                 </div>
 
                 {selected.output_hint && (
-                  <div className="text-[11px] bg-[#06B6D4]/10 border border-[#06B6D4]/20 rounded p-2 text-[#06B6D4]">
+                  <div className="text-[11px] bg-secondary/15 border border-secondary/40 p-2 text-secondary">
                     {selected.output_hint}
                   </div>
                 )}
 
                 {rendering ? (
-                  <div className="flex items-center gap-2 text-sm text-white/60 py-8">
+                  <div className="flex items-center gap-2 text-sm text-on-surface-variant py-8">
                     <Loader2 className="w-4 h-4 animate-spin" /> Renderizando...
                   </div>
                 ) : rendered ? (
                   <>
                     <div>
-                      <div className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-2">Prompt renderizado</div>
-                      <pre className="text-xs text-white/80 bg-black/40 border border-white/10 rounded p-3 whitespace-pre-wrap font-mono max-h-[40vh] overflow-y-auto">{rendered.rendered_prompt}</pre>
+                      <div className="text-[10px] uppercase tracking-widest font-bold text-muted mb-2">Prompt renderizado</div>
+                      <pre className="text-xs text-on-surface bg-surface-lowest border border-outline/10 p-3 whitespace-pre-wrap font-mono max-h-[40vh] overflow-y-auto">{rendered.rendered_prompt}</pre>
                     </div>
 
                     {Object.keys(rendered.vars_used).length > 0 && (
-                      <details className="bg-white/[0.02] border border-white/5 rounded p-3">
-                        <summary className="text-[10px] uppercase tracking-widest font-bold text-white/40 cursor-pointer">Variáveis usadas ({Object.keys(rendered.vars_used).length})</summary>
+                      <details className="bg-surface-low border border-outline/10 p-3">
+                        <summary className="text-[10px] uppercase tracking-widest font-bold text-muted cursor-pointer">Variáveis usadas ({Object.keys(rendered.vars_used).length})</summary>
                         <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[11px]">
                           {Object.entries(rendered.vars_used).map(([k, v]) => (
                             <div key={k} className="flex gap-2">
-                              <span className="text-[#06B6D4] font-mono">{k}:</span>
-                              <span className="text-white/60 truncate">{String(v).slice(0, 80)}</span>
+                              <span className="text-secondary font-mono">{k}:</span>
+                              <span className="text-on-surface-variant truncate">{String(v).slice(0, 80)}</span>
                             </div>
                           ))}
                         </div>
@@ -209,7 +209,7 @@ export function PromptGeneratorModal({ source, onClose }: Props) {
                     )}
                   </>
                 ) : (
-                  <div className="text-xs text-white/40 py-8">Falha ao renderizar — veja console.</div>
+                  <div className="text-xs text-muted py-8">Falha ao renderizar — veja console.</div>
                 )}
               </div>
             )}

@@ -121,19 +121,19 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
 
   return (
     <div className="fixed inset-0 z-[60] flex" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/70" />
-      <div className="relative ml-auto w-full max-w-4xl h-full bg-[#0F1729] border-l border-white/10 overflow-y-auto" onClick={e => e.stopPropagation()}>
+      <div className="absolute inset-0 bg-surface-lowest" />
+      <div className="relative ml-auto w-full max-w-4xl h-full bg-surface-container border-l border-outline/10 overflow-y-auto" onClick={e => e.stopPropagation()}>
 
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-[#0F1729] border-b border-white/10 px-6 py-4 flex items-center justify-between">
+        <div className="sticky top-0 z-10 bg-surface-container border-b border-outline/10 px-6 py-4 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#06B6D4]" />
+              <Sparkles className="w-4 h-4 text-secondary" />
               <h2 className="text-lg font-semibold">Produzir post</h2>
             </div>
-            <p className="text-xs text-white/40 mt-1 truncate max-w-xl">{post.hook ?? '(sem hook)'}</p>
+            <p className="text-xs text-muted mt-1 truncate max-w-xl">{post.hook ?? '(sem hook)'}</p>
           </div>
-          <button onClick={onClose} className="p-2 text-white/60 hover:text-white"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-2 text-on-surface-variant hover:text-on-surface"><X className="w-5 h-5" /></button>
         </div>
 
         {/* Stepper */}
@@ -147,20 +147,20 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
                 <div key={s.id} className="flex items-center flex-1">
                   <button
                     onClick={() => { setStep(s.id); setSelectedTemplate(null); }}
-                    className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border ${
-                      isCurrent ? 'border-white/40 bg-white/5' : 'border-white/10 hover:bg-white/[0.03]'
+                    className={`flex-1 flex items-center gap-2 px-3 py-2 border ${
+                      isCurrent ? 'border-outline/30 bg-surface-low' : 'border-outline/10 hover:bg-surface-low'
                     }`}
                   >
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${done ? '' : 'bg-white/10 text-white/40'}`}
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${done ? '' : 'bg-surface-high text-muted'}`}
                       style={done ? { background: s.color, color: '#0A0F1E' } : {}}>
                       {done ? <Check className="w-3.5 h-3.5" /> : s.id}
                     </div>
                     <div className="text-left min-w-0">
                       <div className="text-xs font-semibold truncate">{s.label}</div>
-                      <div className="text-[10px] text-white/40">{stepDoneCount(s)} outputs</div>
+                      <div className="text-[10px] text-muted">{stepDoneCount(s)} outputs</div>
                     </div>
                   </button>
-                  {i < STEPS.length - 1 && <ArrowRight className="w-3 h-3 text-white/20 shrink-0" />}
+                  {i < STEPS.length - 1 && <ArrowRight className="w-3 h-3 text-muted shrink-0" />}
                 </div>
               );
             })}
@@ -173,7 +173,7 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
           {!selectedTemplate && (
             <>
               <div>
-                <div className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-2">
+                <div className="text-[10px] uppercase tracking-widest font-bold text-muted mb-2">
                   Escolha o template ({currentStep.label})
                 </div>
                 <div className="grid grid-cols-2 gap-2">
@@ -181,14 +181,14 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
                     <button
                       key={t.id}
                       onClick={() => handlePick(t)}
-                      className="bg-white/5 border border-white/10 rounded-lg p-3 text-left hover:bg-white/[0.08] border-l-4"
+                      className="bg-surface-low border border-outline/10 p-3 text-left hover:bg-surface-highest border-l-4"
                       style={{ borderLeftColor: currentStep.color }}
                     >
                       <div className="flex items-center justify-between gap-2 mb-1">
                         <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: currentStep.color }}>{t.ai_target}</span>
                       </div>
                       <div className="text-sm font-medium">{t.name}</div>
-                      {t.description && <div className="text-[11px] text-white/40 mt-1 line-clamp-2">{t.description}</div>}
+                      {t.description && <div className="text-[11px] text-muted mt-1 line-clamp-2">{t.description}</div>}
                     </button>
                   ))}
                 </div>
@@ -197,21 +197,21 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
               {/* Outputs já feitos nesse step */}
               {stepOutputs.length > 0 && (
                 <div>
-                  <div className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-2">
+                  <div className="text-[10px] uppercase tracking-widest font-bold text-muted mb-2">
                     Já produzido ({stepOutputs.length})
                   </div>
                   <div className="space-y-2">
                     {stepOutputs.map(o => (
-                      <div key={o.id} className="bg-white/5 border border-white/10 rounded p-3">
+                      <div key={o.id} className="bg-surface-low border border-outline/10 p-3">
                         <div className="flex items-center justify-between gap-2 mb-1">
-                          <span className="text-[10px] uppercase tracking-widest font-bold text-white/60">
+                          <span className="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">
                             {o.template_name ?? o.template_code} · {o.ai_provider}
                           </span>
-                          <span className="text-[10px] text-white/30">{new Date(o.generated_at).toLocaleString('pt-BR')}</span>
+                          <span className="text-[10px] text-muted">{new Date(o.generated_at).toLocaleString('pt-BR')}</span>
                         </div>
-                        {o.output_text && <pre className="text-[11px] text-white/70 whitespace-pre-wrap font-sans mt-1 max-h-32 overflow-y-auto">{o.output_text.slice(0, 400)}{o.output_text.length > 400 ? '…' : ''}</pre>}
+                        {o.output_text && <pre className="text-[11px] text-on-surface-variant whitespace-pre-wrap font-sans mt-1 max-h-32 overflow-y-auto">{o.output_text.slice(0, 400)}{o.output_text.length > 400 ? '…' : ''}</pre>}
                         {o.output_url && (
-                          <a href={o.output_url} target="_blank" rel="noreferrer" className="text-xs text-[#06B6D4] flex items-center gap-1 mt-2">
+                          <a href={o.output_url} target="_blank" rel="noreferrer" className="text-xs text-secondary flex items-center gap-1 mt-2">
                             <ExternalLink className="w-3 h-3" /> Abrir arte
                           </a>
                         )}
@@ -228,55 +228,55 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
             <>
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold">{selectedTemplate.name}</h3>
-                <button onClick={() => setSelectedTemplate(null)} className="text-xs text-white/40 hover:text-white">
+                <button onClick={() => setSelectedTemplate(null)} className="text-xs text-muted hover:text-on-surface">
                   ← Voltar
                 </button>
               </div>
 
               {/* Prompt + copiar */}
-              <div className="bg-black/40 border border-white/10 rounded-lg p-3">
+              <div className="bg-surface-lowest border border-outline/10 p-3">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] uppercase tracking-widest font-bold text-white/40">
+                  <span className="text-[10px] uppercase tracking-widest font-bold text-muted">
                     Prompt pronto pra colar em {selectedTemplate.ai_target}
                   </span>
                   <div className="flex items-center gap-2">
                     {AI_LINKS[selectedTemplate.ai_target] && (
                       <a href={AI_LINKS[selectedTemplate.ai_target]} target="_blank" rel="noreferrer"
-                        className="flex items-center gap-1 text-[11px] text-white/60 hover:text-white border border-white/10 rounded px-2 py-1">
+                        className="flex items-center gap-1 text-[11px] text-on-surface-variant hover:text-on-surface border border-outline/10 px-2 py-1">
                         Abrir {selectedTemplate.ai_target} <ExternalLink className="w-3 h-3" />
                       </a>
                     )}
                     <button onClick={handleCopy}
-                      className="flex items-center gap-1 text-[11px] bg-[#06B6D4] text-[#0A0F1E] font-medium px-3 py-1.5 rounded hover:bg-[#06B6D4]/90">
+                      className="flex items-center gap-1 text-[11px] bg-secondary text-surface font-medium px-3 py-1.5 hover:bg-secondary/90">
                       {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                       {copied ? 'Copiado!' : 'Copiar'}
                     </button>
                   </div>
                 </div>
-                <pre className="text-[11px] text-white/70 whitespace-pre-wrap font-mono max-h-48 overflow-y-auto">{renderedPrompt}</pre>
+                <pre className="text-[11px] text-on-surface-variant whitespace-pre-wrap font-mono max-h-48 overflow-y-auto">{renderedPrompt}</pre>
               </div>
 
               {/* Área de resposta */}
               {currentStep.category === 'text' && (
                 <div>
-                  <label className="text-xs text-white/70 block mb-1">Cole aqui a resposta da {selectedTemplate.ai_target}:</label>
+                  <label className="text-xs text-on-surface-variant block mb-1">Cole aqui a resposta da {selectedTemplate.ai_target}:</label>
                   <textarea value={outputText} onChange={e => setOutputText(e.target.value)} rows={10}
                     placeholder='Ctrl+V depois de copiar a resposta no ChatGPT/Claude'
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#06B6D4]/50 text-white font-mono" />
+                    className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-xs focus:outline-none focus:border-secondary/40 text-on-surface font-mono" />
                 </div>
               )}
 
               {(currentStep.category === 'image' || currentStep.category === 'video' || currentStep.category === 'audio') && (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-white/70 block mb-1">URL da arte / vídeo / áudio gerado:</label>
+                    <label className="text-xs text-on-surface-variant block mb-1">URL da arte / vídeo / áudio gerado:</label>
                     <input value={outputUrl} onChange={e => setOutputUrl(e.target.value)}
                       placeholder='https://i.imgur.com/... ou Canva/Drive'
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs focus:outline-none text-white" />
+                      className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-xs focus:outline-none text-on-surface" />
                   </div>
                   <div>
-                    <label className="text-xs text-white/70 block mb-1">OU upload direto (até 50MB):</label>
-                    <label className="flex items-center justify-center gap-2 w-full bg-white/5 border border-dashed border-white/20 rounded-lg px-3 py-2 text-xs text-white/60 hover:bg-white/[0.08] cursor-pointer">
+                    <label className="text-xs text-on-surface-variant block mb-1">OU upload direto (até 50MB):</label>
+                    <label className="flex items-center justify-center gap-2 w-full bg-surface-low border border-dashed border-outline/30 px-3 py-2 text-xs text-on-surface-variant hover:bg-surface-highest cursor-pointer">
                       {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
                       {uploading ? 'Subindo...' : 'Escolher arquivo'}
                       <input type="file" className="hidden" onChange={handleUpload}
@@ -284,22 +284,22 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
                     </label>
                   </div>
                   <div className="col-span-2">
-                    <label className="text-xs text-white/70 block mb-1">Notas (opcional):</label>
+                    <label className="text-xs text-on-surface-variant block mb-1">Notas (opcional):</label>
                     <textarea value={outputText} onChange={e => setOutputText(e.target.value)} rows={2}
                       placeholder='Ex: usei a 3ª variação do Midjourney'
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white" />
+                      className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-xs text-on-surface" />
                   </div>
                 </div>
               )}
 
               {/* Salvar */}
-              <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+              <div className="flex items-center gap-2 pt-2 border-t border-outline/10">
                 <button onClick={handleSave} disabled={saving || (!outputText.trim() && !outputUrl.trim())}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#10B981] text-[#0A0F1E] font-medium rounded-lg hover:bg-[#10B981]/90 text-sm disabled:opacity-50">
+                  className="flex items-center gap-2 px-4 py-2 bg-[#10B981] text-[#0A0F1E] font-medium hover:bg-[#10B981]/90 text-sm disabled:opacity-50">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                   Salvar output
                 </button>
-                <span className="text-[11px] text-white/40">
+                <span className="text-[11px] text-muted">
                   Vai pra "Já produzido" desse step e dispara pipeline auto.
                 </span>
               </div>
@@ -308,14 +308,14 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
 
           {/* Navegação steps */}
           {!selectedTemplate && (
-            <div className="flex items-center justify-between pt-4 border-t border-white/5">
+            <div className="flex items-center justify-between pt-4 border-t border-outline/10">
               <button onClick={() => setStep(Math.max(1, step - 1))} disabled={step === 1}
-                className="flex items-center gap-1 text-xs text-white/60 hover:text-white px-3 py-1.5 disabled:opacity-30">
+                className="flex items-center gap-1 text-xs text-on-surface-variant hover:text-on-surface px-3 py-1.5 disabled:opacity-30">
                 <ArrowLeft className="w-3 h-3" /> Anterior
               </button>
-              <span className="text-xs text-white/40">Step {step} de {STEPS.length}</span>
+              <span className="text-xs text-muted">Step {step} de {STEPS.length}</span>
               <button onClick={() => setStep(Math.min(STEPS.length, step + 1))} disabled={step === STEPS.length}
-                className="flex items-center gap-1 text-xs text-white/60 hover:text-white px-3 py-1.5 disabled:opacity-30">
+                className="flex items-center gap-1 text-xs text-on-surface-variant hover:text-on-surface px-3 py-1.5 disabled:opacity-30">
                 Próximo <ArrowRight className="w-3 h-3" />
               </button>
             </div>

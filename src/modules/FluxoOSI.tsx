@@ -36,8 +36,8 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
   }, []);
 
   const Card = ({ icon, etapa, titulo, children }: { icon: React.ReactNode; etapa: string; titulo: string; children: React.ReactNode }) => (
-    <div className="flex-1 min-w-[200px] rounded-2xl border border-white/8 bg-white/[0.02] p-5">
-      <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-white/30 mb-2">
+    <div className="flex-1 min-w-[200px] border border-outline/10 bg-surface-low p-5">
+      <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-muted mb-2">
         {icon} {etapa}
       </div>
       <div className="font-bold text-base mb-3">{titulo}</div>
@@ -47,13 +47,13 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
 
   const Metric = ({ label, value }: { label: string; value: string }) => (
     <div className="flex justify-between gap-2">
-      <span className="text-white/40">{label}</span>
-      <span className="text-white/85 font-medium text-right">{value}</span>
+      <span className="text-muted">{label}</span>
+      <span className="text-on-surface font-medium text-right">{value}</span>
     </div>
   );
 
   const Arrow = () => (
-    <div className="flex items-center justify-center text-white/20 py-2 md:py-0">
+    <div className="flex items-center justify-center text-muted py-2 md:py-0">
       <ArrowRight className="w-5 h-5 hidden md:block" />
       <ArrowRight className="w-5 h-5 md:hidden rotate-90" />
     </div>
@@ -62,13 +62,13 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-          <Workflow className="w-7 h-7 text-[#06B6D4]" /> Fluxo OSI
+        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3 font-serif">
+          <Workflow className="w-7 h-7 text-secondary" /> Fluxo OSI
         </h1>
-        <p className="text-white/50 mt-1">
+        <p className="text-on-surface-variant mt-1">
           A espinha que conecta os três módulos em torno da Ótica Sem Improviso:
-          <b className="text-white/70"> produto</b> (Academy) → <b className="text-white/70">captação</b> (Funil) →
-          <b className="text-white/70"> distribuição</b> (Marketing) → <b className="text-[#06B6D4]">Clearix</b>.
+          <b className="text-on-surface-variant"> produto</b> (Academy) → <b className="text-on-surface-variant">captação</b> (Funil) →
+          <b className="text-on-surface-variant"> distribuição</b> (Marketing) → <b className="text-secondary">Clearix</b>.
         </p>
       </div>
 
@@ -78,7 +78,7 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
         <Card icon={<BookOpen className="w-3.5 h-3.5" />} etapa="Produto · Academy" titulo={s.produto?.nome || '…'}>
           <Metric label="Preço" value={brl(s.produto?.preco)} />
           <Metric label="Status" value={s.produto?.status || '—'} />
-          <button onClick={() => onNavigate?.('academy')} className="text-[11px] text-[#06B6D4]/70 hover:text-[#06B6D4] pt-1 transition-colors">Abrir Academy →</button>
+          <button onClick={() => onNavigate?.('academy')} className="text-[11px] text-secondary hover:text-secondary pt-1 transition-colors">Abrir Academy →</button>
         </Card>
 
         <Arrow />
@@ -86,7 +86,7 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
         <Card icon={<Flame className="w-3.5 h-3.5" />} etapa="Captação · Funil OSI" titulo="Isca paga + esteira">
           <Metric label="Ticket médio" value={s.funil ? brl(s.funil.ticket) : '…'} />
           <Metric label="ROAS microteste" value={s.funil ? s.funil.roas.toFixed(2) : '…'} />
-          <button onClick={() => onNavigate?.('funil')} className="text-[11px] text-[#06B6D4]/70 hover:text-[#06B6D4] pt-1 transition-colors">Abrir Funil OSI →</button>
+          <button onClick={() => onNavigate?.('funil')} className="text-[11px] text-secondary hover:text-secondary pt-1 transition-colors">Abrir Funil OSI →</button>
         </Card>
 
         <Arrow />
@@ -95,20 +95,20 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
           <Metric label="Posts no calendário" value={s.mkt ? String(s.mkt.posts) : '…'} />
           <Metric label="Ideias no banco" value={s.mkt ? String(s.mkt.ideias) : '…'} />
           <Metric label="Afiliados" value={s.mkt ? String(s.mkt.afiliados) : '…'} />
-          <button onClick={() => onNavigate?.('marketing')} className="text-[11px] text-[#06B6D4]/70 hover:text-[#06B6D4] pt-1 transition-colors">Abrir Marketing →</button>
+          <button onClick={() => onNavigate?.('marketing')} className="text-[11px] text-secondary hover:text-secondary pt-1 transition-colors">Abrir Marketing →</button>
         </Card>
       </div>
 
-      <button onClick={() => onNavigate?.('clearix')} className="w-full text-left rounded-2xl border border-[#2563EB]/20 bg-[#2563EB]/[0.06] hover:bg-[#2563EB]/[0.12] p-5 flex items-center gap-3 transition-colors">
-        <Boxes className="w-5 h-5 text-[#06B6D4] shrink-0" />
-        <div className="text-sm text-white/70">
-          <b className="text-white">Destino: Clearix.</b> Academy/OSI são funil de entrada do ecossistema (decisão 17/04) —
+      <button onClick={() => onNavigate?.('clearix')} className="w-full text-left border border-secondary/40 bg-secondary-container/40 hover:bg-secondary-container/60 p-5 flex items-center gap-3 transition-colors">
+        <Boxes className="w-5 h-5 text-secondary shrink-0" />
+        <div className="text-sm text-on-surface-variant">
+          <b className="text-on-surface">Destino: Clearix.</b> Academy/OSI são funil de entrada do ecossistema (decisão 17/04) —
           todo conteúdo do Marketing e toda venda do Funil devem puxar o comprador pro Clearix. É a trava
-          <b className="text-white/85"> "CTA pro Clearix em tudo"</b>. <span className="text-[#06B6D4]">Abrir Central Clearix →</span>
+          <b className="text-on-surface"> "CTA pro Clearix em tudo"</b>. <span className="text-secondary">Abrir Central Clearix →</span>
         </div>
       </button>
 
-      <div className="text-[11px] text-white/30 border-t border-white/5 pt-4">
+      <div className="text-[11px] text-muted border-t border-outline/10 pt-4">
         Fonte viva: <span className="font-mono">academy.products</span> + funil (workspace local) +
         <span className="font-mono"> marketing.content_calendar/ideas/affiliates</span>. Esta é a visão consolidada;
         a edição continua em cada módulo.

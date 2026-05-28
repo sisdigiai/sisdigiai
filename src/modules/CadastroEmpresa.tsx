@@ -23,8 +23,8 @@ export default function CadastroEmpresa() {
       <header className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold">Cadastro Empresa</h1>
-            <p className="text-slate-400 mt-1">
+            <h1 className="text-3xl font-bold font-serif">Cadastro Empresa</h1>
+            <p className="text-muted mt-1">
               Registro único e canônico da DIGIAI — dados reais usados em contratos, propostas e snapshots para agentes.
             </p>
           </div>
@@ -35,20 +35,20 @@ export default function CadastroEmpresa() {
             </span>
             <button
               onClick={() => companyStore.downloadExport('json')}
-              className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-md text-sm flex items-center gap-2"
+              className="px-3 py-1.5 bg-surface-high hover:bg-surface-highest text-sm flex items-center gap-2"
             >
               <Download size={14} /> JSON
             </button>
             <button
               onClick={() => companyStore.downloadExport('md')}
-              className="px-3 py-1.5 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm flex items-center gap-2"
+              className="px-3 py-1.5 bg-secondary hover:bg-secondary/90 text-surface text-sm flex items-center gap-2"
             >
               <Download size={14} /> Markdown
             </button>
           </div>
         </div>
 
-        <nav className="flex gap-1 border-b border-slate-800">
+        <nav className="flex gap-1 border-b border-outline/10">
           {TABS.map((t) => {
             const Icon = t.icon;
             return (
@@ -57,8 +57,8 @@ export default function CadastroEmpresa() {
                 onClick={() => setTab(t.id)}
                 className={`px-4 py-3 text-sm font-medium flex items-center gap-2 border-b-2 transition-colors ${
                   tab === t.id
-                    ? 'border-[#06B6D4] text-white'
-                    : 'border-transparent text-slate-400 hover:text-white'
+                    ? 'border-secondary text-on-surface'
+                    : 'border-transparent text-muted hover:text-on-surface'
                 }`}
               >
                 <Icon size={16} /> {t.label}
@@ -85,13 +85,13 @@ function Field({ label, children, col = 1 }: { label: string; children: React.Re
   const colClass = col === 3 ? 'md:col-span-3' : col === 2 ? 'md:col-span-2' : '';
   return (
     <div className={colClass}>
-      <label className="block text-xs font-medium text-slate-400 mb-1.5">{label}</label>
+      <label className="block text-xs font-medium text-muted mb-1.5">{label}</label>
       {children}
     </div>
   );
 }
 
-const inputClass = 'w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-[#06B6D4]';
+const inputClass = 'w-full bg-surface-lowest border border-outline/30 px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-secondary/40';
 const selectClass = inputClass;
 
 // =========== Tab 1: Identidade Legal ===========
@@ -249,7 +249,7 @@ function IdentidadeTab() {
       </section>
 
       <div className="flex items-center gap-4">
-        <button onClick={save} className="px-6 py-2.5 bg-[#2563EB] hover:bg-blue-600 rounded-md font-medium">
+        <button onClick={save} className="px-6 py-2.5 bg-secondary hover:bg-secondary/90 text-surface font-medium">
           Salvar
         </button>
         {saved && <span className="text-green-400 text-sm">✓ Salvo</span>}
@@ -274,7 +274,7 @@ function ContatosTab() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-semibold">Contatos profissionais</h2>
-        <button onClick={() => setEditing(newContact())} className="px-3 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm flex items-center gap-2">
+        <button onClick={() => setEditing(newContact())} className="px-3 py-2 bg-secondary hover:bg-secondary/90 text-surface text-sm flex items-center gap-2">
           <Plus size={14} /> Novo contato
         </button>
       </div>
@@ -289,21 +289,21 @@ function ContatosTab() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {contacts.map((c) => (
-          <div key={c.id} className="bg-slate-900 border border-slate-800 rounded-lg p-4">
+          <div key={c.id} className="bg-surface-lowest border border-outline/10 p-4">
             <div className="flex justify-between items-start mb-2">
               <div>
-                <div className="text-xs uppercase text-[#06B6D4] font-semibold">{c.tipo}</div>
+                <div className="text-xs uppercase text-secondary font-semibold">{c.tipo}</div>
                 <div className="font-semibold">{c.nome}</div>
-                {c.empresa && <div className="text-sm text-slate-400">{c.empresa}</div>}
+                {c.empresa && <div className="text-sm text-muted">{c.empresa}</div>}
               </div>
               <div className="flex gap-1">
-                <button onClick={() => setEditing(c)} className="p-1.5 hover:bg-slate-800 rounded">✎</button>
-                <button onClick={() => c.id && companyStore.deleteContact(c.id).then(load)} className="p-1.5 hover:bg-slate-800 rounded text-red-400">
+                <button onClick={() => setEditing(c)} className="p-1.5 hover:bg-surface-highest">✎</button>
+                <button onClick={() => c.id && companyStore.deleteContact(c.id).then(load)} className="p-1.5 hover:bg-surface-highest text-red-400">
                   <Trash2 size={14} />
                 </button>
               </div>
             </div>
-            <div className="text-sm text-slate-300 space-y-1">
+            <div className="text-sm text-on-surface-variant space-y-1">
               {c.email && <div>📧 {c.email}</div>}
               {c.telefone && <div>📞 {c.telefone}</div>}
               {c.custo_mensal_brl && <div>R$ {c.custo_mensal_brl}/mês</div>}
@@ -313,7 +313,7 @@ function ContatosTab() {
       </div>
 
       {contacts.length === 0 && !editing && (
-        <div className="text-center py-12 text-slate-500 border-2 border-dashed border-slate-800 rounded-lg">
+        <div className="text-center py-12 text-muted border-2 border-dashed border-outline/10">
           Nenhum contato cadastrado ainda. Clique em "Novo contato" para começar.
         </div>
       )}
@@ -324,7 +324,7 @@ function ContatosTab() {
 function ContactForm({ contact, onSave, onCancel }: { contact: CompanyContact; onSave: (c: CompanyContact) => void; onCancel: () => void }) {
   const [c, setC] = useState(contact);
   return (
-    <div className="bg-slate-900 border border-[#06B6D4] rounded-lg p-5 mb-6">
+    <div className="bg-surface-lowest border border-secondary/40 p-5 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Field label="Tipo">
           <select className={selectClass} value={c.tipo} onChange={(e) => setC({ ...c, tipo: e.target.value as any })}>
@@ -365,8 +365,8 @@ function ContactForm({ contact, onSave, onCancel }: { contact: CompanyContact; o
         </Field>
       </div>
       <div className="flex gap-2 mt-4">
-        <button onClick={() => onSave(c)} className="px-4 py-2 bg-[#2563EB] rounded-md text-sm">Salvar</button>
-        <button onClick={onCancel} className="px-4 py-2 bg-slate-700 rounded-md text-sm">Cancelar</button>
+        <button onClick={() => onSave(c)} className="px-4 py-2 bg-secondary text-surface text-sm">Salvar</button>
+        <button onClick={onCancel} className="px-4 py-2 bg-surface-high text-sm">Cancelar</button>
       </div>
     </div>
   );
@@ -386,7 +386,7 @@ function DigitalTab() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-semibold">Identidade digital (domínios, emails, redes, sites)</h2>
-        <button onClick={() => setEditing(newAsset())} className="px-3 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm flex items-center gap-2">
+        <button onClick={() => setEditing(newAsset())} className="px-3 py-2 bg-secondary hover:bg-secondary/90 text-surface text-sm flex items-center gap-2">
           <Plus size={14} /> Novo item
         </button>
       </div>
@@ -397,7 +397,7 @@ function DigitalTab() {
 
       <table className="w-full text-sm">
         <thead>
-          <tr className="text-left text-xs text-slate-400 border-b border-slate-800">
+          <tr className="text-left text-xs text-muted border-b border-outline/10">
             <th className="py-2">Categoria</th>
             <th>Rótulo</th>
             <th>Valor</th>
@@ -409,16 +409,16 @@ function DigitalTab() {
         </thead>
         <tbody>
           {assets.map((a) => (
-            <tr key={a.id} className="border-b border-slate-900 hover:bg-slate-900/50">
-              <td className="py-3 text-[#06B6D4]">{a.categoria}</td>
+            <tr key={a.id} className="border-b border-outline/10 hover:bg-surface-lowest/50">
+              <td className="py-3 text-secondary">{a.categoria}</td>
               <td className="font-medium">{a.rotulo}</td>
-              <td className="text-slate-300">{a.valor || '—'}</td>
-              <td className="text-slate-400">{a.owner_product || '—'}</td>
-              <td><span className={`text-xs px-2 py-0.5 rounded ${a.status === 'ativo' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{a.status}</span></td>
+              <td className="text-on-surface-variant">{a.valor || '—'}</td>
+              <td className="text-muted">{a.owner_product || '—'}</td>
+              <td><span className={`text-xs px-2 py-0.5 ${a.status === 'ativo' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{a.status}</span></td>
               <td>{a.custo_mensal_brl ? `R$ ${a.custo_mensal_brl}/mês` : '—'}</td>
               <td className="flex gap-1 py-3">
-                <button onClick={() => setEditing(a)} className="p-1 hover:bg-slate-800 rounded">✎</button>
-                <button onClick={() => a.id && companyStore.deleteDigitalAsset(a.id).then(load)} className="p-1 hover:bg-slate-800 rounded text-red-400">
+                <button onClick={() => setEditing(a)} className="p-1 hover:bg-surface-highest">✎</button>
+                <button onClick={() => a.id && companyStore.deleteDigitalAsset(a.id).then(load)} className="p-1 hover:bg-surface-highest text-red-400">
                   <Trash2 size={14} />
                 </button>
               </td>
@@ -427,7 +427,7 @@ function DigitalTab() {
         </tbody>
       </table>
       {assets.length === 0 && !editing && (
-        <div className="text-center py-12 text-slate-500 border-2 border-dashed border-slate-800 rounded-lg">
+        <div className="text-center py-12 text-muted border-2 border-dashed border-outline/10">
           Nenhum ativo digital cadastrado.
         </div>
       )}
@@ -438,7 +438,7 @@ function DigitalTab() {
 function DigitalForm({ asset, onSave, onCancel }: { asset: DigitalAsset; onSave: (a: DigitalAsset) => void; onCancel: () => void }) {
   const [a, setA] = useState(asset);
   return (
-    <div className="bg-slate-900 border border-[#06B6D4] rounded-lg p-5 mb-6">
+    <div className="bg-surface-lowest border border-secondary/40 p-5 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Field label="Categoria">
           <select className={selectClass} value={a.categoria} onChange={(e) => setA({ ...a, categoria: e.target.value as any })}>
@@ -485,8 +485,8 @@ function DigitalForm({ asset, onSave, onCancel }: { asset: DigitalAsset; onSave:
         </Field>
       </div>
       <div className="flex gap-2 mt-4">
-        <button onClick={() => onSave(a)} className="px-4 py-2 bg-[#2563EB] rounded-md text-sm">Salvar</button>
-        <button onClick={onCancel} className="px-4 py-2 bg-slate-700 rounded-md text-sm">Cancelar</button>
+        <button onClick={() => onSave(a)} className="px-4 py-2 bg-secondary text-surface text-sm">Salvar</button>
+        <button onClick={onCancel} className="px-4 py-2 bg-surface-high text-sm">Cancelar</button>
       </div>
     </div>
   );
@@ -510,9 +510,9 @@ function FerramentasTab() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-lg font-semibold">Ferramentas pagas</h2>
-          <p className="text-sm text-slate-400">Total mensal ativo: <span className="text-[#06B6D4] font-semibold">R$ {totalMensal.toFixed(2)}</span></p>
+          <p className="text-sm text-muted">Total mensal ativo: <span className="text-secondary font-semibold">R$ {totalMensal.toFixed(2)}</span></p>
         </div>
-        <button onClick={() => setEditing(newTool())} className="px-3 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm flex items-center gap-2">
+        <button onClick={() => setEditing(newTool())} className="px-3 py-2 bg-secondary hover:bg-secondary/90 text-surface text-sm flex items-center gap-2">
           <Plus size={14} /> Nova ferramenta
         </button>
       </div>
@@ -523,7 +523,7 @@ function FerramentasTab() {
 
       <table className="w-full text-sm">
         <thead>
-          <tr className="text-left text-xs text-slate-400 border-b border-slate-800">
+          <tr className="text-left text-xs text-muted border-b border-outline/10">
             <th className="py-2">Ferramenta</th>
             <th>Categoria</th>
             <th>Produto</th>
@@ -537,25 +537,25 @@ function FerramentasTab() {
         </thead>
         <tbody>
           {tools.map((t) => (
-            <tr key={t.id} className="border-b border-slate-900 hover:bg-slate-900/50">
+            <tr key={t.id} className="border-b border-outline/10 hover:bg-surface-lowest/50">
               <td className="py-3 font-medium">{t.nome}</td>
-              <td className="text-[#06B6D4]">{t.categoria}</td>
-              <td className="text-slate-400">{t.owner_product || '—'}</td>
-              <td className="text-slate-300">{t.plano || '—'}</td>
+              <td className="text-secondary">{t.categoria}</td>
+              <td className="text-muted">{t.owner_product || '—'}</td>
+              <td className="text-on-surface-variant">{t.plano || '—'}</td>
               <td>{t.custo_mensal_brl ? `${t.moeda} ${t.custo_mensal_brl}` : '—'}</td>
-              <td><span className="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300">{t.frequencia_cobranca || 'mensal'}</span></td>
-              <td className="text-slate-400">{t.proximo_vencimento || '—'}</td>
-              <td><span className={`text-xs px-2 py-0.5 rounded ${t.status === 'ativo' ? 'bg-green-500/20 text-green-400' : 'bg-slate-500/20 text-slate-400'}`}>{t.status}</span></td>
+              <td><span className="text-xs px-2 py-0.5 bg-surface-high text-on-surface-variant">{t.frequencia_cobranca || 'mensal'}</span></td>
+              <td className="text-muted">{t.proximo_vencimento || '—'}</td>
+              <td><span className={`text-xs px-2 py-0.5 ${t.status === 'ativo' ? 'bg-green-500/20 text-green-400' : 'bg-surface-high text-muted'}`}>{t.status}</span></td>
               <td className="flex gap-1 py-3">
-                <button onClick={() => setEditing(t)} className="p-1 hover:bg-slate-800 rounded">✎</button>
-                <button onClick={() => t.id && companyStore.deleteTool(t.id).then(load)} className="p-1 hover:bg-slate-800 rounded text-red-400"><Trash2 size={14} /></button>
+                <button onClick={() => setEditing(t)} className="p-1 hover:bg-surface-highest">✎</button>
+                <button onClick={() => t.id && companyStore.deleteTool(t.id).then(load)} className="p-1 hover:bg-surface-highest text-red-400"><Trash2 size={14} /></button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
       {tools.length === 0 && !editing && (
-        <div className="text-center py-12 text-slate-500 border-2 border-dashed border-slate-800 rounded-lg">
+        <div className="text-center py-12 text-muted border-2 border-dashed border-outline/10">
           Nenhuma ferramenta cadastrada.
         </div>
       )}
@@ -566,7 +566,7 @@ function FerramentasTab() {
 function ToolForm({ tool, onSave, onCancel }: { tool: Tool; onSave: (t: Tool) => void; onCancel: () => void }) {
   const [t, setT] = useState(tool);
   return (
-    <div className="bg-slate-900 border border-[#06B6D4] rounded-lg p-5 mb-6">
+    <div className="bg-surface-lowest border border-secondary/40 p-5 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Field label="Nome">
           <input className={inputClass} value={t.nome} onChange={(e) => setT({ ...t, nome: e.target.value })} />
@@ -635,8 +635,8 @@ function ToolForm({ tool, onSave, onCancel }: { tool: Tool; onSave: (t: Tool) =>
         </Field>
       </div>
       <div className="flex gap-2 mt-4">
-        <button onClick={() => onSave(t)} className="px-4 py-2 bg-[#2563EB] rounded-md text-sm">Salvar</button>
-        <button onClick={onCancel} className="px-4 py-2 bg-slate-700 rounded-md text-sm">Cancelar</button>
+        <button onClick={() => onSave(t)} className="px-4 py-2 bg-secondary text-surface text-sm">Salvar</button>
+        <button onClick={onCancel} className="px-4 py-2 bg-surface-high text-sm">Cancelar</button>
       </div>
     </div>
   );
@@ -666,7 +666,7 @@ function FinanceiroTab() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-semibold">Snapshots financeiros mensais</h2>
-        <button onClick={() => setEditing(newSnapshot())} className="px-3 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm flex items-center gap-2">
+        <button onClick={() => setEditing(newSnapshot())} className="px-3 py-2 bg-secondary hover:bg-secondary/90 text-surface text-sm flex items-center gap-2">
           <Plus size={14} /> Novo snapshot
         </button>
       </div>
@@ -677,7 +677,7 @@ function FinanceiroTab() {
 
       <table className="w-full text-sm">
         <thead>
-          <tr className="text-left text-xs text-slate-400 border-b border-slate-800">
+          <tr className="text-left text-xs text-muted border-b border-outline/10">
             <th className="py-2">Mês</th>
             <th>MRR</th>
             <th>Custo total</th>
@@ -692,21 +692,21 @@ function FinanceiroTab() {
             const custoTotal = s.custo_infra_brl + s.custo_ferramentas_brl + s.custo_pessoas_brl + s.custo_outros_brl;
             const resultado = (s.mrr_total_brl + s.receita_unica_brl) - custoTotal;
             return (
-              <tr key={s.id || s.month} className="border-b border-slate-900">
+              <tr key={s.id || s.month} className="border-b border-outline/10">
                 <td className="py-3 font-medium">{s.month}</td>
-                <td className="text-[#06B6D4]">R$ {s.mrr_total_brl.toFixed(2)}</td>
+                <td className="text-secondary">R$ {s.mrr_total_brl.toFixed(2)}</td>
                 <td className="text-red-400">R$ {custoTotal.toFixed(2)}</td>
                 <td className={resultado >= 0 ? 'text-green-400' : 'text-red-400'}>R$ {resultado.toFixed(2)}</td>
                 <td>{s.clientes_pagantes}</td>
                 <td>{s.saldo_conta_pj_brl ? `R$ ${s.saldo_conta_pj_brl.toFixed(2)}` : '—'}</td>
-                <td><button onClick={() => setEditing(s)} className="p-1 hover:bg-slate-800 rounded">✎</button></td>
+                <td><button onClick={() => setEditing(s)} className="p-1 hover:bg-surface-highest">✎</button></td>
               </tr>
             );
           })}
         </tbody>
       </table>
       {snapshots.length === 0 && !editing && (
-        <div className="text-center py-12 text-slate-500 border-2 border-dashed border-slate-800 rounded-lg">
+        <div className="text-center py-12 text-muted border-2 border-dashed border-outline/10">
           Nenhum snapshot cadastrado. Crie um por mês para acompanhar a evolução financeira.
         </div>
       )}
@@ -720,7 +720,7 @@ function SnapshotForm({ s, onSave, onCancel }: { s: FinancialSnapshot; onSave: (
     <input type="number" step="0.01" className={inputClass} value={(v[key] as number | null) || ''} onChange={(e) => setV({ ...v, [key]: parseFloat(e.target.value) || 0 })} />
   );
   return (
-    <div className="bg-slate-900 border border-[#06B6D4] rounded-lg p-5 mb-6">
+    <div className="bg-surface-lowest border border-secondary/40 p-5 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Field label="Mês (YYYY-MM-01)">
           <input type="date" className={inputClass} value={v.month} onChange={(e) => setV({ ...v, month: e.target.value })} />
@@ -742,8 +742,8 @@ function SnapshotForm({ s, onSave, onCancel }: { s: FinancialSnapshot; onSave: (
         </Field>
       </div>
       <div className="flex gap-2 mt-4">
-        <button onClick={() => onSave(v)} className="px-4 py-2 bg-[#2563EB] rounded-md text-sm">Salvar</button>
-        <button onClick={onCancel} className="px-4 py-2 bg-slate-700 rounded-md text-sm">Cancelar</button>
+        <button onClick={() => onSave(v)} className="px-4 py-2 bg-secondary text-surface text-sm">Salvar</button>
+        <button onClick={onCancel} className="px-4 py-2 bg-surface-high text-sm">Cancelar</button>
       </div>
     </div>
   );
@@ -785,13 +785,13 @@ function LgpdTab() {
 
   return (
     <div className="space-y-8">
-      <div className="bg-slate-900 rounded-lg p-4">
+      <div className="bg-surface-lowest p-4">
         <div className="flex justify-between mb-2">
           <span className="text-sm">Progresso LGPD</span>
-          <span className="text-sm text-[#06B6D4] font-semibold">{progress}/14</span>
+          <span className="text-sm text-secondary font-semibold">{progress}/14</span>
         </div>
-        <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-          <div className="h-full bg-[#06B6D4]" style={{ width: `${(progress / 14) * 100}%` }} />
+        <div className="h-2 bg-surface-high rounded-full overflow-hidden">
+          <div className="h-full bg-secondary" style={{ width: `${(progress / 14) * 100}%` }} />
         </div>
       </div>
 
@@ -841,7 +841,7 @@ function LgpdTab() {
       </section>
 
       <div className="flex items-center gap-4">
-        <button onClick={save} className="px-6 py-2.5 bg-[#2563EB] hover:bg-blue-600 rounded-md font-medium">Salvar</button>
+        <button onClick={save} className="px-6 py-2.5 bg-secondary hover:bg-secondary/90 text-surface font-medium">Salvar</button>
         {saved && <span className="text-green-400 text-sm">✓ Salvo</span>}
       </div>
     </div>

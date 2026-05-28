@@ -41,7 +41,7 @@ import { backlogStore } from '../lib/backlogStore';
 import { decisionsStore } from '../lib/decisionsStore';
 import { roadmapStore } from '../lib/roadmapStore';
 
-const inputClass = 'w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-[#06B6D4]';
+const inputClass = 'w-full bg-surface-lowest border border-outline/30 px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-secondary';
 const textareaClass = `${inputClass} min-h-[88px]`;
 
 const scenarioStatusLabel: Record<AcademyScenarioStatus, string> = {
@@ -54,10 +54,10 @@ const scenarioStatusLabel: Record<AcademyScenarioStatus, string> = {
 
 const scenarioStatusClass: Record<AcademyScenarioStatus, string> = {
   recommended: 'bg-emerald-400/10 text-emerald-300 border-emerald-400/30',
-  testing: 'bg-[#06B6D4]/10 text-[#06B6D4] border-[#06B6D4]/30',
-  draft: 'bg-[#2563EB]/10 text-[#2563EB] border-[#2563EB]/30',
+  testing: 'bg-secondary/15 text-secondary border-secondary/40',
+  draft: 'bg-secondary-container/40 text-secondary border-secondary/40',
   hold: 'bg-amber-400/10 text-amber-300 border-amber-400/30',
-  rejected: 'bg-white/5 text-white/40 border-white/10',
+  rejected: 'bg-surface-low text-muted border-outline/10',
 };
 
 const questionStatusLabel: Record<AcademyQuestionStatus, string> = {
@@ -68,8 +68,8 @@ const questionStatusLabel: Record<AcademyQuestionStatus, string> = {
 };
 
 const questionStatusClass: Record<AcademyQuestionStatus, string> = {
-  open: 'bg-white/5 text-white/60 border-white/10',
-  deciding: 'bg-[#2563EB]/10 text-[#2563EB] border-[#2563EB]/30',
+  open: 'bg-surface-low text-on-surface-variant border-outline/10',
+  deciding: 'bg-secondary-container/40 text-secondary border-secondary/40',
   blocked: 'bg-red-400/10 text-red-300 border-red-400/30',
   done: 'bg-emerald-400/10 text-emerald-300 border-emerald-400/30',
 };
@@ -290,7 +290,7 @@ export default function Academy() {
   if (loading || !workspace || !productDraft) {
     return (
       <div className="p-8 max-w-6xl mx-auto">
-        <div className="text-white/40 text-sm">Carregando workspace do Academy...</div>
+        <div className="text-muted text-sm">Carregando workspace do Academy...</div>
       </div>
     );
   }
@@ -407,13 +407,13 @@ export default function Academy() {
       <header className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <BookOpen className="w-6 h-6 text-[#06B6D4]" />
-            <h1 className="text-3xl font-bold tracking-tight">Academy</h1>
+            <BookOpen className="w-6 h-6 text-secondary" />
+            <h1 className="text-3xl font-serif font-bold tracking-tight">Academy</h1>
           </div>
-          <p className="text-white/60 max-w-3xl">
+          <p className="text-on-surface-variant max-w-3xl">
             Base operacional dos produtos digitais do Academy: oferta, assets, PDF final, dados de criacao e cenarios de venda.
           </p>
-          <p className="text-xs font-mono text-white/30 mt-2">
+          <p className="text-xs font-mono text-muted mt-2">
             Atualizado em {new Date(workspace.updated_at).toLocaleString('pt-BR')}
           </p>
         </div>
@@ -427,18 +427,18 @@ export default function Academy() {
             {academyStore.isOnline() ? <Cloud size={14} /> : <HardDrive size={14} />}
             {academyStore.isOnline() ? 'Academy pronto para Supabase' : 'Academy em fallback local'}
           </span>
-          <button onClick={load} className="p-2 hover:bg-white/5 rounded-lg text-white/50 hover:text-white" title="Recarregar">
+          <button onClick={load} className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface" title="Recarregar">
             <RefreshCw size={16} />
           </button>
           <button
             onClick={() => academyStore.downloadExport('json')}
-            className="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-md text-sm flex items-center gap-2"
+            className="px-3 py-2 bg-surface-high hover:bg-surface-highest text-sm flex items-center gap-2"
           >
             <Download size={14} /> JSON
           </button>
           <button
             onClick={() => academyStore.downloadExport('md')}
-            className="px-3 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm flex items-center gap-2"
+            className="px-3 py-2 bg-secondary hover:bg-secondary/90 text-sm flex items-center gap-2"
           >
             <Download size={14} /> Markdown
           </button>
@@ -448,18 +448,18 @@ export default function Academy() {
       <TravasBanner />
 
       {saveMessage && (
-        <div className="bg-emerald-400/10 border border-emerald-400/30 rounded-xl px-4 py-3 text-sm text-emerald-300">
+        <div className="bg-emerald-400/10 border border-emerald-400/30 px-4 py-3 text-sm text-emerald-300">
           {saveMessage}
         </div>
       )}
 
-      <section className="bg-white/3 border border-white/8 rounded-2xl p-6 space-y-5">
+      <section className="bg-surface-low border border-outline/10 p-6 space-y-5">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
             <h2 className="text-xl font-semibold">Produto em foco</h2>
-            <p className="text-sm text-white/50">O produto principal do workspace, pronto para crescer para outros produtos depois.</p>
+            <p className="text-sm text-on-surface-variant">O produto principal do workspace, pronto para crescer para outros produtos depois.</p>
           </div>
-          <button onClick={saveProduct} className="px-4 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm flex items-center gap-2">
+          <button onClick={saveProduct} className="px-4 py-2 bg-secondary hover:bg-secondary/90 text-sm flex items-center gap-2">
             <Save size={14} /> Salvar produto
           </button>
         </div>
@@ -551,25 +551,25 @@ export default function Academy() {
       </section>
 
       <section className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <div className="bg-white/3 border border-white/8 rounded-2xl p-6 space-y-5">
+        <div className="bg-surface-low border border-outline/10 p-6 space-y-5">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <div className="flex items-center gap-2">
-                <Image className="w-5 h-5 text-[#06B6D4]" />
+                <Image className="w-5 h-5 text-secondary" />
                 <h2 className="text-xl font-semibold">Assets do produto</h2>
               </div>
-              <p className="text-sm text-white/50">Capas, PDF final, mockups e qualquer arquivo importante da oferta.</p>
+              <p className="text-sm text-on-surface-variant">Capas, PDF final, mockups e qualquer arquivo importante da oferta.</p>
             </div>
-            <button onClick={() => setAssetDraft(emptyAsset())} className="px-4 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm flex items-center gap-2">
+            <button onClick={() => setAssetDraft(emptyAsset())} className="px-4 py-2 bg-secondary hover:bg-secondary/90 text-sm flex items-center gap-2">
               <Plus size={14} /> Novo asset
             </button>
           </div>
 
           {assetDraft && (
-            <div className="bg-slate-900 border border-[#06B6D4] rounded-xl p-5 space-y-4">
+            <div className="bg-surface-lowest border border-secondary p-5 space-y-4">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="font-semibold text-sm">Editar asset</h3>
-                <button onClick={() => setAssetDraft(null)} className="p-1 hover:bg-white/5 rounded">
+                <button onClick={() => setAssetDraft(null)} className="p-1 hover:bg-surface-highest">
                   <X size={16} />
                 </button>
               </div>
@@ -625,7 +625,7 @@ export default function Academy() {
                       onChange={(e) => setAssetDraft({ ...assetDraft, is_primary: e.target.checked })}
                       className="w-4 h-4"
                     />
-                    <span className="text-sm text-white/80">Marcar como asset principal deste tipo</span>
+                    <span className="text-sm text-on-surface">Marcar como asset principal deste tipo</span>
                   </label>
                 </div>
                 <Field label="Notas" col={2}>
@@ -633,23 +633,23 @@ export default function Academy() {
                 </Field>
               </div>
               <div className="flex gap-2">
-                <button onClick={saveAsset} className="px-4 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm">Salvar asset</button>
-                <button onClick={() => setAssetDraft(null)} className="px-4 py-2 bg-slate-700 rounded-md text-sm">Cancelar</button>
+                <button onClick={saveAsset} className="px-4 py-2 bg-secondary hover:bg-secondary/90 text-sm">Salvar asset</button>
+                <button onClick={() => setAssetDraft(null)} className="px-4 py-2 bg-surface-high text-sm">Cancelar</button>
               </div>
             </div>
           )}
 
           <div className="space-y-3">
             {workspace.assets.map((asset) => (
-              <div key={asset.id} className="bg-[#0A0F1E] border border-white/8 rounded-xl p-4">
+              <div key={asset.id} className="bg-surface border border-outline/10 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-white">{asset.title}</span>
-                      <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-white/5 text-white/40 border border-white/10">
+                      <span className="font-medium text-on-surface">{asset.title}</span>
+                      <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-surface-low text-muted border border-outline/10">
                         {assetTypeLabel[asset.asset_type]}
                       </span>
-                      <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-[#06B6D4]/10 text-[#06B6D4] border border-[#06B6D4]/30">
+                      <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-secondary/15 text-secondary border border-secondary/40">
                         {assetStatusLabel[asset.status]}
                       </span>
                       {asset.is_primary && (
@@ -658,14 +658,14 @@ export default function Academy() {
                         </span>
                       )}
                     </div>
-                    <div className="text-xs text-white/35 mt-2 break-all">
+                    <div className="text-xs text-muted mt-2 break-all">
                       {asset.file_url || asset.storage_path || 'Sem URL ou path ainda'}
                     </div>
-                    {asset.notes && <div className="text-sm text-white/55 mt-2">{asset.notes}</div>}
+                    {asset.notes && <div className="text-sm text-on-surface-variant mt-2">{asset.notes}</div>}
                   </div>
                   <div className="flex gap-1 shrink-0">
-                    <button onClick={() => setAssetDraft({ ...asset })} className="p-1.5 hover:bg-white/5 rounded text-white/50 hover:text-white text-sm">Edit</button>
-                    <button onClick={() => removeAsset(asset.id)} className="p-1.5 hover:bg-red-500/10 rounded text-white/40 hover:text-red-400">
+                    <button onClick={() => setAssetDraft({ ...asset })} className="p-1.5 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface text-sm">Edit</button>
+                    <button onClick={() => removeAsset(asset.id)} className="p-1.5 hover:bg-red-500/10 rounded text-muted hover:text-red-400">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -675,25 +675,25 @@ export default function Academy() {
           </div>
         </div>
 
-        <div className="bg-white/3 border border-white/8 rounded-2xl p-6 space-y-5">
+        <div className="bg-surface-low border border-outline/10 p-6 space-y-5">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-[#06B6D4]" />
+                <FileText className="w-5 h-5 text-secondary" />
                 <h2 className="text-xl font-semibold">Dados de criacao</h2>
               </div>
-              <p className="text-sm text-white/50">Prompts, copy, editorial, design e referencias do produto.</p>
+              <p className="text-sm text-on-surface-variant">Prompts, copy, editorial, design e referencias do produto.</p>
             </div>
-            <button onClick={() => setCreationDraft(emptyCreationRecord())} className="px-4 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm flex items-center gap-2">
+            <button onClick={() => setCreationDraft(emptyCreationRecord())} className="px-4 py-2 bg-secondary hover:bg-secondary/90 text-sm flex items-center gap-2">
               <Plus size={14} /> Novo registro
             </button>
           </div>
 
           {creationDraft && (
-            <div className="bg-slate-900 border border-[#06B6D4] rounded-xl p-5 space-y-4">
+            <div className="bg-surface-lowest border border-secondary p-5 space-y-4">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="font-semibold text-sm">Editar registro de criacao</h3>
-                <button onClick={() => { setCreationDraft(null); setTagInput(''); }} className="p-1 hover:bg-white/5 rounded">
+                <button onClick={() => { setCreationDraft(null); setTagInput(''); }} className="p-1 hover:bg-surface-highest">
                   <X size={16} />
                 </button>
               </div>
@@ -734,7 +734,7 @@ export default function Academy() {
                   <textarea className={textareaClass} value={creationDraft.notes} onChange={(e) => setCreationDraft({ ...creationDraft, notes: e.target.value })} />
                 </Field>
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-medium text-slate-400 mb-1.5">Tags</label>
+                  <label className="block text-xs font-medium text-muted mb-1.5">Tags</label>
                   <div className="flex gap-2 mb-2">
                     <input
                       className={inputClass}
@@ -743,11 +743,11 @@ export default function Academy() {
                       onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
                       placeholder="ex: landing"
                     />
-                    <button onClick={addTag} className="px-3 py-2 bg-slate-700 rounded-md text-xs">Add</button>
+                    <button onClick={addTag} className="px-3 py-2 bg-surface-high text-xs">Add</button>
                   </div>
                   <div className="flex gap-1.5 flex-wrap">
                     {creationDraft.tags.map((tag) => (
-                      <span key={tag} className="text-xs px-2 py-1 bg-[#06B6D4]/20 text-[#06B6D4] rounded flex items-center gap-1">
+                      <span key={tag} className="text-xs px-2 py-1 bg-secondary/15 text-secondary rounded flex items-center gap-1">
                         #{tag}
                         <button onClick={() => removeTag(tag)}><X size={10} /></button>
                       </span>
@@ -756,43 +756,43 @@ export default function Academy() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <button onClick={saveCreationRecord} className="px-4 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm">Salvar registro</button>
-                <button onClick={() => { setCreationDraft(null); setTagInput(''); }} className="px-4 py-2 bg-slate-700 rounded-md text-sm">Cancelar</button>
+                <button onClick={saveCreationRecord} className="px-4 py-2 bg-secondary hover:bg-secondary/90 text-sm">Salvar registro</button>
+                <button onClick={() => { setCreationDraft(null); setTagInput(''); }} className="px-4 py-2 bg-surface-high text-sm">Cancelar</button>
               </div>
             </div>
           )}
 
           <div className="space-y-3">
             {workspace.creation_records.map((record) => (
-              <div key={record.id} className="bg-[#0A0F1E] border border-white/8 rounded-xl p-4">
+              <div key={record.id} className="bg-surface border border-outline/10 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-white">{record.title}</span>
-                      <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-white/5 text-white/40 border border-white/10">
+                      <span className="font-medium text-on-surface">{record.title}</span>
+                      <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-surface-low text-muted border border-outline/10">
                         {creationTypeLabel[record.record_type]}
                       </span>
-                      <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/30">
+                      <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-secondary-container/40 text-secondary border border-secondary/40">
                         {assetStatusLabel[record.status]}
                       </span>
                     </div>
-                    <div className="text-xs text-white/35 mt-2 break-all">
+                    <div className="text-xs text-muted mt-2 break-all">
                       {record.source_path || record.external_url || 'Sem referencia registrada'}
                     </div>
                     {record.tags.length > 0 && (
                       <div className="flex gap-1.5 flex-wrap mt-2">
                         {record.tags.map((tag) => (
-                          <span key={tag} className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#06B6D4]/10 text-[#06B6D4] border border-[#06B6D4]/20">
+                          <span key={tag} className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-secondary/15 text-secondary border border-secondary/40">
                             #{tag}
                           </span>
                         ))}
                       </div>
                     )}
-                    {record.notes && <div className="text-sm text-white/55 mt-2">{record.notes}</div>}
+                    {record.notes && <div className="text-sm text-on-surface-variant mt-2">{record.notes}</div>}
                   </div>
                   <div className="flex gap-1 shrink-0">
-                    <button onClick={() => { setCreationDraft({ ...record }); setTagInput(''); }} className="p-1.5 hover:bg-white/5 rounded text-white/50 hover:text-white text-sm">Edit</button>
-                    <button onClick={() => removeCreationRecord(record.id)} className="p-1.5 hover:bg-red-500/10 rounded text-white/40 hover:text-red-400">
+                    <button onClick={() => { setCreationDraft({ ...record }); setTagInput(''); }} className="p-1.5 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface text-sm">Edit</button>
+                    <button onClick={() => removeCreationRecord(record.id)} className="p-1.5 hover:bg-red-500/10 rounded text-muted hover:text-red-400">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -803,25 +803,25 @@ export default function Academy() {
         </div>
       </section>
 
-      <section className="bg-white/3 border border-white/8 rounded-2xl p-6 space-y-5">
+      <section className="bg-surface-low border border-outline/10 p-6 space-y-5">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
             <div className="flex items-center gap-2">
-              <Workflow className="w-5 h-5 text-[#06B6D4]" />
+              <Workflow className="w-5 h-5 text-secondary" />
               <h2 className="text-xl font-semibold">Cenarios de venda e entrega</h2>
             </div>
-            <p className="text-sm text-white/50">Aqui a gente compara os trilhos antes de fechar o fluxo definitivo.</p>
+            <p className="text-sm text-on-surface-variant">Aqui a gente compara os trilhos antes de fechar o fluxo definitivo.</p>
           </div>
-          <button onClick={() => setScenarioDraft(emptyScenario())} className="px-4 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm flex items-center gap-2">
+          <button onClick={() => setScenarioDraft(emptyScenario())} className="px-4 py-2 bg-secondary hover:bg-secondary/90 text-sm flex items-center gap-2">
             <Plus size={14} /> Novo cenario
           </button>
         </div>
 
         {scenarioDraft && (
-          <div className="bg-slate-900 border border-[#06B6D4] rounded-xl p-5 space-y-4">
+          <div className="bg-surface-lowest border border-secondary p-5 space-y-4">
             <div className="flex items-center justify-between gap-2">
               <h3 className="font-semibold text-sm">Editar cenario</h3>
-              <button onClick={() => setScenarioDraft(null)} className="p-1 hover:bg-white/5 rounded">
+              <button onClick={() => setScenarioDraft(null)} className="p-1 hover:bg-surface-highest">
                 <X size={16} />
               </button>
             </div>
@@ -873,26 +873,26 @@ export default function Academy() {
               </Field>
             </div>
             <div className="flex gap-2">
-              <button onClick={saveScenario} className="px-4 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm">Salvar cenario</button>
-              <button onClick={() => setScenarioDraft(null)} className="px-4 py-2 bg-slate-700 rounded-md text-sm">Cancelar</button>
+              <button onClick={saveScenario} className="px-4 py-2 bg-secondary hover:bg-secondary/90 text-sm">Salvar cenario</button>
+              <button onClick={() => setScenarioDraft(null)} className="px-4 py-2 bg-surface-high text-sm">Cancelar</button>
             </div>
           </div>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {workspace.scenarios.map((scenario) => (
-            <div key={scenario.id} className="bg-[#0A0F1E] border border-white/8 rounded-2xl p-5 space-y-4">
+            <div key={scenario.id} className="bg-surface border border-outline/10 p-5 space-y-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className={`inline-flex px-2 py-1 rounded-full text-[10px] font-mono uppercase tracking-widest border ${scenarioStatusClass[scenario.status]}`}>
                     {scenarioStatusLabel[scenario.status]}
                   </div>
                   <h3 className="text-lg font-semibold mt-2">{scenario.name}</h3>
-                  <p className="text-sm text-white/55 mt-1">{scenario.summary}</p>
+                  <p className="text-sm text-on-surface-variant mt-1">{scenario.summary}</p>
                 </div>
                 <div className="flex gap-1">
-                  <button onClick={() => setScenarioDraft({ ...scenario })} className="p-1.5 hover:bg-white/5 rounded text-white/50 hover:text-white text-sm">Edit</button>
-                  <button onClick={() => removeScenario(scenario.id)} className="p-1.5 hover:bg-red-500/10 rounded text-white/40 hover:text-red-400">
+                  <button onClick={() => setScenarioDraft({ ...scenario })} className="p-1.5 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface text-sm">Edit</button>
+                  <button onClick={() => removeScenario(scenario.id)} className="p-1.5 hover:bg-red-500/10 rounded text-muted hover:text-red-400">
                     <Trash2 size={14} />
                   </button>
                 </div>
@@ -917,25 +917,25 @@ export default function Academy() {
       </section>
 
       <section className="grid grid-cols-1 xl:grid-cols-[1.2fr_0.8fr] gap-6">
-        <div className="bg-white/3 border border-white/8 rounded-2xl p-6 space-y-5">
+        <div className="bg-surface-low border border-outline/10 p-6 space-y-5">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <div className="flex items-center gap-2">
-                <Layers3 className="w-5 h-5 text-[#06B6D4]" />
+                <Layers3 className="w-5 h-5 text-secondary" />
                 <h2 className="text-xl font-semibold">Questoes e decisoes em aberto</h2>
               </div>
-              <p className="text-sm text-white/50">Pontos que ainda precisam fechar para nao misturar plataforma, checkout, acesso e entrega.</p>
+              <p className="text-sm text-on-surface-variant">Pontos que ainda precisam fechar para nao misturar plataforma, checkout, acesso e entrega.</p>
             </div>
-            <button onClick={() => setQuestionDraft(emptyQuestion())} className="px-4 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm flex items-center gap-2">
+            <button onClick={() => setQuestionDraft(emptyQuestion())} className="px-4 py-2 bg-secondary hover:bg-secondary/90 text-sm flex items-center gap-2">
               <Plus size={14} /> Nova questao
             </button>
           </div>
 
           {questionDraft && (
-            <div className="bg-slate-900 border border-[#06B6D4] rounded-xl p-5 space-y-4">
+            <div className="bg-surface-lowest border border-secondary p-5 space-y-4">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="font-semibold text-sm">Editar questao</h3>
-                <button onClick={() => setQuestionDraft(null)} className="p-1 hover:bg-white/5 rounded">
+                <button onClick={() => setQuestionDraft(null)} className="p-1 hover:bg-surface-highest">
                   <X size={16} />
                 </button>
               </div>
@@ -969,28 +969,28 @@ export default function Academy() {
                 </Field>
               </div>
               <div className="flex gap-2">
-                <button onClick={saveQuestion} className="px-4 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm">Salvar questao</button>
-                <button onClick={() => setQuestionDraft(null)} className="px-4 py-2 bg-slate-700 rounded-md text-sm">Cancelar</button>
+                <button onClick={saveQuestion} className="px-4 py-2 bg-secondary hover:bg-secondary/90 text-sm">Salvar questao</button>
+                <button onClick={() => setQuestionDraft(null)} className="px-4 py-2 bg-surface-high text-sm">Cancelar</button>
               </div>
             </div>
           )}
 
           <div className="space-y-3">
             {workspace.questions.map((question) => (
-              <div key={question.id} className="bg-[#0A0F1E] border border-white/8 rounded-xl p-4">
+              <div key={question.id} className="bg-surface border border-outline/10 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
                     <div className={`inline-flex px-2 py-1 rounded-full text-[10px] font-mono uppercase tracking-widest border ${questionStatusClass[question.status]}`}>
                       {questionStatusLabel[question.status]}
                     </div>
-                    <div className="font-medium text-white mt-2">{question.title}</div>
-                    <div className="text-xs font-mono text-white/35 mt-1">owner: {question.owner || 'sem owner'}</div>
-                    <div className="text-sm text-white/65 mt-3">{question.next_step}</div>
-                    {question.notes && <div className="text-sm text-white/45 mt-2">{question.notes}</div>}
+                    <div className="font-medium text-on-surface mt-2">{question.title}</div>
+                    <div className="text-xs font-mono text-muted mt-1">owner: {question.owner || 'sem owner'}</div>
+                    <div className="text-sm text-on-surface-variant mt-3">{question.next_step}</div>
+                    {question.notes && <div className="text-sm text-on-surface-variant mt-2">{question.notes}</div>}
                   </div>
                   <div className="flex gap-1 shrink-0">
-                    <button onClick={() => setQuestionDraft({ ...question })} className="p-1.5 hover:bg-white/5 rounded text-white/50 hover:text-white text-sm">Edit</button>
-                    <button onClick={() => removeQuestion(question.id)} className="p-1.5 hover:bg-red-500/10 rounded text-white/40 hover:text-red-400">
+                    <button onClick={() => setQuestionDraft({ ...question })} className="p-1.5 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface text-sm">Edit</button>
+                    <button onClick={() => removeQuestion(question.id)} className="p-1.5 hover:bg-red-500/10 rounded text-muted hover:text-red-400">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -1000,16 +1000,16 @@ export default function Academy() {
           </div>
         </div>
 
-        <div className="bg-white/3 border border-white/8 rounded-2xl p-6 space-y-5">
+        <div className="bg-surface-low border border-outline/10 p-6 space-y-5">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-[#06B6D4]" />
+                <CheckCircle2 className="w-5 h-5 text-secondary" />
                 <h2 className="text-xl font-semibold">Checklist operacional</h2>
               </div>
-              <p className="text-sm text-white/50">O que precisa estar redondo antes de colocar o fluxo para rodar.</p>
+              <p className="text-sm text-on-surface-variant">O que precisa estar redondo antes de colocar o fluxo para rodar.</p>
             </div>
-            <button onClick={saveChecklist} className="px-4 py-2 bg-[#2563EB] hover:bg-blue-600 rounded-md text-sm flex items-center gap-2">
+            <button onClick={saveChecklist} className="px-4 py-2 bg-secondary hover:bg-secondary/90 text-sm flex items-center gap-2">
               <Save size={14} /> Salvar checklist
             </button>
           </div>
@@ -1019,24 +1019,24 @@ export default function Academy() {
               const last = prev.length > 0 ? prev[prev.length - 1] : null;
               return [...prev, emptyChecklistItem((last?.sort_order || 0) + 10)];
             })}
-            className="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-md text-sm flex items-center gap-2"
+            className="px-3 py-2 bg-surface-high hover:bg-surface-highest text-sm flex items-center gap-2"
           >
             <Plus size={14} /> Novo item
           </button>
 
-          <div className="bg-[#0A0F1E] border border-white/8 rounded-xl p-4">
+          <div className="bg-surface border border-outline/10 p-4">
             <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-white/60">Progresso</span>
-              <span className="font-mono text-[#06B6D4]">{checklistProgress}%</span>
+              <span className="text-on-surface-variant">Progresso</span>
+              <span className="font-mono text-secondary">{checklistProgress}%</span>
             </div>
-            <div className="h-2 bg-black/30 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-[#06B6D4] to-[#2563EB]" style={{ width: `${checklistProgress}%` }} />
+            <div className="h-2 bg-surface-lowest rounded-full overflow-hidden">
+              <div className="h-full bg-secondary" style={{ width: `${checklistProgress}%` }} />
             </div>
           </div>
 
           <div className="space-y-3">
             {checklistDraft.map((item) => (
-              <div key={item.id} className="bg-[#0A0F1E] border border-white/8 rounded-xl p-4">
+              <div key={item.id} className="bg-surface border border-outline/10 p-4">
                 <div className="flex items-start gap-3">
                   <button
                     onClick={() => updateChecklistItem(item.id, { done: !item.done })}
@@ -1046,7 +1046,7 @@ export default function Academy() {
                     {item.done ? (
                       <CheckCircle2 className="w-5 h-5 text-emerald-300" />
                     ) : (
-                      <Circle className="w-5 h-5 text-white/30" />
+                      <Circle className="w-5 h-5 text-muted" />
                     )}
                   </button>
                   <div className="flex-1 space-y-3">
@@ -1086,19 +1086,19 @@ export default function Academy() {
         </div>
       </section>
 
-      <section className="bg-white/3 border border-white/8 rounded-2xl p-6 space-y-5">
+      <section className="bg-surface-low border border-outline/10 p-6 space-y-5">
         <div className="flex items-center gap-2">
-          <ShieldCheck className="w-5 h-5 text-[#06B6D4]" />
+          <ShieldCheck className="w-5 h-5 text-secondary" />
           <h2 className="text-xl font-semibold">Auditoria de persistencia do frontend</h2>
         </div>
-        <p className="text-sm text-white/55">
+        <p className="text-sm text-on-surface-variant">
           Resumo rapido para sabermos o que o app ja grava de verdade e onde ainda existe gap de persistencia.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {persistenceAudit.map((item) => (
-            <div key={item.module} className="bg-[#0A0F1E] border border-white/8 rounded-xl p-4 space-y-2">
-              <div className="font-medium text-white">{item.module}</div>
+            <div key={item.module} className="bg-surface border border-outline/10 p-4 space-y-2">
+              <div className="font-medium text-on-surface">{item.module}</div>
               <div className={`text-xs inline-flex px-2 py-1 rounded-full border ${
                 item.tone === 'good'
                   ? 'text-emerald-300 bg-emerald-400/10 border-emerald-400/30'
@@ -1106,11 +1106,11 @@ export default function Academy() {
                   ? 'text-amber-300 bg-amber-400/10 border-amber-400/30'
                   : item.tone === 'bad'
                   ? 'text-red-300 bg-red-400/10 border-red-400/30'
-                  : 'text-white/55 bg-white/5 border-white/10'
+                  : 'text-on-surface-variant bg-surface-low border-outline/10'
               }`}>
                 {item.target}
               </div>
-              <p className="text-sm text-white/60">{item.status}</p>
+              <p className="text-sm text-on-surface-variant">{item.status}</p>
             </div>
           ))}
         </div>
@@ -1131,7 +1131,7 @@ function Field({
   const colClass = col === 3 ? 'md:col-span-3' : col === 2 ? 'md:col-span-2' : '';
   return (
     <div className={colClass}>
-      <label className="block text-xs font-medium text-slate-400 mb-1.5">{label}</label>
+      <label className="block text-xs font-medium text-muted mb-1.5">{label}</label>
       {children}
     </div>
   );
@@ -1140,8 +1140,8 @@ function Field({
 function InfoItem({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div className="text-[10px] font-mono uppercase tracking-widest text-white/30 mb-1">{label}</div>
-      <div className="text-white/80">{value || '-'}</div>
+      <div className="text-[10px] font-mono uppercase tracking-widest text-muted mb-1">{label}</div>
+      <div className="text-on-surface">{value || '-'}</div>
     </div>
   );
 }
@@ -1149,8 +1149,8 @@ function InfoItem({ label, value }: { label: string; value: string }) {
 function LongInfo({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div className="text-[10px] font-mono uppercase tracking-widest text-white/30 mb-1">{label}</div>
-      <div className="text-white/65">{value || '-'}</div>
+      <div className="text-[10px] font-mono uppercase tracking-widest text-muted mb-1">{label}</div>
+      <div className="text-on-surface-variant">{value || '-'}</div>
     </div>
   );
 }

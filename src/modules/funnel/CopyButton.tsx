@@ -237,7 +237,7 @@ export default function CopyButton({ content, asset, compact }: Props) {
       <button
         onClick={() => handleCopy('text')}
         className={`flex items-center gap-1 text-xs transition-colors cursor-pointer ${
-          copied ? 'text-emerald-300' : 'text-white/40 hover:text-white/70'
+          copied ? 'text-emerald-300' : 'text-muted hover:text-on-surface-variant'
         }`}
         title="Copiar texto"
       >
@@ -251,8 +251,8 @@ export default function CopyButton({ content, asset, compact }: Props) {
       <div className="flex items-center">
         <button
           onClick={() => handleCopy('json_en')}
-          className={`flex items-center gap-1.5 text-xs font-medium transition-colors cursor-pointer px-2 py-1 rounded-l-md hover:bg-white/5 ${
-            copied ? 'text-emerald-300' : 'text-white/40 hover:text-white/70'
+          className={`flex items-center gap-1.5 text-xs font-medium transition-colors cursor-pointer px-2 py-1 rounded-l-md hover:bg-surface-highest ${
+            copied ? 'text-emerald-300' : 'text-muted hover:text-on-surface-variant'
           }`}
           title="Copiar JSON (EN) — prompt para agent visual"
         >
@@ -261,7 +261,7 @@ export default function CopyButton({ content, asset, compact }: Props) {
         </button>
         <button
           onClick={() => setShowMenu(!showMenu)}
-          className="px-1 py-1 text-white/30 hover:text-white/60 hover:bg-white/5 rounded-r-md transition-colors cursor-pointer border-l border-white/10"
+          className="px-1 py-1 text-muted hover:text-on-surface-variant hover:bg-surface-highest rounded-r-md transition-colors cursor-pointer border-l border-outline/10"
           title="Opções de cópia"
         >
           <ChevronDown size={12} />
@@ -269,16 +269,16 @@ export default function CopyButton({ content, asset, compact }: Props) {
       </div>
 
       {showMenu && (
-        <div className="absolute bottom-full left-0 mb-1 bg-[#141B2D] border border-white/10 rounded-lg shadow-xl py-1 z-50 min-w-[140px]">
+        <div className="absolute bottom-full left-0 mb-1 bg-[#141B2D] border border-outline/10 shadow-xl py-1 z-50 min-w-[140px]">
           {(Object.keys(MODE_LABELS) as CopyMode[]).map((mode) => (
             <button
               key={mode}
               onClick={() => handleCopy(mode)}
-              className="w-full text-left px-3 py-1.5 text-xs text-white/70 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+              className="w-full text-left px-3 py-1.5 text-xs text-on-surface-variant hover:text-on-surface hover:bg-surface-highest transition-colors cursor-pointer"
             >
               {MODE_LABELS[mode]}
               {mode === 'json_en' && (
-                <span className="text-[10px] text-[#06B6D4]/60 ml-1">agent</span>
+                <span className="text-[10px] text-secondary/60 ml-1">agent</span>
               )}
             </button>
           ))}

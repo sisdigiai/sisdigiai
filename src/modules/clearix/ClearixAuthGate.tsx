@@ -48,15 +48,15 @@ export default function ClearixAuthGate({ children }: { children: ReactNode }) {
   if (!clearixConfigured) {
     return (
       <div className="p-8 max-w-2xl">
-        <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-5">
+        <div className="border border-amber-500/30 bg-amber-500/5 p-5">
           <div className="flex items-center gap-2 mb-2 text-amber-300">
             <ShieldAlert size={18} />
             <div className="font-medium">Clearix não configurado</div>
           </div>
-          <div className="text-sm text-white/70 leading-relaxed">
-            Defina <code className="font-mono text-xs bg-black/30 px-1.5 py-0.5 rounded">VITE_CLEARIX_SUPABASE_URL</code> e{' '}
-            <code className="font-mono text-xs bg-black/30 px-1.5 py-0.5 rounded">VITE_CLEARIX_SUPABASE_ANON_KEY</code>{' '}
-            em <code className="font-mono text-xs bg-black/30 px-1.5 py-0.5 rounded">.env</code> e reinicie o dev server.
+          <div className="text-sm text-on-surface-variant leading-relaxed">
+            Defina <code className="font-mono text-xs bg-surface-lowest px-1.5 py-0.5">VITE_CLEARIX_SUPABASE_URL</code> e{' '}
+            <code className="font-mono text-xs bg-surface-lowest px-1.5 py-0.5">VITE_CLEARIX_SUPABASE_ANON_KEY</code>{' '}
+            em <code className="font-mono text-xs bg-surface-lowest px-1.5 py-0.5">.env</code> e reinicie o dev server.
           </div>
         </div>
       </div>
@@ -64,7 +64,7 @@ export default function ClearixAuthGate({ children }: { children: ReactNode }) {
   }
 
   if (loading) {
-    return <div className="p-8 text-sm text-white/40">Verificando sessão Clearix…</div>;
+    return <div className="p-8 text-sm text-muted">Verificando sessão Clearix…</div>;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -86,12 +86,12 @@ export default function ClearixAuthGate({ children }: { children: ReactNode }) {
   if (!session) {
     return (
       <div className="p-8 max-w-md">
-        <div className="rounded-xl border border-white/10 bg-[#0F172A] p-6">
+        <div className="border border-outline/10 bg-surface-container p-6">
           <div className="flex items-center gap-2 mb-4">
-            <Network size={18} className="text-[#06B6D4]" />
-            <div className="text-sm font-medium text-white">Acesso Clearix</div>
+            <Network size={18} className="text-secondary" />
+            <div className="text-sm font-medium text-on-surface">Acesso Clearix</div>
           </div>
-          <div className="text-xs text-white/50 mb-4 leading-relaxed">
+          <div className="text-xs text-on-surface-variant mb-4 leading-relaxed">
             Login super_admin no banco Clearix (separado do login DigiAI).
           </div>
           <form onSubmit={handleSubmit} className="space-y-3">
@@ -102,7 +102,7 @@ export default function ClearixAuthGate({ children }: { children: ReactNode }) {
               placeholder="email@digiai.com.br"
               autoComplete="email"
               required
-              className="w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-[#06B6D4]"
+              className="w-full bg-surface-lowest border border-outline/30 px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-secondary/40"
             />
             <input
               type="password"
@@ -111,13 +111,13 @@ export default function ClearixAuthGate({ children }: { children: ReactNode }) {
               placeholder="senha"
               autoComplete="current-password"
               required
-              className="w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:border-[#06B6D4]"
+              className="w-full bg-surface-lowest border border-outline/30 px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-secondary/40"
             />
             {error && <div className="text-xs text-rose-400">{error}</div>}
             <button
               type="submit"
               disabled={signingIn}
-              className="w-full rounded-md bg-[#2563EB] text-white text-sm py-2 hover:bg-[#1D4ED8] disabled:opacity-50"
+              className="w-full bg-secondary text-surface text-sm py-2 hover:bg-secondary/90 disabled:opacity-50"
             >
               {signingIn ? 'Entrando…' : 'Entrar no Clearix'}
             </button>
@@ -130,23 +130,23 @@ export default function ClearixAuthGate({ children }: { children: ReactNode }) {
   if (roleCode !== 'super_admin') {
     return (
       <div className="p-8 max-w-2xl">
-        <div className="rounded-xl border border-rose-500/30 bg-rose-500/5 p-5">
+        <div className="border border-rose-500/30 bg-rose-500/5 p-5">
           <div className="flex items-center gap-2 mb-2 text-rose-300">
             <ShieldAlert size={18} />
             <div className="font-medium">Acesso negado</div>
           </div>
-          <div className="text-sm text-white/70 leading-relaxed mb-3">
+          <div className="text-sm text-on-surface-variant leading-relaxed mb-3">
             Conta <span className="font-mono">{email}</span> está autenticada no Clearix,
-            mas não tem <code className="font-mono text-xs bg-black/30 px-1.5 py-0.5 rounded">role_code=super_admin</code>.
+            mas não tem <code className="font-mono text-xs bg-surface-lowest px-1.5 py-0.5">role_code=super_admin</code>.
             {roleCode ? (
-              <> Role atual: <code className="font-mono text-xs bg-black/30 px-1.5 py-0.5 rounded">{roleCode}</code>.</>
+              <> Role atual: <code className="font-mono text-xs bg-surface-lowest px-1.5 py-0.5">{roleCode}</code>.</>
             ) : (
               <> Role não injetada no JWT — verifique o Access Token Hook do Supabase.</>
             )}
           </div>
           <button
             onClick={handleSignOut}
-            className="inline-flex items-center gap-1.5 text-xs rounded-md border border-white/10 bg-black/20 px-3 py-1.5 text-white/70 hover:text-white hover:border-white/20"
+            className="inline-flex items-center gap-1.5 text-xs border border-outline/10 bg-surface-lowest px-3 py-1.5 text-on-surface-variant hover:text-on-surface hover:border-outline/30"
           >
             <LogOut size={12} /> Sair e trocar de conta
           </button>
@@ -157,16 +157,16 @@ export default function ClearixAuthGate({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-6 py-2 border-b border-white/5 text-[11px] text-white/40">
+      <div className="flex items-center justify-between px-6 py-2 border-b border-outline/10 text-[11px] text-on-surface-variant">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-          <span>Clearix: <span className="text-white/70 font-mono">{email}</span></span>
-          <span className="text-white/20">·</span>
+          <span>Clearix: <span className="text-on-surface-variant font-mono">{email}</span></span>
+          <span className="text-muted">·</span>
           <span>super_admin</span>
         </div>
         <button
           onClick={handleSignOut}
-          className="inline-flex items-center gap-1 text-white/40 hover:text-white/80"
+          className="inline-flex items-center gap-1 text-muted hover:text-on-surface"
         >
           <LogOut size={11} /> Sair do Clearix
         </button>

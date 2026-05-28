@@ -78,27 +78,27 @@ export function Validacao() {
             <TrendingUp className="w-5 h-5 text-[#10B981]" />
             <h2 className="text-lg font-semibold">Validação de hipóteses</h2>
           </div>
-          <p className="text-xs text-white/40 mt-1">
+          <p className="text-xs text-muted mt-1">
             Quais hooks, pilares e posts realmente convertem em venda no Hotmart.
           </p>
         </div>
         <button
           onClick={refresh}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm border border-white/10 rounded-lg hover:bg-white/5"
+          className="flex items-center gap-2 px-3 py-1.5 text-sm border border-outline/10 hover:bg-surface-highest"
         >
           <RefreshCw className="w-4 h-4" /> Atualizar
         </button>
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-white/40 text-sm">Carregando vendas...</div>
+        <div className="text-center py-12 text-muted text-sm">Carregando vendas...</div>
       ) : !stats ? (
-        <div className="text-center py-12 text-white/40 text-sm">Sem dados ainda.</div>
+        <div className="text-center py-12 text-muted text-sm">Sem dados ainda.</div>
       ) : stats.sales_total === 0 ? (
-        <div className="bg-white/5 border border-white/10 rounded-lg p-12 text-center">
-          <AlertCircle className="w-10 h-10 mx-auto mb-3 text-white/30" />
+        <div className="bg-surface-low border border-outline/10 p-12 text-center">
+          <AlertCircle className="w-10 h-10 mx-auto mb-3 text-muted" />
           <h3 className="text-sm font-semibold mb-2">Nenhuma venda registrada ainda</h3>
-          <p className="text-xs text-white/40 max-w-md mx-auto">
+          <p className="text-xs text-muted max-w-md mx-auto">
             Quando o Hotmart confirmar a 1ª venda via webhook, ela aparece aqui atribuída ao post correto via UTM.
             Cada PostDrawer gera a URL UTM automaticamente — cola na bio/stories/feed e o tracking corre sozinho.
           </p>
@@ -158,12 +158,12 @@ export function Validacao() {
 
           {/* Ranking pilares */}
           <div className="mb-8">
-            <h3 className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-3">
+            <h3 className="text-[10px] uppercase tracking-widest font-bold text-muted mb-3">
               Receita por pilar (ranking)
             </h3>
-            <div className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-3">
+            <div className="bg-surface-low border border-outline/10 p-4 space-y-3">
               {ranking.length === 0 ? (
-                <div className="text-xs text-white/40">Sem ranking ainda.</div>
+                <div className="text-xs text-muted">Sem ranking ainda.</div>
               ) : (
                 ranking.map((p) => {
                   const widthPct = Math.round((p.revenue_cents / maxRev) * 100);
@@ -173,20 +173,20 @@ export function Validacao() {
                         <span className="font-medium" style={{ color: p.pillar_color }}>
                           {p.pillar_name}
                         </span>
-                        <div className="flex items-center gap-3 text-white/60">
+                        <div className="flex items-center gap-3 text-on-surface-variant">
                           <span>{p.posts_count} posts</span>
                           <span>{p.sales_count} vendas</span>
-                          <span className="font-semibold text-white" style={{ color: p.pillar_color }}>
+                          <span className="font-semibold text-on-surface" style={{ color: p.pillar_color }}>
                             {brl(p.revenue_cents)}
                           </span>
-                          <span className="text-white/40 text-[10px]">
+                          <span className="text-muted text-[10px]">
                             ({p.sales_per_post.toFixed(2)} v/post)
                           </span>
                         </div>
                       </div>
-                      <div className="h-1.5 bg-white/5 rounded overflow-hidden">
+                      <div className="h-1.5 bg-surface-low overflow-hidden">
                         <div
-                          className="h-full rounded transition-all"
+                          className="h-full transition-all"
                           style={{
                             width: `${widthPct}%`,
                             background: p.pillar_color,
@@ -202,11 +202,11 @@ export function Validacao() {
 
           {/* Top posts */}
           <div>
-            <h3 className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-3">
+            <h3 className="text-[10px] uppercase tracking-widest font-bold text-muted mb-3">
               Top 10 posts por receita
             </h3>
             {topPosts.length === 0 ? (
-              <div className="bg-white/5 border border-white/10 rounded-lg p-8 text-center text-xs text-white/40">
+              <div className="bg-surface-low border border-outline/10 p-8 text-center text-xs text-muted">
                 Nenhum post com venda atribuída ainda.
               </div>
             ) : (
@@ -214,12 +214,12 @@ export function Validacao() {
                 {topPosts.map((p, i) => (
                   <div
                     key={p.id}
-                    className="bg-white/5 border border-white/10 rounded-lg p-3 flex items-center gap-3 border-l-4"
+                    className="bg-surface-low border border-outline/10 p-3 flex items-center gap-3 border-l-4"
                     style={{ borderLeftColor: p.pillar_color ?? '#06B6D4' }}
                   >
-                    <div className="text-2xl font-bold text-white/20 w-8 text-center">{i + 1}</div>
+                    <div className="text-2xl font-bold text-muted w-8 text-center">{i + 1}</div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1">
+                      <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-muted mb-1">
                         <span style={{ color: p.pillar_color ?? '#06B6D4' }}>{p.pillar_name}</span>
                         <span>·</span>
                         <span>{dateBR(p.scheduled_date)}</span>
@@ -232,7 +232,7 @@ export function Validacao() {
                         <ArrowUpRight className="w-3.5 h-3.5" />
                         {brl(p.revenue_cents)}
                       </div>
-                      <div className="text-[10px] text-white/40">{p.sales_count} vendas · {brl(p.commission_cents)} comissão</div>
+                      <div className="text-[10px] text-muted">{p.sales_count} vendas · {brl(p.commission_cents)} comissão</div>
                     </div>
                   </div>
                 ))}
@@ -247,8 +247,8 @@ export function Validacao() {
 
 function StatCard({ label, value, color, icon }: { label: string; value: string; color: string; icon?: React.ReactNode }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-lg p-3">
-      <div className="flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1">
+    <div className="bg-surface-low border border-outline/10 p-3">
+      <div className="flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold text-muted mb-1">
         {icon} {label}
       </div>
       <div className="text-lg font-semibold" style={{ color }}>{value}</div>

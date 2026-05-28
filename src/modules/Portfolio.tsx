@@ -150,19 +150,19 @@ const PRODUTOS: Produto[] = [
 ];
 
 const categoriaBadge: Record<string, { label: string; className: string }> = {
-  'produto-ancora': { label: 'Produto-âncora', className: 'bg-[#2563EB]/20 text-[#2563EB] border-[#2563EB]/30' },
-  'alavanca-critica': { label: 'Alavanca crítica', className: 'bg-[#06B6D4]/20 text-[#06B6D4] border-[#06B6D4]/30' },
-  suporte: { label: 'Suporte prioritário', className: 'bg-white/10 text-white/60 border-white/10' },
-  incubacao: { label: 'Incubação', className: 'bg-white/5 text-white/40 border-white/5' },
-  institucional: { label: 'Institucional', className: 'bg-white/5 text-white/30 border-white/5' },
-  infraestrutura: { label: 'Infraestrutura interna', className: 'bg-white/8 text-white/50 border-white/8' },
+  'produto-ancora': { label: 'Produto-âncora', className: 'bg-secondary-container/40 text-secondary border-secondary/40' },
+  'alavanca-critica': { label: 'Alavanca crítica', className: 'bg-secondary/15 text-secondary border-secondary/40' },
+  suporte: { label: 'Suporte prioritário', className: 'bg-surface-high text-on-surface-variant border-outline/10' },
+  incubacao: { label: 'Incubação', className: 'bg-surface-low text-muted border-outline/10' },
+  institucional: { label: 'Institucional', className: 'bg-surface-low text-muted border-outline/10' },
+  infraestrutura: { label: 'Infraestrutura interna', className: 'bg-surface-high text-on-surface-variant border-outline/10' },
 };
 
 const prioridadeDot: Record<string, string> = {
-  maxima: 'bg-[#2563EB]',
-  alta: 'bg-[#06B6D4]',
-  media: 'bg-white/40',
-  baixa: 'bg-white/15',
+  maxima: 'bg-secondary',
+  alta: 'bg-secondary',
+  media: 'bg-muted',
+  baixa: 'bg-muted',
 };
 
 const OWNER_BY_NAME: Record<string, string> = {
@@ -196,8 +196,8 @@ export default function Portfolio() {
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Portfólio de Produtos</h1>
-        <p className="text-white/50 mt-1">{PRODUTOS.length} frentes · hierarquia canônica · atualizado 2026-05-28</p>
+        <h1 className="text-3xl font-bold tracking-tight font-serif">Portfólio de Produtos</h1>
+        <p className="text-on-surface-variant mt-1">{PRODUTOS.length} frentes · hierarquia canônica · atualizado 2026-05-28</p>
       </div>
 
       <div className="space-y-3">
@@ -208,12 +208,12 @@ export default function Portfolio() {
           return (
             <div
               key={p.nome}
-              className={`rounded-2xl border transition-all duration-200 overflow-hidden
+              className={`border transition-all duration-200 overflow-hidden
                 ${p.categoria === 'produto-ancora'
-                  ? 'border-[#2563EB]/30 bg-[#2563EB]/5'
+                  ? 'border-secondary/40 bg-secondary-container/40'
                   : p.categoria === 'alavanca-critica'
-                  ? 'border-[#06B6D4]/20 bg-[#06B6D4]/3'
-                  : 'border-white/8 bg-white/2'
+                  ? 'border-secondary/40 bg-secondary/15'
+                  : 'border-outline/10 bg-surface-low'
                 }`}
             >
               <button
@@ -225,7 +225,7 @@ export default function Portfolio() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 flex-wrap">
                     <span className="font-bold text-base">{p.nome}</span>
-                    <span className={`text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded border ${badge.className}`}>
+                    <span className={`text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 border ${badge.className}`}>
                       {badge.label}
                     </span>
                     {liveCount(p.nome) > 0 && (
@@ -234,37 +234,37 @@ export default function Portfolio() {
                       </span>
                     )}
                   </div>
-                  <div className="text-sm text-white/50 mt-0.5 truncate">{p.subtitulo}</div>
+                  <div className="text-sm text-on-surface-variant mt-0.5 truncate">{p.subtitulo}</div>
                 </div>
 
                 <div className="flex items-center gap-3 shrink-0">
-                  <span className="text-xs font-mono text-white/30 hidden md:block">{p.faseAtual}</span>
-                  {isOpen ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />}
+                  <span className="text-xs font-mono text-muted hidden md:block">{p.faseAtual}</span>
+                  {isOpen ? <ChevronUp className="w-4 h-4 text-muted" /> : <ChevronDown className="w-4 h-4 text-muted" />}
                 </div>
               </button>
 
               {isOpen && (
-                <div className="px-5 pb-5 space-y-4 border-t border-white/5 pt-4">
+                <div className="px-5 pb-5 space-y-4 border-t border-outline/10 pt-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <div className="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-1">Status</div>
-                      <div className="text-sm text-white/80">{p.status}</div>
+                      <div className="text-[10px] font-mono text-muted uppercase tracking-widest mb-1">Status</div>
+                      <div className="text-sm text-on-surface">{p.status}</div>
                     </div>
                     <div>
-                      <div className="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-1">Fase</div>
-                      <div className="text-sm text-white/80">{p.faseAtual}</div>
+                      <div className="text-[10px] font-mono text-muted uppercase tracking-widest mb-1">Fase</div>
+                      <div className="text-sm text-on-surface">{p.faseAtual}</div>
                     </div>
                     <div className="md:col-span-2">
-                      <div className="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-1">Repositório</div>
-                      <div className="text-sm font-mono text-white/60 bg-white/5 rounded-lg px-3 py-2">{p.repo}</div>
+                      <div className="text-[10px] font-mono text-muted uppercase tracking-widest mb-1">Repositório</div>
+                      <div className="text-sm font-mono text-on-surface-variant bg-surface-low px-3 py-2">{p.repo}</div>
                     </div>
                     <div className="md:col-span-2">
-                      <div className="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-1">Stack</div>
-                      <div className="text-sm text-white/60">{p.stack}</div>
+                      <div className="text-[10px] font-mono text-muted uppercase tracking-widest mb-1">Stack</div>
+                      <div className="text-sm text-on-surface-variant">{p.stack}</div>
                     </div>
                     <div className="md:col-span-2">
-                      <div className="text-[10px] font-mono text-[#06B6D4] uppercase tracking-widest mb-1">Próximo passo</div>
-                      <div className="text-sm text-white/80">{p.proximo}</div>
+                      <div className="text-[10px] font-mono text-secondary uppercase tracking-widest mb-1">Próximo passo</div>
+                      <div className="text-sm text-on-surface">{p.proximo}</div>
                     </div>
                     {p.bloqueio && (
                       <div className="md:col-span-2">

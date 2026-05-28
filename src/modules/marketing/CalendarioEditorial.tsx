@@ -88,23 +88,23 @@ export function CalendarioEditorial() {
     <div className="p-8">
       {/* Toolbar */}
       <div className="flex items-center gap-4 mb-6 flex-wrap">
-        <div className="text-sm text-white/60">
+        <div className="text-sm text-on-surface-variant">
           {posts.length} postagens no calendário
         </div>
 
         <div className="flex-1" />
 
         {/* View toggle */}
-        <div className="flex border border-white/10 rounded-lg overflow-hidden">
+        <div className="flex border border-outline/10 overflow-hidden">
           <button
             onClick={() => setViewMode('month')}
-            className={`flex items-center gap-1 px-3 py-1.5 text-xs ${viewMode === 'month' ? 'bg-[#06B6D4] text-[#0A0F1E] font-medium' : 'text-white/60 hover:bg-white/5'}`}
+            className={`flex items-center gap-1 px-3 py-1.5 text-xs ${viewMode === 'month' ? 'bg-secondary text-surface font-medium' : 'text-on-surface-variant hover:bg-surface-highest'}`}
           >
             <LayoutGrid className="w-3.5 h-3.5" /> Mês
           </button>
           <button
             onClick={() => setViewMode('list')}
-            className={`flex items-center gap-1 px-3 py-1.5 text-xs ${viewMode === 'list' ? 'bg-[#06B6D4] text-[#0A0F1E] font-medium' : 'text-white/60 hover:bg-white/5'}`}
+            className={`flex items-center gap-1 px-3 py-1.5 text-xs ${viewMode === 'list' ? 'bg-secondary text-surface font-medium' : 'text-on-surface-variant hover:bg-surface-highest'}`}
           >
             <List className="w-3.5 h-3.5" /> Lista
           </button>
@@ -113,7 +113,7 @@ export function CalendarioEditorial() {
         <select
           value={pillarFilter}
           onChange={(e) => setPillarFilter(e.target.value)}
-          className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm focus:outline-none"
+          className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm focus:outline-none"
         >
           <option value="all">Todos os pilares</option>
           {pillars.map((p) => (
@@ -126,7 +126,7 @@ export function CalendarioEditorial() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm focus:outline-none"
+          className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm focus:outline-none"
         >
           <option value="all">Todos status</option>
           <option value="planned">Planejado</option>
@@ -138,7 +138,7 @@ export function CalendarioEditorial() {
 
         <button
           onClick={refresh}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm border border-white/10 rounded-lg hover:bg-white/5"
+          className="flex items-center gap-2 px-3 py-1.5 text-sm border border-outline/10 hover:bg-surface-highest"
         >
           <RefreshCw className="w-4 h-4" />
           Atualizar
@@ -154,14 +154,14 @@ export function CalendarioEditorial() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-white/40 text-sm">Carregando calendário...</div>
+        <div className="text-center py-12 text-muted text-sm">Carregando calendário...</div>
       ) : byDate.length === 0 ? (
-        <div className="text-center py-16 text-white/40">
+        <div className="text-center py-16 text-muted">
           <Calendar className="w-12 h-12 mx-auto mb-3 opacity-30" />
           <p className="text-sm">
             Nenhuma postagem agendada ainda.
           </p>
-          <p className="text-xs mt-2 text-white/30">
+          <p className="text-xs mt-2 text-muted">
             Vá pra "Planejador" pra gerar uma agenda completa, ou "Banco de Ideias" pra agendar uma por vez.
           </p>
         </div>
@@ -201,11 +201,11 @@ export function CalendarioEditorial() {
 
 function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+    <div className="bg-surface-low border border-outline/10 p-4">
       <div className="text-2xl font-semibold" style={{ color }}>
         {value}
       </div>
-      <div className="text-xs text-white/40 mt-1">{label}</div>
+      <div className="text-xs text-muted mt-1">{label}</div>
     </div>
   );
 }
@@ -225,17 +225,17 @@ function DateGroup({ date, posts, onAdvance, onEdit }: { date: string; posts: Ca
   return (
     <div>
       <div className="flex items-center gap-2 mb-3">
-        <Calendar className="w-4 h-4 text-white/40" />
-        <h3 className="text-sm font-semibold uppercase tracking-widest text-white/70">
+        <Calendar className="w-4 h-4 text-muted" />
+        <h3 className="text-sm font-semibold uppercase tracking-widest text-on-surface-variant">
           {formatted}
         </h3>
         {isToday && (
-          <span className="px-2 py-0.5 text-[10px] bg-[#06B6D4]/20 text-[#06B6D4] rounded-full font-bold uppercase">
+          <span className="px-2 py-0.5 text-[10px] bg-secondary/15 text-secondary rounded-full font-bold uppercase">
             Hoje
           </span>
         )}
         {isPast && !isToday && (
-          <span className="text-[10px] text-white/30 uppercase">Passado</span>
+          <span className="text-[10px] text-muted uppercase">Passado</span>
         )}
       </div>
       <div className="space-y-2">
@@ -266,7 +266,7 @@ function PostCard({ post, onAdvance, onEdit }: { post: CalendarPost; onAdvance: 
 
   return (
     <div
-      className="bg-white/5 border border-white/10 rounded-lg p-4 border-l-4"
+      className="bg-surface-low border border-outline/10 p-4 border-l-4"
       style={{ borderLeftColor: post.pillar_color ?? '#06B6D4' }}
     >
       <div className="flex items-start justify-between gap-3">
@@ -280,7 +280,7 @@ function PostCard({ post, onAdvance, onEdit }: { post: CalendarPost; onAdvance: 
             </div>
           )}
           <div className="text-sm font-medium mb-1">{post.hook ?? '(sem hook)'}</div>
-          <div className="flex items-center gap-3 text-[11px] text-white/40">
+          <div className="flex items-center gap-3 text-[11px] text-muted">
             {post.content_type && <span>{post.content_type}</span>}
             {post.platform && <span>· {post.platform}</span>}
             {post.scheduled_time && (
@@ -294,7 +294,7 @@ function PostCard({ post, onAdvance, onEdit }: { post: CalendarPost; onAdvance: 
                 href={post.media_external_url}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-1 hover:text-white"
+                className="flex items-center gap-1 hover:text-on-surface"
               >
                 <ExternalLink className="w-3 h-3" />
                 Mídia
@@ -313,7 +313,7 @@ function PostCard({ post, onAdvance, onEdit }: { post: CalendarPost; onAdvance: 
           <div className="flex items-center gap-2">
             <button
               onClick={() => onEdit(post)}
-              className="flex items-center gap-1 text-[11px] text-white/50 hover:text-white"
+              className="flex items-center gap-1 text-[11px] text-on-surface-variant hover:text-on-surface"
             >
               <Pencil className="w-3 h-3" />
               Editar
@@ -321,7 +321,7 @@ function PostCard({ post, onAdvance, onEdit }: { post: CalendarPost; onAdvance: 
             {post.status !== 'published' && post.status !== 'cancelled' && (
               <button
                 onClick={() => onAdvance(post)}
-                className="flex items-center gap-1 text-[11px] text-white/50 hover:text-white"
+                className="flex items-center gap-1 text-[11px] text-on-surface-variant hover:text-on-surface"
               >
                 <CheckCircle2 className="w-3 h-3" />
                 Avançar
@@ -385,16 +385,16 @@ function MonthView({ monthCursor, onMonthChange, posts, onEdit }: {
           <h3 className="text-base font-semibold">
             {MONTH_NAMES[month]} {year}
           </h3>
-          <span className="text-xs text-white/40">· {totalPostsInMonth} posts</span>
+          <span className="text-xs text-muted">· {totalPostsInMonth} posts</span>
         </div>
         <div className="flex items-center gap-1">
-          <button onClick={goPrev} className="p-1.5 hover:bg-white/5 rounded text-white/60 hover:text-white">
+          <button onClick={goPrev} className="p-1.5 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface">
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <button onClick={goToday} className="px-2 py-1 text-xs text-white/60 hover:text-white border border-white/10 rounded hover:bg-white/5">
+          <button onClick={goToday} className="px-2 py-1 text-xs text-on-surface-variant hover:text-on-surface border border-outline/10 hover:bg-surface-highest">
             Hoje
           </button>
-          <button onClick={goNext} className="p-1.5 hover:bg-white/5 rounded text-white/60 hover:text-white">
+          <button onClick={goNext} className="p-1.5 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface">
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
@@ -403,7 +403,7 @@ function MonthView({ monthCursor, onMonthChange, posts, onEdit }: {
       {/* Header dias da semana */}
       <div className="grid grid-cols-7 gap-1 mb-1">
         {WEEKDAY_NAMES.map(w => (
-          <div key={w} className="text-[10px] uppercase tracking-widest font-bold text-white/30 text-center py-1">{w}</div>
+          <div key={w} className="text-[10px] uppercase tracking-widest font-bold text-muted text-center py-1">{w}</div>
         ))}
       </div>
 
@@ -417,11 +417,11 @@ function MonthView({ monthCursor, onMonthChange, posts, onEdit }: {
           return (
             <div
               key={i}
-              className={`min-h-[100px] border rounded p-1.5 ${
-                inMonth ? 'bg-white/[0.03] border-white/10' : 'bg-transparent border-white/5 opacity-40'
-              } ${isToday ? 'ring-1 ring-[#06B6D4]' : ''}`}
+              className={`min-h-[100px] border p-1.5 ${
+                inMonth ? 'bg-surface-low border-outline/10' : 'bg-transparent border-outline/10 opacity-40'
+              } ${isToday ? 'ring-1 ring-secondary' : ''}`}
             >
-              <div className={`text-[10px] mb-1 ${isToday ? 'text-[#06B6D4] font-bold' : 'text-white/40'}`}>
+              <div className={`text-[10px] mb-1 ${isToday ? 'text-secondary font-bold' : 'text-muted'}`}>
                 {d.getDate()}
               </div>
               <div className="space-y-0.5">
@@ -429,7 +429,7 @@ function MonthView({ monthCursor, onMonthChange, posts, onEdit }: {
                   <button
                     key={p.id}
                     onClick={() => onEdit(p)}
-                    className="w-full text-left text-[10px] truncate px-1 py-0.5 rounded hover:brightness-125 transition-all"
+                    className="w-full text-left text-[10px] truncate px-1 py-0.5 hover:brightness-125 transition-all"
                     style={{
                       background: `${p.pillar_color ?? '#06B6D4'}25`,
                       color: p.pillar_color ?? '#06B6D4',
@@ -442,7 +442,7 @@ function MonthView({ monthCursor, onMonthChange, posts, onEdit }: {
                   </button>
                 ))}
                 {dayPosts.length > 4 && (
-                  <div className="text-[9px] text-white/40 px-1">+{dayPosts.length - 4} mais</div>
+                  <div className="text-[9px] text-muted px-1">+{dayPosts.length - 4} mais</div>
                 )}
               </div>
             </div>

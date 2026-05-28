@@ -26,7 +26,7 @@ const RESOURCE_LABELS: Record<string, string> = {
 
 const ACTION_ICONS: Record<string, React.ReactNode> = {
   INSERT: <Plus size={13} className="text-emerald-400" />,
-  UPDATE: <Edit size={13} className="text-[#06B6D4]" />,
+  UPDATE: <Edit size={13} className="text-secondary" />,
   DELETE: <Trash2 size={13} className="text-red-400" />,
 };
 
@@ -116,13 +116,13 @@ export default function RoadmapHistorico() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <History className="w-5 h-5 text-[#06B6D4]" />
+            <History className="w-5 h-5 text-secondary" />
             <h2 className="text-lg font-semibold">Histórico de auditoria</h2>
           </div>
-          <p className="text-xs text-white/40 mt-0.5">Últimas 100 mudanças · atualiza em tempo real</p>
+          <p className="text-xs text-muted mt-0.5">Últimas 100 mudanças · atualiza em tempo real</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={load} className="p-2 hover:bg-white/5 rounded-lg text-white/50 hover:text-white" title="Recarregar">
+          <button onClick={load} className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface" title="Recarregar">
             <RefreshCw size={14} />
           </button>
         </div>
@@ -133,8 +133,8 @@ export default function RoadmapHistorico() {
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`text-xs px-3 py-1.5 rounded-lg font-mono transition-colors ${
-              filter === f ? 'bg-[#2563EB] text-white' : 'bg-white/5 text-white/40 hover:text-white/70'
+            className={`text-xs px-3 py-1.5 font-mono transition-colors ${
+              filter === f ? 'bg-secondary text-surface' : 'bg-surface-low text-muted hover:text-on-surface-variant'
             }`}
           >
             <Filter size={10} className="inline mr-1" />
@@ -144,27 +144,27 @@ export default function RoadmapHistorico() {
       </div>
 
       {loading ? (
-        <div className="text-sm text-white/40 py-8">Carregando...</div>
+        <div className="text-sm text-muted py-8">Carregando...</div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-12 text-white/30 border-2 border-dashed border-white/5 rounded-xl">
+        <div className="text-center py-12 text-muted border-2 border-dashed border-outline/10">
           Nenhuma entrada no histórico ainda.
         </div>
       ) : (
         <div className="space-y-1">
           {filtered.map((log) => (
-            <div key={log.id} className="bg-white/2 border border-white/6 rounded-lg px-3 py-2 flex items-start gap-3 hover:bg-white/[0.04] transition-colors">
+            <div key={log.id} className="bg-surface-low border border-outline/10 px-3 py-2 flex items-start gap-3 hover:bg-surface-highest transition-colors">
               <div className="mt-0.5 shrink-0">{ACTION_ICONS[log.action]}</div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm text-white/85">
-                    <span className="text-[#06B6D4]">{log.user_email || 'sistema'}</span>{' '}
-                    <span className="text-white/60">{summarizeChange(log)}</span>
+                  <span className="text-sm text-on-surface">
+                    <span className="text-secondary">{log.user_email || 'sistema'}</span>{' '}
+                    <span className="text-on-surface-variant">{summarizeChange(log)}</span>
                   </span>
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-[10px] font-mono text-white/30">{formatRelative(log.created_at)}</span>
-                  <span className="text-[10px] font-mono text-white/25">·</span>
-                  <span className="text-[10px] font-mono text-white/25">{RESOURCE_LABELS[log.resource_type] || log.resource_type}</span>
+                  <span className="text-[10px] font-mono text-muted">{formatRelative(log.created_at)}</span>
+                  <span className="text-[10px] font-mono text-muted">·</span>
+                  <span className="text-[10px] font-mono text-muted">{RESOURCE_LABELS[log.resource_type] || log.resource_type}</span>
                 </div>
               </div>
             </div>

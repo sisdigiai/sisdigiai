@@ -114,19 +114,19 @@ export default function ImageGallery({ images, onUpload, onRemove, onReorder }: 
               onDragOver={onItemDragOver(i)}
               onDrop={onItemDrop(i)}
               onDragEnd={onItemDragEnd}
-              className={`relative w-20 h-20 rounded-lg overflow-hidden border group shrink-0 transition-all ${
+              className={`relative w-20 h-20 overflow-hidden border group shrink-0 transition-all ${
                 isDragging ? 'opacity-40 scale-95' : ''
-              } ${isOver ? 'border-[#06B6D4] ring-2 ring-[#06B6D4]/40' : 'border-white/10'}`}
+              } ${isOver ? 'border-secondary ring-2 ring-secondary/40' : 'border-outline/10'}`}
               title={`Imagem ${i + 1} — arraste para reordenar`}
             >
               <img src={img.url} alt={`Imagem ${i + 1}`} className="w-full h-full object-cover" />
               {/* Numeração */}
-              <div className="absolute bottom-1 left-1 bg-black/70 text-white text-[10px] font-mono px-1 rounded">
+              <div className="absolute bottom-1 left-1 bg-black/70 text-on-surface text-[10px] font-mono px-1 rounded">
                 {i + 1}
               </div>
               {/* Drag handle */}
               <div className="absolute top-1 left-1 opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 rounded p-0.5 cursor-grab active:cursor-grabbing">
-                <GripVertical size={10} className="text-white/80" />
+                <GripVertical size={10} className="text-on-surface" />
               </div>
               {/* Remover */}
               <button
@@ -136,7 +136,7 @@ export default function ImageGallery({ images, onUpload, onRemove, onReorder }: 
                 className="absolute top-1 right-1 w-5 h-5 bg-black/70 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:cursor-wait"
                 title="Remover imagem"
               >
-                {removing ? <Loader2 size={10} className="animate-spin text-white" /> : <X size={10} className="text-white" />}
+                {removing ? <Loader2 size={10} className="animate-spin text-on-surface" /> : <X size={10} className="text-on-surface" />}
               </button>
             </div>
           );
@@ -152,19 +152,19 @@ export default function ImageGallery({ images, onUpload, onRemove, onReorder }: 
             onDragLeave={() => setDragOver(false)}
             onDrop={handleDropFile}
             onClick={() => inputRef.current?.click()}
-            className={`w-20 h-20 rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors ${
+            className={`w-20 h-20 border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors ${
               dragOver
-                ? 'border-[#06B6D4] bg-[#06B6D4]/10'
-                : 'border-white/15 hover:border-white/30 bg-white/3'
+                ? 'border-secondary bg-secondary/15'
+                : 'border-outline/30 hover:border-outline/30 bg-surface-low'
             }`}
             title="Adicionar imagem"
           >
             {uploading ? (
-              <Loader2 size={16} className="animate-spin text-white/50" />
+              <Loader2 size={16} className="animate-spin text-on-surface-variant" />
             ) : (
               <>
-                <Upload size={14} className="text-white/30" />
-                <span className="text-[9px] text-white/30 text-center leading-tight">
+                <Upload size={14} className="text-muted" />
+                <span className="text-[9px] text-muted text-center leading-tight">
                   + adicionar
                 </span>
               </>
@@ -182,7 +182,7 @@ export default function ImageGallery({ images, onUpload, onRemove, onReorder }: 
 
       {error && <p className="text-[10px] text-red-400">{error}</p>}
       {images.length > 1 && (
-        <p className="text-[10px] text-white/30">
+        <p className="text-[10px] text-muted">
           {images.length} imagens · arraste para reordenar
         </p>
       )}

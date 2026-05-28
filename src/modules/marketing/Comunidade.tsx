@@ -78,15 +78,15 @@ export function Comunidade() {
             <Users className="w-5 h-5 text-[#F59E0B]" />
             <h2 className="text-lg font-semibold">Comunidade OSI</h2>
           </div>
-          <p className="text-xs text-white/40 mt-1">
+          <p className="text-xs text-muted mt-1">
             Membros vindos do Hotmart. Webhook cria automático cada compra aprovada.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#F59E0B] text-[#0A0F1E] font-medium rounded-lg hover:bg-[#F59E0B]/90">
+          <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#F59E0B] text-[#0A0F1E] font-medium hover:bg-[#F59E0B]/90">
             <Plus className="w-4 h-4" /> Adicionar manual
           </button>
-          <button onClick={refresh} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-white/10 rounded-lg hover:bg-white/5">
+          <button onClick={refresh} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-outline/10 hover:bg-surface-highest">
             <RefreshCw className="w-4 h-4" /> Atualizar
           </button>
         </div>
@@ -113,11 +113,11 @@ export function Comunidade() {
       {/* Filtros */}
       <div className="flex items-center gap-3 mb-4 flex-wrap">
         <div className="flex items-center gap-2 flex-1 min-w-[260px]">
-          <Search className="w-4 h-4 text-white/40" />
+          <Search className="w-4 h-4 text-muted" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Nome / email / cidade..."
-            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm focus:outline-none" />
+            className="flex-1 bg-surface-low border border-outline/10 px-3 py-1.5 text-sm focus:outline-none" />
         </div>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm">
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm">
           <option value="all">Todos status</option>
           <option value="active">Ativo</option>
           <option value="vip">VIP</option>
@@ -125,7 +125,7 @@ export function Comunidade() {
           <option value="refunded">Reembolsado</option>
           <option value="blocked">Bloqueado</option>
         </select>
-        <select value={tierFilter} onChange={e => setTierFilter(e.target.value)} className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm">
+        <select value={tierFilter} onChange={e => setTierFilter(e.target.value)} className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm">
           <option value="all">Todos tiers</option>
           <option value="bronze">Bronze</option>
           <option value="prata">Prata</option>
@@ -135,9 +135,9 @@ export function Comunidade() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-white/40 text-sm">Carregando...</div>
+        <div className="text-center py-12 text-muted text-sm">Carregando...</div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white/5 border border-white/10 rounded-lg p-12 text-center text-white/40">
+        <div className="bg-surface-low border border-outline/10 p-12 text-center text-muted">
           <Users className="w-10 h-10 mx-auto mb-3 opacity-30" />
           <p className="text-sm">
             {members.length === 0 ? 'Nenhum membro ainda — a 1ª venda Hotmart cria o primeiro automaticamente.' : 'Nenhum match nos filtros.'}
@@ -172,22 +172,22 @@ function MemberCard({ m, busy, onPromoteVip, onSetActive, onSetInactive, onBlock
 }) {
   const isVip = m.status === 'vip';
   return (
-    <div className="bg-white/5 border border-white/10 rounded-lg p-4 border-l-4"
+    <div className="bg-surface-low border border-outline/10 p-4 border-l-4"
       style={{ borderLeftColor: STATUS_COLOR[m.status] }}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="font-semibold">{m.full_name}</span>
             {isVip && <Crown className="w-3.5 h-3.5 text-[#F59E0B]" />}
-            <span className="text-[10px] uppercase tracking-widest font-bold px-1.5 py-0.5 rounded"
+            <span className="text-[10px] uppercase tracking-widest font-bold px-1.5 py-0.5"
               style={{ background: `${TIER_COLOR[m.tier]}30`, color: TIER_COLOR[m.tier] }}>
               {m.tier}
             </span>
-            <span className="text-xs text-white/40">·</span>
-            <span className="text-xs text-white/60">{m.email}</span>
+            <span className="text-xs text-muted">·</span>
+            <span className="text-xs text-on-surface-variant">{m.email}</span>
             {m.whatsapp && <span className="text-xs text-[#25D366]">· {m.whatsapp}</span>}
           </div>
-          <div className="text-[10px] text-white/30">
+          <div className="text-[10px] text-muted">
             Comprou em {dateBR(m.joined_at)}
             {m.hotmart_value_cents != null && ` · ${brl(m.hotmart_value_cents)}`}
             {m.pillar_code && <> · veio do pilar <b style={{ color: m.pillar_color ?? '#06B6D4' }}>{m.pillar_name}</b></>}
@@ -195,38 +195,38 @@ function MemberCard({ m, busy, onPromoteVip, onSetActive, onSetInactive, onBlock
             {m.city && ` · ${m.city}/${m.state}`}
           </div>
         </div>
-        <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded shrink-0"
+        <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 shrink-0"
           style={{ background: `${STATUS_COLOR[m.status]}20`, color: STATUS_COLOR[m.status] }}>
           {STATUS_LABEL[m.status]}
         </span>
       </div>
 
       {m.notes && (
-        <p className="text-[11px] text-white/40 mt-2 italic">{m.notes}</p>
+        <p className="text-[11px] text-muted mt-2 italic">{m.notes}</p>
       )}
 
-      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/5">
+      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-outline/10">
         {m.whatsapp && (
           <button onClick={onSendWhats} disabled={busy}
-            className="flex items-center gap-1 text-xs bg-[#25D366]/20 text-[#25D366] px-3 py-1.5 rounded hover:bg-[#25D366]/30 disabled:opacity-50">
+            className="flex items-center gap-1 text-xs bg-[#25D366]/20 text-[#25D366] px-3 py-1.5 hover:bg-[#25D366]/30 disabled:opacity-50">
             <MessageCircle className="w-3 h-3" /> WhatsApp
           </button>
         )}
         {!isVip && (
           <button onClick={onPromoteVip} disabled={busy}
-            className="flex items-center gap-1 text-xs border border-[#F59E0B]/40 text-[#F59E0B] px-3 py-1.5 rounded hover:bg-[#F59E0B]/10 disabled:opacity-50">
+            className="flex items-center gap-1 text-xs border border-[#F59E0B]/40 text-[#F59E0B] px-3 py-1.5 hover:bg-[#F59E0B]/10 disabled:opacity-50">
             {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Crown className="w-3 h-3" />} VIP
           </button>
         )}
         {m.status === 'inactive' && (
           <button onClick={onSetActive} disabled={busy}
-            className="flex items-center gap-1 text-xs border border-[#10B981]/40 text-[#10B981] px-3 py-1.5 rounded hover:bg-[#10B981]/10 disabled:opacity-50">
+            className="flex items-center gap-1 text-xs border border-[#10B981]/40 text-[#10B981] px-3 py-1.5 hover:bg-[#10B981]/10 disabled:opacity-50">
             <CheckCircle2 className="w-3 h-3" /> Reativar
           </button>
         )}
         {m.status === 'active' && (
           <button onClick={onSetInactive} disabled={busy}
-            className="text-xs text-white/40 hover:text-white px-3 py-1.5">
+            className="text-xs text-muted hover:text-on-surface px-3 py-1.5">
             Marcar inativo
           </button>
         )}
@@ -249,28 +249,28 @@ function AddMemberModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/70" />
-      <div className="relative bg-[#0F1729] border border-white/10 rounded-xl p-6 max-w-md w-full" onClick={e => e.stopPropagation()}>
+      <div className="absolute inset-0 bg-surface-lowest" />
+      <div className="relative bg-surface-container border border-outline/10 p-6 max-w-md w-full" onClick={e => e.stopPropagation()}>
         <h3 className="text-lg font-semibold mb-4">Adicionar membro manual</h3>
         <div className="space-y-3">
-          <input value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} placeholder="Nome completo *" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm" />
-          <input value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="Email *" type="email" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm" />
-          <input value={form.whatsapp} onChange={e => setForm({ ...form, whatsapp: e.target.value })} placeholder="WhatsApp +55 11 99999-0000" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm" />
+          <input value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} placeholder="Nome completo *" className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm" />
+          <input value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="Email *" type="email" className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm" />
+          <input value={form.whatsapp} onChange={e => setForm({ ...form, whatsapp: e.target.value })} placeholder="WhatsApp +55 11 99999-0000" className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm" />
           <div className="grid grid-cols-2 gap-2">
-            <input value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} placeholder="Cidade" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm" />
-            <input value={form.state} onChange={e => setForm({ ...form, state: e.target.value.toUpperCase() })} placeholder="UF" maxLength={2} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm" />
+            <input value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} placeholder="Cidade" className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm" />
+            <input value={form.state} onChange={e => setForm({ ...form, state: e.target.value.toUpperCase() })} placeholder="UF" maxLength={2} className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm" />
           </div>
-          <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} placeholder="Notas internas" rows={3} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm" />
-          <label className="flex items-center gap-2 text-xs text-white/70">
+          <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} placeholder="Notas internas" rows={3} className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm" />
+          <label className="flex items-center gap-2 text-xs text-on-surface-variant">
             <input type="checkbox" checked={form.whatsapp_consent} onChange={e => setForm({ ...form, whatsapp_consent: e.target.checked })} className="accent-[#F59E0B]" />
             Autorizou contato pelo WhatsApp
           </label>
         </div>
         <div className="flex items-center gap-2 mt-5">
-          <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#F59E0B] text-[#0A0F1E] font-medium rounded-lg hover:bg-[#F59E0B]/90 text-sm disabled:opacity-50">
+          <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#F59E0B] text-[#0A0F1E] font-medium hover:bg-[#F59E0B]/90 text-sm disabled:opacity-50">
             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Adicionar
           </button>
-          <button onClick={onClose} className="px-4 py-2 border border-white/10 text-white/60 rounded-lg hover:bg-white/5 text-sm">Cancelar</button>
+          <button onClick={onClose} className="px-4 py-2 border border-outline/10 text-on-surface-variant hover:bg-surface-highest text-sm">Cancelar</button>
         </div>
       </div>
     </div>
@@ -279,8 +279,8 @@ function AddMemberModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
 
 function StatCard({ label, value, color, icon }: { label: string; value: string; color: string; icon?: React.ReactNode }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-lg p-3">
-      <div className="flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1">
+    <div className="bg-surface-low border border-outline/10 p-3">
+      <div className="flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold text-muted mb-1">
         {icon} {label}
       </div>
       <div className="text-lg font-semibold" style={{ color }}>{value}</div>

@@ -71,15 +71,15 @@ export function Desafios() {
             <Trophy className="w-5 h-5 text-[#F59E0B]" />
             <h2 className="text-lg font-semibold">Desafios mensais (gamificação)</h2>
           </div>
-          <p className="text-xs text-white/40 mt-1">
+          <p className="text-xs text-muted mt-1">
             Lança desafio por Movimento (1-5), vendedores submetem prova, ranking dispara mecânica viral.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowNew(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#F59E0B] text-[#0A0F1E] font-medium rounded-lg hover:bg-[#F59E0B]/90">
+          <button onClick={() => setShowNew(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#F59E0B] text-[#0A0F1E] font-medium hover:bg-[#F59E0B]/90">
             <Plus className="w-4 h-4" /> Novo desafio
           </button>
-          <button onClick={refresh} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-white/10 rounded-lg hover:bg-white/5">
+          <button onClick={refresh} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-outline/10 hover:bg-surface-highest">
             <RefreshCw className="w-4 h-4" /> Atualizar
           </button>
         </div>
@@ -89,13 +89,13 @@ export function Desafios() {
         <div className="grid grid-cols-5 gap-3 mb-6">
           {(['active','draft','closed','cancelled'] as const).map(s => (
             <button key={s} onClick={() => setStatusFilter(s)}
-              className={`bg-white/5 border rounded-lg p-3 text-left ${statusFilter === s ? 'border-white/30 ring-1 ring-white/20' : 'border-white/10 hover:bg-white/[0.08]'}`}>
-              <div className="text-[10px] uppercase tracking-widest font-bold text-white/40">{STATUS_LABEL[s]}</div>
+              className={`bg-surface-low border p-3 text-left ${statusFilter === s ? 'border-outline/30 ring-1 ring-outline/30' : 'border-outline/10 hover:bg-surface-highest'}`}>
+              <div className="text-[10px] uppercase tracking-widest font-bold text-muted">{STATUS_LABEL[s]}</div>
               <div className="text-2xl font-semibold mt-1" style={{ color: STATUS_COLOR[s] }}>{stats[s] ?? 0}</div>
             </button>
           ))}
-          <div className="bg-white/5 border border-white/10 rounded-lg p-3">
-            <div className="text-[10px] uppercase tracking-widest font-bold text-white/40">Vencedores totais</div>
+          <div className="bg-surface-low border border-outline/10 p-3">
+            <div className="text-[10px] uppercase tracking-widest font-bold text-muted">Vencedores totais</div>
             <div className="text-2xl font-semibold mt-1 text-[#F59E0B]">{stats.total_winners}</div>
           </div>
         </div>
@@ -103,18 +103,18 @@ export function Desafios() {
 
       <div className="flex items-center gap-2 mb-4">
         <button onClick={() => setStatusFilter('all')}
-          className={`text-xs px-3 py-1 rounded-full border ${statusFilter === 'all' ? 'border-white/30 text-white' : 'border-white/10 text-white/50 hover:border-white/20'}`}>
+          className={`text-xs px-3 py-1 rounded-full border ${statusFilter === 'all' ? 'border-outline/30 text-on-surface' : 'border-outline/10 text-on-surface-variant hover:border-outline/30'}`}>
           Ver todos
         </button>
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-white/40 text-sm">Carregando...</div>
+        <div className="text-center py-12 text-muted text-sm">Carregando...</div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white/5 border border-white/10 rounded-lg p-12 text-center text-white/40">
+        <div className="bg-surface-low border border-outline/10 p-12 text-center text-muted">
           <Trophy className="w-10 h-10 mx-auto mb-3 opacity-30" />
           <p className="text-sm">Nenhum desafio ainda. Clica em "Novo desafio" pra lançar o primeiro.</p>
-          <p className="text-xs mt-2 text-white/30">
+          <p className="text-xs mt-2 text-muted">
             Sugestão: "Desafio Movimento 3 — aplica indicação com segurança essa semana e me conta o que vendeu"
           </p>
         </div>
@@ -143,12 +143,12 @@ function ChallengeCard({ c, onOpen }: { c: Challenge; onOpen: () => void }) {
   const movColor = MOVEMENT_COLOR[movement] ?? '#06B6D4';
   return (
     <button onClick={onOpen}
-      className="bg-white/5 border border-white/10 rounded-lg p-4 text-left hover:bg-white/[0.08] border-l-4"
+      className="bg-surface-low border border-outline/10 p-4 text-left hover:bg-surface-highest border-l-4"
       style={{ borderLeftColor: STATUS_COLOR[c.status] }}>
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-2">
           {c.movement && (
-            <span className="text-[10px] uppercase tracking-widest font-bold px-1.5 py-0.5 rounded"
+            <span className="text-[10px] uppercase tracking-widest font-bold px-1.5 py-0.5"
               style={{ background: `${movColor}25`, color: movColor }}>
               Movimento {c.movement}
             </span>
@@ -159,16 +159,16 @@ function ChallengeCard({ c, onOpen }: { c: Challenge; onOpen: () => void }) {
           </span>
         </div>
         {c.hashtag && (
-          <span className="text-[10px] text-white/40 flex items-center gap-0.5">
+          <span className="text-[10px] text-muted flex items-center gap-0.5">
             <Hash className="w-3 h-3" /> {c.hashtag}
           </span>
         )}
       </div>
       <h3 className="font-semibold mb-1">{c.name}</h3>
-      {c.movement && <p className="text-[11px] text-white/40 mb-2">{MOVEMENT_NAMES[c.movement]}</p>}
-      {c.description && <p className="text-xs text-white/60 line-clamp-2 mb-3">{c.description}</p>}
+      {c.movement && <p className="text-[11px] text-muted mb-2">{MOVEMENT_NAMES[c.movement]}</p>}
+      {c.description && <p className="text-xs text-on-surface-variant line-clamp-2 mb-3">{c.description}</p>}
 
-      <div className="flex items-center gap-3 text-[11px] text-white/40">
+      <div className="flex items-center gap-3 text-[11px] text-muted">
         {(c.start_date || c.end_date) && (
           <span className="flex items-center gap-1">
             <Calendar className="w-3 h-3" /> {dateBR(c.start_date)} → {dateBR(c.end_date)}
@@ -207,11 +207,11 @@ function NewChallengeModal({ onClose, onSaved }: { onClose: () => void; onSaved:
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/70" />
-      <div className="relative bg-[#0F1729] border border-white/10 rounded-xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+      <div className="absolute inset-0 bg-surface-lowest" />
+      <div className="relative bg-surface-container border border-outline/10 p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Novo desafio</h3>
-          <button onClick={onClose} className="p-1 text-white/60 hover:text-white"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-1 text-on-surface-variant hover:text-on-surface"><X className="w-5 h-5" /></button>
         </div>
         <div className="space-y-3">
           <Field label="Nome do desafio *">
@@ -255,10 +255,10 @@ function NewChallengeModal({ onClose, onSaved }: { onClose: () => void; onSaved:
           </Field>
         </div>
         <div className="flex items-center gap-2 mt-5">
-          <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#F59E0B] text-[#0A0F1E] font-medium rounded-lg hover:bg-[#F59E0B]/90 text-sm disabled:opacity-50">
+          <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#F59E0B] text-[#0A0F1E] font-medium hover:bg-[#F59E0B]/90 text-sm disabled:opacity-50">
             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Criar
           </button>
-          <button onClick={onClose} className="px-4 py-2 border border-white/10 text-white/60 rounded-lg hover:bg-white/5 text-sm">Cancelar</button>
+          <button onClick={onClose} className="px-4 py-2 border border-outline/10 text-on-surface-variant hover:bg-surface-highest text-sm">Cancelar</button>
         </div>
       </div>
     </div>
@@ -306,96 +306,96 @@ function ChallengeDetailDrawer({ challenge, onClose, onChanged }: { challenge: C
 
   return (
     <div className="fixed inset-0 z-50 flex" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/60" />
-      <div className="relative ml-auto w-full max-w-3xl h-full bg-[#0F1729] border-l border-white/10 overflow-y-auto" onClick={e => e.stopPropagation()}>
-        <div className="sticky top-0 z-10 bg-[#0F1729] border-b border-white/10 px-6 py-4 flex items-center justify-between">
+      <div className="absolute inset-0 bg-surface-lowest" />
+      <div className="relative ml-auto w-full max-w-3xl h-full bg-surface-container border-l border-outline/10 overflow-y-auto" onClick={e => e.stopPropagation()}>
+        <div className="sticky top-0 z-10 bg-surface-container border-b border-outline/10 px-6 py-4 flex items-center justify-between">
           <div>
             <div className="text-[10px] uppercase tracking-widest font-bold" style={{ color: MOVEMENT_COLOR[challenge.movement ?? 1] }}>
               Movimento {challenge.movement} — {MOVEMENT_NAMES[challenge.movement ?? 1]}
             </div>
             <h2 className="text-lg font-semibold mt-1">{challenge.name}</h2>
-            <p className="text-xs text-white/40 mt-0.5">
+            <p className="text-xs text-muted mt-0.5">
               {dateBR(challenge.start_date)} → {dateBR(challenge.end_date)} · {challenge.participants_count} inscritos · {challenge.submissions_count} provas
             </p>
           </div>
           <div className="flex items-center gap-2">
             {challenge.status === 'draft' && (
-              <button onClick={handleActivate} disabled={busy} className="flex items-center gap-1 px-3 py-2 bg-[#10B981] text-[#0A0F1E] font-medium rounded-lg text-sm disabled:opacity-50">
+              <button onClick={handleActivate} disabled={busy} className="flex items-center gap-1 px-3 py-2 bg-[#10B981] text-[#0A0F1E] font-medium text-sm disabled:opacity-50">
                 {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Flag className="w-4 h-4" />} Ativar
               </button>
             )}
             {challenge.status === 'active' && (
-              <button onClick={handleFinalize} disabled={busy} className="flex items-center gap-1 px-3 py-2 bg-[#F59E0B] text-[#0A0F1E] font-medium rounded-lg text-sm disabled:opacity-50">
+              <button onClick={handleFinalize} disabled={busy} className="flex items-center gap-1 px-3 py-2 bg-[#F59E0B] text-[#0A0F1E] font-medium text-sm disabled:opacity-50">
                 {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trophy className="w-4 h-4" />} Finalizar
               </button>
             )}
-            <button onClick={onClose} className="p-2 text-white/60 hover:text-white"><X className="w-5 h-5" /></button>
+            <button onClick={onClose} className="p-2 text-on-surface-variant hover:text-on-surface"><X className="w-5 h-5" /></button>
           </div>
         </div>
 
         <div className="p-6 space-y-5">
           {challenge.description && (
             <div>
-              <div className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1">Descrição</div>
-              <p className="text-sm text-white/80 whitespace-pre-wrap">{challenge.description}</p>
+              <div className="text-[10px] uppercase tracking-widest font-bold text-muted mb-1">Descrição</div>
+              <p className="text-sm text-on-surface whitespace-pre-wrap">{challenge.description}</p>
             </div>
           )}
           {challenge.prize_description && (
             <div>
-              <div className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1 flex items-center gap-1">
+              <div className="text-[10px] uppercase tracking-widest font-bold text-muted mb-1 flex items-center gap-1">
                 <Award className="w-3 h-3 text-[#F59E0B]" /> Prêmio
               </div>
-              <p className="text-sm text-white/80">{challenge.prize_description}</p>
+              <p className="text-sm text-on-surface">{challenge.prize_description}</p>
             </div>
           )}
           {challenge.rules && (
             <div>
-              <div className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1">Regras</div>
-              <p className="text-sm text-white/80 whitespace-pre-wrap">{challenge.rules}</p>
+              <div className="text-[10px] uppercase tracking-widest font-bold text-muted mb-1">Regras</div>
+              <p className="text-sm text-on-surface whitespace-pre-wrap">{challenge.rules}</p>
             </div>
           )}
           {challenge.hashtag && (
             <div>
-              <div className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1">Hashtag oficial</div>
-              <code className="text-sm text-[#F59E0B] bg-black/30 px-2 py-1 rounded">#{challenge.hashtag}</code>
+              <div className="text-[10px] uppercase tracking-widest font-bold text-muted mb-1">Hashtag oficial</div>
+              <code className="text-sm text-[#F59E0B] bg-surface-lowest px-2 py-1">#{challenge.hashtag}</code>
             </div>
           )}
 
           <div>
-            <div className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-2">
+            <div className="text-[10px] uppercase tracking-widest font-bold text-muted mb-2">
               Leaderboard ({participations.length})
             </div>
             {loading ? (
-              <div className="text-xs text-white/40">Carregando...</div>
+              <div className="text-xs text-muted">Carregando...</div>
             ) : participations.length === 0 ? (
-              <div className="bg-white/5 border border-white/10 rounded p-4 text-xs text-white/40 text-center">
+              <div className="bg-surface-low border border-outline/10 p-4 text-xs text-muted text-center">
                 Nenhum inscrito ainda.
               </div>
             ) : (
               <div className="space-y-2">
                 {participations.map((p, i) => (
-                  <div key={p.id} className="bg-white/5 border border-white/10 rounded p-3 border-l-4"
+                  <div key={p.id} className="bg-surface-low border border-outline/10 p-3 border-l-4"
                     style={{ borderLeftColor: PART_STATUS_COLOR[p.status] }}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          {p.ranking && <span className="text-lg font-bold text-white/30">#{p.ranking}</span>}
+                          {p.ranking && <span className="text-lg font-bold text-muted">#{p.ranking}</span>}
                           <span className="font-semibold">{p.participant_name}</span>
-                          {(p.city || p.state) && <span className="text-[11px] text-white/40">· {[p.city, p.state].filter(Boolean).join('/')}</span>}
-                          <span className="text-[10px] uppercase tracking-widest font-bold px-1.5 py-0.5 rounded shrink-0"
+                          {(p.city || p.state) && <span className="text-[11px] text-muted">· {[p.city, p.state].filter(Boolean).join('/')}</span>}
+                          <span className="text-[10px] uppercase tracking-widest font-bold px-1.5 py-0.5 shrink-0"
                             style={{ background: `${PART_STATUS_COLOR[p.status]}30`, color: PART_STATUS_COLOR[p.status] }}>
                             {PART_STATUS_LABEL[p.status]}
                           </span>
                         </div>
                         {p.submission_text && (
-                          <p className="text-xs text-white/70 mt-1 whitespace-pre-wrap">{p.submission_text}</p>
+                          <p className="text-xs text-on-surface-variant mt-1 whitespace-pre-wrap">{p.submission_text}</p>
                         )}
                         {p.submission_url && (
-                          <a href={p.submission_url} target="_blank" rel="noreferrer" className="text-[11px] text-[#06B6D4] hover:text-white flex items-center gap-1 mt-1">
+                          <a href={p.submission_url} target="_blank" rel="noreferrer" className="text-[11px] text-secondary hover:text-on-surface flex items-center gap-1 mt-1">
                             <ExternalLink className="w-3 h-3" /> Prova
                           </a>
                         )}
-                        <div className="text-[10px] text-white/40 mt-1 flex gap-3">
+                        <div className="text-[10px] text-muted mt-1 flex gap-3">
                           <span>Inscrito em {dateBR(p.joined_at)}</span>
                           {p.sales_amount_cents != null && <span>Venda: {brl(p.sales_amount_cents)}</span>}
                           {p.score != null && <span className="text-[#F59E0B]">Score: {p.score}</span>}
@@ -403,7 +403,7 @@ function ChallengeDetailDrawer({ challenge, onClose, onChanged }: { challenge: C
                       </div>
                       <div className="flex flex-col gap-1 shrink-0">
                         {p.status === 'submitted' && p.score == null && (
-                          <button onClick={() => handleSetScore(p.id)} className="text-[11px] text-[#06B6D4] hover:text-white">
+                          <button onClick={() => handleSetScore(p.id)} className="text-[11px] text-secondary hover:text-on-surface">
                             Atribuir score
                           </button>
                         )}
@@ -426,11 +426,11 @@ function ChallengeDetailDrawer({ challenge, onClose, onChanged }: { challenge: C
   );
 }
 
-const inputCls = 'w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#F59E0B]/50 text-white placeholder:text-white/30';
+const inputCls = 'w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-[#F59E0B]/50 text-on-surface placeholder:text-muted';
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-[11px] text-white/50 block mb-1">{label}</label>
+      <label className="text-[11px] text-on-surface-variant block mb-1">{label}</label>
       {children}
     </div>
   );

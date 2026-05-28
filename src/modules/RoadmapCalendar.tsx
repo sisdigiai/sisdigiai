@@ -10,13 +10,13 @@ const DIAS_CURTOS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
 const TRACK_COLOR: Record<Track, string> = {
   A: 'bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/40',
-  B: 'bg-[#2563EB]/20 text-[#06B6D4] border-[#2563EB]/40',
+  B: 'bg-secondary-container/40 text-secondary border-secondary/40',
   C: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
 };
 
 const TRACK_DOT: Record<Track, string> = {
   A: 'bg-fuchsia-400',
-  B: 'bg-[#06B6D4]',
+  B: 'bg-secondary',
   C: 'bg-emerald-400',
 };
 
@@ -103,7 +103,7 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-2xl font-bold">{MESES[month]} {year}</h2>
-          <div className="text-xs text-white/50 mt-1 flex items-center gap-3 flex-wrap">
+          <div className="text-xs text-on-surface-variant mt-1 flex items-center gap-3 flex-wrap">
             <span>{monthStats.total} tarefas</span>
             <span className="text-emerald-400">{monthStats.done} feitas</span>
             {monthStats.overdue > 0 && (
@@ -114,20 +114,20 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
           </div>
         </div>
         <div className="flex gap-2">
-          <button onClick={prevMonth} className="p-2 hover:bg-white/5 rounded-lg text-white/60 hover:text-white" title="Mês anterior">
+          <button onClick={prevMonth} className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface" title="Mês anterior">
             <ChevronLeft size={18} />
           </button>
-          <button onClick={thisMonth} className="px-3 py-1.5 text-xs bg-[#2563EB]/20 hover:bg-[#2563EB]/30 border border-[#2563EB]/40 rounded-lg text-[#06B6D4] font-medium">
+          <button onClick={thisMonth} className="px-3 py-1.5 text-xs bg-secondary-container/40 hover:bg-secondary-container/40 border border-secondary/40 text-secondary font-medium">
             Hoje
           </button>
-          <button onClick={nextMonth} className="p-2 hover:bg-white/5 rounded-lg text-white/60 hover:text-white" title="Próximo mês">
+          <button onClick={nextMonth} className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface" title="Próximo mês">
             <ChevronRight size={18} />
           </button>
         </div>
       </div>
 
       {/* Legenda de tracks */}
-      <div className="flex items-center gap-4 text-xs text-white/60">
+      <div className="flex items-center gap-4 text-xs text-on-surface-variant">
         <div className="flex items-center gap-1.5">
           <span className={`w-2 h-2 rounded-full ${TRACK_DOT.A}`} /> Academy
         </div>
@@ -141,16 +141,16 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
 
       {/* Cabeçalho dos dias da semana */}
       <div>
-        <div className="grid grid-cols-7 gap-px bg-white/5 rounded-t-lg overflow-hidden">
+        <div className="grid grid-cols-7 gap-px bg-surface-low rounded-t-lg overflow-hidden">
           {DIAS_CURTOS.map((d) => (
-            <div key={d} className="bg-[#0A0F1E] text-center py-2 text-[10px] font-mono text-white/40 uppercase tracking-widest">
+            <div key={d} className="bg-surface text-center py-2 text-[10px] font-mono text-muted uppercase tracking-widest">
               {d}
             </div>
           ))}
         </div>
 
         {/* Grade do mês */}
-        <div className="grid grid-cols-7 gap-px bg-white/5 rounded-b-lg overflow-hidden">
+        <div className="grid grid-cols-7 gap-px bg-surface-low rounded-b-lg overflow-hidden">
           {cells.map((cell, i) => {
             const tasksOfDay = tasksByDate.get(cell.date) ?? [];
             const isToday = cell.date === todayISO;
@@ -163,15 +163,15 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
               <button
                 key={i}
                 onClick={() => setSelectedDate(isSelected ? null : cell.date)}
-                className={`relative bg-[#0A0F1E] min-h-[84px] p-1.5 text-left transition-all hover:bg-white/[0.02]
+                className={`relative bg-surface min-h-[84px] p-1.5 text-left transition-all hover:bg-surface-highest
                   ${!cell.inMonth ? 'opacity-25' : ''}
-                  ${isSelected ? 'ring-2 ring-[#06B6D4] ring-inset z-10' : ''}
+                  ${isSelected ? 'ring-2 ring-secondary ring-inset z-10' : ''}
                   ${hasOverdue ? 'bg-red-500/5' : ''}
                   ${allDone ? 'bg-emerald-500/5' : ''}
                 `}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className={`text-xs font-mono ${isToday ? 'text-[#06B6D4] font-bold bg-[#06B6D4]/10 px-1.5 rounded' : 'text-white/50'}`}>
+                  <span className={`text-xs font-mono ${isToday ? 'text-secondary font-bold bg-secondary/15 px-1.5 rounded' : 'text-on-surface-variant'}`}>
                     {cell.dayNum}
                   </span>
                   {hasMilestone && <Flag size={9} className="text-amber-400" />}
@@ -195,7 +195,7 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
                     );
                   })}
                   {tasksOfDay.length > 3 && (
-                    <div className="text-[9.5px] text-white/40 pl-1">+ {tasksOfDay.length - 3} mais</div>
+                    <div className="text-[9.5px] text-muted pl-1">+ {tasksOfDay.length - 3} mais</div>
                   )}
                 </div>
               </button>
@@ -206,21 +206,21 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
 
       {/* Detalhe do dia selecionado */}
       {selectedDate && selectedDateObj && (
-        <div className="bg-[#2563EB]/5 border border-[#2563EB]/20 rounded-xl p-4">
+        <div className="bg-secondary/15 border border-secondary/40 p-4">
           <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
             <h3 className="text-sm font-semibold">
               {selectedDateObj.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
-              {selectedDate === todayISO && <span className="ml-2 text-xs text-[#06B6D4] bg-[#06B6D4]/10 px-2 py-0.5 rounded font-mono">HOJE</span>}
+              {selectedDate === todayISO && <span className="ml-2 text-xs text-secondary bg-secondary/15 px-2 py-0.5 rounded font-mono">HOJE</span>}
             </h3>
             {selectedTasks.length > 0 && (
-              <span className="text-xs text-white/40">
+              <span className="text-xs text-muted">
                 {selectedTasks.filter((t) => t.completed_at).length}/{selectedTasks.length} tarefas feitas
               </span>
             )}
           </div>
 
           {selectedTasks.length === 0 ? (
-            <div className="text-sm text-white/40 italic">Nenhuma tarefa agendada para este dia.</div>
+            <div className="text-sm text-muted italic">Nenhuma tarefa agendada para este dia.</div>
           ) : (
             <div className="space-y-2">
               {selectedTasks.map((t) => {
@@ -229,20 +229,20 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
                 return (
                   <div
                     key={t.id}
-                    className={`flex items-start gap-3 p-2 rounded-lg transition-colors
+                    className={`flex items-start gap-3 p-2 transition-colors
                       ${overdue ? 'bg-red-500/5' : ''}
-                      hover:bg-white/[0.02]
+                      hover:bg-surface-highest
                     `}
                   >
                     <button
                       onClick={() => onToggle(t)}
-                      className={`mt-0.5 shrink-0 transition-colors ${done ? 'text-emerald-400' : 'text-white/30 hover:text-white/70'}`}
+                      className={`mt-0.5 shrink-0 transition-colors ${done ? 'text-emerald-400' : 'text-muted hover:text-on-surface-variant'}`}
                     >
                       {done ? <CheckSquare size={16} /> : <Square size={16} />}
                     </button>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`text-sm ${done ? 'text-white/40 line-through' : 'text-white/90'}`}>
+                        <span className={`text-sm ${done ? 'text-muted line-through' : 'text-on-surface'}`}>
                           {t.title}
                         </span>
                         {t.track && (
@@ -250,7 +250,7 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
                             Track {t.track}
                           </span>
                         )}
-                        <span className="text-[10px] text-white/30 font-mono">Fase {t.phase_number}</span>
+                        <span className="text-[10px] text-muted font-mono">Fase {t.phase_number}</span>
                         {t.category === 'milestone' && (
                           <span className="text-[9px] font-mono uppercase text-amber-400 bg-amber-500/10 px-1.5 rounded flex items-center gap-1">
                             <Award size={9} /> Marco
@@ -263,7 +263,7 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
                         )}
                       </div>
                       {t.description && (
-                        <div className="text-xs text-white/50 mt-1">{t.description}</div>
+                        <div className="text-xs text-on-surface-variant mt-1">{t.description}</div>
                       )}
                     </div>
                   </div>

@@ -10,8 +10,8 @@ type Props = {
 const STATUS_COLORS: Record<string, string> = {
   active: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20',
   suspended: 'bg-amber-500/10 text-amber-300 border-amber-500/20',
-  inactive: 'bg-white/5 text-white/50 border-white/10',
-  trial: 'bg-[#06B6D4]/10 text-[#06B6D4] border-[#06B6D4]/20',
+  inactive: 'bg-surface-low text-on-surface-variant border-outline/10',
+  trial: 'bg-secondary/15 text-secondary border-secondary/40',
 };
 
 export default function TabTenants({ onSelectTenant }: Props) {
@@ -72,8 +72,8 @@ export default function TabTenants({ onSelectTenant }: Props) {
     <div className="p-6 space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-lg font-medium text-white">Tenants</div>
-          <div className="text-xs text-white/40 mt-0.5">
+          <div className="text-lg font-medium text-on-surface">Tenants</div>
+          <div className="text-xs text-on-surface-variant mt-0.5">
             {rows.length} tenant{rows.length === 1 ? '' : 's'}
             {pendingAddons > 0 && (
               <> · <span className="text-amber-300">{pendingAddons} add-on{pendingAddons === 1 ? '' : 's'} em análise</span></>
@@ -82,7 +82,7 @@ export default function TabTenants({ onSelectTenant }: Props) {
         </div>
         <button
           onClick={load}
-          className="inline-flex items-center gap-1.5 text-xs rounded-md border border-white/10 bg-black/20 px-3 py-1.5 text-white/70 hover:text-white hover:border-white/20"
+          className="inline-flex items-center gap-1.5 text-xs border border-outline/10 bg-surface-lowest px-3 py-1.5 text-on-surface-variant hover:text-on-surface hover:border-outline/30"
         >
           <RefreshCw size={12} /> Atualizar
         </button>
@@ -90,30 +90,30 @@ export default function TabTenants({ onSelectTenant }: Props) {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {packages.map((p) => (
-          <div key={p.slug} className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
-            <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-white/40">
+          <div key={p.slug} className="border border-outline/10 bg-surface-low p-3">
+            <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-on-surface-variant">
               <Package size={10} /> {p.slug}
             </div>
-            <div className="text-xl font-medium text-white mt-1">{byPackage[p.slug] ?? 0}</div>
-            <div className="text-[11px] text-white/50">{p.name}</div>
+            <div className="text-xl font-medium text-on-surface mt-1">{byPackage[p.slug] ?? 0}</div>
+            <div className="text-[11px] text-on-surface-variant">{p.name}</div>
           </div>
         ))}
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative flex-1 min-w-[220px]">
-          <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30" />
+          <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar tenant…"
-            className="w-full bg-slate-900 border border-slate-700 rounded-md pl-7 pr-3 py-1.5 text-sm text-white focus:outline-none focus:border-[#06B6D4]"
+            className="w-full bg-surface-lowest border border-outline/30 pl-7 pr-3 py-1.5 text-sm text-on-surface focus:outline-none focus:border-secondary/40"
           />
         </div>
         <select
           value={packageFilter}
           onChange={(e) => setPackageFilter(e.target.value)}
-          className="bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-sm text-white focus:outline-none focus:border-[#06B6D4]"
+          className="bg-surface-lowest border border-outline/30 px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-secondary/40"
         >
           <option value="all">Todos pacotes</option>
           {packages.map((p) => (
@@ -124,7 +124,7 @@ export default function TabTenants({ onSelectTenant }: Props) {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-sm text-white focus:outline-none focus:border-[#06B6D4]"
+          className="bg-surface-lowest border border-outline/30 px-2 py-1.5 text-sm text-on-surface focus:outline-none focus:border-secondary/40"
         >
           <option value="all">Todos status</option>
           {allStatuses.map((s) => (
@@ -134,18 +134,18 @@ export default function TabTenants({ onSelectTenant }: Props) {
       </div>
 
       {loading ? (
-        <div className="text-sm text-white/40">Carregando…</div>
+        <div className="text-sm text-on-surface-variant">Carregando…</div>
       ) : error ? (
-        <div className="rounded-md border border-rose-500/30 bg-rose-500/5 p-3 text-sm text-rose-300">{error}</div>
+        <div className="border border-rose-500/30 bg-rose-500/5 p-3 text-sm text-rose-300">{error}</div>
       ) : filtered.length === 0 ? (
-        <div className="text-sm text-white/40 py-8 text-center">
+        <div className="text-sm text-on-surface-variant py-8 text-center">
           Nenhum tenant bate com o filtro.
         </div>
       ) : (
-        <div className="rounded-lg border border-white/10 overflow-hidden">
+        <div className="border border-outline/10 overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-white/[0.03] text-[10px] uppercase tracking-widest text-white/40 font-mono">
+              <tr className="bg-surface-low text-[10px] uppercase tracking-widest text-on-surface-variant font-mono">
                 <th className="text-left px-3 py-2">Tenant</th>
                 <th className="text-left px-3 py-2">Pacote</th>
                 <th className="text-left px-3 py-2">Status</th>
@@ -162,28 +162,28 @@ export default function TabTenants({ onSelectTenant }: Props) {
                   <tr
                     key={r.tenant_id}
                     onClick={() => onSelectTenant(r.tenant_id)}
-                    className="border-t border-white/5 hover:bg-white/[0.02] cursor-pointer"
+                    className="border-t border-outline/10 hover:bg-surface-low cursor-pointer"
                   >
-                    <td className="px-3 py-2.5 text-white">{r.tenant_name}</td>
+                    <td className="px-3 py-2.5 text-on-surface">{r.tenant_name}</td>
                     <td className="px-3 py-2.5">
                       {r.package_slug ? (
-                        <span className="inline-flex items-center text-xs text-white/80">{r.package_name}</span>
+                        <span className="inline-flex items-center text-xs text-on-surface">{r.package_name}</span>
                       ) : (
-                        <span className="text-xs text-white/30 italic">sem pacote</span>
+                        <span className="text-xs text-muted italic">sem pacote</span>
                       )}
                     </td>
                     <td className="px-3 py-2.5">
-                      <span className={`inline-flex text-[10px] font-mono uppercase px-1.5 py-0.5 rounded border ${statusClass}`}>
+                      <span className={`inline-flex text-[10px] font-mono uppercase px-1.5 py-0.5 border ${statusClass}`}>
                         {r.tenant_status}
                       </span>
                     </td>
-                    <td className="px-3 py-2.5 text-xs text-white/60">
+                    <td className="px-3 py-2.5 text-xs text-on-surface-variant">
                       {active > 0 && <span>{active} ativo{active === 1 ? '' : 's'}</span>}
-                      {active > 0 && pending > 0 && <span className="text-white/20"> · </span>}
+                      {active > 0 && pending > 0 && <span className="text-muted"> · </span>}
                       {pending > 0 && <span className="text-amber-300">{pending} análise</span>}
-                      {active === 0 && pending === 0 && <span className="text-white/20">—</span>}
+                      {active === 0 && pending === 0 && <span className="text-muted">—</span>}
                     </td>
-                    <td className="px-3 py-2.5 text-white/30">
+                    <td className="px-3 py-2.5 text-muted">
                       <ChevronRight size={14} />
                     </td>
                   </tr>

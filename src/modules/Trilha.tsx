@@ -21,8 +21,8 @@ const TRACK_INFO: Record<Track, { nome: string; descricao: string; cor: string; 
   B: {
     nome: 'Clearix B2B',
     descricao: 'MRR recorrente + case studies + enterprise path',
-    cor: 'from-[#2563EB]/20 to-[#06B6D4]/10 border-[#2563EB]/30 text-[#06B6D4]',
-    badge: 'bg-[#2563EB]/15 text-[#06B6D4] border-[#2563EB]/30',
+    cor: 'border-secondary/40 text-secondary',
+    badge: 'bg-secondary/15 text-secondary border-secondary/40',
   },
   C: {
     nome: 'Empresa / Ops',
@@ -130,7 +130,7 @@ export default function Trilha() {
   if (loading) {
     return (
       <div className="p-8 max-w-5xl mx-auto">
-        <div className="text-white/40 text-sm">Carregando Roadmap...</div>
+        <div className="text-muted text-sm">Carregando Roadmap...</div>
       </div>
     );
   }
@@ -138,9 +138,9 @@ export default function Trilha() {
   if (phases.length === 0) {
     return (
       <div className="p-8 max-w-5xl mx-auto">
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-5">
+        <div className="bg-amber-500/10 border border-amber-500/30 p-5">
           <div className="text-amber-400 font-semibold mb-2">Roadmap sem dados</div>
-          <p className="text-sm text-white/70">
+          <p className="text-sm text-on-surface-variant">
             Não há fases cadastradas no banco. Confirme que a migration 014 foi aplicada e que o usuário está autenticado como staff.
           </p>
         </div>
@@ -152,12 +152,12 @@ export default function Trilha() {
     <div className="p-8 max-w-5xl mx-auto space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Roadmap — Do Zero aos Milhões</h1>
-          <p className="text-white/50 mt-1">9 fases · 3 tracks paralelos · Playbook Unicórnio Adaptado · calendário 45d seed</p>
+          <h1 className="text-3xl font-bold tracking-tight font-serif">Roadmap — Do Zero aos Milhões</h1>
+          <p className="text-on-surface-variant mt-1">9 fases · 3 tracks paralelos · Playbook Unicórnio Adaptado · calendário 45d seed</p>
         </div>
         <button
           onClick={loadAll}
-          className="p-2 hover:bg-white/5 rounded-lg text-white/50 hover:text-white transition-colors"
+          className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface transition-colors"
           title="Recarregar do Supabase"
         >
           <RefreshCw size={18} />
@@ -165,13 +165,13 @@ export default function Trilha() {
       </div>
 
       {/* Abas de visualização */}
-      <div className="flex gap-1 border-b border-white/5">
+      <div className="flex gap-1 border-b border-outline/10">
         <button
           onClick={() => setView('timeline')}
           className={`px-4 py-2.5 text-sm font-medium flex items-center gap-2 border-b-2 transition-colors ${
             view === 'timeline'
-              ? 'border-[#06B6D4] text-white'
-              : 'border-transparent text-white/40 hover:text-white/70'
+              ? 'border-secondary text-on-surface'
+              : 'border-transparent text-muted hover:text-on-surface-variant'
           }`}
         >
           <GitBranch size={14} /> Timeline (9 fases)
@@ -180,8 +180,8 @@ export default function Trilha() {
           onClick={() => setView('calendar')}
           className={`px-4 py-2.5 text-sm font-medium flex items-center gap-2 border-b-2 transition-colors ${
             view === 'calendar'
-              ? 'border-[#06B6D4] text-white'
-              : 'border-transparent text-white/40 hover:text-white/70'
+              ? 'border-secondary text-on-surface'
+              : 'border-transparent text-muted hover:text-on-surface-variant'
           }`}
         >
           <CalendarDays size={14} /> Calendário
@@ -190,8 +190,8 @@ export default function Trilha() {
           onClick={() => setView('historico')}
           className={`px-4 py-2.5 text-sm font-medium flex items-center gap-2 border-b-2 transition-colors ${
             view === 'historico'
-              ? 'border-[#06B6D4] text-white'
-              : 'border-transparent text-white/40 hover:text-white/70'
+              ? 'border-secondary text-on-surface'
+              : 'border-transparent text-muted hover:text-on-surface-variant'
           }`}
         >
           <History size={14} /> Histórico
@@ -210,10 +210,10 @@ export default function Trilha() {
       {view === 'timeline' && (
       <>
       {/* Banner com script sync */}
-      <div className="bg-fuchsia-500/5 border border-fuchsia-500/20 rounded-xl p-3 flex items-center gap-3 text-xs">
+      <div className="bg-fuchsia-500/5 border border-fuchsia-500/20 p-3 flex items-center gap-3 text-xs">
         <RefreshCw size={14} className="text-fuchsia-400 shrink-0" />
         <div className="flex-1">
-          <span className="text-white/70">Sincronizar manifest do cowork com o banco: </span>
+          <span className="text-on-surface-variant">Sincronizar manifest do cowork com o banco: </span>
           <code className="text-fuchsia-300 font-mono">cd D:/projetos/digiai && node scripts/sync-manifest.cjs</code>
         </div>
       </div>
@@ -223,12 +223,12 @@ export default function Trilha() {
         {(['A', 'B', 'C'] as Track[]).map((t) => {
           const info = TRACK_INFO[t];
           return (
-            <div key={t} className={`rounded-xl border bg-gradient-to-br ${info.cor} p-4`}>
+            <div key={t} className={`border bg-gradient-to-br ${info.cor} p-4`}>
               <div className="flex items-center gap-2 mb-1">
                 <TrackBadge track={t} />
                 <span className="text-xs font-mono uppercase tracking-widest">Track {t}</span>
               </div>
-              <div className="font-semibold text-white">{info.nome}</div>
+              <div className="font-semibold text-on-surface">{info.nome}</div>
               <div className="text-xs opacity-80 mt-0.5">{info.descricao}</div>
             </div>
           );
@@ -237,37 +237,37 @@ export default function Trilha() {
 
       {/* Fase atual em destaque com progresso */}
       {currentPhase && currentProgress && (
-        <div className="bg-[#2563EB]/10 border border-[#2563EB]/30 rounded-2xl p-5">
+        <div className="bg-secondary-container/40 border border-secondary/40 p-5">
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-full bg-[#2563EB]/20 border border-[#2563EB]/40 flex items-center justify-center text-lg font-bold text-[#2563EB]">
+            <div className="w-10 h-10 rounded-full bg-secondary-container/40 border border-secondary/40 flex items-center justify-center text-lg font-bold text-secondary">
               {currentPhase.phase_number}
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-mono text-[#06B6D4] uppercase tracking-widest">Fase atual</span>
+                <span className="text-xs font-mono text-secondary uppercase tracking-widest">Fase atual</span>
                 {currentPhase.track_lider && <TrackBadge track={currentPhase.track_lider} compact />}
-                <span className="text-[10px] font-mono text-white/40">líder</span>
-                <span className="text-[10px] font-mono text-white/30">· {currentPhase.duracao_estimada}</span>
+                <span className="text-[10px] font-mono text-muted">líder</span>
+                <span className="text-[10px] font-mono text-muted">· {currentPhase.duracao_estimada}</span>
                 {currentProgress.overdue_tasks > 0 && (
                   <span className="text-[10px] font-mono text-red-400 bg-red-500/10 px-2 py-0.5 rounded flex items-center gap-1">
                     <AlertOctagon size={10} /> {currentProgress.overdue_tasks} atrasada{currentProgress.overdue_tasks > 1 ? 's' : ''}
                   </span>
                 )}
               </div>
-              <div className="font-bold text-white mt-1">{currentPhase.nome}</div>
-              <div className="text-sm text-white/60 mt-0.5">{currentPhase.objetivo}</div>
+              <div className="font-bold text-on-surface mt-1">{currentPhase.nome}</div>
+              <div className="text-sm text-on-surface-variant mt-0.5">{currentPhase.objetivo}</div>
 
               {/* Barra de progresso */}
               <div className="mt-3">
                 <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="text-white/50">Progresso das tarefas</span>
-                  <span className="text-[#06B6D4] font-mono font-semibold">
+                  <span className="text-on-surface-variant">Progresso das tarefas</span>
+                  <span className="text-secondary font-mono font-semibold">
                     {currentProgress.completed_tasks}/{currentProgress.total_tasks} · {currentProgress.percent_complete}%
                   </span>
                 </div>
-                <div className="h-2 bg-black/30 rounded-full overflow-hidden">
+                <div className="h-2 bg-surface-lowest rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-[#06B6D4] to-[#2563EB] transition-all duration-300"
+                    className="h-full bg-secondary transition-all duration-300"
                     style={{ width: `${parseFloat(currentProgress.percent_complete)}%` }}
                   />
                 </div>
@@ -276,24 +276,24 @@ export default function Trilha() {
               {/* Próxima data */}
               {currentProgress.next_target_date && (
                 <div className="mt-3 flex items-center gap-2 text-xs">
-                  <Calendar size={12} className="text-[#06B6D4]" />
-                  <span className="text-white/50">Próxima data:</span>
-                  <span className="text-white/80 font-mono">{formatDate(currentProgress.next_target_date)}</span>
+                  <Calendar size={12} className="text-secondary" />
+                  <span className="text-on-surface-variant">Próxima data:</span>
+                  <span className="text-on-surface font-mono">{formatDate(currentProgress.next_target_date)}</span>
                   {(() => {
                     const d = daysUntil(currentProgress.next_target_date);
                     if (d === null) return null;
                     if (d < 0) return <span className="text-red-400">· {Math.abs(d)}d atrasado</span>;
                     if (d === 0) return <span className="text-amber-400">· hoje</span>;
-                    return <span className="text-white/40">· em {d}d</span>;
+                    return <span className="text-muted">· em {d}d</span>;
                   })()}
                 </div>
               )}
 
-              <div className="mt-3 bg-black/20 rounded-lg p-3 flex items-start gap-2">
-                <Target className="w-4 h-4 text-[#06B6D4] mt-0.5 shrink-0" />
+              <div className="mt-3 bg-surface-lowest p-3 flex items-start gap-2">
+                <Target className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
                 <div>
-                  <div className="text-[10px] font-mono text-[#06B6D4] uppercase tracking-widest">Métrica única</div>
-                  <div className="text-sm text-white/80">{currentPhase.metrica_unica}</div>
+                  <div className="text-[10px] font-mono text-secondary uppercase tracking-widest">Métrica única</div>
+                  <div className="text-sm text-on-surface">{currentPhase.metrica_unica}</div>
                 </div>
               </div>
             </div>
@@ -303,7 +303,7 @@ export default function Trilha() {
 
       {/* Timeline */}
       <div className="relative">
-        <div className="absolute left-5 top-0 bottom-0 w-px bg-white/8" />
+        <div className="absolute left-5 top-0 bottom-0 w-px bg-surface-high" />
 
         <div className="space-y-3">
           {phases.map((fase) => {
@@ -315,10 +315,10 @@ export default function Trilha() {
             const hasOverdue = (pp?.overdue_tasks ?? 0) > 0;
 
             let statusLabel = 'Não iniciada';
-            let statusClasses = 'text-white/25 bg-white/5';
-            let dotColor = 'bg-white/10';
-            let borderColor = 'border-white/8 bg-white/2';
-            let statusIcon = <Circle className="w-5 h-5 text-white/20" />;
+            let statusClasses = 'text-muted bg-surface-low';
+            let dotColor = 'bg-surface-high';
+            let borderColor = 'border-outline/10 bg-surface-low';
+            let statusIcon = <Circle className="w-5 h-5 text-muted" />;
 
             if (isCompleted) {
               statusLabel = 'Concluída';
@@ -328,10 +328,10 @@ export default function Trilha() {
               statusIcon = <CheckCircle2 className="w-5 h-5 text-emerald-400" />;
             } else if (isActive) {
               statusLabel = 'Em andamento';
-              statusClasses = 'text-[#2563EB] bg-[#2563EB]/10';
-              dotColor = 'bg-[#2563EB]';
-              borderColor = 'border-[#2563EB]/30 bg-[#2563EB]/8';
-              statusIcon = <Clock className="w-5 h-5 text-[#2563EB]" />;
+              statusClasses = 'text-secondary bg-secondary-container/40';
+              dotColor = 'bg-secondary';
+              borderColor = 'border-secondary/40 bg-secondary-container/40';
+              statusIcon = <Clock className="w-5 h-5 text-secondary" />;
             } else if ((pp?.completed_tasks ?? 0) > 0) {
               statusLabel = 'Iniciada';
               statusClasses = 'text-amber-400 bg-amber-400/10';
@@ -342,9 +342,9 @@ export default function Trilha() {
 
             return (
               <div key={fase.phase_number} className="relative pl-14">
-                <div className={`absolute left-3.5 top-5 w-3 h-3 rounded-full border-2 border-[#0A0F1E] ${dotColor}`} />
+                <div className={`absolute left-3.5 top-5 w-3 h-3 rounded-full border-2 border-surface ${dotColor}`} />
 
-                <div className={`rounded-2xl border ${borderColor} overflow-hidden`}>
+                <div className={`border ${borderColor} overflow-hidden`}>
                   <button
                     className="w-full flex items-center gap-3 p-5 text-left"
                     onClick={() => setExpandido(isOpen ? null : fase.phase_number)}
@@ -352,47 +352,47 @@ export default function Trilha() {
                     {statusIcon}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-mono text-white/30">Fase {fase.phase_number}</span>
+                        <span className="text-xs font-mono text-muted">Fase {fase.phase_number}</span>
                         {fase.track_lider && <TrackBadge track={fase.track_lider} compact />}
                         <span className="font-semibold text-sm">{fase.nome}</span>
-                        <span className="text-[10px] font-mono text-white/30">· {fase.duracao_estimada}</span>
+                        <span className="text-[10px] font-mono text-muted">· {fase.duracao_estimada}</span>
                         {hasOverdue && (
                           <span className="text-[10px] font-mono text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded flex items-center gap-1">
                             <AlertOctagon size={9} /> {pp?.overdue_tasks}
                           </span>
                         )}
                       </div>
-                      <div className="text-xs text-white/40 mt-0.5 truncate">{fase.objetivo}</div>
+                      <div className="text-xs text-muted mt-0.5 truncate">{fase.objetivo}</div>
                       {pp && pp.total_tasks > 0 && (
                         <div className="mt-2 flex items-center gap-2">
-                          <div className="flex-1 max-w-[200px] h-1.5 bg-black/30 rounded-full overflow-hidden">
+                          <div className="flex-1 max-w-[200px] h-1.5 bg-surface-lowest rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-[#06B6D4] transition-all duration-300"
+                              className="h-full bg-secondary transition-all duration-300"
                               style={{ width: `${parseFloat(pp.percent_complete)}%` }}
                             />
                           </div>
-                          <span className="text-[10px] font-mono text-white/40">
+                          <span className="text-[10px] font-mono text-muted">
                             {pp.completed_tasks}/{pp.total_tasks}
                           </span>
                         </div>
                       )}
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className={`text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded ${statusClasses}`}>
+                      <span className={`text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 ${statusClasses}`}>
                         {statusLabel}
                       </span>
-                      {isOpen ? <ChevronUp className="w-4 h-4 text-white/30" /> : <ChevronDown className="w-4 h-4 text-white/30" />}
+                      {isOpen ? <ChevronUp className="w-4 h-4 text-muted" /> : <ChevronDown className="w-4 h-4 text-muted" />}
                     </div>
                   </button>
 
                   {isOpen && (
-                    <div className="px-5 pb-5 space-y-4 border-t border-white/5 pt-4">
+                    <div className="px-5 pb-5 space-y-4 border-t border-outline/10 pt-4">
                       {/* Métrica única */}
-                      <div className="bg-[#06B6D4]/5 border border-[#06B6D4]/20 rounded-xl p-3 flex items-start gap-2">
-                        <Target className="w-4 h-4 text-[#06B6D4] mt-0.5 shrink-0" />
+                      <div className="bg-secondary/15 border border-secondary/40 p-3 flex items-start gap-2">
+                        <Target className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
                         <div>
-                          <div className="text-[10px] font-mono text-[#06B6D4] uppercase tracking-widest">Métrica única</div>
-                          <div className="text-sm text-white/80">{fase.metrica_unica}</div>
+                          <div className="text-[10px] font-mono text-secondary uppercase tracking-widest">Métrica única</div>
+                          <div className="text-sm text-on-surface">{fase.metrica_unica}</div>
                         </div>
                       </div>
 
@@ -402,7 +402,7 @@ export default function Trilha() {
                           <BookOpen className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
                           <div>
                             <div className="text-[10px] font-mono text-amber-400 uppercase tracking-widest">Playbook aplicado</div>
-                            <div className="text-sm text-white/70">{fase.playbook_sv}</div>
+                            <div className="text-sm text-on-surface-variant">{fase.playbook_sv}</div>
                           </div>
                         </div>
                       )}
@@ -410,7 +410,7 @@ export default function Trilha() {
                       {/* Tarefas agrupadas por track */}
                       {fTasks.length > 0 && (
                         <div>
-                          <div className="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-2">
+                          <div className="text-[10px] font-mono text-muted uppercase tracking-widest mb-2">
                             Tarefas do calendário ({fTasks.filter((t) => t.completed_at).length}/{fTasks.length})
                           </div>
                           {(['C', 'B', 'A'] as Track[]).map((tr) => {
@@ -421,7 +421,7 @@ export default function Trilha() {
                               <div key={tr} className="mb-3">
                                 <div className="flex items-center gap-2 mb-2 mt-2">
                                   <TrackBadge track={tr} compact />
-                                  <span className="text-xs font-semibold text-white/70">{info.nome}</span>
+                                  <span className="text-xs font-semibold text-on-surface-variant">{info.nome}</span>
                                 </div>
                                 <div className="space-y-1.5 ml-1">
                                   {trTasks.map((task) => {
@@ -433,14 +433,14 @@ export default function Trilha() {
                                       <div key={task.id} className={`flex items-start gap-2 group ${overdue ? 'bg-red-500/5 -mx-2 px-2 py-1 rounded' : ''}`}>
                                         <button
                                           onClick={() => handleToggle(task)}
-                                          className={`mt-0.5 shrink-0 transition-colors ${done ? 'text-emerald-400' : 'text-white/30 hover:text-white/60'}`}
+                                          className={`mt-0.5 shrink-0 transition-colors ${done ? 'text-emerald-400' : 'text-muted hover:text-on-surface-variant'}`}
                                           title={done ? 'Marcar como pendente' : 'Marcar como concluída'}
                                         >
                                           {done ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
                                         </button>
                                         <div className="flex-1 min-w-0">
                                           <div className="flex items-center gap-2 flex-wrap">
-                                            <span className={`text-sm ${done ? 'text-white/40 line-through' : 'text-white/80'}`}>
+                                            <span className={`text-sm ${done ? 'text-muted line-through' : 'text-on-surface'}`}>
                                               {task.title}
                                             </span>
                                             {isGate && !done && (
@@ -455,12 +455,12 @@ export default function Trilha() {
                                             )}
                                           </div>
                                           {task.description && (
-                                            <div className="text-xs text-white/40 mt-0.5">{task.description}</div>
+                                            <div className="text-xs text-muted mt-0.5">{task.description}</div>
                                           )}
                                           {task.target_date && (
                                             <div className="flex items-center gap-1 mt-0.5">
-                                              <Calendar size={10} className={overdue ? 'text-red-400' : done ? 'text-white/20' : 'text-white/40'} />
-                                              <span className={`text-[10px] font-mono ${overdue ? 'text-red-400' : done ? 'text-white/30' : 'text-white/50'}`}>
+                                              <Calendar size={10} className={overdue ? 'text-red-400' : done ? 'text-muted' : 'text-muted'} />
+                                              <span className={`text-[10px] font-mono ${overdue ? 'text-red-400' : done ? 'text-muted' : 'text-on-surface-variant'}`}>
                                                 {formatDate(task.target_date)}
                                                 {overdue && ' · atrasada'}
                                                 {done && task.completed_at && ` · feito ${formatDate(task.completed_at)}`}
@@ -479,18 +479,18 @@ export default function Trilha() {
                       )}
 
                       {fTasks.length === 0 && (
-                        <div className="text-xs text-white/30 italic">
+                        <div className="text-xs text-muted italic">
                           Fase sem tarefas pré-seed. Tarefas serão criadas ao atingir a fase anterior.
                         </div>
                       )}
 
                       {/* Decision gate */}
                       {fase.decision_gate && (
-                        <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-3 flex items-start gap-2">
+                        <div className="bg-emerald-500/5 border border-emerald-500/20 p-3 flex items-start gap-2">
                           <Flag className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
                           <div>
                             <div className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest">Decision gate (para avançar)</div>
-                            <div className="text-sm text-white/80">{fase.decision_gate}</div>
+                            <div className="text-sm text-on-surface">{fase.decision_gate}</div>
                           </div>
                         </div>
                       )}
@@ -506,7 +506,7 @@ export default function Trilha() {
                             {fase.anti_patterns.map((ap, i) => (
                               <div key={i} className="flex items-start gap-2">
                                 <span className="text-red-400/70 mt-0.5 text-xs">✗</span>
-                                <span className="text-xs text-white/50">{ap}</span>
+                                <span className="text-xs text-on-surface-variant">{ap}</span>
                               </div>
                             ))}
                           </div>
@@ -514,11 +514,11 @@ export default function Trilha() {
                       )}
 
                       {fase.track_paralelo_nota && (
-                        <div className="bg-white/3 rounded-xl px-4 py-3 flex items-start gap-2">
-                          <FileText className="w-4 h-4 text-white/40 mt-0.5 shrink-0" />
+                        <div className="bg-surface-low px-4 py-3 flex items-start gap-2">
+                          <FileText className="w-4 h-4 text-muted mt-0.5 shrink-0" />
                           <div>
-                            <div className="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-1">Nota de execução</div>
-                            <div className="text-xs text-white/60">{fase.track_paralelo_nota}</div>
+                            <div className="text-[10px] font-mono text-muted uppercase tracking-widest mb-1">Nota de execução</div>
+                            <div className="text-xs text-on-surface-variant">{fase.track_paralelo_nota}</div>
                           </div>
                         </div>
                       )}

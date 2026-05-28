@@ -29,18 +29,18 @@ function FieldRow({ label, value }: { label: string; value: string }) {
   };
 
   return (
-    <div className="border-b border-white/5 pb-3 mb-3 last:border-0 last:pb-0 last:mb-0">
+    <div className="border-b border-outline/10 pb-3 mb-3 last:border-0 last:pb-0 last:mb-0">
       <div className="flex items-center justify-between mb-1">
-        <span className="text-[10px] font-bold text-white/30 uppercase tracking-wider">{label}</span>
+        <span className="text-[10px] font-bold text-muted uppercase tracking-wider">{label}</span>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1 text-[10px] text-white/30 hover:text-white/60 transition-colors cursor-pointer"
+          className="flex items-center gap-1 text-[10px] text-muted hover:text-on-surface-variant transition-colors cursor-pointer"
         >
           {copied ? <Check size={10} /> : <Copy size={10} />}
           {copied ? 'Copiado' : 'Copiar'}
         </button>
       </div>
-      <p className="text-sm text-white/80 whitespace-pre-wrap leading-relaxed">{value}</p>
+      <p className="text-sm text-on-surface whitespace-pre-wrap leading-relaxed">{value}</p>
     </div>
   );
 }
@@ -70,19 +70,19 @@ export default function CopyModal({
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative bg-[#0A0F1E] border border-white/10 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-surface border border-outline/10 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-[#0A0F1E] border-b border-white/8 p-5 flex items-start justify-between gap-4 z-10">
+        <div className="sticky top-0 bg-surface border-b border-outline/10 p-5 flex items-start justify-between gap-4 z-10">
           <div>
-            <h3 className="text-lg font-semibold text-white">{asset.title}</h3>
+            <h3 className="text-lg font-semibold text-on-surface">{asset.title}</h3>
             <div className="flex items-center gap-3 mt-1">
-              <span className="text-xs text-white/30 font-mono">{asset.format}</span>
+              <span className="text-xs text-muted font-mono">{asset.format}</span>
               {asset.angulo && (
-                <span className="text-xs text-[#06B6D4]/70 bg-[#06B6D4]/10 px-2 py-0.5 rounded">
+                <span className="text-xs text-secondary/70 bg-secondary/15 px-2 py-0.5 rounded">
                   {asset.angulo}
                 </span>
               )}
-              <span className="text-xs text-white/20">{asset.source_file}</span>
+              <span className="text-xs text-muted">{asset.source_file}</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -90,7 +90,7 @@ export default function CopyModal({
             <StatusSelector status={asset.status} onChange={(s) => onStatusChange(asset.id, s)} />
             <button
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/5 text-white/50 hover:text-white transition-colors cursor-pointer"
+              className="w-8 h-8 flex items-center justify-center hover:bg-surface-highest text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
             >
               <X size={18} />
             </button>
@@ -113,16 +113,16 @@ export default function CopyModal({
               <FieldRow label="Roteiro" value={content.roteiro.join('\n')} />
             )}
             {content.slides && (
-              <div className="border-b border-white/5 pb-3 mb-3">
-                <span className="text-[10px] font-bold text-white/30 uppercase tracking-wider block mb-2">Slides</span>
+              <div className="border-b border-outline/10 pb-3 mb-3">
+                <span className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-2">Slides</span>
                 <div className="space-y-2">
                   {(content.slides as Array<Record<string, unknown>>).map((slide, i) => (
-                    <div key={i} className="bg-white/3 border border-white/5 rounded-lg p-3">
-                      <span className="text-[10px] font-bold text-[#06B6D4]">
+                    <div key={i} className="bg-surface-low border border-outline/10 p-3">
+                      <span className="text-[10px] font-bold text-secondary">
                         Slide {(slide.slide as number) || i + 1}
                         {slide.tipo && ` — ${slide.tipo}`}
                       </span>
-                      <p className="text-xs text-white/70 mt-1">
+                      <p className="text-xs text-on-surface-variant mt-1">
                         {(slide.texto_principal as string) || (slide.texto as string) || JSON.stringify(slide)}
                       </p>
                     </div>
@@ -136,7 +136,7 @@ export default function CopyModal({
           <div className={`shrink-0 ${isMulti ? 'w-72' : 'w-40'}`}>
             {isMulti ? (
               <div className="space-y-3">
-                <div className="text-[10px] font-bold text-white/30 uppercase tracking-wider">
+                <div className="text-[10px] font-bold text-muted uppercase tracking-wider">
                   Galeria · carrossel
                 </div>
                 <ImageGallery
@@ -151,7 +151,7 @@ export default function CopyModal({
                 <img
                   src={asset.image_url}
                   alt="Criativo final"
-                  className="w-full rounded-xl border border-white/10 object-cover"
+                  className="w-full border border-outline/10 object-cover"
                 />
                 <ImageUploader
                   imageUrl={asset.image_url}

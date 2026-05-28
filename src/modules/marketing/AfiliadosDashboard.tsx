@@ -68,18 +68,18 @@ export function AfiliadosDashboard() {
             <Trophy className="w-5 h-5 text-[#F59E0B]" />
             <h2 className="text-lg font-semibold">Programa de Afiliados — Ativo</h2>
           </div>
-          <p className="text-xs text-white/40 mt-1">
+          <p className="text-xs text-muted mt-1">
             CRM dos parceiros + link único Hotmart + cálculo de comissão automático + registro de pagamentos.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowLeaderboard(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-[#F59E0B]/40 text-[#F59E0B] rounded-lg hover:bg-[#F59E0B]/10">
+          <button onClick={() => setShowLeaderboard(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-[#F59E0B]/40 text-[#F59E0B] hover:bg-[#F59E0B]/10">
             <Award className="w-4 h-4" /> Leaderboard
           </button>
-          <button onClick={() => setShowNewForm(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#F59E0B] text-[#0A0F1E] font-medium rounded-lg hover:bg-[#F59E0B]/90">
+          <button onClick={() => setShowNewForm(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#F59E0B] text-[#0A0F1E] font-medium hover:bg-[#F59E0B]/90">
             <Plus className="w-4 h-4" /> Novo afiliado
           </button>
-          <button onClick={refresh} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-white/10 rounded-lg hover:bg-white/5">
+          <button onClick={refresh} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-outline/10 hover:bg-surface-highest">
             <RefreshCw className="w-4 h-4" /> Atualizar
           </button>
         </div>
@@ -103,20 +103,20 @@ export function AfiliadosDashboard() {
 
       <div className="flex items-center gap-3 mb-4 flex-wrap">
         <div className="flex items-center gap-2 flex-1 min-w-[260px]">
-          <Search className="w-4 h-4 text-white/40" />
+          <Search className="w-4 h-4 text-muted" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Nome / email / código Hotmart..."
-            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm focus:outline-none" />
+            className="flex-1 bg-surface-low border border-outline/10 px-3 py-1.5 text-sm focus:outline-none" />
         </div>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm">
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm">
           <option value="all">Todos status</option>
           {Object.entries(STATUS_LABEL).map(([v,l]) => <option key={v} value={v}>{l}</option>)}
         </select>
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-white/40 text-sm">Carregando...</div>
+        <div className="text-center py-12 text-muted text-sm">Carregando...</div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white/5 border border-white/10 rounded-lg p-12 text-center text-white/40">
+        <div className="bg-surface-low border border-outline/10 p-12 text-center text-muted">
           <Trophy className="w-10 h-10 mx-auto mb-3 opacity-30" />
           <p className="text-sm">{rows.length === 0 ? 'Nenhum afiliado ainda. Clica em "Novo afiliado" pra começar.' : 'Nenhum match.'}</p>
         </div>
@@ -161,21 +161,21 @@ function AffiliateCard({ a, onRequestPayout, onChanged }: { a: DashRow; onReques
   };
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-lg p-4 border-l-4"
+    <div className="bg-surface-low border border-outline/10 p-4 border-l-4"
       style={{ borderLeftColor: STATUS_COLOR[a.status] }}>
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <span className="font-semibold">{a.full_name}</span>
-            <span className="text-[10px] uppercase tracking-widest font-bold px-1.5 py-0.5 rounded"
+            <span className="text-[10px] uppercase tracking-widest font-bold px-1.5 py-0.5"
               style={{ background: `${TIER_COLOR[a.tier]}30`, color: TIER_COLOR[a.tier] }}>
               {a.tier}
             </span>
-            <span className="text-xs text-white/40">·</span>
-            <span className="text-xs text-white/60">{a.email}</span>
+            <span className="text-xs text-muted">·</span>
+            <span className="text-xs text-on-surface-variant">{a.email}</span>
             {a.whatsapp && <span className="text-xs text-[#25D366]">· {a.whatsapp}</span>}
           </div>
-          <div className="text-[10px] text-white/30 flex flex-wrap gap-2">
+          <div className="text-[10px] text-muted flex flex-wrap gap-2">
             {a.hotmart_code ? (
               <span>Hotmart code: <code className="text-[#F59E0B]">{a.hotmart_code}</code></span>
             ) : (
@@ -187,7 +187,7 @@ function AffiliateCard({ a, onRequestPayout, onChanged }: { a: DashRow; onReques
             {a.last_sale_at && <span>· última {dateBR(a.last_sale_at)}</span>}
           </div>
         </div>
-        <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded shrink-0"
+        <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 shrink-0"
           style={{ background: `${STATUS_COLOR[a.status]}20`, color: STATUS_COLOR[a.status] }}>
           {STATUS_LABEL[a.status]}
         </span>
@@ -200,26 +200,26 @@ function AffiliateCard({ a, onRequestPayout, onChanged }: { a: DashRow; onReques
         <MiniStat label="A pagar" value={brl(a.commission_due_cents)} color={a.commission_due_cents > 0 ? '#EF4444' : '#6B7280'} />
       </div>
 
-      <div className="flex items-center gap-2 pt-2 border-t border-white/5 flex-wrap">
+      <div className="flex items-center gap-2 pt-2 border-t border-outline/10 flex-wrap">
         <button onClick={handleCopyLink} disabled={loadingLink}
-          className="flex items-center gap-1 text-xs bg-[#F59E0B] text-[#0A0F1E] font-medium px-3 py-1.5 rounded hover:bg-[#F59E0B]/90 disabled:opacity-50">
+          className="flex items-center gap-1 text-xs bg-[#F59E0B] text-[#0A0F1E] font-medium px-3 py-1.5 hover:bg-[#F59E0B]/90 disabled:opacity-50">
           {loadingLink ? <Loader2 className="w-3 h-3 animate-spin" /> : copied ? <Check className="w-3 h-3" /> : <LinkIcon className="w-3 h-3" />}
           {copied ? 'Link copiado!' : 'Copiar link Hotmart'}
         </button>
         {a.whatsapp && (
           <a href={`https://wa.me/${a.whatsapp.replace(/\D/g,'')}`} target="_blank" rel="noreferrer"
-            className="flex items-center gap-1 text-xs bg-[#25D366]/20 text-[#25D366] px-3 py-1.5 rounded hover:bg-[#25D366]/30">
+            className="flex items-center gap-1 text-xs bg-[#25D366]/20 text-[#25D366] px-3 py-1.5 hover:bg-[#25D366]/30">
             <MessageCircle className="w-3 h-3" /> WhatsApp
           </a>
         )}
         {a.commission_due_cents > 0 && (
           <button onClick={onRequestPayout}
-            className="flex items-center gap-1 text-xs border border-[#10B981]/40 text-[#10B981] px-3 py-1.5 rounded hover:bg-[#10B981]/10">
+            className="flex items-center gap-1 text-xs border border-[#10B981]/40 text-[#10B981] px-3 py-1.5 hover:bg-[#10B981]/10">
             <DollarSign className="w-3 h-3" /> Registrar pagamento
           </button>
         )}
         {a.payouts_count > 0 && (
-          <span className="text-[10px] text-white/40">{a.payouts_count} pagamentos · último {dateBR(a.last_payout_at)}</span>
+          <span className="text-[10px] text-muted">{a.payouts_count} pagamentos · último {dateBR(a.last_payout_at)}</span>
         )}
       </div>
     </div>
@@ -267,7 +267,7 @@ function NewAffiliateModal({ onClose, onSaved }: { onClose: () => void; onSaved:
           <Input label="Cidade" v={form.city} on={v => setForm({ ...form, city: v })} />
           <Input label="UF" v={form.state} on={v => setForm({ ...form, state: v.toUpperCase() })} max={2} />
           <div>
-            <label className="text-xs text-white/70 block mb-1">Tier inicial</label>
+            <label className="text-xs text-on-surface-variant block mb-1">Tier inicial</label>
             <select value={form.tier} onChange={e => setForm({ ...form, tier: e.target.value })} className={inputCls}>
               <option value="bronze">Bronze</option>
               <option value="prata">Prata</option>
@@ -276,15 +276,15 @@ function NewAffiliateModal({ onClose, onSaved }: { onClose: () => void; onSaved:
           </div>
         </div>
         <div>
-          <label className="text-xs text-white/70 block mb-1">Notas</label>
+          <label className="text-xs text-on-surface-variant block mb-1">Notas</label>
           <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={2} className={inputCls} />
         </div>
       </div>
       <div className="flex items-center gap-2 mt-5">
-        <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#F59E0B] text-[#0A0F1E] font-medium rounded-lg hover:bg-[#F59E0B]/90 text-sm disabled:opacity-50">
+        <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#F59E0B] text-[#0A0F1E] font-medium hover:bg-[#F59E0B]/90 text-sm disabled:opacity-50">
           {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Cadastrar
         </button>
-        <button onClick={onClose} className="px-4 py-2 border border-white/10 text-white/60 rounded-lg hover:bg-white/5 text-sm">Cancelar</button>
+        <button onClick={onClose} className="px-4 py-2 border border-outline/10 text-on-surface-variant hover:bg-surface-highest text-sm">Cancelar</button>
       </div>
     </Modal>
   );
@@ -326,7 +326,7 @@ function PayoutModal({ affiliate, onClose, onSaved }: { affiliate: DashRow; onCl
       <div className="space-y-3">
         <Input label="Valor a pagar (R$)" v={amount} on={setAmount} placeholder="Ex: 850,00" />
         <div>
-          <label className="text-xs text-white/70 block mb-1">Método</label>
+          <label className="text-xs text-on-surface-variant block mb-1">Método</label>
           <select value={method} onChange={e => setMethod(e.target.value)} className={inputCls}>
             <option value="pix">PIX</option>
             <option value="transfer">Transferência bancária</option>
@@ -336,17 +336,17 @@ function PayoutModal({ affiliate, onClose, onSaved }: { affiliate: DashRow; onCl
         </div>
         <Input label="Referência (comprovante, recibo, ID PIX)" v={reference} on={setReference} />
         <div>
-          <label className="text-xs text-white/70 block mb-1">Notas</label>
+          <label className="text-xs text-on-surface-variant block mb-1">Notas</label>
           <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} className={inputCls} />
         </div>
       </div>
 
       {payouts.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-white/5">
-          <div className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-2">Histórico ({payouts.length})</div>
+        <div className="mt-4 pt-4 border-t border-outline/10">
+          <div className="text-[10px] uppercase tracking-widest font-bold text-muted mb-2">Histórico ({payouts.length})</div>
           <div className="space-y-1 max-h-40 overflow-y-auto">
             {payouts.map(p => (
-              <div key={p.id} className="flex items-center justify-between text-xs bg-white/5 rounded px-2 py-1.5">
+              <div key={p.id} className="flex items-center justify-between text-xs bg-surface-low px-2 py-1.5">
                 <span>{dateBR(p.payout_date)} · {p.method.toUpperCase()}</span>
                 <span className="font-semibold text-[#10B981]">{brl(p.amount_cents)}</span>
               </div>
@@ -356,10 +356,10 @@ function PayoutModal({ affiliate, onClose, onSaved }: { affiliate: DashRow; onCl
       )}
 
       <div className="flex items-center gap-2 mt-5">
-        <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#10B981] text-[#0A0F1E] font-medium rounded-lg hover:bg-[#10B981]/90 text-sm disabled:opacity-50">
+        <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#10B981] text-[#0A0F1E] font-medium hover:bg-[#10B981]/90 text-sm disabled:opacity-50">
           {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <DollarSign className="w-4 h-4" />} Registrar pagamento
         </button>
-        <button onClick={onClose} className="px-4 py-2 border border-white/10 text-white/60 rounded-lg hover:bg-white/5 text-sm">Cancelar</button>
+        <button onClick={onClose} className="px-4 py-2 border border-outline/10 text-on-surface-variant hover:bg-surface-highest text-sm">Cancelar</button>
       </div>
     </Modal>
   );
@@ -369,21 +369,21 @@ function LeaderboardModal({ leaders, onClose }: { leaders: Leader[]; onClose: ()
   return (
     <Modal title="🏆 Leaderboard de Afiliados" onClose={onClose}>
       {leaders.length === 0 ? (
-        <div className="text-center py-8 text-white/40 text-sm">
+        <div className="text-center py-8 text-muted text-sm">
           Nenhum afiliado com vendas ainda. Quando entrarem vendas Hotmart vinculadas a afiliado, aparecem aqui.
         </div>
       ) : (
         <div className="space-y-2">
           {leaders.map(l => (
-            <div key={l.id} className="flex items-center gap-3 bg-white/5 border border-white/10 rounded p-3">
-              <div className="text-2xl font-bold text-white/30 w-8 text-center">#{l.rank}</div>
+            <div key={l.id} className="flex items-center gap-3 bg-surface-low border border-outline/10 p-3">
+              <div className="text-2xl font-bold text-muted w-8 text-center">#{l.rank}</div>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold">{l.full_name}</div>
-                <div className="text-[10px] text-white/40">{l.email} · código <code className="text-[#F59E0B]">{l.hotmart_code}</code></div>
+                <div className="text-[10px] text-muted">{l.email} · código <code className="text-[#F59E0B]">{l.hotmart_code}</code></div>
               </div>
               <div className="text-right">
                 <div className="text-base font-semibold text-[#F59E0B]">{brl(l.total_commission_cents)}</div>
-                <div className="text-[10px] text-white/40">{l.total_sales} vendas</div>
+                <div className="text-[10px] text-muted">{l.total_sales} vendas</div>
               </div>
             </div>
           ))}
@@ -396,11 +396,11 @@ function LeaderboardModal({ leaders, onClose }: { leaders: Leader[]; onClose: ()
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/70" />
-      <div className="relative bg-[#0F1729] border border-white/10 rounded-xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+      <div className="absolute inset-0 bg-surface-lowest" />
+      <div className="relative bg-surface-container border border-outline/10 p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">{title}</h3>
-          <button onClick={onClose} className="p-1 text-white/60 hover:text-white"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-1 text-on-surface-variant hover:text-on-surface"><X className="w-5 h-5" /></button>
         </div>
         {children}
       </div>
@@ -408,12 +408,12 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
   );
 }
 
-const inputCls = 'w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#F59E0B]/50 text-white placeholder:text-white/30';
+const inputCls = 'w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-[#F59E0B]/50 text-on-surface placeholder:text-muted';
 
 function Input({ label, v, on, type='text', placeholder, max }: { label: string; v: string; on: (v: string) => void; type?: string; placeholder?: string; max?: number }) {
   return (
     <div>
-      <label className="text-xs text-white/70 block mb-1">{label}</label>
+      <label className="text-xs text-on-surface-variant block mb-1">{label}</label>
       <input type={type} value={v} onChange={e => on(e.target.value)} placeholder={placeholder} maxLength={max} className={inputCls} />
     </div>
   );
@@ -421,8 +421,8 @@ function Input({ label, v, on, type='text', placeholder, max }: { label: string;
 
 function StatCard({ label, value, color, icon }: { label: string; value: string; color: string; icon?: React.ReactNode }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-lg p-3">
-      <div className="flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold text-white/40 mb-1">
+    <div className="bg-surface-low border border-outline/10 p-3">
+      <div className="flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold text-muted mb-1">
         {icon} {label}
       </div>
       <div className="text-lg font-semibold" style={{ color }}>{value}</div>
@@ -432,8 +432,8 @@ function StatCard({ label, value, color, icon }: { label: string; value: string;
 
 function MiniStat({ label, value, color }: { label: string; value: string; color: string }) {
   return (
-    <div className="bg-white/[0.03] border border-white/5 rounded px-2 py-1.5">
-      <div className="text-[9px] uppercase tracking-widest font-bold text-white/40">{label}</div>
+    <div className="bg-surface-low border border-outline/10 px-2 py-1.5">
+      <div className="text-[9px] uppercase tracking-widest font-bold text-muted">{label}</div>
       <div className="text-sm font-semibold mt-0.5" style={{ color }}>{value}</div>
     </div>
   );

@@ -74,9 +74,9 @@ const categoriaLabel: Record<Categoria, string> = {
 
 const statusBadge: Record<string, string> = {
   validado: 'text-emerald-400 bg-emerald-400/10',
-  'canonico-inicial': 'text-[#06B6D4] bg-[#06B6D4]/10',
+  'canonico-inicial': 'text-secondary bg-secondary/15',
   rascunho: 'text-amber-400 bg-amber-400/10',
-  'em-revisao': 'text-white/40 bg-white/5',
+  'em-revisao': 'text-muted bg-surface-low',
 };
 
 const CATS_FILTRO: Array<Categoria | 'todos'> = ['todos', 'fundacao', 'empresa', 'portfolio', 'produtos', 'comercial', 'marketing', 'operacao', 'roadmap', 'governanca'];
@@ -91,14 +91,14 @@ export default function Biblioteca() {
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Biblioteca Central</h1>
-        <p className="text-white/50 mt-1">{DOCS.length} documentos · repositório canônico: <span className="font-mono text-white/40">D:\projetos\docs\digiai\docs\</span></p>
+        <h1 className="text-3xl font-bold tracking-tight font-serif">Biblioteca Central</h1>
+        <p className="text-on-surface-variant mt-1">{DOCS.length} documentos · repositório canônico: <span className="font-mono text-muted">D:\projetos\docs\digiai\docs\</span></p>
       </div>
 
-      <div className="bg-[#2563EB]/8 border border-[#2563EB]/20 rounded-xl px-4 py-3 flex items-start gap-3">
-        <BookOpen className="w-4 h-4 text-[#2563EB] mt-0.5 shrink-0" />
-        <div className="text-sm text-white/70">
-          <span className="font-semibold text-white">Regra de ouro:</span> se houver conflito entre documentos, vale o que estiver em <span className="font-mono text-[#06B6D4]">docs/</span>. Fonte máxima: <span className="font-mono">zero-aos-milhoes-digiai.md</span>
+      <div className="bg-secondary-container/40 border border-secondary/40 px-4 py-3 flex items-start gap-3">
+        <BookOpen className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
+        <div className="text-sm text-on-surface-variant">
+          <span className="font-semibold text-on-surface">Regra de ouro:</span> se houver conflito entre documentos, vale o que estiver em <span className="font-mono text-secondary">docs/</span>. Fonte máxima: <span className="font-mono">zero-aos-milhoes-digiai.md</span>
         </div>
       </div>
 
@@ -108,8 +108,8 @@ export default function Biblioteca() {
           <button
             key={c}
             onClick={() => setFiltro(c)}
-            className={`text-xs px-3 py-1.5 rounded-lg font-mono transition-all
-              ${filtro === c ? 'bg-[#2563EB] text-white' : 'bg-white/5 text-white/40 hover:text-white/70'}`}
+            className={`text-xs px-3 py-1.5 font-mono transition-all
+              ${filtro === c ? 'bg-secondary text-surface' : 'bg-surface-low text-muted hover:text-on-surface-variant'}`}
           >
             {c === 'todos' ? 'Todos' : categoriaLabel[c as Categoria]}
           </button>
@@ -122,27 +122,27 @@ export default function Biblioteca() {
           const catDocs = docs.filter(d => d.categoria === cat);
           return (
             <div key={cat}>
-              <div className="text-xs font-mono text-white/30 uppercase tracking-widest mb-3 px-1">
+              <div className="text-xs font-mono text-muted uppercase tracking-widest mb-3 px-1">
                 {categoriaLabel[cat]}
               </div>
               <div className="space-y-2">
                 {catDocs.map((doc) => (
                   <div
                     key={doc.path}
-                    className="bg-white/2 border border-white/6 rounded-xl px-4 py-3 flex items-start gap-3 hover:border-white/12 transition-colors"
+                    className="bg-surface-low border border-outline/10 px-4 py-3 flex items-start gap-3 hover:border-outline/30 transition-colors"
                   >
-                    <FileText className="w-4 h-4 text-white/25 mt-0.5 shrink-0" />
+                    <FileText className="w-4 h-4 text-muted mt-0.5 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                        <span className="text-sm font-medium text-white/90">{doc.titulo}</span>
-                        <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${statusBadge[doc.status]}`}>
+                        <span className="text-sm font-medium text-on-surface">{doc.titulo}</span>
+                        <span className={`text-[10px] font-mono px-1.5 py-0.5 ${statusBadge[doc.status]}`}>
                           {doc.status === 'canonico-inicial' ? 'canônico' : doc.status}
                         </span>
                       </div>
-                      <div className="text-xs text-white/50">{doc.descricao}</div>
-                      <div className="text-[10px] font-mono text-white/20 mt-1">{doc.path}</div>
+                      <div className="text-xs text-on-surface-variant">{doc.descricao}</div>
+                      <div className="text-[10px] font-mono text-muted mt-1">{doc.path}</div>
                     </div>
-                    <div className="text-[10px] font-mono text-white/20 shrink-0 mt-0.5">{doc.revisao}</div>
+                    <div className="text-[10px] font-mono text-muted shrink-0 mt-0.5">{doc.revisao}</div>
                   </div>
                 ))}
               </div>

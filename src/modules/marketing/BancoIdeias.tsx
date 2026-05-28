@@ -61,19 +61,19 @@ export function BancoIdeias() {
       {/* Toolbar */}
       <div className="flex items-center gap-4 mb-6 flex-wrap">
         <div className="flex items-center gap-2 flex-1 min-w-[260px]">
-          <Search className="w-4 h-4 text-white/40" />
+          <Search className="w-4 h-4 text-muted" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar no hook..."
-            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-[#06B6D4]/50"
+            className="flex-1 bg-surface-low border border-outline/10 px-3 py-1.5 text-sm focus:outline-none focus:border-secondary/40"
           />
         </div>
 
         <select
           value={pillarFilter}
           onChange={(e) => setPillarFilter(e.target.value)}
-          className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm focus:outline-none"
+          className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm focus:outline-none"
         >
           <option value="all">Todos os pilares</option>
           {pillars.map((p) => (
@@ -86,7 +86,7 @@ export function BancoIdeias() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm focus:outline-none"
+          className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm focus:outline-none"
         >
           <option value="all">Todos status</option>
           <option value="available">Disponíveis</option>
@@ -97,7 +97,7 @@ export function BancoIdeias() {
 
         <button
           onClick={refresh}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm border border-white/10 rounded-lg hover:bg-white/5"
+          className="flex items-center gap-2 px-3 py-1.5 text-sm border border-outline/10 hover:bg-surface-highest"
         >
           <RefreshCw className="w-4 h-4" />
           Atualizar
@@ -119,9 +119,9 @@ export function BancoIdeias() {
       )}
 
       {loading ? (
-        <div className="text-center py-12 text-white/40 text-sm">Carregando ideias...</div>
+        <div className="text-center py-12 text-muted text-sm">Carregando ideias...</div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-12 text-white/40 text-sm">
+        <div className="text-center py-12 text-muted text-sm">
           Nenhuma ideia encontrada com esses filtros.
         </div>
       ) : (
@@ -139,34 +139,34 @@ export function BancoIdeias() {
       {/* Modal de agendamento */}
       {scheduling && (
         <div
-          className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-surface-lowest flex items-center justify-center z-50 p-4"
           onClick={() => setScheduling(null)}
         >
           <div
-            className="bg-[#0F1729] border border-white/10 rounded-xl p-6 max-w-md w-full"
+            className="bg-surface-container border border-outline/10 p-6 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="font-semibold mb-1">Agendar postagem</h3>
-            <p className="text-xs text-white/40 mb-4">{scheduling.idea.hook}</p>
+            <p className="text-xs text-muted mb-4">{scheduling.idea.hook}</p>
 
-            <label className="text-xs text-white/60 block mb-1">Data</label>
+            <label className="text-xs text-on-surface-variant block mb-1">Data</label>
             <input
               type="date"
               value={scheduling.date}
               onChange={(e) => setScheduling({ ...scheduling, date: e.target.value })}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#06B6D4]/50 mb-4"
+              className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-secondary/40 mb-4"
             />
 
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setScheduling(null)}
-                className="px-4 py-2 text-sm text-white/60 hover:text-white"
+                className="px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSchedule}
-                className="px-4 py-2 text-sm bg-[#06B6D4] text-[#0A0F1E] font-medium rounded-lg hover:bg-[#06B6D4]/90"
+                className="px-4 py-2 text-sm bg-secondary text-surface font-medium hover:bg-secondary/90"
               >
                 Agendar
               </button>
@@ -180,11 +180,11 @@ export function BancoIdeias() {
 
 function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+    <div className="bg-surface-low border border-outline/10 p-4">
       <div className="text-2xl font-semibold" style={{ color }}>
         {value}
       </div>
-      <div className="text-xs text-white/40 mt-1">{label}</div>
+      <div className="text-xs text-muted mt-1">{label}</div>
     </div>
   );
 }
@@ -204,7 +204,7 @@ function IdeaCard({ idea, onSchedule }: { idea: ContentIdea; onSchedule: (date: 
   };
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-lg p-4 flex flex-col">
+    <div className="bg-surface-low border border-outline/10 p-4 flex flex-col">
       {/* Pillar tag */}
       {idea.pillar_name && (
         <div
@@ -220,28 +220,28 @@ function IdeaCard({ idea, onSchedule }: { idea: ContentIdea; onSchedule: (date: 
       <div className="text-sm font-medium mb-3 flex-1">{idea.hook}</div>
 
       {/* Metadata */}
-      <div className="flex items-center gap-2 text-[11px] text-white/40 mb-3">
+      <div className="flex items-center gap-2 text-[11px] text-muted mb-3">
         {idea.suggested_format && (
-          <span className="px-1.5 py-0.5 bg-white/5 rounded">{idea.suggested_format}</span>
+          <span className="px-1.5 py-0.5 bg-surface-low">{idea.suggested_format}</span>
         )}
         {idea.target_audience && (
-          <span className="px-1.5 py-0.5 bg-white/5 rounded truncate">{idea.target_audience}</span>
+          <span className="px-1.5 py-0.5 bg-surface-low truncate">{idea.target_audience}</span>
         )}
       </div>
 
       {/* Footer: status + action */}
-      <div className="flex items-center justify-between border-t border-white/5 pt-3">
+      <div className="flex items-center justify-between border-t border-outline/10 pt-3">
         <span
           className="text-[10px] uppercase tracking-widest font-bold"
           style={{ color: statusColors[idea.status] }}
         >
           {idea.status}
-          {idea.used_count > 0 && <span className="ml-1 text-white/30">({idea.used_count}x)</span>}
+          {idea.used_count > 0 && <span className="ml-1 text-muted">({idea.used_count}x)</span>}
         </span>
         {idea.status === 'available' && (
           <button
             onClick={() => onSchedule(tomorrow)}
-            className="flex items-center gap-1 text-xs text-[#06B6D4] hover:text-white"
+            className="flex items-center gap-1 text-xs text-secondary hover:text-on-surface"
           >
             <Calendar className="w-3 h-3" />
             Agendar
