@@ -43,6 +43,7 @@ const PULSO_URL       = import.meta.env.VITE_PULSO_URL       || 'https://pulsopr
 const QUALFOTO_URL    = import.meta.env.VITE_QUALFOTO_URL    || 'https://qualfoto.netlify.app';
 const LUMINA_URL      = import.meta.env.VITE_LUMINA_URL      || 'https://lumina.netlify.app';
 const EASY_URL        = import.meta.env.VITE_EASY_URL        || 'https://easyidiomas.netlify.app';
+const NIPO_URL        = import.meta.env.VITE_NIPO_URL        || 'https://niposchool.vercel.app';
 
 const operacional: NavItem[] = [
   { id: 'visao',            label: 'Visão',             icon: <Eye className="w-4 h-4" /> },
@@ -73,7 +74,7 @@ const ecossistemas: Ecossistema[] = [
   { key: 'lumina',       icone: <Wand2        className="w-4 h-4" />, nome: 'Lumina',        url: LUMINA_URL,      status: 'ativo' },
   { key: 'qualafoto',    icone: <Camera       className="w-4 h-4" />, nome: 'Qual a Foto',   url: QUALFOTO_URL,    status: 'ativo' },
   { key: 'easyidiomas',  icone: <Languages    className="w-4 h-4" />, nome: 'Easy Idiomas',  url: EASY_URL,        status: 'ativo' },
-  { key: 'niposchool',   icone: <Music2       className="w-4 h-4" />, nome: 'Nipo School',                         status: 'em_concepcao' },
+  { key: 'niposchool',   icone: <Music2       className="w-4 h-4" />, nome: 'Nipo School',   url: NIPO_URL,        status: 'ativo' },
 ];
 
 const sistema: NavItem[] = [
