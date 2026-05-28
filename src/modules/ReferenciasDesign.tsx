@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PageHeader from '../components/PageHeader';
 
 /**
  * Módulo Referências de Design — comparativo visual organizado por CATEGORIAS.
@@ -601,109 +602,109 @@ export default function ReferenciasDesign() {
   const categoriaAtual = CATEGORIAS.find(c => c.id === categoria)!;
 
   return (
-    <div className="p-8 max-w-[1800px] mx-auto">
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <span className="text-xs uppercase tracking-wider text-white/40">Apoio · Design · Benchmark</span>
-        </div>
-        <h1 className="text-3xl font-bold text-white mb-2">Referências de Design System</h1>
-        <p className="text-white/60 text-sm max-w-3xl leading-relaxed">
-          <strong className="text-white">15 referências organizadas em 5 categorias</strong> para inspirar a evolução do
-          {' '}<strong className="text-white">Clearix Lens v1.0</strong> (R-014). Use as abas para alternar entre
-          categorias. O foco vai além do "IA-óbvio" — incluí <strong className="text-white">eyewear premium</strong>,
-          {' '}<strong className="text-white">bento hub</strong>, <strong className="text-white">brasileiros</strong> e
-          {' '}<strong className="text-white">healthcare humano</strong>. Logo abaixo, os <strong className="text-white">3 experimentos ativos</strong> rodando no laboratório Import.
-        </p>
-      </div>
+    <div className="max-w-6xl mx-auto p-8">
+      <PageHeader
+        eyebrow="Sistema · Design · Benchmark"
+        title="Referências de Design System"
+        subtitle={
+          <>
+            <strong className="text-on-surface">15 referências organizadas em 5 categorias</strong> para inspirar a evolução do
+            {' '}<strong className="text-on-surface">Clearix Lens v1.0</strong> (R-014). Use as abas para alternar entre
+            categorias. O foco vai além do "IA-óbvio" — incluí <strong className="text-on-surface">eyewear premium</strong>,
+            {' '}<strong className="text-on-surface">bento hub</strong>, <strong className="text-on-surface">brasileiros</strong> e
+            {' '}<strong className="text-on-surface">healthcare humano</strong>. Logo abaixo, os <strong className="text-on-surface">3 experimentos ativos</strong> rodando no laboratório Import.
+          </>
+        }
+      />
 
       {/* Experimentos ativos distribuídos por app (ADR-0025) */}
-      <div className="mb-8 p-5 rounded-xl border border-[#06B6D4]/30 bg-gradient-to-br from-[#06B6D4]/10 to-transparent">
+      <div className="mb-8 p-5 border border-[#06B6D4]/30 bg-gradient-to-br from-[#06B6D4]/10 to-transparent">
         <div className="flex items-start gap-3 mb-4">
           <span style={{ fontSize: '24px' }}>🧪</span>
           <div>
             <div style={{ fontSize: '11px', fontWeight: 700, color: '#06B6D4', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>
               3 experimentos ativos · 3 destinos · ADR-0025
             </div>
-            <h2 className="text-lg font-bold text-white mb-1">Cada estética encontra seu app de destino</h2>
-            <p className="text-sm text-white/70 leading-relaxed">
-              Decisão registrada em <strong className="text-white">ADR-0025</strong> (2026-05-25):
-              em vez de competirem por 1 vaga em Clearix Vendas, as 3 estéticas vão pra <strong className="text-white">3 apps diferentes</strong>,
+            <h2 className="text-lg font-bold text-on-surface mb-1">Cada estética encontra seu app de destino</h2>
+            <p className="text-sm text-on-surface-variant leading-relaxed">
+              Decisão registrada em <strong className="text-on-surface">ADR-0025</strong> (2026-05-25):
+              em vez de competirem por 1 vaga em Clearix Vendas, as 3 estéticas vão pra <strong className="text-on-surface">3 apps diferentes</strong>,
               cada uma alinhada com o perfil do usuário daquele app. Briefings vivem em
-              {' '}<code className="bg-white/10 px-1.5 py-0.5 rounded text-xs">D:\projetos\clearix_eco_full\clearix_import\BRIEFING_*_EXPERIMENT.md</code>.
+              {' '}<code className="bg-surface-high px-1.5 py-0.5 rounded text-xs">D:\projetos\clearix_eco_full\clearix_import\BRIEFING_*_EXPERIMENT.md</code>.
               Mock visual comparativo:
-              {' '}<strong className="text-white">Mock Vendas (4 estilos)</strong> da sidebar.
+              {' '}<strong className="text-on-surface">Mock Vendas (4 estilos)</strong> da sidebar.
             </p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {/* STONE-LENS → CLEARIX VENDAS */}
-          <div className="p-4 rounded-lg border border-[#10B981]/40 bg-[#10B981]/5">
+          <div className="p-4 border border-[#10B981]/40 bg-[#10B981]/5">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
               <span style={{ fontSize: '18px' }}>🇧🇷</span>
               <div className="text-sm font-bold text-[#34D399]">Stone-Lens</div>
               <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#10B981]/20 text-[#34D399] font-semibold">universal BR</span>
             </div>
-            <div className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mb-1">Destino (R-018)</div>
-            <div className="text-sm font-bold text-white mb-2">→ Clearix Import (lab) → Vendas</div>
-            <div className="text-xs text-white/70 leading-relaxed mb-3">
+            <div className="text-[10px] uppercase tracking-wider text-muted font-semibold mb-1">Destino (R-018)</div>
+            <div className="text-sm font-bold text-on-surface mb-2">→ Clearix Import (lab) → Vendas</div>
+            <div className="text-xs text-on-surface-variant leading-relaxed mb-3">
               Etapa 1: valida em <strong className="text-[#34D399]">Clearix Import</strong> (laboratório local, sem risco operacional). Etapa 2: porta pra Clearix Vendas em PR revisado.
             </div>
-            <div className="text-[11px] text-white/50 mb-2"><strong className="text-white/80">📄 Briefing:</strong></div>
-            <code className="block text-[10px] bg-black/30 px-2 py-1.5 rounded text-[#34D399] break-all leading-snug">
+            <div className="text-[11px] text-on-surface-variant mb-2"><strong className="text-on-surface">📄 Briefing:</strong></div>
+            <code className="block text-[10px] bg-surface-lowest px-2 py-1.5 rounded text-[#34D399] break-all leading-snug">
               BRIEFING_STONELENS_EXPERIMENT.md
             </code>
-            <div className="text-[10px] text-white/40 mt-2">7 métricas · mobile-first · serve operador 8h/dia</div>
+            <div className="text-[10px] text-muted mt-2">7 métricas · mobile-first · serve operador 8h/dia</div>
           </div>
 
           {/* PERSOL → POLAPETIT */}
-          <div className="p-4 rounded-lg border border-[#A67C52]/40 bg-[#A67C52]/5">
+          <div className="p-4 border border-[#A67C52]/40 bg-[#A67C52]/5">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
               <span style={{ fontSize: '18px' }}>👓</span>
               <div className="text-sm font-bold text-[#D4A574]">Persol</div>
               <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#A67C52]/20 text-[#D4A574] font-semibold">heritage glamour</span>
             </div>
-            <div className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mb-1">Destino</div>
-            <div className="text-sm font-bold text-white mb-2">→ Polapetit</div>
-            <div className="text-xs text-white/70 leading-relaxed mb-3">
+            <div className="text-[10px] uppercase tracking-wider text-muted font-semibold mb-1">Destino</div>
+            <div className="text-sm font-bold text-on-surface mb-2">→ Polapetit</div>
+            <div className="text-xs text-on-surface-variant leading-relaxed mb-3">
               Festa infantil premium · Noto Serif italic + gold #D4AF37 + verde sutil + cream warm · DESIGN.md atual já alinhado 80%
             </div>
-            <div className="text-[11px] text-white/50 mb-2"><strong className="text-white/80">📄 Briefing:</strong></div>
-            <code className="block text-[10px] bg-black/30 px-2 py-1.5 rounded text-[#D4A574] break-all leading-snug">
+            <div className="text-[11px] text-on-surface-variant mb-2"><strong className="text-on-surface">📄 Briefing:</strong></div>
+            <code className="block text-[10px] bg-surface-lowest px-2 py-1.5 rounded text-[#D4A574] break-all leading-snug">
               BRIEFING_PERSOL_EXPERIMENT.md
             </code>
-            <div className="text-[10px] text-white/40 mt-2">Reescrito 2026-05-25 · materializa o DESIGN.md atual</div>
+            <div className="text-[10px] text-muted mt-2">Reescrito 2026-05-25 · materializa o DESIGN.md atual</div>
           </div>
 
           {/* MYKITA → PULSO CONTROL */}
-          <div className="p-4 rounded-lg border border-[#FF6B35]/40 bg-[#FF6B35]/5">
+          <div className="p-4 border border-[#FF6B35]/40 bg-[#FF6B35]/5">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
               <span style={{ fontSize: '18px' }}>⚙️</span>
               <div className="text-sm font-bold text-[#FF6B35]">Mykita</div>
               <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FF6B35]/20 text-[#FF6B35] font-semibold">engenharia industrial</span>
             </div>
-            <div className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mb-1">Destino</div>
-            <div className="text-sm font-bold text-white mb-2">→ Pulso Control</div>
-            <div className="text-xs text-white/70 leading-relaxed mb-3">
+            <div className="text-[10px] uppercase tracking-wider text-muted font-semibold mb-1">Destino</div>
+            <div className="text-sm font-bold text-on-surface mb-2">→ Pulso Control</div>
+            <div className="text-xs text-on-surface-variant leading-relaxed mb-3">
               DevOps editorial · Helvetica Grotesk + black + 1 acento laranja radical · monitor industrial pra 10 canais + 49 agendados + worker parado
             </div>
-            <div className="text-[11px] text-white/50 mb-2"><strong className="text-white/80">📄 Briefing:</strong></div>
-            <code className="block text-[10px] bg-black/30 px-2 py-1.5 rounded text-[#FF6B35] break-all leading-snug">
+            <div className="text-[11px] text-on-surface-variant mb-2"><strong className="text-on-surface">📄 Briefing:</strong></div>
+            <code className="block text-[10px] bg-surface-lowest px-2 py-1.5 rounded text-[#FF6B35] break-all leading-snug">
               BRIEFING_MYKITA_EXPERIMENT.md
             </code>
-            <div className="text-[10px] text-white/40 mt-2">Reescrito 2026-05-25 · 4 telas (dashboard/kanban/analytics/workflow)</div>
+            <div className="text-[10px] text-muted mt-2">Reescrito 2026-05-25 · 4 telas (dashboard/kanban/analytics/workflow)</div>
           </div>
         </div>
 
-        <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/10">
-          <div className="text-[10px] uppercase tracking-wider text-white/40 mb-1.5 font-semibold">💡 Pergunta de Ouro de cada briefing (adaptada ao destino)</div>
-          <ul className="space-y-1.5 text-xs text-white/80 leading-relaxed">
+        <div className="mt-4 p-3 bg-surface-low border border-outline/10">
+          <div className="text-[10px] uppercase tracking-wider text-muted mb-1.5 font-semibold">💡 Pergunta de Ouro de cada briefing (adaptada ao destino)</div>
+          <ul className="space-y-1.5 text-xs text-on-surface-variant leading-relaxed">
             <li><strong className="text-[#34D399]">Stone-Lens → Clearix Import (lab) → Vendas:</strong> "Funciona pra AMBOS (Mello + ótica de bairro) sem perder identidade Clearix?" (R-018: testa primeiro no Import)</li>
             <li><strong className="text-[#D4A574]">Persol → Polapetit:</strong> "Pra família que contrata festa infantil premium, transmite glamour acolhedor ou pesa como museu?"</li>
             <li><strong className="text-[#FF6B35]">Mykita → Pulso Control:</strong> "Pro operador que vê 49 itens agendados e worker parado, transmite controle industrial ou frieza Berlim?"</li>
           </ul>
-          <div className="mt-3 text-[11px] text-white/50">
-            <strong className="text-white/80">Resultado esperado:</strong> 3 apps com identidade própria · R-014 (Clearix Lens) mantida pro ecossistema Clearix Hub · cada app evolui sem competir com os outros.
+          <div className="mt-3 text-[11px] text-on-surface-variant">
+            <strong className="text-on-surface">Resultado esperado:</strong> 3 apps com identidade própria · R-014 (Clearix Lens) mantida pro ecossistema Clearix Hub · cada app evolui sem competir com os outros.
           </div>
         </div>
       </div>
@@ -748,7 +749,7 @@ export default function ReferenciasDesign() {
 
       {/* Descrição da categoria selecionada */}
       <div
-        className="mb-8 p-4 rounded-lg border"
+        className="mb-8 p-4 border"
         style={{
           background: `${categoriaAtual.cor}10`,
           borderColor: `${categoriaAtual.cor}30`,
@@ -760,7 +761,7 @@ export default function ReferenciasDesign() {
             <div style={{ fontSize: '12px', fontWeight: 700, color: categoriaAtual.cor, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>
               {categoriaAtual.label}
             </div>
-            <p className="text-sm text-white/80 leading-relaxed">{categoriaAtual.descricao}</p>
+            <p className="text-sm text-on-surface-variant leading-relaxed">{categoriaAtual.descricao}</p>
           </div>
         </div>
       </div>
@@ -772,31 +773,31 @@ export default function ReferenciasDesign() {
 
       {/* Resumo decisório dinâmico */}
       {categoria === 'todos' && (
-        <div className="mt-12 p-6 bg-white/5 border border-white/10 rounded-lg">
-          <h2 className="text-lg font-bold text-white mb-4">📊 Síntese cruzada — 5 categorias</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-white/80">
-            <div className="p-4 bg-white/5 rounded-lg">
+        <div className="mt-12 p-6 bg-surface-low border border-outline/10">
+          <h2 className="text-lg font-bold text-on-surface mb-4">📊 Síntese cruzada — 5 categorias</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-on-surface-variant">
+            <div className="p-4 bg-surface-low">
               <div className="font-semibold text-[#06B6D4] mb-2">🎯 Adotar pro Hub Clearix imediato</div>
               <p className="leading-relaxed">
                 <strong>Apple Bento Grid</strong> pra app launcher dos 17 sub-apps + <strong>Notion workspace switcher</strong> pra
                 multi-tenant. 23% ganho em scan UX comprovado.
               </p>
             </div>
-            <div className="p-4 bg-white/5 rounded-lg">
+            <div className="p-4 bg-surface-low">
               <div className="font-semibold text-[#A67C52] mb-2">👓 Inspirar identidade pra evitar IA-genérico</div>
               <p className="leading-relaxed">
                 <strong>Mykita</strong> (radicalismo + 1 acento) + <strong>Persol</strong> (atemporalidade italiana) +
                 {' '}<strong>Chilli Beans</strong> (ousadia brasileira) — referências DO SETOR ótica.
               </p>
             </div>
-            <div className="p-4 bg-white/5 rounded-lg">
+            <div className="p-4 bg-surface-low">
               <div className="font-semibold text-[#009245] mb-2">🇧🇷 Manter brasilidade autêntica</div>
               <p className="leading-relaxed">
                 <strong>Tátil Design</strong> (RJ, Olimpíada Rio + Netflix + SailGP) prova que ótica BR pode ter identidade
                 premiada sem virar "wannabe SF/Berlin".
               </p>
             </div>
-            <div className="p-4 bg-white/5 rounded-lg">
+            <div className="p-4 bg-surface-low">
               <div className="font-semibold text-[#F47D31] mb-2">🧠 Humanizar pra fugir do "cara de hospital"</div>
               <p className="leading-relaxed">
                 <strong>Headspace</strong> (tom humano + ilustração própria) pra Clearix Clinics não parecer prontuário
@@ -804,15 +805,15 @@ export default function ReferenciasDesign() {
               </p>
             </div>
           </div>
-          <div className="mt-4 p-3 bg-[#2563EB]/10 border border-[#2563EB]/30 rounded text-sm text-white/90">
-            <strong>🎯 Recomendação prática:</strong> próxima iteração do <code className="bg-black/40 px-1.5 py-0.5 rounded text-xs">clearix_design v1.1</code> deveria
+          <div className="mt-4 p-3 bg-[#2563EB]/10 border border-[#2563EB]/30 text-sm text-on-surface">
+            <strong>🎯 Recomendação prática:</strong> próxima iteração do <code className="bg-surface-lowest px-1.5 py-0.5 rounded text-xs">clearix_design v1.1</code> deveria
             puxar <strong>bento grid (Apple) + 1 acento radical (Mykita) + warmth brasileira (Tátil)</strong> sem perder os
             tokens W3C atuais nem o Inter/JetBrains Mono.
           </div>
         </div>
       )}
 
-      <div className="mt-8 text-xs text-white/40 text-center">
+      <div className="mt-8 text-xs text-muted text-center">
         Página atualizada em 2026-05-25 · 15 sistemas em 5 categorias + 3 experimentos ativos no Import · Estilização inline isolada · Consulta ADR-0023 e R-014
       </div>
     </div>

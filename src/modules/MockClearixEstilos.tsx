@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PageHeader from '../components/PageHeader';
 
 /**
  * Mock visual: MESMA TELA do Clearix Vendas em 4 estéticas × 2 modos (dark/light).
@@ -691,8 +692,8 @@ function BlocoEstetica({ numero, nome, desc, cor, modo, onChange, children }: Bl
     <div>
       <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
         <div className="flex items-baseline gap-3">
-          <h2 className="text-xl font-bold text-white">{numero}. {nome}</h2>
-          <span className="text-xs text-white/40">{desc}</span>
+          <h2 className="text-xl font-bold text-on-surface">{numero}. {nome}</h2>
+          <span className="text-xs text-muted">{desc}</span>
         </div>
         <ToggleModo modo={modo} onChange={onChange} accent={cor} />
       </div>
@@ -709,21 +710,23 @@ export default function MockClearixEstilos() {
   const [modoStoneLens, setModoStoneLens] = useState<Modo>('light');
 
   return (
-    <div className="p-8 max-w-[1900px] mx-auto">
-      <div className="mb-6">
-        <span className="text-xs uppercase tracking-wider text-white/40">Apoio · Design · Galeria viva dos 4 destinos (ADR-0025)</span>
-        <h1 className="text-3xl font-bold text-white mb-2 mt-2">4 estéticas × 4 destinos × 2 modos</h1>
-        <p className="text-white/60 text-sm max-w-3xl leading-relaxed">
-          Após <strong className="text-white">ADR-0025</strong> (2026-05-25), as 4 estéticas deixaram de competir por 1 vaga em Clearix Vendas
-          e foram <strong className="text-white">distribuídas por app</strong>:
-          {' '}<strong style={{ color: '#2563EB' }}>Clearix Lens</strong> = ecossistema Clearix (R-014) ·
-          {' '}<strong style={{ color: '#34D399' }}>Stone-Lens</strong> → Clearix Import (lab, R-018) → Vendas ·
-          {' '}<strong style={{ color: '#D4A574' }}>Persol</strong> → Polapetit ·
-          {' '}<strong style={{ color: '#FF6B35' }}>Mykita</strong> → Pulso Control.
-          Dados visuais reais Mello em todas pra comparação justa. Briefings em
-          {' '}<code className="bg-white/10 px-1.5 py-0.5 rounded text-xs">clearix_eco_full/clearix_import/BRIEFING_*_EXPERIMENT.md</code>.
-        </p>
-      </div>
+    <div className="max-w-6xl mx-auto p-8">
+      <PageHeader
+        eyebrow="Vendas · Design · Galeria viva dos 4 destinos (ADR-0025)"
+        title="4 estéticas × 4 destinos × 2 modos"
+        subtitle={
+          <>
+            Após <strong className="text-on-surface">ADR-0025</strong> (2026-05-25), as 4 estéticas deixaram de competir por 1 vaga em Clearix Vendas
+            e foram <strong className="text-on-surface">distribuídas por app</strong>:
+            {' '}<strong style={{ color: '#2563EB' }}>Clearix Lens</strong> = ecossistema Clearix (R-014) ·
+            {' '}<strong style={{ color: '#34D399' }}>Stone-Lens</strong> → Clearix Import (lab, R-018) → Vendas ·
+            {' '}<strong style={{ color: '#D4A574' }}>Persol</strong> → Polapetit ·
+            {' '}<strong style={{ color: '#FF6B35' }}>Mykita</strong> → Pulso Control.
+            Dados visuais reais Mello em todas pra comparação justa. Briefings em
+            {' '}<code className="bg-surface-high px-1.5 py-0.5 rounded text-xs">clearix_eco_full/clearix_import/BRIEFING_*_EXPERIMENT.md</code>.
+          </>
+        }
+      />
 
       <div className="flex gap-2 mb-8 flex-wrap">
         {[
@@ -797,14 +800,14 @@ export default function MockClearixEstilos() {
             <VersaoMykita modo={modoMykita} />
           </BlocoEstetica>
 
-          <div className="mt-12 p-6 bg-white/5 border border-white/10 rounded-lg">
-            <h2 className="text-lg font-bold text-white mb-1">🎯 4 estéticas, 4 destinos (ADR-0025)</h2>
-            <p className="text-sm text-white/60 mb-4">Em vez de competirem por 1 vaga, cada estética encontra o app onde ela faz sentido natural.</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-white/80">
-              <div className="p-4 bg-[#2563EB]/10 border border-[#2563EB]/20 rounded-lg">
-                <div className="text-[10px] uppercase tracking-wider text-white/40 mb-1">Destino</div>
-                <div className="font-bold text-white mb-1">Ecossistema Clearix</div>
-                <div className="text-xs text-white/50 mb-3">17 sub-apps · R-014</div>
+          <div className="mt-12 p-6 bg-surface-low border border-outline/10">
+            <h2 className="text-lg font-bold text-on-surface mb-1">🎯 4 estéticas, 4 destinos (ADR-0025)</h2>
+            <p className="text-sm text-on-surface-variant mb-4">Em vez de competirem por 1 vaga, cada estética encontra o app onde ela faz sentido natural.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-on-surface-variant">
+              <div className="p-4 bg-[#2563EB]/10 border border-[#2563EB]/20">
+                <div className="text-[10px] uppercase tracking-wider text-muted mb-1">Destino</div>
+                <div className="font-bold text-on-surface mb-1">Ecossistema Clearix</div>
+                <div className="text-xs text-muted mb-3">17 sub-apps · R-014</div>
                 <div className="font-semibold text-[#06B6D4] mb-2 text-sm">🛡️ Clearix Lens</div>
                 <ul className="space-y-1 list-disc list-inside leading-relaxed text-xs">
                   <li>Inter + blue-500/blue-300</li>
@@ -812,10 +815,10 @@ export default function MockClearixEstilos() {
                   <li><strong>Status:</strong> em produção (mantido)</li>
                 </ul>
               </div>
-              <div className="p-4 bg-[#10B981]/10 border border-[#10B981]/30 rounded-lg">
-                <div className="text-[10px] uppercase tracking-wider text-white/40 mb-1">Destino (R-018)</div>
-                <div className="font-bold text-white mb-1">Clearix Import (lab)</div>
-                <div className="text-xs text-white/50 mb-3">etapa 1 · valida no lab antes de Vendas</div>
+              <div className="p-4 bg-[#10B981]/10 border border-[#10B981]/30">
+                <div className="text-[10px] uppercase tracking-wider text-muted mb-1">Destino (R-018)</div>
+                <div className="font-bold text-on-surface mb-1">Clearix Import (lab)</div>
+                <div className="text-xs text-muted mb-3">etapa 1 · valida no lab antes de Vendas</div>
                 <div className="font-semibold text-[#34D399] mb-2 text-sm">🇧🇷 Stone-Lens</div>
                 <ul className="space-y-1 list-disc list-inside leading-relaxed text-xs">
                   <li>Inter + paleta funcional rica</li>
@@ -823,10 +826,10 @@ export default function MockClearixEstilos() {
                   <li><strong>Status:</strong> Import valida → depois porta pra Vendas</li>
                 </ul>
               </div>
-              <div className="p-4 bg-[#A67C52]/10 border border-[#A67C52]/30 rounded-lg">
-                <div className="text-[10px] uppercase tracking-wider text-white/40 mb-1">Destino</div>
-                <div className="font-bold text-white mb-1">Polapetit</div>
-                <div className="text-xs text-white/50 mb-3">festa infantil premium</div>
+              <div className="p-4 bg-[#A67C52]/10 border border-[#A67C52]/30">
+                <div className="text-[10px] uppercase tracking-wider text-muted mb-1">Destino</div>
+                <div className="font-bold text-on-surface mb-1">Polapetit</div>
+                <div className="text-xs text-muted mb-3">festa infantil premium</div>
                 <div className="font-semibold text-[#D4A574] mb-2 text-sm">👓 Persol</div>
                 <ul className="space-y-1 list-disc list-inside leading-relaxed text-xs">
                   <li>Noto Serif italic + gold #D4AF37</li>
@@ -834,10 +837,10 @@ export default function MockClearixEstilos() {
                   <li><strong>Status:</strong> DESIGN.md já alinhado 80%</li>
                 </ul>
               </div>
-              <div className="p-4 bg-[#FF6B35]/10 border border-[#FF6B35]/30 rounded-lg">
-                <div className="text-[10px] uppercase tracking-wider text-white/40 mb-1">Destino</div>
-                <div className="font-bold text-white mb-1">Pulso Control</div>
-                <div className="text-xs text-white/50 mb-3">DevOps editorial · 10 canais</div>
+              <div className="p-4 bg-[#FF6B35]/10 border border-[#FF6B35]/30">
+                <div className="text-[10px] uppercase tracking-wider text-muted mb-1">Destino</div>
+                <div className="font-bold text-on-surface mb-1">Pulso Control</div>
+                <div className="text-xs text-muted mb-3">DevOps editorial · 10 canais</div>
                 <div className="font-semibold text-[#FF6B35] mb-2 text-sm">⚙️ Mykita</div>
                 <ul className="space-y-1 list-disc list-inside leading-relaxed text-xs">
                   <li>Helvetica Grotesk + 1 acento laranja</li>
@@ -847,18 +850,18 @@ export default function MockClearixEstilos() {
               </div>
             </div>
 
-            <div className="mt-6 p-4 bg-[#06B6D4]/10 border border-[#06B6D4]/30 rounded-lg">
+            <div className="mt-6 p-4 bg-[#06B6D4]/10 border border-[#06B6D4]/30">
               <div className="text-xs font-semibold uppercase tracking-wider text-[#06B6D4] mb-2">💡 Por que distribuir e não escolher 1</div>
-              <p className="text-sm text-white/90 leading-relaxed">
+              <p className="text-sm text-on-surface leading-relaxed">
                 Cada app tem perfil de usuário diferente. Operador 8h/dia do Mello pede densidade Stone-Lens.
                 Família contratando festa infantil pede glamour Persol. Operador editorial vendo worker parado pede industrial Mykita.
                 Forçar uma estética única para todos os apps desperdiça o ajuste fino de cada destino.
               </p>
-              <ul className="mt-3 space-y-1 list-disc list-inside text-sm text-white/80 leading-relaxed">
-                <li><strong className="text-white">R-014 segue canônica</strong> pro ecossistema Clearix (Hub + 17 sub-apps)</li>
-                <li><strong className="text-white">Polapetit e Pulso</strong> ganham autonomia visual com tokens próprios (mas mesmo padrão W3C DTCG)</li>
-                <li><strong className="text-white">3 briefings em paralelo</strong> — Stone-Lens, Persol e Mykita podem rodar independentemente</li>
-                <li><strong className="text-white">Mock fica como galeria viva</strong> de pré-visualização dos 4 destinos</li>
+              <ul className="mt-3 space-y-1 list-disc list-inside text-sm text-on-surface-variant leading-relaxed">
+                <li><strong className="text-on-surface">R-014 segue canônica</strong> pro ecossistema Clearix (Hub + 17 sub-apps)</li>
+                <li><strong className="text-on-surface">Polapetit e Pulso</strong> ganham autonomia visual com tokens próprios (mas mesmo padrão W3C DTCG)</li>
+                <li><strong className="text-on-surface">3 briefings em paralelo</strong> — Stone-Lens, Persol e Mykita podem rodar independentemente</li>
+                <li><strong className="text-on-surface">Mock fica como galeria viva</strong> de pré-visualização dos 4 destinos</li>
               </ul>
             </div>
           </div>
@@ -886,8 +889,8 @@ export default function MockClearixEstilos() {
         </BlocoEstetica>
       )}
 
-      <div className="mt-8 text-xs text-white/40 text-center">
-        Página atualizada em 2026-05-25 · 4 estéticas distribuídas em 4 destinos (ADR-0025) · Dados reais Mello visualizados em todas pra comparação justa · Briefings em <code className="bg-white/10 px-1 rounded">clearix_import/BRIEFING_*_EXPERIMENT.md</code>
+      <div className="mt-8 text-xs text-muted text-center">
+        Página atualizada em 2026-05-25 · 4 estéticas distribuídas em 4 destinos (ADR-0025) · Dados reais Mello visualizados em todas pra comparação justa · Briefings em <code className="bg-surface-high px-1 rounded">clearix_import/BRIEFING_*_EXPERIMENT.md</code>
       </div>
     </div>
   );
