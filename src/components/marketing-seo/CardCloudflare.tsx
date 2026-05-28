@@ -32,7 +32,7 @@ export function CardCloudflare() {
       onAfterSync={refetch}
     >
       {!hasAny ? (
-        <EmptyHint>Sem dados ainda. Site no ar há pouco tempo — Cloudflare leva ~1h pra exibir analytics.</EmptyHint>
+        <EmptyHint>Clique <strong className="text-white/70">Sincronizar</strong> para carregar. Cloudflare consolida o tráfego com ~1h de atraso.</EmptyHint>
       ) : (
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-2">

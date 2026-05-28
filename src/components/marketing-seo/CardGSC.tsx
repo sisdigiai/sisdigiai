@@ -24,14 +24,14 @@ export function CardGSC() {
       onAfterSync={refetch}
     >
       {!hasAny ? (
-        <EmptyHint>Sem dados ainda. Configure credenciais e clique <strong className="text-white/70">Sincronizar</strong>.</EmptyHint>
+        <EmptyHint>Clique <strong className="text-white/70">Sincronizar</strong> para carregar. Os números aparecem conforme o Google indexa o site.</EmptyHint>
       ) : (
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-2">
             <MetricStat label="Clicks" value={clicks7d ?? '—'} />
             <MetricStat label="Impressions" value={impressions7d ?? '—'} />
-            <MetricStat label="CTR" value={ctr7d != null ? `${(ctr7d * 100).toFixed(2)}%` : '—'} />
-            <MetricStat label="Posição média" value={position7d?.toFixed(1) ?? '—'} />
+            <MetricStat label="CTR" value={ctr7d ? `${(ctr7d * 100).toFixed(2)}%` : '—'} />
+            <MetricStat label="Posição média" value={position7d ? position7d.toFixed(1) : '—'} />
           </div>
           {topQueries.length > 0 && (
             <div>

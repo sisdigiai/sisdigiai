@@ -148,16 +148,14 @@ Deno.serve(async (req: Request) => {
     const t7 = (totals7.rows as Array<Record<string, number>> | undefined)?.[0];
     const t30 = (totals30.rows as Array<Record<string, number>> | undefined)?.[0];
 
-    if (t7) {
-      rows.push({ metric_type: "clicks", period: "7d", value_numeric: t7.clicks, period_start: start7, period_end: end });
-      rows.push({ metric_type: "impressions", period: "7d", value_numeric: t7.impressions, period_start: start7, period_end: end });
-      rows.push({ metric_type: "ctr", period: "7d", value_numeric: t7.ctr, period_start: start7, period_end: end });
-      rows.push({ metric_type: "position", period: "7d", value_numeric: t7.position, period_start: start7, period_end: end });
-    }
-    if (t30) {
-      rows.push({ metric_type: "clicks", period: "30d", value_numeric: t30.clicks, period_start: start30, period_end: end });
-      rows.push({ metric_type: "impressions", period: "30d", value_numeric: t30.impressions, period_start: start30, period_end: end });
-    }
+    // Totais sempre gravados (0 quando ainda não há dados) — mantém o card consistente.
+    rows.push({ metric_type: "clicks", period: "7d", value_numeric: t7?.clicks ?? 0, period_start: start7, period_end: end });
+    rows.push({ metric_type: "impressions", period: "7d", value_numeric: t7?.impressions ?? 0, period_start: start7, period_end: end });
+    rows.push({ metric_type: "ctr", period: "7d", value_numeric: t7?.ctr ?? 0, period_start: start7, period_end: end });
+    rows.push({ metric_type: "position", period: "7d", value_numeric: t7?.position ?? 0, period_start: start7, period_end: end });
+    rows.push({ metric_type: "clicks", period: "30d", value_numeric: t30?.clicks ?? 0, period_start: start30, period_end: end });
+    rows.push({ metric_type: "impressions", period: "30d", value_numeric: t30?.impressions ?? 0, period_start: start30, period_end: end });
+
     for (const q of (queries7.rows as Array<Record<string, unknown>> | undefined) ?? []) {
       const keys = q.keys as string[];
       rows.push({ metric_type: "top_query", period: "7d", metric_key: keys[0], value_numeric: q.clicks, period_start: start7, period_end: end });
@@ -169,6 +167,30 @@ Deno.serve(async (req: Request) => {
 
     const { data: count, error: repErr } = await supabase.rpc("fn_replace_metrics", { p_source: "gsc", p_rows: rows });
     if (repErr) throw new Error(`replace_metrics: ${repErr.message}`);
+
+    // Sitemap health (best-effort) — popula o card Sitemap a partir do GSC.
+    try {
+      const smUrl = `${GSC_BASE}/${encodeURIComponent(SITE_URL)}/sitemaps`;
+      const smR = await fetch(smUrl, { headers: { "Authorization": `Bearer ${accessToken}` } });
+      const smJ = await smR.json();
+      if (smR.ok) {
+        const list = (smJ.sitemap as Array<Record<string, unknown>> | undefined) ?? [];
+        let urls = 0, errors = 0;
+        let lastRead = "";
+        for (const sm of list) {
+          errors += Number(sm.errors ?? 0);
+          for (const c of (sm.contents as Array<Record<string, unknown>> | undefined) ?? []) {
+            urls += Number(c.submitted ?? 0);
+          }
+          if (sm.lastDownloaded) lastRead = String(sm.lastDownloaded).slice(0, 10);
+        }
+        await supabase.rpc("fn_replace_metrics", { p_source: "sitemap", p_rows: [
+          { metric_type: "gsc_last_read", period: "all_time", value_text: lastRead || "—" },
+          { metric_type: "urls_discovered", period: "all_time", value_numeric: urls },
+          { metric_type: "errors", period: "all_time", value_numeric: errors },
+        ] });
+      }
+    } catch (_) { /* sitemap best-effort */ }
 
     await supabase.rpc("fn_mark_sync", { p_provider: PROVIDER, p_status: "ok", p_error: null });
 

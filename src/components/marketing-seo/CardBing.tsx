@@ -22,7 +22,7 @@ export function CardBing() {
       onAfterSync={refetch}
     >
       {!hasAny ? (
-        <EmptyHint>Sem dados ainda. Configure API key e clique <strong className="text-white/70">Sincronizar</strong>.</EmptyHint>
+        <EmptyHint>Clique <strong className="text-white/70">Sincronizar</strong> para carregar. O Bing reporta dados alguns dias após a indexação.</EmptyHint>
       ) : (
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-2">

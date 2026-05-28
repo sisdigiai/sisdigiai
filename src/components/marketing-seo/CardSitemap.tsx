@@ -20,7 +20,7 @@ export function CardSitemap() {
       externalLabel="Abrir sitemap"
     >
       {!hasAny ? (
-        <EmptyHint>Sem dados ainda. Sincronize GSC e Bing pra ler estado do sitemap.</EmptyHint>
+        <EmptyHint>Sincronize o card Google Search Console para ler o estado do sitemap.</EmptyHint>
       ) : (
         <div className="grid grid-cols-2 gap-2">
           <MetricStat
