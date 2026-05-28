@@ -14,7 +14,7 @@ export type ModuleId =
   | 'backlog' | 'comercial' | 'academy' | 'funil' | 'financeiro'
   | 'decisoes' | 'biblioteca' | 'brand' | 'cadastro-empresa'
   | 'clearix' | 'referencias-design' | 'mock-estilos' | 'marketing'
-  | 'marketing-seo';
+  | 'marketing-seo' | 'ecossistemas';
 
 interface NavItem {
   id: ModuleId;
@@ -112,6 +112,7 @@ export default function Sidebar({ active, onSelect }: SidebarProps) {
         <div>
           <div className="px-3 mb-2 text-[10px] font-mono text-white/25 uppercase tracking-widest">Ecossistemas</div>
           <div className="space-y-0.5">
+            <NavButton item={{ id: 'ecossistemas', label: 'Painel', icon: <Boxes className="w-4 h-4" /> }} />
             {ecossistemas.map(e => (
               <EcossistemaLink
                 key={e.key}

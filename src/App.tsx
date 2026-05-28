@@ -18,6 +18,7 @@ import Marketing from './modules/Marketing';
 import MarketingSEO from './modules/MarketingSEO';
 import ReferenciasDesign from './modules/ReferenciasDesign';
 import MockClearixEstilos from './modules/MockClearixEstilos';
+import Ecossistemas from './modules/Ecossistemas';
 import { ModuleStub } from './modules/Stub';
 import { useAuth } from './contexts/AuthContext';
 
@@ -95,6 +96,7 @@ export default function App() {
       case 'marketing-seo': return <MarketingSEO />;
       case 'referencias-design': return <ReferenciasDesign />;
       case 'mock-estilos': return <MockClearixEstilos />;
+      case 'ecossistemas': return <Ecossistemas />;
       default: {
         const stub = STUBS[activeModule];
         if (stub) {
