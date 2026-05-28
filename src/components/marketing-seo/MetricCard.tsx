@@ -65,16 +65,23 @@ export function MetricCard({ title, icon, period, provider, externalUrl, externa
             </div>
           </div>
         )}
-        {status && status.configured && status.todo && (
+        {status && status.ok && status.configured && (
           <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/30 p-3 mb-3 text-xs">
             <div className="flex items-start gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
               <div className="min-w-0">
-                <div className="text-emerald-200 font-medium">Credenciais OK · stub respondendo</div>
-                <div className="text-white/60 mt-1">{status.todo}</div>
-                {status.label && (
-                  <div className="text-[10px] font-mono text-white/40 mt-1">credencial: {status.label}</div>
-                )}
+                <div className="text-emerald-200 font-medium">
+                  {status.todo ? 'Credenciais OK · stub respondendo' : 'Sincronizado agora'}
+                </div>
+                <div className="text-white/60 mt-1">
+                  {status.todo
+                    ? status.todo
+                    : typeof status.rows_written === 'number'
+                      ? status.rows_written > 0
+                        ? `${status.rows_written} métricas atualizadas${status.period_end ? ` (até ${status.period_end})` : ''}`
+                        : 'Conectado, mas ainda sem dados no período — o site é novo e as métricas aparecem conforme houver tráfego/indexação.'
+                      : 'Dados atualizados.'}
+                </div>
               </div>
             </div>
           </div>

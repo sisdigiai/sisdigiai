@@ -26,6 +26,8 @@ export type SyncStatus = {
   last_sync_status?: 'ok' | 'error' | 'partial' | null;
   error?: string;
   todo?: string;
+  rows_written?: number;
+  period_end?: string;
 };
 
 export type MetricRow = {
