@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar, { ModuleId } from './components/Sidebar';
+import CommandPalette from './components/CommandPalette';
 import BrandGuidelines from './components/BrandGuidelines';
 import Login from './components/Login';
 import TestimonialPublicForm from './components/TestimonialPublicForm';
@@ -142,6 +143,7 @@ export default function App() {
       <main className="flex-1 overflow-y-auto">
         {renderContent()}
       </main>
+      <CommandPalette onNavigate={navigate} />
     </div>
   );
 }
