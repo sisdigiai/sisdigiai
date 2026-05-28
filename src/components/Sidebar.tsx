@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Eye, LayoutGrid, Map, List, Zap, TrendingUp,
   BookOpen, DollarSign, GitBranch, Library, Palette, Building2, Network,
   Compass, Flame, Megaphone, LogOut, Store, Sparkles, Music2, Activity,
-  Camera, Wand2, Boxes, Search, ShieldCheck, Workflow
+  Camera, Wand2, Boxes, Search, ShieldCheck, Workflow, ChevronDown
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
@@ -83,8 +83,60 @@ interface SidebarProps {
   onClose?: () => void;
 }
 
+type SectionKey = 'operacional' | 'ecossistemas' | 'sistema';
+
+const SISTEMA_IDS = sistema.map(i => i.id) as ModuleId[];
+
+function sectionOf(id: ModuleId): SectionKey {
+  if (id === 'ecossistemas') return 'ecossistemas';
+  if (SISTEMA_IDS.includes(id)) return 'sistema';
+  return 'operacional';
+}
+
+const COLLAPSE_KEY = 'digiai.sidebar.collapsed.v1';
+
+function loadCollapsed(): Record<SectionKey, boolean> {
+  const fallback = { operacional: false, ecossistemas: true, sistema: false };
+  if (typeof window === 'undefined') return fallback;
+  try {
+    const raw = window.localStorage.getItem(COLLAPSE_KEY);
+    return raw ? { ...fallback, ...JSON.parse(raw) } : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export default function Sidebar({ active, onSelect, mobileOpen = false, onClose }: SidebarProps) {
   const { user, signOut } = useAuth();
+  const [collapsed, setCollapsed] = useState<Record<SectionKey, boolean>>(loadCollapsed);
+  const activeSection = sectionOf(active);
+
+  const toggleSection = (k: SectionKey) => {
+    setCollapsed(prev => {
+      const next = { ...prev, [k]: !prev[k] };
+      try { window.localStorage.setItem(COLLAPSE_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+      return next;
+    });
+  };
+
+  // Ao navegar, abre a seção do módulo ativo (só em memória — não sobrescreve
+  // a preferência salva, então o default recolhido volta no reload).
+  useEffect(() => {
+    setCollapsed(prev => (prev[activeSection] ? { ...prev, [activeSection]: false } : prev));
+  }, [activeSection]);
+
+  const isOpen = (k: SectionKey) => !collapsed[k];
+
+  const GroupHeader = ({ k, label }: { k: SectionKey; label: string }) => (
+    <button
+      onClick={() => toggleSection(k)}
+      className="w-full flex items-center justify-between px-3 mb-2 group/h"
+      aria-expanded={isOpen(k)}
+    >
+      <span className="text-[10px] font-mono text-muted uppercase tracking-widest group-hover/h:text-on-surface-variant transition-colors">{label}</span>
+      <ChevronDown className={`w-3.5 h-3.5 text-muted transition-transform duration-200 ${isOpen(k) ? '' : '-rotate-90'}`} />
+    </button>
+  );
 
   const NavButton = ({ item }: { item: NavItem }) => (
     <button
@@ -111,36 +163,44 @@ export default function Sidebar({ active, onSelect, mobileOpen = false, onClose 
 
       <nav className="flex-1 overflow-y-auto p-3 space-y-5">
         <div>
-          <div className="px-3 mb-2 text-[10px] font-mono text-muted uppercase tracking-widest">Operacional</div>
-          <div className="space-y-0.5">
-            {operacional.map(item => <NavButton key={item.id} item={item} />)}
-          </div>
+          <GroupHeader k="operacional" label="Operacional" />
+          {isOpen('operacional') && (
+            <div className="space-y-0.5">
+              {operacional.map(item => <NavButton key={item.id} item={item} />)}
+            </div>
+          )}
         </div>
 
         <div>
-          <div className="px-3 mb-2 text-[10px] font-mono text-muted uppercase tracking-widest">Ecossistemas</div>
-          <div className="space-y-0.5">
-            <NavButton item={{ id: 'ecossistemas', label: 'Painel', icon: <Boxes className="w-4 h-4" /> }} />
-            {ecossistemas.map(e => (
-              <EcossistemaLink
-                key={e.key}
-                icone={e.icone}
-                nome={e.nome}
-                url={e.url}
-                status={e.status}
-              />
-            ))}
-          </div>
-          <div className="px-3 mt-2 text-[9px] font-mono text-muted/70 leading-relaxed">
-            Links externos · cada ecossistema tem banco e auth próprios (ADR-0029)
-          </div>
+          <GroupHeader k="ecossistemas" label="Ecossistemas" />
+          {isOpen('ecossistemas') && (
+            <>
+              <div className="space-y-0.5">
+                <NavButton item={{ id: 'ecossistemas', label: 'Painel', icon: <Boxes className="w-4 h-4" /> }} />
+                {ecossistemas.map(e => (
+                  <EcossistemaLink
+                    key={e.key}
+                    icone={e.icone}
+                    nome={e.nome}
+                    url={e.url}
+                    status={e.status}
+                  />
+                ))}
+              </div>
+              <div className="px-3 mt-2 text-[9px] font-mono text-muted/70 leading-relaxed">
+                Links externos · cada ecossistema tem banco e auth próprios (ADR-0029)
+              </div>
+            </>
+          )}
         </div>
 
         <div>
-          <div className="px-3 mb-2 text-[10px] font-mono text-muted uppercase tracking-widest">Sistema</div>
-          <div className="space-y-0.5">
-            {sistema.map(item => <NavButton key={item.id} item={item} />)}
-          </div>
+          <GroupHeader k="sistema" label="Sistema" />
+          {isOpen('sistema') && (
+            <div className="space-y-0.5">
+              {sistema.map(item => <NavButton key={item.id} item={item} />)}
+            </div>
+          )}
         </div>
       </nav>
 
