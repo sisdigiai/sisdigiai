@@ -3,7 +3,7 @@ import {
   Eye, LayoutGrid, Map, List, Zap, TrendingUp,
   BookOpen, DollarSign, GitBranch, Library, Palette, Building2, Network,
   Compass, Flame, Megaphone, LogOut, Store, Sparkles, Music2, Activity,
-  Camera, Wand2, Boxes, Search, ShieldCheck
+  Camera, Wand2, Boxes, Search, ShieldCheck, Workflow
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
@@ -14,7 +14,7 @@ export type ModuleId =
   | 'backlog' | 'comercial' | 'academy' | 'funil' | 'financeiro'
   | 'decisoes' | 'biblioteca' | 'brand' | 'cadastro-empresa'
   | 'clearix' | 'referencias-design' | 'mock-estilos' | 'marketing'
-  | 'marketing-seo' | 'ecossistemas' | 'travas-marketing';
+  | 'marketing-seo' | 'ecossistemas' | 'travas-marketing' | 'fluxo-osi';
 
 interface NavItem {
   id: ModuleId;
@@ -46,6 +46,7 @@ const operacional: NavItem[] = [
   { id: 'comercial',        label: 'Comercial',         icon: <TrendingUp className="w-4 h-4" /> },
   { id: 'academy',          label: 'Academy',           icon: <BookOpen className="w-4 h-4" /> },
   { id: 'funil',            label: 'Funil OSI',         icon: <Flame className="w-4 h-4" /> },
+  { id: 'fluxo-osi',        label: 'Fluxo OSI',         icon: <Workflow className="w-4 h-4" /> },
   { id: 'marketing',        label: 'Marketing',         icon: <Megaphone className="w-4 h-4" /> },
   { id: 'marketing-seo',    label: 'Marketing & SEO',   icon: <Search className="w-4 h-4" /> },
   { id: 'clearix',          label: 'Central Clearix',   icon: <Network className="w-4 h-4" /> },

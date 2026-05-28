@@ -21,6 +21,7 @@ import MockClearixEstilos from './modules/MockClearixEstilos';
 import Ecossistemas from './modules/Ecossistemas';
 import ListaMestra from './modules/ListaMestra';
 import TravasMarketing from './modules/TravasMarketing';
+import FluxoOSI from './modules/FluxoOSI';
 import { ModuleStub } from './modules/Stub';
 import { useAuth } from './contexts/AuthContext';
 
@@ -90,6 +91,7 @@ export default function App() {
       case 'ecossistemas': return <Ecossistemas />;
       case 'lista-mestra': return <ListaMestra />;
       case 'travas-marketing': return <TravasMarketing />;
+      case 'fluxo-osi': return <FluxoOSI />;
       default: {
         const stub = STUBS[activeModule];
         if (stub) {
