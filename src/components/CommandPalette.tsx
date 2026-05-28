@@ -73,32 +73,32 @@ export default function CommandPalette({ onNavigate }: { onNavigate: (id: Module
 
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[12vh] bg-black/60" onClick={() => setOpen(false)}>
-      <div className="w-full max-w-lg bg-[#0F1729] border border-white/10 rounded-2xl shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
-          <Search className="w-4 h-4 text-white/40" />
+      <div className="w-full max-w-lg bg-surface-container border border-outline/20 shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-outline/10">
+          <Search className="w-4 h-4 text-muted" />
           <input
             ref={inputRef}
             value={query}
             onChange={e => setQuery(e.target.value)}
             onKeyDown={onInputKey}
             placeholder="Ir para módulo… (Ctrl+K)"
-            className="flex-1 bg-transparent text-sm text-white/90 placeholder:text-white/30 focus:outline-none"
+            className="flex-1 bg-transparent text-sm text-on-surface placeholder:text-muted focus:outline-none"
           />
-          <kbd className="text-[10px] font-mono text-white/30 border border-white/10 rounded px-1.5 py-0.5">esc</kbd>
+          <kbd className="text-[10px] font-mono text-muted border border-outline/30 px-1.5 py-0.5">esc</kbd>
         </div>
         <div className="max-h-[50vh] overflow-y-auto py-2">
-          {results.length === 0 && <div className="px-4 py-6 text-center text-sm text-white/30">Nenhum módulo.</div>}
+          {results.length === 0 && <div className="px-4 py-6 text-center text-sm text-muted">Nenhum módulo.</div>}
           {results.map((i, idx) => (
             <button
               key={i.id}
               onMouseEnter={() => setSel(idx)}
               onClick={() => go(i.id)}
-              className={`w-full flex items-center justify-between gap-3 px-4 py-2 text-left text-sm transition-colors ${idx === sel ? 'bg-[#2563EB]/20 text-white' : 'text-white/70 hover:bg-white/5'}`}
+              className={`w-full flex items-center justify-between gap-3 px-4 py-2 text-left text-sm transition-colors border-l-2 ${idx === sel ? 'bg-secondary-container text-on-secondary-container border-secondary' : 'text-on-surface-variant border-transparent hover:bg-surface-highest'}`}
             >
               <span>{i.label}</span>
               <span className="flex items-center gap-2">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-white/25">{i.group}</span>
-                {idx === sel && <CornerDownLeft className="w-3.5 h-3.5 text-white/40" />}
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted">{i.group}</span>
+                {idx === sel && <CornerDownLeft className="w-3.5 h-3.5 text-secondary" />}
               </span>
             </button>
           ))}

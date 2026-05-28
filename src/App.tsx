@@ -100,8 +100,8 @@ export default function App() {
 
   if (loading && authEnabled) {
     return (
-      <div className="min-h-screen bg-[#0A0F1E] text-white flex items-center justify-center">
-        <div className="text-sm text-white/40">Carregando...</div>
+      <div className="min-h-screen bg-surface text-on-surface flex items-center justify-center">
+        <div className="text-sm font-mono uppercase tracking-widest text-muted">Carregando...</div>
       </div>
     );
   }
@@ -150,25 +150,25 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen bg-[#0A0F1E] text-white overflow-hidden">
+    <div className="flex h-screen bg-surface text-on-surface overflow-hidden">
       <Sidebar active={activeModule} onSelect={navigate} mobileOpen={navOpen} onClose={() => setNavOpen(false)} />
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="shrink-0 z-20 flex items-center gap-3 h-14 px-4 md:px-8 border-b border-white/5 bg-[#0A0F1E]">
+        <header className="shrink-0 z-20 flex items-center gap-3 h-14 px-4 md:px-8 border-b border-outline/10 bg-surface/80 backdrop-blur-md">
           <button
             onClick={() => setNavOpen(true)}
-            className="md:hidden p-1.5 -ml-1 rounded-lg text-white/60 hover:text-white hover:bg-white/5"
+            className="md:hidden p-1.5 -ml-1 text-on-surface-variant hover:text-on-surface hover:bg-surface-highest"
             aria-label="Abrir menu"
           >
             <Menu className="w-5 h-5" />
           </button>
-          <span className="hidden sm:inline text-[10px] font-mono uppercase tracking-widest text-white/30">Painel</span>
-          <span className="hidden sm:inline text-white/20">/</span>
-          <span className="text-sm font-semibold text-white/85 truncate">{MODULE_LABEL[activeModule] ?? 'Visão'}</span>
+          <span className="hidden sm:inline text-[10px] font-mono uppercase tracking-[0.2em] text-secondary">Painel</span>
+          <span className="hidden sm:inline text-muted">/</span>
+          <span className="text-sm font-semibold text-on-surface truncate">{MODULE_LABEL[activeModule] ?? 'Visão'}</span>
           <button
             onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
-            className="ml-auto hidden md:flex items-center gap-1.5 text-[11px] text-white/40 border border-white/10 rounded-lg px-2.5 py-1.5 hover:text-white/70 hover:border-white/20 transition-colors"
+            className="ml-auto hidden md:flex items-center gap-1.5 text-[11px] text-muted border border-outline/30 px-2.5 py-1.5 hover:text-on-surface hover:border-outline/60 transition-colors"
           >
-            <Search className="w-3.5 h-3.5" /> Buscar <kbd className="font-mono text-[10px] text-white/30 border border-white/10 rounded px-1">Ctrl K</kbd>
+            <Search className="w-3.5 h-3.5" /> Buscar <kbd className="font-mono text-[10px] text-muted border border-outline/30 px-1">Ctrl K</kbd>
           </button>
         </header>
         <main key={activeModule} className="flex-1 overflow-y-auto">

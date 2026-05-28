@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
-  Target, AlertCircle, CheckCircle2, Clock, Calendar, AlertOctagon,
-  Zap, GitBranch, DollarSign, RefreshCw, TrendingUp, Flag, Award,
+  Target, AlertCircle, CheckCircle2, Calendar, AlertOctagon,
+  Zap, GitBranch, DollarSign, RefreshCw, Flag, Award,
   Circle
 } from 'lucide-react';
 import { dashboardStore, type DashboardSummary } from '../lib/dashboardStore';
@@ -23,16 +23,16 @@ const VERDADES_CANONICAS = [
 ];
 
 const nivelCor: Record<string, string> = {
-  máximo: 'border-[#2563EB] text-[#2563EB]',
-  alto: 'border-[#06B6D4] text-[#06B6D4]',
-  médio: 'border-white/30 text-white/60',
-  baixo: 'border-white/10 text-white/30',
+  máximo: 'border-secondary text-secondary',
+  alto: 'border-secondary/50 text-secondary/80',
+  médio: 'border-outline/40 text-on-surface-variant',
+  baixo: 'border-outline/20 text-muted',
 };
 
 const trackColor: Record<Track, string> = {
-  A: 'bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/30',
-  B: 'bg-[#2563EB]/20 text-[#06B6D4] border-[#2563EB]/30',
-  C: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+  A: 'bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/30',
+  B: 'bg-secondary/15 text-secondary border-secondary/30',
+  C: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
 };
 
 function formatDate(iso: string): string {
@@ -72,7 +72,7 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
   if (loading || !summary) {
     return (
       <div className="p-8 max-w-6xl mx-auto">
-        <div className="text-white/40 text-sm">Carregando dashboard...</div>
+        <div className="text-muted text-sm font-mono uppercase tracking-widest">Carregando dashboard...</div>
       </div>
     );
   }
@@ -85,24 +85,26 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
   const nextMilestone = summary.upcomingMilestones[0];
 
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-8">
+    <div className="p-8 max-w-6xl mx-auto space-y-10">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Visão da Empresa</h1>
-          <p className="text-white/50 mt-1">Dashboard em tempo real · dados do Supabase</p>
+          <span className="font-mono text-[11px] text-secondary uppercase tracking-[0.2em] mb-2 block">Dashboard Interno</span>
+          <h1 className="font-serif text-4xl font-semibold tracking-tight text-on-surface">Visão da Empresa</h1>
+          <div className="h-px w-24 bg-secondary mt-4" />
+          <p className="text-on-surface-variant mt-3 text-sm">Dashboard em tempo real · dados do Supabase</p>
         </div>
-        <button onClick={load} className="p-2 hover:bg-white/5 rounded-lg text-white/50 hover:text-white" title="Recarregar">
+        <button onClick={load} className="p-2 hover:bg-surface-highest text-muted hover:text-on-surface transition-colors" title="Recarregar">
           <RefreshCw size={18} />
         </button>
       </div>
 
       {/* Alertas críticos no topo */}
       {(summary.overdueTasks > 0 || summary.backlogCritical > 0) && (
-        <div className="bg-red-500/5 border border-red-500/30 rounded-2xl p-5 flex items-start gap-3">
+        <div className="bg-red-500/5 border border-red-500/30 p-5 flex items-start gap-3">
           <AlertOctagon className="w-6 h-6 text-red-400 shrink-0" />
           <div className="flex-1">
             <div className="text-sm font-semibold text-red-400 mb-1">Atenção necessária</div>
-            <div className="flex flex-wrap gap-4 text-sm text-white/70">
+            <div className="flex flex-wrap gap-4 text-sm text-on-surface-variant">
               {summary.overdueTasks > 0 && (
                 <span>⚠ {summary.overdueTasks} tarefa{summary.overdueTasks > 1 ? 's' : ''} do Roadmap atrasada{summary.overdueTasks > 1 ? 's' : ''}</span>
               )}
@@ -116,38 +118,38 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
 
       {/* Fase atual + Métrica + Progresso */}
       {summary.currentPhase && (
-        <div className="bg-[#2563EB]/10 border border-[#2563EB]/30 rounded-2xl p-6">
+        <div className="bg-secondary-container/25 border border-secondary/30 p-6">
           <div className="flex items-start gap-5">
-            <div className="w-14 h-14 rounded-xl bg-[#2563EB]/20 border border-[#2563EB]/40 flex items-center justify-center text-2xl font-bold text-[#2563EB] shrink-0">
+            <div className="w-14 h-14 bg-secondary-container border border-secondary/40 flex items-center justify-center text-2xl font-serif font-bold text-secondary shrink-0">
               {summary.currentPhase.phase_number}
             </div>
             <div className="flex-1">
-              <div className="text-xs font-mono text-[#06B6D4] uppercase tracking-widest">Fase atual do Roadmap</div>
-              <div className="text-xl font-bold text-white mt-0.5">{summary.currentPhase.nome}</div>
-              <div className="text-sm text-white/60 mt-0.5">{summary.currentPhase.objetivo}</div>
+              <div className="text-xs font-mono text-secondary uppercase tracking-widest">Fase atual do Roadmap</div>
+              <div className="text-xl font-serif font-semibold text-on-surface mt-0.5">{summary.currentPhase.nome}</div>
+              <div className="text-sm text-on-surface-variant mt-0.5">{summary.currentPhase.objetivo}</div>
 
               {summary.currentPhaseProgress && (
                 <div className="mt-4">
                   <div className="flex items-center justify-between text-xs mb-1.5">
-                    <span className="text-white/50">Progresso desta fase</span>
-                    <span className="text-[#06B6D4] font-mono font-semibold">
+                    <span className="text-on-surface-variant">Progresso desta fase</span>
+                    <span className="text-secondary font-mono font-semibold">
                       {summary.currentPhaseProgress.completed_tasks}/{summary.currentPhaseProgress.total_tasks} · {summary.currentPhaseProgress.percent_complete}%
                     </span>
                   </div>
-                  <div className="h-2 bg-black/30 rounded-full overflow-hidden">
+                  <div className="h-2 bg-surface-lowest overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-[#06B6D4] to-[#2563EB] transition-all duration-500"
+                      className="h-full bg-secondary transition-all duration-500"
                       style={{ width: `${parseFloat(summary.currentPhaseProgress.percent_complete)}%` }}
                     />
                   </div>
                 </div>
               )}
 
-              <div className="mt-4 bg-black/20 rounded-lg p-3 flex items-start gap-2">
-                <Target className="w-4 h-4 text-[#06B6D4] mt-0.5 shrink-0" />
+              <div className="mt-4 bg-surface-lowest p-3 flex items-start gap-2">
+                <Target className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
                 <div>
-                  <div className="text-[10px] font-mono text-[#06B6D4] uppercase tracking-widest">Métrica única da fase</div>
-                  <div className="text-sm text-white/80">{summary.currentPhase.metrica_unica}</div>
+                  <div className="text-[10px] font-mono text-secondary uppercase tracking-widest">Métrica única da fase</div>
+                  <div className="text-sm text-on-surface">{summary.currentPhase.metrica_unica}</div>
                 </div>
               </div>
             </div>
@@ -162,7 +164,7 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
           label="Roadmap"
           value={`${totalProgress}%`}
           sub={`${summary.completedTasks}/${summary.totalTasks} tarefas`}
-          color="text-[#06B6D4]"
+          color="text-secondary"
           onClick={() => onNavigate?.('trilha')}
         />
         <KpiCard
@@ -186,7 +188,7 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
           label="MRR"
           value={summary.latestMrr != null ? `R$ ${summary.latestMrr.toFixed(0)}` : '—'}
           sub={summary.runwayMonths != null ? `runway ${summary.runwayMonths} meses` : 'preencher Cadastro'}
-          color="text-white/70"
+          color="text-on-surface-variant"
           onClick={() => onNavigate?.('financeiro')}
         />
       </div>
@@ -194,13 +196,13 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
       {/* Grid: Próximas tarefas + Próximo marco */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Próximas 7 tarefas */}
-        <div className="lg:col-span-2 bg-white/3 border border-white/8 rounded-2xl p-5">
+        <div className="lg:col-span-2 bg-surface-low border border-outline/10 p-5">
           <div className="flex items-center gap-2 mb-4">
-            <Calendar className="w-5 h-5 text-[#06B6D4]" />
-            <h2 className="text-lg font-semibold">Próximas 7 tarefas</h2>
+            <Calendar className="w-5 h-5 text-secondary" />
+            <h2 className="font-serif text-lg font-semibold text-on-surface">Próximas 7 tarefas</h2>
           </div>
           {summary.nextTasks.length === 0 ? (
-            <div className="text-sm text-white/40 italic py-4">Nenhuma tarefa pendente com data.</div>
+            <div className="text-sm text-muted italic py-4">Nenhuma tarefa pendente com data.</div>
           ) : (
             <div className="space-y-2">
               {summary.nextTasks.map((t) => {
@@ -208,18 +210,18 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
                 const overdue = d < 0;
                 const urgent = d >= 0 && d <= 2;
                 return (
-                  <button key={t.id} onClick={() => onNavigate?.('trilha')} className={`w-full text-left flex items-start gap-3 p-2 rounded-lg transition-colors hover:bg-white/5 ${overdue ? 'bg-red-500/5' : urgent ? 'bg-amber-500/5' : ''}`}>
-                    <Circle className="w-3.5 h-3.5 text-white/20 mt-1 shrink-0" />
+                  <button key={t.id} onClick={() => onNavigate?.('trilha')} className={`w-full text-left flex items-start gap-3 p-2 transition-colors hover:bg-surface-highest ${overdue ? 'bg-red-500/5' : urgent ? 'bg-amber-500/5' : ''}`}>
+                    <Circle className="w-3.5 h-3.5 text-muted mt-1 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm text-white/85">{t.title}</span>
+                        <span className="text-sm text-on-surface">{t.title}</span>
                         {t.track && (
-                          <span className={`text-[9px] font-mono px-1.5 rounded border ${trackColor[t.track]}`}>{t.track}</span>
+                          <span className={`text-[9px] font-mono px-1.5 border ${trackColor[t.track]}`}>{t.track}</span>
                         )}
-                        <span className="text-[9px] font-mono text-white/30">F{t.phase_number}</span>
+                        <span className="text-[9px] font-mono text-muted">F{t.phase_number}</span>
                       </div>
                       {t.target_date && (
-                        <div className={`text-xs mt-0.5 font-mono ${overdue ? 'text-red-400' : urgent ? 'text-amber-400' : 'text-white/40'}`}>
+                        <div className={`text-xs mt-0.5 font-mono ${overdue ? 'text-red-400' : urgent ? 'text-amber-400' : 'text-muted'}`}>
                           {formatDate(t.target_date)} · {overdue ? `${Math.abs(d)}d atrasado` : d === 0 ? 'hoje' : `em ${d}d`}
                         </div>
                       )}
@@ -232,28 +234,28 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
         </div>
 
         {/* Próximo marco destacado */}
-        <div onClick={() => onNavigate?.('trilha')} className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-amber-500/30 rounded-2xl p-5 cursor-pointer hover:border-amber-400/50 transition-colors">
+        <div onClick={() => onNavigate?.('trilha')} className="bg-surface-low border border-outline/10 p-5 cursor-pointer hover:border-secondary/40 transition-colors">
           <div className="flex items-center gap-2 mb-3">
-            <Flag className="w-5 h-5 text-amber-400" />
-            <h2 className="text-sm font-semibold">Próximo marco</h2>
+            <Flag className="w-5 h-5 text-secondary" />
+            <h2 className="font-serif text-base font-semibold text-on-surface">Próximo marco</h2>
           </div>
           {nextMilestone ? (
             <>
-              <div className="text-xs font-mono text-amber-400 uppercase tracking-widest mb-1">
+              <div className="text-xs font-mono text-secondary uppercase tracking-widest mb-1">
                 {nextMilestone.category === 'decision_gate' ? 'Decision gate' : 'Marco'}
               </div>
-              <div className="font-medium text-white mb-3">{nextMilestone.title}</div>
+              <div className="font-medium text-on-surface mb-3">{nextMilestone.title}</div>
               {nextMilestone.target_date && (
-                <div className="text-3xl font-bold text-amber-400">
+                <div className="text-4xl font-serif font-bold text-secondary">
                   {Math.max(0, daysUntil(nextMilestone.target_date))}d
                 </div>
               )}
-              <div className="text-xs text-white/50 mt-1">
+              <div className="text-xs text-muted mt-1">
                 {nextMilestone.target_date && formatDate(nextMilestone.target_date)} · Fase {nextMilestone.phase_number}
               </div>
             </>
           ) : (
-            <div className="text-sm text-white/40 italic">Nenhum marco próximo.</div>
+            <div className="text-sm text-muted italic">Nenhum marco próximo.</div>
           )}
         </div>
       </div>
@@ -270,19 +272,19 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
       {summary.recentDecisions.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <GitBranch className="w-5 h-5 text-[#06B6D4]" />
-            <h2 className="text-lg font-semibold">Decisões recentes</h2>
+            <GitBranch className="w-5 h-5 text-secondary" />
+            <h2 className="font-serif text-lg font-semibold text-on-surface">Decisões recentes</h2>
           </div>
           <div className="space-y-2">
             {summary.recentDecisions.map((d) => (
-              <button key={d.id} onClick={() => onNavigate?.('decisoes')} className="w-full text-left bg-white/3 border border-white/8 rounded-xl px-4 py-3 transition-colors hover:border-[#2563EB]/40">
+              <button key={d.id} onClick={() => onNavigate?.('decisoes')} className="w-full text-left bg-surface-low border border-outline/10 px-4 py-3 transition-colors hover:border-secondary/40">
                 <div className="flex items-center gap-2 flex-wrap mb-1">
-                  <span className="text-xs font-mono text-white/40">{new Date(d.decided_at + 'T00:00:00').toLocaleDateString('pt-BR')}</span>
+                  <span className="text-xs font-mono text-muted">{new Date(d.decided_at + 'T00:00:00').toLocaleDateString('pt-BR')}</span>
                   {d.tags.slice(0, 3).map((t) => (
-                    <span key={t} className="text-[9px] font-mono text-[#06B6D4] bg-[#06B6D4]/10 px-1.5 py-0.5 rounded">#{t}</span>
+                    <span key={t} className="text-[9px] font-mono text-secondary bg-secondary/10 px-1.5 py-0.5">#{t}</span>
                   ))}
                 </div>
-                <div className="text-sm text-white/85 font-medium">{d.title}</div>
+                <div className="text-sm text-on-surface font-medium">{d.title}</div>
               </button>
             ))}
           </div>
@@ -292,15 +294,15 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
       {/* Verdades canônicas */}
       <div>
         <div className="flex items-center gap-2 mb-4">
-          <AlertCircle className="w-5 h-5 text-[#06B6D4]" />
-          <h2 className="text-lg font-semibold">Verdades Canônicas</h2>
-          <span className="text-xs font-mono text-white/30 ml-2">não podem ser alteradas sem decisão estratégica</span>
+          <AlertCircle className="w-5 h-5 text-secondary" />
+          <h2 className="font-serif text-lg font-semibold text-on-surface">Verdades Canônicas</h2>
+          <span className="text-xs font-mono text-muted ml-2">não podem ser alteradas sem decisão estratégica</span>
         </div>
         <div className="space-y-2">
           {VERDADES_CANONICAS.map((v, i) => (
-            <div key={i} className={`flex items-center gap-3 border rounded-xl px-4 py-3 ${nivelCor[v.nível]} bg-transparent`}>
+            <div key={i} className={`flex items-center gap-3 border px-4 py-3 ${nivelCor[v.nível]} bg-transparent`}>
               <CheckCircle2 className="w-4 h-4 shrink-0" />
-              <span className="text-sm text-white/80">{v.texto}</span>
+              <span className="text-sm text-on-surface-variant">{v.texto}</span>
               <span className={`ml-auto text-[10px] font-mono uppercase tracking-widest shrink-0 ${nivelCor[v.nível]}`}>
                 {v.nível}
               </span>
@@ -310,9 +312,9 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
       </div>
 
       {/* Pergunta de ouro */}
-      <div className="border border-[#2563EB]/30 bg-[#2563EB]/5 rounded-2xl p-6 text-center">
-        <div className="text-xs font-mono text-[#2563EB] uppercase tracking-widest mb-3">Pergunta de Ouro</div>
-        <p className="text-lg font-medium text-white/90">
+      <div className="border border-secondary/30 bg-secondary-container/20 p-6 text-center">
+        <div className="text-xs font-mono text-secondary uppercase tracking-widest mb-3">Pergunta de Ouro</div>
+        <p className="font-serif text-lg font-medium text-on-surface">
           Isso fortalece a DIGIAI, o Clearix e a implantação da empresa segundo a verdade canônica atual?
         </p>
       </div>
@@ -322,25 +324,25 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
 
 function KpiCard({ icon, label, value, sub, color, onClick }: { icon: React.ReactNode; label: string; value: string; sub: string; color: string; onClick?: () => void }) {
   return (
-    <button onClick={onClick} disabled={!onClick} className="text-left w-full bg-white/3 border border-white/8 rounded-xl p-4 transition-all enabled:hover:border-[#2563EB]/40 enabled:hover:bg-[#2563EB]/5 disabled:cursor-default">
+    <button onClick={onClick} disabled={!onClick} className="text-left w-full bg-surface-low border border-outline/10 p-4 transition-all enabled:hover:border-secondary/40 enabled:hover:bg-secondary-container/15 disabled:cursor-default">
       <div className={`flex items-center gap-2 text-xs ${color} mb-2`}>
         {icon}
         <span className="font-mono uppercase tracking-widest">{label}</span>
       </div>
-      <div className="text-2xl font-bold text-white">{value}</div>
-      <div className="text-[11px] text-white/40 mt-0.5">{sub}</div>
+      <div className="text-2xl font-serif font-bold text-on-surface">{value}</div>
+      <div className="text-[11px] text-muted mt-0.5">{sub}</div>
     </button>
   );
 }
 
 function StatusCard({ label, done, hint, onClick }: { label: string; done: boolean; hint: string; onClick?: () => void }) {
   return (
-    <button onClick={onClick} disabled={!onClick} className={`text-left w-full rounded-xl p-3 border transition-all enabled:hover:border-[#2563EB]/40 disabled:cursor-default ${done ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-white/3 border-white/8'}`}>
+    <button onClick={onClick} disabled={!onClick} className={`text-left w-full p-3 border transition-all enabled:hover:border-secondary/40 disabled:cursor-default ${done ? 'bg-secondary-container/25 border-secondary/30' : 'bg-surface-low border-outline/10'}`}>
       <div className="flex items-center gap-2 mb-1">
-        {done ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Circle className="w-4 h-4 text-white/20" />}
-        <span className={`text-xs font-medium ${done ? 'text-emerald-300' : 'text-white/60'}`}>{label}</span>
+        {done ? <CheckCircle2 className="w-4 h-4 text-secondary" /> : <Circle className="w-4 h-4 text-muted" />}
+        <span className={`text-xs font-medium ${done ? 'text-on-secondary-container' : 'text-on-surface-variant'}`}>{label}</span>
       </div>
-      <div className="text-[10px] text-white/30">{hint}</div>
+      <div className="text-[10px] text-muted">{hint}</div>
     </button>
   );
 }

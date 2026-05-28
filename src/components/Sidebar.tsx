@@ -87,13 +87,13 @@ export default function Sidebar({ active, onSelect, mobileOpen = false, onClose 
   const NavButton = ({ item }: { item: NavItem }) => (
     <button
       onClick={() => onSelect(item.id)}
-      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 text-left
+      className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all duration-150 text-left border-l-2
         ${active === item.id
-          ? 'bg-[#2563EB]/20 text-white border border-[#2563EB]/40'
-          : 'text-white/50 hover:text-white/80 hover:bg-white/5'
+          ? 'bg-secondary-container text-on-secondary-container border-secondary'
+          : 'text-on-surface-variant border-transparent hover:text-on-surface hover:bg-surface-highest'
         }`}
     >
-      <span className={active === item.id ? 'text-[#06B6D4]' : ''}>{item.icon}</span>
+      <span>{item.icon}</span>
       {item.label}
     </button>
   );
@@ -101,22 +101,22 @@ export default function Sidebar({ active, onSelect, mobileOpen = false, onClose 
   return (
     <>
       {mobileOpen && <div className="fixed inset-0 z-40 bg-black/60 md:hidden" onClick={onClose} />}
-      <div className={`w-60 shrink-0 h-screen bg-[#0A0F1E] border-r border-white/5 flex flex-col z-50 fixed inset-y-0 left-0 transition-transform duration-200 md:static md:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-      <div className="p-5 border-b border-white/5">
+      <div className={`w-60 shrink-0 h-screen bg-surface-container border-r border-outline/10 flex flex-col z-50 fixed inset-y-0 left-0 transition-transform duration-200 md:static md:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className="p-5 border-b border-outline/10">
         <Logo variant="horizontal" iconClassName="w-7 h-7" textClassName="text-xl" />
-        <div className="mt-2 text-[10px] font-mono text-white/30 uppercase tracking-widest">Painel Operacional</div>
+        <div className="mt-2 text-[10px] font-mono text-muted uppercase tracking-widest">Painel Operacional</div>
       </div>
 
       <nav className="flex-1 overflow-y-auto p-3 space-y-5">
         <div>
-          <div className="px-3 mb-2 text-[10px] font-mono text-white/25 uppercase tracking-widest">Operacional</div>
+          <div className="px-3 mb-2 text-[10px] font-mono text-muted uppercase tracking-widest">Operacional</div>
           <div className="space-y-0.5">
             {operacional.map(item => <NavButton key={item.id} item={item} />)}
           </div>
         </div>
 
         <div>
-          <div className="px-3 mb-2 text-[10px] font-mono text-white/25 uppercase tracking-widest">Ecossistemas</div>
+          <div className="px-3 mb-2 text-[10px] font-mono text-muted uppercase tracking-widest">Ecossistemas</div>
           <div className="space-y-0.5">
             <NavButton item={{ id: 'ecossistemas', label: 'Painel', icon: <Boxes className="w-4 h-4" /> }} />
             {ecossistemas.map(e => (
@@ -129,36 +129,36 @@ export default function Sidebar({ active, onSelect, mobileOpen = false, onClose 
               />
             ))}
           </div>
-          <div className="px-3 mt-2 text-[9px] font-mono text-white/20 leading-relaxed">
+          <div className="px-3 mt-2 text-[9px] font-mono text-muted/70 leading-relaxed">
             Links externos · cada ecossistema tem banco e auth próprios (ADR-0029)
           </div>
         </div>
 
         <div>
-          <div className="px-3 mb-2 text-[10px] font-mono text-white/25 uppercase tracking-widest">Sistema</div>
+          <div className="px-3 mb-2 text-[10px] font-mono text-muted uppercase tracking-widest">Sistema</div>
           <div className="space-y-0.5">
             {sistema.map(item => <NavButton key={item.id} item={item} />)}
           </div>
         </div>
       </nav>
 
-      <div className="p-3 border-t border-white/5 space-y-2">
+      <div className="p-3 border-t border-outline/10 space-y-2">
         {user && (
-          <div className="px-3 py-2 rounded-lg bg-white/[0.03] border border-white/5">
-            <div className="text-[10px] font-mono text-white/40 uppercase tracking-widest">Logado</div>
-            <div className="text-xs text-white/70 truncate" title={user.email ?? ''}>
+          <div className="px-3 py-2 bg-surface-high border border-outline/10">
+            <div className="text-[10px] font-mono text-muted uppercase tracking-widest">Logado</div>
+            <div className="text-xs text-on-surface-variant truncate" title={user.email ?? ''}>
               {user.email}
             </div>
           </div>
         )}
         <button
           onClick={() => signOut()}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-white/50 hover:text-white hover:bg-red-500/10 hover:border-red-500/30 border border-transparent transition-all duration-150"
+          className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-on-surface-variant hover:text-white hover:bg-red-500/10 hover:border-red-500/30 border border-transparent transition-all duration-150"
         >
           <LogOut className="w-4 h-4" />
           Sair
         </button>
-        <div className="text-[10px] font-mono text-white/20 text-center pt-1">
+        <div className="text-[10px] font-mono text-muted text-center pt-1">
           Fase 0–1 de 8 · Zero aos Milhões
         </div>
       </div>

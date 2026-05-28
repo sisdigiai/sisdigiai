@@ -11,9 +11,9 @@ interface Props {
 }
 
 const STATUS_STYLE: Record<EcossistemaStatus, { label: string; dotClass: string; textClass: string }> = {
-  ativo:          { label: 'Ativo',     dotClass: 'bg-emerald-400',       textClass: 'text-emerald-300/80' },
+  ativo:          { label: 'Ativo',     dotClass: 'bg-secondary',         textClass: 'text-secondary' },
   em_construcao:  { label: 'Em obra',   dotClass: 'bg-amber-400',         textClass: 'text-amber-300/80' },
-  em_concepcao:   { label: 'Concepção', dotClass: 'bg-white/30',          textClass: 'text-white/40' },
+  em_concepcao:   { label: 'Concepção', dotClass: 'bg-muted/60',          textClass: 'text-muted' },
   pausado:        { label: 'Pausado',   dotClass: 'bg-rose-400/70',       textClass: 'text-rose-300/70' },
 };
 
@@ -25,13 +25,13 @@ export default function EcossistemaLink({ icone, nome, url, status }: Props) {
     <>
       <span className={isClickable ? '' : 'opacity-40'}>{icone}</span>
       <span className="flex-1 flex items-center gap-2 min-w-0">
-        <span className={`truncate ${isClickable ? '' : 'text-white/30'}`}>{nome}</span>
+        <span className={`truncate ${isClickable ? '' : 'text-muted'}`}>{nome}</span>
         <span className={`shrink-0 inline-flex items-center gap-1 text-[9px] font-mono uppercase tracking-wider ${style.textClass}`}>
           <span className={`w-1.5 h-1.5 rounded-full ${style.dotClass}`} />
           {style.label}
         </span>
       </span>
-      {isClickable && <ExternalLink className="w-3 h-3 text-white/30 shrink-0" />}
+      {isClickable && <ExternalLink className="w-3 h-3 text-muted shrink-0" />}
     </>
   );
 
@@ -41,7 +41,7 @@ export default function EcossistemaLink({ icone, nome, url, status }: Props) {
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 text-left text-white/60 hover:text-white/90 hover:bg-white/5"
+        className="w-full flex items-center gap-3 px-3 py-2.5 border-l-2 border-transparent text-sm font-medium transition-all duration-150 text-left text-on-surface-variant hover:text-on-surface hover:bg-surface-highest"
       >
         {inner}
       </a>
@@ -51,7 +51,7 @@ export default function EcossistemaLink({ icone, nome, url, status }: Props) {
   return (
     <div
       title={url ? 'Em breve' : 'Sem URL ainda'}
-      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/30 cursor-not-allowed"
+      className="w-full flex items-center gap-3 px-3 py-2.5 border-l-2 border-transparent text-sm font-medium text-muted cursor-not-allowed"
     >
       {inner}
     </div>
