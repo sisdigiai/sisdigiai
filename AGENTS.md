@@ -46,15 +46,15 @@
   - [`docs/brand/README.md`](docs/brand/README.md) — visão geral
   - [`docs/brand/prompts-stitch-rebrand-v2.md`](docs/brand/prompts-stitch-rebrand-v2.md) — 603 linhas, prompts sequenciais v2
   - [`docs/brand/GUIA-aplicar-nas-redes-sociais.md`](docs/brand/GUIA-aplicar-nas-redes-sociais.md) — aplicação prática
-  - [`docs/brand/stitch_final/`](docs/brand/stitch_final/) — 8 subpastas (design system, logo, lockups, telas, redes, papelaria, pitch deck, sub-produtos)
+  - `docs/brand/` — assets de brand em arquivos `.zip` (ex.: `stitch_digiai_systemic_rebrand_strategy.zip`). **Não existe** pasta `stitch_final/`/`stitch_digiai_final/` descompactada.
   - **Mapa cross-app** das identidades em [`../Cockpit/marca-institucional.md`](../Cockpit/marca-institucional.md) §"Mapa cross-app de identidades visuais"
   - **Princípio:** brand DIGIAI mãe ≠ brand Clearix. Clearix tem `Cockpit/clearix_design/` (R-014). digiai App é dono da brand DIGIAI **institucional** (holding).
 
 ## 4. Stack + dev
 
-- **Stack:** **Vite 6.2** + React 19 + TypeScript 5.8 + TailwindCSS 4.1 + Motion + Chart.js + Lucide React + `@google/genai` 1.29
+- **Stack:** **Vite 6.2** + React 19 + TypeScript 5.8 + TailwindCSS 4.1 + Motion + Chart.js + Lucide React (o `@google/genai` foi **removido em 2026-05-28** — era dependência morta; a geração de IA do Marketing é server-side via RPC `marketing_render_prompt`)
 - **Porta dev:** **3000** (host `0.0.0.0` — `npm run dev` em `vite --port=3000 --host=0.0.0.0`) — **conflita com `clearix_hub`** ao rodar local; mudar uma das duas
-- **URL produção:** ⚠️ A verificar (não documentado no README) — link no header do app aponta para `digiaiatlas.netlify.app` (clearix_atlas, app diferente)
+- **URL produção:** **https://sisdigiai.netlify.app** (auto-deploy do branch `main`; repo `sisdigiai/sisdigiai`). Verificado logado em 2026-05-28. O `digiaiatlas.netlify.app` é só um **link externo** do grupo Ecossistemas (Atlas), não o host deste app.
 - **Como rodar:**
   ```bash
   npm install
@@ -64,21 +64,22 @@
   npm run lint     # tsc --noEmit (typecheck — sem ESLint)
   npm run clean    # rm -rf dist
   ```
-- **Hospedagem:** ⚠️ A verificar (Spec §13 gap: "Confirmar hospedagem — Netlify? Vercel? Cloud Run?")
+- **Hospedagem:** **Netlify** (consome `public/_headers`, que já traz HSTS + X-Frame-Options + CSP). R-025: Cloudflare é o host canônico — migração conforme priorização do dono.
 - **Repositório:** `https://github.com/sisdigiai/sisdigiai.git`
 - **Modo offline/fallback:** ✅ funciona sem `.env` — dev local sem chaves usa `localStorage`
 
 ## 5. Banco + permissões
 
 - **Projeto Supabase próprio:** `hswyopqvnolqpmprqvzh.supabase.co` (banco DIGIAI **isolado** do Clearix por [ADR-0001](../Cockpit/ADR/ADR-0001-clearix-db-isolamento.md))
-- **MCP Supabase tem acesso direto?** ❌ Não (MCP só vê banco Clearix `mhgbuplnxtfgipbemchb`). Operações DB aqui são via SDK Supabase normal usando `VITE_SUPABASE_*`.
-- **Schemas locais:**
-  - `company.*` — identidade legal, contatos, ativos digitais, ferramentas, snapshots financeiros, status LGPD
-  - `finance.*` — produtos, vendors, despesas, subscriptions, infra costs, revenue, founder time
-  - `iam.*` — usuários e auditoria
-  - `academy.*` (mig 015) — produtos digitais Academy
-  - `roadmap.*` — fases/tarefas do Roadmap 8 fases
-- **Migrations:** 17 versionadas em `supabase/migrations/` (ordem: schemas → IAM → company → finance → ops → academy → roadmap → copy)
+- **MCP Supabase tem acesso direto?** ❌ Não — o MCP do workspace só enxerga o Clearix `mhgbuplnxtfgipbemchb` (R-012). Para operar o banco digiai há **dois caminhos**: (a) SDK no app via `VITE_SUPABASE_*`; (b) **Management API** com o `SUPABASE_TOKEN` (PAT) do `.env` — permite SQL/migrations diretas (`POST https://api.supabase.com/v1/projects/hswyopqvnolqpmprqvzh/database/query`).
+- **Schemas locais (verificados no banco 2026-05-28):**
+  - `company.*` — identity, partners, contacts, digital_assets, tools, financial_snapshots, legal_status, api_credentials, metrics
+  - `finance.*` — products, vendors, expenses, subscriptions, infra_costs, revenue, founder_time
+  - `iam.*` — users (+ R-013: digiai_user_uuid/wa_bsuid/wa_username/wa_phone_legacy desde mig 025) e audit_logs
+  - `ops.*` — backlog_items, decisions, milestones, **roadmap_phases**, **roadmap_tasks**, copy_assets — o Roadmap mora em `ops`, **não** num schema `roadmap`
+  - `academy.*` (mig 015) — products + assets/checklist/questions/scenarios/creation_records
+  - `marketing.*` — **16 tabelas** (content_pillars/ideas/calendar, affiliates/materials/payouts, community, challenges, testimonials, hotmart_events_raw/sales, platforms, ai_prompt_templates, post_ai_outputs)
+- **Migrations:** `001`–`025` em `supabase/migrations/` + **SQL solto** que cria o schema Marketing. ⚠️ o ledger remoto (`schema_migrations`) diverge das numeradas — ler [`supabase/migrations/README.md`](supabase/migrations/README.md) antes de qualquer rebuild. **RLS habilitado em todas as tabelas** (`api_credentials` é service_role-only, sem policy — proposital).
 - **Auth:** Supabase Auth — gate "Acesso restrito" na entrada
 - **Central Clearix (módulo interno):** **única exceção ao isolamento** — usa `VITE_CLEARIX_SUPABASE_URL` + auth super_admin **separada** do login DigiAI normal (gate explícito no UI). Usuário comum digiai **NUNCA** vê o banco Clearix.
 
@@ -118,23 +119,34 @@
 
 ## 7. Módulos do painel
 
-| Sidebar label       | Componente                                     |
-|---------------------|------------------------------------------------|
-| Visão               | `src/modules/Visao.tsx`                        |
-| Portfólio           | `src/modules/Portfolio.tsx`                    |
-| Roadmap             | `src/modules/Trilha.tsx` (importa `RoadmapCalendar` + `RoadmapHistorico`) |
-| Lista Mestra        | `src/modules/ListaMestra.tsx`                  |
-| Backlog Executivo   | `src/modules/Backlog.tsx`                      |
-| Cadastro Empresa    | `src/modules/CadastroEmpresa.tsx`              |
-| **Clearix (central)** | `src/modules/Clearix.tsx` + `clearix/*` — auth super_admin **separado** |
-| Atlas               | link externo → `digiaiatlas.netlify.app`       |
-| Comercial           | `src/modules/Comercial.tsx`                    |
-| Academy             | `src/modules/Academy.tsx`                      |
-| Funil OSI           | `src/modules/Funil.tsx` (OSI = Ótica Sem Improviso) |
+Roteamento real em `App.tsx` (`activeModule` por estado, não por URL). 16 cases + 2 stubs:
+
+| Sidebar label       | Componente / Origem                                  |
+|---------------------|------------------------------------------------------|
+| Visão               | `src/modules/Visao.tsx`                              |
+| Portfólio           | `src/modules/Portfolio.tsx` (subtítulo auto-conta `PRODUTOS.length`) |
+| Roadmap             | `src/modules/Trilha.tsx` (+ `RoadmapCalendar` + `RoadmapHistorico`) |
+| Lista Mestra        | **STUB** — objeto `STUBS` em `App.tsx` → `ModuleStub` (sem arquivo) |
+| Backlog Executivo   | `src/modules/Backlog.tsx`                            |
+| Cadastro Empresa    | `src/modules/CadastroEmpresa.tsx`                    |
 | Financeiro          | `src/modules/Financeiro.tsx` (toggle "Ocultar aporte intelectual") |
-| Decisões            | `src/modules/Decisoes.tsx`                     |
-| Biblioteca          | `src/modules/Biblioteca.tsx` (consome `docs_sync/`) |
-| Brand Guidelines    | `src/components/BrandGuidelines.tsx`           |
+| Comercial           | **STUB** — objeto `STUBS` em `App.tsx` → `ModuleStub` (sem arquivo) |
+| Academy             | `src/modules/Academy.tsx`                            |
+| Funil OSI           | `src/modules/Funil.tsx` (+ `funnel/*`)               |
+| Marketing           | `src/modules/Marketing.tsx` (+ `marketing/*`) — 10 abas: Calendário, Planejador, Banco de Ideias, Prompts IA, Validação, Depoimentos, Comunidade OSI, Desafios, Materiais, Afiliados |
+| Marketing & SEO     | `src/modules/MarketingSEO.tsx` — GSC/Bing/Cloudflare/IndexNow + edge fns `marketing-sync-*` |
+| Central Clearix     | `src/modules/Clearix.tsx` + `clearix/*` — auth super_admin **separado** (ADR-0001) |
+| Decisões            | `src/modules/Decisoes.tsx`                           |
+| Biblioteca          | `src/modules/Biblioteca.tsx` (consome `docs_sync/`)  |
+| Brand Guidelines    | `src/components/BrandGuidelines.tsx`                 |
+| Referências Design  | `src/modules/ReferenciasDesign.tsx`                  |
+| Mock Vendas         | `src/modules/MockClearixEstilos.tsx`                 |
+
+**Ecossistemas (links externos — ADR-0029, via `EcossistemaLink.tsx`):** Clearix Hub, Clearix Atlas, OSI, Polapetit, Nipo School, Pulso Control, Qual a Foto, Lumina. Não são módulos embutidos — cada um tem banco/auth/deploy próprios.
+
+**Rota pública (sem login):** `/osi/depoimento` → `src/components/TestimonialPublicForm.tsx` (coleta de depoimentos do funil OSI).
+
+**Edge functions (`supabase/functions/`):** `hotmart-webhook` (ingest Hotmart, HOTTOK fail-closed), `marketing-sync-gsc|bing|cloudflare`, `health` (R-016 — deploy com `--no-verify-jwt`).
 
 ## 8. NÃO fazer (antipatterns específicos deste app)
 
@@ -157,19 +169,20 @@
   - `VITE_CLEARIX_SUPABASE_URL` — projeto Clearix (para módulo Central Clearix — auth super_admin separado)
   - `VITE_CLEARIX_SUPABASE_ANON_KEY`
   - `VITE_ATLAS_URL` — default `https://digiaiatlas.netlify.app` (link no header)
-- **IA:**
-  - Configuração `@google/genai` — chave a verificar (não está em `.env.example` na raiz do README)
-- **NUNCA commitar `.env*`** — verificar `.gitignore` antes de qualquer push
+- **Edge functions (secrets no Supabase Vault / Dashboard, NÃO em `.env`):** `HOTMART_HOTTOK` (webhook Hotmart), credenciais GSC/Bing/Cloudflare do Marketing & SEO. **R-021:** as 3 credenciais de Marketing & SEO foram cadastradas em 2026-05-28 → **rotacionar até 2026-08-26**.
+- **NUNCA commitar `.env*`** — `.gitignore` cobre `.env*` e `.mcp.json` (verificado).
 
 ## 10. Pendências conhecidas (do Spec §13 + §8)
 
-- [ ] Confirmar hospedagem (Netlify? Vercel? Cloud Run?) — gap aberto na Spec
-- [ ] Documentar identidade visual em `Cockpit/marca-institucional.md` (decisão 17/04 sobre marca "Clearix Academy, by DIGIAI" sugere material disponível)
+- [x] ~~Confirmar hospedagem~~ — **Netlify** (`sisdigiai.netlify.app`), confirmado 2026-05-28
+- [x] ~~Migrar `iam.users` para R-013~~ — **feito 2026-05-28** (mig 025: USUUID + wa_bsuid/username/phone_legacy + campos LGPD)
+- [ ] **Deploy** da edge function `health` (R-016) com `--no-verify-jwt` + monitor UptimeRobot
+- [ ] **CSP em produção** validada após deploy (header adicionado em `public/_headers`)
 - [ ] DPO nomeado (Cadastro Empresa → LGPD) — marco pendente
-- [ ] Snapshot financeiro consolidado em `company.financial_snapshots` (parcialmente atendido — falta agregado mensal)
-- [ ] 1ª entrevista feita (Fase 0 do Roadmap — métrica única: 20 entrevistas honestas + 3 cartas de intenção)
-- [ ] Migrar `iam.users` para R-013 (USUUID + WhatsApp fields)
-- [ ] Resolver 58 tarefas atrasadas do Roadmap + 13 itens críticos do Backlog (Spec §5)
+- [ ] Snapshot financeiro mensal agregado em `company.financial_snapshots` (granular já em `finance.expenses`: 220 lançamentos ativos)
+- [ ] 1ª entrevista feita (Fase 0 do Roadmap — métrica única: 20 entrevistas + 3 cartas de intenção)
+- [ ] Resolver **65 tarefas atrasadas** do Roadmap + 13 itens críticos do Backlog
+- [ ] Rotacionar 3 credenciais Marketing & SEO até 2026-08-26 (R-021)
 
 ## 11. Pergunta de Ouro pra qualquer decisão
 
@@ -181,7 +194,7 @@ Se não → pause e questione. Em caso de dúvida ou ambiguidade, **pause e perg
 
 ## Notas para quem mantém este arquivo
 
-- **Última atualização:** 2026-05-25 (criação seguindo padrão piloto `clearix_hub`)
+- **Última atualização:** 2026-05-28 (auditoria completa: 18 módulos verificados no navegador logado, banco lido via Management API, drift reconciliado, fixes A/B/C/D aplicados)
 - **Versão do template base:** v1.0 (espelhando `Templates/AGENTS.md`)
 - **Validação em produção:** ⚠️ A verificar (Spec foi verificada no navegador em 2026-05-22)
 - **Referências:** [Spec/digiai.md](../Cockpit/Spec/digiai.md), [CLAUDE.md](../CLAUDE.md), [ADR-0004](../Cockpit/ADR/ADR-0004-digiai-app-control-plane.md), [ADR-0005](../Cockpit/ADR/ADR-0005-digiai-app-sla-rigoroso.md), [docs/README.md](docs/README.md)

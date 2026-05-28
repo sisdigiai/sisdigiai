@@ -124,9 +124,15 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'storage_failed', detail: String(e) }, 500);
   }
 
-  // 2. HOTTOK errado → 200 (Hotmart não retentaria, mas raw fica gravado pra auditoria)
-  if (HOTTOK !== '' && !signatureOk) {
-    return json({ ok: false, reason: 'invalid_hottok', raw_id: rawId }, 200);
+  // 2. Fail-closed: só dispara o ingest quando a assinatura foi validada.
+  //    HOTTOK ausente (mal-configurado) OU divergente => NÃO processa.
+  //    O raw já foi gravado acima, então auditoria não perde o evento mesmo na rejeição.
+  if (!signatureOk) {
+    const reason = HOTTOK === '' ? 'hottok_not_configured' : 'invalid_hottok';
+    if (HOTTOK === '') {
+      console.error('[hotmart-webhook] HOTMART_HOTTOK ausente — modo fail-closed, evento não processado');
+    }
+    return json({ ok: false, reason, raw_id: rawId }, 200);
   }
 
   // 3. Dispara ingest síncrono

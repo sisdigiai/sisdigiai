@@ -1,5 +1,7 @@
-# Cloudflare Pages — headers de segurança (R-024 baseline)
-# Aplicados a todas as respostas servidas pelas Pages
+# Netlify / Cloudflare Pages — headers de seguranca (R-024 baseline)
+# Ambos os hosts consomem public/_headers. Prod atual: sisdigiai.netlify.app
+# (R-025: Cloudflare e o host canonico; migracao conforme priorizacao do dono).
+# CSP permissiva de partida (R-024 A05) — endurecer apos validar em prod.
 
 /*
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
@@ -8,3 +10,4 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   X-XSS-Protection: 1; mode=block
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https: wss:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'

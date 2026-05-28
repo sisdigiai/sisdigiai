@@ -92,7 +92,7 @@ export default function Biblioteca() {
     <div className="p-8 max-w-5xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Biblioteca Central</h1>
-        <p className="text-white/50 mt-1">{DOCS.length} documentos · repositório canônico: <span className="font-mono text-white/40">D:\projetos\diferentes\docs_digiAI\docs\</span></p>
+        <p className="text-white/50 mt-1">{DOCS.length} documentos · repositório canônico: <span className="font-mono text-white/40">D:\projetos\docs\digiai\docs\</span></p>
       </div>
 
       <div className="bg-[#2563EB]/8 border border-[#2563EB]/20 rounded-xl px-4 py-3 flex items-start gap-3">

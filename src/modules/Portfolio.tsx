@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Produto {
@@ -17,108 +17,108 @@ interface Produto {
 const PRODUTOS: Produto[] = [
   {
     nome: 'Clearix',
-    subtitulo: 'Ecossistema SaaS vertical para varejo Ã³ptico',
+    subtitulo: 'Ecossistema SaaS vertical para varejo óptico',
     categoria: 'produto-ancora',
     prioridade: 'maxima',
     status: 'Empacotamento comercial em andamento',
-    faseAtual: 'Fase 2 â€” Empacotamento',
+    faseAtual: 'Fase 2 — Empacotamento',
     repo: 'D:\\projetos\\clearix_eco_full',
-    stack: 'Next.js 15/SvelteKit 2/React 19 Â· Supabase Â· ~20 sub-apps',
-    proximo: 'Formalizar pricing + fechar 1Âº piloto externo alÃ©m da loja de teste',
-    bloqueio: 'Modelo comercial final e validaÃ§Ã£o externa pendentes',
+    stack: 'Next.js 15/SvelteKit 2/React 19 · Supabase · ~20 sub-apps',
+    proximo: 'Formalizar pricing + fechar 1º piloto externo além da loja de teste',
+    bloqueio: 'Modelo comercial final e validação externa pendentes',
   },
   {
     nome: 'Clearix Academy',
-    subtitulo: 'Enxame de guias low ticket para educar o varejo optico e alimentar o ecossistema',
+    subtitulo: 'Enxame de guias low ticket para educar o varejo óptico e alimentar o ecossistema',
     categoria: 'alavanca-critica',
     prioridade: 'alta',
-    status: 'Primeira isca em engenharia: Otica Sem Improviso',
-    faseAtual: 'Fase 2 - Produto-isca + funil',
-    repo: '(sem repositÃ³rio de cÃ³digo)',
+    status: 'Primeira isca em engenharia: Ótica Sem Improviso',
+    faseAtual: 'Fase 2 — Produto-isca + funil',
+    repo: '(sem repositório de código)',
     stack: 'Guias pagos · App de apoio · Nexus · Meta Ads · CRM/WhatsApp',
-    proximo: 'Rodar OSI como isca paga, capturar dores e preparar ascensao para apps de otica',
-    bloqueio: 'Definir primeiro modulo do ecossistema que recebera os compradores qualificados',
+    proximo: 'Rodar OSI como isca paga, capturar dores e preparar ascensão para apps de ótica',
+    bloqueio: 'Definir primeiro módulo do ecossistema que receberá os compradores qualificados',
   },
   {
-    nome: 'Otica Sem Improviso',
-    subtitulo: 'Primeira isca paga do ecossistema de apps para oticas',
+    nome: 'Ótica Sem Improviso',
+    subtitulo: 'Primeira isca paga do ecossistema de apps para óticas',
     categoria: 'alavanca-critica',
     prioridade: 'alta',
     status: 'Engenharia de funil implementada no DIGIAI App',
-    faseAtual: 'Fase 2 - Teste de oferta e trafego',
-    repo: 'D:\\OneDrive - Oticas Taty Mello\\Grupo Mello\\Marketing_e_Vendas\\digiai\\otica_sem_improviso',
-    stack: 'PDF + App de apoio + Kiwify + Meta Ads + Automacao WhatsApp/Email',
+    faseAtual: 'Fase 2 — Teste de oferta e tráfego',
+    repo: 'D:\\OneDrive - Óticas Taty Mello\\Grupo Mello\\Marketing_e_Vendas\\digiai\\otica_sem_improviso',
+    stack: 'PDF + App de apoio + Kiwify + Meta Ads + Automação WhatsApp/Email',
     proximo: 'Configurar checkout, subir criativos ABO e medir dores compradoras',
-    bloqueio: 'Primeiro modulo do app principal ainda precisa ser escolhido pelos dados do funil',
+    bloqueio: 'Primeiro módulo do app principal ainda precisa ser escolhido pelos dados do funil',
   },
   {
     nome: 'Nexus',
-    subtitulo: 'Plataforma de aprendizado AI-first Â· metodologia Alpha School',
+    subtitulo: 'Plataforma de aprendizado AI-first · metodologia Alpha School',
     categoria: 'suporte',
     prioridade: 'media',
-    status: 'MVP funcional â€” 3 verticais (idioma, concurso, clearix)',
-    faseAtual: 'Fase 1 â†’ aguardando ativaÃ§Ã£o comercial',
-    repo: 'D:\\projetos\\diferentes\\nexus',
-    stack: 'React 19 Â· TypeScript Â· Supabase Â· Gemini Â· 126 tabelas Â· 14 schemas',
+    status: 'MVP funcional — 3 verticais (idioma, concurso, clearix)',
+    faseAtual: 'Fase 1 → aguardando ativação comercial',
+    repo: 'D:\\projetos\\nexus',
+    stack: 'React 19 · TypeScript · Supabase · Gemini · 126 tabelas · 14 schemas',
     proximo: 'Ativar Clearix University como apoio ao Academy',
   },
   {
     nome: 'Lumina',
-    subtitulo: 'SaaS de digital signage para lojas fÃ­sicas',
+    subtitulo: 'SaaS de digital signage para lojas físicas',
     categoria: 'suporte',
     prioridade: 'media',
-    status: 'MVP tÃ©cnico funcional â€” nÃ£o validado comercialmente',
-    faseAtual: 'Fase 1 â†’ upsell futuro',
+    status: 'MVP técnico funcional — não validado comercialmente',
+    faseAtual: 'Fase 1 → upsell futuro',
     repo: 'D:\\projetos\\lumina_box',
-    stack: 'React 19 Â· Vite Â· TypeScript Â· Supabase Â· TailwindCSS',
-    proximo: 'Atualizar README e package.json Â· Avaliar como upsell para clientes Clearix',
+    stack: 'React 19 · Vite · TypeScript · Supabase · TailwindCSS',
+    proximo: 'Atualizar README e package.json · Avaliar como upsell para clientes Clearix',
     bloqueio: 'Sem modelo comercial nem onboarding definidos',
   },
   {
     nome: 'Pulso',
-    subtitulo: 'Sistema operacional editorial para vÃ­deos faceless',
+    subtitulo: 'Sistema operacional editorial para vídeos faceless',
     categoria: 'incubacao',
     prioridade: 'baixa',
-    status: 'MVP em execuÃ§Ã£o â€” uso interno da DIGIAI',
-    faseAtual: 'Fase 1 â€” incubaÃ§Ã£o',
-    repo: 'D:\\projetos\\diferentes\\pulso_control',
-    stack: 'Next.js Â· Supabase Â· n8n Â· OpenAI/Claude Â· ElevenLabs',
-    proximo: 'Usar como motor de conteÃºdo para o Academy (Regra 5: Pulso trabalha para a DIGIAI primeiro)',
-    bloqueio: 'DecisÃ£o estratÃ©gica pendente: motor de mÃ­dia interno ou canal externo?',
+    status: 'MVP em execução — uso interno da DIGIAI',
+    faseAtual: 'Fase 1 — incubação',
+    repo: 'D:\\projetos\\pulso_control',
+    stack: 'Next.js · Supabase · n8n · OpenAI/Claude · ElevenLabs',
+    proximo: 'Usar como motor de conteúdo para o Academy (Regra 5: Pulso trabalha para a DIGIAI primeiro)',
+    bloqueio: 'Decisão estratégica pendente: motor de mídia interno ou canal externo?',
   },
   {
     nome: 'Polapetit',
     subtitulo: 'Sistema operacional para empresa de eventos/festas infantis',
     categoria: 'incubacao',
     prioridade: 'baixa',
-    status: 'MVP interno â€” single-tenant, operaÃ§Ã£o PolÃ¡ Petit',
-    faseAtual: 'Fase 1 â€” incubaÃ§Ã£o',
-    repo: 'D:\\projetos\\diferentes\\polapetit',
-    stack: 'React Â· Vite Â· TypeScript Â· Supabase Â· Firebase',
-    proximo: 'Fechar mocks/TODOs Â· DecisÃ£o: sistema interno ou SaaS vertical?',
+    status: 'MVP interno — single-tenant, operação Polá Petit',
+    faseAtual: 'Fase 1 — incubação',
+    repo: 'D:\\projetos\\polapetit',
+    stack: 'React · Vite · TypeScript · Supabase · Firebase',
+    proximo: 'Fechar mocks/TODOs · Decisão: sistema interno ou SaaS vertical?',
   },
   {
     nome: 'Qual a Foto',
-    subtitulo: 'Plataforma de aprovaÃ§Ã£o de fotos para fotÃ³grafos',
+    subtitulo: 'Plataforma de aprovação de fotos para fotógrafos',
     categoria: 'incubacao',
     prioridade: 'baixa',
-    status: 'MVP em construÃ§Ã£o â€” test fechado, bugs ativos',
-    faseAtual: 'Fase 1 â€” incubaÃ§Ã£o',
-    repo: 'D:\\projetos\\diferentes\\qual_foto',
-    stack: 'SvelteKit 2 Â· TypeScript Â· Supabase Â· TailwindCSS Â· pgcrypto',
-    proximo: 'Fechar UI de criaÃ§Ã£o de galeria Â· Corrigir bug de seleÃ§Ãµes Â· Ativar worker IA',
-    bloqueio: 'IA worker (Gemini 2.0 Flash) nÃ£o confirmado em produÃ§Ã£o',
+    status: 'MVP em construção — teste fechado, bugs ativos',
+    faseAtual: 'Fase 1 — incubação',
+    repo: 'D:\\projetos\\qual_foto',
+    stack: 'SvelteKit 2 · TypeScript · Supabase · TailwindCSS · pgcrypto',
+    proximo: 'Fechar UI de criação de galeria · Corrigir bug de seleções · Ativar worker IA',
+    bloqueio: 'IA worker (Gemini 2.0 Flash) não confirmado em produção',
   },
   {
     nome: 'Nipo School',
-    subtitulo: 'Plataforma educacional musical comunitÃ¡ria Â· ADNIPO Suzano',
+    subtitulo: 'Plataforma educacional musical comunitária · ADNIPO Suzano',
     categoria: 'institucional',
     prioridade: 'baixa',
-    status: 'Piloto robusto â€” pronto para piloto controlado',
-    faseAtual: 'Fase 1 â€” institucional',
-    repo: 'D:\\projetos\\diferentes\\nipo_school',
-    stack: 'Next.js Â· TypeScript Â· Supabase Â· OpenAI Â· TailwindCSS',
-    proximo: 'Iniciar piloto com ADNIPO Â· Resolver mÃ³dulo de pagamentos',
+    status: 'Piloto robusto — pronto para piloto controlado',
+    faseAtual: 'Fase 1 — institucional',
+    repo: 'D:\\projetos\\nipo_school',
+    stack: 'Next.js · TypeScript · Supabase · OpenAI · TailwindCSS',
+    proximo: 'Iniciar piloto com ADNIPO · Resolver módulo de pagamentos',
     bloqueio: 'Pagamentos ausentes bloqueiam rollout comercial',
   },
   {
@@ -126,20 +126,20 @@ const PRODUTOS: Produto[] = [
     subtitulo: 'Painel de comando interno da DIGIAI',
     categoria: 'infraestrutura',
     prioridade: 'alta',
-    status: 'Operacional · 15 módulos funcionais · schema company 100% populado · finanças reconciliadas via OFX · 4 agents AI travados como consultoria interna',
+    status: 'Operacional · 16 módulos roteados + 2 stubs · schema company populado · finanças reconciliadas via OFX · Marketing/Marketing & SEO ativos',
     faseAtual: 'Fase 1 → 2 — operação interna ativa',
     repo: 'D:\\projetos\\digiai',
-    stack: 'React 19 · Vite · TypeScript · TailwindCSS 4 · Motion · Supabase · Google GenAI · Chart.js',
-    proximo: 'Publicar drafts legais (Política, MSA, DPA) · Integrar com central Clearix · Confirmar Anexo III com Konsep · Validar criptografia repouso',
+    stack: 'React 19 · Vite · TypeScript · TailwindCSS 4 · Motion · Supabase · Chart.js',
+    proximo: 'Publicar drafts legais (Política, MSA, DPA) · Migrar iam.users para R-013 · Nomear DPO formal',
     bloqueio: 'CNPJ em transição na RFB · Domínio próprio pendente · DPO formal não nomeado',
   },
 ];
 
 const categoriaBadge: Record<string, { label: string; className: string }> = {
-  'produto-ancora': { label: 'Produto-Ã¢ncora', className: 'bg-[#2563EB]/20 text-[#2563EB] border-[#2563EB]/30' },
-  'alavanca-critica': { label: 'Alavanca crÃ­tica', className: 'bg-[#06B6D4]/20 text-[#06B6D4] border-[#06B6D4]/30' },
-  suporte: { label: 'Suporte prioritÃ¡rio', className: 'bg-white/10 text-white/60 border-white/10' },
-  incubacao: { label: 'IncubaÃ§Ã£o', className: 'bg-white/5 text-white/40 border-white/5' },
+  'produto-ancora': { label: 'Produto-âncora', className: 'bg-[#2563EB]/20 text-[#2563EB] border-[#2563EB]/30' },
+  'alavanca-critica': { label: 'Alavanca crítica', className: 'bg-[#06B6D4]/20 text-[#06B6D4] border-[#06B6D4]/30' },
+  suporte: { label: 'Suporte prioritário', className: 'bg-white/10 text-white/60 border-white/10' },
+  incubacao: { label: 'Incubação', className: 'bg-white/5 text-white/40 border-white/5' },
   institucional: { label: 'Institucional', className: 'bg-white/5 text-white/30 border-white/5' },
   infraestrutura: { label: 'Infraestrutura interna', className: 'bg-white/8 text-white/50 border-white/8' },
 };
@@ -157,8 +157,8 @@ export default function Portfolio() {
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">PortfÃ³lio de Produtos</h1>
-        <p className="text-white/50 mt-1">9 frentes Â· hierarquia canÃ´nica Â· atualizado 2026-04-16</p>
+        <h1 className="text-3xl font-bold tracking-tight">Portfólio de Produtos</h1>
+        <p className="text-white/50 mt-1">{PRODUTOS.length} frentes · hierarquia canônica · atualizado 2026-05-28</p>
       </div>
 
       <div className="space-y-3">
@@ -211,7 +211,7 @@ export default function Portfolio() {
                       <div className="text-sm text-white/80">{p.faseAtual}</div>
                     </div>
                     <div className="md:col-span-2">
-                      <div className="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-1">RepositÃ³rio</div>
+                      <div className="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-1">Repositório</div>
                       <div className="text-sm font-mono text-white/60 bg-white/5 rounded-lg px-3 py-2">{p.repo}</div>
                     </div>
                     <div className="md:col-span-2">
@@ -219,7 +219,7 @@ export default function Portfolio() {
                       <div className="text-sm text-white/60">{p.stack}</div>
                     </div>
                     <div className="md:col-span-2">
-                      <div className="text-[10px] font-mono text-[#06B6D4] uppercase tracking-widest mb-1">PrÃ³ximo passo</div>
+                      <div className="text-[10px] font-mono text-[#06B6D4] uppercase tracking-widest mb-1">Próximo passo</div>
                       <div className="text-sm text-white/80">{p.proximo}</div>
                     </div>
                     {p.bloqueio && (
@@ -238,4 +238,3 @@ export default function Portfolio() {
     </div>
   );
 }
-

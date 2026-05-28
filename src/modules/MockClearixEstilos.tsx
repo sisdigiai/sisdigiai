@@ -64,7 +64,7 @@ function ToggleModo({ modo, onChange, accent }: { modo: Modo; onChange: (m: Modo
         onClick={() => onChange('dark')}
         style={{
           background: modo === 'dark' ? accent : 'transparent',
-          color: modo === 'dark' ? '#fff' : (modo === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)'),
+          color: modo === 'dark' ? '#fff' : 'rgba(0,0,0,0.6)',
           border: 'none',
           padding: '4px 12px',
           borderRadius: '999px',

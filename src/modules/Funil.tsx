@@ -700,7 +700,7 @@ function NumberField({ label, value, suffix, onChange }: { label: string; value:
           type="number"
           step="0.1"
           className={`${inputClass} ${suffix ? 'pr-9' : ''}`}
-          value={Number.isFinite(value) ? value : 0}
+          value={Number.isFinite(value) ? Math.round(value * 1e6) / 1e6 : 0}
           onChange={(e) => onChange(parseFloat(e.target.value || '0'))}
         />
         {suffix && <span className="absolute right-3 top-2.5 text-xs text-white/35">{suffix}</span>}
