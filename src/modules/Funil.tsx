@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
+import { TravasBanner } from './TravasMarketing';
 import {
   Activity,
   BarChart3,
@@ -133,6 +134,8 @@ export default function Funil() {
           </button>
         </div>
       </header>
+
+      <TravasBanner />
 
       <div className="bg-[#2563EB]/8 border border-[#2563EB]/20 rounded-2xl p-5 flex items-start gap-3">
         <Route className="w-5 h-5 text-[#06B6D4] shrink-0 mt-0.5" />

@@ -3,7 +3,7 @@ import {
   Eye, LayoutGrid, Map, List, Zap, TrendingUp,
   BookOpen, DollarSign, GitBranch, Library, Palette, Building2, Network,
   Compass, Flame, Megaphone, LogOut, Store, Sparkles, Music2, Activity,
-  Camera, Wand2, Boxes, Search
+  Camera, Wand2, Boxes, Search, ShieldCheck
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
@@ -14,7 +14,7 @@ export type ModuleId =
   | 'backlog' | 'comercial' | 'academy' | 'funil' | 'financeiro'
   | 'decisoes' | 'biblioteca' | 'brand' | 'cadastro-empresa'
   | 'clearix' | 'referencias-design' | 'mock-estilos' | 'marketing'
-  | 'marketing-seo' | 'ecossistemas';
+  | 'marketing-seo' | 'ecossistemas' | 'travas-marketing';
 
 interface NavItem {
   id: ModuleId;
@@ -65,6 +65,7 @@ const ecossistemas: Ecossistema[] = [
 ];
 
 const sistema: NavItem[] = [
+  { id: 'travas-marketing',   label: 'Travas Marketing',    icon: <ShieldCheck className="w-4 h-4" /> },
   { id: 'decisoes',           label: 'Decisões',            icon: <GitBranch className="w-4 h-4" /> },
   { id: 'biblioteca',         label: 'Biblioteca',          icon: <Library className="w-4 h-4" /> },
   { id: 'brand',              label: 'Brand Guidelines',    icon: <Palette className="w-4 h-4" /> },

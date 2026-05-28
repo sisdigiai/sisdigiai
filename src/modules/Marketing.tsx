@@ -10,6 +10,7 @@ import { Depoimentos } from './marketing/Depoimentos';
 import { Planejador } from './marketing/Planejador';
 import { Comunidade } from './marketing/Comunidade';
 import { Desafios } from './marketing/Desafios';
+import { TravasBanner } from './TravasMarketing';
 
 type SubTab = 'calendario' | 'planejador' | 'banco' | 'prompts' | 'validacao' | 'depoimentos' | 'comunidade' | 'desafios' | 'materiais' | 'afiliados';
 
@@ -39,6 +40,10 @@ export default function Marketing() {
         <p className="text-xs text-white/40">
           Calendário editorial + banco de ideias + materiais de afiliados + CRM de afiliados. Tudo num lugar só.
         </p>
+      </div>
+
+      <div className="px-8 pt-4">
+        <TravasBanner />
       </div>
 
       <div className="border-b border-white/5 px-8">

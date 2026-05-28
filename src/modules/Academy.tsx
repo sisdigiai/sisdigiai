@@ -36,6 +36,7 @@ import {
   type AcademyWorkspace,
 } from '../lib/academyStore';
 import { companyStore } from '../lib/companyStore';
+import { TravasBanner } from './TravasMarketing';
 import { backlogStore } from '../lib/backlogStore';
 import { decisionsStore } from '../lib/decisionsStore';
 import { roadmapStore } from '../lib/roadmapStore';
@@ -443,6 +444,8 @@ export default function Academy() {
           </button>
         </div>
       </header>
+
+      <TravasBanner />
 
       {saveMessage && (
         <div className="bg-emerald-400/10 border border-emerald-400/30 rounded-xl px-4 py-3 text-sm text-emerald-300">
