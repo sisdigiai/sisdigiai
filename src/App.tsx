@@ -19,21 +19,11 @@ import MarketingSEO from './modules/MarketingSEO';
 import ReferenciasDesign from './modules/ReferenciasDesign';
 import MockClearixEstilos from './modules/MockClearixEstilos';
 import Ecossistemas from './modules/Ecossistemas';
+import ListaMestra from './modules/ListaMestra';
 import { ModuleStub } from './modules/Stub';
 import { useAuth } from './contexts/AuthContext';
 
 const STUBS: Record<string, { numero: number; nome: string; descricao: string; entregaveis: string[] }> = {
-  'lista-mestra': {
-    numero: 4,
-    nome: 'Lista Mestra',
-    descricao: 'Todos os itens de implantacao filtraveis por area, prioridade, status, responsavel, fase e prazo.',
-    entregaveis: [
-      'Importacao dos itens da lista mestra canonica',
-      'Filtros por area / prioridade / status / fase',
-      'Vinculo com documentos e backlog',
-      'Itens atrasados e criticos em destaque',
-    ],
-  },
   comercial: {
     numero: 6,
     nome: 'Comercial',
@@ -97,6 +87,7 @@ export default function App() {
       case 'referencias-design': return <ReferenciasDesign />;
       case 'mock-estilos': return <MockClearixEstilos />;
       case 'ecossistemas': return <Ecossistemas />;
+      case 'lista-mestra': return <ListaMestra />;
       default: {
         const stub = STUBS[activeModule];
         if (stub) {
