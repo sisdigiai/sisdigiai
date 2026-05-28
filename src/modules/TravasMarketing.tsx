@@ -1,4 +1,5 @@
 import { ShieldCheck, Bot, Lock, Target, Heart } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 
 // Travas de marketing — derivadas das regras canônicas (R-011, R-013/LGPD,
 // decisões 17/04 Academy-funil, design system). Fonte única para Marketing,
@@ -79,17 +80,13 @@ export function TravasBanner() {
 
 export default function TravasMarketing() {
   return (
-    <div className="p-8 max-w-4xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3 font-serif">
-          <ShieldCheck className="w-7 h-7 text-amber-300" /> Travas de Marketing
-        </h1>
-        <p className="text-on-surface-variant mt-1">
-          Regras inegociáveis que regem todo conteúdo de marketing — derivadas das regras canônicas
-          (R-011, R-013, decisões 17/04, design system). Aplicam em Marketing, Funil OSI e Academy.
-        </p>
-      </div>
-
+    <div className="p-8 max-w-6xl mx-auto">
+      <PageHeader
+        eyebrow="Governança"
+        title="Travas de Marketing"
+        subtitle="Regras inegociáveis que regem todo conteúdo de marketing — derivadas das regras canônicas (R-011, R-013, decisões 17/04, design system). Aplicam em Marketing, Funil OSI e Academy."
+      />
+      <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {TRAVAS.map(t => {
           const Icon = t.icone;
@@ -120,6 +117,7 @@ export default function TravasMarketing() {
       <div className="text-[11px] text-muted border-t border-outline/10 pt-4">
         Estas travas foram codificadas a partir das regras canônicas existentes. Para mudar uma trava,
         atualize a regra de origem (Harness/ADR/decisão) e este painel no mesmo turno.
+      </div>
       </div>
     </div>
   );

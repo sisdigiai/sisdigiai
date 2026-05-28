@@ -31,7 +31,7 @@ interface Props {
 }
 
 const STATUS_OPTIONS: { value: CalendarStatus; label: string; color: string }[] = [
-  { value: 'planned', label: 'Planejado', color: '#06B6D4' },
+  { value: 'planned', label: 'Planejado', color: '#adcebd' },
   { value: 'in_production', label: 'Em produção', color: '#F59E0B' },
   { value: 'ready', label: 'Pronto', color: '#8B5CF6' },
   { value: 'published', label: 'Publicado', color: '#10B981' },
@@ -149,7 +149,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
         {/* Header */}
         <div className="sticky top-0 z-10 bg-surface-container border-b border-outline/10 px-6 py-4 flex items-center justify-between">
           <div className="flex-1">
-            <div className="text-[10px] uppercase tracking-widest font-bold" style={{ color: draft.pillar_color ?? '#06B6D4' }}>
+            <div className="text-[10px] uppercase tracking-widest font-bold" style={{ color: draft.pillar_color ?? '#adcebd' }}>
               {draft.pillar_name ?? 'Sem pilar'}
             </div>
             <h2 className="text-lg font-semibold mt-1">{draft.hook ?? 'Sem hook'}</h2>
@@ -158,7 +158,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowWizard(true)}
-              className="flex items-center gap-2 px-3 py-2 bg-[#10B981] text-[#0A0F1E] font-medium hover:bg-[#10B981]/90 text-sm"
+              className="flex items-center gap-2 px-3 py-2 bg-[#10B981] text-surface font-medium hover:bg-[#10B981]/90 text-sm"
               title="Wizard 4 steps: roteiro / capa / voz / vídeo. Salva tudo no banco."
             >
               <Wand2 className="w-4 h-4" />
@@ -199,7 +199,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
                 <button
                   key={s.value}
                   onClick={() => update({ status: s.value })}
-                  className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest ${draft.status === s.value ? 'text-[#0A0F1E]' : 'text-muted hover:text-on-surface-variant border border-outline/10'}`}
+                  className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest ${draft.status === s.value ? 'text-surface' : 'text-muted hover:text-on-surface-variant border border-outline/10'}`}
                   style={draft.status === s.value ? { background: s.color } : {}}
                 >
                   {s.label}
@@ -237,7 +237,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
                   <button
                     disabled={!gatePassed}
                     onClick={() => { setGateOpen(false); handleSave(); }}
-                    className="px-4 py-2 text-sm font-medium bg-[#10B981] text-[#0A0F1E] disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="px-4 py-2 text-sm font-medium bg-[#10B981] text-surface disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     Confirmar e publicar
                   </button>
@@ -318,7 +318,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
               <div className="mt-3 grid grid-cols-3 gap-2">
                 <StatPill label="Vendas" value={String(sales.sales_count)} color="#10B981" icon={<DollarSign className="w-3 h-3" />} />
                 <StatPill label="Receita" value={brl(sales.revenue_cents)} color="#10B981" />
-                <StatPill label="Comissão" value={brl(sales.commission_cents)} color="#06B6D4" />
+                <StatPill label="Comissão" value={brl(sales.commission_cents)} color="#adcebd" />
                 {sales.refunds_count > 0 && (
                   <StatPill label="Reembolsos" value={String(sales.refunds_count)} color="#F59E0B" />
                 )}

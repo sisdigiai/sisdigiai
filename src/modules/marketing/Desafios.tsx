@@ -15,11 +15,11 @@ const MOVEMENT_NAMES: Record<number, string> = {
 };
 
 const MOVEMENT_COLOR: Record<number, string> = {
-  1: '#06B6D4', 2: '#8B5CF6', 3: '#10B981', 4: '#F59E0B', 5: '#EC4899',
+  1: '#adcebd', 2: '#8B5CF6', 3: '#10B981', 4: '#F59E0B', 5: '#EC4899',
 };
 
 const STATUS_COLOR: Record<string, string> = {
-  draft: '#6B7280', active: '#10B981', closed: '#06B6D4', cancelled: '#EF4444',
+  draft: '#6B7280', active: '#10B981', closed: '#adcebd', cancelled: '#EF4444',
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -76,7 +76,7 @@ export function Desafios() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowNew(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#F59E0B] text-[#0A0F1E] font-medium hover:bg-[#F59E0B]/90">
+          <button onClick={() => setShowNew(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#F59E0B] text-surface font-medium hover:bg-[#F59E0B]/90">
             <Plus className="w-4 h-4" /> Novo desafio
           </button>
           <button onClick={refresh} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-outline/10 hover:bg-surface-highest">
@@ -140,7 +140,7 @@ export function Desafios() {
 
 function ChallengeCard({ c, onOpen }: { c: Challenge; onOpen: () => void }) {
   const movement = c.movement ?? 0;
-  const movColor = MOVEMENT_COLOR[movement] ?? '#06B6D4';
+  const movColor = MOVEMENT_COLOR[movement] ?? '#adcebd';
   return (
     <button onClick={onOpen}
       className="bg-surface-low border border-outline/10 p-4 text-left hover:bg-surface-highest border-l-4"
@@ -255,7 +255,7 @@ function NewChallengeModal({ onClose, onSaved }: { onClose: () => void; onSaved:
           </Field>
         </div>
         <div className="flex items-center gap-2 mt-5">
-          <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#F59E0B] text-[#0A0F1E] font-medium hover:bg-[#F59E0B]/90 text-sm disabled:opacity-50">
+          <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#F59E0B] text-surface font-medium hover:bg-[#F59E0B]/90 text-sm disabled:opacity-50">
             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Criar
           </button>
           <button onClick={onClose} className="px-4 py-2 border border-outline/10 text-on-surface-variant hover:bg-surface-highest text-sm">Cancelar</button>
@@ -320,12 +320,12 @@ function ChallengeDetailDrawer({ challenge, onClose, onChanged }: { challenge: C
           </div>
           <div className="flex items-center gap-2">
             {challenge.status === 'draft' && (
-              <button onClick={handleActivate} disabled={busy} className="flex items-center gap-1 px-3 py-2 bg-[#10B981] text-[#0A0F1E] font-medium text-sm disabled:opacity-50">
+              <button onClick={handleActivate} disabled={busy} className="flex items-center gap-1 px-3 py-2 bg-[#10B981] text-surface font-medium text-sm disabled:opacity-50">
                 {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Flag className="w-4 h-4" />} Ativar
               </button>
             )}
             {challenge.status === 'active' && (
-              <button onClick={handleFinalize} disabled={busy} className="flex items-center gap-1 px-3 py-2 bg-[#F59E0B] text-[#0A0F1E] font-medium text-sm disabled:opacity-50">
+              <button onClick={handleFinalize} disabled={busy} className="flex items-center gap-1 px-3 py-2 bg-[#F59E0B] text-surface font-medium text-sm disabled:opacity-50">
                 {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trophy className="w-4 h-4" />} Finalizar
               </button>
             )}

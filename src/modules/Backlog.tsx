@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Zap, AlertTriangle, Clock, CheckCircle2, Circle, Plus, X, RefreshCw, Trash2 } from 'lucide-react';
 import { backlogStore, type BacklogItem, type BacklogStatus, type NewBacklogItem } from '../lib/backlogStore';
 import { realtimeStore } from '../lib/realtimeStore';
+import PageHeader from '../components/PageHeader';
 
 type PriorityLabel = 'critico' | 'alto' | 'medio' | 'baixo' | 'minimo';
 
@@ -107,22 +108,24 @@ export default function Backlog() {
   };
 
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-6">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight font-serif">Backlog Executivo</h1>
-          <p className="text-on-surface-variant mt-1">{items.length} itens · {criticos} críticos · {emAndamento} em andamento</p>
-        </div>
-        <div className="flex gap-2">
-          <button onClick={load} className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface" title="Recarregar">
-            <RefreshCw size={16} />
-          </button>
-          <button onClick={startCreate} className="px-3 py-2 bg-secondary hover:bg-secondary/90 text-surface text-sm flex items-center gap-2">
-            <Plus size={14} /> Novo item
-          </button>
-        </div>
-      </div>
+    <div className="p-8 max-w-6xl mx-auto">
+      <PageHeader
+        eyebrow="Execução"
+        title="Backlog Executivo"
+        subtitle={`${items.length} itens · ${criticos} críticos · ${emAndamento} em andamento`}
+        actions={
+          <>
+            <button onClick={load} className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface" title="Recarregar">
+              <RefreshCw size={16} />
+            </button>
+            <button onClick={startCreate} className="px-3 py-2 bg-secondary hover:bg-secondary/90 text-surface text-sm flex items-center gap-2">
+              <Plus size={14} /> Novo item
+            </button>
+          </>
+        }
+      />
 
+      <div className="space-y-6">
       {criticos > 0 && (
         <div className="bg-red-400/5 border border-red-400/20 p-4 flex items-start gap-3">
           <Zap className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
@@ -254,6 +257,7 @@ export default function Backlog() {
           })}
         </div>
       )}
+      </div>
     </div>
   );
 }

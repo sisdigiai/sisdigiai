@@ -106,7 +106,7 @@ export function BancoIdeias() {
 
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <StatCard label="Total no banco" value={stats.total} color="#06B6D4" />
+        <StatCard label="Total no banco" value={stats.total} color="#adcebd" />
         <StatCard label="Disponíveis" value={stats.available} color="#10B981" />
         <StatCard label="Agendadas" value={stats.scheduled} color="#F59E0B" />
         <StatCard label="Já usadas" value={stats.used} color="#8B5CF6" />
@@ -209,9 +209,9 @@ function IdeaCard({ idea, onSchedule }: { idea: ContentIdea; onSchedule: (date: 
       {idea.pillar_name && (
         <div
           className="text-[10px] uppercase tracking-widest font-bold mb-2 flex items-center gap-1.5"
-          style={{ color: idea.pillar_color ?? '#06B6D4' }}
+          style={{ color: idea.pillar_color ?? '#adcebd' }}
         >
-          <span className="w-1.5 h-1.5 rounded-full" style={{ background: idea.pillar_color ?? '#06B6D4' }} />
+          <span className="w-1.5 h-1.5 rounded-full" style={{ background: idea.pillar_color ?? '#adcebd' }} />
           {idea.pillar_name}
         </div>
       )}

@@ -11,7 +11,7 @@ interface Props {
 }
 
 const STEPS = [
-  { id: 1, category: 'text',  label: 'Roteiro / Copy',  icon: FileText, color: '#06B6D4',
+  { id: 1, category: 'text',  label: 'Roteiro / Copy',  icon: FileText, color: '#adcebd',
     templates: ['chatgpt-reel-roteiro','chatgpt-instagram-feed','chatgpt-carrossel-10-slides','chatgpt-email-lista','chatgpt-whatsapp-1msg'] },
   { id: 2, category: 'image', label: 'Capa / Arte',     icon: ImagePlus, color: '#8B5CF6',
     templates: ['midjourney-capa-quadrada','midjourney-story-vertical','midjourney-infografico','dalle-capa-quadrada'] },
@@ -295,7 +295,7 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
               {/* Salvar */}
               <div className="flex items-center gap-2 pt-2 border-t border-outline/10">
                 <button onClick={handleSave} disabled={saving || (!outputText.trim() && !outputUrl.trim())}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#10B981] text-[#0A0F1E] font-medium hover:bg-[#10B981]/90 text-sm disabled:opacity-50">
+                  className="flex items-center gap-2 px-4 py-2 bg-[#10B981] text-surface font-medium hover:bg-[#10B981]/90 text-sm disabled:opacity-50">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                   Salvar output
                 </button>

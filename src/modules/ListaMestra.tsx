@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { List, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { backlogStore } from '../lib/backlogStore';
 import { roadmapStore } from '../lib/roadmapStore';
+import PageHeader from '../components/PageHeader';
 
 type Fonte = 'Backlog' | 'Roadmap';
 type StatusNorm = 'done' | 'in_progress' | 'pending' | 'blocked' | 'atrasado' | 'cancelled';
@@ -90,17 +91,19 @@ export default function ListaMestra() {
     }`;
 
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-5">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3 font-serif">
-          <List className="w-7 h-7 text-secondary" /> Lista Mestra
-        </h1>
-        <p className="text-on-surface-variant mt-1">
-          {items === null ? 'Carregando…' : `${items.length} itens de implantação`} · unifica Backlog + Roadmap
-          {atrasados > 0 && <span className="text-amber-300"> · {atrasados} atrasados</span>}
-        </p>
-      </div>
+    <div className="p-8 max-w-6xl mx-auto">
+      <PageHeader
+        eyebrow="Implantação"
+        title="Lista Mestra"
+        subtitle={
+          <>
+            {items === null ? 'Carregando…' : `${items.length} itens de implantação`} · unifica Backlog + Roadmap
+            {atrasados > 0 && <span className="text-amber-300"> · {atrasados} atrasados</span>}
+          </>
+        }
+      />
 
+      <div className="space-y-5">
       <div className="space-y-3">
         <div className="flex flex-wrap gap-2 items-center">
           <span className="text-[10px] font-mono uppercase tracking-widest text-muted mr-1">Fonte</span>
@@ -174,6 +177,7 @@ export default function ListaMestra() {
       <div className="text-[11px] text-muted">
         Fonte: <span className="font-mono">v_backlog_items</span> + <span className="font-mono">v_roadmap_tasks</span> (vivo).
         Editar é feito nos módulos Backlog e Roadmap; aqui é a visão consolidada filtrável.
+      </div>
       </div>
     </div>
   );

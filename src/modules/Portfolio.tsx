@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import { companyStore } from '../lib/companyStore';
 import type { DigitalAsset } from '../lib/supabase';
+import PageHeader from '../components/PageHeader';
 
 interface Produto {
   nome: string;
@@ -194,12 +195,14 @@ export default function Portfolio() {
   const liveCount = (nome: string) => liveSites[OWNER_BY_NAME[nome] ?? ''] || 0;
 
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight font-serif">Portfólio de Produtos</h1>
-        <p className="text-on-surface-variant mt-1">{PRODUTOS.length} frentes · hierarquia canônica · atualizado 2026-05-28</p>
-      </div>
+    <div className="p-8 max-w-6xl mx-auto">
+      <PageHeader
+        eyebrow="Hierarquia Canônica"
+        title="Portfólio de Produtos"
+        subtitle={`${PRODUTOS.length} frentes · hierarquia canônica · atualizado 2026-05-28`}
+      />
 
+      <div className="space-y-6">
       <div className="space-y-3">
         {PRODUTOS.map((p) => {
           const badge = categoriaBadge[p.categoria];
@@ -278,6 +281,7 @@ export default function Portfolio() {
             </div>
           );
         })}
+      </div>
       </div>
     </div>
   );

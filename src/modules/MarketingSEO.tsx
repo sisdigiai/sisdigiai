@@ -1,4 +1,5 @@
-import { Megaphone, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 import { CardGSC } from '../components/marketing-seo/CardGSC';
 import { CardBing } from '../components/marketing-seo/CardBing';
 import { CardCloudflare } from '../components/marketing-seo/CardCloudflare';
@@ -8,28 +9,25 @@ import { CardIndexNow } from '../components/marketing-seo/CardIndexNow';
 
 export default function MarketingSEO() {
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      <header className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="bg-secondary-container/40 border border-secondary/40 flex items-center justify-center w-10 h-10">
-            <Megaphone className="w-5 h-5 text-secondary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-semibold font-serif text-on-surface">Marketing & SEO</h1>
-            <p className="text-sm text-on-surface-variant">
-              Observabilidade do site institucional <a
-                href="https://digiai.app.br"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-secondary hover:underline inline-flex items-center gap-1"
-              >digiai.app.br <ExternalLink className="w-3 h-3" /></a>
-            </p>
-          </div>
-        </div>
-        <div className="text-[11px] font-mono text-muted uppercase tracking-widest">
+    <div className="p-8 max-w-6xl mx-auto">
+      <PageHeader
+        eyebrow="SEO & Conteúdo"
+        title="Marketing & SEO"
+        subtitle={
+          <>
+            Observabilidade do site institucional <a
+              href="https://digiai.app.br"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-secondary hover:underline inline-flex items-center gap-1"
+            >digiai.app.br <ExternalLink className="w-3 h-3" /></a>
+          </>
+        }
+      >
+        <div className="text-[11px] font-mono text-muted uppercase tracking-widest mt-4">
           Fontes: Google Search Console · Bing Webmaster · Cloudflare Analytics · IndexNow
         </div>
-      </header>
+      </PageHeader>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <CardGSC />

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { GitBranch, Plus, Trash2, Tag, Calendar, X, Download, RefreshCw } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 import { decisionsStore, type Decision, type NewDecision } from '../lib/decisionsStore';
 import { realtimeStore } from '../lib/realtimeStore';
 
@@ -123,17 +124,17 @@ export default function Decisoes() {
 
   return (
     <div className="max-w-6xl mx-auto p-8">
-      <header className="mb-8">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <GitBranch className="w-6 h-6 text-secondary" />
-              <h1 className="text-3xl font-serif font-bold">Decisões</h1>
-            </div>
-            <p className="text-muted">Memória institucional — por que cada direção foi tomada, com contexto e alternativas.</p>
-            <p className="text-xs text-muted mt-1">{items.length} decisões · {allTags.length} tags únicas</p>
-          </div>
-          <div className="flex gap-2">
+      <PageHeader
+        eyebrow="Memória Institucional"
+        title="Decisões"
+        subtitle={
+          <>
+            Memória institucional — por que cada direção foi tomada, com contexto e alternativas.
+            <span className="block text-xs text-muted mt-1">{items.length} decisões · {allTags.length} tags únicas</span>
+          </>
+        }
+        actions={
+          <>
             <button onClick={load} className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface" title="Recarregar">
               <RefreshCw size={16} />
             </button>
@@ -150,9 +151,9 @@ export default function Decisoes() {
             >
               <Plus size={14} /> Nova decisão
             </button>
-          </div>
-        </div>
-
+          </>
+        }
+      >
         {allTags.length > 0 && (
           <div className="mt-4 flex gap-1.5 flex-wrap">
             <button
@@ -172,7 +173,7 @@ export default function Decisoes() {
             ))}
           </div>
         )}
-      </header>
+      </PageHeader>
 
       {draft && (
         <div className="bg-surface-lowest border border-secondary p-5 mb-6 space-y-4">

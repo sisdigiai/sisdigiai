@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Workflow, BookOpen, Flame, Megaphone, Boxes, ArrowRight } from 'lucide-react';
+import { BookOpen, Flame, Megaphone, Boxes, ArrowRight } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 import { academyStore } from '../lib/academyStore';
 import { funnelStore, calculateFunnelSummary } from '../lib/funnelStore';
 import { marketingStore } from '../lib/marketingStore';
@@ -60,18 +61,19 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
   );
 
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3 font-serif">
-          <Workflow className="w-7 h-7 text-secondary" /> Fluxo OSI
-        </h1>
-        <p className="text-on-surface-variant mt-1">
-          A espinha que conecta os três módulos em torno da Ótica Sem Improviso:
-          <b className="text-on-surface-variant"> produto</b> (Academy) → <b className="text-on-surface-variant">captação</b> (Funil) →
-          <b className="text-on-surface-variant"> distribuição</b> (Marketing) → <b className="text-secondary">Clearix</b>.
-        </p>
-      </div>
-
+    <div className="p-8 max-w-6xl mx-auto">
+      <PageHeader
+        eyebrow="Espinha do ecossistema"
+        title="Fluxo OSI"
+        subtitle={
+          <>
+            A espinha que conecta os três módulos em torno da Ótica Sem Improviso:
+            <b className="text-on-surface-variant"> produto</b> (Academy) → <b className="text-on-surface-variant">captação</b> (Funil) →
+            <b className="text-on-surface-variant"> distribuição</b> (Marketing) → <b className="text-secondary">Clearix</b>.
+          </>
+        }
+      />
+      <div className="space-y-6">
       <TravasBanner />
 
       <div className="flex flex-col md:flex-row gap-3 items-stretch">
@@ -112,6 +114,7 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
         Fonte viva: <span className="font-mono">academy.products</span> + funil (workspace local) +
         <span className="font-mono"> marketing.content_calendar/ideas/affiliates</span>. Esta é a visão consolidada;
         a edição continua em cada módulo.
+      </div>
       </div>
     </div>
   );

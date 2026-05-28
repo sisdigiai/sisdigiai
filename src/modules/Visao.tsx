@@ -9,6 +9,7 @@ import type { Track } from '../lib/roadmapStore';
 import { realtimeStore } from '../lib/realtimeStore';
 import { useRealtimeToasts } from '../contexts/ToastContext';
 import type { ModuleId } from '../components/Sidebar';
+import PageHeader from '../components/PageHeader';
 
 const VERDADES_CANONICAS = [
   { texto: 'Clearix é a prioridade máxima da DIGIAI', nível: 'máximo' },
@@ -85,18 +86,19 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
   const nextMilestone = summary.upcomingMilestones[0];
 
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-10">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <span className="font-mono text-[11px] text-secondary uppercase tracking-[0.2em] mb-2 block">Dashboard Interno</span>
-          <h1 className="font-serif text-4xl font-semibold tracking-tight text-on-surface">Visão da Empresa</h1>
-          <div className="h-px w-24 bg-secondary mt-4" />
-          <p className="text-on-surface-variant mt-3 text-sm">Dashboard em tempo real · dados do Supabase</p>
-        </div>
-        <button onClick={load} className="p-2 hover:bg-surface-highest text-muted hover:text-on-surface transition-colors" title="Recarregar">
-          <RefreshCw size={18} />
-        </button>
-      </div>
+    <div className="p-8 max-w-6xl mx-auto">
+      <PageHeader
+        eyebrow="Dashboard Interno"
+        title="Visão da Empresa"
+        subtitle="Dashboard em tempo real · dados do Supabase"
+        actions={
+          <button onClick={load} className="p-2 hover:bg-surface-highest text-muted hover:text-on-surface transition-colors" title="Recarregar">
+            <RefreshCw size={18} />
+          </button>
+        }
+      />
+      <div className="space-y-10">
+
 
       {/* Alertas críticos no topo */}
       {(summary.overdueTasks > 0 || summary.backlogCritical > 0) && (
@@ -317,6 +319,7 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
         <p className="font-serif text-lg font-medium text-on-surface">
           Isso fortalece a DIGIAI, o Clearix e a implantação da empresa segundo a verdade canônica atual?
         </p>
+      </div>
       </div>
     </div>
   );

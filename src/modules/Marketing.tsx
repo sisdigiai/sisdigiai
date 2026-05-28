@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar as CalendarIcon, Crown, Lightbulb, Megaphone, MessageSquareQuote, Package, Sparkles, TrendingUp, Trophy, Users, Wand2 } from 'lucide-react';
+import { Calendar as CalendarIcon, Crown, Lightbulb, MessageSquareQuote, Package, Sparkles, TrendingUp, Trophy, Users, Wand2 } from 'lucide-react';
 import { CalendarioEditorial } from './marketing/CalendarioEditorial';
 import { BancoIdeias } from './marketing/BancoIdeias';
 import { MateriaisAfiliados } from './marketing/MateriaisAfiliados';
@@ -11,6 +11,7 @@ import { Planejador } from './marketing/Planejador';
 import { Comunidade } from './marketing/Comunidade';
 import { Desafios } from './marketing/Desafios';
 import { TravasBanner } from './TravasMarketing';
+import PageHeader from '../components/PageHeader';
 
 type SubTab = 'calendario' | 'planejador' | 'banco' | 'prompts' | 'validacao' | 'depoimentos' | 'comunidade' | 'desafios' | 'materiais' | 'afiliados';
 
@@ -32,17 +33,12 @@ export default function Marketing() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="border-b border-outline/10 px-8 py-5">
-        <div className="flex items-center gap-3 mb-1">
-          <Megaphone className="w-5 h-5 text-secondary" />
-          <h1 className="text-xl font-semibold">Marketing</h1>
-        </div>
-        <p className="text-xs text-muted">
-          Calendário editorial + banco de ideias + materiais de afiliados + CRM de afiliados. Tudo num lugar só.
-        </p>
-      </div>
-
-      <div className="px-8 pt-4">
+      <div className="px-8 pt-8">
+        <PageHeader
+          eyebrow="Distribuição & conteúdo"
+          title="Marketing"
+          subtitle="Calendário editorial + banco de ideias + materiais de afiliados + CRM de afiliados. Tudo num lugar só."
+        />
         <TravasBanner />
       </div>
 

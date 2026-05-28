@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Building2, Users, Globe, Wrench, DollarSign, Shield, Download, Plus, Trash2, Cloud, HardDrive } from 'lucide-react';
 import { companyStore } from '../lib/companyStore';
+import PageHeader from '../components/PageHeader';
 import type { CompanyIdentity, CompanyContact, DigitalAsset, Tool, FinancialSnapshot, LegalStatus } from '../lib/supabase';
 
 type TabId = 'identidade' | 'contatos' | 'digital' | 'ferramentas' | 'financeiro' | 'lgpd';
@@ -19,16 +20,13 @@ export default function CadastroEmpresa() {
   const online = companyStore.isOnline();
 
   return (
-    <div className="max-w-7xl mx-auto p-8">
-      <header className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-3xl font-bold font-serif">Cadastro Empresa</h1>
-            <p className="text-muted mt-1">
-              Registro único e canônico da DIGIAI — dados reais usados em contratos, propostas e snapshots para agentes.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
+    <div className="max-w-6xl mx-auto p-8">
+      <PageHeader
+        eyebrow="Registro Canônico"
+        title="Cadastro Empresa"
+        subtitle="Registro único e canônico da DIGIAI — dados reais usados em contratos, propostas e snapshots para agentes."
+        actions={
+          <>
             <span className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 ${online ? 'bg-green-500/10 text-green-400 border border-green-500/30' : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30'}`}>
               {online ? <Cloud size={14} /> : <HardDrive size={14} />}
               {online ? 'Supabase conectado' : 'localStorage (offline)'}
@@ -45,28 +43,28 @@ export default function CadastroEmpresa() {
             >
               <Download size={14} /> Markdown
             </button>
-          </div>
-        </div>
+          </>
+        }
+      />
 
-        <nav className="flex gap-1 border-b border-outline/10">
-          {TABS.map((t) => {
-            const Icon = t.icon;
-            return (
-              <button
-                key={t.id}
-                onClick={() => setTab(t.id)}
-                className={`px-4 py-3 text-sm font-medium flex items-center gap-2 border-b-2 transition-colors ${
-                  tab === t.id
-                    ? 'border-secondary text-on-surface'
-                    : 'border-transparent text-muted hover:text-on-surface'
-                }`}
-              >
-                <Icon size={16} /> {t.label}
-              </button>
-            );
-          })}
-        </nav>
-      </header>
+      <nav className="flex gap-1 border-b border-outline/10 mb-8">
+        {TABS.map((t) => {
+          const Icon = t.icon;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`px-4 py-3 text-sm font-medium flex items-center gap-2 border-b-2 transition-colors ${
+                tab === t.id
+                  ? 'border-secondary text-on-surface'
+                  : 'border-transparent text-muted hover:text-on-surface'
+              }`}
+            >
+              <Icon size={16} /> {t.label}
+            </button>
+          );
+        })}
+      </nav>
 
       <section>
         {tab === 'identidade' && <IdentidadeTab />}

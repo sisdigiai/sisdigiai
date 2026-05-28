@@ -147,7 +147,7 @@ export function CalendarioEditorial() {
 
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <StatCard label="Planejados" value={stats.planned} color="#06B6D4" />
+        <StatCard label="Planejados" value={stats.planned} color="#adcebd" />
         <StatCard label="Em produção" value={stats.in_production} color="#F59E0B" />
         <StatCard label="Prontos" value={stats.ready} color="#8B5CF6" />
         <StatCard label="Publicados" value={stats.published} color="#10B981" />
@@ -249,7 +249,7 @@ function DateGroup({ date, posts, onAdvance, onEdit }: { date: string; posts: Ca
 
 function PostCard({ post, onAdvance, onEdit }: { post: CalendarPost; onAdvance: (p: CalendarPost) => void; onEdit: (p: CalendarPost) => void }) {
   const statusColors: Record<CalendarStatus, string> = {
-    planned: '#06B6D4',
+    planned: '#adcebd',
     in_production: '#F59E0B',
     ready: '#8B5CF6',
     published: '#10B981',
@@ -267,14 +267,14 @@ function PostCard({ post, onAdvance, onEdit }: { post: CalendarPost; onAdvance: 
   return (
     <div
       className="bg-surface-low border border-outline/10 p-4 border-l-4"
-      style={{ borderLeftColor: post.pillar_color ?? '#06B6D4' }}
+      style={{ borderLeftColor: post.pillar_color ?? '#adcebd' }}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           {post.pillar_name && (
             <div
               className="text-[10px] uppercase tracking-widest font-bold mb-1"
-              style={{ color: post.pillar_color ?? '#06B6D4' }}
+              style={{ color: post.pillar_color ?? '#adcebd' }}
             >
               {post.pillar_name}
             </div>
@@ -431,9 +431,9 @@ function MonthView({ monthCursor, onMonthChange, posts, onEdit }: {
                     onClick={() => onEdit(p)}
                     className="w-full text-left text-[10px] truncate px-1 py-0.5 hover:brightness-125 transition-all"
                     style={{
-                      background: `${p.pillar_color ?? '#06B6D4'}25`,
-                      color: p.pillar_color ?? '#06B6D4',
-                      borderLeft: `2px solid ${p.pillar_color ?? '#06B6D4'}`,
+                      background: `${p.pillar_color ?? '#adcebd'}25`,
+                      color: p.pillar_color ?? '#adcebd',
+                      borderLeft: `2px solid ${p.pillar_color ?? '#adcebd'}`,
                     }}
                     title={`${p.content_type ?? 'post'}: ${p.hook ?? ''}`}
                   >

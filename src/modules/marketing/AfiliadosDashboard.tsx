@@ -76,7 +76,7 @@ export function AfiliadosDashboard() {
           <button onClick={() => setShowLeaderboard(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-[#F59E0B]/40 text-[#F59E0B] hover:bg-[#F59E0B]/10">
             <Award className="w-4 h-4" /> Leaderboard
           </button>
-          <button onClick={() => setShowNewForm(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#F59E0B] text-[#0A0F1E] font-medium hover:bg-[#F59E0B]/90">
+          <button onClick={() => setShowNewForm(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#F59E0B] text-surface font-medium hover:bg-[#F59E0B]/90">
             <Plus className="w-4 h-4" /> Novo afiliado
           </button>
           <button onClick={refresh} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-outline/10 hover:bg-surface-highest">
@@ -88,7 +88,7 @@ export function AfiliadosDashboard() {
       {stats && (
         <>
           <div className="grid grid-cols-4 gap-3 mb-3">
-            <StatCard label="Afiliados" value={String(stats.total_affiliates)} color="#06B6D4" />
+            <StatCard label="Afiliados" value={String(stats.total_affiliates)} color="#adcebd" />
             <StatCard label="Com vendas" value={String(stats.with_sales)} color="#10B981" />
             <StatCard label="Vendas totais" value={String(stats.sales_total)} color="#8B5CF6" />
             <StatCard label="Receita gerada" value={brl(stats.commission_total_cents * 100 / 30)} color="#F59E0B" />
@@ -194,7 +194,7 @@ function AffiliateCard({ a, onRequestPayout, onChanged }: { a: DashRow; onReques
       </div>
 
       <div className="grid grid-cols-4 gap-2 mt-3 mb-3">
-        <MiniStat label="Vendas" value={String(a.total_sales ?? 0)} color="#06B6D4" />
+        <MiniStat label="Vendas" value={String(a.total_sales ?? 0)} color="#adcebd" />
         <MiniStat label="Comissão total" value={brl(a.total_commission_cents)} color="#F59E0B" />
         <MiniStat label="Já pago" value={brl(a.commission_paid_total_cents)} color="#10B981" />
         <MiniStat label="A pagar" value={brl(a.commission_due_cents)} color={a.commission_due_cents > 0 ? '#EF4444' : '#6B7280'} />
@@ -202,7 +202,7 @@ function AffiliateCard({ a, onRequestPayout, onChanged }: { a: DashRow; onReques
 
       <div className="flex items-center gap-2 pt-2 border-t border-outline/10 flex-wrap">
         <button onClick={handleCopyLink} disabled={loadingLink}
-          className="flex items-center gap-1 text-xs bg-[#F59E0B] text-[#0A0F1E] font-medium px-3 py-1.5 hover:bg-[#F59E0B]/90 disabled:opacity-50">
+          className="flex items-center gap-1 text-xs bg-[#F59E0B] text-surface font-medium px-3 py-1.5 hover:bg-[#F59E0B]/90 disabled:opacity-50">
           {loadingLink ? <Loader2 className="w-3 h-3 animate-spin" /> : copied ? <Check className="w-3 h-3" /> : <LinkIcon className="w-3 h-3" />}
           {copied ? 'Link copiado!' : 'Copiar link Hotmart'}
         </button>
@@ -281,7 +281,7 @@ function NewAffiliateModal({ onClose, onSaved }: { onClose: () => void; onSaved:
         </div>
       </div>
       <div className="flex items-center gap-2 mt-5">
-        <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#F59E0B] text-[#0A0F1E] font-medium hover:bg-[#F59E0B]/90 text-sm disabled:opacity-50">
+        <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#F59E0B] text-surface font-medium hover:bg-[#F59E0B]/90 text-sm disabled:opacity-50">
           {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Cadastrar
         </button>
         <button onClick={onClose} className="px-4 py-2 border border-outline/10 text-on-surface-variant hover:bg-surface-highest text-sm">Cancelar</button>
@@ -356,7 +356,7 @@ function PayoutModal({ affiliate, onClose, onSaved }: { affiliate: DashRow; onCl
       )}
 
       <div className="flex items-center gap-2 mt-5">
-        <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#10B981] text-[#0A0F1E] font-medium hover:bg-[#10B981]/90 text-sm disabled:opacity-50">
+        <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#10B981] text-surface font-medium hover:bg-[#10B981]/90 text-sm disabled:opacity-50">
           {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <DollarSign className="w-4 h-4" />} Registrar pagamento
         </button>
         <button onClick={onClose} className="px-4 py-2 border border-outline/10 text-on-surface-variant hover:bg-surface-highest text-sm">Cancelar</button>

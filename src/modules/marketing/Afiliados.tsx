@@ -67,7 +67,7 @@ export function Afiliados() {
 
       {/* Stats */}
       <div className="grid grid-cols-5 gap-3 mb-6">
-        <StatCard label="Total" value={stats.total} color="#06B6D4" />
+        <StatCard label="Total" value={stats.total} color="#adcebd" />
         <StatCard label="Pendentes" value={stats.pending} color="#F59E0B" />
         <StatCard label="Ativos" value={stats.active} color="#10B981" />
         <StatCard label="Vendas" value={stats.sales} color="#8B5CF6" />

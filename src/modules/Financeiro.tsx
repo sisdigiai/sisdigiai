@@ -9,6 +9,7 @@ import {
   CategoryScale, LinearScale, BarElement, Tooltip, Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import PageHeader from '../components/PageHeader';
 import {
   financeStore,
   CATEGORY_LABELS, CATEGORY_COLORS,
@@ -45,13 +46,12 @@ export default function Financeiro() {
   const [tab, setTab] = useState<TabId>('dashboard');
 
   return (
-    <div className="max-w-7xl mx-auto p-8">
-      <header className="mb-8">
-        <h1 className="text-3xl font-serif font-bold">Financeiro</h1>
-        <p className="text-muted mt-1">
-          Investimento real da DigiAI — segmentado por produto, categoria e vendor.
-        </p>
-
+    <div className="max-w-6xl mx-auto p-8">
+      <PageHeader
+        eyebrow="Investimento Real"
+        title="Financeiro"
+        subtitle="Investimento real da DigiAI — segmentado por produto, categoria e vendor."
+      >
         <nav className="flex gap-1 border-b border-outline/10 mt-6">
           {TABS.map((t) => {
             const Icon = t.icon;
@@ -70,7 +70,7 @@ export default function Financeiro() {
             );
           })}
         </nav>
-      </header>
+      </PageHeader>
 
       <section>
         {tab === 'dashboard' && <DashboardTab />}
@@ -223,10 +223,10 @@ function DashboardTab() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <KpiCard label={`Total Investido${filterProduct !== 'all' ? '' : ' (geral)'}`} value={brl(total12m)} icon={<DollarSign size={20} />} color="text-blue-400" />
-        <KpiCard label="Lançamentos" value={String(expenses.length)} sub="despesas registradas" icon={<TrendingDown size={20} />} color="text-cyan-400" />
-        <KpiCard label="Burn Rate (média)" value={brl(burnRate3m)} sub="/mês" icon={<BarChart3 size={20} />} color="text-orange-400" />
-        <KpiCard label="Subscriptions ativas" value={brl(monthlySubsTotal)} sub={`${activeSubs.length} serviços`} icon={<Repeat size={20} />} color="text-purple-400" />
+        <KpiCard label={`Total Investido${filterProduct !== 'all' ? '' : ' (geral)'}`} value={brl(total12m)} icon={<DollarSign size={20} />} color="text-secondary" />
+        <KpiCard label="Lançamentos" value={String(expenses.length)} sub="despesas registradas" icon={<TrendingDown size={20} />} color="text-secondary" />
+        <KpiCard label="Burn Rate (média)" value={brl(burnRate3m)} sub="/mês" icon={<BarChart3 size={20} />} color="text-secondary" />
+        <KpiCard label="Subscriptions ativas" value={brl(monthlySubsTotal)} sub={`${activeSubs.length} serviços`} icon={<Repeat size={20} />} color="text-secondary" />
       </div>
 
       {/* Stacked bar chart */}

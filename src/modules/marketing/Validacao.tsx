@@ -121,7 +121,7 @@ export function Validacao() {
             <StatCard
               label="Compradores únicos"
               value={String(stats.unique_buyers)}
-              color="#06B6D4"
+              color="#adcebd"
               icon={<Users className="w-3.5 h-3.5" />}
             />
             <StatCard
@@ -215,12 +215,12 @@ export function Validacao() {
                   <div
                     key={p.id}
                     className="bg-surface-low border border-outline/10 p-3 flex items-center gap-3 border-l-4"
-                    style={{ borderLeftColor: p.pillar_color ?? '#06B6D4' }}
+                    style={{ borderLeftColor: p.pillar_color ?? '#adcebd' }}
                   >
                     <div className="text-2xl font-bold text-muted w-8 text-center">{i + 1}</div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-muted mb-1">
-                        <span style={{ color: p.pillar_color ?? '#06B6D4' }}>{p.pillar_name}</span>
+                        <span style={{ color: p.pillar_color ?? '#adcebd' }}>{p.pillar_name}</span>
                         <span>·</span>
                         <span>{dateBR(p.scheduled_date)}</span>
                         {p.content_type && <><span>·</span><span>{p.content_type}</span></>}

@@ -75,12 +75,12 @@ export function MateriaisAfiliados() {
       ) : (
         <div className="space-y-3">
           {filtered.map(m => (
-            <div key={m.id} className="bg-surface-low border border-outline/10 p-4 border-l-4" style={{ borderLeftColor: m.pillar_color ?? '#06B6D4' }}>
+            <div key={m.id} className="bg-surface-low border border-outline/10 p-4 border-l-4" style={{ borderLeftColor: m.pillar_color ?? '#adcebd' }}>
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-[10px] uppercase tracking-widest font-bold text-muted">{TYPE_LABELS[m.type] ?? m.type}</span>
-                    {m.pillar_name && <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: m.pillar_color ?? '#06B6D4' }}>· {m.pillar_name}</span>}
+                    {m.pillar_name && <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: m.pillar_color ?? '#adcebd' }}>· {m.pillar_name}</span>}
                   </div>
                   <h3 className="font-medium">{m.title}</h3>
                   {m.description && <p className="text-xs text-on-surface-variant mt-1">{m.description}</p>}

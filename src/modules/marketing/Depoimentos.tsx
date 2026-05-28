@@ -8,7 +8,7 @@ type Stats = NonNullable<Awaited<ReturnType<typeof marketingStore.getTestimonial
 const STATUS_COLOR: Record<string, string> = {
   pending: '#F59E0B',
   approved: '#10B981',
-  used: '#06B6D4',
+  used: '#adcebd',
   rejected: '#6B7280',
   spam: '#EF4444',
 };
@@ -237,7 +237,7 @@ function TestimonialCard({ t, busy, onApprove, onReject, onSpam, onPromote }: {
         {t.status === 'pending' && (
           <>
             <button onClick={onApprove} disabled={busy}
-              className="flex items-center gap-1 text-xs bg-[#10B981] text-[#0A0F1E] font-medium px-3 py-1.5 hover:bg-[#10B981]/90 disabled:opacity-50">
+              className="flex items-center gap-1 text-xs bg-[#10B981] text-surface font-medium px-3 py-1.5 hover:bg-[#10B981]/90 disabled:opacity-50">
               {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />} Aprovar
             </button>
             <button onClick={onReject} disabled={busy}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FileText, BookOpen, ChevronRight } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 
 type Categoria = 'fundacao' | 'empresa' | 'portfolio' | 'produtos' | 'comercial' | 'marketing' | 'financeiro' | 'operacao' | 'roadmap' | 'governanca';
 
@@ -89,12 +90,13 @@ export default function Biblioteca() {
   const grupos = [...new Set(docs.map(d => d.categoria))];
 
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight font-serif">Biblioteca Central</h1>
-        <p className="text-on-surface-variant mt-1">{DOCS.length} documentos · repositório canônico: <span className="font-mono text-muted">D:\projetos\docs\digiai\docs\</span></p>
-      </div>
-
+    <div className="p-8 max-w-6xl mx-auto">
+      <PageHeader
+        eyebrow="Acervo Canônico"
+        title="Biblioteca Central"
+        subtitle={<>{DOCS.length} documentos · repositório canônico: <span className="font-mono text-muted">D:\projetos\docs\digiai\docs\</span></>}
+      />
+      <div className="space-y-6">
       <div className="bg-secondary-container/40 border border-secondary/40 px-4 py-3 flex items-start gap-3">
         <BookOpen className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
         <div className="text-sm text-on-surface-variant">
@@ -149,6 +151,7 @@ export default function Biblioteca() {
             </div>
           );
         })}
+      </div>
       </div>
     </div>
   );

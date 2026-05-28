@@ -83,7 +83,7 @@ export function Comunidade() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#F59E0B] text-[#0A0F1E] font-medium hover:bg-[#F59E0B]/90">
+          <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#F59E0B] text-surface font-medium hover:bg-[#F59E0B]/90">
             <Plus className="w-4 h-4" /> Adicionar manual
           </button>
           <button onClick={refresh} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-outline/10 hover:bg-surface-highest">
@@ -95,7 +95,7 @@ export function Comunidade() {
       {/* Stats */}
       {stats && (
         <div className="grid grid-cols-4 gap-3 mb-3">
-          <StatCard label="Total membros" value={String(stats.total)} color="#06B6D4" icon={<Users className="w-3.5 h-3.5" />} />
+          <StatCard label="Total membros" value={String(stats.total)} color="#adcebd" icon={<Users className="w-3.5 h-3.5" />} />
           <StatCard label="Ativos" value={String(stats.active)} color="#10B981" />
           <StatCard label="VIPs" value={String(stats.vip)} color="#F59E0B" icon={<Crown className="w-3.5 h-3.5" />} />
           <StatCard label="Novos 7d" value={String(stats.new_last_7d)} color="#8B5CF6" />
@@ -190,7 +190,7 @@ function MemberCard({ m, busy, onPromoteVip, onSetActive, onSetInactive, onBlock
           <div className="text-[10px] text-muted">
             Comprou em {dateBR(m.joined_at)}
             {m.hotmart_value_cents != null && ` · ${brl(m.hotmart_value_cents)}`}
-            {m.pillar_code && <> · veio do pilar <b style={{ color: m.pillar_color ?? '#06B6D4' }}>{m.pillar_name}</b></>}
+            {m.pillar_code && <> · veio do pilar <b style={{ color: m.pillar_color ?? '#adcebd' }}>{m.pillar_name}</b></>}
             {m.attributed_post_hook && <> · post: "{m.attributed_post_hook.slice(0, 40)}..."</>}
             {m.city && ` · ${m.city}/${m.state}`}
           </div>
@@ -267,7 +267,7 @@ function AddMemberModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
           </label>
         </div>
         <div className="flex items-center gap-2 mt-5">
-          <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#F59E0B] text-[#0A0F1E] font-medium hover:bg-[#F59E0B]/90 text-sm disabled:opacity-50">
+          <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#F59E0B] text-surface font-medium hover:bg-[#F59E0B]/90 text-sm disabled:opacity-50">
             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Adicionar
           </button>
           <button onClick={onClose} className="px-4 py-2 border border-outline/10 text-on-surface-variant hover:bg-surface-highest text-sm">Cancelar</button>

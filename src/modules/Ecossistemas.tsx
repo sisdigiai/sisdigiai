@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ExternalLink, Boxes, Globe } from 'lucide-react';
+import { ExternalLink, Globe } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 import { companyStore } from '../lib/companyStore';
 import type { DigitalAsset } from '../lib/supabase';
 
@@ -39,17 +40,18 @@ export default function Ecossistemas() {
   const orderedKeys = Object.keys(groups).sort((a, b) => groups[b].length - groups[a].length);
 
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3 font-serif">
-          <Boxes className="w-7 h-7 text-secondary" /> Ecossistemas
-        </h1>
-        <p className="text-on-surface-variant mt-1">
-          {assets === null ? 'Carregando…' : `${sites.length} apps · ${ativos} ativos`} · cada ecossistema tem banco, auth e deploy próprios{' '}
-          <span className="font-mono text-muted">(ADR-0029)</span>
-        </p>
-      </div>
-
+    <div className="p-8 max-w-6xl mx-auto">
+      <PageHeader
+        eyebrow="Mapa de apps"
+        title="Ecossistemas"
+        subtitle={
+          <>
+            {assets === null ? 'Carregando…' : `${sites.length} apps · ${ativos} ativos`} · cada ecossistema tem banco, auth e deploy próprios{' '}
+            <span className="font-mono text-muted">(ADR-0029)</span>
+          </>
+        }
+      />
+      <div className="space-y-6">
       {assets === null && <div className="text-sm text-muted">Carregando ecossistemas do banco…</div>}
       {assets !== null && sites.length === 0 && (
         <div className="text-sm text-muted">Nenhum app registrado em ativos digitais.</div>
@@ -99,6 +101,7 @@ export default function Ecossistemas() {
       <div className="text-[11px] text-muted border-t border-outline/10 pt-4">
         Fonte: <span className="font-mono">company.digital_assets</span> (vivo). Monitoramento de uptime/health real
         via UptimeRobot é pendência (R-016).
+      </div>
       </div>
     </div>
   );

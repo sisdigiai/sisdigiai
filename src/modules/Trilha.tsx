@@ -10,6 +10,7 @@ import { supabase } from '../lib/supabase';
 import { realtimeStore } from '../lib/realtimeStore';
 import RoadmapCalendar from './RoadmapCalendar';
 import RoadmapHistorico from './RoadmapHistorico';
+import PageHeader from '../components/PageHeader';
 
 const TRACK_INFO: Record<Track, { nome: string; descricao: string; cor: string; badge: string }> = {
   A: {
@@ -129,7 +130,7 @@ export default function Trilha() {
 
   if (loading) {
     return (
-      <div className="p-8 max-w-5xl mx-auto">
+      <div className="p-8 max-w-6xl mx-auto">
         <div className="text-muted text-sm">Carregando Roadmap...</div>
       </div>
     );
@@ -137,7 +138,7 @@ export default function Trilha() {
 
   if (phases.length === 0) {
     return (
-      <div className="p-8 max-w-5xl mx-auto">
+      <div className="p-8 max-w-6xl mx-auto">
         <div className="bg-amber-500/10 border border-amber-500/30 p-5">
           <div className="text-amber-400 font-semibold mb-2">Roadmap sem dados</div>
           <p className="text-sm text-on-surface-variant">
@@ -149,21 +150,23 @@ export default function Trilha() {
   }
 
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight font-serif">Roadmap — Do Zero aos Milhões</h1>
-          <p className="text-on-surface-variant mt-1">9 fases · 3 tracks paralelos · Playbook Unicórnio Adaptado · calendário 45d seed</p>
-        </div>
-        <button
-          onClick={loadAll}
-          className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface transition-colors"
-          title="Recarregar do Supabase"
-        >
-          <RefreshCw size={18} />
-        </button>
-      </div>
+    <div className="p-8 max-w-6xl mx-auto">
+      <PageHeader
+        eyebrow="Plano Mestre"
+        title="Roadmap — Do Zero aos Milhões"
+        subtitle="9 fases · 3 tracks paralelos · Playbook Unicórnio Adaptado · calendário 45d seed"
+        actions={
+          <button
+            onClick={loadAll}
+            className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface transition-colors"
+            title="Recarregar do Supabase"
+          >
+            <RefreshCw size={18} />
+          </button>
+        }
+      />
 
+      <div className="space-y-6">
       {/* Abas de visualização */}
       <div className="flex gap-1 border-b border-outline/10">
         <button
@@ -532,6 +535,7 @@ export default function Trilha() {
       </div>
       </>
       )}
+      </div>
     </div>
   );
 }

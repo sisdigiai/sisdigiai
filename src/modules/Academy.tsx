@@ -36,6 +36,7 @@ import {
   type AcademyWorkspace,
 } from '../lib/academyStore';
 import { companyStore } from '../lib/companyStore';
+import PageHeader from '../components/PageHeader';
 import { TravasBanner } from './TravasMarketing';
 import { backlogStore } from '../lib/backlogStore';
 import { decisionsStore } from '../lib/decisionsStore';
@@ -403,48 +404,48 @@ export default function Academy() {
   };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-8">
-      <header className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <BookOpen className="w-6 h-6 text-secondary" />
-            <h1 className="text-3xl font-serif font-bold tracking-tight">Academy</h1>
-          </div>
-          <p className="text-on-surface-variant max-w-3xl">
+    <div className="p-8 max-w-6xl mx-auto">
+      <PageHeader
+        eyebrow="Educação"
+        title="Academy"
+        subtitle={
+          <>
             Base operacional dos produtos digitais do Academy: oferta, assets, PDF final, dados de criacao e cenarios de venda.
-          </p>
-          <p className="text-xs font-mono text-muted mt-2">
-            Atualizado em {new Date(workspace.updated_at).toLocaleString('pt-BR')}
-          </p>
-        </div>
+            <span className="block text-xs font-mono text-muted mt-2">
+              Atualizado em {new Date(workspace.updated_at).toLocaleString('pt-BR')}
+            </span>
+          </>
+        }
+        actions={
+          <>
+            <span className={`px-3 py-1.5 rounded-full text-xs font-medium border flex items-center gap-2 ${
+              academyStore.isOnline()
+                ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300'
+                : 'border-amber-400/30 bg-amber-400/10 text-amber-300'
+            }`}>
+              {academyStore.isOnline() ? <Cloud size={14} /> : <HardDrive size={14} />}
+              {academyStore.isOnline() ? 'Academy pronto para Supabase' : 'Academy em fallback local'}
+            </span>
+            <button onClick={load} className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface" title="Recarregar">
+              <RefreshCw size={16} />
+            </button>
+            <button
+              onClick={() => academyStore.downloadExport('json')}
+              className="px-3 py-2 bg-surface-high hover:bg-surface-highest text-sm flex items-center gap-2"
+            >
+              <Download size={14} /> JSON
+            </button>
+            <button
+              onClick={() => academyStore.downloadExport('md')}
+              className="px-3 py-2 bg-secondary hover:bg-secondary/90 text-sm flex items-center gap-2"
+            >
+              <Download size={14} /> Markdown
+            </button>
+          </>
+        }
+      />
 
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className={`px-3 py-1.5 rounded-full text-xs font-medium border flex items-center gap-2 ${
-            academyStore.isOnline()
-              ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300'
-              : 'border-amber-400/30 bg-amber-400/10 text-amber-300'
-          }`}>
-            {academyStore.isOnline() ? <Cloud size={14} /> : <HardDrive size={14} />}
-            {academyStore.isOnline() ? 'Academy pronto para Supabase' : 'Academy em fallback local'}
-          </span>
-          <button onClick={load} className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface" title="Recarregar">
-            <RefreshCw size={16} />
-          </button>
-          <button
-            onClick={() => academyStore.downloadExport('json')}
-            className="px-3 py-2 bg-surface-high hover:bg-surface-highest text-sm flex items-center gap-2"
-          >
-            <Download size={14} /> JSON
-          </button>
-          <button
-            onClick={() => academyStore.downloadExport('md')}
-            className="px-3 py-2 bg-secondary hover:bg-secondary/90 text-sm flex items-center gap-2"
-          >
-            <Download size={14} /> Markdown
-          </button>
-        </div>
-      </header>
-
+      <div className="space-y-8">
       <TravasBanner />
 
       {saveMessage && (
@@ -1115,6 +1116,7 @@ export default function Academy() {
           ))}
         </div>
       </section>
+      </div>
     </div>
   );
 }

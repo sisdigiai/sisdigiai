@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
+import PageHeader from '../components/PageHeader';
 import { TravasBanner } from './TravasMarketing';
 import {
   Activity,
@@ -104,37 +105,38 @@ export default function Funil() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-8 space-y-7">
-      <header className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <div className="flex items-center gap-3">
-            <Flame className="w-7 h-7 text-secondary" />
-            <h1 className="text-3xl font-serif font-bold tracking-tight">Engenharia de Funil OSI</h1>
-          </div>
-          <p className="text-on-surface-variant mt-2 max-w-4xl">
+    <div className="max-w-6xl mx-auto p-8">
+      <PageHeader
+        eyebrow="Aquisição & Conversão"
+        title="Engenharia de Funil OSI"
+        subtitle={
+          <>
             Controle vivo da isca paga Otica Sem Improviso, da esteira de guias e da ponte para o ecossistema de apps para oticas.
-          </p>
-          <div className="text-xs font-mono text-muted mt-2">
-            Atualizado em {new Date(workspace.updatedAt).toLocaleString('pt-BR')} · fonte local do app
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setWorkspace(funnelStore.getWorkspace())}
-            className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface"
-            title="Recarregar"
-          >
-            <RefreshCw size={18} />
-          </button>
-          <button
-            onClick={reset}
-            className="px-3 py-2 bg-surface-high hover:bg-surface-highest text-sm text-on-surface-variant"
-          >
-            Reset
-          </button>
-        </div>
-      </header>
+            <span className="block text-xs font-mono text-muted mt-2">
+              Atualizado em {new Date(workspace.updatedAt).toLocaleString('pt-BR')} · fonte local do app
+            </span>
+          </>
+        }
+        actions={
+          <>
+            <button
+              onClick={() => setWorkspace(funnelStore.getWorkspace())}
+              className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface"
+              title="Recarregar"
+            >
+              <RefreshCw size={18} />
+            </button>
+            <button
+              onClick={reset}
+              className="px-3 py-2 bg-surface-high hover:bg-surface-highest text-sm text-on-surface-variant"
+            >
+              Reset
+            </button>
+          </>
+        }
+      />
 
+      <div className="space-y-7">
       <TravasBanner />
 
       <div className="bg-secondary-container/40 border border-secondary/40 p-5 flex items-start gap-3">
@@ -176,6 +178,7 @@ export default function Funil() {
       {tab === 'guias' && <GuiasTab workspace={workspace} />}
       {tab === 'copys' && <CopysTab />}
       {tab === 'proximos' && <ProximosTab workspace={workspace} updateTaskStatus={updateTaskStatus} />}
+      </div>
     </div>
   );
 }

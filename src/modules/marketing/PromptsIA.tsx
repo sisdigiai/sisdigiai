@@ -18,7 +18,7 @@ const TARGET_LINK: Record<string, string> = {
 };
 
 const CATEGORY_COLOR: Record<string, string> = {
-  text: '#06B6D4', image: '#8B5CF6', video: '#F59E0B', audio: '#10B981', music: '#EC4899',
+  text: '#adcebd', image: '#8B5CF6', video: '#F59E0B', audio: '#10B981', music: '#EC4899',
 };
 
 export function PromptsIA() {
@@ -135,7 +135,7 @@ export function PromptsIA() {
           {/* Lista */}
           <div className="space-y-2">
             {filtered.map(t => {
-              const color = CATEGORY_COLOR[t.category] ?? '#06B6D4';
+              const color = CATEGORY_COLOR[t.category] ?? '#adcebd';
               return (
                 <button
                   key={t.id}

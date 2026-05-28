@@ -1,5 +1,6 @@
 import React from 'react';
 import { Construction } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 
 interface StubProps {
   numero: number;
@@ -10,12 +11,9 @@ interface StubProps {
 
 export function ModuleStub({ numero, nome, descricao, entregaveis }: StubProps) {
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight font-serif">{nome}</h1>
-        <p className="text-on-surface-variant mt-1">Módulo {numero} · em implementação</p>
-      </div>
-
+    <div className="p-8 max-w-6xl mx-auto">
+      <PageHeader eyebrow={`Módulo ${numero}`} title={nome} subtitle={descricao} />
+      <div className="space-y-8">
       <div className="border border-amber-400/20 bg-amber-400/5 p-8 flex flex-col items-center text-center gap-4">
         <Construction className="w-12 h-12 text-amber-400/60" />
         <div>
@@ -34,6 +32,7 @@ export function ModuleStub({ numero, nome, descricao, entregaveis }: StubProps) 
             </div>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );

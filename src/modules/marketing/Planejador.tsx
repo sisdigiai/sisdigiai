@@ -119,7 +119,7 @@ export function Planejador() {
       {scheduledStats && (
         <div className="grid grid-cols-3 gap-3 mb-6">
           <StatCard label="Ideias disponíveis" value={String(scheduledStats.available)} color="#10B981" />
-          <StatCard label="Ideias já agendadas" value={String(scheduledStats.scheduled)} color="#06B6D4" />
+          <StatCard label="Ideias já agendadas" value={String(scheduledStats.scheduled)} color="#adcebd" />
           <StatCard label="Posts planejados (não publicados)" value={String(scheduledStats.planned)} color="#F59E0B" />
         </div>
       )}
