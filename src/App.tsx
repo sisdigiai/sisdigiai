@@ -150,7 +150,7 @@ export default function App() {
         <Menu className="w-5 h-5" />
       </button>
       <Sidebar active={activeModule} onSelect={navigate} mobileOpen={navOpen} onClose={() => setNavOpen(false)} />
-      <main className="flex-1 overflow-y-auto">
+      <main key={activeModule} className="flex-1 overflow-y-auto">
         {renderContent()}
       </main>
       <CommandPalette onNavigate={navigate} />
