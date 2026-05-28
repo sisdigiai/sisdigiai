@@ -3,7 +3,8 @@ import {
   Eye, LayoutGrid, Map, List, Zap, TrendingUp,
   BookOpen, DollarSign, GitBranch, Library, Palette, Building2, Network,
   Compass, Flame, Megaphone, LogOut, Store, Sparkles, Music2, Activity,
-  Camera, Wand2, Boxes, Search, ShieldCheck, Workflow, ChevronDown
+  Camera, Wand2, Boxes, Search, ShieldCheck, Workflow, ChevronDown,
+  GraduationCap, Languages
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
@@ -32,9 +33,16 @@ interface Ecossistema {
 }
 
 // URLs externas dos ecossistemas (override via .env quando aplicavel)
-const ATLAS_URL    = import.meta.env.VITE_ATLAS_URL    || 'https://digiaiatlas.netlify.app';
-const OSI_URL      = import.meta.env.VITE_OSI_URL      || 'https://oticasemimproviso.netlify.app';
-const CLEARIX_HUB_URL = import.meta.env.VITE_CLEARIX_HUB_URL || ''; // ainda nao deployado
+// Verificado online em 2026-05-28 — todos respondendo 200.
+const ATLAS_URL       = import.meta.env.VITE_ATLAS_URL       || 'https://digiaiatlas.netlify.app';
+const OSI_URL         = import.meta.env.VITE_OSI_URL         || 'https://oticasemimproviso.netlify.app';
+const CLEARIX_HUB_URL = import.meta.env.VITE_CLEARIX_HUB_URL || 'https://clearixhub.netlify.app';
+const NEXUS_URL       = import.meta.env.VITE_NEXUS_URL       || 'https://sisnexus.netlify.app';
+const POLAPETIT_URL   = import.meta.env.VITE_POLAPETIT_URL   || 'https://polapetit.netlify.app';
+const PULSO_URL       = import.meta.env.VITE_PULSO_URL       || 'https://pulsoprojects.vercel.app';
+const QUALFOTO_URL    = import.meta.env.VITE_QUALFOTO_URL    || 'https://qualfoto.netlify.app';
+const LUMINA_URL      = import.meta.env.VITE_LUMINA_URL      || 'https://lumina.netlify.app';
+const EASY_URL        = import.meta.env.VITE_EASY_URL        || 'https://easyidiomas.netlify.app';
 
 const operacional: NavItem[] = [
   { id: 'visao',            label: 'Visão',             icon: <Eye className="w-4 h-4" /> },
@@ -56,14 +64,16 @@ const operacional: NavItem[] = [
 // Ecossistemas (links externos — ADR-0029)
 // Ordem: ativos primeiro, depois em_construcao, depois em_concepcao
 const ecossistemas: Ecossistema[] = [
-  { key: 'clearix-hub',  icone: <Boxes    className="w-4 h-4" />, nome: 'Clearix Hub',    url: CLEARIX_HUB_URL || undefined, status: CLEARIX_HUB_URL ? 'ativo' : 'em_construcao' },
-  { key: 'atlas',        icone: <Compass  className="w-4 h-4" />, nome: 'Clearix Atlas',  url: ATLAS_URL,                    status: 'ativo' },
-  { key: 'osi',          icone: <Store    className="w-4 h-4" />, nome: 'OSI',            url: OSI_URL,                      status: 'ativo' },
-  { key: 'polapetit',    icone: <Sparkles className="w-4 h-4" />, nome: 'Polapetit',                                          status: 'em_concepcao' },
-  { key: 'niposchool',   icone: <Music2   className="w-4 h-4" />, nome: 'Nipo School',                                        status: 'em_concepcao' },
-  { key: 'pulsocontrol', icone: <Activity className="w-4 h-4" />, nome: 'Pulso Control',                                      status: 'em_concepcao' },
-  { key: 'qualafoto',    icone: <Camera   className="w-4 h-4" />, nome: 'Qual a Foto',                                        status: 'em_concepcao' },
-  { key: 'lumina',       icone: <Wand2    className="w-4 h-4" />, nome: 'Lumina',                                             status: 'em_concepcao' },
+  { key: 'clearix-hub',  icone: <Boxes        className="w-4 h-4" />, nome: 'Clearix Hub',   url: CLEARIX_HUB_URL, status: 'ativo' },
+  { key: 'atlas',        icone: <Compass      className="w-4 h-4" />, nome: 'Clearix Atlas', url: ATLAS_URL,       status: 'ativo' },
+  { key: 'osi',          icone: <Store        className="w-4 h-4" />, nome: 'OSI',           url: OSI_URL,         status: 'ativo' },
+  { key: 'nexus',        icone: <GraduationCap className="w-4 h-4" />, nome: 'Nexus',        url: NEXUS_URL,       status: 'ativo' },
+  { key: 'pulsocontrol', icone: <Activity     className="w-4 h-4" />, nome: 'Pulso Control', url: PULSO_URL,       status: 'ativo' },
+  { key: 'polapetit',    icone: <Sparkles     className="w-4 h-4" />, nome: 'Polapetit',     url: POLAPETIT_URL,   status: 'ativo' },
+  { key: 'lumina',       icone: <Wand2        className="w-4 h-4" />, nome: 'Lumina',        url: LUMINA_URL,      status: 'ativo' },
+  { key: 'qualafoto',    icone: <Camera       className="w-4 h-4" />, nome: 'Qual a Foto',   url: QUALFOTO_URL,    status: 'ativo' },
+  { key: 'easyidiomas',  icone: <Languages    className="w-4 h-4" />, nome: 'Easy Idiomas',  url: EASY_URL,        status: 'ativo' },
+  { key: 'niposchool',   icone: <Music2       className="w-4 h-4" />, nome: 'Nipo School',                         status: 'em_concepcao' },
 ];
 
 const sistema: NavItem[] = [

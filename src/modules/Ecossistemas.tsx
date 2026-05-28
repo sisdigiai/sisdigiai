@@ -13,6 +13,9 @@ const OWNER_LABEL: Record<string, string> = {
   pulso: 'Pulso Control',
   nexus: 'Nexus',
   lumina: 'Lumina',
+  easyidiomas: 'Easy Idiomas',
+  niposchool: 'Nipo School',
+  qualfoto: 'Qual a Foto',
 };
 
 const STATUS_STYLE: Record<string, { label: string; cls: string }> = {
