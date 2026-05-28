@@ -20,48 +20,48 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0F1E] text-white flex items-center justify-center p-6">
+    <div className="min-h-screen bg-surface text-on-surface flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <Logo variant="horizontal" iconClassName="w-10 h-10" textClassName="text-3xl" className="justify-center" />
-          <div className="mt-3 text-sm text-white/40 font-mono tracking-wider uppercase">Painel Operacional</div>
+          <div className="mt-3 text-[11px] text-secondary font-mono tracking-[0.25em] uppercase">Painel Operacional</div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-8 space-y-5">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-[#2563EB]/20 flex items-center justify-center">
-              <Lock size={18} className="text-[#06B6D4]" />
+        <form onSubmit={handleSubmit} className="bg-surface-container border border-outline/10 p-8 space-y-5">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-secondary-container border border-secondary/40 flex items-center justify-center">
+              <Lock size={18} className="text-secondary" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold">Acesso restrito</h1>
-              <p className="text-xs text-white/50">Apenas usuários cadastrados</p>
+              <h1 className="font-serif text-xl font-semibold text-on-surface">Acesso restrito</h1>
+              <p className="text-xs text-on-surface-variant">Apenas usuários cadastrados</p>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-white/60 mb-1.5">Email</label>
+            <label className="block text-[10px] font-mono uppercase tracking-widest text-muted mb-1.5">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:border-[#06B6D4]"
+              className="w-full bg-surface-lowest border border-outline/30 px-3 py-2.5 text-sm text-on-surface focus:outline-none focus:border-secondary transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-white/60 mb-1.5">Senha</label>
+            <label className="block text-[10px] font-mono uppercase tracking-widest text-muted mb-1.5">Senha</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:border-[#06B6D4]"
+              className="w-full bg-surface-lowest border border-outline/30 px-3 py-2.5 text-sm text-on-surface focus:outline-none focus:border-secondary transition-colors"
             />
           </div>
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2 text-sm text-red-400">
+            <div className="bg-red-500/10 border border-red-500/30 px-3 py-2 text-sm text-red-400">
               {error}
             </div>
           )}
@@ -69,13 +69,13 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading || !email || !password}
-            className="w-full bg-[#2563EB] hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-md py-2.5 font-medium text-sm flex items-center justify-center gap-2 transition-colors"
+            className="w-full bg-secondary text-surface hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed py-2.5 font-semibold text-sm flex items-center justify-center gap-2 transition-colors"
           >
             {loading ? 'Entrando...' : (<><LogIn size={16} /> Entrar</>)}
           </button>
         </form>
 
-        <p className="text-center text-xs text-white/30 mt-6">
+        <p className="text-center text-[10px] font-mono uppercase tracking-widest text-muted mt-6">
           DIGIAI · Fase 0–1 de 8 · Zero aos Milhões
         </p>
       </div>

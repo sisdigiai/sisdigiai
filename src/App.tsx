@@ -153,23 +153,31 @@ export default function App() {
     <div className="flex h-screen bg-surface text-on-surface overflow-hidden">
       <Sidebar active={activeModule} onSelect={navigate} mobileOpen={navOpen} onClose={() => setNavOpen(false)} />
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="shrink-0 z-20 flex items-center gap-3 h-14 px-4 md:px-8 border-b border-outline/10 bg-surface/80 backdrop-blur-md">
-          <button
-            onClick={() => setNavOpen(true)}
-            className="md:hidden p-1.5 -ml-1 text-on-surface-variant hover:text-on-surface hover:bg-surface-highest"
-            aria-label="Abrir menu"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-          <span className="hidden sm:inline text-[10px] font-mono uppercase tracking-[0.2em] text-secondary">Painel</span>
-          <span className="hidden sm:inline text-muted">/</span>
-          <span className="text-sm font-semibold text-on-surface truncate">{MODULE_LABEL[activeModule] ?? 'Visão'}</span>
-          <button
-            onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
-            className="ml-auto hidden md:flex items-center gap-1.5 text-[11px] text-muted border border-outline/30 px-2.5 py-1.5 hover:text-on-surface hover:border-outline/60 transition-colors"
-          >
-            <Search className="w-3.5 h-3.5" /> Buscar <kbd className="font-mono text-[10px] text-muted border border-outline/30 px-1">Ctrl K</kbd>
-          </button>
+        <header className="shrink-0 z-20 border-b border-outline/10 bg-surface/80 backdrop-blur-md">
+          <div className="flex items-center gap-3 px-4 md:px-8 py-3.5">
+            <button
+              onClick={() => setNavOpen(true)}
+              className="md:hidden p-1.5 -ml-1 text-on-surface-variant hover:text-on-surface hover:bg-surface-highest"
+              aria-label="Abrir menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="h-8 w-px bg-secondary/60 shrink-0" />
+              <div className="flex flex-col min-w-0">
+                <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-secondary leading-none mb-1.5">Painel Operacional</span>
+                <h1 className="font-serif text-xl md:text-2xl font-semibold uppercase tracking-tight text-on-surface leading-none truncate">
+                  {MODULE_LABEL[activeModule] ?? 'Visão'}
+                </h1>
+              </div>
+            </div>
+            <button
+              onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
+              className="ml-auto hidden md:flex items-center gap-1.5 text-[11px] text-muted border border-outline/30 px-3 py-2 hover:text-on-surface hover:border-secondary/50 transition-colors"
+            >
+              <Search className="w-3.5 h-3.5" /> Buscar <kbd className="font-mono text-[10px] text-muted border border-outline/30 px-1">Ctrl K</kbd>
+            </button>
+          </div>
         </header>
         <main key={activeModule} className="flex-1 overflow-y-auto">
           {renderContent()}
