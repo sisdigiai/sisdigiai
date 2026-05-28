@@ -32,7 +32,7 @@ export default function Marketing() {
   const [active, setActive] = useState<SubTab>('calendario');
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col max-w-6xl mx-auto w-full">
       <div className="px-8 pt-8">
         <PageHeader
           eyebrow="Distribuição & conteúdo"
