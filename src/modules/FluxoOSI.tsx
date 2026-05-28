@@ -4,6 +4,7 @@ import { academyStore } from '../lib/academyStore';
 import { funnelStore, calculateFunnelSummary } from '../lib/funnelStore';
 import { marketingStore } from '../lib/marketingStore';
 import { TravasBanner } from './TravasMarketing';
+import type { ModuleId } from '../components/Sidebar';
 
 const brl = (v: number | null | undefined) =>
   v == null ? '—' : `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -14,7 +15,7 @@ interface Stage {
   mkt: { posts: number; ideias: number; afiliados: number } | null;
 }
 
-export default function FluxoOSI() {
+export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) => void }) {
   const [s, setS] = useState<Stage>({ produto: null, funil: null, mkt: null });
 
   useEffect(() => {
@@ -77,7 +78,7 @@ export default function FluxoOSI() {
         <Card icon={<BookOpen className="w-3.5 h-3.5" />} etapa="Produto · Academy" titulo={s.produto?.nome || '…'}>
           <Metric label="Preço" value={brl(s.produto?.preco)} />
           <Metric label="Status" value={s.produto?.status || '—'} />
-          <div className="text-[11px] text-white/30 pt-1">Editar em Operacional → Academy</div>
+          <button onClick={() => onNavigate?.('academy')} className="text-[11px] text-[#06B6D4]/70 hover:text-[#06B6D4] pt-1 transition-colors">Abrir Academy →</button>
         </Card>
 
         <Arrow />
@@ -85,7 +86,7 @@ export default function FluxoOSI() {
         <Card icon={<Flame className="w-3.5 h-3.5" />} etapa="Captação · Funil OSI" titulo="Isca paga + esteira">
           <Metric label="Ticket médio" value={s.funil ? brl(s.funil.ticket) : '…'} />
           <Metric label="ROAS microteste" value={s.funil ? s.funil.roas.toFixed(2) : '…'} />
-          <div className="text-[11px] text-white/30 pt-1">Editar em Operacional → Funil OSI</div>
+          <button onClick={() => onNavigate?.('funil')} className="text-[11px] text-[#06B6D4]/70 hover:text-[#06B6D4] pt-1 transition-colors">Abrir Funil OSI →</button>
         </Card>
 
         <Arrow />
@@ -94,18 +95,18 @@ export default function FluxoOSI() {
           <Metric label="Posts no calendário" value={s.mkt ? String(s.mkt.posts) : '…'} />
           <Metric label="Ideias no banco" value={s.mkt ? String(s.mkt.ideias) : '…'} />
           <Metric label="Afiliados" value={s.mkt ? String(s.mkt.afiliados) : '…'} />
-          <div className="text-[11px] text-white/30 pt-1">Editar em Operacional → Marketing</div>
+          <button onClick={() => onNavigate?.('marketing')} className="text-[11px] text-[#06B6D4]/70 hover:text-[#06B6D4] pt-1 transition-colors">Abrir Marketing →</button>
         </Card>
       </div>
 
-      <div className="rounded-2xl border border-[#2563EB]/20 bg-[#2563EB]/[0.06] p-5 flex items-center gap-3">
+      <button onClick={() => onNavigate?.('clearix')} className="w-full text-left rounded-2xl border border-[#2563EB]/20 bg-[#2563EB]/[0.06] hover:bg-[#2563EB]/[0.12] p-5 flex items-center gap-3 transition-colors">
         <Boxes className="w-5 h-5 text-[#06B6D4] shrink-0" />
         <div className="text-sm text-white/70">
           <b className="text-white">Destino: Clearix.</b> Academy/OSI são funil de entrada do ecossistema (decisão 17/04) —
           todo conteúdo do Marketing e toda venda do Funil devem puxar o comprador pro Clearix. É a trava
-          <b className="text-white/85"> "CTA pro Clearix em tudo"</b>.
+          <b className="text-white/85"> "CTA pro Clearix em tudo"</b>. <span className="text-[#06B6D4]">Abrir Central Clearix →</span>
         </div>
-      </div>
+      </button>
 
       <div className="text-[11px] text-white/30 border-t border-white/5 pt-4">
         Fonte viva: <span className="font-mono">academy.products</span> + funil (workspace local) +

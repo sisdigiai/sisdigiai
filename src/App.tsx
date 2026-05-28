@@ -91,7 +91,7 @@ export default function App() {
       case 'ecossistemas': return <Ecossistemas />;
       case 'lista-mestra': return <ListaMestra />;
       case 'travas-marketing': return <TravasMarketing />;
-      case 'fluxo-osi': return <FluxoOSI />;
+      case 'fluxo-osi': return <FluxoOSI onNavigate={setActiveModule} />;
       default: {
         const stub = STUBS[activeModule];
         if (stub) {
