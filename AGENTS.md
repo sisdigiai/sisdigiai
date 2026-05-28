@@ -176,8 +176,10 @@ Roteamento real em `App.tsx` (`activeModule` por estado, não por URL). 16 cases
 
 - [x] ~~Confirmar hospedagem~~ — **Netlify** (`sisdigiai.netlify.app`), confirmado 2026-05-28
 - [x] ~~Migrar `iam.users` para R-013~~ — **feito 2026-05-28** (mig 025: USUUID + wa_bsuid/username/phone_legacy + campos LGPD)
-- [ ] **Deploy** da edge function `health` (R-016) com `--no-verify-jwt` + monitor UptimeRobot
-- [ ] **CSP em produção** validada após deploy (header adicionado em `public/_headers`)
+- [x] ~~Deploy `health` (R-016)~~ — **feito 2026-05-28**, público em `/functions/v1/health` (HTTP 200, checa DB)
+- [x] ~~CSP em produção~~ — **validada 2026-05-28** (app + conexão Supabase OK sob a CSP)
+- [x] ~~hotmart-webhook fail-closed~~ — **deployado 2026-05-28** (GET → 405; ingest só com HOTTOK válido)
+- [ ] Monitor UptimeRobot no `/health` (keyword `"status":"ok"`)
 - [ ] DPO nomeado (Cadastro Empresa → LGPD) — marco pendente
 - [ ] Snapshot financeiro mensal agregado em `company.financial_snapshots` (granular já em `finance.expenses`: 220 lançamentos ativos)
 - [ ] 1ª entrevista feita (Fase 0 do Roadmap — métrica única: 20 entrevistas + 3 cartas de intenção)
