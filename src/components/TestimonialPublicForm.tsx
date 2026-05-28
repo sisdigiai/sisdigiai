@@ -59,14 +59,14 @@ export default function TestimonialPublicForm() {
 
   if (sent) {
     return (
-      <div className="min-h-screen bg-[#0A0F1E] text-white flex items-center justify-center p-6">
+      <div className="min-h-screen bg-surface text-on-surface flex items-center justify-center p-6">
         <div className="max-w-md text-center">
           <CheckCircle2 className="w-16 h-16 text-[#10B981] mx-auto mb-4" />
           <h1 className="text-2xl font-semibold mb-3">Recebemos, valeu demais!</h1>
-          <p className="text-sm text-white/60 mb-2">
+          <p className="text-sm text-on-surface-variant mb-2">
             A Taty lê pessoalmente todos os depoimentos. Se a gente decidir usar o seu como conteúdo, te avisa antes pelo WhatsApp.
           </p>
-          <p className="text-xs text-white/40 mt-6 flex items-center gap-1 justify-center">
+          <p className="text-xs text-muted mt-6 flex items-center gap-1 justify-center">
             <Heart className="w-3 h-3 text-[#EC4899]" /> Ótica Sem Improviso
           </p>
         </div>
@@ -75,15 +75,15 @@ export default function TestimonialPublicForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0F1E] text-white">
+    <div className="min-h-screen bg-surface text-on-surface">
       {/* Header */}
-      <header className="border-b border-white/10 px-6 py-6">
+      <header className="border-b border-outline/10 px-6 py-6">
         <div className="max-w-2xl mx-auto">
-          <div className="text-[10px] uppercase tracking-widest font-bold text-[#06B6D4] mb-1">
+          <div className="text-[10px] uppercase tracking-widest font-bold text-secondary mb-1">
             Ótica Sem Improviso
           </div>
           <h1 className="text-2xl font-semibold">Conta sua história, vendedor</h1>
-          <p className="text-sm text-white/60 mt-2">
+          <p className="text-sm text-on-surface-variant mt-2">
             Aplicou alguma coisa do método e deu certo no balcão? Manda pra Taty.
             Se o seu caso virar conteúdo, a gente te marca antes de publicar.
           </p>
@@ -118,7 +118,7 @@ export default function TestimonialPublicForm() {
           <textarea value={form.story} onChange={e => update('story', e.target.value)} rows={6}
             placeholder="Pode ser direto. Cliente entrou, eu fiz X, conversamos Y, fechamos Z. Sem precisar caprichar — a gente edita depois se publicar."
             className={inputCls + ' resize-none'} required minLength={20} maxLength={4000} />
-          <div className="text-[10px] text-white/30 mt-1 text-right">{form.story.length} / 4000</div>
+          <div className="text-[10px] text-muted mt-1 text-right">{form.story.length} / 4000</div>
         </Field>
 
         <div className="grid grid-cols-2 gap-3">
@@ -130,7 +130,7 @@ export default function TestimonialPublicForm() {
             <div className="flex gap-1 mt-1">
               {[1,2,3,4,5].map(n => (
                 <button key={n} type="button" onClick={() => update('rating', n)}
-                  className={`text-2xl ${n <= form.rating ? 'text-[#F59E0B]' : 'text-white/20 hover:text-white/40'}`}>★</button>
+                  className={`text-2xl ${n <= form.rating ? 'text-[#F59E0B]' : 'text-muted hover:text-muted'}`}>★</button>
               ))}
             </div>
           </Field>
@@ -139,10 +139,10 @@ export default function TestimonialPublicForm() {
         <Field label="WhatsApp pra gente te avisar se publicar (opcional)">
           <input value={form.whatsapp} onChange={e => update('whatsapp', e.target.value)}
             placeholder="Ex: 11 99999-0000" className={inputCls} />
-          <label className="flex items-center gap-2 mt-2 text-xs text-white/60">
+          <label className="flex items-center gap-2 mt-2 text-xs text-on-surface-variant">
             <input type="checkbox" checked={form.whatsapp_consent}
               onChange={e => update('whatsapp_consent', e.target.checked)}
-              className="accent-[#06B6D4]" />
+              className="accent-secondary" />
             Pode me chamar no WhatsApp se decidirem usar meu depoimento
           </label>
         </Field>
@@ -158,16 +158,16 @@ export default function TestimonialPublicForm() {
         </Field>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-sm text-red-300">{error}</div>
+          <div className="bg-red-500/10 border border-red-500/30 p-3 text-sm text-red-300">{error}</div>
         )}
 
         <button type="submit" disabled={sending}
-          className="w-full flex items-center justify-center gap-2 bg-[#06B6D4] text-[#0A0F1E] font-semibold py-3 rounded-lg hover:bg-[#06B6D4]/90 disabled:opacity-50">
+          className="w-full flex items-center justify-center gap-2 bg-secondary text-surface font-semibold py-3 hover:bg-secondary/90 disabled:opacity-50">
           {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           {sending ? 'Enviando...' : 'Enviar depoimento'}
         </button>
 
-        <p className="text-[11px] text-white/30 text-center">
+        <p className="text-[11px] text-muted text-center">
           Seus dados ficam só com a gente. Sem cadastro, sem spam.
         </p>
       </form>
@@ -175,13 +175,13 @@ export default function TestimonialPublicForm() {
   );
 }
 
-const inputCls = 'w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#06B6D4]/50 text-white placeholder:text-white/30';
+const inputCls = 'w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-secondary text-on-surface placeholder:text-muted';
 
 function Field({ label, children, required }: { label: string; children: React.ReactNode; required?: boolean }) {
   return (
     <div>
-      <label className="text-xs text-white/70 block mb-1.5">
-        {label}{required && <span className="text-[#06B6D4]"> *</span>}
+      <label className="text-xs text-on-surface-variant block mb-1.5">
+        {label}{required && <span className="text-secondary"> *</span>}
       </label>
       {children}
     </div>

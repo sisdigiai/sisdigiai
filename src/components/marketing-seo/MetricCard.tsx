@@ -28,20 +28,20 @@ export function MetricCard({ title, icon, period, provider, externalUrl, externa
   }
 
   return (
-    <div className="bg-white/[0.02] border border-white/5 rounded-xl p-5 flex flex-col gap-4">
+    <div className="bg-surface-low border border-outline/10 p-5 flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-[#06B6D4] shrink-0">{icon}</span>
+          <span className="text-secondary shrink-0">{icon}</span>
           <div className="min-w-0">
-            <div className="text-sm font-semibold text-white truncate">{title}</div>
-            {period && <div className="text-[10px] font-mono uppercase tracking-widest text-white/30">{period}</div>}
+            <div className="text-sm font-semibold text-on-surface truncate">{title}</div>
+            {period && <div className="text-[10px] font-mono uppercase tracking-widest text-muted">{period}</div>}
           </div>
         </div>
         {provider && (
           <button
             onClick={handleSync}
             disabled={syncing}
-            className="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-white/60 hover:text-white hover:bg-white/5 border border-white/10 transition-colors disabled:opacity-50"
+            className="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-highest border border-outline/10 transition-colors disabled:opacity-50"
             aria-label="Sincronizar agora"
           >
             {syncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
@@ -52,28 +52,28 @@ export function MetricCard({ title, icon, period, provider, externalUrl, externa
 
       <div className="flex-1 min-h-[120px]">
         {status && !status.configured && (
-          <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 p-3 mb-3 text-xs">
+          <div className="bg-amber-500/10 border border-amber-500/30 p-3 mb-3 text-xs">
             <div className="flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <div className="min-w-0">
                 <div className="text-amber-200 font-medium">Credenciais não configuradas</div>
-                <div className="text-white/60 mt-1">{status.message ?? 'Cadastre as credenciais para começar.'}</div>
+                <div className="text-on-surface-variant mt-1">{status.message ?? 'Cadastre as credenciais para começar.'}</div>
                 {status.doc && (
-                  <code className="block mt-2 text-[10px] font-mono text-white/40 break-all">{status.doc}</code>
+                  <code className="block mt-2 text-[10px] font-mono text-muted break-all">{status.doc}</code>
                 )}
               </div>
             </div>
           </div>
         )}
         {status && status.ok && status.configured && (
-          <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/30 p-3 mb-3 text-xs">
+          <div className="bg-emerald-500/10 border border-emerald-500/30 p-3 mb-3 text-xs">
             <div className="flex items-start gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
               <div className="min-w-0">
                 <div className="text-emerald-200 font-medium">
                   {status.todo ? 'Credenciais OK · stub respondendo' : 'Sincronizado agora'}
                 </div>
-                <div className="text-white/60 mt-1">
+                <div className="text-on-surface-variant mt-1">
                   {status.todo
                     ? status.todo
                     : typeof status.rows_written === 'number'
@@ -87,12 +87,12 @@ export function MetricCard({ title, icon, period, provider, externalUrl, externa
           </div>
         )}
         {status && status.error && (
-          <div className="rounded-lg bg-red-500/10 border border-red-500/30 p-3 mb-3 text-xs">
+          <div className="bg-red-500/10 border border-red-500/30 p-3 mb-3 text-xs">
             <div className="flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
               <div className="min-w-0">
                 <div className="text-red-200 font-medium">Erro ao sincronizar</div>
-                <div className="text-white/60 mt-1 font-mono break-all">{status.error}</div>
+                <div className="text-on-surface-variant mt-1 font-mono break-all">{status.error}</div>
               </div>
             </div>
           </div>
@@ -101,12 +101,12 @@ export function MetricCard({ title, icon, period, provider, externalUrl, externa
       </div>
 
       {externalUrl && (
-        <div className="pt-3 border-t border-white/5">
+        <div className="pt-3 border-t border-outline/10">
           <a
             href={externalUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors"
+            className="flex items-center gap-1.5 text-xs text-muted hover:text-on-surface-variant transition-colors"
           >
             <ExternalLink className="w-3 h-3" />
             <span>{externalLabel ?? 'Abrir painel externo'}</span>
@@ -119,18 +119,18 @@ export function MetricCard({ title, icon, period, provider, externalUrl, externa
 
 export function MetricStat({ label, value, hint }: { label: string; value: React.ReactNode; hint?: string }) {
   return (
-    <div className="bg-white/[0.02] rounded-lg p-3">
-      <div className="text-[10px] font-mono uppercase tracking-widest text-white/40">{label}</div>
-      <div className="text-xl font-semibold text-white tabular-nums mt-1">{value}</div>
-      {hint && <div className="text-[10px] text-white/30 mt-0.5">{hint}</div>}
+    <div className="bg-surface-low p-3">
+      <div className="text-[10px] font-mono uppercase tracking-widest text-muted">{label}</div>
+      <div className="text-xl font-semibold text-on-surface tabular-nums mt-1">{value}</div>
+      {hint && <div className="text-[10px] text-muted mt-0.5">{hint}</div>}
     </div>
   );
 }
 
 export function EmptyHint({ children }: { children: React.ReactNode }) {
   return (
-    <div className="text-xs text-white/40 italic flex items-center gap-2 py-4">
-      <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+    <div className="text-xs text-muted italic flex items-center gap-2 py-4">
+      <div className="w-1.5 h-1.5 rounded-full bg-surface-high" />
       {children}
     </div>
   );

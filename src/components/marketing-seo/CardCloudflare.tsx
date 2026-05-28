@@ -32,7 +32,7 @@ export function CardCloudflare() {
       onAfterSync={refetch}
     >
       {!hasAny ? (
-        <EmptyHint>Clique <strong className="text-white/70">Sincronizar</strong> para carregar. Cloudflare consolida o tráfego com ~1h de atraso.</EmptyHint>
+        <EmptyHint>Clique <strong className="text-on-surface-variant">Sincronizar</strong> para carregar. Cloudflare consolida o tráfego com ~1h de atraso.</EmptyHint>
       ) : (
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-2">
@@ -42,18 +42,18 @@ export function CardCloudflare() {
             <MetricStat label="Threats bloqueados" value={threats7d ?? 0} />
           </div>
           {sslStatus && (
-            <div className="text-xs text-white/60">
+            <div className="text-xs text-on-surface-variant">
               SSL: <span className="font-mono text-emerald-300">{sslStatus}</span>
             </div>
           )}
           {topCountries.length > 0 && (
             <div>
-              <div className="text-[10px] font-mono uppercase tracking-widest text-white/40 mb-1.5">Top countries</div>
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted mb-1.5">Top countries</div>
               <ul className="space-y-1">
                 {topCountries.map(c => (
                   <li key={c.id} className="flex items-center justify-between text-xs">
-                    <span className="text-white/70 font-mono">{c.metric_key}</span>
-                    <span className="font-mono tabular-nums text-white/50">{c.value_numeric}</span>
+                    <span className="text-on-surface-variant font-mono">{c.metric_key}</span>
+                    <span className="font-mono tabular-nums text-on-surface-variant">{c.value_numeric}</span>
                   </li>
                 ))}
               </ul>

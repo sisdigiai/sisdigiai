@@ -21,7 +21,7 @@ export function CardIndexNow() {
     >
       {!hasAny ? (
         <EmptyHint>
-          Histórico vazio. IndexNow ativo via chave <code className="text-white/60 font-mono text-[10px]">6aa032cad330bfd49b32be85843c253c</code>;
+          Histórico vazio. IndexNow ativo via chave <code className="text-on-surface-variant font-mono text-[10px]">6aa032cad330bfd49b32be85843c253c</code>;
           eventos são populados pelo workflow GitHub no push.
         </EmptyHint>
       ) : (

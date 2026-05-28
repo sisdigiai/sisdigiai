@@ -24,14 +24,14 @@ export function useToast() {
 }
 
 const icons: Record<ToastKind, React.ReactNode> = {
-  info: <Info size={18} className="text-[#06B6D4]" />,
+  info: <Info size={18} className="text-secondary" />,
   success: <CheckCircle2 size={18} className="text-emerald-400" />,
   warning: <AlertCircle size={18} className="text-amber-400" />,
   realtime: <Zap size={18} className="text-fuchsia-400" />,
 };
 
 const colors: Record<ToastKind, string> = {
-  info: 'border-[#06B6D4]/30 bg-[#06B6D4]/5',
+  info: 'border-secondary/40 bg-secondary/15',
   success: 'border-emerald-500/30 bg-emerald-500/5',
   warning: 'border-amber-500/30 bg-amber-500/5',
   realtime: 'border-fuchsia-500/30 bg-fuchsia-500/5',
@@ -60,17 +60,17 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`rounded-xl border backdrop-blur p-3 shadow-lg flex items-start gap-3 animate-slide-in ${colors[t.kind]}`}
+            className={`border backdrop-blur p-3 shadow-lg flex items-start gap-3 animate-slide-in ${colors[t.kind]}`}
             style={{ animation: 'slideIn 0.25s ease-out' }}
           >
             <div className="mt-0.5 shrink-0">{icons[t.kind]}</div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-white">{t.title}</div>
-              {t.description && <div className="text-xs text-white/60 mt-0.5">{t.description}</div>}
+              <div className="text-sm font-medium text-on-surface">{t.title}</div>
+              {t.description && <div className="text-xs text-on-surface-variant mt-0.5">{t.description}</div>}
             </div>
             <button
               onClick={() => dismiss(t.id)}
-              className="text-white/30 hover:text-white/70 shrink-0"
+              className="text-muted hover:text-on-surface-variant shrink-0"
             >
               <X size={14} />
             </button>

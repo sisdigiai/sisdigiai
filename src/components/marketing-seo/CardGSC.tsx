@@ -24,7 +24,7 @@ export function CardGSC() {
       onAfterSync={refetch}
     >
       {!hasAny ? (
-        <EmptyHint>Clique <strong className="text-white/70">Sincronizar</strong> para carregar. Os números aparecem conforme o Google indexa o site.</EmptyHint>
+        <EmptyHint>Clique <strong className="text-on-surface-variant">Sincronizar</strong> para carregar. Os números aparecem conforme o Google indexa o site.</EmptyHint>
       ) : (
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-2">
@@ -35,12 +35,12 @@ export function CardGSC() {
           </div>
           {topQueries.length > 0 && (
             <div>
-              <div className="text-[10px] font-mono uppercase tracking-widest text-white/40 mb-1.5">Top queries</div>
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted mb-1.5">Top queries</div>
               <ul className="space-y-1">
                 {topQueries.map(q => (
                   <li key={q.id} className="flex items-center justify-between text-xs">
-                    <span className="text-white/70 truncate">{q.metric_key}</span>
-                    <span className="font-mono tabular-nums text-white/50 shrink-0 ml-2">{q.value_numeric}</span>
+                    <span className="text-on-surface-variant truncate">{q.metric_key}</span>
+                    <span className="font-mono tabular-nums text-on-surface-variant shrink-0 ml-2">{q.value_numeric}</span>
                   </li>
                 ))}
               </ul>
@@ -48,12 +48,12 @@ export function CardGSC() {
           )}
           {topPages.length > 0 && (
             <div>
-              <div className="text-[10px] font-mono uppercase tracking-widest text-white/40 mb-1.5">Top pages</div>
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted mb-1.5">Top pages</div>
               <ul className="space-y-1">
                 {topPages.map(p => (
                   <li key={p.id} className="flex items-center justify-between text-xs">
-                    <span className="text-white/70 truncate">{p.metric_key}</span>
-                    <span className="font-mono tabular-nums text-white/50 shrink-0 ml-2">{p.value_numeric}</span>
+                    <span className="text-on-surface-variant truncate">{p.metric_key}</span>
+                    <span className="font-mono tabular-nums text-on-surface-variant shrink-0 ml-2">{p.value_numeric}</span>
                   </li>
                 ))}
               </ul>

@@ -152,7 +152,7 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
                     }`}
                   >
                     <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${done ? '' : 'bg-surface-high text-muted'}`}
-                      style={done ? { background: s.color, color: '#0A0F1E' } : {}}>
+                      style={done ? { background: s.color, color: '#0d131f' } : {}}>
                       {done ? <Check className="w-3.5 h-3.5" /> : s.id}
                     </div>
                     <div className="text-left min-w-0">

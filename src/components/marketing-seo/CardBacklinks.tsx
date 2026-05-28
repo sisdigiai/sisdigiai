@@ -24,12 +24,12 @@ export function CardBacklinks() {
           <MetricStat label="Total de backlinks" value={total?.value_numeric ?? '—'} />
           {referrers.length > 0 && (
             <div>
-              <div className="text-[10px] font-mono uppercase tracking-widest text-white/40 mb-1.5">Top referrers</div>
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted mb-1.5">Top referrers</div>
               <ul className="space-y-1">
                 {referrers.map(r => (
                   <li key={r.id} className="flex items-center justify-between text-xs">
-                    <span className="text-white/70 truncate">{r.metric_key}</span>
-                    <span className="font-mono tabular-nums text-white/50 shrink-0 ml-2">{r.value_numeric}</span>
+                    <span className="text-on-surface-variant truncate">{r.metric_key}</span>
+                    <span className="font-mono tabular-nums text-on-surface-variant shrink-0 ml-2">{r.value_numeric}</span>
                   </li>
                 ))}
               </ul>
