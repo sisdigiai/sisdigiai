@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar, { ModuleId } from './components/Sidebar';
 import BrandGuidelines from './components/BrandGuidelines';
 import Login from './components/Login';
@@ -43,9 +43,36 @@ const STUBS: Record<string, { numero: number; nome: string; descricao: string; e
 // Rotas públicas (não passam pelo gate de login)
 const PUBLIC_ROUTES = ['/osi/depoimento'];
 
+// Todos os módulos roteáveis — usado pelo deep-link por hash (#/<modulo>).
+const MODULES: ModuleId[] = [
+  'visao', 'portfolio', 'trilha', 'lista-mestra', 'backlog', 'comercial',
+  'cadastro-empresa', 'financeiro', 'academy', 'funil', 'fluxo-osi',
+  'marketing', 'marketing-seo', 'clearix', 'ecossistemas',
+  'decisoes', 'biblioteca', 'brand', 'travas-marketing',
+  'referencias-design', 'mock-estilos',
+];
+
+function moduleFromHash(): ModuleId {
+  if (typeof window === 'undefined') return 'visao';
+  const h = window.location.hash.replace(/^#\/?/, '');
+  return (MODULES as string[]).includes(h) ? (h as ModuleId) : 'visao';
+}
+
 export default function App() {
   const { session, loading } = useAuth();
-  const [activeModule, setActiveModule] = useState<ModuleId>('visao');
+  const [activeModule, setActiveModule] = useState<ModuleId>(moduleFromHash);
+
+  // Deep links: refresh mantém o módulo + back/forward do navegador funcionam.
+  useEffect(() => {
+    const onHash = () => setActiveModule(moduleFromHash());
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  const navigate = (id: ModuleId) => {
+    if (window.location.hash !== `#/${id}`) window.location.hash = `/${id}`;
+    setActiveModule(id);
+  };
 
   // Modo offline: sem .env configurado, app roda sem auth e usa fallback local onde existir.
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -72,7 +99,7 @@ export default function App() {
 
   const renderContent = () => {
     switch (activeModule) {
-      case 'visao': return <Visao />;
+      case 'visao': return <Visao onNavigate={navigate} />;
       case 'portfolio': return <Portfolio />;
       case 'trilha': return <Trilha />;
       case 'backlog': return <Backlog />;
@@ -91,7 +118,7 @@ export default function App() {
       case 'ecossistemas': return <Ecossistemas />;
       case 'lista-mestra': return <ListaMestra />;
       case 'travas-marketing': return <TravasMarketing />;
-      case 'fluxo-osi': return <FluxoOSI onNavigate={setActiveModule} />;
+      case 'fluxo-osi': return <FluxoOSI onNavigate={navigate} />;
       default: {
         const stub = STUBS[activeModule];
         if (stub) {
@@ -104,14 +131,14 @@ export default function App() {
             />
           );
         }
-        return <Visao />;
+        return <Visao onNavigate={navigate} />;
       }
     }
   };
 
   return (
     <div className="flex h-screen bg-[#0A0F1E] text-white overflow-hidden">
-      <Sidebar active={activeModule} onSelect={setActiveModule} />
+      <Sidebar active={activeModule} onSelect={navigate} />
       <main className="flex-1 overflow-y-auto">
         {renderContent()}
       </main>

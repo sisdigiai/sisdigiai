@@ -8,6 +8,7 @@ import { dashboardStore, type DashboardSummary } from '../lib/dashboardStore';
 import type { Track } from '../lib/roadmapStore';
 import { realtimeStore } from '../lib/realtimeStore';
 import { useRealtimeToasts } from '../contexts/ToastContext';
+import type { ModuleId } from '../components/Sidebar';
 
 const VERDADES_CANONICAS = [
   { texto: 'Clearix é a prioridade máxima da DIGIAI', nível: 'máximo' },
@@ -45,7 +46,7 @@ function daysUntil(iso: string): number {
   return Math.round((target.getTime() - today.getTime()) / 86400000);
 }
 
-export default function Visao() {
+export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => void }) {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -162,6 +163,7 @@ export default function Visao() {
           value={`${totalProgress}%`}
           sub={`${summary.completedTasks}/${summary.totalTasks} tarefas`}
           color="text-[#06B6D4]"
+          onClick={() => onNavigate?.('trilha')}
         />
         <KpiCard
           icon={<Zap className="w-4 h-4" />}
@@ -169,6 +171,7 @@ export default function Visao() {
           value={String(summary.backlogInProgress)}
           sub={`em andamento · ${summary.backlogCritical} críticos`}
           color={summary.backlogCritical > 0 ? 'text-red-400' : 'text-amber-400'}
+          onClick={() => onNavigate?.('backlog')}
         />
         <KpiCard
           icon={<Award className="w-4 h-4" />}
@@ -176,6 +179,7 @@ export default function Visao() {
           value={String(summary.totalDecisions)}
           sub="registradas"
           color="text-emerald-400"
+          onClick={() => onNavigate?.('decisoes')}
         />
         <KpiCard
           icon={<DollarSign className="w-4 h-4" />}
@@ -183,6 +187,7 @@ export default function Visao() {
           value={summary.latestMrr != null ? `R$ ${summary.latestMrr.toFixed(0)}` : '—'}
           sub={summary.runwayMonths != null ? `runway ${summary.runwayMonths} meses` : 'preencher Cadastro'}
           color="text-white/70"
+          onClick={() => onNavigate?.('financeiro')}
         />
       </div>
 
@@ -203,7 +208,7 @@ export default function Visao() {
                 const overdue = d < 0;
                 const urgent = d >= 0 && d <= 2;
                 return (
-                  <div key={t.id} className={`flex items-start gap-3 p-2 rounded-lg ${overdue ? 'bg-red-500/5' : urgent ? 'bg-amber-500/5' : ''}`}>
+                  <button key={t.id} onClick={() => onNavigate?.('trilha')} className={`w-full text-left flex items-start gap-3 p-2 rounded-lg transition-colors hover:bg-white/5 ${overdue ? 'bg-red-500/5' : urgent ? 'bg-amber-500/5' : ''}`}>
                     <Circle className="w-3.5 h-3.5 text-white/20 mt-1 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -219,7 +224,7 @@ export default function Visao() {
                         </div>
                       )}
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>
@@ -227,7 +232,7 @@ export default function Visao() {
         </div>
 
         {/* Próximo marco destacado */}
-        <div className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-amber-500/30 rounded-2xl p-5">
+        <div onClick={() => onNavigate?.('trilha')} className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-amber-500/30 rounded-2xl p-5 cursor-pointer hover:border-amber-400/50 transition-colors">
           <div className="flex items-center gap-2 mb-3">
             <Flag className="w-5 h-5 text-amber-400" />
             <h2 className="text-sm font-semibold">Próximo marco</h2>
@@ -255,10 +260,10 @@ export default function Visao() {
 
       {/* Status institucional */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatusCard label="CNPJ cadastrado" done={summary.hasCnpj} hint="Cadastro Empresa → Identidade" />
-        <StatusCard label="DPO nomeado" done={summary.hasDpo} hint="Cadastro Empresa → LGPD" />
-        <StatusCard label="Snapshot financeiro" done={summary.latestMrr !== null} hint="Cadastro Empresa → Financeiro" />
-        <StatusCard label="1ª entrevista feita" done={false} hint="Fase 0 do Roadmap" />
+        <StatusCard label="CNPJ cadastrado" done={summary.hasCnpj} hint="Cadastro Empresa → Identidade" onClick={() => onNavigate?.('cadastro-empresa')} />
+        <StatusCard label="DPO nomeado" done={summary.hasDpo} hint="Cadastro Empresa → LGPD" onClick={() => onNavigate?.('cadastro-empresa')} />
+        <StatusCard label="Snapshot financeiro" done={summary.latestMrr !== null} hint="Cadastro Empresa → Financeiro" onClick={() => onNavigate?.('cadastro-empresa')} />
+        <StatusCard label="1ª entrevista feita" done={false} hint="Fase 0 do Roadmap" onClick={() => onNavigate?.('trilha')} />
       </div>
 
       {/* Decisões recentes */}
@@ -270,7 +275,7 @@ export default function Visao() {
           </div>
           <div className="space-y-2">
             {summary.recentDecisions.map((d) => (
-              <div key={d.id} className="bg-white/3 border border-white/8 rounded-xl px-4 py-3">
+              <button key={d.id} onClick={() => onNavigate?.('decisoes')} className="w-full text-left bg-white/3 border border-white/8 rounded-xl px-4 py-3 transition-colors hover:border-[#2563EB]/40">
                 <div className="flex items-center gap-2 flex-wrap mb-1">
                   <span className="text-xs font-mono text-white/40">{new Date(d.decided_at + 'T00:00:00').toLocaleDateString('pt-BR')}</span>
                   {d.tags.slice(0, 3).map((t) => (
@@ -278,7 +283,7 @@ export default function Visao() {
                   ))}
                 </div>
                 <div className="text-sm text-white/85 font-medium">{d.title}</div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -315,27 +320,27 @@ export default function Visao() {
   );
 }
 
-function KpiCard({ icon, label, value, sub, color }: { icon: React.ReactNode; label: string; value: string; sub: string; color: string }) {
+function KpiCard({ icon, label, value, sub, color, onClick }: { icon: React.ReactNode; label: string; value: string; sub: string; color: string; onClick?: () => void }) {
   return (
-    <div className="bg-white/3 border border-white/8 rounded-xl p-4">
+    <button onClick={onClick} disabled={!onClick} className="text-left w-full bg-white/3 border border-white/8 rounded-xl p-4 transition-all enabled:hover:border-[#2563EB]/40 enabled:hover:bg-[#2563EB]/5 disabled:cursor-default">
       <div className={`flex items-center gap-2 text-xs ${color} mb-2`}>
         {icon}
         <span className="font-mono uppercase tracking-widest">{label}</span>
       </div>
       <div className="text-2xl font-bold text-white">{value}</div>
       <div className="text-[11px] text-white/40 mt-0.5">{sub}</div>
-    </div>
+    </button>
   );
 }
 
-function StatusCard({ label, done, hint }: { label: string; done: boolean; hint: string }) {
+function StatusCard({ label, done, hint, onClick }: { label: string; done: boolean; hint: string; onClick?: () => void }) {
   return (
-    <div className={`rounded-xl p-3 border ${done ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-white/3 border-white/8'}`}>
+    <button onClick={onClick} disabled={!onClick} className={`text-left w-full rounded-xl p-3 border transition-all enabled:hover:border-[#2563EB]/40 disabled:cursor-default ${done ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-white/3 border-white/8'}`}>
       <div className="flex items-center gap-2 mb-1">
         {done ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Circle className="w-4 h-4 text-white/20" />}
         <span className={`text-xs font-medium ${done ? 'text-emerald-300' : 'text-white/60'}`}>{label}</span>
       </div>
       <div className="text-[10px] text-white/30">{hint}</div>
-    </div>
+    </button>
   );
 }
