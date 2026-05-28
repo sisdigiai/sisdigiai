@@ -110,6 +110,18 @@ const PRODUTOS: Produto[] = [
     bloqueio: 'IA worker (Gemini 2.0 Flash) não confirmado em produção',
   },
   {
+    nome: 'Easy Idiomas',
+    subtitulo: 'SaaS para escolas de idiomas',
+    categoria: 'incubacao',
+    prioridade: 'baixa',
+    status: 'MVP em construção — ainda não deployado',
+    faseAtual: 'Fase 1 — incubação',
+    repo: 'D:\\projetos\\easy-idiomas',
+    stack: 'React 19 · Vite · Supabase · Google Gemini',
+    proximo: 'Definir deploy de produção e validar oferta com escolas de idiomas',
+    bloqueio: 'Sem deploy nem validação comercial definidos',
+  },
+  {
     nome: 'Nipo School',
     subtitulo: 'Plataforma educacional musical comunitária · ADNIPO Suzano',
     categoria: 'institucional',
