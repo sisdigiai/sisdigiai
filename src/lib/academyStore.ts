@@ -132,11 +132,11 @@ function defaultProduct(): AcademyProduct {
   return {
     slug: DEFAULT_SLUG,
     line: 'clearix_academy',
-    product_name: 'Otica Sem Improviso',
+    product_name: 'Ótica Sem Improviso',
     subtitle: 'Manual Visual + App para Atendimento, WhatsApp e Objecoes em Oticas',
     status: 'in_production',
     offer_type: 'low_ticket',
-    price_brl: 97,
+    price_brl: 47.90,
     launch_condition: 'Preco de estreia para a turma inicial',
     promise: 'Sair do atendimento no improviso, responder melhor no WhatsApp e vender com mais seguranca enquanto a otica e apresentada ao ecossistema de apps.',
     main_cta: 'Quero atender sem improviso',
