@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { X, Plus, Trash2, ExternalLink, Save, Loader2, Sparkles, Package, Check, DollarSign, Copy, Link as LinkIcon, Wand2 } from 'lucide-react';
+import { X, Plus, Trash2, ExternalLink, Save, Loader2, Sparkles, Package, Check, DollarSign, Copy, Link as LinkIcon, Wand2, ShieldCheck } from 'lucide-react';
 import { marketingStore, type CalendarPost, type CalendarStatus, type ContentPillar, type Platform, type CalendarArt } from '../../lib/marketingStore';
 import { PromptGeneratorModal } from './PromptGeneratorModal';
 import { ProduzirPostWizard } from './ProduzirPostWizard';
@@ -50,6 +50,8 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
   const [promoting, setPromoting] = useState(false);
   const [sales, setSales] = useState<Awaited<ReturnType<typeof marketingStore.getPostSales>>>(null);
   const [copiedUrl, setCopiedUrl] = useState(false);
+  const [gateOpen, setGateOpen] = useState(false);
+  const [gate, setGate] = useState({ humano: false, optin: false, cta: false, template: false });
 
   useEffect(() => { setDraft(post); }, [post.id]);
 
@@ -102,7 +104,10 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
   };
   const removeArt = (idx: number) => update({ arts: (draft.arts ?? []).filter((_, i) => i !== idx) });
 
+  const gatePassed = gate.humano && gate.optin && gate.cta && gate.template;
   const handleSave = async () => {
+    // Trava dura (R-011/R-013): publicar exige checklist confirmado.
+    if (draft.status === 'published' && !gatePassed) { setGateOpen(true); return; }
     setSaving(true);
     const patch: Partial<CalendarPost> = {
       scheduled_date: draft.scheduled_date,
@@ -201,7 +206,45 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
                 </button>
               ))}
             </div>
+            {draft.status === 'published' && !gatePassed && (
+              <p className="text-[11px] text-amber-300/80 mt-2">⚠ Publicar exige confirmar as travas de marketing ao salvar.</p>
+            )}
           </Section>
+
+          {gateOpen && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4" onClick={(e) => { e.stopPropagation(); setGateOpen(false); }}>
+              <div className="w-full max-w-md rounded-2xl border border-amber-500/30 bg-[#0F1729] p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-amber-300" />
+                  <h3 className="font-bold text-base">Travas de marketing — confirmar antes de publicar</h3>
+                </div>
+                <p className="text-xs text-white/50">Marcar como <b className="text-white/80">Publicado</b> exige confirmar as travas (R-011 / R-013). AI não publica sozinha.</p>
+                <div className="space-y-2">
+                  {([
+                    ['humano', 'Revisado e aprovado por humano (R-011)'],
+                    ['optin', 'Base com opt-in / consentimento LGPD (R-013)'],
+                    ['cta', 'CTA pro Clearix presente no conteúdo'],
+                    ['template', 'Categoria / template correto (se WhatsApp ativo)'],
+                  ] as const).map(([k, label]) => (
+                    <label key={k} className="flex items-start gap-2 text-sm text-white/75 cursor-pointer">
+                      <input type="checkbox" checked={gate[k]} onChange={e => setGate(g => ({ ...g, [k]: e.target.checked }))} className="mt-0.5" />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </div>
+                <div className="flex gap-2 justify-end pt-2">
+                  <button onClick={() => setGateOpen(false)} className="px-3 py-2 text-sm text-white/50 hover:text-white">Cancelar</button>
+                  <button
+                    disabled={!gatePassed}
+                    onClick={() => { setGateOpen(false); handleSave(); }}
+                    className="px-4 py-2 text-sm font-medium rounded-lg bg-[#10B981] text-[#0A0F1E] disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Confirmar e publicar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Data + tempo + pilar + tipo */}
           <Section title="Quando + categorização">

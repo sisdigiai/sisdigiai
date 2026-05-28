@@ -63,15 +63,20 @@ export function CalendarioEditorial() {
   }, [posts]);
 
   const handleAdvanceStatus = async (post: CalendarPost) => {
+    // Trava de marketing: publicar só pelo PostDrawer (com checklist R-011/R-013).
+    // O avanço rápido para em "Pronto" e manda abrir o post pra publicar.
     const next: Record<CalendarStatus, CalendarStatus> = {
       planned: 'in_production',
       in_production: 'ready',
-      ready: 'published',
+      ready: 'ready',
       published: 'published',
       cancelled: 'cancelled',
     };
     const newStatus = next[post.status];
-    if (newStatus === post.status) return;
+    if (newStatus === post.status) {
+      if (post.status === 'ready') alert('Para publicar, abra o post e confirme as travas de marketing.');
+      return;
+    }
     const ok = await marketingStore.updateCalendarPost(post.id, {
       status: newStatus,
       published_at: newStatus === 'published' ? new Date().toISOString() : post.published_at,
