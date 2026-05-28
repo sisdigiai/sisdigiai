@@ -20,6 +20,7 @@ const ITEMS: Item[] = [
   { id: 'marketing-seo', label: 'Marketing & SEO', group: 'Operacional' },
   { id: 'clearix', label: 'Central Clearix', group: 'Operacional' },
   { id: 'ecossistemas', label: 'Ecossistemas (Painel)', group: 'Ecossistemas' },
+  { id: 'guia', label: 'Guia Operacional', group: 'Sistema' },
   { id: 'travas-marketing', label: 'Travas Marketing', group: 'Sistema' },
   { id: 'decisoes', label: 'Decisões', group: 'Sistema' },
   { id: 'biblioteca', label: 'Biblioteca', group: 'Sistema' },

@@ -14,7 +14,8 @@ export type ModuleId =
   | 'backlog' | 'comercial' | 'academy' | 'funil' | 'financeiro'
   | 'decisoes' | 'biblioteca' | 'brand' | 'cadastro-empresa'
   | 'clearix' | 'referencias-design' | 'mock-estilos' | 'marketing'
-  | 'marketing-seo' | 'ecossistemas' | 'travas-marketing' | 'fluxo-osi';
+  | 'marketing-seo' | 'ecossistemas' | 'travas-marketing' | 'fluxo-osi'
+  | 'guia';
 
 interface NavItem {
   id: ModuleId;
@@ -66,6 +67,7 @@ const ecossistemas: Ecossistema[] = [
 ];
 
 const sistema: NavItem[] = [
+  { id: 'guia',               label: 'Guia Operacional',    icon: <Compass className="w-4 h-4" /> },
   { id: 'travas-marketing',   label: 'Travas Marketing',    icon: <ShieldCheck className="w-4 h-4" /> },
   { id: 'decisoes',           label: 'Decisões',            icon: <GitBranch className="w-4 h-4" /> },
   { id: 'biblioteca',         label: 'Biblioteca',          icon: <Library className="w-4 h-4" /> },

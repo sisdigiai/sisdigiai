@@ -24,6 +24,7 @@ import Ecossistemas from './modules/Ecossistemas';
 import ListaMestra from './modules/ListaMestra';
 import TravasMarketing from './modules/TravasMarketing';
 import FluxoOSI from './modules/FluxoOSI';
+import Guia from './modules/Guia';
 import { ModuleStub } from './modules/Stub';
 import { useAuth } from './contexts/AuthContext';
 
@@ -51,7 +52,7 @@ const MODULES: ModuleId[] = [
   'cadastro-empresa', 'financeiro', 'academy', 'funil', 'fluxo-osi',
   'marketing', 'marketing-seo', 'clearix', 'ecossistemas',
   'decisoes', 'biblioteca', 'brand', 'travas-marketing',
-  'referencias-design', 'mock-estilos',
+  'referencias-design', 'mock-estilos', 'guia',
 ];
 
 function moduleFromHash(): ModuleId {
@@ -67,6 +68,7 @@ const MODULE_LABEL: Record<ModuleId, string> = {
   marketing: 'Marketing', 'marketing-seo': 'Marketing & SEO', clearix: 'Central Clearix',
   ecossistemas: 'Ecossistemas', decisoes: 'Decisões', biblioteca: 'Biblioteca', brand: 'Brand Guidelines',
   'travas-marketing': 'Travas Marketing', 'referencias-design': 'Referências Design', 'mock-estilos': 'Mock Vendas',
+  guia: 'Guia Operacional',
 };
 
 // Seção da navegação a que cada módulo pertence — usado como breadcrumb no header.
@@ -76,7 +78,7 @@ const MODULE_SECTION: Record<ModuleId, string> = {
   academy: 'Operacional', funil: 'Operacional', 'fluxo-osi': 'Operacional', marketing: 'Operacional',
   'marketing-seo': 'Operacional', clearix: 'Operacional', ecossistemas: 'Ecossistemas',
   decisoes: 'Sistema', biblioteca: 'Sistema', brand: 'Sistema', 'travas-marketing': 'Sistema',
-  'referencias-design': 'Sistema', 'mock-estilos': 'Sistema',
+  'referencias-design': 'Sistema', 'mock-estilos': 'Sistema', guia: 'Sistema',
 };
 
 export default function App() {
@@ -142,6 +144,7 @@ export default function App() {
       case 'lista-mestra': return <ListaMestra />;
       case 'travas-marketing': return <TravasMarketing />;
       case 'fluxo-osi': return <FluxoOSI onNavigate={navigate} />;
+      case 'guia': return <Guia onNavigate={navigate} />;
       default: {
         const stub = STUBS[activeModule];
         if (stub) {
