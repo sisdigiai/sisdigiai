@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar, { ModuleId } from './components/Sidebar';
 import CommandPalette from './components/CommandPalette';
+import { Menu } from 'lucide-react';
 import BrandGuidelines from './components/BrandGuidelines';
 import Login from './components/Login';
 import TestimonialPublicForm from './components/TestimonialPublicForm';
@@ -62,6 +63,7 @@ function moduleFromHash(): ModuleId {
 export default function App() {
   const { session, loading } = useAuth();
   const [activeModule, setActiveModule] = useState<ModuleId>(moduleFromHash);
+  const [navOpen, setNavOpen] = useState(false);
 
   // Deep links: refresh mantém o módulo + back/forward do navegador funcionam.
   useEffect(() => {
@@ -73,6 +75,7 @@ export default function App() {
   const navigate = (id: ModuleId) => {
     if (window.location.hash !== `#/${id}`) window.location.hash = `/${id}`;
     setActiveModule(id);
+    setNavOpen(false);
   };
 
   // Modo offline: sem .env configurado, app roda sem auth e usa fallback local onde existir.
@@ -139,7 +142,14 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-[#0A0F1E] text-white overflow-hidden">
-      <Sidebar active={activeModule} onSelect={navigate} />
+      <button
+        onClick={() => setNavOpen(true)}
+        className="md:hidden fixed top-3 left-3 z-30 p-2 rounded-lg bg-[#0F1729]/90 border border-white/10 text-white/70 backdrop-blur"
+        aria-label="Abrir menu"
+      >
+        <Menu className="w-5 h-5" />
+      </button>
+      <Sidebar active={activeModule} onSelect={navigate} mobileOpen={navOpen} onClose={() => setNavOpen(false)} />
       <main className="flex-1 overflow-y-auto">
         {renderContent()}
       </main>

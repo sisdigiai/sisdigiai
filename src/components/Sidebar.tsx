@@ -77,9 +77,11 @@ const sistema: NavItem[] = [
 interface SidebarProps {
   active: ModuleId;
   onSelect: (id: ModuleId) => void;
+  mobileOpen?: boolean;
+  onClose?: () => void;
 }
 
-export default function Sidebar({ active, onSelect }: SidebarProps) {
+export default function Sidebar({ active, onSelect, mobileOpen = false, onClose }: SidebarProps) {
   const { user, signOut } = useAuth();
 
   const NavButton = ({ item }: { item: NavItem }) => (
@@ -97,7 +99,9 @@ export default function Sidebar({ active, onSelect }: SidebarProps) {
   );
 
   return (
-    <div className="w-60 shrink-0 h-screen sticky top-0 bg-[#0A0F1E] border-r border-white/5 flex flex-col">
+    <>
+      {mobileOpen && <div className="fixed inset-0 z-40 bg-black/60 md:hidden" onClick={onClose} />}
+      <div className={`w-60 shrink-0 h-screen bg-[#0A0F1E] border-r border-white/5 flex flex-col z-50 fixed inset-y-0 left-0 transition-transform duration-200 md:static md:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <div className="p-5 border-b border-white/5">
         <Logo variant="horizontal" iconClassName="w-7 h-7" textClassName="text-xl" />
         <div className="mt-2 text-[10px] font-mono text-white/30 uppercase tracking-widest">Painel Operacional</div>
@@ -159,5 +163,6 @@ export default function Sidebar({ active, onSelect }: SidebarProps) {
         </div>
       </div>
     </div>
+    </>
   );
 }
