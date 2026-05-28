@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar, { ModuleId } from './components/Sidebar';
 import CommandPalette from './components/CommandPalette';
-import { Menu } from 'lucide-react';
+import { Menu, Search } from 'lucide-react';
 import BrandGuidelines from './components/BrandGuidelines';
 import Login from './components/Login';
 import TestimonialPublicForm from './components/TestimonialPublicForm';
@@ -59,6 +59,15 @@ function moduleFromHash(): ModuleId {
   const h = window.location.hash.replace(/^#\/?/, '');
   return (MODULES as string[]).includes(h) ? (h as ModuleId) : 'visao';
 }
+
+const MODULE_LABEL: Record<ModuleId, string> = {
+  visao: 'Visão', portfolio: 'Portfólio', trilha: 'Roadmap', 'lista-mestra': 'Lista Mestra',
+  backlog: 'Backlog Executivo', comercial: 'Comercial', 'cadastro-empresa': 'Cadastro Empresa',
+  financeiro: 'Financeiro', academy: 'Academy', funil: 'Funil OSI', 'fluxo-osi': 'Fluxo OSI',
+  marketing: 'Marketing', 'marketing-seo': 'Marketing & SEO', clearix: 'Central Clearix',
+  ecossistemas: 'Ecossistemas', decisoes: 'Decisões', biblioteca: 'Biblioteca', brand: 'Brand Guidelines',
+  'travas-marketing': 'Travas Marketing', 'referencias-design': 'Referências Design', 'mock-estilos': 'Mock Vendas',
+};
 
 export default function App() {
   const { session, loading } = useAuth();
@@ -142,17 +151,30 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-[#0A0F1E] text-white overflow-hidden">
-      <button
-        onClick={() => setNavOpen(true)}
-        className="md:hidden fixed top-3 left-3 z-30 p-2 rounded-lg bg-[#0F1729]/90 border border-white/10 text-white/70 backdrop-blur"
-        aria-label="Abrir menu"
-      >
-        <Menu className="w-5 h-5" />
-      </button>
       <Sidebar active={activeModule} onSelect={navigate} mobileOpen={navOpen} onClose={() => setNavOpen(false)} />
-      <main key={activeModule} className="flex-1 overflow-y-auto">
-        {renderContent()}
-      </main>
+      <div className="flex-1 flex flex-col min-w-0">
+        <header className="shrink-0 z-20 flex items-center gap-3 h-14 px-4 md:px-8 border-b border-white/5 bg-[#0A0F1E]">
+          <button
+            onClick={() => setNavOpen(true)}
+            className="md:hidden p-1.5 -ml-1 rounded-lg text-white/60 hover:text-white hover:bg-white/5"
+            aria-label="Abrir menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          <span className="hidden sm:inline text-[10px] font-mono uppercase tracking-widest text-white/30">Painel</span>
+          <span className="hidden sm:inline text-white/20">/</span>
+          <span className="text-sm font-semibold text-white/85 truncate">{MODULE_LABEL[activeModule] ?? 'Visão'}</span>
+          <button
+            onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
+            className="ml-auto hidden md:flex items-center gap-1.5 text-[11px] text-white/40 border border-white/10 rounded-lg px-2.5 py-1.5 hover:text-white/70 hover:border-white/20 transition-colors"
+          >
+            <Search className="w-3.5 h-3.5" /> Buscar <kbd className="font-mono text-[10px] text-white/30 border border-white/10 rounded px-1">Ctrl K</kbd>
+          </button>
+        </header>
+        <main key={activeModule} className="flex-1 overflow-y-auto">
+          {renderContent()}
+        </main>
+      </div>
       <CommandPalette onNavigate={navigate} />
     </div>
   );
