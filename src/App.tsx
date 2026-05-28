@@ -69,6 +69,16 @@ const MODULE_LABEL: Record<ModuleId, string> = {
   'travas-marketing': 'Travas Marketing', 'referencias-design': 'Referências Design', 'mock-estilos': 'Mock Vendas',
 };
 
+// Seção da navegação a que cada módulo pertence — usado como breadcrumb no header.
+const MODULE_SECTION: Record<ModuleId, string> = {
+  visao: 'Operacional', portfolio: 'Operacional', trilha: 'Operacional', 'lista-mestra': 'Operacional',
+  backlog: 'Operacional', comercial: 'Operacional', 'cadastro-empresa': 'Operacional', financeiro: 'Operacional',
+  academy: 'Operacional', funil: 'Operacional', 'fluxo-osi': 'Operacional', marketing: 'Operacional',
+  'marketing-seo': 'Operacional', clearix: 'Operacional', ecossistemas: 'Ecossistemas',
+  decisoes: 'Sistema', biblioteca: 'Sistema', brand: 'Sistema', 'travas-marketing': 'Sistema',
+  'referencias-design': 'Sistema', 'mock-estilos': 'Sistema',
+};
+
 export default function App() {
   const { session, loading } = useAuth();
   const [activeModule, setActiveModule] = useState<ModuleId>(moduleFromHash);
@@ -153,8 +163,8 @@ export default function App() {
     <div className="flex h-screen bg-surface text-on-surface overflow-hidden">
       <Sidebar active={activeModule} onSelect={navigate} mobileOpen={navOpen} onClose={() => setNavOpen(false)} />
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="shrink-0 z-20 border-b border-outline/10 bg-surface/80 backdrop-blur-md">
-          <div className="flex items-center gap-3 px-4 md:px-8 py-3.5">
+        <header className="shrink-0 z-20 h-20 flex items-center border-b border-outline/10 bg-surface/80 backdrop-blur-md">
+          <div className="w-full max-w-6xl mx-auto flex items-center gap-3 px-4 md:px-8">
             <button
               onClick={() => setNavOpen(true)}
               className="md:hidden p-1.5 -ml-1 text-on-surface-variant hover:text-on-surface hover:bg-surface-highest"
@@ -162,14 +172,13 @@ export default function App() {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div className="flex items-center gap-3 min-w-0">
-              <span className="h-8 w-px bg-secondary/60 shrink-0" />
-              <div className="flex flex-col min-w-0">
-                <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-secondary leading-none mb-1.5">Painel Operacional</span>
-                <h1 className="font-serif text-xl md:text-2xl font-semibold uppercase tracking-tight text-on-surface leading-none truncate">
-                  {MODULE_LABEL[activeModule] ?? 'Visão'}
-                </h1>
-              </div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-secondary leading-none mb-2">
+                {MODULE_SECTION[activeModule] ?? 'Operacional'}
+              </span>
+              <h1 className="font-serif text-xl font-semibold uppercase text-on-surface leading-none truncate">
+                {MODULE_LABEL[activeModule] ?? 'Visão'}
+              </h1>
             </div>
             <button
               onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
