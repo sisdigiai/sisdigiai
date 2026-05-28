@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
+import { companyStore } from '../lib/companyStore';
+import type { DigitalAsset } from '../lib/supabase';
 
 interface Produto {
   nome: string;
@@ -163,8 +165,33 @@ const prioridadeDot: Record<string, string> = {
   baixa: 'bg-white/15',
 };
 
+const OWNER_BY_NAME: Record<string, string> = {
+  'Clearix': 'clearix',
+  'Ótica Sem Improviso': 'osi',
+  'Nexus': 'nexus',
+  'Lumina': 'lumina',
+  'Pulso': 'pulso',
+  'Polapetit': 'polapetit',
+  'DIGIAI App': 'digiai',
+};
+
 export default function Portfolio() {
   const [expandido, setExpandido] = useState<string | null>('Clearix');
+  const [liveSites, setLiveSites] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    companyStore.listDigitalAssets().then((assets: DigitalAsset[]) => {
+      const counts: Record<string, number> = {};
+      for (const a of assets) {
+        if (a.categoria === 'site' && a.status === 'ativo' && a.owner_product) {
+          counts[a.owner_product] = (counts[a.owner_product] || 0) + 1;
+        }
+      }
+      setLiveSites(counts);
+    }).catch(() => {});
+  }, []);
+
+  const liveCount = (nome: string) => liveSites[OWNER_BY_NAME[nome] ?? ''] || 0;
 
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-6">
@@ -201,6 +228,11 @@ export default function Portfolio() {
                     <span className={`text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded border ${badge.className}`}>
                       {badge.label}
                     </span>
+                    {liveCount(p.nome) > 0 && (
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 inline-flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> {liveCount(p.nome)} no ar
+                      </span>
+                    )}
                   </div>
                   <div className="text-sm text-white/50 mt-0.5 truncate">{p.subtitulo}</div>
                 </div>
