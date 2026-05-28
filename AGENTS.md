@@ -126,7 +126,7 @@ Roteamento real em `App.tsx` (`activeModule` por estado, não por URL). 16 cases
 | Visão               | `src/modules/Visao.tsx`                              |
 | Portfólio           | `src/modules/Portfolio.tsx` (subtítulo auto-conta `PRODUTOS.length`) |
 | Roadmap             | `src/modules/Trilha.tsx` (+ `RoadmapCalendar` + `RoadmapHistorico`) |
-| Lista Mestra        | **STUB** — objeto `STUBS` em `App.tsx` → `ModuleStub` (sem arquivo) |
+| Lista Mestra        | `src/modules/ListaMestra.tsx` — visão unificada filtrável de Backlog + Roadmap (119 itens) |
 | Backlog Executivo   | `src/modules/Backlog.tsx`                            |
 | Cadastro Empresa    | `src/modules/CadastroEmpresa.tsx`                    |
 | Financeiro          | `src/modules/Financeiro.tsx` (toggle "Ocultar aporte intelectual") |
@@ -141,8 +141,11 @@ Roteamento real em `App.tsx` (`activeModule` por estado, não por URL). 16 cases
 | Brand Guidelines    | `src/components/BrandGuidelines.tsx`                 |
 | Referências Design  | `src/modules/ReferenciasDesign.tsx`                  |
 | Mock Vendas         | `src/modules/MockClearixEstilos.tsx`                 |
+| Fluxo OSI           | `src/modules/FluxoOSI.tsx` — integra Academy+Funil+Marketing (espinha OSI → Clearix), dado vivo dos 3 stores |
+| Travas Marketing    | `src/modules/TravasMarketing.tsx` — travas canônicas + `TravasBanner` plantado em Marketing/Funil/Academy |
+| Ecossistemas (Painel) | `src/modules/Ecossistemas.tsx` — painel de status lendo `v_company_digital_assets` (ADR-0029) |
 
-**Ecossistemas (links externos — ADR-0029, via `EcossistemaLink.tsx`):** Clearix Hub, Clearix Atlas, OSI, Polapetit, Nipo School, Pulso Control, Qual a Foto, Lumina. Não são módulos embutidos — cada um tem banco/auth/deploy próprios.
+**Ecossistemas (links externos — ADR-0029, via `EcossistemaLink.tsx`):** Clearix Hub, Clearix Atlas, OSI, Polapetit, Nipo School, Pulso Control, Qual a Foto, Lumina. Não são módulos embutidos — cada um tem banco/auth/deploy próprios. Há também o módulo **Painel** (`Ecossistemas.tsx`) que consolida status/URLs dos apps lendo o banco.
 
 **Rota pública (sem login):** `/osi/depoimento` → `src/components/TestimonialPublicForm.tsx` (coleta de depoimentos do funil OSI).
 
