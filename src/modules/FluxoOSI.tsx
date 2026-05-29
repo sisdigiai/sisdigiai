@@ -64,7 +64,7 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
     <div className="p-8 max-w-6xl mx-auto">
       <PageHeader
         eyebrow="Espinha do ecossistema"
-        title="Fluxo OSI"
+        title="Mapa OSI"
         subtitle={
           <>
             A espinha que conecta os três módulos em torno da Ótica Sem Improviso:

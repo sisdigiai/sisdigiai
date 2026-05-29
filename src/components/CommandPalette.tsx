@@ -15,7 +15,7 @@ const ITEMS: Item[] = [
   { id: 'comercial', label: 'Comercial', group: 'Operacional' },
   { id: 'academy', label: 'Academy', group: 'Operacional' },
   { id: 'funil', label: 'Funil OSI', group: 'Operacional' },
-  { id: 'fluxo-osi', label: 'Fluxo OSI', group: 'Operacional' },
+  { id: 'fluxo-osi', label: 'Mapa OSI', group: 'Operacional' },
   { id: 'marketing', label: 'Marketing', group: 'Operacional' },
   { id: 'marketing-seo', label: 'Marketing & SEO', group: 'Operacional' },
   { id: 'clearix', label: 'Central Clearix', group: 'Operacional' },

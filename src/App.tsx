@@ -64,7 +64,7 @@ function moduleFromHash(): ModuleId {
 const MODULE_LABEL: Record<ModuleId, string> = {
   visao: 'Visão', portfolio: 'Portfólio', trilha: 'Roadmap', 'lista-mestra': 'Lista Mestra',
   backlog: 'Backlog Executivo', comercial: 'Comercial', 'cadastro-empresa': 'Cadastro Empresa',
-  financeiro: 'Financeiro', academy: 'Academy', funil: 'Funil OSI', 'fluxo-osi': 'Fluxo OSI',
+  financeiro: 'Financeiro', academy: 'Academy', funil: 'Funil OSI', 'fluxo-osi': 'Mapa OSI',
   marketing: 'Marketing', 'marketing-seo': 'Marketing & SEO', clearix: 'Central Clearix',
   ecossistemas: 'Ecossistemas', decisoes: 'Decisões', biblioteca: 'Biblioteca', brand: 'Brand Guidelines',
   'travas-marketing': 'Travas Marketing', 'referencias-design': 'Referências Design', 'mock-estilos': 'Mock Vendas',
