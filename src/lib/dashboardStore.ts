@@ -98,17 +98,19 @@ export const dashboardStore = {
 
     const totalTasks = progress.reduce((s, p) => s + (p.total_tasks || 0), 0);
     const completedTasks = progress.reduce((s, p) => s + (p.completed_tasks || 0), 0);
-    const overdueTasks = progress.reduce((s, p) => s + (p.overdue_tasks || 0), 0);
+    // Só fases iniciadas podem ter tarefa "atrasada" — uma fase que não começou não tem prazo corrente.
+    const startedPhases = new Set(phases.filter((p) => p.started_at).map((p) => p.phase_number));
+    const overdueTasks = progress.reduce((s, p) => s + (p.started_at ? (p.overdue_tasks || 0) : 0), 0);
 
-    // Tarefas futuras (não concluídas, com data próxima)
+    // Tarefas futuras (não concluídas, com data) — só de fases já iniciadas (as demais ainda não são acionáveis)
     const nextTasks = tasks
-      .filter((t) => !t.completed_at && t.target_date)
+      .filter((t) => !t.completed_at && t.target_date && startedPhases.has(t.phase_number))
       .sort((a, b) => (a.target_date || '').localeCompare(b.target_date || ''))
       .slice(0, 7);
 
-    // Milestones próximos
+    // Milestones próximos — idem, só de fases iniciadas
     const upcomingMilestones = tasks
-      .filter((t) => !t.completed_at && t.target_date && (t.category === 'milestone' || t.category === 'decision_gate'))
+      .filter((t) => !t.completed_at && t.target_date && startedPhases.has(t.phase_number) && (t.category === 'milestone' || t.category === 'decision_gate'))
       .sort((a, b) => (a.target_date || '').localeCompare(b.target_date || ''))
       .slice(0, 3);
 
