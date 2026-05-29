@@ -1,153 +1,172 @@
 # Plano do Clearix Academy
 
 ## Classificação documental
-- tipo: marketing e educação
-- status: canônico inicial
-- última revisão: 2026-04-22
+- tipo: plano estratégico e comercial
+- status: canônico atual
+- última revisão: 2026-04-23
 - responsável formal: Precisa de validação manual
-- documento-mãe relacionado: `../08-roadmap/zero-aos-milhoes-digiai.md`
 
 ## Objetivo do documento
-Definir o papel estratégico do Clearix Academy dentro da DIGIAI e orientar sua construção como frente de entrada, autoridade e caixa complementar.
+Orientar a construção do Clearix Academy como frente de entrada comercial do ecossistema DIGIAI com lógica marketplace-first.
 
 ## Definição
-O Clearix Academy é o braço educacional e comercial do ecossistema Clearix.
+O Clearix Academy é o braço editorial e comercial de entrada do ecossistema.
+
+No estágio atual, sua prioridade não é construir uma escola complexa.
+Sua prioridade é vender low tickets úteis, ganhar compradores e preparar venda futura do Clearix.
 
 ## Arquitetura de marca
 - DIGIAI = marca-mãe
-- Clearix = produto-âncora
-- Clearix Academy = frente de entrada e formação
+- Clearix = produto-âncora de maior valor
+- Clearix Academy = frente de entrada e relacionamento
 - Fora da Manada = linha editorial futura
-- Ótica Sem Achismo = primeiro low ticket oficial da linha
-
-## Função estratégica
-- gerar autoridade
-- atrair o mercado
-- educar o operacional
-- gerar caixa inicial
-- preparar adoção futura do Clearix
+- Ótica Sem Improviso = primeiro low ticket oficial
 
 ## Regra central
 O conteúdo vende método.
-O método aponta para sistema.
+O método aproxima o comprador do sistema.
+
+## Fase atual
+Hoje a frente opera com:
+- baixa ou nenhuma tração própria consolidada
+- prioridade em marketplaces para descoberta
+- produto principal no formato `ebook / manual visual em PDF`
+- `90 dias de Nexus` como camada complementar
+
+## Função estratégica do Academy
+- gerar caixa inicial
+- ganhar compradores reais
+- testar temas e dores com o mercado
+- criar familiaridade com o ecossistema
+- abrir ponte futura para o Clearix
 
 ## Público inicial prioritário
 - vendedores de ótica
-- consultores
+- atendentes
+- consultores ópticos
+- profissionais de linha de frente
+
+## Público comprador secundário
 - gerentes comerciais
 - líderes operacionais
-
-## Público secundário
-- proprietários
-- coordenadores
-- equipes em treinamento
+- donos que compram para treinar equipe
 
 ## Estrutura de valor
 
-### Camada 1 - Gratuito
+### Camada 1 — Gratuito
+- conteúdos leves
 - checklists
-- mini PDFs
-- materiais rápidos
-- iscas digitais
+- materiais curtos
 
-### Camada 2 - Low ticket
+Regra:
+- útil, mas não obrigatório para a operação começar
+
+### Camada 2 — Low ticket
 - ebooks premium
-- manuais visuais premium
-- kits
-- minicursos
-- trilhas básicas
+- manuais visuais
+- kits práticos
 
-### Camada 3 - Progressão
-- séries
-- trilhas por função
-- progressão por nível
-- certificados simples
+Regra:
+- esta é a camada prioritária agora
 
-### Camada 4 - B2B
-- treinamento de equipes
-- onboarding de lojas
-- conexão com o ecossistema Clearix
+### Camada 3 — Continuidade
+- complementos na Nexus
+- revisão guiada
+- pequenos apoios de aplicação
+
+Regra:
+- continuidade restrita ao produto comprado
+
+### Camada 4 — Evolução comercial
+- aproximação para treinamento maior
+- conversa comercial futura
+- entrada no Clearix quando houver fit
 
 ## Produto inaugural oficial
 
 ### Nome
-Ótica Sem Achismo
+Ótica Sem Improviso
 
 ### Subtítulo
 Manual Visual de Atendimento e Conversão para Óticas
 
+### Formato comercial
+- ebook / manual visual em PDF
+- acesso complementar de 90 dias na Nexus
+
 ### Função estratégica
-- provar demanda real
+- provar demanda
 - gerar caixa de entrada
-- fortalecer autoridade prática do Academy
-- aproximar vendedores do ecossistema
-- abrir ponte futura para treinamentos e Clearix
+- formar base compradora
+- aproximar o comprador do ecossistema
+- abrir ponte futura para o Clearix
 
-### Público principal do produto
-- vendedor
-- atendente
-- consultor óptico
-- colaborador de linha de frente
-
-### Regras do produto inaugural
+## Regra do produto inaugural
 - falar com quem atende no balcão
-- parecer ferramenta profissional
-- não parecer curso genérico
-- usar a Nexus como apoio, não como protagonista
-- manter o Clearix apenas como referência sutil de ecossistema
+- parecer ferramenta prática
+- não parecer curso longo
+- vender primeiro o ebook
+- tratar a Nexus como complemento
+- manter o Clearix apenas como contexto estratégico, não como protagonista
 
-## Temas iniciais sugeridos
-1. atendimento consultivo em óticas
-2. follow-up que recupera vendas
-3. WhatsApp comercial no dia a dia da ótica
-4. erros que derrubam conversão
-5. checklist diário do vendedor
-6. pós-venda que gera retorno
-7. abordagem sem parecer insistente
-8. organização da rotina comercial
-9. objeções comuns em óticas
-10. como não perder oportunidades por falta de processo
+## Funil oficial desta fase
+```text
+Marketplace
+-> compra do low ticket
+-> ebook + Nexus 90 dias
+-> ativação e aplicação
+-> relacionamento
+-> oportunidade futura de Clearix
+```
 
-## Funil sugerido
-conteúdo gratuito -> low ticket -> trilha -> treinamento de equipe -> conversa comercial -> Clearix
+## Ativos mínimos da fase atual
+- página/listagem do produto em marketplace
+- checkout funcionando
+- ebook finalizado
+- onboarding simples
+- acesso na Nexus por 90 dias
+- suporte operacional
+- página externa de apoio, se fizer sentido
 
-## Ativos mínimos da fase inicial
-- biblioteca de materiais gratuitos
-- primeiros low tickets
-- landing do primeiro low ticket
-- CTA padrão
-- página de captura
-- rotina editorial
-- ligação clara com DIGIAI e Clearix
+## O que não é prioridade agora
+- depender de site completo para começar
+- depender de grande operação orgânica
+- tratar Academy como negócio educacional isolado
+- criar plataforma própria complexa antes da venda validar
 
-## Integração com outras frentes
+## Relação com a Nexus
+A Nexus é infraestrutura complementar.
 
-### Relação com o Clearix
-Preparar o mercado para desejar a estrutura que o produto organiza.
+Ela deve:
+- organizar acesso
+- aumentar ativação
+- complementar o produto
 
-### Relação com o Nexus
-Infraestrutura de apoio e continuidade.
+Ela não deve:
+- complicar a oferta
+- parecer maior que o ebook
+- virar argumento principal de venda
 
-No estágio atual:
-- pode aparecer como ambiente leve de acesso
-- não pode complicar a oferta
-- não pode roubar o protagonismo do material principal
+## Relação com o Clearix
+O Clearix continua sendo a solução futura de maior valor.
 
-### Relação com o Pulso
-Pulso pode apoiar distribuição e escala de conteúdo, sem substituir a lógica editorial.
+O Academy deve:
+- aquecer o mercado
+- gerar confiança
+- criar base
+- facilitar aproximação futura
 
-## Métricas mínimas da frente
-- materiais publicados
-- leads captados
-- conversão para low ticket
-- temas com melhor resposta
-- interesse gerado para o Clearix
-
-## Risco principal a evitar
-Virar um braço de infoproduto desconectado do produto principal.
+## Métricas mínimas
+- visitas e cliques nas páginas dos marketplaces
+- compras aprovadas
+- ativação na Nexus
+- abertura do ebook
+- consumo do complemento
+- sinais de interesse posterior no Clearix
 
 ## Dependências críticas
+- `modelo-comercial-marketplace-first-clearix-academy.md`
 - `operacao-editorial-clearix-academy.md`
 - `presenca-digital-e-sites.md`
-- `otica-sem-achismo.md`
-- `landing-otica-sem-achismo.md`
+- `otica-sem-improviso.md`
+- `arquitetura-de-venda-e-entrega-otica-sem-improviso.md`

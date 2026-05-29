@@ -1,14 +1,14 @@
-# Runbook de Lançamento, Venda e Acesso de Ótica Sem Achismo
+# Runbook de Lançamento, Venda e Acesso de Ótica Sem Improviso
 
 ## Classificação documental
 - tipo: runbook operacional
 - status: canônico inicial
 - última revisão: 2026-04-23
 - responsável formal: Precisa de validação manual
-- documento-mãe relacionado: `../05-marketing/arquitetura-de-venda-e-entrega-otica-sem-achismo.md`
+- documento-mãe relacionado: `../05-marketing/arquitetura-de-venda-e-entrega-otica-sem-improviso.md`
 
 ## Objetivo do documento
-Definir como operar o lançamento de Ótica Sem Achismo da venda ao acesso, incluindo plataforma de checkout, liberação na Nexus, suporte, contingência, analytics e tratamento de falhas.
+Definir como operar o lançamento de Ótica Sem Improviso da venda ao acesso, incluindo plataforma de checkout, liberação na Nexus, suporte, contingência, analytics e tratamento de falhas.
 
 ## Princípio operacional
 Não misturar estratégia boa com operação confusa.
@@ -326,9 +326,9 @@ Sempre manter como:
 - fallback manual pronto
 
 ## Dependências documentais
-- `../05-marketing/otica-sem-achismo.md`
-- `../05-marketing/landing-otica-sem-achismo.md`
-- `../05-marketing/arquitetura-de-venda-e-entrega-otica-sem-achismo.md`
+- `../05-marketing/otica-sem-improviso.md`
+- `../05-marketing/landing-otica-sem-improviso.md`
+- `../05-marketing/arquitetura-de-venda-e-entrega-otica-sem-improviso.md`
 
 ## Lacunas abertas
 - ferramenta final de e-mail complementar

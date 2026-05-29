@@ -13,5 +13,4 @@ Regra:
 - insumo bruto entra primeiro na pasta do produto e depois sobe para os docs canônicos quando fizer sentido
 
 Estrutura inicial:
-- `otica-sem-achismo/`
 - `otica-sem-improviso/`
