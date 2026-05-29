@@ -63,7 +63,7 @@ const scenarioStatusClass: Record<AcademyScenarioStatus, string> = {
 
 const questionStatusLabel: Record<AcademyQuestionStatus, string> = {
   open: 'Aberta',
-  deciding: 'Em decisao',
+  deciding: 'Em decisão',
   blocked: 'Bloqueada',
   done: 'Fechada',
 };
@@ -86,7 +86,7 @@ const checklistAreaLabel: Record<AcademyChecklistArea, string> = {
 const productStatusLabel: Record<AcademyProductStatus, string> = {
   draft: 'Draft',
   planned: 'Planejado',
-  in_production: 'Em producao',
+  in_production: 'Em produção',
   ready_for_sale: 'Pronto para venda',
   live: 'Ao vivo',
   archived: 'Arquivado',
@@ -126,8 +126,8 @@ const creationTypeLabel: Record<AcademyCreationRecordType, string> = {
   design: 'Design',
   research: 'Research',
   editorial: 'Editorial',
-  operation: 'Operacao',
-  decision: 'Decisao',
+  operation: 'Operação',
+  decision: 'Decisão',
   other: 'Outro',
 };
 

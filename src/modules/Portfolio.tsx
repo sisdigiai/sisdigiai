@@ -50,7 +50,7 @@ const PRODUTOS: Produto[] = [
     status: 'Engenharia de funil implementada no DIGIAI App',
     faseAtual: 'Fase 2 — Teste de oferta e tráfego',
     repo: 'D:\\OneDrive - Óticas Taty Mello\\Grupo Mello\\Marketing_e_Vendas\\digiai\\otica_sem_improviso',
-    stack: 'PDF + App de apoio + Kiwify + Meta Ads + Automação WhatsApp/Email',
+    stack: 'PDF + App de apoio + Hotmart + Meta Ads + Automação WhatsApp/Email',
     proximo: 'Configurar checkout, subir criativos ABO e medir dores compradoras',
     bloqueio: 'Primeiro módulo do app principal ainda precisa ser escolhido pelos dados do funil',
   },
