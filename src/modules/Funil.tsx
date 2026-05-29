@@ -298,7 +298,7 @@ function ControleTab({
       <section className="grid grid-cols-1 xl:grid-cols-[1fr_0.85fr] gap-5">
         <div className="bg-surface-low border border-outline/10 p-5">
           <h2 className="text-xl font-semibold">Entradas reais do teste</h2>
-          <p className="text-sm text-on-surface-variant mt-1 mb-5">Preencha estes campos depois de cada leitura do Ads/Kiwify/CRM.</p>
+          <p className="text-sm text-on-surface-variant mt-1 mb-5">Preencha estes campos depois de cada leitura do Ads/Hotmart/CRM.</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {fields.map((field) => (
               <NumberField

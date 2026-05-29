@@ -118,7 +118,7 @@ export type FunnelSummary = {
 const LS_KEY = 'digiai_funnel_osi_workspace';
 
 const defaultAssumptions: FunnelAssumptions = {
-  mainPrice: 97,
+  mainPrice: 97, // preco cheio modelado; estreia da turma inicial e R$47,90 (regua OSI)
   bumpWhatsappPrice: 27,
   bumpChecklistPrice: 19,
   upsellPrice: 197,
@@ -289,14 +289,14 @@ const defaultAutomation: FunnelAutomationStep[] = [
 const defaultTasks: FunnelTask[] = [
   {
     id: 'checkout-kiwify',
-    title: 'Configurar produto, bumps e upsell na Kiwify',
+    title: 'Configurar produto, bumps e upsell na Hotmart',
     area: 'checkout',
     status: 'next',
     owner: 'Growth',
-    nextStep: 'Criar checkout com OSI R$97, bumps R$27/R$19 e upsell R$197.',
+    nextStep: 'Criar checkout na Hotmart: OSI estreia R$47,90 (cheio R$97), bumps R$27/R$19 e upsell R$197.',
     why: 'Sem checkout limpo, nao existe leitura confiavel de conversao, ticket medio, bumps e upsell.',
     checklist: [
-      'Criar produto principal Manual OSI + App por R$97.',
+      'Criar produto principal Manual OSI + App: estreia R$47,90 (turma inicial) e cheio R$97.',
       'Adicionar bump Kit WhatsApp por R$27 com texto de uso imediato.',
       'Adicionar bump Checklist 30 segundos por R$19 com promessa operacional.',
       'Criar upsell 1-click Treinamento OSI na Pratica por R$197.',
