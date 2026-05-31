@@ -1,4 +1,4 @@
-import { ShieldCheck, Bot, Lock, Target, Heart } from 'lucide-react';
+import { ShieldCheck, Bot, Lock, Target, Heart, Store } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 
 // Travas de marketing — derivadas das regras canônicas (R-011, R-013/LGPD,
@@ -38,14 +38,25 @@ export const TRAVAS: Trava[] = [
   },
   {
     icone: Target,
-    titulo: 'Estratégia / CTA pro Clearix',
-    fonte: 'Decisões 17/04 · Verdades Canônicas',
+    titulo: 'Ponte sutil pro Clearix',
+    fonte: 'plano-mestre §5 · landing-osi §104-108',
     regras: [
-      'Academy e OSI são funil de entrada do Clearix — todo conteúdo puxa pro ecossistema.',
-      'Distribuição > Produto: Academy/Pulso são canais do Clearix, não fins em si.',
-      'Nenhuma frente editorial pode competir com a venda do Clearix.',
+      'Clearix é sobremesa, não prato principal — Academy/OSI nunca empurram, abrem ponte.',
+      'Distribuição > Produto: Academy/OSI são canais que constroem confiança pro Clearix futuro.',
+      'Nenhuma frente editorial deve sobre-vender Clearix no low-ticket.',
     ],
-    onde: 'Banco de Ideias · Calendário · Landing OSI',
+    onde: 'Banco de Ideias · Calendário · Landing OSI · PromptsIA',
+  },
+  {
+    icone: Store,
+    titulo: 'Marketplace-first',
+    fonte: 'modelo-comercial §43-48 · presença-digital §12-30',
+    regras: [
+      'Hotmart/Kiwify é o canal primário de aquisição — landing e site são apoio, não eixo.',
+      'Toda copy/CTA aponta pro listing do marketplace, não pra landing intermediária.',
+      'Preço, capa e oferta no marketplace são fonte da verdade — sincronizar app ↔ marketplace.',
+    ],
+    onde: 'Marketplace · Calendário · Materiais de afiliados · Landing OSI',
   },
   {
     icone: Heart,
@@ -70,7 +81,8 @@ export function TravasBanner() {
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-on-surface-variant">
         <span><b className="text-on-surface">AI produz / humano publica</b> (R-011)</span>
         <span><b className="text-on-surface">opt-in + template LGPD</b> (R-013)</span>
-        <span><b className="text-on-surface">CTA pro Clearix</b> em tudo</span>
+        <span><b className="text-on-surface">marketplace-first</b> (Hotmart/Kiwify)</span>
+        <span><b className="text-on-surface">ponte sutil pro Clearix</b></span>
         <span><b className="text-on-surface">tom humano PT-BR</b></span>
         <span className="text-muted">· detalhe em Sistema → Travas Marketing</span>
       </div>

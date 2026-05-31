@@ -44,7 +44,7 @@ const PRODUTOS: Produto[] = [
   },
   {
     nome: 'Ótica Sem Improviso',
-    subtitulo: 'Primeira isca paga do ecossistema de apps para óticas',
+    subtitulo: 'Primeira isca paga — funil pro Clearix',
     categoria: 'alavanca-critica',
     prioridade: 'alta',
     status: 'Engenharia de funil implementada no DIGIAI App',
@@ -52,7 +52,7 @@ const PRODUTOS: Produto[] = [
     repo: 'D:\\OneDrive - Óticas Taty Mello\\Grupo Mello\\Marketing_e_Vendas\\digiai\\otica_sem_improviso',
     stack: 'PDF + App de apoio + Hotmart + Meta Ads + Automação WhatsApp/Email',
     proximo: 'Configurar checkout, subir criativos ABO e medir dores compradoras',
-    bloqueio: 'Primeiro módulo do app principal ainda precisa ser escolhido pelos dados do funil',
+    bloqueio: 'Primeira ponte concreta pro Clearix ainda precisa ser escolhida pelos dados do funil',
   },
   {
     nome: 'Nexus',

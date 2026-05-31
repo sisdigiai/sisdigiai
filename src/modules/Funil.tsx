@@ -111,7 +111,7 @@ export default function Funil() {
         title="Engenharia de Funil OSI"
         subtitle={
           <>
-            Controle vivo da isca paga Otica Sem Improviso, da esteira de guias e da ponte para o ecossistema de apps para oticas.
+            Controle vivo da isca paga Otica Sem Improviso, da esteira de guias e da ponte sutil pro Clearix.
             <span className="block text-xs font-mono text-muted mt-2">
               Atualizado em {new Date(workspace.updatedAt).toLocaleString('pt-BR')} · fonte local do app
             </span>
@@ -367,7 +367,7 @@ function ProdutoTab() {
       </section>
 
       <section className="bg-surface-low border border-outline/10 p-6 space-y-5">
-        <h2 className="text-xl font-semibold">Como o produto prepara o app principal</h2>
+        <h2 className="text-xl font-semibold">Como o produto abre ponte pro Clearix</h2>
         <div className="space-y-3">
           <BridgeRow from="Atendimento sem metodo" to="App de scripts e conducoes por situacao" />
           <BridgeRow from="Cliente sumiu no WhatsApp" to="CRM de orcamentos e retomada com contexto" />

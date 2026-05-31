@@ -354,7 +354,7 @@ const defaultTasks: FunnelTask[] = [
     acceptanceCriteria: [
       'Todos os criativos possuem gancho claro nos 3 primeiros segundos ou primeira linha.',
       'Cada criativo aponta para uma dor unica.',
-      'Nenhum criativo promete o app principal como entrega do ebook.',
+      'Nenhum criativo promete o Clearix como entrega do ebook.',
       'Todos possuem CTA coerente com OSI.',
     ],
     decisionRule: 'Duplicar o angulo vencedor; nao misturar dores antes de saber qual compra.',

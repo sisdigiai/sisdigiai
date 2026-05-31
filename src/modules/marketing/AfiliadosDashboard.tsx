@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Plus, RefreshCw, Search, X, Save, ExternalLink, MessageCircle, Copy, Check, DollarSign, Trophy, Award, Loader2, Link as LinkIcon, Receipt } from 'lucide-react';
+import { Plus, RefreshCw, Search, X, Save, ExternalLink, MessageCircle, Copy, Check, DollarSign, Trophy, Award, Loader2, Link as LinkIcon, Receipt, AlertTriangle } from 'lucide-react';
 import { marketingStore } from '../../lib/marketingStore';
 
 type DashRow = Awaited<ReturnType<typeof marketingStore.listAffiliatesDashboard>>[number];
@@ -84,6 +84,18 @@ export function AfiliadosDashboard() {
           </button>
         </div>
       </div>
+
+      {stats && stats.sales_total === 0 && (
+        <div className="mb-4 border border-amber-500/30 bg-amber-500/[0.08] px-4 py-3 flex items-start gap-3">
+          <AlertTriangle className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
+          <div className="text-xs text-on-surface-variant leading-relaxed">
+            <b className="text-amber-200">Aguarde a 1ª prova social antes de recrutar afiliados agressivamente.</b>{' '}
+            Plano-mestre §12 passo 10: afiliado bom busca produto que vende. Recrutar antes da 1ª venda real
+            desperdiça tempo e queima reputação.{' '}
+            <span className="text-muted">(Cadastrar 2-3 parceiros próximos antes do lançamento está ok.)</span>
+          </div>
+        </div>
+      )}
 
       {stats && (
         <>
