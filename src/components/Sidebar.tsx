@@ -15,8 +15,8 @@ export type ModuleId =
   | 'backlog' | 'comercial' | 'academy' | 'funil' | 'financeiro'
   | 'decisoes' | 'biblioteca' | 'brand' | 'cadastro-empresa'
   | 'clearix' | 'referencias-design' | 'mock-estilos' | 'marketing'
-  | 'marketing-seo' | 'ecossistemas' | 'travas-marketing' | 'fluxo-osi'
-  | 'guia';
+  | 'marketing-seo' | 'marketplace' | 'ecossistemas' | 'travas-marketing'
+  | 'fluxo-osi' | 'guia';
 
 interface NavItem {
   id: ModuleId;
@@ -59,6 +59,7 @@ const operacional: NavItem[] = [
   { id: 'fluxo-osi',        label: 'Mapa OSI',          icon: <Workflow className="w-4 h-4" /> },
   { id: 'marketing',        label: 'Marketing',         icon: <Megaphone className="w-4 h-4" /> },
   { id: 'marketing-seo',    label: 'Marketing & SEO',   icon: <Search className="w-4 h-4" /> },
+  { id: 'marketplace',      label: 'Marketplace',       icon: <Store className="w-4 h-4" /> },
   { id: 'clearix',          label: 'Central Clearix',   icon: <Network className="w-4 h-4" /> },
 ];
 

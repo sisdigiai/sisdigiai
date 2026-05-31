@@ -18,6 +18,7 @@ import Academy from './modules/Academy';
 import Funil from './modules/Funil';
 import Marketing from './modules/Marketing';
 import MarketingSEO from './modules/MarketingSEO';
+import Marketplace from './modules/Marketplace';
 import ReferenciasDesign from './modules/ReferenciasDesign';
 import MockClearixEstilos from './modules/MockClearixEstilos';
 import Ecossistemas from './modules/Ecossistemas';
@@ -138,6 +139,7 @@ export default function App() {
       case 'funil': return <Funil />;
       case 'marketing': return <Marketing />;
       case 'marketing-seo': return <MarketingSEO />;
+      case 'marketplace': return <Marketplace />;
       case 'referencias-design': return <ReferenciasDesign />;
       case 'mock-estilos': return <MockClearixEstilos />;
       case 'ecossistemas': return <Ecossistemas />;
