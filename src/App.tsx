@@ -66,7 +66,7 @@ const MODULE_LABEL: Record<ModuleId, string> = {
   visao: 'Visão', portfolio: 'Portfólio', trilha: 'Roadmap', 'lista-mestra': 'Lista Mestra',
   backlog: 'Backlog Executivo', comercial: 'Comercial', 'cadastro-empresa': 'Cadastro Empresa',
   financeiro: 'Financeiro', academy: 'Academy', funil: 'Funil OSI', 'fluxo-osi': 'Mapa OSI',
-  marketing: 'Marketing', 'marketing-seo': 'Marketing & SEO', clearix: 'Central Clearix',
+  marketing: 'Marketing', 'marketing-seo': 'Marketing & SEO', marketplace: 'Marketplace', clearix: 'Central Clearix',
   ecossistemas: 'Ecossistemas', decisoes: 'Decisões', biblioteca: 'Biblioteca', brand: 'Brand Guidelines',
   'travas-marketing': 'Travas Marketing', 'referencias-design': 'Referências Design', 'mock-estilos': 'Mock Vendas',
   guia: 'Guia Operacional',
@@ -77,7 +77,7 @@ const MODULE_SECTION: Record<ModuleId, string> = {
   visao: 'Operacional', portfolio: 'Operacional', trilha: 'Operacional', 'lista-mestra': 'Operacional',
   backlog: 'Operacional', comercial: 'Operacional', 'cadastro-empresa': 'Operacional', financeiro: 'Operacional',
   academy: 'Operacional', funil: 'Operacional', 'fluxo-osi': 'Operacional', marketing: 'Operacional',
-  'marketing-seo': 'Operacional', clearix: 'Operacional', ecossistemas: 'Ecossistemas',
+  'marketing-seo': 'Operacional', marketplace: 'Operacional', clearix: 'Operacional', ecossistemas: 'Ecossistemas',
   decisoes: 'Sistema', biblioteca: 'Sistema', brand: 'Sistema', 'travas-marketing': 'Sistema',
   'referencias-design': 'Sistema', 'mock-estilos': 'Sistema', guia: 'Sistema',
 };
