@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, Flame, Megaphone, Boxes, ArrowRight, CheckCircle2, Circle, AlertCircle, Rocket, MapPin } from 'lucide-react';
+import { BookOpen, Flame, Megaphone, Boxes, ArrowRight, CheckCircle2, Circle, AlertCircle, Rocket, MapPin, Heart } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { academyStore } from '../lib/academyStore';
 import { funnelStore, calculateFunnelSummary } from '../lib/funnelStore';
 import { marketingStore } from '../lib/marketingStore';
 import { supabase } from '../lib/supabase';
+import { fetchOsiOnboardingSummary, nexusReady, OsiOnboardingSummary } from '../lib/nexusClient';
 import { TravasBanner } from './TravasMarketing';
 import type { ModuleId } from '../components/Sidebar';
 
@@ -38,6 +39,7 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
   const [s, setS] = useState<Stage>({ produto: null, funil: null, mkt: null });
   const [fase0, setFase0] = useState<Fase0Item[]>([]);
   const [geo, setGeo] = useState<GeoRow[]>([]);
+  const [nexus, setNexus] = useState<{ data: OsiOnboardingSummary | null; error: string | null } | null>(null);
 
   useEffect(() => {
     // Funil é local (síncrono)
@@ -143,6 +145,12 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
           .limit(10);
         setGeo((data ?? []) as GeoRow[]);
       } catch { /* silencioso */ }
+    })();
+
+    // M4.2 — Nexus 90 dias (cross-DB read)
+    (async () => {
+      const result = await fetchOsiOnboardingSummary();
+      setNexus(result);
     })();
   }, []);
 
@@ -263,6 +271,55 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
           </div>
         );
       })()}
+
+      {/* M4.2 — Entrega Nexus 90 dias (cross-DB read, anon key) */}
+      {nexus && (
+        <div className="border border-outline/10 bg-surface-low p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <Heart className="w-4 h-4 text-secondary" />
+            <span className="text-xs font-mono uppercase tracking-widest text-muted">Nexus · ativação 90 dias</span>
+            {nexus.data && (
+              <span className="ml-auto text-[11px] text-on-surface-variant font-mono tabular-nums">
+                {nexus.data.total_buyers} compradores
+              </span>
+            )}
+          </div>
+          {!nexusReady ? (
+            <div className="text-xs text-amber-200 leading-relaxed">
+              <b>VITE_NEXUS_SUPABASE_URL / VITE_NEXUS_SUPABASE_ANON_KEY ausentes no .env.</b> Adicione pra ativar leitura cross-DB do banco Nexus.
+            </div>
+          ) : nexus.error === 'view_not_created_in_nexus' ? (
+            <div className="text-xs text-on-surface-variant leading-relaxed space-y-1.5">
+              <div className="text-amber-200"><b>View <code className="font-mono">v_osi_onboarding_summary</code> ainda não existe no Nexus.</b></div>
+              <div>Credencial cross-DB OK (anon key configurada e respondendo). Falta criar a view no repo Nexus com este formato:</div>
+              <pre className="font-mono text-[10px] bg-surface-lowest p-2 overflow-x-auto whitespace-pre">{`CREATE VIEW public.v_osi_onboarding_summary AS
+SELECT
+  COUNT(*) FILTER (WHERE compra_origem='osi') AS total_buyers,
+  COUNT(*) FILTER (WHERE ultimo_login_at > now() - interval '7 days') AS active_last_7d,
+  COUNT(*) FILTER (WHERE ultimo_login_at > now() - interval '30 days') AS active_last_30d,
+  COUNT(*) FILTER (WHERE progresso_pct >= 50) AS with_progress_50_plus,
+  COUNT(*) FILTER (WHERE certificado_emitido) AS certificates_issued,
+  AVG(progresso_pct) AS avg_progress_pct
+FROM learning.osi_buyers_progress;
+GRANT SELECT ON public.v_osi_onboarding_summary TO anon, authenticated;`}</pre>
+              <div className="text-muted">arquitetura-de-venda-e-entrega §38-46 / §88-107 · plano-mestre §11 (fundo de funil).</div>
+            </div>
+          ) : nexus.error ? (
+            <div className="text-xs text-red-300">Erro inesperado: {nexus.error}</div>
+          ) : nexus.data ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              <Metric label="Compradores OSI" value={String(nexus.data.total_buyers)} />
+              <Metric label="Ativos últimos 7d" value={String(nexus.data.active_last_7d)} />
+              <Metric label="Ativos últimos 30d" value={String(nexus.data.active_last_30d)} />
+              <Metric label="≥ 50% progresso" value={String(nexus.data.with_progress_50_plus)} />
+              <Metric label="Certificados" value={String(nexus.data.certificates_issued)} />
+              <Metric label="Progresso médio" value={nexus.data.avg_progress_pct != null ? `${nexus.data.avg_progress_pct.toFixed(0)}%` : '—'} />
+            </div>
+          ) : (
+            <div className="text-xs text-muted">Carregando...</div>
+          )}
+        </div>
+      )}
 
       <div className="flex flex-col md:flex-row gap-3 items-stretch">
         <Card icon={<BookOpen className="w-3.5 h-3.5" />} etapa="Produto · Academy" titulo={s.produto?.nome || '…'}>
