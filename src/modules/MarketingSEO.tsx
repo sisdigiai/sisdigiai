@@ -43,7 +43,7 @@ export default function MarketingSEO() {
           Setup de credenciais: <code className="font-mono">docs/setup-gsc-oauth.md</code> · <code className="font-mono">docs/setup-bing-api-key.md</code> · <code className="font-mono">docs/setup-cloudflare-api-token.md</code>
         </div>
         <div>
-          Cache via tabela <code className="font-mono">company.metrics</code>. Sincronização sob demanda via edge functions <code className="font-mono">marketing-sync-*</code> (cron diário em V2).
+          Cache via tabela <code className="font-mono">company.metrics</code>. Sincronização autom&aacute;tica via cron <code className="font-mono">marketing-sync-daily</code> (09:00 UTC / 06:00 BRT). Bot&atilde;o &laquo;Sincronizar&raquo; em cada card dispara on-demand.
         </div>
       </footer>
     </div>
