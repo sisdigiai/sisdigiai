@@ -35,7 +35,10 @@ export function CardBing() {
               <div className="text-xs text-on-surface-variant">{aiPerf.value_text ?? `${aiPerf.value_numeric} citações`}</div>
             </div>
           ) : (
-            <div className="text-[10px] text-muted italic">AI Performance (Copilot) indisponível ou em BETA pra esta conta.</div>
+            <div className="text-[10px] text-muted italic">
+              AI Performance (Copilot) só está disponível na UI do Bing Webmaster — Microsoft ainda não expôs o endpoint via API REST. Veja em{' '}
+              <a href="https://www.bing.com/webmasters/aiperformance" target="_blank" rel="noopener noreferrer" className="text-secondary hover:underline">bing.com/webmasters/aiperformance</a>.
+            </div>
           )}
           {topQueries.length > 0 && (
             <div>
