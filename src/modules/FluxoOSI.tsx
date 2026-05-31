@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, Flame, Megaphone, Boxes, ArrowRight, CheckCircle2, Circle, AlertCircle, Rocket } from 'lucide-react';
+import { BookOpen, Flame, Megaphone, Boxes, ArrowRight, CheckCircle2, Circle, AlertCircle, Rocket, MapPin } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { academyStore } from '../lib/academyStore';
 import { funnelStore, calculateFunnelSummary } from '../lib/funnelStore';
@@ -25,9 +25,19 @@ interface Fase0Item {
   detail?: string;
 }
 
+interface GeoRow {
+  city: string;
+  state: string;
+  community_count: number;
+  affiliate_count: number;
+  testimonial_count: number;
+  total: number;
+}
+
 export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) => void }) {
   const [s, setS] = useState<Stage>({ produto: null, funil: null, mkt: null });
   const [fase0, setFase0] = useState<Fase0Item[]>([]);
+  const [geo, setGeo] = useState<GeoRow[]>([]);
 
   useEffect(() => {
     // Funil é local (síncrono)
@@ -123,6 +133,17 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
 
       setFase0(items);
     })();
+
+    // Cidade-foco "efeito caracol" (plano-mestre §1)
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('v_marketing_geo_funnel')
+          .select('city, state, community_count, affiliate_count, testimonial_count, total')
+          .limit(10);
+        setGeo((data ?? []) as GeoRow[]);
+      } catch { /* silencioso */ }
+    })();
   }, []);
 
   const Card = ({ icon, etapa, titulo, children }: { icon: React.ReactNode; etapa: string; titulo: string; children: React.ReactNode }) => (
@@ -194,6 +215,51 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
                 );
               })}
             </ul>
+          </div>
+        );
+      })()}
+
+      {/* M4.7 — Cidade-foco "efeito caracol" (plano-mestre §1) */}
+      {geo.length > 0 && (() => {
+        const totalAll = geo.reduce((acc, g) => acc + g.total, 0);
+        const suzano = geo.find(g => g.city.toLowerCase() === 'suzano' && g.state === 'SP');
+        return (
+          <div className="border border-outline/10 bg-surface-low p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-secondary" />
+              <span className="text-xs font-mono uppercase tracking-widest text-muted">Cidade-foco · efeito caracol</span>
+              <span className="ml-auto text-[11px] text-on-surface-variant font-mono tabular-nums">{totalAll} pessoas · {geo.length} cidades</span>
+            </div>
+            <div className="text-xs text-muted">
+              Suzano → região → BR → mundo (plano-mestre §1). Cold-start prefere densidade local antes de dispersar tráfego.
+            </div>
+            {suzano ? (
+              <div className="bg-secondary-container/20 border border-secondary/30 px-3 py-2 text-xs text-on-surface-variant">
+                <b className="text-secondary">Suzano-SP em foco:</b> {suzano.total} pessoas
+                ({suzano.community_count} comunidade · {suzano.affiliate_count} afiliados · {suzano.testimonial_count} depoimentos)
+              </div>
+            ) : (
+              <div className="bg-amber-500/[0.08] border border-amber-500/20 px-3 py-2 text-xs text-on-surface-variant">
+                <b className="text-amber-200">Suzano-SP ainda sem registros.</b> Cold-start começa aqui — comunicar localmente antes de escalar mídia paga.
+              </div>
+            )}
+            <ul className="space-y-1">
+              {geo.slice(0, 10).map((g, i) => {
+                const isSuzano = g.city.toLowerCase() === 'suzano' && g.state === 'SP';
+                return (
+                  <li key={`${g.city}-${g.state}`} className={`flex items-center justify-between text-xs ${isSuzano ? 'text-secondary font-semibold' : 'text-on-surface-variant'}`}>
+                    <span className="truncate">
+                      <span className="text-muted font-mono mr-2">#{i + 1}</span>
+                      {g.city} <span className="text-muted">/ {g.state}</span>
+                    </span>
+                    <span className="font-mono tabular-nums shrink-0 ml-2">
+                      {g.total} <span className="text-muted">({g.community_count}/{g.affiliate_count}/{g.testimonial_count})</span>
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="text-[10px] text-muted font-mono">total (comunidade/afiliados/depoimentos)</div>
           </div>
         );
       })()}
