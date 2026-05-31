@@ -18,6 +18,7 @@ export function CardCloudflare() {
   const threats7d = rows.find(r => r.metric_type === 'threats' && r.period === '7d')?.value_numeric;
   const sslStatus = rows.find(r => r.metric_type === 'ssl_status')?.value_text;
   const topCountries = rows.filter(r => r.metric_type === 'top_country' && r.period === '7d').slice(0, 5);
+  const topStatuses = rows.filter(r => r.metric_type === 'status_code' && r.period === '7d').slice(0, 6);
 
   const hasAny = rows.length > 0;
 
@@ -54,6 +55,19 @@ export function CardCloudflare() {
                   <li key={c.id} className="flex items-center justify-between text-xs">
                     <span className="text-on-surface-variant font-mono">{c.metric_key}</span>
                     <span className="font-mono tabular-nums text-on-surface-variant">{c.value_numeric}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {topStatuses.length > 0 && (
+            <div>
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted mb-1.5">Status codes (7d)</div>
+              <ul className="space-y-1">
+                {topStatuses.map(s => (
+                  <li key={s.id} className="flex items-center justify-between text-xs">
+                    <span className="text-on-surface-variant font-mono">HTTP {s.metric_key}</span>
+                    <span className="font-mono tabular-nums text-on-surface-variant">{s.value_numeric}</span>
                   </li>
                 ))}
               </ul>
