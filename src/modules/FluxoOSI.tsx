@@ -24,6 +24,9 @@ interface Fase0Item {
   label: string;
   status: Fase0Status;
   detail?: string;
+  how?: string[];          // passo a passo acionável
+  action_url?: string;     // link direto pra ação
+  action_label?: string;   // label do link
 }
 
 interface GeoRow {
@@ -74,29 +77,55 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
           label: 'Contas sociais primárias OSI (Instagram + TikTok)',
           status: active.length >= 2 ? 'done' : active.length === 1 ? 'partial' : 'pending',
           detail: `${active.length}/2 ativas — ${active.map(a => a.categoria).join(', ') || 'nenhuma criada'}`,
+          how: [
+            'Abre Instagram e TikTok no celular (uma de cada vez)',
+            'Cria @oticasemimproviso — handle deve ser idêntico nas duas',
+            'Bio idêntica: "Pare de atender no improviso · por Tatiana Camargo · método em 5 movimentos"',
+            'Link da bio = https://go.hotmart.com/B105515825L?dp=1 (Hotmart direto — NÃO landing)',
+            'Avatar: arte gerada pelo MJ (prompt no calendário) ou foto da Taty',
+            'Capa IG (1080x608): arte gerada pelo MJ (prompt no calendário)',
+            'Quando criar, me avisa pra eu marcar digital_assets.status = ativo',
+          ],
         });
       } catch {
         items.push({ key: 'social', label: 'Contas sociais primárias OSI (Instagram + TikTok)', status: 'pending', detail: '(erro ao consultar digital_assets)' });
       }
 
-      // 2. 5 peças de estreia 01-05/06 (sem fonte estrutural; manual)
+      // 2. 5 peças de estreia 01-05/06
       items.push({
         key: 'estreia',
-        label: '5 peças de estreia (01-05/06)',
+        label: '6 peças de estreia (01-05/06)',
         status: 'pending',
-        detail: 'Roteiros + capturas. Marcar com tag "estreia" no calendário quando entrar.',
+        detail: 'Roteiros prontos no calendário (status `ready`). Falta gravar/produzir e publicar.',
+        how: [
+          'Abre Marketing > Calendário Editorial e filtra dias 01-05/06',
+          'Cada peça tem copy_full (roteiro literal), posting_brief (direção) e arts (prompts MJ)',
+          'Dia 01/06 19:30 reel autoridade Taty: agendar gravação 60-90s com a Taty no balcão',
+          'Demais 5 peças têm cenas curtas em estúdio caseiro / smartphone (briefing já detalha)',
+          'Pra capas: cola os prompts do campo `arts` no Midjourney, escolhe variação, baixa, finaliza em Canva (texto + logo)',
+          'Quando publicar: usa o UTM gerado em cada peça pro tracking funcionar',
+        ],
+        action_url: '/marketing',
+        action_label: 'Abrir Calendário Editorial',
       });
 
-      // 3. Pixel Meta + TikTok (manual; sem fonte estrutural ainda)
+      // 3. Pixel Meta + TikTok
       items.push({
         key: 'pixel',
         label: 'Pixel Meta + TikTok instalados na landing OSI',
         status: 'pending',
-        detail: 'Sem retargeting, R$50/dia queima cego. Confirmar inspecionando o HTML da landing.',
+        detail: 'Sem retargeting, R$50/dia queima cego (plano-de-largada §8).',
+        how: [
+          'Abre business.facebook.com (Meta Business Suite)',
+          'Eventos do Pixel > Conectar fonte de dados > Web > Criar pixel',
+          'Nomeia "OSI Landing" e copia o Pixel ID (formato: 123456789012345)',
+          'Repete em ads.tiktok.com (Meta de eventos > Web > Conectar Web > Pixel manual)',
+          'Me passa os 2 IDs no chat — eu ploto no código da landing (D:\\projetos\\otica_sem_improviso) e push',
+          'Após plotar, valida com extensão Meta Pixel Helper (Chrome) abrindo a landing',
+        ],
       });
 
-      // 4. Preço reconciliado (plano-mestre §13: pendência aberta 47,90 vs 48,50)
-      // Doc canônico (plano-mestre §7): R$ 47,90 / Hotmart real (digital_assets): R$ 48,50
+      // 4. Preço reconciliado
       try {
         const w = await academyStore.getWorkspace();
         const appPrice = w.product.price_brl ?? null;
@@ -106,20 +135,36 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
           label: 'Preço reconciliado (plano-mestre vs Hotmart vs app)',
           status: appPrice === docPrice ? 'done' : 'pending',
           detail: `Doc: R$ 47,90 · App: ${appPrice ? `R$ ${appPrice.toFixed(2)}` : '—'} · Hotmart: R$ 48,50 (§13 pendência)`,
+          how: [
+            'Decide a verdade: R$ 47,90 (doc) OU R$ 48,50 (Hotmart) — escolhe uma só',
+            'Opção A: atualizar Hotmart de 48,50 → 47,90 (entrar em app.hotmart.com > Produtos > Ótica Sem Improviso > Edição > Preço)',
+            'Opção B: aceitar 48,50 como verdade — atualizar academy.products.price_brl no app + plano-mestre §7 no doc',
+            'Recomendo Opção B (R$ 48,50): preço redondo, valor sutil ancorado, e bate com o que afiliados verão no checkout',
+          ],
+          action_url: 'https://app.hotmart.com/products/B105515825',
+          action_label: 'Abrir produto no Hotmart',
         });
       } catch {
         items.push({ key: 'preco', label: 'Preço reconciliado (plano-mestre vs Hotmart vs app)', status: 'pending' });
       }
 
-      // 5. Capa Hotmart (manual)
+      // 5. Capa Hotmart
       items.push({
         key: 'capa',
         label: 'Capa Hotmart atualizada (brand OSI)',
         status: 'pending',
         detail: 'Trocar capa do listing pra padrão visual atual.',
+        how: [
+          'Abrir Hotmart > Produtos > Ótica Sem Improviso > Edição > Imagens',
+          'Capa principal: 600x600 (formato quadrado). Usa o avatar OSI ou versão maior do logo + tagline',
+          'Banner promocional: 1500x500. Usa a capa IG gerada pelo MJ',
+          'Backup: posso gerar um prompt MJ específico pra capa Hotmart se você pedir',
+        ],
+        action_url: 'https://app.hotmart.com/products/B105515825',
+        action_label: 'Abrir produto no Hotmart',
       });
 
-      // 6. 1ª prova social antes de recrutar afiliados (plano-mestre §12 passo 10)
+      // 6. 1ª prova social
       try {
         const stats = await marketingStore.getHotmartStats();
         const sales = stats?.unique_buyers ?? 0;
@@ -127,7 +172,12 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
           key: 'afiliados',
           label: '1ª prova social registrada (destrava recrutamento de afiliados)',
           status: sales > 0 ? 'done' : 'pending',
-          detail: `${sales} comprador(es) Hotmart únicos · plano-mestre §12 passo 10.`,
+          detail: `${sales} comprador(es) Hotmart únicos · plano-mestre §12 passo 10. (Hoje inclui 1 venda TESTE — esperar 1ª real)`,
+          how: [
+            'Esse item destrava SOZINHO quando 1ª venda real entrar (webhook Hotmart popula community_members + hotmart_sales)',
+            'Antes dela, NÃO recrutar afiliados — afiliado bom só entra em produto que vende',
+            'Após 1ª venda: ativar fase de recrutamento via Marketing > Afiliados Dashboard',
+          ],
         });
       } catch {
         items.push({ key: 'afiliados', label: '1ª prova social registrada (destrava recrutamento de afiliados)', status: 'pending' });
@@ -208,17 +258,43 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
             <div className="text-xs text-muted">
               Bloqueadores humanos do plano-de-largada — itens ❌ trancam o lançamento, 🟡 dependem de validação manual.
             </div>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {fase0.map(i => {
                 const Icon = i.status === 'done' ? CheckCircle2 : i.status === 'partial' ? AlertCircle : Circle;
                 const colorClass = i.status === 'done' ? 'text-emerald-400' : i.status === 'partial' ? 'text-amber-300' : 'text-muted';
                 return (
-                  <li key={i.key} className="flex items-start gap-2 text-sm">
-                    <Icon className={`w-4 h-4 shrink-0 mt-0.5 ${colorClass}`} />
-                    <div className="min-w-0">
-                      <div className="text-on-surface">{i.label}</div>
-                      {i.detail && <div className="text-[11px] text-muted mt-0.5">{i.detail}</div>}
-                    </div>
+                  <li key={i.key} className="text-sm">
+                    <details className="group" open={i.status !== 'done'}>
+                      <summary className="flex items-start gap-2 cursor-pointer list-none">
+                        <Icon className={`w-4 h-4 shrink-0 mt-0.5 ${colorClass}`} />
+                        <div className="min-w-0 flex-1">
+                          <div className="text-on-surface flex items-center justify-between gap-2">
+                            <span>{i.label}</span>
+                            {(i.how || i.action_url) && (
+                              <span className="text-[10px] text-muted font-mono group-open:hidden">[expandir]</span>
+                            )}
+                          </div>
+                          {i.detail && <div className="text-[11px] text-muted mt-0.5">{i.detail}</div>}
+                        </div>
+                      </summary>
+                      {(i.how || i.action_url) && (
+                        <div className="ml-6 mt-2 space-y-2">
+                          {i.how && (
+                            <ol className="space-y-1 text-[11px] text-on-surface-variant list-decimal list-inside">
+                              {i.how.map((step, k) => <li key={k}>{step}</li>)}
+                            </ol>
+                          )}
+                          {i.action_url && (
+                            <a href={i.action_url}
+                               target={i.action_url.startsWith('http') ? '_blank' : undefined}
+                               rel="noopener noreferrer"
+                               className="inline-flex items-center gap-1 text-[11px] text-secondary hover:underline">
+                              → {i.action_label ?? 'Abrir'}
+                            </a>
+                          )}
+                        </div>
+                      )}
+                    </details>
                   </li>
                 );
               })}
