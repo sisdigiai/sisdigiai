@@ -66,11 +66,20 @@ Deno.serve(async (req: Request) => {
     rows.push({ metric_type: "clicks", period: "7d", value_numeric: totalClicks });
     rows.push({ metric_type: "impressions", period: "7d", value_numeric: totalImpr });
 
-    // Backlinks total (best-effort)
+    // Backlinks: total + top referrers (best-effort)
+    // Backlinks: GetLinkCounts retorna { d: { Links: [{Url, Count}], TotalPages } }
     try {
-      const bl = await bingGet("GetLinkCounts", apiKey) as { d?: Array<Record<string, number>> };
-      const total = (bl.d ?? []).reduce((acc, x) => acc + (Number(x.Count) || 0), 0);
-      if (total > 0) rows.push({ metric_type: "backlinks_total", period: "all_time", value_numeric: total });
+      const bl = await bingGet("GetLinkCounts", apiKey) as { d?: { Links?: Array<{ Url?: string; Count?: number }> } };
+      const list = bl.d?.Links ?? [];
+      const total = list.reduce((acc, x) => acc + (Number(x.Count) || 0), 0);
+      rows.push({ metric_type: "backlinks_total", period: "all_time", value_numeric: total });
+
+      const sorted = [...list].sort((a, b) => (Number(b.Count) || 0) - (Number(a.Count) || 0));
+      for (const r of sorted.slice(0, 10)) {
+        if (r.Url) {
+          rows.push({ metric_type: "top_referrer", period: "all_time", metric_key: r.Url, value_numeric: Number(r.Count) || 0 });
+        }
+      }
     } catch (_) { /* indisponível */ }
 
     const { data: count, error: repErr } = await supabase.rpc("fn_replace_metrics", { p_source: "bing", p_rows: rows });
