@@ -3,7 +3,6 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const PROVIDER = "google_search_console";
 const SETUP_DOC = "/docs/setup-gsc-oauth.md";
-const SITE_URL = "sc-domain:digiai.app.br";
 const TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
 const GSC_BASE = "https://searchconsole.googleapis.com/webmasters/v3/sites";
 
@@ -28,6 +27,7 @@ function isoDaysAgo(n: number): string {
 
 // deno-lint-ignore no-explicit-any
 type Supa = any;
+type SiteRow = { site: string; gsc_property: string; sort_order: number };
 
 async function getSecret(supabase: Supa, label: string): Promise<string | null> {
   const { data, error } = await supabase.rpc("fn_get_credential_secret", {
@@ -36,6 +36,14 @@ async function getSecret(supabase: Supa, label: string): Promise<string | null> 
   });
   if (error) throw new Error(`get_secret ${label}: ${error.message}`);
   return data ?? null;
+}
+
+async function getSites(supabase: Supa, only?: string): Promise<SiteRow[]> {
+  let q = supabase.from("v_seo_sites").select("site, gsc_property, sort_order");
+  if (only) q = q.eq("site", only);
+  const { data, error } = await q;
+  if (error) throw new Error(`sites: ${error.message}`);
+  return ((data ?? []) as SiteRow[]).sort((a, b) => a.sort_order - b.sort_order);
 }
 
 async function getAccessToken(clientId: string, clientSecret: string, refreshToken: string): Promise<string> {
@@ -55,8 +63,8 @@ async function getAccessToken(clientId: string, clientSecret: string, refreshTok
   return j.access_token as string;
 }
 
-async function gscQuery(accessToken: string, payload: unknown): Promise<Record<string, unknown>> {
-  const url = `${GSC_BASE}/${encodeURIComponent(SITE_URL)}/searchAnalytics/query`;
+async function gscQuery(accessToken: string, siteUrl: string, payload: unknown): Promise<Record<string, unknown>> {
+  const url = `${GSC_BASE}/${encodeURIComponent(siteUrl)}/searchAnalytics/query`;
   const r = await fetch(url, {
     method: "POST",
     headers: { "Authorization": `Bearer ${accessToken}`, "Content-Type": "application/json" },
@@ -65,6 +73,68 @@ async function gscQuery(accessToken: string, payload: unknown): Promise<Record<s
   const j = await r.json();
   if (!r.ok) throw new Error(`gsc_query: ${JSON.stringify(j)}`);
   return j;
+}
+
+// Sincroniza um site: grava métricas GSC + saúde do sitemap, ambas keyed por site.
+async function syncOneSite(supabase: Supa, accessToken: string, s: SiteRow): Promise<number> {
+  const SITE_URL = s.gsc_property; // ex.: "sc-domain:digiai.app.br"
+  const end = isoDaysAgo(2);       // GSC tem ~2 dias de atraso
+  const start7 = isoDaysAgo(9);
+  const start30 = isoDaysAgo(32);
+
+  const totals7 = await gscQuery(accessToken, SITE_URL, { startDate: start7, endDate: end });
+  const totals30 = await gscQuery(accessToken, SITE_URL, { startDate: start30, endDate: end });
+  const queries7 = await gscQuery(accessToken, SITE_URL, { startDate: start7, endDate: end, dimensions: ["query"], rowLimit: 5 });
+  const pages7 = await gscQuery(accessToken, SITE_URL, { startDate: start7, endDate: end, dimensions: ["page"], rowLimit: 5 });
+
+  const rows: Record<string, unknown>[] = [];
+  const t7 = (totals7.rows as Array<Record<string, number>> | undefined)?.[0];
+  const t30 = (totals30.rows as Array<Record<string, number>> | undefined)?.[0];
+
+  rows.push({ metric_type: "clicks", period: "7d", value_numeric: t7?.clicks ?? 0, period_start: start7, period_end: end });
+  rows.push({ metric_type: "impressions", period: "7d", value_numeric: t7?.impressions ?? 0, period_start: start7, period_end: end });
+  rows.push({ metric_type: "ctr", period: "7d", value_numeric: t7?.ctr ?? 0, period_start: start7, period_end: end });
+  rows.push({ metric_type: "position", period: "7d", value_numeric: t7?.position ?? 0, period_start: start7, period_end: end });
+  rows.push({ metric_type: "clicks", period: "30d", value_numeric: t30?.clicks ?? 0, period_start: start30, period_end: end });
+  rows.push({ metric_type: "impressions", period: "30d", value_numeric: t30?.impressions ?? 0, period_start: start30, period_end: end });
+
+  for (const q of (queries7.rows as Array<Record<string, unknown>> | undefined) ?? []) {
+    const keys = q.keys as string[];
+    rows.push({ metric_type: "top_query", period: "7d", metric_key: keys[0], value_numeric: q.clicks, period_start: start7, period_end: end });
+  }
+  for (const p of (pages7.rows as Array<Record<string, unknown>> | undefined) ?? []) {
+    const keys = p.keys as string[];
+    rows.push({ metric_type: "top_page", period: "7d", metric_key: keys[0], value_numeric: p.clicks, period_start: start7, period_end: end });
+  }
+
+  const { error: repErr } = await supabase.rpc("fn_replace_metrics", { p_source: "gsc", p_site: s.site, p_rows: rows });
+  if (repErr) throw new Error(`replace_metrics: ${repErr.message}`);
+
+  // Saúde do sitemap (best-effort) — popula o card Sitemap a partir do GSC, por site.
+  try {
+    const smUrl = `${GSC_BASE}/${encodeURIComponent(SITE_URL)}/sitemaps`;
+    const smR = await fetch(smUrl, { headers: { "Authorization": `Bearer ${accessToken}` } });
+    const smJ = await smR.json();
+    if (smR.ok) {
+      const list = (smJ.sitemap as Array<Record<string, unknown>> | undefined) ?? [];
+      let urls = 0, errors = 0;
+      let lastRead = "";
+      for (const sm of list) {
+        errors += Number(sm.errors ?? 0);
+        for (const c of (sm.contents as Array<Record<string, unknown>> | undefined) ?? []) {
+          urls += Number(c.submitted ?? 0);
+        }
+        if (sm.lastDownloaded) lastRead = String(sm.lastDownloaded).slice(0, 10);
+      }
+      await supabase.rpc("fn_replace_metrics", { p_source: "sitemap", p_site: s.site, p_rows: [
+        { metric_type: "gsc_last_read", period: "all_time", value_text: lastRead || "—" },
+        { metric_type: "urls_discovered", period: "all_time", value_numeric: urls },
+        { metric_type: "errors", period: "all_time", value_numeric: errors },
+      ] });
+    }
+  } catch (_) { /* sitemap best-effort */ }
+
+  return rows.length;
 }
 
 Deno.serve(async (req: Request) => {
@@ -76,8 +146,8 @@ Deno.serve(async (req: Request) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
   );
 
-  let payload: { action?: string; code?: string; redirect_uri?: string } = {};
-  try { payload = await req.json(); } catch { /* sem body = sync default */ }
+  let payload: { action?: string; code?: string; redirect_uri?: string; site?: string } = {};
+  try { payload = await req.json(); } catch { /* sem body = sync de todos os sites */ }
 
   // --- Modo 1: troca authorization code por refresh_token (uma vez) ---
   if (payload.action === "exchange_code") {
@@ -118,7 +188,7 @@ Deno.serve(async (req: Request) => {
     }
   }
 
-  // --- Modo 2: sync de métricas ---
+  // --- Modo 2: sync de métricas (multi-site) ---
   try {
     const clientId = await getSecret(supabase, "gsc-client-id");
     const clientSecret = await getSecret(supabase, "gsc-client-secret");
@@ -134,67 +204,28 @@ Deno.serve(async (req: Request) => {
     }
 
     const accessToken = await getAccessToken(clientId, clientSecret, refreshToken);
+    const sites = await getSites(supabase, payload.site);
+    if (!sites.length) return jsonResp({ ok: false, configured: true, provider: PROVIDER, error: "no_active_sites" }, 404);
 
-    const end = isoDaysAgo(2);   // GSC tem ~2 dias de atraso
-    const start7 = isoDaysAgo(9);
-    const start30 = isoDaysAgo(32);
-
-    const totals7 = await gscQuery(accessToken, { startDate: start7, endDate: end });
-    const totals30 = await gscQuery(accessToken, { startDate: start30, endDate: end });
-    const queries7 = await gscQuery(accessToken, { startDate: start7, endDate: end, dimensions: ["query"], rowLimit: 5 });
-    const pages7 = await gscQuery(accessToken, { startDate: start7, endDate: end, dimensions: ["page"], rowLimit: 5 });
-
-    const rows: Record<string, unknown>[] = [];
-    const t7 = (totals7.rows as Array<Record<string, number>> | undefined)?.[0];
-    const t30 = (totals30.rows as Array<Record<string, number>> | undefined)?.[0];
-
-    // Totais sempre gravados (0 quando ainda não há dados) — mantém o card consistente.
-    rows.push({ metric_type: "clicks", period: "7d", value_numeric: t7?.clicks ?? 0, period_start: start7, period_end: end });
-    rows.push({ metric_type: "impressions", period: "7d", value_numeric: t7?.impressions ?? 0, period_start: start7, period_end: end });
-    rows.push({ metric_type: "ctr", period: "7d", value_numeric: t7?.ctr ?? 0, period_start: start7, period_end: end });
-    rows.push({ metric_type: "position", period: "7d", value_numeric: t7?.position ?? 0, period_start: start7, period_end: end });
-    rows.push({ metric_type: "clicks", period: "30d", value_numeric: t30?.clicks ?? 0, period_start: start30, period_end: end });
-    rows.push({ metric_type: "impressions", period: "30d", value_numeric: t30?.impressions ?? 0, period_start: start30, period_end: end });
-
-    for (const q of (queries7.rows as Array<Record<string, unknown>> | undefined) ?? []) {
-      const keys = q.keys as string[];
-      rows.push({ metric_type: "top_query", period: "7d", metric_key: keys[0], value_numeric: q.clicks, period_start: start7, period_end: end });
-    }
-    for (const p of (pages7.rows as Array<Record<string, unknown>> | undefined) ?? []) {
-      const keys = p.keys as string[];
-      rows.push({ metric_type: "top_page", period: "7d", metric_key: keys[0], value_numeric: p.clicks, period_start: start7, period_end: end });
-    }
-
-    const { data: count, error: repErr } = await supabase.rpc("fn_replace_metrics", { p_source: "gsc", p_rows: rows });
-    if (repErr) throw new Error(`replace_metrics: ${repErr.message}`);
-
-    // Sitemap health (best-effort) — popula o card Sitemap a partir do GSC.
-    try {
-      const smUrl = `${GSC_BASE}/${encodeURIComponent(SITE_URL)}/sitemaps`;
-      const smR = await fetch(smUrl, { headers: { "Authorization": `Bearer ${accessToken}` } });
-      const smJ = await smR.json();
-      if (smR.ok) {
-        const list = (smJ.sitemap as Array<Record<string, unknown>> | undefined) ?? [];
-        let urls = 0, errors = 0;
-        let lastRead = "";
-        for (const sm of list) {
-          errors += Number(sm.errors ?? 0);
-          for (const c of (sm.contents as Array<Record<string, unknown>> | undefined) ?? []) {
-            urls += Number(c.submitted ?? 0);
-          }
-          if (sm.lastDownloaded) lastRead = String(sm.lastDownloaded).slice(0, 10);
-        }
-        await supabase.rpc("fn_replace_metrics", { p_source: "sitemap", p_rows: [
-          { metric_type: "gsc_last_read", period: "all_time", value_text: lastRead || "—" },
-          { metric_type: "urls_discovered", period: "all_time", value_numeric: urls },
-          { metric_type: "errors", period: "all_time", value_numeric: errors },
-        ] });
+    const results: Array<{ site: string; rows_written?: number; error?: string }> = [];
+    for (const s of sites) {
+      try {
+        const n = await syncOneSite(supabase, accessToken, s);
+        results.push({ site: s.site, rows_written: n });
+      } catch (e) {
+        results.push({ site: s.site, error: String(e) });
       }
-    } catch (_) { /* sitemap best-effort */ }
+    }
+
+    // Single-site (botão da aba): reflete o erro daquele site no card.
+    if (payload.site && results.length === 1 && results[0].error) {
+      await supabase.rpc("fn_mark_sync", { p_provider: PROVIDER, p_status: "error", p_error: results[0].error }).catch(() => {});
+      return jsonResp({ ok: false, configured: true, provider: PROVIDER, error: results[0].error, results }, 500);
+    }
 
     await supabase.rpc("fn_mark_sync", { p_provider: PROVIDER, p_status: "ok", p_error: null });
-
-    return jsonResp({ ok: true, configured: true, provider: PROVIDER, rows_written: count, period_end: end });
+    const totalRows = results.reduce((a, r) => a + (r.rows_written ?? 0), 0);
+    return jsonResp({ ok: true, configured: true, provider: PROVIDER, results, rows_written: totalRows, period_end: isoDaysAgo(2) });
   } catch (e) {
     await supabase.rpc("fn_mark_sync", { p_provider: PROVIDER, p_status: "error", p_error: String(e) }).catch(() => {});
     return jsonResp({ ok: false, error: String(e) }, 500);

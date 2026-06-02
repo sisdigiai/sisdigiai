@@ -1,6 +1,7 @@
 import { Cloud } from 'lucide-react';
 import { MetricCard, MetricStat, EmptyHint } from './MetricCard';
 import { useMarketingMetrics } from '../../hooks/useMarketingMetrics';
+import { type SeoSite, seoUrls } from '../../hooks/useSeoSites';
 
 function formatBytes(n: number | null | undefined): string {
   if (n == null) return '—';
@@ -10,8 +11,8 @@ function formatBytes(n: number | null | undefined): string {
   return `${(n / 1024 ** 3).toFixed(2)} GB`;
 }
 
-export function CardCloudflare() {
-  const { rows, refetch } = useMarketingMetrics('cloudflare');
+export function CardCloudflare({ site }: { site: SeoSite }) {
+  const { rows, refetch } = useMarketingMetrics('cloudflare', site.site);
   const requests24h = rows.find(r => r.metric_type === 'requests' && r.period === '24h')?.value_numeric;
   const requests7d = rows.find(r => r.metric_type === 'requests' && r.period === '7d')?.value_numeric;
   const bandwidth7d = rows.find(r => r.metric_type === 'bandwidth' && r.period === '7d')?.value_numeric;
@@ -28,7 +29,8 @@ export function CardCloudflare() {
       icon={<Cloud className="w-4 h-4" />}
       period="24h / 7d"
       provider="cloudflare"
-      externalUrl="https://dash.cloudflare.com/135d7fae19fe4fac099b241fec40fba1/digiai.app.br/analytics/traffic"
+      site={site.site}
+      externalUrl={seoUrls.cloudflare(site)}
       externalLabel="Abrir Cloudflare Dashboard"
       onAfterSync={refetch}
     >

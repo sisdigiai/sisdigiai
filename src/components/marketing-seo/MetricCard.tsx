@@ -8,20 +8,21 @@ type Props = {
   icon: React.ReactNode;
   period?: string;
   provider?: SyncProvider;
+  site?: string;
   externalUrl?: string;
   externalLabel?: string;
   children: React.ReactNode;
   onAfterSync?: () => void;
 };
 
-export function MetricCard({ title, icon, period, provider, externalUrl, externalLabel, children, onAfterSync }: Props) {
+export function MetricCard({ title, icon, period, provider, site, externalUrl, externalLabel, children, onAfterSync }: Props) {
   const [syncing, setSyncing] = useState(false);
   const [status, setStatus] = useState<SyncStatus | null>(null);
 
   async function handleSync() {
-    if (!provider) return;
+    if (!provider || !site) return;
     setSyncing(true);
-    const result = await triggerSync(provider);
+    const result = await triggerSync(provider, site);
     setStatus(result);
     setSyncing(false);
     onAfterSync?.();

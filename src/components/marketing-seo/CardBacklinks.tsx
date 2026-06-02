@@ -1,9 +1,10 @@
 import { Link2 } from 'lucide-react';
 import { MetricCard, MetricStat, EmptyHint } from './MetricCard';
 import { useMarketingMetrics } from '../../hooks/useMarketingMetrics';
+import { type SeoSite, seoUrls } from '../../hooks/useSeoSites';
 
-export function CardBacklinks() {
-  const { rows } = useMarketingMetrics('bing');
+export function CardBacklinks({ site }: { site: SeoSite }) {
+  const { rows } = useMarketingMetrics('bing', site.site);
   const total = rows.find(r => r.metric_type === 'backlinks_total');
   const referrers = rows.filter(r => r.metric_type === 'top_referrer').slice(0, 10);
 
@@ -14,7 +15,7 @@ export function CardBacklinks() {
       title="Backlinks"
       icon={<Link2 className="w-4 h-4" />}
       period="all time"
-      externalUrl="https://www.bing.com/webmasters/backlinks?siteUrl=https%3A%2F%2Fdigiai.app.br%2F"
+      externalUrl={seoUrls.bingBacklinks(site)}
       externalLabel="Abrir relatório Bing"
     >
       {!hasAny ? (

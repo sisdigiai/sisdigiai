@@ -134,7 +134,7 @@ Roteamento real em `App.tsx` (`activeModule` por estado, não por URL). 16 cases
 | Academy             | `src/modules/Academy.tsx`                            |
 | Funil OSI           | `src/modules/Funil.tsx` (+ `funnel/*`)               |
 | Marketing           | `src/modules/Marketing.tsx` (+ `marketing/*`) — 10 abas: Calendário, Planejador, Banco de Ideias, Prompts IA, Validação, Depoimentos, Comunidade OSI, Desafios, Materiais, Afiliados |
-| Marketing & SEO     | `src/modules/MarketingSEO.tsx` — GSC/Bing/Cloudflare/IndexNow + edge fns `marketing-sync-*` |
+| Marketing & SEO     | `src/modules/MarketingSEO.tsx` — **centro de controle multi-domínio (abas por site)**. GSC/Bing/Cloudflare/IndexNow por domínio, lendo `company.seo_sites` (registro data-driven; add domínio = 1 INSERT). Métricas em `company.metrics` keyed por `(site, source)`. Edge fns `marketing-sync-*` iteram todos os sites ativos (cron) ou `{site}` específico (botão). |
 | Central Clearix     | `src/modules/Clearix.tsx` + `clearix/*` — auth super_admin **separado** (ADR-0001) |
 | Decisões            | `src/modules/Decisoes.tsx`                           |
 | Biblioteca          | `src/modules/Biblioteca.tsx` (consome `docs_sync/`)  |
@@ -188,6 +188,7 @@ Roteamento real em `App.tsx` (`activeModule` por estado, não por URL). 16 cases
 - [ ] 1ª entrevista feita (Fase 0 do Roadmap — métrica única: 20 entrevistas + 3 cartas de intenção)
 - [ ] Resolver **65 tarefas atrasadas** do Roadmap + 13 itens críticos do Backlog
 - [ ] Rotacionar 3 credenciais Marketing & SEO até 2026-08-26 (R-021)
+- [ ] **Cloudflare Analytics do `clearix.app.br`** no Marketing & SEO: o token CF atual (`digiai-app-br-readonly`) é escopado só à zona `digiai.app.br`. Ampliar o escopo (Analytics:Read incluindo a zona do clearix, ou token novo) e setar `cloudflare_zone_id` em `company.seo_sites` p/ o site clearix. GSC/Bing/Sitemap/IndexNow do clearix já funcionam.
 
 ## 11. Pergunta de Ouro pra qualquer decisão
 

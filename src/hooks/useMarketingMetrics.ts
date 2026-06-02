@@ -33,6 +33,7 @@ export type SyncStatus = {
 export type MetricRow = {
   id: string;
   source: string;
+  site: string;
   metric_type: string;
   metric_key: string | null;
   value_numeric: number | null;
@@ -44,34 +45,37 @@ export type MetricRow = {
   collected_at: string;
 };
 
-export function useMarketingMetrics(source: string) {
+export function useMarketingMetrics(source: string, site: string) {
   const [rows, setRows] = useState<MetricRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const refetch = useCallback(async () => {
+    if (!site) return;
     setLoading(true);
     setError(null);
     const { data, error: err } = await supabase
       .from('v_company_metrics')
-      .select('id, source, metric_type, metric_key, value_numeric, value_text, metadata, period, period_start, period_end, collected_at')
+      .select('id, source, site, metric_type, metric_key, value_numeric, value_text, metadata, period, period_start, period_end, collected_at')
       .eq('source', source)
+      .eq('site', site)
       .order('collected_at', { ascending: false })
       .limit(200);
     if (err) setError(err.message);
     else setRows((data ?? []) as MetricRow[]);
     setLoading(false);
-  }, [source]);
+  }, [source, site]);
 
   useEffect(() => { refetch(); }, [refetch]);
 
   return { rows, loading, error, refetch };
 }
 
-export async function triggerSync(provider: SyncProvider): Promise<SyncStatus> {
+export async function triggerSync(provider: SyncProvider, site: string): Promise<SyncStatus> {
   const fnName = FN_BY_PROVIDER[provider];
   const { data, error } = await supabase.functions.invoke<SyncStatus>(fnName, {
     method: 'POST',
+    body: { site },
   });
   if (error) {
     const body = (error.context && typeof error.context === 'object' && 'json' in (error.context as object))

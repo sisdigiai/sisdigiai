@@ -5,6 +5,13 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 ## [Não lançado]
 
 ### Adicionado
+- **Marketing & SEO virou centro de controle multi-domínio (abas por site)** — migration `seo_multisite` + `seo_sites_view`:
+  - Nova tabela `company.seo_sites` (registro data-driven: `gsc_property`, `bing_site_url`, `cloudflare_zone_id`, `indexnow_key`, `github_repo`, `label`, `color`, `active`, `sort_order`) + view `public.v_seo_sites`. Seed: `digiai.app.br` + `clearix.app.br`. Adicionar domínio = 1 INSERT (sem deploy).
+  - `company.metrics` ganhou coluna `site` (backfill `digiai.app.br`); cache passa a ser por `(site, source)`. `fn_replace_metrics` ganhou overload `(p_source, p_site, p_rows)`. `v_company_metrics` expõe `site`.
+  - As 3 edge functions (`marketing-sync-{gsc,bing,cloudflare}`) reescritas multi-site: `{site}` no body sincroniza 1 site; sem body (cron) itera todos os ativos — **cron `marketing-sync-daily` não mudou** e agora cobre todos os sites.
+  - UI: `MarketingSEO.tsx` com abas por domínio (lê `v_seo_sites`); hook `useSeoSites` + `seoUrls`; `useMarketingMetrics(source, site)`; `triggerSync(provider, site)`; cards recebem prop `SeoSite` e computam URLs de console por site.
+  - **Validação real**: clearix já tem GSC (6), Bing (3) e Sitemap (3) populados (mesma conta sisdigiai valida). Cloudflare do clearix fica em "configurar" (amarelo) — o token CF atual é escopado só à zona `digiai.app.br`; **pendência humana**: ampliar o escopo do token (Analytics:Read incluindo a zona do clearix) e setar `cloudflare_zone_id` em `company.seo_sites`.
+  - Consoles SEO do clearix catalogados em `company.digital_assets` (GSC/Bing/IndexNow).
 - **Módulo Marketing & SEO** — `src/modules/MarketingSEO.tsx` + 6 cards (`CardGSC`, `CardBing`, `CardCloudflare`, `CardSitemap`, `CardBacklinks`, `CardIndexNow` em `src/components/marketing-seo/`) + hook `src/hooks/useMarketingMetrics.ts`. Item novo no sidebar (`marketing-seo`, grupo Operacional, ícone `Search`). Placeholders amigáveis quando credenciais não estão configuradas.
 - **Tabela `company.api_credentials`** (migration `019_marketing_seo_credentials_metrics.sql`) — ponteiros pra credenciais externas, com valor encriptado em `vault.secrets`. Acesso só `service_role`. Provider ∈ {`google_search_console`, `bing_webmaster`, `cloudflare`}.
 - **Tabela `company.metrics`** — cache de métricas vindas de APIs externas (clicks, impressions, requests, etc.). Source ∈ {`gsc`, `bing`, `cloudflare`, `indexnow`, `sitemap`}. Leitura: staff. Escrita: service_role.

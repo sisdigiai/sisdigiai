@@ -1,9 +1,10 @@
 import { Zap } from 'lucide-react';
 import { MetricCard, MetricStat, EmptyHint } from './MetricCard';
 import { useMarketingMetrics } from '../../hooks/useMarketingMetrics';
+import { type SeoSite, seoUrls } from '../../hooks/useSeoSites';
 
-export function CardIndexNow() {
-  const { rows } = useMarketingMetrics('indexnow');
+export function CardIndexNow({ site }: { site: SeoSite }) {
+  const { rows } = useMarketingMetrics('indexnow', site.site);
   const lastBatch = rows.find(r => r.metric_type === 'last_batch');
   const urlsInBatch = rows.find(r => r.metric_type === 'urls_in_batch');
   const successCount = rows.find(r => r.metric_type === 'success_count_30d');
@@ -16,12 +17,12 @@ export function CardIndexNow() {
       title="IndexNow"
       icon={<Zap className="w-4 h-4" />}
       period="últimas notificações"
-      externalUrl="https://github.com/sisdigiai/digiai-site/actions"
+      externalUrl={seoUrls.indexnow(site)}
       externalLabel="Abrir GitHub Action"
     >
       {!hasAny ? (
         <EmptyHint>
-          Histórico vazio. IndexNow ativo via chave <code className="text-on-surface-variant font-mono text-[10px]">6aa032cad330bfd49b32be85843c253c</code>;
+          Histórico vazio. IndexNow ativo{site.indexnow_key ? <> via chave <code className="text-on-surface-variant font-mono text-[10px]">{site.indexnow_key}</code></> : ''};
           eventos são populados pelo workflow GitHub no push.
         </EmptyHint>
       ) : (

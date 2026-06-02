@@ -1,9 +1,10 @@
 import { Bot } from 'lucide-react';
 import { MetricCard, MetricStat, EmptyHint } from './MetricCard';
 import { useMarketingMetrics } from '../../hooks/useMarketingMetrics';
+import { type SeoSite, seoUrls } from '../../hooks/useSeoSites';
 
-export function CardBing() {
-  const { rows, refetch } = useMarketingMetrics('bing');
+export function CardBing({ site }: { site: SeoSite }) {
+  const { rows, refetch } = useMarketingMetrics('bing', site.site);
   const clicks7d = rows.find(r => r.metric_type === 'clicks' && r.period === '7d')?.value_numeric;
   const impressions7d = rows.find(r => r.metric_type === 'impressions' && r.period === '7d')?.value_numeric;
   const aiPerf = rows.find(r => r.metric_type === 'ai_performance' && r.period === '7d');
@@ -17,7 +18,8 @@ export function CardBing() {
       icon={<Bot className="w-4 h-4" />}
       period="últimos 7 dias"
       provider="bing"
-      externalUrl="https://www.bing.com/webmasters/home/mysites?siteUrl=https%3A%2F%2Fdigiai.app.br%2F"
+      site={site.site}
+      externalUrl={seoUrls.bing(site)}
       externalLabel="Abrir Bing Webmaster"
       onAfterSync={refetch}
     >

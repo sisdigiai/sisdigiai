@@ -1,9 +1,10 @@
 import { Map } from 'lucide-react';
 import { MetricCard, MetricStat, EmptyHint } from './MetricCard';
 import { useMarketingMetrics } from '../../hooks/useMarketingMetrics';
+import { type SeoSite, seoUrls } from '../../hooks/useSeoSites';
 
-export function CardSitemap() {
-  const { rows } = useMarketingMetrics('sitemap');
+export function CardSitemap({ site }: { site: SeoSite }) {
+  const { rows } = useMarketingMetrics('sitemap', site.site);
   const gscRead = rows.find(r => r.metric_type === 'gsc_last_read');
   const bingRead = rows.find(r => r.metric_type === 'bing_last_read');
   const urlsFound = rows.find(r => r.metric_type === 'urls_discovered');
@@ -16,7 +17,7 @@ export function CardSitemap() {
       title="Sitemap Health"
       icon={<Map className="w-4 h-4" />}
       period="última verificação"
-      externalUrl="https://digiai.app.br/sitemap-index.xml"
+      externalUrl={seoUrls.sitemap(site)}
       externalLabel="Abrir sitemap"
     >
       {!hasAny ? (

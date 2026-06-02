@@ -1,9 +1,10 @@
 import { Search } from 'lucide-react';
 import { MetricCard, MetricStat, EmptyHint } from './MetricCard';
 import { useMarketingMetrics } from '../../hooks/useMarketingMetrics';
+import { type SeoSite, seoUrls } from '../../hooks/useSeoSites';
 
-export function CardGSC() {
-  const { rows, refetch } = useMarketingMetrics('gsc');
+export function CardGSC({ site }: { site: SeoSite }) {
+  const { rows, refetch } = useMarketingMetrics('gsc', site.site);
   const clicks7d = rows.find(r => r.metric_type === 'clicks' && r.period === '7d')?.value_numeric;
   const impressions7d = rows.find(r => r.metric_type === 'impressions' && r.period === '7d')?.value_numeric;
   const ctr7d = rows.find(r => r.metric_type === 'ctr' && r.period === '7d')?.value_numeric;
@@ -19,7 +20,8 @@ export function CardGSC() {
       icon={<Search className="w-4 h-4" />}
       period="últimos 7 dias"
       provider="gsc"
-      externalUrl="https://search.google.com/search-console?resource_id=sc-domain%3Adigiai.app.br"
+      site={site.site}
+      externalUrl={seoUrls.gsc(site)}
       externalLabel="Abrir GSC"
       onAfterSync={refetch}
     >
