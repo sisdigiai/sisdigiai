@@ -15,6 +15,7 @@ interface Produto {
   stack: string;
   proximo: string;
   bloqueio?: string;
+  site?: string; // URL pública do produto (landing/site no ar), quando existe
 }
 
 const PRODUTOS: Produto[] = [
@@ -29,6 +30,7 @@ const PRODUTOS: Produto[] = [
     stack: 'Next.js 15/SvelteKit 2/React 19 · Supabase · ~20 sub-apps',
     proximo: 'Formalizar pricing + fechar 1º piloto externo além da loja de teste',
     bloqueio: 'Modelo comercial final e validação externa pendentes',
+    site: 'https://clearix.app.br',
   },
   {
     nome: 'Clearix Academy',
@@ -147,6 +149,7 @@ const PRODUTOS: Produto[] = [
     stack: 'React 19 · Vite · TypeScript · TailwindCSS 4 · Motion · Supabase · Chart.js',
     proximo: 'Publicar drafts legais (Política, MSA, DPA) · Migrar iam.users para R-013 · Nomear DPO formal',
     bloqueio: 'CNPJ em transição na RFB · Domínio próprio pendente · DPO formal não nomeado',
+    site: 'https://digiai.app.br',
   },
 ];
 
@@ -269,6 +272,20 @@ export default function Portfolio() {
                       <div className="text-[10px] font-mono text-secondary uppercase tracking-widest mb-1">Próximo passo</div>
                       <div className="text-sm text-on-surface">{p.proximo}</div>
                     </div>
+                    {p.site && (
+                      <div className="md:col-span-2">
+                        <div className="text-[10px] font-mono text-muted uppercase tracking-widest mb-1">Site público</div>
+                        <a
+                          href={p.site}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-sm font-mono text-emerald-300 hover:text-emerald-200 transition-colors"
+                        >
+                          {p.site.replace(/^https?:\/\//, '')}
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      </div>
+                    )}
                     {p.bloqueio && (
                       <div className="md:col-span-2">
                         <div className="text-[10px] font-mono text-amber-400/70 uppercase tracking-widest mb-1">Bloqueio</div>
