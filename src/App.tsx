@@ -5,6 +5,7 @@ import { Menu, Search } from 'lucide-react';
 import BrandGuidelines from './components/BrandGuidelines';
 import Login from './components/Login';
 import TestimonialPublicForm from './components/TestimonialPublicForm';
+import OsiPublicLanding from './components/OsiPublicLanding';
 import Visao from './modules/Visao';
 import Portfolio from './modules/Portfolio';
 import Trilha from './modules/Trilha';
@@ -45,7 +46,7 @@ const STUBS: Record<string, { numero: number; nome: string; descricao: string; e
 };
 
 // Rotas públicas (não passam pelo gate de login)
-const PUBLIC_ROUTES = ['/osi/depoimento'];
+const PUBLIC_ROUTES = ['/osi/depoimento', '/osi'];
 
 // Todos os módulos roteáveis — usado pelo deep-link por hash (#/<modulo>).
 const MODULES: ModuleId[] = [
@@ -109,6 +110,7 @@ export default function App() {
   const path = typeof window !== 'undefined' ? window.location.pathname : '';
   if (PUBLIC_ROUTES.includes(path)) {
     if (path === '/osi/depoimento') return <TestimonialPublicForm />;
+    if (path === '/osi') return <OsiPublicLanding />;
   }
 
   if (loading && authEnabled) {
