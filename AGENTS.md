@@ -119,7 +119,7 @@
 
 ## 7. Módulos do painel
 
-Roteamento real em `App.tsx` (`activeModule` por estado, não por URL). 16 cases + 2 stubs:
+Roteamento real em `App.tsx` (`activeModule` por estado, não por URL). **~22 módulos roteados; só `Comercial` é stub** (reconciliado no código 2026-06-02):
 
 | Sidebar label       | Componente / Origem                                  |
 |---------------------|------------------------------------------------------|
@@ -141,7 +141,9 @@ Roteamento real em `App.tsx` (`activeModule` por estado, não por URL). 16 cases
 | Brand Guidelines    | `src/components/BrandGuidelines.tsx`                 |
 | Referências Design  | `src/modules/ReferenciasDesign.tsx`                  |
 | Mock Vendas         | `src/modules/MockClearixEstilos.tsx`                 |
-| Fluxo OSI           | `src/modules/FluxoOSI.tsx` — integra Academy+Funil+Marketing (espinha OSI → Clearix), dado vivo dos 3 stores |
+| Mapa OSI (Fluxo OSI) | `src/modules/FluxoOSI.tsx` — integra Academy+Funil+Marketing (espinha OSI → Clearix), dado vivo dos 3 stores. Sidebar exibe como "Mapa OSI". |
+| Marketplace         | `src/modules/Marketplace.tsx` — lê `academy.products` (preço canônico) + integra Hotmart/Kiwify. ⚠️ esqueleto: API Hotmart ainda não plugada. |
+| Guia Operacional    | `src/modules/Guia.tsx` — guia operacional do painel |
 | Travas Marketing    | `src/modules/TravasMarketing.tsx` — travas canônicas + `TravasBanner` plantado em Marketing/Funil/Academy |
 | Ecossistemas (Painel) | `src/modules/Ecossistemas.tsx` — painel de status lendo `v_company_digital_assets` (ADR-0029) |
 

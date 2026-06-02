@@ -129,37 +129,23 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
       try {
         const w = await academyStore.getWorkspace();
         const appPrice = w.product.price_brl ?? null;
-        const docPrice = 47.9;
+        const docPrice = 48.5; // reconciliado 2026-06-02 (doc/app/Hotmart/Kiwify = R$ 48,50)
         items.push({
           key: 'preco',
           label: 'Preço reconciliado (plano-mestre vs Hotmart vs app)',
           status: appPrice === docPrice ? 'done' : 'pending',
-          detail: `Doc: R$ 47,90 · App: ${appPrice ? `R$ ${appPrice.toFixed(2)}` : '—'} · Hotmart: R$ 48,50 (§13 pendência)`,
-          how: [
-            'Decide a verdade: R$ 47,90 (doc) OU R$ 48,50 (Hotmart) — escolhe uma só',
-            'Opção A: atualizar Hotmart de 48,50 → 47,90 (entrar em app.hotmart.com > Produtos > Ótica Sem Improviso > Edição > Preço)',
-            'Opção B: aceitar 48,50 como verdade — atualizar academy.products.price_brl no app + plano-mestre §7 no doc',
-            'Recomendo Opção B (R$ 48,50): preço redondo, valor sutil ancorado, e bate com o que afiliados verão no checkout',
-          ],
-          action_url: 'https://app.hotmart.com/products/B105515825',
-          action_label: 'Abrir produto no Hotmart',
+          detail: `Reconciliado 2026-06-02: R$ 48,50 em doc + app (${appPrice ? `R$ ${appPrice.toFixed(2)}` : '—'}) + Hotmart + Kiwify.`,
         });
       } catch {
         items.push({ key: 'preco', label: 'Preço reconciliado (plano-mestre vs Hotmart vs app)', status: 'pending' });
       }
 
-      // 5. Capa Hotmart
+      // 5. Capa Hotmart — feito (verificado no navegador 2026-06-02)
       items.push({
         key: 'capa',
         label: 'Capa Hotmart atualizada (brand OSI)',
-        status: 'pending',
-        detail: 'Trocar capa do listing pra padrão visual atual.',
-        how: [
-          'Abrir Hotmart > Produtos > Ótica Sem Improviso > Edição > Imagens',
-          'Capa principal: 600x600 (formato quadrado). Usa o avatar OSI ou versão maior do logo + tagline',
-          'Banner promocional: 1500x500. Usa a capa IG gerada pelo MJ',
-          'Backup: posso gerar um prompt MJ específico pra capa Hotmart se você pedir',
-        ],
+        status: 'done',
+        detail: 'Feito — capa brand OSI no ar (Hotmart produto ID 7611033 + Kiwify, título "Ótica Sem Improviso"). Verificado 2026-06-02.',
         action_url: 'https://app.hotmart.com/products/B105515825',
         action_label: 'Abrir produto no Hotmart',
       });
