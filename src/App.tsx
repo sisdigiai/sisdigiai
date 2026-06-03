@@ -27,23 +27,12 @@ import ListaMestra from './modules/ListaMestra';
 import TravasMarketing from './modules/TravasMarketing';
 import FluxoOSI from './modules/FluxoOSI';
 import Guia from './modules/Guia';
+import Comercial from './modules/Comercial';
 import { ModuleStub } from './modules/Stub';
 import { useAuth } from './contexts/AuthContext';
 
-const STUBS: Record<string, { numero: number; nome: string; descricao: string; entregaveis: string[] }> = {
-  comercial: {
-    numero: 6,
-    nome: 'Comercial',
-    descricao: 'Acompanhar leads, reunioes, propostas, pilotos e evolucao do Clearix no mercado.',
-    entregaveis: [
-      'CRM minimo: leads + status de negociacao',
-      'Reunioes agendadas e realizadas',
-      'Propostas enviadas e em aberto',
-      'Pilotos ativos e resultados da loja de teste',
-      'Objecoes registradas',
-    ],
-  },
-};
+// Comercial deixou de ser stub (2026-06-02) — agora é módulo real (CRM de pipeline).
+const STUBS: Record<string, { numero: number; nome: string; descricao: string; entregaveis: string[] }> = {};
 
 // Rotas públicas (não passam pelo gate de login)
 const PUBLIC_ROUTES = ['/osi/depoimento', '/osi'];
@@ -149,6 +138,7 @@ export default function App() {
       case 'travas-marketing': return <TravasMarketing />;
       case 'fluxo-osi': return <FluxoOSI onNavigate={navigate} />;
       case 'guia': return <Guia onNavigate={navigate} />;
+      case 'comercial': return <Comercial />;
       default: {
         const stub = STUBS[activeModule];
         if (stub) {
