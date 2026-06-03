@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import PageHeader from '../components/PageHeader';
 import { TravasBanner } from './TravasMarketing';
 import {
@@ -87,6 +87,11 @@ export default function Funil() {
   const [workspace, setWorkspace] = useState<FunnelWorkspace>(() => funnelStore.getWorkspace());
   const summary = useMemo(() => calculateFunnelSummary(workspace), [workspace]);
 
+  // Carrega o workspace do Supabase no mount (cross-device); cai no cache local se offline.
+  useEffect(() => {
+    funnelStore.pullRemote().then((remote) => { if (remote) setWorkspace(remote); }).catch(() => {});
+  }, []);
+
   const updateAssumption = (key: keyof FunnelAssumptions, value: number) => {
     setWorkspace(funnelStore.updateAssumptions({ [key]: value }));
   };
@@ -113,7 +118,7 @@ export default function Funil() {
           <>
             Controle vivo da isca paga Otica Sem Improviso, da esteira de guias e da ponte sutil pro Clearix.
             <span className="block text-xs font-mono text-muted mt-2">
-              Atualizado em {new Date(workspace.updatedAt).toLocaleString('pt-BR')} · fonte local do app
+              Atualizado em {new Date(workspace.updatedAt).toLocaleString('pt-BR')} · {funnelStore.isOnline() ? 'Supabase + cache local' : 'fonte local do app'}
             </span>
           </>
         }

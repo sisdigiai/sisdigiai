@@ -1,3 +1,5 @@
+import { supabase } from './supabase';
+
 export type FunnelProductRole = 'isca_paga' | 'guia_planejado' | 'app_principal';
 export type FunnelStepStatus = 'done' | 'doing' | 'next' | 'blocked';
 export type CreativeStatus = 'validar' | 'ajustar' | 'cortar';
@@ -422,33 +424,37 @@ function cloneDefaults(): FunnelWorkspace {
   };
 }
 
+function normalize(parsed: Partial<FunnelWorkspace> | null | undefined): FunnelWorkspace {
+  const fallback = cloneDefaults();
+  if (!parsed) return fallback;
+  return {
+    ...fallback,
+    ...parsed,
+    version: 1,
+    assumptions: { ...fallback.assumptions, ...(parsed.assumptions || {}) },
+    actuals: { ...fallback.actuals, ...(parsed.actuals || {}) },
+    guides: parsed.guides || fallback.guides,
+    creatives: parsed.creatives || fallback.creatives,
+    automation: parsed.automation || fallback.automation,
+    tasks: (parsed.tasks || fallback.tasks).map((task) => {
+      const defaultTask = fallback.tasks.find((item) => item.id === task.id);
+      return {
+        ...defaultTask,
+        ...task,
+        why: task.why || defaultTask?.why || '',
+        checklist: task.checklist || defaultTask?.checklist || [],
+        acceptanceCriteria: task.acceptanceCriteria || defaultTask?.acceptanceCriteria || [],
+        decisionRule: task.decisionRule || defaultTask?.decisionRule || '',
+      };
+    }),
+  };
+}
+
 function readLocal(): FunnelWorkspace {
   try {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return cloneDefaults();
-    const parsed = JSON.parse(raw) as Partial<FunnelWorkspace>;
-    const fallback = cloneDefaults();
-    return {
-      ...fallback,
-      ...parsed,
-      version: 1,
-      assumptions: { ...fallback.assumptions, ...(parsed.assumptions || {}) },
-      actuals: { ...fallback.actuals, ...(parsed.actuals || {}) },
-      guides: parsed.guides || fallback.guides,
-      creatives: parsed.creatives || fallback.creatives,
-      automation: parsed.automation || fallback.automation,
-      tasks: (parsed.tasks || fallback.tasks).map((task) => {
-        const defaultTask = fallback.tasks.find((item) => item.id === task.id);
-        return {
-          ...defaultTask,
-          ...task,
-          why: task.why || defaultTask?.why || '',
-          checklist: task.checklist || defaultTask?.checklist || [],
-          acceptanceCriteria: task.acceptanceCriteria || defaultTask?.acceptanceCriteria || [],
-          decisionRule: task.decisionRule || defaultTask?.decisionRule || '',
-        };
-      }),
-    };
+    return normalize(JSON.parse(raw) as Partial<FunnelWorkspace>);
   } catch {
     return cloneDefaults();
   }
@@ -456,6 +462,40 @@ function readLocal(): FunnelWorkspace {
 
 function writeLocal(data: FunnelWorkspace) {
   localStorage.setItem(LS_KEY, JSON.stringify({ ...data, updatedAt: new Date().toISOString() }));
+}
+
+// ===== Persistência Supabase (workspace inteiro como JSONB; localStorage vira cache) =====
+const FUNNEL_KEY = 'osi';
+
+function isSupabaseReady(): boolean {
+  const url = import.meta.env.VITE_SUPABASE_URL;
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  return !!url && !!key && !url.includes('placeholder');
+}
+
+async function pushRemote(ws: FunnelWorkspace): Promise<void> {
+  if (!isSupabaseReady()) return;
+  const { error } = await supabase.rpc('fn_save_funnel_workspace', { p_key: FUNNEL_KEY, p_workspace: ws });
+  if (error) console.error('[funnelStore] pushRemote', error);
+}
+
+async function pullRemote(): Promise<FunnelWorkspace | null> {
+  if (!isSupabaseReady()) return null;
+  const { data, error } = await supabase
+    .from('v_funnel_workspace')
+    .select('workspace')
+    .eq('key', FUNNEL_KEY)
+    .maybeSingle();
+  if (error) { console.error('[funnelStore] pullRemote', error); return null; }
+  if (!data?.workspace) {
+    // Primeira vez: semeia o banco com o estado local (defaults ou já editado).
+    const local = readLocal();
+    await pushRemote(local);
+    return local;
+  }
+  const ws = normalize(data.workspace as Partial<FunnelWorkspace>);
+  writeLocal(ws);
+  return ws;
 }
 
 export function calculateFunnelSummary(workspace: FunnelWorkspace): FunnelSummary {
@@ -538,6 +578,11 @@ export function creativeDecision(creative: FunnelCreative, assumptions: FunnelAs
 }
 
 export const funnelStore = {
+  isOnline: isSupabaseReady,
+
+  // Carrega o workspace do banco (cross-device) e atualiza o cache local. Usar no mount.
+  pullRemote,
+
   getWorkspace(): FunnelWorkspace {
     return readLocal();
   },
@@ -545,6 +590,7 @@ export const funnelStore = {
   saveWorkspace(workspace: FunnelWorkspace): FunnelWorkspace {
     const next = { ...workspace, updatedAt: new Date().toISOString() };
     writeLocal(next);
+    void pushRemote(next);
     return next;
   },
 
@@ -556,6 +602,7 @@ export const funnelStore = {
       updatedAt: new Date().toISOString(),
     };
     writeLocal(next);
+    void pushRemote(next);
     return next;
   },
 
@@ -567,6 +614,7 @@ export const funnelStore = {
       updatedAt: new Date().toISOString(),
     };
     writeLocal(next);
+    void pushRemote(next);
     return next;
   },
 
@@ -578,12 +626,14 @@ export const funnelStore = {
       updatedAt: new Date().toISOString(),
     };
     writeLocal(next);
+    void pushRemote(next);
     return next;
   },
 
   reset(): FunnelWorkspace {
     const next = cloneDefaults();
     writeLocal(next);
+    void pushRemote(next);
     return next;
   },
 };
