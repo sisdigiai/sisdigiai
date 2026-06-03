@@ -17,11 +17,23 @@ interface MarketplaceItem {
   notes: string | null;
 }
 
-const DOC_PRICE_BRL = 47.9; // plano-mestre §7
+interface HotmartStats {
+  sales_total: number;
+  revenue_cents_total: number;
+  refunds_total: number;
+  chargebacks_total: number;
+  unique_buyers: number;
+  affiliate_sales: number;
+  unique_affiliates: number;
+  last_sale_at: string | null;
+}
+
+const DOC_PRICE_BRL = 48.5; // plano-mestre §7 (reconciliado 2026-06-02: doc/app/Hotmart/Kiwify)
 
 export default function Marketplace() {
   const [items, setItems] = useState<MarketplaceItem[]>([]);
   const [appPrice, setAppPrice] = useState<number | null>(null);
+  const [hot, setHot] = useState<HotmartStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,6 +56,14 @@ export default function Marketplace() {
       try {
         const w = await academyStore.getWorkspace();
         setAppPrice(w.product.price_brl ?? null);
+      } catch { /* silencioso */ }
+
+      try {
+        const { data: stats } = await supabase
+          .from('v_marketing_hotmart_stats')
+          .select('*')
+          .maybeSingle();
+        if (stats) setHot(stats as HotmartStats);
       } catch { /* silencioso */ }
 
       setLoading(false);
@@ -106,13 +126,38 @@ export default function Marketplace() {
             </span>
           </div>
           <div className="text-xs text-muted">
-            Pendência §13 do plano-mestre: 47,90 (doc) vs 48,50 (Hotmart). Reconciliar antes do lançamento 01/06.
+            Reconciliado 2026-06-02: R$ 48,50 em doc + app + Hotmart + Kiwify.
           </div>
           <ul className="space-y-1.5">
             <PriceRow label="Plano-mestre §7" value={DOC_PRICE_BRL} expected={DOC_PRICE_BRL} source="docs/digiai/docs/05-marketing" />
             <PriceRow label="App (academy.products.price_brl)" value={appPrice} expected={DOC_PRICE_BRL} source="banco" />
             <PriceRow label="Hotmart (listing real)" value={hotmartPrice} expected={DOC_PRICE_BRL} source="digital_assets.observacoes" />
           </ul>
+        </div>
+
+        {/* Vendas reais (Hotmart) — alimentado pelo webhook hotmart-webhook */}
+        <div className="border border-outline/10 bg-surface-low p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono uppercase tracking-widest text-muted">Vendas reais · Hotmart</span>
+            <span className="ml-auto text-[10px] font-mono text-muted">fonte: v_marketing_hotmart_stats (webhook)</span>
+          </div>
+          {hot ? (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="bg-surface-high p-3"><div className="text-[10px] font-mono uppercase tracking-widest text-muted">Vendas</div><div className="text-xl font-semibold tabular-nums text-on-surface mt-1">{hot.sales_total}</div></div>
+                <div className="bg-surface-high p-3"><div className="text-[10px] font-mono uppercase tracking-widest text-muted">Receita</div><div className="text-xl font-semibold tabular-nums text-on-surface mt-1">R$ {(hot.revenue_cents_total / 100).toFixed(2).replace('.', ',')}</div></div>
+                <div className="bg-surface-high p-3"><div className="text-[10px] font-mono uppercase tracking-widest text-muted">Compradores</div><div className="text-xl font-semibold tabular-nums text-on-surface mt-1">{hot.unique_buyers}</div></div>
+                <div className="bg-surface-high p-3"><div className="text-[10px] font-mono uppercase tracking-widest text-muted">Via afiliado</div><div className="text-xl font-semibold tabular-nums text-on-surface mt-1">{hot.affiliate_sales}</div></div>
+              </div>
+              <div className="text-[11px] text-muted">
+                {hot.refunds_total} reembolsos · {hot.chargebacks_total} chargebacks · {hot.unique_affiliates} afiliados ·
+                {hot.last_sale_at ? ` última venda ${new Date(hot.last_sale_at).toLocaleString('pt-BR')}` : ' sem venda ainda'}
+                {hot.sales_total === 1 ? ' · inclui a venda TESTE (1ª venda real ainda pendente)' : ''}
+              </div>
+            </>
+          ) : (
+            <div className="text-xs text-muted italic">{loading ? 'Carregando…' : 'Sem vendas registradas ainda — o webhook popula quando houver compra.'}</div>
+          )}
         </div>
 
         {/* Cards Hotmart + Kiwify */}
