@@ -114,14 +114,13 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
         key: 'pixel',
         label: 'Pixel Meta + TikTok instalados na landing OSI',
         status: 'pending',
-        detail: 'Sem retargeting, R$50/dia queima cego (plano-de-largada §8).',
+        detail: 'Código PRONTO (bootPixels env-driven em otica_sem_improviso). Falta só setar os IDs no env da Netlify e redeploy — não precisa mexer no código.',
         how: [
-          'Abre business.facebook.com (Meta Business Suite)',
-          'Eventos do Pixel > Conectar fonte de dados > Web > Criar pixel',
-          'Nomeia "OSI Landing" e copia o Pixel ID (formato: 123456789012345)',
-          'Repete em ads.tiktok.com (Meta de eventos > Web > Conectar Web > Pixel manual)',
-          'Me passa os 2 IDs no chat — eu ploto no código da landing (D:\\projetos\\otica_sem_improviso) e push',
-          'Após plotar, valida com extensão Meta Pixel Helper (Chrome) abrindo a landing',
+          'Cria o pixel: business.facebook.com (Meta) > copia o ID (123456789012345)',
+          'Idem em ads.tiktok.com (TikTok pixel) > copia o ID',
+          'Netlify (conta sisdigiai) > site da landing OSI > Site settings > Environment variables',
+          'Adiciona VITE_META_PIXEL_ID e VITE_TIKTOK_PIXEL_ID com os IDs > Redeploy',
+          'Valida com a extensão Meta Pixel Helper (Chrome) — bootPixels() dispara sozinho',
         ],
       });
 
