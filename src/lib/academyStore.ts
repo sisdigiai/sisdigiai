@@ -131,7 +131,7 @@ function isSupabaseReady(): boolean {
 function defaultProduct(): AcademyProduct {
   return {
     slug: DEFAULT_SLUG,
-    line: 'clearix_academy',
+    line: 'digiai_academy',
     product_name: 'Ótica Sem Improviso',
     subtitle: 'Manual Visual + App para Atendimento, WhatsApp e Objecoes em Oticas',
     status: 'in_production',

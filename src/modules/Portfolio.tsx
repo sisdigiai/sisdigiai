@@ -33,8 +33,8 @@ const PRODUTOS: Produto[] = [
     site: 'https://clearix.app.br',
   },
   {
-    nome: 'Clearix Academy',
-    subtitulo: 'Enxame de guias low ticket para educar o varejo óptico e alimentar o ecossistema',
+    nome: 'DIGIAI Academy',
+    subtitulo: 'Enxame de guias low ticket (company-level, ADR-0037) para educar o varejo óptico e alimentar o portfólio DIGIAI',
     categoria: 'alavanca-critica',
     prioridade: 'alta',
     status: 'Primeira isca em engenharia: Ótica Sem Improviso',

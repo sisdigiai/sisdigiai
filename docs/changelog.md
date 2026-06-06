@@ -5,6 +5,7 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 ## [Não lançado]
 
 ### Corrigido
+- **Gaps de dado do app** (2026-06-06): (B2) Portfólio + `academyStore` default `Clearix Academy`/`clearix_academy` → **DIGIAI Academy/`digiai_academy`** (ADR-0037). (B1) **`finance.subscriptions` populado** — 12 assinaturas ativas derivadas de `finance.expenses` (kind=subscription, último mês ≥ 2026-04): Anthropic, Supabase, Google/Google Cloud, Canva+Microsoft (polapetit), Higgsfield, ElevenLabs, Z-API, Netlify, Pagar.me, EBANX (~R$ 1.336/mês). Antes a aba Subscriptions estava vazia (0).
 - **Marca "Ótica Sem Achismo" no checkout Kiwify** (2026-06-06) — o produto OSI no Kiwify tinha o nome antigo errado ("Achismo") visível no checkout. Re-salvar o produto + checkout propagou o nome correto **"Ótica Sem Improviso"** ao cabeçalho e título da página renderizada (verificado na página ao vivo). Resíduo "Achismo" restante existe só num campo de config interno **não renderizado** (invisível ao cliente) — limpeza opcional via suporte Kiwify.
 - **Módulo Marketplace estava inacessível** (2026-06-06) — `'marketplace'` faltava no array `MODULES` (validação de rota em `App.tsx`). Clicar no item bouncava de volta pra Visão (o listener de `hashchange` chamava `moduleFromHash()`, que não reconhecia a rota e caía no default `visao`). Import, `case`, sidebar e labels já existiam; só faltava o id na whitelist. Fix: adicionado `'marketplace'` a `MODULES`.
 
