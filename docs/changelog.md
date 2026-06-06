@@ -5,7 +5,10 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 ## [Não lançado]
 
 ### Adicionado
-- **TikTok Pixel da landing OSI no ar** (2026-06-06): criado Ads Account TikTok (conta `Digiai Academy_adv`, aadvid `7648134658340765716`) → Events Manager > Web > Manual > TikTok Pixel "OSI - Ótica Sem Improviso" (ID `D8HQ7JJC77U8POE06IQG`). Ativado via `VITE_TIKTOK_PIXEL_ID` no `netlify.toml` do repo `otica_sem_improviso` (ID é público/client-side). Catalogado em `company.digital_assets` (categoria `outro`, owner `osi`). Item Pixel do Mapa OSI atualizado pra `partial` (TikTok ✅ / Meta 🔴 ainda restrito).
+- **Pixels TikTok + Meta da landing OSI no ar** (2026-06-06): ambos ativados via `netlify.toml` do repo `otica_sem_improviso` (IDs públicos/client-side) e verificados disparando em produção.
+  - **TikTok**: criado Ads Account (conta `Digiai Academy_adv`, aadvid `7648134658340765716`) → Events Manager > Web > Manual > pixel "OSI - Ótica Sem Improviso" (ID `D8HQ7JJC77U8POE06IQG`) → `VITE_TIKTOK_PIXEL_ID`.
+  - **Meta**: dataset/pixel "OSI Landing" (ID `1010582578011237`, Business `Digiai` 1330524481742986) **já existia** — instalado via `VITE_META_PIXEL_ID`. Coleta de eventos **independe** da conta de anúncios (`act 635388131903898`) que segue RESTRITA; só *rodar anúncios* depende dela.
+  - Ambos catalogados em `company.digital_assets` (categoria `outro`, owner `osi`). Item Pixel do Mapa OSI → `done`.
 - **Programa de afiliados OSI ponta-a-ponta + Central de Materiais** (2026-06-06):
   - Edge function `affiliate-materials-public` (Deno, `verify_jwt=false`) deployada em `hswyopqvnolqpmprqvzh`: GET serve `v_marketing_affiliate_materials` ativos; POST `{action:'download',id}` incrementa `downloads_count`. Usa service_role internamente (auto-injetado) — a landing OSI não carrega chave Supabase.
   - 10 materiais ativos em `marketing.affiliate_materials`: **3 reels AI** (voz da Taty clonada no ElevenLabs + avatar falante lip-sync), 4 imagens (carrossel 5 Movimentos, banner quadrado, banner story 9:16, card autoridade), 3 textos (e-mail, WhatsApp, legenda). `art_urls`/`preview_url` apontam pros estáticos servidos pela landing (`landingoticasemimproviso.netlify.app/materiais-afiliado/...`) — **sem Storage/service_role, sem Google Drive**.

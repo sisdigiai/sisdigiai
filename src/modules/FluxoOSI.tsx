@@ -118,16 +118,16 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
         action_label: 'Abrir Calendário Editorial',
       });
 
-      // 3. Pixel Meta + TikTok
+      // 3. Pixel Meta + TikTok — ambos LIVE 2026-06-06
       items.push({
         key: 'pixel',
-        label: 'Pixel TikTok ✅ + Meta 🔴 na landing OSI',
-        status: 'partial',
-        detail: '✅ TikTok LIVE 2026-06-06: pixel "OSI - Ótica Sem Improviso" (ID D8HQ7JJC77U8POE06IQG, conta Digiai Academy_adv) setado via VITE_TIKTOK_PIXEL_ID no netlify.toml + deploy. 🔴 Meta ainda bloqueado: conta de anúncios RESTRITA + Business não verificado — Events Manager nega criar o pixel; entra quando a conta Meta liberar (só setar VITE_META_PIXEL_ID).',
+        label: 'Pixel TikTok ✅ + Meta ✅ instalados na landing OSI',
+        status: 'done',
+        detail: '✅ Ambos LIVE 2026-06-06 via VITE_*_PIXEL_ID no netlify.toml + deploy. TikTok: "OSI - Ótica Sem Improviso" (ID D8HQ7JJC77U8POE06IQG, conta Digiai Academy_adv). Meta: dataset "OSI Landing" (ID 1010582578011237, Business Digiai) — o pixel já existia; coleta de eventos independe da conta de anúncios restrita. ⚠️ Rodar anúncios pagos (Meta) segue bloqueado até liberar a conta de anúncios — mas o pixel já captura tráfego/audiência.',
         how: [
-          'TikTok: FEITO — Ads Account criado, Events Manager > Web > Manual > TikTok Pixel; ID no netlify.toml do repo otica_sem_improviso; catalogado em company.digital_assets.',
-          'Meta (pendente): resolver a restrição da conta de anúncios + verificação do Business Manager → business.facebook.com cria o pixel → setar VITE_META_PIXEL_ID no netlify.toml → redeploy.',
-          'Validar TikTok: extensão TikTok Pixel Helper (Chrome) na landing — bootPixels() dispara sozinho.',
+          'Pixels instalados e catalogados em company.digital_assets (TikTok + Meta).',
+          'Validar: TikTok/Meta Pixel Helper (Chrome) na landing — bootPixels() dispara sozinho (landing_visit + click_checkout).',
+          'Meta ads pagos: ainda dependem de liberar a conta de anúncios restrita + verificar o Business (pendência humana, não bloqueia a coleta do pixel).',
         ],
       });
 
