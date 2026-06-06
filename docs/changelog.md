@@ -5,6 +5,12 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 ## [Não lançado]
 
 ### Adicionado
+- **Funil de conversão first-party no painel** (2026-06-06) — fecha o loop tráfego→conversão sem depender das APIs de Meta/TikTok nem da conta de anúncios restrita:
+  - Migration `034_analytics_funnel_views.sql`: RLS staff-read em `analytics.events_log` + views públicas `v_analytics_funnel_summary` (7d/30d/total por evento) e `v_analytics_funnel_daily` (90d). A ingestão já existia (`fn_log_event`, migration 032).
+  - Edge function **`events-ingest`** (`verify_jwt=false`): a landing OSI POSTa eventos (keyless) → `fn_log_event` via service_role → `analytics.events_log`. Só aceita os 3 eventos client-side (`landing_visit`/`click_checkout`/`checkout_started`); `purchase_approved`/`first_login_nexus` seguem server-side (anti-spoof). R-013: só `session_id` anônimo + UTM + user_agent, **zero PII**.
+  - Landing `tracker.ts` (repo `otica_sem_improviso`): `trackEvent` agora **também** envia ao `events-ingest` via `sendBeacon`/fetch keepalive — captura o funil **completo, inclusive de quem tem ad blocker** (nosso endpoint não é alvo de bloqueador, ≠ pixels).
+  - **Mapa OSI** ganhou o card **"Funil de conversão · first-party"**: visitas/cliques/checkout/compra (7d/30d) + taxa de conversão 7d, lendo `v_analytics_funnel_summary`.
+  - **Verificado end-to-end em produção**: a landing deployada disparou um `landing_visit` real (session anônima) → `events_log` → card no painel.
 - **Pixels TikTok + Meta da landing OSI no ar** (2026-06-06): ambos ativados via `netlify.toml` do repo `otica_sem_improviso` (IDs públicos/client-side) e verificados disparando em produção.
   - **TikTok**: criado Ads Account (conta `Digiai Academy_adv`, aadvid `7648134658340765716`) → Events Manager > Web > Manual > pixel "OSI - Ótica Sem Improviso" (ID `D8HQ7JJC77U8POE06IQG`) → `VITE_TIKTOK_PIXEL_ID`.
   - **Meta**: dataset/pixel "OSI Landing" (ID `1010582578011237`, Business `Digiai` 1330524481742986) **já existia** — instalado via `VITE_META_PIXEL_ID`. Coleta de eventos **independe** da conta de anúncios (`act 635388131903898`) que segue RESTRITA; só *rodar anúncios* depende dela.

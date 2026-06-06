@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, Flame, Megaphone, Boxes, ArrowRight, CheckCircle2, Circle, AlertCircle, Rocket, MapPin, Heart } from 'lucide-react';
+import { BookOpen, Flame, Megaphone, Boxes, ArrowRight, CheckCircle2, Circle, AlertCircle, Rocket, MapPin, Heart, Activity } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { academyStore } from '../lib/academyStore';
 import { funnelStore, calculateFunnelSummary } from '../lib/funnelStore';
@@ -39,10 +39,28 @@ interface GeoRow {
   total: number;
 }
 
+interface FunnelRow {
+  event_code: string;
+  funnel_stage: string;
+  n_7d: number;
+  n_30d: number;
+  n_total: number;
+  sort_order: number;
+}
+
+const FUNNEL_LABEL: Record<string, string> = {
+  landing_visit: 'Visitas na landing',
+  click_checkout: 'Clicou no checkout',
+  checkout_started: 'Checkout iniciado',
+  purchase_approved: 'Compra aprovada',
+  first_login_nexus: '1º login no Nexus',
+};
+
 export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) => void }) {
   const [s, setS] = useState<Stage>({ produto: null, funil: null, mkt: null, materiais: null });
   const [fase0, setFase0] = useState<Fase0Item[]>([]);
   const [geo, setGeo] = useState<GeoRow[]>([]);
+  const [funnel, setFunnel] = useState<FunnelRow[]>([]);
   const [nexus, setNexus] = useState<{ data: OsiOnboardingSummary | null; error: string | null } | null>(null);
 
   useEffect(() => {
@@ -214,6 +232,18 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
       } catch { /* silencioso */ }
     })();
 
+    // Funil first-party (analytics.events_log via view) — conversão real da landing
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('v_analytics_funnel_summary')
+          .select('event_code, funnel_stage, n_7d, n_30d, n_total, sort_order')
+          .eq('product', 'osi')
+          .order('sort_order');
+        setFunnel((data ?? []) as FunnelRow[]);
+      } catch { /* silencioso */ }
+    })();
+
     // M4.2 — Nexus 90 dias (cross-DB read)
     (async () => {
       const result = await fetchOsiOnboardingSummary();
@@ -316,6 +346,50 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
                 );
               })}
             </ul>
+          </div>
+        );
+      })()}
+
+      {/* Funil de conversão first-party (analytics.events_log via view) */}
+      {funnel.length > 0 && (() => {
+        const byCode: Record<string, FunnelRow> = Object.fromEntries(funnel.map(f => [f.event_code, f]));
+        const visits7 = byCode['landing_visit']?.n_7d ?? 0;
+        const clicks7 = byCode['click_checkout']?.n_7d ?? 0;
+        const conv7 = visits7 > 0 ? (clicks7 / visits7) * 100 : null;
+        const totalAll = funnel.reduce((a, f) => a + f.n_total, 0);
+        const order = ['landing_visit', 'click_checkout', 'checkout_started', 'purchase_approved'];
+        return (
+          <div className="border border-outline/10 bg-surface-low p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <Activity className="w-4 h-4 text-secondary" />
+              <span className="text-xs font-mono uppercase tracking-widest text-muted">Funil de conversão · first-party</span>
+              <span className="ml-auto text-[11px] text-on-surface-variant font-mono tabular-nums">
+                {totalAll} eventos · conversão 7d {conv7 != null ? `${conv7.toFixed(1)}%` : '—'}
+              </span>
+            </div>
+            <div className="text-xs text-muted">
+              Eventos reais da landing OSI gravados no nosso banco (<span className="font-mono">analytics.events_log</span>) — independe de ad blocker, ≠ pixels.
+              Conversão 7d = cliques no checkout ÷ visitas.
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {order.map((code) => {
+                const f = byCode[code];
+                return (
+                  <div key={code} className="bg-surface-lowest border border-outline/10 px-3 py-2">
+                    <div className="text-[11px] text-muted truncate">{FUNNEL_LABEL[code] ?? code}</div>
+                    <div className="text-lg font-bold text-on-surface tabular-nums">
+                      {f?.n_7d ?? 0}<span className="text-xs text-muted font-normal"> /7d</span>
+                    </div>
+                    <div className="text-[11px] text-muted tabular-nums">{f?.n_30d ?? 0} em 30d</div>
+                  </div>
+                );
+              })}
+            </div>
+            {totalAll === 0 && (
+              <div className="bg-amber-500/[0.08] border border-amber-500/20 px-3 py-2 text-xs text-on-surface-variant">
+                Ainda sem eventos — o funil popula assim que a landing receber tráfego (pixels + sink first-party já no ar).
+              </div>
+            )}
           </div>
         );
       })()}
