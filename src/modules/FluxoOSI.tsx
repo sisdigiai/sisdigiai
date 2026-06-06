@@ -121,15 +121,13 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
       // 3. Pixel Meta + TikTok
       items.push({
         key: 'pixel',
-        label: 'Pixel Meta + TikTok instalados na landing OSI',
-        status: 'pending',
-        detail: '🔴 BLOQUEADO no Meta: conta de anúncios RESTRITA + Business não verificado (2026-06-05) — o Events Manager nega criar pixel. Código PRONTO (bootPixels env-driven). TikTok pode seguir sozinho. Adiado por canon até liberar a conta Meta.',
+        label: 'Pixel TikTok ✅ + Meta 🔴 na landing OSI',
+        status: 'partial',
+        detail: '✅ TikTok LIVE 2026-06-06: pixel "OSI - Ótica Sem Improviso" (ID D8HQ7JJC77U8POE06IQG, conta Digiai Academy_adv) setado via VITE_TIKTOK_PIXEL_ID no netlify.toml + deploy. 🔴 Meta ainda bloqueado: conta de anúncios RESTRITA + Business não verificado — Events Manager nega criar o pixel; entra quando a conta Meta liberar (só setar VITE_META_PIXEL_ID).',
         how: [
-          'Meta (bloqueado): resolver a restrição da conta de anúncios + verificação do Business Manager primeiro — só depois business.facebook.com cria o pixel',
-          'TikTok (livre): ads.tiktok.com > criar pixel > copia o ID',
-          'Netlify (conta sisdigiai) > site da landing OSI > Site settings > Environment variables',
-          'Adiciona VITE_META_PIXEL_ID (quando liberar) e VITE_TIKTOK_PIXEL_ID > Redeploy',
-          'Valida com a extensão Pixel Helper (Chrome) — bootPixels() dispara sozinho',
+          'TikTok: FEITO — Ads Account criado, Events Manager > Web > Manual > TikTok Pixel; ID no netlify.toml do repo otica_sem_improviso; catalogado em company.digital_assets.',
+          'Meta (pendente): resolver a restrição da conta de anúncios + verificação do Business Manager → business.facebook.com cria o pixel → setar VITE_META_PIXEL_ID no netlify.toml → redeploy.',
+          'Validar TikTok: extensão TikTok Pixel Helper (Chrome) na landing — bootPixels() dispara sozinho.',
         ],
       });
 
