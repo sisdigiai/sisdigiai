@@ -5,6 +5,16 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 ## [Não lançado]
 
 ### Adicionado
+- **Programa de afiliados OSI ponta-a-ponta + Central de Materiais** (2026-06-06):
+  - Edge function `affiliate-materials-public` (Deno, `verify_jwt=false`) deployada em `hswyopqvnolqpmprqvzh`: GET serve `v_marketing_affiliate_materials` ativos; POST `{action:'download',id}` incrementa `downloads_count`. Usa service_role internamente (auto-injetado) — a landing OSI não carrega chave Supabase.
+  - 10 materiais ativos em `marketing.affiliate_materials`: **3 reels AI** (voz da Taty clonada no ElevenLabs + avatar falante lip-sync), 4 imagens (carrossel 5 Movimentos, banner quadrado, banner story 9:16, card autoridade), 3 textos (e-mail, WhatsApp, legenda). `art_urls`/`preview_url` apontam pros estáticos servidos pela landing (`landingoticasemimproviso.netlify.app/materiais-afiliado/...`) — **sem Storage/service_role, sem Google Drive**.
+  - Marca corrigida e propagada: as 5 artes (avatar, capa hero, card autoridade, banner quadrado, banner story) refeitas com **avatar REAL da Taty + DIGIAI Academy / "Ótica Sem Improviso"** — substituindo o "Clearix Academy / Ótica Sem Achismo" que estava no ar (landing + capa Hotmart).
+  - E-mail canônico de suporte ao afiliado: **vendas@digiai.app.br** (criado via Cloudflare Email Routing).
+- **Módulo Mapa OSI (`FluxoOSI.tsx`) atualizado** pra refletir a realidade:
+  - FASE 0 agora `5/7`: item novo **"Central de Materiais do afiliado no ar"** (lê `marketing.affiliate_materials` ao vivo — total, reels, com-arte) com link pra `/materiais-afiliado`.
+  - Item **Pixel** atualizado: 🔴 bloqueado no Meta (conta de anúncios RESTRITA + Business não verificado, 2026-06-05) — Events Manager nega criar pixel; TikTok pode seguir sozinho; adiado por canon.
+  - Item **Capa Hotmart** virou **"Marca DIGIAI + avatar real propagados"** (capa, card, landing, Hotmart) — re-verificado 2026-06-06.
+  - Card Marketing ganhou métrica **"Materiais na Central"** (`marketingStore.listMaterials()`).
 - **Marketing & SEO virou centro de controle multi-domínio (abas por site)** — migration `seo_multisite` + `seo_sites_view`:
   - Nova tabela `company.seo_sites` (registro data-driven: `gsc_property`, `bing_site_url`, `cloudflare_zone_id`, `indexnow_key`, `github_repo`, `label`, `color`, `active`, `sort_order`) + view `public.v_seo_sites`. Seed: `digiai.app.br` + `clearix.app.br`. Adicionar domínio = 1 INSERT (sem deploy).
   - `company.metrics` ganhou coluna `site` (backfill `digiai.app.br`); cache passa a ser por `(site, source)`. `fn_replace_metrics` ganhou overload `(p_source, p_site, p_rows)`. `v_company_metrics` expõe `site`.

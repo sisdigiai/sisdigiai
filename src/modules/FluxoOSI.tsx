@@ -16,6 +16,7 @@ interface Stage {
   produto: { nome: string; preco: number | null; status: string } | null;
   funil: { ticket: number; roas: number } | null;
   mkt: { posts: number; ideias: number; afiliados: number } | null;
+  materiais: { total: number; reels: number; comArte: number } | null;
 }
 
 type Fase0Status = 'done' | 'partial' | 'pending';
@@ -39,7 +40,7 @@ interface GeoRow {
 }
 
 export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) => void }) {
-  const [s, setS] = useState<Stage>({ produto: null, funil: null, mkt: null });
+  const [s, setS] = useState<Stage>({ produto: null, funil: null, mkt: null, materiais: null });
   const [fase0, setFase0] = useState<Fase0Item[]>([]);
   const [geo, setGeo] = useState<GeoRow[]>([]);
   const [nexus, setNexus] = useState<{ data: OsiOnboardingSummary | null; error: string | null } | null>(null);
@@ -58,6 +59,14 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
 
     Promise.all([marketingStore.listCalendar(), marketingStore.listIdeas(), marketingStore.listAffiliates()])
       .then(([cal, ideias, afi]) => setS(prev => ({ ...prev, mkt: { posts: cal.length, ideias: ideias.length, afiliados: afi.length } })))
+      .catch(() => {});
+
+    marketingStore.listMaterials()
+      .then(mats => setS(prev => ({ ...prev, materiais: {
+        total: mats.length,
+        reels: mats.filter(m => m.type === 'reel').length,
+        comArte: mats.filter(m => m.art_urls.length > 0).length,
+      } })))
       .catch(() => {});
 
     // FASE 0 — bloqueadores humanos do lançamento OSI 01/06 (plano-de-largada FASE 0)
@@ -114,13 +123,13 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
         key: 'pixel',
         label: 'Pixel Meta + TikTok instalados na landing OSI',
         status: 'pending',
-        detail: 'Código PRONTO (bootPixels env-driven em otica_sem_improviso). Falta só setar os IDs no env da Netlify e redeploy — não precisa mexer no código.',
+        detail: '🔴 BLOQUEADO no Meta: conta de anúncios RESTRITA + Business não verificado (2026-06-05) — o Events Manager nega criar pixel. Código PRONTO (bootPixels env-driven). TikTok pode seguir sozinho. Adiado por canon até liberar a conta Meta.',
         how: [
-          'Cria o pixel: business.facebook.com (Meta) > copia o ID (123456789012345)',
-          'Idem em ads.tiktok.com (TikTok pixel) > copia o ID',
+          'Meta (bloqueado): resolver a restrição da conta de anúncios + verificação do Business Manager primeiro — só depois business.facebook.com cria o pixel',
+          'TikTok (livre): ads.tiktok.com > criar pixel > copia o ID',
           'Netlify (conta sisdigiai) > site da landing OSI > Site settings > Environment variables',
-          'Adiciona VITE_META_PIXEL_ID e VITE_TIKTOK_PIXEL_ID com os IDs > Redeploy',
-          'Valida com a extensão Meta Pixel Helper (Chrome) — bootPixels() dispara sozinho',
+          'Adiciona VITE_META_PIXEL_ID (quando liberar) e VITE_TIKTOK_PIXEL_ID > Redeploy',
+          'Valida com a extensão Pixel Helper (Chrome) — bootPixels() dispara sozinho',
         ],
       });
 
@@ -139,12 +148,12 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
         items.push({ key: 'preco', label: 'Preço reconciliado (plano-mestre vs Hotmart vs app)', status: 'pending' });
       }
 
-      // 5. Capa Hotmart — feito (verificado no navegador 2026-06-02)
+      // 5. Capa Hotmart + propagação de marca/avatar real (re-verificado 2026-06-06)
       items.push({
         key: 'capa',
-        label: 'Capa Hotmart atualizada (brand OSI)',
+        label: 'Marca DIGIAI + avatar real propagados (capa, card, landing, Hotmart)',
         status: 'done',
-        detail: 'Feito — capa brand OSI no ar (Hotmart produto ID 7611033 + Kiwify, título "Ótica Sem Improviso"). Verificado 2026-06-02.',
+        detail: 'Feito 2026-06-06 — as 5 artes (avatar, capa hero, card autoridade, banner quadrado, banner story) refeitas com avatar REAL da Taty + marca correta (DIGIAI Academy / "Ótica Sem Improviso") e subidas em TODOS os lugares: landing (hero+card), Central de Materiais, capa Hotmart (ID 7611033). Corrigido o "Clearix Academy / Ótica Sem Achismo" que estava no ar.',
         action_url: 'https://app.hotmart.com/products/B105515825',
         action_label: 'Abrir produto no Hotmart',
       });
@@ -166,6 +175,31 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
         });
       } catch {
         items.push({ key: 'afiliados', label: '1ª prova social registrada (destrava recrutamento de afiliados)', status: 'pending' });
+      }
+
+      // 7. Central de Materiais do afiliado (pronta 2026-06-06)
+      try {
+        const mats = await marketingStore.listMaterials();
+        const total = mats.length;
+        const reels = mats.filter(m => m.type === 'reel').length;
+        const comArte = mats.filter(m => m.art_urls.length > 0).length;
+        items.push({
+          key: 'central',
+          label: 'Central de Materiais do afiliado no ar',
+          status: total > 0 ? 'done' : 'pending',
+          detail: `${total} materiais ativos (${comArte} com arte pronta) · ${reels} reels AI (voz clonada + avatar) + banners + carrossel + textos. Servidos do nosso próprio sistema via edge function pública — sem Google Drive. Programa de afiliação Hotmart ligado; suporte = vendas@digiai.app.br.`,
+          how: [
+            'Página pública: landingoticasemimproviso.netlify.app/materiais-afiliado (baixar artes + copiar textos + assistir/baixar reels)',
+            'Backend: edge function affiliate-materials-public (DIGIAI App) serve marketing.affiliate_materials read-only',
+            'Artes servidas como estáticos em otica_sem_improviso/public/materiais-afiliado/ (sem Storage/service_role)',
+            'Edição/curadoria dos materiais: Marketing > Materiais de Afiliados (este app)',
+            'Recrutar afiliados só APÓS a 1ª venda real (item acima) — R-011',
+          ],
+          action_url: 'https://landingoticasemimproviso.netlify.app/materiais-afiliado',
+          action_label: 'Abrir Central de Materiais',
+        });
+      } catch {
+        items.push({ key: 'central', label: 'Central de Materiais do afiliado no ar', status: 'pending', detail: '(erro ao consultar affiliate_materials)' });
       }
 
       setFase0(items);
@@ -403,6 +437,7 @@ GRANT SELECT ON public.v_osi_onboarding_summary TO anon, authenticated;`}</pre>
           <Metric label="Posts no calendário" value={s.mkt ? String(s.mkt.posts) : '…'} />
           <Metric label="Ideias no banco" value={s.mkt ? String(s.mkt.ideias) : '…'} />
           <Metric label="Afiliados" value={s.mkt ? String(s.mkt.afiliados) : '…'} />
+          <Metric label="Materiais na Central" value={s.materiais ? `${s.materiais.total} (${s.materiais.reels} reels)` : '…'} />
           <button onClick={() => onNavigate?.('marketing')} className="text-[11px] text-secondary hover:text-secondary pt-1 transition-colors">Abrir Marketing →</button>
         </Card>
       </div>
