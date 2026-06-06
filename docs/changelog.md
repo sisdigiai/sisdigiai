@@ -5,9 +5,16 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 ## [Não lançado]
 
 ### Corrigido
+- **Marca "Ótica Sem Achismo" no checkout Kiwify** (2026-06-06) — o produto OSI no Kiwify tinha o nome antigo errado ("Achismo") visível no checkout. Re-salvar o produto + checkout propagou o nome correto **"Ótica Sem Improviso"** ao cabeçalho e título da página renderizada (verificado na página ao vivo). Resíduo "Achismo" restante existe só num campo de config interno **não renderizado** (invisível ao cliente) — limpeza opcional via suporte Kiwify.
 - **Módulo Marketplace estava inacessível** (2026-06-06) — `'marketplace'` faltava no array `MODULES` (validação de rota em `App.tsx`). Clicar no item bouncava de volta pra Visão (o listener de `hashchange` chamava `moduleFromHash()`, que não reconhecia a rota e caía no default `visao`). Import, `case`, sidebar e labels já existiam; só faltava o id na whitelist. Fix: adicionado `'marketplace'` a `MODULES`.
 
 ### Adicionado
+- **Kiwify (marketplace secundário OSI) configurado completo** (2026-06-06):
+  - Programa de afiliados ON: comissão **52%** (afiliado ~R$ 21,66, paridade c/ Hotmart R$ 21,78), aprovação manual, estratégia de vendas. E-mail de suporte de afiliados corrigido `oticastatymello@gmail.com` → **`vendas@digiai.app.br`**.
+  - **Pixels no checkout Kiwify**: Meta `1010582578011237` + TikTok `D8HQ7JJC77U8POE06IQG` (mesmos IDs da landing).
+  - Pagamento: Cartão+Boleto+Pix, até 5x, 2 cartões, Apple Pay. Produto Ativo R$ 48,50, reconciliado c/ Hotmart e doc.
+  - `company.digital_assets` (linha "Conta Kiwify") atualizado com toda a config.
+  - **Entrega (webhook Kiwify→Nexus) pendente** — registrada como tarefa; caminho financeiro crítico, fazer com calma. Pré-requisito: `HOTMART_HOTTOK` (canal primário) ainda não setado → o `hotmart-webhook` é fail-closed e hoje **não processa** vendas reais (grava raw, não provisiona Nexus/e-mail).
 - **Funil de conversão first-party no painel** (2026-06-06) — fecha o loop tráfego→conversão sem depender das APIs de Meta/TikTok nem da conta de anúncios restrita:
   - Migration `034_analytics_funnel_views.sql`: RLS staff-read em `analytics.events_log` + views públicas `v_analytics_funnel_summary` (7d/30d/total por evento) e `v_analytics_funnel_daily` (90d). A ingestão já existia (`fn_log_event`, migration 032).
   - Edge function **`events-ingest`** (`verify_jwt=false`): a landing OSI POSTa eventos (keyless) → `fn_log_event` via service_role → `analytics.events_log`. Só aceita os 3 eventos client-side (`landing_visit`/`click_checkout`/`checkout_started`); `purchase_approved`/`first_login_nexus` seguem server-side (anti-spoof). R-013: só `session_id` anônimo + UTM + user_agent, **zero PII**.
@@ -52,6 +59,8 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Primeira métrica real**: Cloudflare retornou 863 requests / 2.9 MB / 20 threats bloqueados nos últimos 7 dias de `digiai.app.br`. GSC e Bing ainda 0 (site recém-indexado).
 
 ### Mudado
+- **Rebrand: academy do OSI virou "DIGIAI Academy"** (2026-06-06, decisão do dono) — `academy.products.line` do produto `otica-sem-improviso` mudou `clearix_academy` → **`digiai_academy`**. Cria divergência com o doc-set "Clearix Academy" em `docs/digiai/docs/05-marketing/` (plano, operação editorial, etc.) + itens de backlog — **reconciliação registrada como tarefa** (ler ADRs 0025-0027 da brand hierarchy antes de editar em massa).
+- **Reconciliação do Roadmap (tracking defasado → realidade)** (2026-06-06) — 13 tarefas marcadas `done` em `ops.roadmap_tasks` (nota de auditoria `reconciliado 2026-06-06`): landing v1, pixels (GA+Meta), 3 conteúdos/reels, e itens Academy (nome/promessa/domínio, peças visuais, capas, copy/checkout/entrega da página de vendas, PDF principal) + Kiwify configurada (checkout vivo verificado). Roadmap geral **17% → ~33%**; Fase 0 "Validação do Problema" **38% → 47%**. A infra está à frente da validação de mercado (gargalo real = entrevistas com óticas).
 - **`tsconfig.json`** — adicionado `exclude` pra `supabase/functions`, `node_modules`, `dist` (edge functions rodam em Deno, não devem entrar no tsc do frontend).
 
 ### Removido
