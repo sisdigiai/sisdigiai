@@ -41,7 +41,7 @@ const PUBLIC_ROUTES = ['/osi/depoimento', '/osi'];
 const MODULES: ModuleId[] = [
   'visao', 'portfolio', 'trilha', 'lista-mestra', 'backlog', 'comercial',
   'cadastro-empresa', 'financeiro', 'academy', 'funil', 'fluxo-osi',
-  'marketing', 'marketing-seo', 'clearix', 'ecossistemas',
+  'marketing', 'marketing-seo', 'marketplace', 'clearix', 'ecossistemas',
   'decisoes', 'biblioteca', 'brand', 'travas-marketing',
   'referencias-design', 'mock-estilos', 'guia',
 ];

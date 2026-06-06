@@ -4,6 +4,9 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Corrigido
+- **Módulo Marketplace estava inacessível** (2026-06-06) — `'marketplace'` faltava no array `MODULES` (validação de rota em `App.tsx`). Clicar no item bouncava de volta pra Visão (o listener de `hashchange` chamava `moduleFromHash()`, que não reconhecia a rota e caía no default `visao`). Import, `case`, sidebar e labels já existiam; só faltava o id na whitelist. Fix: adicionado `'marketplace'` a `MODULES`.
+
 ### Adicionado
 - **Funil de conversão first-party no painel** (2026-06-06) — fecha o loop tráfego→conversão sem depender das APIs de Meta/TikTok nem da conta de anúncios restrita:
   - Migration `034_analytics_funnel_views.sql`: RLS staff-read em `analytics.events_log` + views públicas `v_analytics_funnel_summary` (7d/30d/total por evento) e `v_analytics_funnel_daily` (90d). A ingestão já existia (`fn_log_event`, migration 032).
