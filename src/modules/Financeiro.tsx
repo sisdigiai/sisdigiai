@@ -139,7 +139,8 @@ function DashboardTab() {
 
   const now = new Date();
   const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1).toISOString().slice(0, 10);
-  const recentExpenses = expenses.filter(e => e.month >= threeMonthsAgo);
+  // Burn = saída de CAIXA. O aporte intelectual (sweat equity) é não-caixa — nunca entra no burn.
+  const recentExpenses = expenses.filter(e => e.month >= threeMonthsAgo && e.kind !== 'aporte_intelectual');
   const uniqueRecentMonths = new Set(recentExpenses.map(e => e.month)).size || 1;
   const burnRate3m = recentExpenses.reduce((a, e) => a + Number(e.amount_brl), 0) / uniqueRecentMonths;
 
@@ -225,7 +226,7 @@ function DashboardTab() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <KpiCard label={`Total Investido${filterProduct !== 'all' ? '' : ' (geral)'}`} value={brl(total12m)} icon={<DollarSign size={20} />} color="text-secondary" />
         <KpiCard label="Lançamentos" value={String(expenses.length)} sub="despesas registradas" icon={<TrendingDown size={20} />} color="text-secondary" />
-        <KpiCard label="Burn Rate (média)" value={brl(burnRate3m)} sub="/mês" icon={<BarChart3 size={20} />} color="text-secondary" />
+        <KpiCard label="Burn de Caixa (média)" value={brl(burnRate3m)} sub="/mês · só caixa" icon={<BarChart3 size={20} />} color="text-secondary" />
         <KpiCard label="Subscriptions ativas" value={brl(monthlySubsTotal)} sub={`${activeSubs.length} serviços`} icon={<Repeat size={20} />} color="text-secondary" />
       </div>
 
