@@ -263,11 +263,10 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
       </div>
 
       {/* Status institucional */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <StatusCard label="CNPJ cadastrado" done={summary.hasCnpj} hint="Cadastro Empresa → Identidade" onClick={() => onNavigate?.('cadastro-empresa')} />
         <StatusCard label="DPO nomeado" done={summary.hasDpo} hint="Cadastro Empresa → LGPD" onClick={() => onNavigate?.('cadastro-empresa')} />
         <StatusCard label="Snapshot financeiro" done={summary.latestMrr !== null} hint="Cadastro Empresa → Financeiro" onClick={() => onNavigate?.('cadastro-empresa')} />
-        <StatusCard label="1ª entrevista feita" done={false} hint="Fase 0 do Roadmap" onClick={() => onNavigate?.('trilha')} />
       </div>
 
       {/* Decisões recentes */}

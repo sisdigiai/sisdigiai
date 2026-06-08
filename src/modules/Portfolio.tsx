@@ -143,7 +143,7 @@ const PRODUTOS: Produto[] = [
     subtitulo: 'Painel de comando interno da DIGIAI',
     categoria: 'infraestrutura',
     prioridade: 'alta',
-    status: 'Operacional · 16 módulos roteados + 2 stubs · schema company populado · finanças reconciliadas via OFX · Marketing/Marketing & SEO ativos',
+    status: 'Operacional · 24 módulos roteados · 0 stubs · schema company populado · finanças reconciliadas via OFX · Marketing/Marketing & SEO ativos',
     faseAtual: 'Fase 1 → 2 — operação interna ativa',
     repo: 'D:\\projetos\\digiai',
     stack: 'React 19 · Vite · TypeScript · TailwindCSS 4 · Motion · Supabase · Chart.js',
@@ -202,7 +202,7 @@ export default function Portfolio() {
       <PageHeader
         eyebrow="Hierarquia Canônica"
         title="Portfólio de Produtos"
-        subtitle={`${PRODUTOS.length} frentes · hierarquia canônica · atualizado 2026-05-28`}
+        subtitle={`${PRODUTOS.length} frentes · hierarquia canônica · atualizado 2026-06-08`}
       />
 
       <div className="space-y-6">

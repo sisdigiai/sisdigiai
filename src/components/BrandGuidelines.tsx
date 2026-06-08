@@ -205,15 +205,16 @@ export default function BrandGuidelines() {
           <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-secondary">Recursos</span>
           <h2 className="font-serif text-3xl font-semibold tracking-tight mt-3 mb-6 text-on-surface">Brand Assets</h2>
           <p className="text-on-surface-variant max-w-2xl mx-auto mb-12 leading-relaxed">
-            Pacote oficial do logo DIGIAI — vetores SVG, PNGs em alta resolução e favicons para todos os produtos do ecossistema.
+            Logo oficial DIGIAI em SVG vetorial. (Pacote completo com PNGs em alta resolução e favicons está em preparação.)
           </p>
-          <button
-            onClick={() => alert('Em produção, isso dispararia o download de um ZIP com todos os assets SVG e PNG.')}
+          <a
+            href="/favicon.svg"
+            download="digiai-logo.svg"
             className="inline-flex items-center gap-3 bg-secondary text-surface px-8 py-4 font-semibold text-base hover:bg-secondary/90 transition-colors"
           >
             <Download className="w-5 h-5" />
-            Baixar pacote completo
-          </button>
+            Baixar logo (SVG)
+          </a>
         </div>
       </section>
     </div>

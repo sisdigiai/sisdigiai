@@ -32,8 +32,10 @@ interface Ecossistema {
   status: EcossistemaStatus;
 }
 
-// URLs externas dos ecossistemas (override via .env quando aplicavel)
-// Verificado online em 2026-05-28 — todos respondendo 200.
+import { useEcosystemUrls } from '../hooks/useEcosystemUrls';
+
+// URLs externas dos ecossistemas — fonte única em company.digital_assets (via
+// useEcosystemUrls). As constantes abaixo são FALLBACK (offline/RLS). ADR-0029.
 const ATLAS_URL       = import.meta.env.VITE_ATLAS_URL       || 'https://digiaiatlas.netlify.app';
 const OSI_URL         = import.meta.env.VITE_OSI_URL         || 'https://oticasemimproviso.netlify.app';
 const CLEARIX_HUB_URL = import.meta.env.VITE_CLEARIX_HUB_URL || 'https://clearixhub.netlify.app';
@@ -41,8 +43,8 @@ const NEXUS_URL       = import.meta.env.VITE_NEXUS_URL       || 'https://sisnexu
 const POLAPETIT_URL   = import.meta.env.VITE_POLAPETIT_URL   || 'https://polapetit.netlify.app';
 const PULSO_URL       = import.meta.env.VITE_PULSO_URL       || 'https://pulsoprojects.vercel.app';
 const QUALFOTO_URL    = import.meta.env.VITE_QUALFOTO_URL    || 'https://qualfoto.netlify.app';
-const LUMINA_URL      = import.meta.env.VITE_LUMINA_URL      || 'https://lumina.netlify.app';
-const EASY_URL        = import.meta.env.VITE_EASY_URL        || 'https://easyidiomas.netlify.app';
+const LUMINA_URL      = import.meta.env.VITE_LUMINA_URL      || 'https://luminabox.netlify.app';
+const EASY_URL        = import.meta.env.VITE_EASY_URL        || 'https://easyidioma.netlify.app';
 const NIPO_URL        = import.meta.env.VITE_NIPO_URL        || 'https://niposchool.vercel.app';
 
 const operacional: NavItem[] = [
@@ -65,7 +67,7 @@ const operacional: NavItem[] = [
 
 // Ecossistemas (links externos — ADR-0029)
 // Ordem: ativos primeiro, depois em_construcao, depois em_concepcao
-const ecossistemas: Ecossistema[] = [
+const ECOSSISTEMA_DEFS: Ecossistema[] = [
   { key: 'clearix-hub',  icone: <Boxes        className="w-4 h-4" />, nome: 'Clearix Hub',   url: CLEARIX_HUB_URL, status: 'ativo' },
   { key: 'atlas',        icone: <Compass      className="w-4 h-4" />, nome: 'Clearix Atlas', url: ATLAS_URL,       status: 'ativo' },
   { key: 'osi',          icone: <Store        className="w-4 h-4" />, nome: 'OSI',           url: OSI_URL,         status: 'ativo' },
@@ -122,6 +124,8 @@ export default function Sidebar({ active, onSelect, mobileOpen = false, onClose 
   const { user, signOut } = useAuth();
   const [collapsed, setCollapsed] = useState<Record<SectionKey, boolean>>(loadCollapsed);
   const activeSection = sectionOf(active);
+  const ecoUrls = useEcosystemUrls();
+  const ecossistemas = ECOSSISTEMA_DEFS.map(e => ({ ...e, url: ecoUrls[e.key] ?? e.url }));
 
   const toggleSection = (k: SectionKey) => {
     setCollapsed(prev => {
