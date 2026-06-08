@@ -67,7 +67,7 @@ export type Expense = {
   vendor_name?: string;
   category: ExpenseCategory;
   category_label: string;
-  kind: 'subscription' | 'one_time';
+  kind: 'subscription' | 'one_time' | 'aporte_intelectual';
   description: string;
   month: string;
   amount_brl: number;
@@ -205,7 +205,7 @@ export const financeStore = {
     product_id: string;
     vendor_id?: string;
     category: ExpenseCategory;
-    kind: 'subscription' | 'one_time';
+    kind: 'subscription' | 'one_time' | 'aporte_intelectual';
     description: string;
     month: string;
     amount_brl: number;

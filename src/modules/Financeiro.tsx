@@ -427,7 +427,7 @@ function LancarTab() {
         await financeStore.addExpense({
           product_id,
           category: category as ExpenseCategory,
-          kind: kind as 'subscription' | 'one_time',
+          kind: kind as 'subscription' | 'one_time' | 'aporte_intelectual',
           description,
           month: month.length === 7 ? month + '-01' : month,
           amount_brl,
@@ -467,7 +467,7 @@ function LancarTab() {
             </p>
             <textarea
               className={inputClass + ' h-28 font-mono text-xs'}
-              placeholder="product_id,category,kind,description,month,amount_brl&#10;clearix,infra_cloud,subscription,Supabase Pro,2025-04,125.00"
+              placeholder="product_id,category,kind,description,month,amount_brl&#10;clearix,infra_cloud,subscription,Supabase Pro,2025-04,125.00&#10;clearix,personnel,aporte_intelectual,Mão de obra fundador,2025-05,18200.00"
               value={csvText}
               onChange={e => setCsvText(e.target.value)}
             />
@@ -506,6 +506,7 @@ function LancarTab() {
             <select className={inputClass} value={draft.kind} onChange={e => setDraft({ ...draft, kind: e.target.value as any })}>
               <option value="one_time">One-time</option>
               <option value="subscription">Subscription</option>
+              <option value="aporte_intelectual">Aporte intelectual (não-caixa)</option>
             </select>
           </div>
           <div>
@@ -588,7 +589,7 @@ function LancarTab() {
                     <td className="py-2">
                       <span className="px-2 py-0.5 rounded-full text-xs bg-surface-high text-on-surface-variant">{e.category_label}</span>
                     </td>
-                    <td className="py-2 text-muted">{e.kind === 'subscription' ? 'Sub' : 'One-time'}</td>
+                    <td className="py-2 text-muted">{e.kind === 'subscription' ? 'Sub' : e.kind === 'aporte_intelectual' ? 'Aporte' : 'One-time'}</td>
                     <td className="py-2 text-right font-mono text-on-surface">{brl(Number(e.amount_brl))}</td>
                     <td className="py-2 text-right">
                       <button onClick={() => handleDelete(e.id)} className="text-muted hover:text-red-400 transition-colors">
