@@ -21,14 +21,14 @@ interface ContaSocial {
 
 export const CONTAS_SOCIAIS: ContaSocial[] = [
   { code: 'pessoal_linkedin', rede: 'LinkedIn', handle: 'Gilberto (pessoal)', url: null, camada: 'pessoal', navegador: 'Chrome · perfil "Gilberto"', cadencia: '3–5 posts/semana (rascunho diário)', papel: 'Build in public · autoridade B2B · rosto da DIGIAI/Clearix' },
-  { code: 'digiai_instagram', rede: 'Instagram', handle: '@_digiai', url: 'https://instagram.com/_digiai', camada: 'digiai', navegador: null, cadencia: '1 carrossel/semana', papel: 'Institucional / ecossistema' },
-  { code: 'digiai_linkedin', rede: 'LinkedIn', handle: 'company/digiai-app-br', url: 'https://www.linkedin.com/company/digiai-app-br/', camada: 'digiai', navegador: null, cadencia: '1 post/semana (consolidado)', papel: 'Institucional B2B' },
-  { code: 'digiai_facebook', rede: 'Facebook', handle: 'Página DIGIAI', url: 'https://facebook.com/61586695274933', camada: 'digiai', navegador: null, cadencia: 'repost do IG', papel: 'Presença / verificação Meta' },
-  { code: 'digiai_youtube', rede: 'YouTube', handle: '@SisDigiai', url: 'https://youtube.com/@SisDigiai', camada: 'digiai', navegador: null, cadencia: 'quando houver vídeo', papel: 'Conteúdo longo futuro' },
-  { code: 'digiai_tiktok', rede: 'TikTok', handle: '@sisdigiai', url: 'https://tiktok.com/@sisdigiai', camada: 'digiai', navegador: null, cadencia: 'quando houver vídeo', papel: 'Reserva de handle / repost' },
-  { code: 'osi_instagram', rede: 'Instagram', handle: '@oticasemimproviso', url: 'https://instagram.com/oticasemimproviso/', camada: 'osi', navegador: null, cadencia: 'calendário editorial OSI', papel: 'Funil OSI primário (rosto = Taty)' },
-  { code: 'osi_tiktok', rede: 'TikTok', handle: '@oticasemimproviso', url: 'https://tiktok.com/@oticasemimproviso', camada: 'osi', navegador: null, cadencia: 'repost dos Reels', papel: 'Funil OSI primário' },
-  { code: 'osi_facebook', rede: 'Facebook', handle: 'Página Óticas Sem Improviso', url: 'https://facebook.com/profile.php?id=61590241545549', camada: 'osi', navegador: null, cadencia: 'repost', papel: 'Suporte BM / ads' },
+  { code: 'digiai_instagram', rede: 'Instagram', handle: '@_digiai', url: 'https://instagram.com/_digiai', camada: 'digiai', navegador: 'Chrome · perfil "sis_digiAI"', cadencia: '1 carrossel/semana', papel: 'Institucional / ecossistema' },
+  { code: 'digiai_linkedin', rede: 'LinkedIn', handle: 'company/digiai-app-br', url: 'https://www.linkedin.com/company/digiai-app-br/', camada: 'digiai', navegador: 'Chrome · perfil "sis_digiAI"', cadencia: '1 post/semana (consolidado)', papel: 'Institucional B2B' },
+  { code: 'digiai_facebook', rede: 'Facebook', handle: 'Página DIGIAI', url: 'https://facebook.com/61586695274933', camada: 'digiai', navegador: 'Chrome · perfil "sis_digiAI"', cadencia: 'repost do IG', papel: 'Presença / verificação Meta' },
+  { code: 'digiai_youtube', rede: 'YouTube', handle: '@SisDigiai', url: 'https://youtube.com/@SisDigiai', camada: 'digiai', navegador: 'Chrome · perfil "sis_digiAI"', cadencia: 'quando houver vídeo', papel: 'Conteúdo longo futuro' },
+  { code: 'digiai_tiktok', rede: 'TikTok', handle: '@sisdigiai', url: 'https://tiktok.com/@sisdigiai', camada: 'digiai', navegador: 'Chrome · perfil "sis_digiAI"', cadencia: 'quando houver vídeo', papel: 'Reserva de handle / repost' },
+  { code: 'osi_instagram', rede: 'Instagram', handle: '@oticasemimproviso', url: 'https://instagram.com/oticasemimproviso/', camada: 'osi', navegador: 'Chrome · perfil "sis_digiAI"', cadencia: 'calendário editorial OSI', papel: 'Funil OSI primário (rosto = Taty)' },
+  { code: 'osi_tiktok', rede: 'TikTok', handle: '@oticasemimproviso', url: 'https://tiktok.com/@oticasemimproviso', camada: 'osi', navegador: 'Chrome · perfil "sis_digiAI"', cadencia: 'repost dos Reels', papel: 'Funil OSI primário' },
+  { code: 'osi_facebook', rede: 'Facebook', handle: 'Página Óticas Sem Improviso', url: 'https://facebook.com/profile.php?id=61590241545549', camada: 'osi', navegador: 'Chrome · perfil "sis_digiAI"', cadencia: 'repost', papel: 'Suporte BM / ads' },
 ];
 
 const CAMADAS: { id: Camada; titulo: string; regra: string }[] = [
