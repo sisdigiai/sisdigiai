@@ -1,4 +1,4 @@
-import { ShieldCheck, Bot, Lock, Target, Heart, Store } from 'lucide-react';
+import { ShieldCheck, Bot, Lock, Target, Heart, Store, Globe } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 
 // Travas de marketing — derivadas das regras canônicas (R-011, R-013/LGPD,
@@ -57,6 +57,18 @@ export const TRAVAS: Trava[] = [
       'Preço, capa e oferta no marketplace são fonte da verdade — sincronizar app ↔ marketplace.',
     ],
     onde: 'Marketplace · Calendário · Materiais de afiliados · Landing OSI',
+  },
+  {
+    icone: Globe,
+    titulo: 'Disciplina de Redes Sociais',
+    fonte: 'Cockpit/social/redes-sociais.md · decidido 2026-06-10',
+    regras: [
+      'Inventário de contas fechado — conta nova só com atualização do doc canônico no mesmo turno.',
+      'Um navegador travado por rede; rede com navegador "a validar" não entra em rotina.',
+      'Devlog diário = LinkedIn pessoal; contas DIGIAI = consolidado semanal; OSI nunca nas contas DIGIAI nem no LinkedIn.',
+      'Toda atualização de rede é registrada em Marketing → Redes (log eterno).',
+    ],
+    onde: 'Marketing → Redes · Calendário Editorial',
   },
   {
     icone: Heart,

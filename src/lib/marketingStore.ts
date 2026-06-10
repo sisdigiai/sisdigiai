@@ -87,6 +87,19 @@ export type CalendarPost = {
   updated_at?: string;
 };
 
+export type SocialUpdateType = 'post' | 'perfil' | 'bio' | 'capa' | 'config' | 'campanha' | 'outro';
+
+export type SocialUpdate = {
+  id: string;
+  account_code: string;
+  update_type: SocialUpdateType;
+  title: string;
+  url: string | null;
+  notes: string | null;
+  happened_on: string;
+  created_at?: string;
+};
+
 export type Platform = {
   code: string;
   name: string;
@@ -201,6 +214,31 @@ export const marketingStore = {
     const { data, error } = await supabase.from('v_marketing_platforms').select('*');
     if (error) { console.error('[marketingStore] listPlatforms:', error.message); return []; }
     return (data ?? []) as Platform[];
+  },
+
+  // ── Social updates (aba Redes — migration 041) ──
+  // null = view ausente (migration 041 ainda não aplicada) ou erro de rede
+  async listSocialUpdates(): Promise<SocialUpdate[] | null> {
+    const { data, error } = await supabase
+      .from('v_marketing_social_updates')
+      .select('*')
+      .order('happened_on', { ascending: false })
+      .order('created_at', { ascending: false });
+    if (error) { console.error('[marketingStore] listSocialUpdates:', error.message); return null; }
+    return (data ?? []) as SocialUpdate[];
+  },
+
+  async logSocialUpdate(input: { account_code: string; update_type: SocialUpdateType; title: string; url?: string; notes?: string; happened_on?: string }): Promise<string | null> {
+    const { data, error } = await supabase.rpc('marketing_log_social_update', {
+      p_account_code: input.account_code,
+      p_update_type: input.update_type,
+      p_title: input.title,
+      p_url: input.url ?? null,
+      p_notes: input.notes ?? null,
+      p_happened_on: input.happened_on ?? null,
+    });
+    if (error) { console.error('[marketingStore] logSocialUpdate:', error.message); return null; }
+    return data as string;
   },
 
   // ── Ideas ──
