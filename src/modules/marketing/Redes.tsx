@@ -20,7 +20,7 @@ interface ContaSocial {
 }
 
 export const CONTAS_SOCIAIS: ContaSocial[] = [
-  { code: 'pessoal_linkedin', rede: 'LinkedIn', handle: 'Gilberto (pessoal)', url: null, camada: 'pessoal', navegador: null, cadencia: '3–5 posts/semana (rascunho diário)', papel: 'Build in public · autoridade B2B · rosto da DIGIAI/Clearix' },
+  { code: 'pessoal_linkedin', rede: 'LinkedIn', handle: 'Gilberto (pessoal)', url: null, camada: 'pessoal', navegador: 'Chrome (perfil dedicado)', cadencia: '3–5 posts/semana (rascunho diário)', papel: 'Build in public · autoridade B2B · rosto da DIGIAI/Clearix' },
   { code: 'digiai_instagram', rede: 'Instagram', handle: '@_digiai', url: 'https://instagram.com/_digiai', camada: 'digiai', navegador: null, cadencia: '1 carrossel/semana', papel: 'Institucional / ecossistema' },
   { code: 'digiai_linkedin', rede: 'LinkedIn', handle: 'company/digiai-app-br', url: 'https://www.linkedin.com/company/digiai-app-br/', camada: 'digiai', navegador: null, cadencia: '1 post/semana (consolidado)', papel: 'Institucional B2B' },
   { code: 'digiai_facebook', rede: 'Facebook', handle: 'Página DIGIAI', url: 'https://facebook.com/61586695274933', camada: 'digiai', navegador: null, cadencia: 'repost do IG', papel: 'Presença / verificação Meta' },
