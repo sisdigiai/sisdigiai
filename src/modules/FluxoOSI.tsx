@@ -39,6 +39,16 @@ interface GeoRow {
   total: number;
 }
 
+interface LeadRow {
+  id: string;
+  name: string | null;
+  email: string | null;
+  phone_e164: string | null;
+  utm_source: string | null;
+  status: string;
+  created_at: string;
+}
+
 interface FunnelRow {
   event_code: string;
   funnel_stage: string;
@@ -61,6 +71,7 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
   const [fase0, setFase0] = useState<Fase0Item[]>([]);
   const [geo, setGeo] = useState<GeoRow[]>([]);
   const [funnel, setFunnel] = useState<FunnelRow[]>([]);
+  const [leads, setLeads] = useState<LeadRow[]>([]);
   const [nexus, setNexus] = useState<{ data: OsiOnboardingSummary | null; error: string | null } | null>(null);
 
   useEffect(() => {
@@ -244,6 +255,18 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
       } catch { /* silencioso */ }
     })();
 
+    // Leads capturados na landing (marketing.landing_leads via view)
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('v_marketing_landing_leads')
+          .select('id, name, email, phone_e164, utm_source, status, created_at')
+          .eq('product', 'osi')
+          .limit(20);
+        setLeads((data ?? []) as LeadRow[]);
+      } catch { /* silencioso */ }
+    })();
+
     // M4.2 — Nexus 90 dias (cross-DB read)
     (async () => {
       const result = await fetchOsiOnboardingSummary();
@@ -393,6 +416,38 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
           </div>
         );
       })()}
+
+      {/* Leads capturados na landing (form "Movimento 1 grátis") */}
+      <div className="border border-outline/10 bg-surface-low p-5 space-y-3">
+        <div className="flex items-center gap-2">
+          <Heart className="w-4 h-4 text-secondary" />
+          <span className="text-xs font-mono uppercase tracking-widest text-muted">Leads da landing · Movimento 1</span>
+          <span className="ml-auto text-[11px] text-on-surface-variant font-mono tabular-nums">{leads.length} leads</span>
+        </div>
+        <div className="text-xs text-muted">
+          Visitantes que não compraram mas deixaram contato (<span className="font-mono">marketing.landing_leads</span>).
+          Cada um é follow-up de WhatsApp/e-mail pendente.
+        </div>
+        {leads.length === 0 ? (
+          <div className="bg-amber-500/[0.08] border border-amber-500/20 px-3 py-2 text-xs text-on-surface-variant">
+            Nenhum lead capturado ainda — o form "Receba o Movimento 1" está no ar na landing e na /osi.
+          </div>
+        ) : (
+          <ul className="space-y-1">
+            {leads.map((l) => (
+              <li key={l.id} className="flex items-center gap-3 bg-surface-lowest border border-outline/10 px-3 py-2 text-xs">
+                <span className="text-on-surface font-medium truncate">{l.name ?? 'Sem nome'}</span>
+                <span className="text-muted truncate">{l.email ?? l.phone_e164 ?? '—'}</span>
+                {l.utm_source && <span className="text-on-surface-variant font-mono text-[10px]">via {l.utm_source}</span>}
+                <span className="ml-auto shrink-0 text-[10px] font-mono uppercase tracking-wider text-secondary">{l.status}</span>
+                <span className="shrink-0 text-[10px] text-muted tabular-nums">
+                  {new Date(l.created_at).toLocaleDateString('pt-BR')}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       {/* M4.7 — Cidade-foco "efeito caracol" (plano-mestre §1) */}
       {geo.length > 0 && (() => {

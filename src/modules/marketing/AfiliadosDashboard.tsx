@@ -1,6 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Plus, RefreshCw, Search, X, Save, ExternalLink, MessageCircle, Copy, Check, DollarSign, Trophy, Award, Loader2, Link as LinkIcon, Receipt, AlertTriangle } from 'lucide-react';
 import { marketingStore } from '../../lib/marketingStore';
+import { supabase } from '../../lib/supabase';
+
+type Candidate = {
+  id: string;
+  name: string | null;
+  email: string | null;
+  phone_e164: string | null;
+  status: string;
+  created_at: string;
+};
 
 type DashRow = Awaited<ReturnType<typeof marketingStore.listAffiliatesDashboard>>[number];
 type Stats = NonNullable<Awaited<ReturnType<typeof marketingStore.getAffiliatesStats>>>;
@@ -38,17 +48,25 @@ export function AfiliadosDashboard() {
   const [showNewForm, setShowNewForm] = useState(false);
   const [payoutFor, setPayoutFor] = useState<DashRow | null>(null);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
 
   const refresh = async () => {
     setLoading(true);
-    const [r, s, l] = await Promise.all([
+    const [r, s, l, c] = await Promise.all([
       marketingStore.listAffiliatesDashboard(),
       marketingStore.getAffiliatesStats(),
       marketingStore.getAffiliateLeaderboard(),
+      supabase
+        .from('v_marketing_landing_leads')
+        .select('id, name, email, phone_e164, status, created_at')
+        .eq('product', 'osi-afiliado')
+        .eq('status', 'novo')
+        .limit(20),
     ]);
     setRows(r);
     setStats(s);
     setLeaderboard(l);
+    setCandidates((c.data ?? []) as Candidate[]);
     setLoading(false);
   };
 
@@ -94,6 +112,26 @@ export function AfiliadosDashboard() {
             desperdiça tempo e queima reputação.{' '}
             <span className="text-muted">(Cadastrar 2-3 parceiros próximos antes do lançamento está ok.)</span>
           </div>
+        </div>
+      )}
+
+      {candidates.length > 0 && (
+        <div className="mb-4 border border-[#10B981]/30 bg-[#10B981]/[0.06] px-4 py-3">
+          <div className="text-xs font-mono uppercase tracking-widest text-[#10B981] mb-2">
+            Candidatos a afiliado · form "Quero ser afiliado" ({candidates.length})
+          </div>
+          <ul className="space-y-1">
+            {candidates.map((c) => (
+              <li key={c.id} className="flex items-center gap-3 text-xs text-on-surface-variant">
+                <span className="font-medium text-on-surface">{c.name ?? 'Sem nome'}</span>
+                <span className="truncate">{c.email ?? c.phone_e164 ?? '—'}</span>
+                <span className="ml-auto shrink-0 text-muted tabular-nums">{dateBR(c.created_at)}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-[11px] text-muted mt-2">
+            Enviar passo a passo de afiliação Hotmart e cadastrar via "Novo afiliado" com o hotmart_code.
+          </p>
         </div>
       )}
 

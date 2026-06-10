@@ -11,11 +11,102 @@
  * Mentor-led brand: Tatiana Camargo como autoridade visível.
  */
 
-import { ArrowRight, BookOpen, Target, Users, Wallet } from 'lucide-react';
+import { ArrowRight, BookOpen, Send, Target, Users, Wallet } from 'lucide-react';
+import { useState } from 'react';
 
 const HOTMART_URL = 'https://go.hotmart.com/B105515825L?dp=1';
 const FULL_LANDING_URL = 'https://landingoticasemimproviso.netlify.app/';
 const PRICE_BRL = 48.5;
+const CAPTURE_URL = 'https://hswyopqvnolqpmprqvzh.supabase.co/functions/v1/lead-capture';
+const CONSENT_TEXT =
+  'Ao enviar, você concorda em receber conteúdos do método Ótica Sem Improviso por e-mail e WhatsApp. Sem spam — você pode sair quando quiser.';
+
+function LeadForm() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
+  const [honeypot, setHoneypot] = useState('');
+  const [state, setState] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle');
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() && !whatsapp.trim()) { setState('error'); return; }
+    setState('sending');
+    try {
+      const res = await fetch(CAPTURE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product: 'osi',
+          name, email, whatsapp,
+          website: honeypot,
+          source_url: window.location.href,
+          consent_text: CONSENT_TEXT,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      setState(res.ok && data?.ok ? 'ok' : 'error');
+    } catch {
+      setState('error');
+    }
+  };
+
+  if (state === 'ok') {
+    return (
+      <div className="bg-white/5 border border-white/10 rounded-lg p-6 text-center mb-6">
+        <p className="text-[#06B6D4] font-bold text-sm">
+          Recebido! Em breve entramos em contato. 👓
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={submit} className="bg-white/5 border border-white/10 rounded-lg p-6 mb-6">
+      <div className="text-xs font-mono uppercase tracking-widest text-slate-400 mb-1 text-center">
+        Ainda não é a hora?
+      </div>
+      <div className="text-sm text-slate-300 mb-4 text-center">
+        Deixe seu contato e receba o <strong>Movimento 1</strong> do método de graça.
+      </div>
+      <input
+        type="text" value={honeypot} onChange={(e) => setHoneypot(e.target.value)}
+        tabIndex={-1} autoComplete="off" aria-hidden="true"
+        className="absolute -left-[9999px] h-0 w-0 opacity-0"
+      />
+      <div className="flex flex-col gap-2">
+        <input
+          type="text" placeholder="Seu nome" value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="px-3 py-2.5 rounded-md bg-white/10 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#06B6D4]"
+        />
+        <input
+          type="email" placeholder="Seu melhor e-mail" value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="px-3 py-2.5 rounded-md bg-white/10 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#06B6D4]"
+        />
+        <input
+          type="tel" placeholder="WhatsApp (com DDD)" value={whatsapp}
+          onChange={(e) => setWhatsapp(e.target.value)}
+          className="px-3 py-2.5 rounded-md bg-white/10 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#06B6D4]"
+        />
+        <button
+          type="submit" disabled={state === 'sending'}
+          className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-[#06B6D4]/60 text-[#06B6D4] hover:bg-[#06B6D4]/10 disabled:opacity-60 font-bold text-xs uppercase tracking-widest rounded-md transition-all"
+        >
+          <Send className="w-3.5 h-3.5" />
+          {state === 'sending' ? 'Enviando…' : 'Quero receber o Movimento 1'}
+        </button>
+        {state === 'error' && (
+          <p className="text-red-400 text-xs text-center">
+            Não foi possível enviar. Confira o e-mail ou WhatsApp e tente de novo.
+          </p>
+        )}
+        <p className="text-[10px] text-slate-500 leading-relaxed">{CONSENT_TEXT}</p>
+      </div>
+    </form>
+  );
+}
 
 const MOVIMENTOS = [
   { n: '1', titulo: 'Sair do automático', resumo: 'Atender com presença real, não roteiro decorado.' },
@@ -97,6 +188,9 @@ export default function OsiPublicLanding() {
             Checkout Hotmart · 7 dias de garantia
           </div>
         </div>
+
+        {/* Captura de lead — quem não compra agora deixa contato */}
+        <LeadForm />
 
         {/* Link pra landing completa */}
         <div className="text-center">
