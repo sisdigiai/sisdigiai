@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, ExternalLink, Globe, Plus, RefreshCw } from 'lucide-react';
+import { AlertTriangle, CalendarDays, ExternalLink, Globe, Plus, RefreshCw } from 'lucide-react';
 import { marketingStore, type SocialUpdate, type SocialUpdateType } from '../../lib/marketingStore';
 
 // Cadastro TRAVADO de contas — espelho do doc canônico
@@ -42,6 +42,22 @@ const STACK_CRIATIVOS = [
   { tipo: 'Imagem conceitual / cena', ferramenta: 'Higgsfield (GPT Image 2) · GPT' },
   { tipo: 'Vídeo curto (Reel/TikTok)', ferramenta: 'Higgsfield (Seedance / Marketing Studio) · gravação própria' },
   { tipo: 'Áudio / locução', ferramenta: 'ElevenLabs' },
+];
+
+// Agenda de implantação + rotina — espelho da §5 do doc canônico (2026-06-10)
+const SEMANA_1 = [
+  { dia: 'D1', redes: 'LinkedIn pessoal', acao: 'Validar navegador (1ª da fila) + piloto do devlog: agente gera rascunho, Gilberto publica, registrar no log' },
+  { dia: 'D2', redes: 'LinkedIn company + IG @_digiai', acao: 'Validar navegadores + subir capa do LinkedIn (pendência 28/05)' },
+  { dia: 'D3', redes: 'IG / TikTok / FB OSI', acao: 'Validar navegadores + preencher bio do IG OSI (texto pronto da sessão META 02/06)' },
+  { dia: 'D4', redes: 'FB DIGIAI · YouTube · TikTok', acao: 'Validar redes de reserva — zerar os "a validar"' },
+  { dia: 'D5', redes: 'IG @_digiai + LinkedIn company', acao: '1º consolidado semanal: carrossel "semana na DIGIAI"' },
+];
+
+const ROTINA = [
+  { freq: 'Diária (seg–sex)', oque: 'Devlog build in public: agente coleta mudanças → rascunho → humano aprova/publica → registrar no log', rede: 'LinkedIn pessoal' },
+  { freq: 'Semanal (sexta)', oque: 'Consolidado da semana (carrossel + post), derivado dos diários', rede: 'IG @_digiai + LinkedIn company' },
+  { freq: 'Mensal (1º dia útil)', oque: 'Balanço build in public com números reais', rede: 'LinkedIn pessoal' },
+  { freq: 'Contínua', oque: 'OSI segue o Calendário Editorial próprio — fora desta rotina', rede: 'contas OSI' },
 ];
 
 const UPDATE_TYPES: { value: SocialUpdateType; label: string }[] = [
@@ -145,6 +161,47 @@ export function Redes() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Agenda de implantação + rotina */}
+      <div>
+        <h3 className="font-semibold text-base mb-1 flex items-center gap-2"><CalendarDays className="w-4 h-4 text-secondary" /> Agenda</h3>
+        <p className="text-xs text-muted mb-3">
+          Sequência travada no doc canônico §5. Conclusão de cada item = registrar no log abaixo.
+          Prioridade quando faltar tempo: LinkedIn pessoal &gt; consolidado semanal &gt; resto.
+        </p>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="border border-outline/10">
+            <div className="px-4 py-2 bg-surface-low border-b border-outline/10 text-xs font-bold uppercase tracking-widest">Semana 1 — implantação</div>
+            <div className="divide-y divide-outline/10">
+              {SEMANA_1.map(item => (
+                <div key={item.dia} className="px-4 py-2.5 flex gap-3 items-start">
+                  <span className="font-mono text-[11px] font-bold text-secondary shrink-0 pt-0.5 w-7">{item.dia}</span>
+                  <div className="min-w-0">
+                    <div className="text-sm">{item.redes}</div>
+                    <div className="text-[11px] text-muted">{item.acao}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="border border-outline/10">
+            <div className="px-4 py-2 bg-surface-low border-b border-outline/10 text-xs font-bold uppercase tracking-widest">Rotina permanente (semana 2+)</div>
+            <div className="divide-y divide-outline/10">
+              {ROTINA.map(item => (
+                <div key={item.freq} className="px-4 py-2.5 flex gap-3 items-start">
+                  <span className="font-mono text-[11px] text-on-surface-variant shrink-0 pt-0.5 w-28">{item.freq}</span>
+                  <div className="min-w-0">
+                    <div className="text-sm">{item.oque}</div>
+                    <div className="text-[11px] text-muted">{item.rede}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
