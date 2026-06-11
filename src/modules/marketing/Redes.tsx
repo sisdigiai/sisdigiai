@@ -54,7 +54,7 @@ const SEMANA_1 = [
 ];
 
 const ROTINA = [
-  { freq: 'Diária (seg–sex)', oque: 'Devlog build in public: agente coleta mudanças → rascunho → humano aprova/publica → registrar no log', rede: 'LinkedIn pessoal' },
+  { freq: 'Diária (seg–sex)', oque: 'Devlog build in public: despertar automático às 08:00 (devlog-diario-redes) gera o rascunho no Calendário → humano aprova/publica → registrar no log', rede: 'LinkedIn pessoal' },
   { freq: 'Semanal (sexta)', oque: 'Consolidado da semana (carrossel + post), derivado dos diários', rede: 'IG @_digiai + LinkedIn company' },
   { freq: 'Mensal (1º dia útil)', oque: 'Balanço build in public com números reais', rede: 'LinkedIn pessoal' },
   { freq: 'Contínua', oque: 'OSI segue o Calendário Editorial próprio — fora desta rotina', rede: 'contas OSI' },
