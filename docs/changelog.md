@@ -4,6 +4,10 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Adicionado (2026-06-11 — rotina automatizada + estreias publicadas)
+- **Despertar `devlog-diario-redes`** (tarefa agendada do Cowork, seg–sex 08:00): coleta mudanças dos projetos → gera rascunho do devlog em `marketing.content_calendar` (status ready) → notifica o humano. Anti-duplicação (não cria se já há post ready do dia); sexta gera também o consolidado semanal. **Nunca publica** (R-011/T-3). Definição em `C:\Users\junio\.claude\scheduled-tasks\devlog-diario-redes\SKILL.md`; refletido na aba Redes (rotina) e no doc canônico §4.
+- **Estreias publicadas e registradas (2026-06-10):** post pessoal (`urn:li:activity:7470580203598110720`) + post da página DIGIAI (`urn:li:activity:7470664096204374016`, primeira publicação da página, com menção ao perfil do fundador). Ambos `published` no calendário + registrados em `marketing.social_updates`. Log com 15 registros (9 navegadores travados + 6 posts).
+
 ### Adicionado (2026-06-10 — aba Redes: controle canônico de redes sociais)
 - **Marketing → aba "Redes"** (`src/modules/marketing/Redes.tsx`) — controle real e eterno das redes sociais da empresa e pessoais. Cadastro **travado em código** (espelho do doc canônico `Cockpit/social/redes-sociais.md`, travas T-1 a T-8 decididas 2026-06-10): 9 contas em 3 camadas (Pessoal Gilberto = devlog diário · DIGIAI institucional = consolidado semanal · OSI = calendário próprio), navegador por rede (todos "a validar" — trava T-2, validação um a um), cadência, papel e stack de criativos (GPT/Higgsfield/ElevenLabs/templates HTML/Canva).
 - **Trava nova "Disciplina de Redes Sociais"** no `TravasMarketing.tsx` (6º card): inventário fechado, um navegador por rede, devlog no pessoal, registro eterno na aba Redes.
