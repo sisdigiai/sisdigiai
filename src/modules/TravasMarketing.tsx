@@ -66,6 +66,7 @@ export const TRAVAS: Trava[] = [
       'Inventário de contas fechado — conta nova só com atualização do doc canônico no mesmo turno.',
       'Um navegador travado por rede; rede com navegador "a validar" não entra em rotina.',
       'Devlog diário = LinkedIn pessoal; contas DIGIAI = consolidado semanal; OSI nunca nas contas DIGIAI nem no LinkedIn.',
+      'Meta (FB+IG) publica via Business Suite, SEMPRE com imagem (T-9/T-10) — conferir o portfólio "Digiai" antes de postar. LinkedIn segue texto livre.',
       'Toda atualização de rede é registrada em Marketing → Redes (log eterno).',
     ],
     onde: 'Marketing → Redes · Calendário Editorial',

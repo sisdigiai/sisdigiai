@@ -33,8 +33,8 @@ export const CONTAS_SOCIAIS: ContaSocial[] = [
 
 const CAMADAS: { id: Camada; titulo: string; regra: string }[] = [
   { id: 'pessoal', titulo: 'Pessoal — Gilberto', regra: 'Devlog diário mora aqui (T-6). OSI só como menção natural.' },
-  { id: 'digiai', titulo: 'DIGIAI institucional', regra: 'Baixa frequência — consolidado semanal. Nunca devlog cru, nunca OSI (T-5).' },
-  { id: 'osi', titulo: 'Ótica Sem Improviso', regra: 'Rosto = Taty. Calendário próprio (Calendário Editorial). Nunca no LinkedIn (T-5).' },
+  { id: 'digiai', titulo: 'DIGIAI institucional', regra: 'Baixa frequência — consolidado semanal. Nunca devlog cru, nunca OSI (T-5). Meta via Business Suite, sempre com imagem (T-9/T-10).' },
+  { id: 'osi', titulo: 'Ótica Sem Improviso', regra: 'Rosto = Taty. Calendário próprio (Calendário Editorial). Nunca no LinkedIn (T-5). Meta via Business Suite, sempre com imagem (T-9/T-10).' },
 ];
 
 const STACK_CRIATIVOS = [
