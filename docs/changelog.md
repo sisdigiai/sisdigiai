@@ -4,6 +4,12 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Adicionado (2026-06-12 — D5: semana 1 fechada + travas T-9/T-10 + ciclo de arte completo)
+- **5 publicações no dia, todas rastreadas:** Devlog #2 (LinkedIn pessoal) · Consolidado Semanal #1 (página DIGIAI) · estreia IG @_digiai (card "Semana 1") · "O cliente trava" no FB OSI (17:32, texto) e no **IG OSI (18:36, card — ID Meta 18058565420739680)**. Log da aba Redes: 27 registros.
+- **Travas T-9/T-10** (doc canônico + app + despertar): publicação Meta via Business Suite no portfólio Digiai, sempre com imagem; LinkedIn segue texto livre.
+- **Prompts canônicos de arte** em `marketing.ai_prompt_templates` (aba Prompts IA): `digiai_card_consolidado_semanal` e `osi_card_post_texto` (paleta real da landing OSI: #406863/#FDFBF7/#E6E0D5/#C86D58). **Primeiro ciclo completo rodado**: prompt → arte gerada pelo humano → QC do agente → MBS → publicação → registro com arte no campo `arts`.
+- Artes do dia versionadas em `docs/divulgacao/artes/` (card consolidado DIGIAI + card OSI "cliente trava" + banner OSI do acervo OneDrive `Marketing_e_Vendas/digiai/otica_sem_improviso/imagens`).
+
 ### Adicionado (2026-06-11 — rotina automatizada + estreias publicadas)
 - **Despertar `devlog-diario-redes`** (tarefa agendada do Cowork, seg–sex 08:00): coleta mudanças dos projetos → gera rascunho do devlog em `marketing.content_calendar` (status ready) → notifica o humano. Anti-duplicação (não cria se já há post ready do dia); sexta gera também o consolidado semanal. **Nunca publica** (R-011/T-3). Definição em `C:\Users\junio\.claude\scheduled-tasks\devlog-diario-redes\SKILL.md`; refletido na aba Redes (rotina) e no doc canônico §4.
 - **Estreias publicadas e registradas (2026-06-10):** post pessoal (`urn:li:activity:7470580203598110720`) + post da página DIGIAI (`urn:li:activity:7470664096204374016`, primeira publicação da página, com menção ao perfil do fundador). Ambos `published` no calendário + registrados em `marketing.social_updates`. Log com 15 registros (9 navegadores travados + 6 posts).
