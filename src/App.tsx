@@ -30,6 +30,7 @@ import Guia from './modules/Guia';
 import Comercial from './modules/Comercial';
 import { ModuleStub } from './modules/Stub';
 import { useAuth } from './contexts/AuthContext';
+import { canAccessModule } from './lib/permissions';
 
 // Comercial deixou de ser stub (2026-06-02) — agora é módulo real (CRM de pipeline).
 const STUBS: Record<string, { numero: number; nome: string; descricao: string; entregaveis: string[] }> = {};
@@ -73,7 +74,7 @@ const MODULE_SECTION: Record<ModuleId, string> = {
 };
 
 export default function App() {
-  const { session, loading } = useAuth();
+  const { session, role, loading } = useAuth();
   const [activeModule, setActiveModule] = useState<ModuleId>(moduleFromHash);
   const [navOpen, setNavOpen] = useState(false);
 
@@ -115,6 +116,16 @@ export default function App() {
   }
 
   const renderContent = () => {
+    if (!canAccessModule(activeModule, role)) {
+      return (
+        <div className="h-full flex items-center justify-center p-8">
+          <div className="text-center max-w-sm">
+            <div className="text-sm font-mono uppercase tracking-widest text-muted mb-2">Acesso restrito</div>
+            <p className="text-on-surface-variant text-sm">Seu perfil não tem acesso a este módulo. Fale com um administrador.</p>
+          </div>
+        </div>
+      );
+    }
     switch (activeModule) {
       case 'visao': return <Visao onNavigate={navigate} />;
       case 'portfolio': return <Portfolio />;

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
+import { canAccessModule } from '../lib/permissions';
 import EcossistemaLink, { EcossistemaStatus } from './EcossistemaLink';
 
 export type ModuleId =
@@ -121,8 +122,9 @@ function loadCollapsed(): Record<SectionKey, boolean> {
 }
 
 export default function Sidebar({ active, onSelect, mobileOpen = false, onClose }: SidebarProps) {
-  const { user, signOut } = useAuth();
+  const { user, role, signOut } = useAuth();
   const [collapsed, setCollapsed] = useState<Record<SectionKey, boolean>>(loadCollapsed);
+  const visibleOperacional = operacional.filter(item => canAccessModule(item.id, role));
   const activeSection = sectionOf(active);
   const ecoUrls = useEcosystemUrls();
   const ecossistemas = ECOSSISTEMA_DEFS.map(e => ({ ...e, url: ecoUrls[e.key] ?? e.url }));
@@ -182,7 +184,7 @@ export default function Sidebar({ active, onSelect, mobileOpen = false, onClose 
           <GroupHeader k="operacional" label="Operacional" />
           {isOpen('operacional') && (
             <div className="space-y-0.5">
-              {operacional.map(item => <NavButton key={item.id} item={item} />)}
+              {visibleOperacional.map(item => <NavButton key={item.id} item={item} />)}
             </div>
           )}
         </div>
