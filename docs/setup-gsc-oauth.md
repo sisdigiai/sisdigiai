@@ -34,7 +34,7 @@ Doc de uso interno. Cria 1 OAuth client + 1 refresh token de longa duração que
    - Developer contact: `sisdigiai@gmail.com`
 4. Próximo (Scopes) → **ADD OR REMOVE SCOPES** → buscar `webmasters.readonly` → marcar `.../auth/webmasters.readonly` → Update → Save and continue.
 5. Test users → **ADD USERS** → adicionar `sisdigiai@gmail.com` → Save.
-6. Voltar pro Dashboard. App fica em "Testing" — OK, refresh token de test users não expira em 7 dias se você adicionar o user à lista de testers (não publicar app).
+6. Voltar pro Dashboard. ⚠️ **NÃO deixar em "Testing"** — **PUBLICAR o app (Production)**. Correção 2026-06-14: no modo Testing o refresh token expira em **7 dias mesmo com test user** (a crença antiga de que test user evita a expiração está ERRADA — foi o que quebrou o GSC). Em Production o refresh token não expira (salvo revogação / 6 meses sem uso).
 
 ## Passo 4 — Criar OAuth client ID
 
@@ -108,6 +108,6 @@ No DIGIAI App, abrir o módulo **Marketing & SEO** e clicar **Sincronizar agora*
 
 ## Notas
 
-- **Refresh token "Testing" expira em 7 dias** se o app não tiver pelo menos 1 test user explícito. Como adicionamos `sisdigiai@gmail.com` no passo 3.5, ele **NÃO** expira.
+- ⚠️ **CORRIGIDO 2026-06-14:** no modo **"Testing" o refresh token expira em 7 dias — SEMPRE**, mesmo com test user explícito (a nota antiga dizia o contrário; estava errada e foi a causa do GSC sync cair com 500/`invalid_grant`). **A correção é publicar o app (Production)**; aí o token não expira. App publicado em 2026-06-14.
 - Se algum dia precisar revogar: <https://myaccount.google.com/permissions> → encontrar "DIGIAI Marketing Sync" → revogar acesso. Depois disso, qualquer chamada usando o refresh token devolve `invalid_grant` — rodar o setup de novo.
 - **Rotação a cada 90 dias** (R-021): refazer passo 5 (gerar novo refresh token), `UPDATE company.api_credentials` com novo `vault_secret_id`, soft-delete o antigo via `deleted_at`.
