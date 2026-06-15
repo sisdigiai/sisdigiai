@@ -45,6 +45,8 @@ Doc de uso interno. Cria 1 OAuth client + 1 refresh token de longa duração que
 
 ## Passo 5 — Gerar refresh token (uma vez só)
 
+⚠️ **CORREÇÃO 2026-06-15:** o OAuth Playground **NÃO funciona com o client "Desktop"** do Passo 4 (dá `redirect_uri_mismatch`, pois Desktop usa loopback, não o redirect do Playground). Crie um client **"Aplicativo da Web"** (ex.: `digiai-marketing-playground`) com o URI de redirecionamento **`https://developers.google.com/oauthplayground`** e use o client_id/secret DELE no Playground. O refresh token fica atrelado a esse client Web → o Vault precisa dos 3 valores (client_id + secret + refresh) desse client.
+
 Use o OAuth Playground (caminho mais rápido sem rodar script local):
 
 1. Abrir <https://developers.google.com/oauthplayground/>.
