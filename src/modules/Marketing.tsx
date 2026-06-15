@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Calendar as CalendarIcon, Crown, Globe, Lightbulb, MessageSquareQuote, Package, Sparkles, TrendingUp, Trophy, Users, Wand2 } from 'lucide-react';
+import { BarChart3, Calendar as CalendarIcon, Crown, Globe, Lightbulb, MessageSquareQuote, Package, Sparkles, TrendingUp, Trophy, Users, Wand2 } from 'lucide-react';
 import { Redes } from './marketing/Redes';
+import { Performance } from './marketing/Performance';
 import { CalendarioEditorial } from './marketing/CalendarioEditorial';
 import { BancoIdeias } from './marketing/BancoIdeias';
 import { MateriaisAfiliados } from './marketing/MateriaisAfiliados';
@@ -14,11 +15,12 @@ import { Desafios } from './marketing/Desafios';
 import { TravasBanner } from './TravasMarketing';
 import PageHeader from '../components/PageHeader';
 
-type SubTab = 'calendario' | 'redes' | 'planejador' | 'banco' | 'prompts' | 'validacao' | 'depoimentos' | 'comunidade' | 'desafios' | 'materiais' | 'afiliados';
+type SubTab = 'calendario' | 'redes' | 'performance' | 'planejador' | 'banco' | 'prompts' | 'validacao' | 'depoimentos' | 'comunidade' | 'desafios' | 'materiais' | 'afiliados';
 
 const SUBTABS: { id: SubTab; label: string; icon: typeof CalendarIcon }[] = [
   { id: 'calendario', label: 'Calendário Editorial', icon: CalendarIcon },
   { id: 'redes', label: 'Redes', icon: Globe },
+  { id: 'performance', label: 'Performance', icon: BarChart3 },
   { id: 'planejador', label: 'Planejador', icon: Wand2 },
   { id: 'banco', label: 'Banco de Ideias', icon: Lightbulb },
   { id: 'prompts', label: 'Prompts IA', icon: Sparkles },
@@ -70,6 +72,7 @@ export default function Marketing() {
       <div className="flex-1 overflow-y-auto">
         {active === 'calendario' && <CalendarioEditorial />}
         {active === 'redes' && <Redes />}
+        {active === 'performance' && <Performance />}
         {active === 'planejador' && <Planejador />}
         {active === 'banco' && <BancoIdeias />}
         {active === 'prompts' && <PromptsIA />}

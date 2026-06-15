@@ -87,6 +87,45 @@ export type CalendarPost = {
   updated_at?: string;
 };
 
+// ── Central de Postagens (ADR-0039) ──
+export type SocialAccount = {
+  account_code: string;
+  display_name: string;
+  platform: string;
+  camada: 'pessoal' | 'digiai' | 'osi';
+  meta_ig_user_id: string | null;
+  meta_page_id: string | null;
+  metrics_enabled: boolean;
+  public_url: string | null;
+  notes: string | null;
+};
+
+export type AccountStatus = {
+  account_code: string;
+  platform: string;
+  followers: number | null;
+  follows: number | null;
+  media_count: number | null;
+  captured_on: string;
+};
+
+export type PostMetric = {
+  id: string;
+  calendar_post_id: string | null;
+  account_code: string;
+  external_post_id: string;
+  platform: string;
+  permalink: string | null;
+  captured_on: string;
+  impressions: number | null;
+  reach: number | null;
+  likes: number | null;
+  comments: number | null;
+  shares: number | null;
+  saves: number | null;
+  video_views: number | null;
+};
+
 export type SocialUpdateType = 'post' | 'perfil' | 'bio' | 'capa' | 'config' | 'campanha' | 'outro';
 
 export type SocialUpdate = {
@@ -239,6 +278,40 @@ export const marketingStore = {
     });
     if (error) { console.error('[marketingStore] logSocialUpdate:', error.message); return null; }
     return data as string;
+  },
+
+  // ── Central de Postagens: performance (ADR-0039) ──
+  // null = views ausentes (mig 042 não aplicada) ou erro
+  async listSocialAccounts(): Promise<SocialAccount[] | null> {
+    const { data, error } = await supabase.from('v_marketing_social_accounts').select('*').order('camada');
+    if (error) { console.error('[marketingStore] listSocialAccounts:', error.message); return null; }
+    return (data ?? []) as SocialAccount[];
+  },
+
+  // Último status de cada conta (placar de seguidores)
+  async latestAccountStatus(): Promise<AccountStatus[] | null> {
+    const { data, error } = await supabase.from('v_marketing_account_status').select('*').order('captured_on', { ascending: false });
+    if (error) { console.error('[marketingStore] latestAccountStatus:', error.message); return null; }
+    const seen = new Set<string>();
+    const latest: AccountStatus[] = [];
+    for (const r of (data ?? []) as AccountStatus[]) {
+      if (!seen.has(r.account_code)) { seen.add(r.account_code); latest.push(r); }
+    }
+    return latest;
+  },
+
+  // Métricas mais recentes por post (último snapshot de cada external_post_id)
+  async latestPostMetrics(limit = 60): Promise<PostMetric[] | null> {
+    const { data, error } = await supabase.from('v_marketing_post_metrics').select('*').order('captured_on', { ascending: false }).limit(400);
+    if (error) { console.error('[marketingStore] latestPostMetrics:', error.message); return null; }
+    const seen = new Set<string>();
+    const latest: PostMetric[] = [];
+    for (const r of (data ?? []) as PostMetric[]) {
+      const key = `${r.account_code}|${r.external_post_id}`;
+      if (!seen.has(key)) { seen.add(key); latest.push(r); }
+      if (latest.length >= limit) break;
+    }
+    return latest;
   },
 
   // ── Ideas ──
