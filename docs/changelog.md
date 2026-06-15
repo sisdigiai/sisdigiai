@@ -4,6 +4,13 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Adicionado (2026-06-15 — Central de Postagens: cockpit social no app (ADR-0039))
+- **Decisão estrutural** ([ADR-0039](../../Cockpit/ADR/ADR-0039-central-postagens-digiai-cockpit-publish-humano.md)): o app vira o cockpit completo da operação social (pipeline ideia→arte→publicado→**métricas**), inspirado no `pulso_control`. **API Meta só pra LEITURA** de métricas/seguidores; **publicação segue humana via Business Suite** (T-9/T-10, R-011 reforçado). Investigação do Pulso por Explore agent.
+- **F0 — fundação de dados** (migration 042, aplicada+verificada): `marketing.social_accounts` (registry data-driven + seed dos IDs Meta conhecidos), `marketing.post_metrics` (série por post) e `marketing.account_status` (placar de seguidores) + 3 views `v_*` security_invoker (anon bloqueado, authenticated lê).
+- **F2 — edge functions** (staged, deploy na F1): `social-sync-accounts` (seguidores) e `social-sync-metrics` (insights IG por post), token Meta no Vault (provider `meta_graph`), no-op gracioso até o token existir.
+- **F3 — aba Performance** no módulo Marketing: placar de seguidores + métricas por post + estado "aguardando F1". Store: `listSocialAccounts`/`latestAccountStatus`/`latestPostMetrics`. Typecheck limpo; render verificado local (fallback gracioso em anon).
+- **F1 (gate humano, pendente):** criar Meta App + token de leitura no BM Digiai — passo a passo em `docs/setup-meta-graph-token.md`. Depois: preencher IDs faltantes, ligar `metrics_enabled`, deploy das functions, cron diário.
+
 ### Adicionado (2026-06-12 — D5: semana 1 fechada + travas T-9/T-10 + ciclo de arte completo)
 - **5 publicações no dia, todas rastreadas:** Devlog #2 (LinkedIn pessoal) · Consolidado Semanal #1 (página DIGIAI) · estreia IG @_digiai (card "Semana 1") · "O cliente trava" no FB OSI (17:32, texto) e no **IG OSI (18:36, card — ID Meta 18058565420739680)**. Log da aba Redes: 27 registros.
 - **Travas T-9/T-10** (doc canônico + app + despertar): publicação Meta via Business Suite no portfólio Digiai, sempre com imagem; LinkedIn segue texto livre.
