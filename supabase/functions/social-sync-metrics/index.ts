@@ -25,7 +25,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 // deno-lint-ignore no-explicit-any
 type Supa = any;
 type Acc = { account_code: string; platform: string; meta_ig_user_id: string | null };
-type Media = { id: string; permalink?: string; media_type?: string; timestamp?: string };
+type Media = { id: string; permalink?: string; media_type?: string; timestamp?: string; like_count?: number; comments_count?: number };
 
 async function getJson(url: string): Promise<Record<string, unknown>> {
   const j = await (await fetch(url)).json();
@@ -35,24 +35,22 @@ async function getJson(url: string): Promise<Record<string, unknown>> {
 
 async function syncOneIg(supabase: Supa, token: string, a: Acc, permalinkToPost: Map<string, string>): Promise<number> {
   if (!a.meta_ig_user_id) return 0;
-  const mediaResp = await getJson(`${GRAPH}/${a.meta_ig_user_id}/media?fields=id,permalink,media_type,timestamp&limit=${MEDIA_LIMIT}&access_token=${token}`);
+  // padrão provado no pulso_control: like_count/comments_count vêm da mídia, não de /insights
+  const mediaResp = await getJson(`${GRAPH}/${a.meta_ig_user_id}/media?fields=id,permalink,media_type,timestamp,like_count,comments_count&limit=${MEDIA_LIMIT}&access_token=${token}`);
   const media = (mediaResp.data ?? []) as Media[];
   let written = 0;
 
   for (const m of media) {
-    // métricas variam por tipo; reach/likes/comments/saved/shares cobrem feed e reels
-    const metricList = m.media_type === "VIDEO" || m.media_type === "REELS"
-      ? "reach,likes,comments,saved,shares,views"
-      : "reach,likes,comments,saved,shares";
+    // /insights só carrega reach/saved/shares/views (likes/comments vêm da mídia, igual pulso_control)
     let insights: Record<string, number> = {};
     try {
-      const ins = await getJson(`${GRAPH}/${m.id}/insights?metric=${metricList}&access_token=${token}`);
+      const ins = await getJson(`${GRAPH}/${m.id}/insights?metric=reach,saved,shares,views&access_token=${token}`);
       for (const row of (ins.data ?? []) as Array<{ name: string; values?: Array<{ value: number }> }>) {
         insights[row.name] = row.values?.[0]?.value ?? 0;
       }
-    } catch { /* mídia sem insights (muito antiga / sem permissão) — registra o que der */ insights = {}; }
+    } catch { /* mídia sem insights (muito antiga / sem permissão) — registra likes/comments mesmo assim */ insights = {}; }
 
-    const calendarPostId = m.permalink ? permalinkToPost.get(m.permalink) ?? null : null;
+    const calendarPostId = m.permalink ? permalinkToPost.get(m.permalink.replace(/\/$/, "")) ?? null : null;
     const { error } = await supabase.from("post_metrics").upsert({
       calendar_post_id: calendarPostId,
       account_code: a.account_code,
@@ -61,8 +59,8 @@ async function syncOneIg(supabase: Supa, token: string, a: Acc, permalinkToPost:
       permalink: m.permalink ?? null,
       captured_on: today(),
       reach: insights.reach ?? null,
-      likes: insights.likes ?? null,
-      comments: insights.comments ?? null,
+      likes: m.like_count ?? null,
+      comments: m.comments_count ?? null,
       shares: insights.shares ?? null,
       saves: insights.saved ?? null,
       video_views: insights.views ?? null,
