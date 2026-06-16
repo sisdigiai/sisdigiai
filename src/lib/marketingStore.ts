@@ -59,6 +59,8 @@ export type CalendarPost = {
   narrative: string | null;
   copy_full: string | null;           // copy pronta
   posting_brief: string | null;       // brief criativo
+  art_prompt: string | null;          // prompt de arte pronto pra copiar (mig 043)
+  art_filename: string | null;        // nome de arquivo sugerido pra pasta de artes
   cta: string | null;
   hashtags: string[] | null;
   arts: CalendarArt[];                // múltiplas artes

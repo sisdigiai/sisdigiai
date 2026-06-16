@@ -48,6 +48,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
   const [showWizard, setShowWizard] = useState(false);
   const [promotedMaterialId, setPromotedMaterialId] = useState<string | null>(null);
   const [promoting, setPromoting] = useState(false);
+  const [promptCopied, setPromptCopied] = useState(false);
   const [sales, setSales] = useState<Awaited<ReturnType<typeof marketingStore.getPostSales>>>(null);
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [gateOpen, setGateOpen] = useState(false);
@@ -340,6 +341,29 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
           <Section title="Brief inicial (ideia criativa para quem produz)">
             <textarea value={draft.posting_brief ?? ''} onChange={e => update({ posting_brief: e.target.value || null })} rows={3} placeholder="Descreva a ideia, ângulo, referências, tom..." className={inputCls} />
           </Section>
+
+          {/* Prompt de arte pronto (copiar e colar no GPT) */}
+          {draft.art_prompt && (
+            <Section title="Prompt de arte (copiar e colar no GPT)">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  {draft.art_filename && (
+                    <span className="text-[11px] text-muted font-mono truncate">
+                      salvar como: <span className="text-on-surface-variant">docs/divulgacao/artes/{draft.art_filename}</span>
+                    </span>
+                  )}
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(draft.art_prompt ?? ''); setPromptCopied(true); setTimeout(() => setPromptCopied(false), 1500); }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-secondary text-surface font-medium hover:bg-secondary/90 shrink-0"
+                  >
+                    {promptCopied ? <><Check className="w-3.5 h-3.5" /> Copiado</> : <><Copy className="w-3.5 h-3.5" /> Copiar prompt</>}
+                  </button>
+                </div>
+                <textarea value={draft.art_prompt} readOnly rows={6} className={inputCls + ' font-mono text-xs'} />
+                <p className="text-[11px] text-muted">Cole no GPT → gere a imagem → salve na pasta acima → registre a arte no post.</p>
+              </div>
+            </Section>
+          )}
 
           {/* Copy completa */}
           <Section title="Copy final (pronta pra colar)">
