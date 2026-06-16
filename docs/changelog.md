@@ -4,6 +4,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Adicionado (2026-06-15 — calendário vira kit: prompt de arte por post)
+- **`art_prompt` + `art_filename` por post** (mig 043): cada post de imagem futuro carrega o prompt de arte **preenchido** (hook + sublinha + paleta da marca) + nome de arquivo sugerido. **24 posts** preenchidos (8 card + 16 carrossel OSI); 22 reels ficam de fora (vídeo, dependem da Taty).
+- **UI**: seção "Prompt de arte (copiar e colar no GPT)" no PostDrawer com botão **Copiar prompt** + caminho de salvamento (`docs/divulgacao/artes/`).
+- **Fix latente** (mig 044): `v_marketing_calendar` recriada com `c.*` — a view tinha lista fixa antiga e **não expunha** `copy_full`/`arts`/`posting_brief`/etc. Agora expõe todas as colunas (auto-atualizável). security_invoker mantido, anon bloqueado.
+
 ### Adicionado (2026-06-15 — Central de Postagens: cockpit social no app (ADR-0039))
 - **Decisão estrutural** ([ADR-0039](../../Cockpit/ADR/ADR-0039-central-postagens-digiai-cockpit-publish-humano.md)): o app vira o cockpit completo da operação social (pipeline ideia→arte→publicado→**métricas**), inspirado no `pulso_control`. **API Meta só pra LEITURA** de métricas/seguidores; **publicação segue humana via Business Suite** (T-9/T-10, R-011 reforçado). Investigação do Pulso por Explore agent.
 - **F0 — fundação de dados** (migration 042, aplicada+verificada): `marketing.social_accounts` (registry data-driven + seed dos IDs Meta conhecidos), `marketing.post_metrics` (série por post) e `marketing.account_status` (placar de seguidores) + 3 views `v_*` security_invoker (anon bloqueado, authenticated lê).
