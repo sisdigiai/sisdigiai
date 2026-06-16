@@ -4,6 +4,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Publicado (2026-06-16 — 3 camadas vivas no mesmo dia + reuso de acervo)
+- **Devlog #4** no LinkedIn pessoal ("Eu tinha 3 semanas de conteúdo pronto. Esquecido numa pasta.") — destrava o pessoal (parado desde 12/06).
+- **Card OSI "O cliente pergunta preço antes de ouvir o valor"** reaproveitado do acervo (`OneDrive/Marketing_e_Vendas/.../divulgacao/1.png` → `docs/divulgacao/artes/2026-06-16_osi-cliente-pergunta-preco.png`), publicado IG+FB via Business Suite. **Estratégia de reuso**: usar o que já está pronto antes de produzir novo.
+- Análise da pasta de artes OSI: **8 posts finalizados** mapeados como banco de prontos pra preencher a fila.
+
 ### Adicionado (2026-06-15 — calendário vira kit: prompt de arte por post)
 - **`art_prompt` + `art_filename` por post** (mig 043): cada post de imagem futuro carrega o prompt de arte **preenchido** (hook + sublinha + paleta da marca) + nome de arquivo sugerido. **24 posts** preenchidos (8 card + 16 carrossel OSI); 22 reels ficam de fora (vídeo, dependem da Taty).
 - **UI**: seção "Prompt de arte (copiar e colar no GPT)" no PostDrawer com botão **Copiar prompt** + caminho de salvamento (`docs/divulgacao/artes/`).
