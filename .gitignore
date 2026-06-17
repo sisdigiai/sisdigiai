@@ -10,3 +10,4 @@ coverage/
 # MCP config pode conter tokens — não commitar
 .mcp.json
 !.mcp.json.example
+.meta-token.tmp
