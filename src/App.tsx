@@ -41,9 +41,11 @@ const PUBLIC_ROUTES = ['/osi/depoimento', '/osi'];
 // Todos os módulos roteáveis — usado pelo deep-link por hash (#/<modulo>).
 const MODULES: ModuleId[] = [
   'visao', 'portfolio', 'trilha', 'lista-mestra', 'backlog', 'comercial',
-  'cadastro-empresa', 'financeiro', 'academy', 'funil', 'fluxo-osi',
-  'marketing', 'marketing-seo', 'marketplace', 'clearix', 'ecossistemas',
-  'decisoes', 'biblioteca', 'brand', 'travas-marketing',
+  'cadastro-empresa', 'financeiro', 'academy', 'marketplace', 'clearix',
+  'marketing', 'marketing-redes', 'marketing-performance', 'marketing-banco',
+  'marketing-prompts', 'marketing-engajamento', 'funil', 'fluxo-osi',
+  'marketing-seo', 'marketing-materiais', 'marketing-afiliados', 'travas-marketing',
+  'ecossistemas', 'decisoes', 'biblioteca', 'brand',
   'referencias-design', 'mock-estilos', 'guia',
 ];
 
@@ -57,7 +59,10 @@ const MODULE_LABEL: Record<ModuleId, string> = {
   visao: 'Visão', portfolio: 'Portfólio', trilha: 'Roadmap', 'lista-mestra': 'Lista Mestra',
   backlog: 'Backlog Executivo', comercial: 'Comercial', 'cadastro-empresa': 'Cadastro Empresa',
   financeiro: 'Financeiro', academy: 'Academy', funil: 'Funil OSI', 'fluxo-osi': 'Mapa OSI',
-  marketing: 'Marketing', 'marketing-seo': 'Marketing & SEO', marketplace: 'Marketplace', clearix: 'Central Clearix',
+  marketing: 'Calendário', 'marketing-redes': 'Redes', 'marketing-performance': 'Performance',
+  'marketing-banco': 'Banco de Ideias', 'marketing-prompts': 'Prompts IA', 'marketing-engajamento': 'Engajamento',
+  'marketing-materiais': 'Materiais', 'marketing-afiliados': 'Afiliados',
+  'marketing-seo': 'Marketing & SEO', marketplace: 'Marketplace', clearix: 'Central Clearix',
   ecossistemas: 'Ecossistemas', decisoes: 'Decisões', biblioteca: 'Biblioteca', brand: 'Brand Guidelines',
   'travas-marketing': 'Travas Marketing', 'referencias-design': 'Referências Design', 'mock-estilos': 'Mock Vendas',
   guia: 'Guia Operacional',
@@ -67,9 +72,13 @@ const MODULE_LABEL: Record<ModuleId, string> = {
 const MODULE_SECTION: Record<ModuleId, string> = {
   visao: 'Operacional', portfolio: 'Operacional', trilha: 'Operacional', 'lista-mestra': 'Operacional',
   backlog: 'Operacional', comercial: 'Operacional', 'cadastro-empresa': 'Operacional', financeiro: 'Operacional',
-  academy: 'Operacional', funil: 'Operacional', 'fluxo-osi': 'Operacional', marketing: 'Operacional',
-  'marketing-seo': 'Operacional', marketplace: 'Operacional', clearix: 'Operacional', ecossistemas: 'Ecossistemas',
-  decisoes: 'Sistema', biblioteca: 'Sistema', brand: 'Sistema', 'travas-marketing': 'Sistema',
+  academy: 'Operacional', marketplace: 'Operacional', clearix: 'Operacional',
+  marketing: 'Marketing', 'marketing-redes': 'Marketing', 'marketing-performance': 'Marketing',
+  'marketing-banco': 'Marketing', 'marketing-prompts': 'Marketing', 'marketing-engajamento': 'Marketing',
+  funil: 'Marketing', 'fluxo-osi': 'Marketing', 'marketing-seo': 'Marketing',
+  'marketing-materiais': 'Marketing', 'marketing-afiliados': 'Marketing', 'travas-marketing': 'Marketing',
+  ecossistemas: 'Ecossistemas',
+  decisoes: 'Sistema', biblioteca: 'Sistema', brand: 'Sistema',
   'referencias-design': 'Sistema', 'mock-estilos': 'Sistema', guia: 'Sistema',
 };
 
@@ -139,7 +148,14 @@ export default function App() {
       case 'financeiro': return <Financeiro />;
       case 'academy': return <Academy />;
       case 'funil': return <Funil />;
-      case 'marketing': return <Marketing />;
+      case 'marketing': return <Marketing view="calendario" />;
+      case 'marketing-redes': return <Marketing view="redes" />;
+      case 'marketing-performance': return <Marketing view="performance" />;
+      case 'marketing-banco': return <Marketing view="banco" />;
+      case 'marketing-prompts': return <Marketing view="prompts" />;
+      case 'marketing-engajamento': return <Marketing view="engajamento" />;
+      case 'marketing-materiais': return <Marketing view="materiais" />;
+      case 'marketing-afiliados': return <Marketing view="afiliados" />;
       case 'marketing-seo': return <MarketingSEO />;
       case 'marketplace': return <Marketplace />;
       case 'referencias-design': return <ReferenciasDesign />;

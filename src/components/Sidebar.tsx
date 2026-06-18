@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import {
   Eye, LayoutGrid, Map, List, Zap, TrendingUp,
   BookOpen, DollarSign, GitBranch, Library, Palette, Building2, Network,
-  Compass, Flame, Megaphone, LogOut, Store, Sparkles, Music2, Activity,
+  Compass, Flame, LogOut, Store, Sparkles, Music2, Activity,
   Camera, Wand2, Boxes, Search, ShieldCheck, Workflow, ChevronDown,
-  GraduationCap, Languages
+  GraduationCap, Languages, Calendar as CalendarIcon, Globe, BarChart3,
+  Lightbulb, Heart, Package, Users
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
@@ -17,7 +18,10 @@ export type ModuleId =
   | 'decisoes' | 'biblioteca' | 'brand' | 'cadastro-empresa'
   | 'clearix' | 'referencias-design' | 'mock-estilos' | 'marketing'
   | 'marketing-seo' | 'marketplace' | 'ecossistemas' | 'travas-marketing'
-  | 'fluxo-osi' | 'guia';
+  | 'fluxo-osi' | 'guia'
+  | 'marketing-redes' | 'marketing-performance' | 'marketing-banco'
+  | 'marketing-prompts' | 'marketing-engajamento' | 'marketing-materiais'
+  | 'marketing-afiliados';
 
 interface NavItem {
   id: ModuleId;
@@ -58,12 +62,25 @@ const operacional: NavItem[] = [
   { id: 'financeiro',       label: 'Financeiro',        icon: <DollarSign className="w-4 h-4" /> },
   { id: 'comercial',        label: 'Comercial',         icon: <TrendingUp className="w-4 h-4" /> },
   { id: 'academy',          label: 'Academy',           icon: <BookOpen className="w-4 h-4" /> },
-  { id: 'funil',            label: 'Funil OSI',         icon: <Flame className="w-4 h-4" /> },
-  { id: 'fluxo-osi',        label: 'Mapa OSI',          icon: <Workflow className="w-4 h-4" /> },
-  { id: 'marketing',        label: 'Marketing',         icon: <Megaphone className="w-4 h-4" /> },
-  { id: 'marketing-seo',    label: 'Marketing & SEO',   icon: <Search className="w-4 h-4" /> },
   { id: 'marketplace',      label: 'Marketplace',       icon: <Store className="w-4 h-4" /> },
   { id: 'clearix',          label: 'Central Clearix',   icon: <Network className="w-4 h-4" /> },
+];
+
+// Marketing — seção de 1º nível (calendário + redes + engajamento + funil OSI +
+// SEO + afiliados + travas). Sub-abas do antigo módulo Marketing viraram itens.
+const marketing: NavItem[] = [
+  { id: 'marketing',             label: 'Calendário',       icon: <CalendarIcon className="w-4 h-4" /> },
+  { id: 'marketing-redes',       label: 'Redes',            icon: <Globe className="w-4 h-4" /> },
+  { id: 'marketing-performance', label: 'Performance',      icon: <BarChart3 className="w-4 h-4" /> },
+  { id: 'marketing-banco',       label: 'Banco de Ideias',  icon: <Lightbulb className="w-4 h-4" /> },
+  { id: 'marketing-prompts',     label: 'Prompts IA',       icon: <Sparkles className="w-4 h-4" /> },
+  { id: 'marketing-engajamento', label: 'Engajamento',      icon: <Heart className="w-4 h-4" /> },
+  { id: 'funil',                 label: 'Funil OSI',        icon: <Flame className="w-4 h-4" /> },
+  { id: 'fluxo-osi',             label: 'Mapa OSI',         icon: <Workflow className="w-4 h-4" /> },
+  { id: 'marketing-seo',         label: 'Marketing & SEO',  icon: <Search className="w-4 h-4" /> },
+  { id: 'marketing-materiais',   label: 'Materiais',        icon: <Package className="w-4 h-4" /> },
+  { id: 'marketing-afiliados',   label: 'Afiliados',        icon: <Users className="w-4 h-4" /> },
+  { id: 'travas-marketing',      label: 'Travas Marketing', icon: <ShieldCheck className="w-4 h-4" /> },
 ];
 
 // Ecossistemas (links externos — ADR-0029)
@@ -83,7 +100,6 @@ const ECOSSISTEMA_DEFS: Ecossistema[] = [
 
 const sistema: NavItem[] = [
   { id: 'guia',               label: 'Guia Operacional',    icon: <Compass className="w-4 h-4" /> },
-  { id: 'travas-marketing',   label: 'Travas Marketing',    icon: <ShieldCheck className="w-4 h-4" /> },
   { id: 'decisoes',           label: 'Decisões',            icon: <GitBranch className="w-4 h-4" /> },
   { id: 'biblioteca',         label: 'Biblioteca',          icon: <Library className="w-4 h-4" /> },
   { id: 'brand',              label: 'Brand Guidelines',    icon: <Palette className="w-4 h-4" /> },
@@ -98,12 +114,14 @@ interface SidebarProps {
   onClose?: () => void;
 }
 
-type SectionKey = 'operacional' | 'ecossistemas' | 'sistema';
+type SectionKey = 'operacional' | 'marketing' | 'ecossistemas' | 'sistema';
 
 const SISTEMA_IDS = sistema.map(i => i.id) as ModuleId[];
+const MARKETING_IDS = marketing.map(i => i.id) as ModuleId[];
 
 function sectionOf(id: ModuleId): SectionKey {
   if (id === 'ecossistemas') return 'ecossistemas';
+  if (MARKETING_IDS.includes(id)) return 'marketing';
   if (SISTEMA_IDS.includes(id)) return 'sistema';
   return 'operacional';
 }
@@ -111,7 +129,7 @@ function sectionOf(id: ModuleId): SectionKey {
 const COLLAPSE_KEY = 'digiai.sidebar.collapsed.v1';
 
 function loadCollapsed(): Record<SectionKey, boolean> {
-  const fallback = { operacional: false, ecossistemas: true, sistema: false };
+  const fallback = { operacional: false, marketing: false, ecossistemas: true, sistema: false };
   if (typeof window === 'undefined') return fallback;
   try {
     const raw = window.localStorage.getItem(COLLAPSE_KEY);
@@ -125,6 +143,7 @@ export default function Sidebar({ active, onSelect, mobileOpen = false, onClose 
   const { user, role, signOut } = useAuth();
   const [collapsed, setCollapsed] = useState<Record<SectionKey, boolean>>(loadCollapsed);
   const visibleOperacional = operacional.filter(item => canAccessModule(item.id, role));
+  const visibleMarketing = marketing.filter(item => canAccessModule(item.id, role));
   const activeSection = sectionOf(active);
   const ecoUrls = useEcosystemUrls();
   const ecossistemas = ECOSSISTEMA_DEFS.map(e => ({ ...e, url: ecoUrls[e.key] ?? e.url }));
@@ -185,6 +204,15 @@ export default function Sidebar({ active, onSelect, mobileOpen = false, onClose 
           {isOpen('operacional') && (
             <div className="space-y-0.5">
               {visibleOperacional.map(item => <NavButton key={item.id} item={item} />)}
+            </div>
+          )}
+        </div>
+
+        <div>
+          <GroupHeader k="marketing" label="Marketing" />
+          {isOpen('marketing') && (
+            <div className="space-y-0.5">
+              {visibleMarketing.map(item => <NavButton key={item.id} item={item} />)}
             </div>
           )}
         </div>

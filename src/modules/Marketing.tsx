@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { BarChart3, Calendar as CalendarIcon, Crown, Globe, Lightbulb, MessageSquareQuote, Package, Sparkles, TrendingUp, Trophy, Users, Wand2 } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { BarChart3, Calendar as CalendarIcon, Crown, MessageSquareQuote, TrendingUp, Trophy, Wand2 } from 'lucide-react';
 import { Redes } from './marketing/Redes';
 import { Performance } from './marketing/Performance';
 import { CalendarioEditorial } from './marketing/CalendarioEditorial';
@@ -15,40 +15,78 @@ import { Desafios } from './marketing/Desafios';
 import { TravasBanner } from './TravasMarketing';
 import PageHeader from '../components/PageHeader';
 
-type SubTab = 'calendario' | 'redes' | 'performance' | 'planejador' | 'banco' | 'prompts' | 'validacao' | 'depoimentos' | 'comunidade' | 'desafios' | 'materiais' | 'afiliados';
+// As antigas sub-abas do módulo Marketing viraram itens de 1º nível na sidebar
+// (seção "Marketing"). Cada item vira uma `MarketingView`. Duas views agregam
+// várias telas em sub-abas internas: "calendario" (+ Planejador) e "engajamento"
+// (Validação / Depoimentos / Comunidade / Desafios).
+export type MarketingView =
+  | 'calendario' | 'redes' | 'performance' | 'banco' | 'prompts'
+  | 'engajamento' | 'materiais' | 'afiliados';
 
-const SUBTABS: { id: SubTab; label: string; icon: typeof CalendarIcon }[] = [
-  { id: 'calendario', label: 'Calendário Editorial', icon: CalendarIcon },
-  { id: 'redes', label: 'Redes', icon: Globe },
-  { id: 'performance', label: 'Performance', icon: BarChart3 },
-  { id: 'planejador', label: 'Planejador', icon: Wand2 },
-  { id: 'banco', label: 'Banco de Ideias', icon: Lightbulb },
-  { id: 'prompts', label: 'Prompts IA', icon: Sparkles },
-  { id: 'validacao', label: 'Validação', icon: TrendingUp },
-  { id: 'depoimentos', label: 'Depoimentos', icon: MessageSquareQuote },
-  { id: 'comunidade', label: 'Comunidade OSI', icon: Crown },
-  { id: 'desafios', label: 'Desafios', icon: Trophy },
-  { id: 'materiais', label: 'Materiais (afiliados)', icon: Package },
-  { id: 'afiliados', label: 'Afiliados', icon: Users },
+const VIEW_META: Record<MarketingView, { eyebrow: string; title: string; subtitle: string }> = {
+  calendario:  { eyebrow: 'Distribuição & conteúdo', title: 'Calendário',     subtitle: 'Calendário editorial das 3 camadas + o Planejador que gera a agenda em lote.' },
+  redes:       { eyebrow: 'Distribuição & conteúdo', title: 'Redes',          subtitle: 'Contas travadas por camada (pessoal · DIGIAI · OSI) + log eterno de atualizações.' },
+  performance: { eyebrow: 'Distribuição & conteúdo', title: 'Performance',    subtitle: 'Placar de seguidores e métricas por post das contas conectadas.' },
+  banco:       { eyebrow: 'Distribuição & conteúdo', title: 'Banco de Ideias', subtitle: 'Repositório de ganchos por pilar — agende uma ideia direto pro calendário.' },
+  prompts:     { eyebrow: 'Distribuição & conteúdo', title: 'Prompts IA',     subtitle: 'Templates de prompt por pilar e canal — AI produz, humano publica (R-011).' },
+  engajamento: { eyebrow: 'Comunidade & prova',      title: 'Engajamento',    subtitle: 'Validação de pilares, depoimentos, comunidade OSI e desafios — tudo num lugar só.' },
+  materiais:   { eyebrow: 'Afiliados',               title: 'Materiais',      subtitle: 'Kit de materiais prontos pros afiliados divulgarem (banners, copy, reels).' },
+  afiliados:   { eyebrow: 'Afiliados',               title: 'Afiliados',      subtitle: 'CRM de afiliados: cadastro, comissões, payouts e leaderboard.' },
+};
+
+interface SubTab { id: string; label: string; icon: typeof CalendarIcon; render: () => ReactNode }
+
+const CALENDARIO_TABS: SubTab[] = [
+  { id: 'calendario', label: 'Calendário Editorial', icon: CalendarIcon, render: () => <CalendarioEditorial /> },
+  { id: 'planejador', label: 'Planejador',           icon: Wand2,        render: () => <Planejador /> },
 ];
 
-export default function Marketing() {
-  const [active, setActive] = useState<SubTab>('calendario');
+const ENGAJAMENTO_TABS: SubTab[] = [
+  { id: 'validacao',   label: 'Validação',     icon: TrendingUp,         render: () => <Validacao /> },
+  { id: 'depoimentos', label: 'Depoimentos',   icon: MessageSquareQuote, render: () => <Depoimentos /> },
+  { id: 'comunidade',  label: 'Comunidade OSI', icon: Crown,             render: () => <Comunidade /> },
+  { id: 'desafios',    label: 'Desafios',      icon: Trophy,             render: () => <Desafios /> },
+];
+
+const SINGLE_VIEW: Partial<Record<MarketingView, () => ReactNode>> = {
+  redes:       () => <Redes />,
+  performance: () => <Performance />,
+  banco:       () => <BancoIdeias />,
+  prompts:     () => <PromptsIA />,
+  materiais:   () => <MateriaisAfiliados />,
+  afiliados:   () => <AfiliadosDashboard />,
+};
+
+export default function Marketing({ view = 'calendario' }: { view?: MarketingView }) {
+  const meta = VIEW_META[view] ?? VIEW_META.calendario;
+  const tabs = view === 'calendario' ? CALENDARIO_TABS : view === 'engajamento' ? ENGAJAMENTO_TABS : null;
 
   return (
     <div className="h-full flex flex-col max-w-6xl mx-auto w-full">
       <div className="px-8 pt-8">
-        <PageHeader
-          eyebrow="Distribuição & conteúdo"
-          title="Marketing"
-          subtitle="Calendário editorial + banco de ideias + materiais de afiliados + CRM de afiliados. Tudo num lugar só."
-        />
+        <PageHeader eyebrow={meta.eyebrow} title={meta.title} subtitle={meta.subtitle} />
         <TravasBanner />
       </div>
 
+      {tabs ? (
+        <TabbedView tabs={tabs} />
+      ) : (
+        <div className="flex-1 overflow-y-auto">
+          {SINGLE_VIEW[view]?.()}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TabbedView({ tabs }: { tabs: SubTab[] }) {
+  const [active, setActive] = useState(tabs[0].id);
+
+  return (
+    <>
       <div className="border-b border-outline/10 px-8">
         <div className="flex gap-1 overflow-x-auto">
-          {SUBTABS.map((tab) => {
+          {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = active === tab.id;
             return (
@@ -70,19 +108,8 @@ export default function Marketing() {
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {active === 'calendario' && <CalendarioEditorial />}
-        {active === 'redes' && <Redes />}
-        {active === 'performance' && <Performance />}
-        {active === 'planejador' && <Planejador />}
-        {active === 'banco' && <BancoIdeias />}
-        {active === 'prompts' && <PromptsIA />}
-        {active === 'validacao' && <Validacao />}
-        {active === 'depoimentos' && <Depoimentos />}
-        {active === 'comunidade' && <Comunidade />}
-        {active === 'desafios' && <Desafios />}
-        {active === 'materiais' && <MateriaisAfiliados />}
-        {active === 'afiliados' && <AfiliadosDashboard />}
+        {tabs.find((t) => t.id === active)?.render()}
       </div>
-    </div>
+    </>
   );
 }

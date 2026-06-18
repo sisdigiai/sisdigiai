@@ -10,6 +10,7 @@ import { realtimeStore } from '../lib/realtimeStore';
 import { useRealtimeToasts } from '../contexts/ToastContext';
 import type { ModuleId } from '../components/Sidebar';
 import PageHeader from '../components/PageHeader';
+import PulsoPublicacoes from '../components/PulsoPublicacoes';
 
 const VERDADES_CANONICAS = [
   { texto: 'Clearix é a prioridade máxima da DIGIAI', nível: 'máximo' },
@@ -194,6 +195,9 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
           onClick={() => onNavigate?.('financeiro')}
         />
       </div>
+
+      {/* Pulso de Publicações — operação social das 3 camadas no centro de comando */}
+      <PulsoPublicacoes onNavigate={onNavigate} />
 
       {/* Grid: Próximas tarefas + Próximo marco */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
