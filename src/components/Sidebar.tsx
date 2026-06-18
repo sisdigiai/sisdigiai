@@ -5,7 +5,7 @@ import {
   Compass, Flame, LogOut, Store, Sparkles, Music2, Activity,
   Camera, Wand2, Boxes, Search, ShieldCheck, Workflow, ChevronDown,
   GraduationCap, Languages, Calendar as CalendarIcon, Globe, BarChart3,
-  Lightbulb, Heart, Package, Users
+  Lightbulb, Heart, Package, Users, Receipt
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
@@ -16,7 +16,7 @@ export type ModuleId =
   | 'visao' | 'portfolio' | 'trilha' | 'lista-mestra'
   | 'backlog' | 'comercial' | 'academy' | 'funil' | 'financeiro'
   | 'decisoes' | 'biblioteca' | 'brand' | 'cadastro-empresa'
-  | 'clearix' | 'referencias-design' | 'mock-estilos' | 'marketing'
+  | 'clearix' | 'cobranca' | 'referencias-design' | 'mock-estilos' | 'marketing'
   | 'marketing-seo' | 'marketplace' | 'ecossistemas' | 'travas-marketing'
   | 'fluxo-osi' | 'guia'
   | 'marketing-redes' | 'marketing-performance' | 'marketing-banco'
@@ -64,6 +64,7 @@ const operacional: NavItem[] = [
   { id: 'academy',          label: 'Academy',           icon: <BookOpen className="w-4 h-4" /> },
   { id: 'marketplace',      label: 'Marketplace',       icon: <Store className="w-4 h-4" /> },
   { id: 'clearix',          label: 'Central Clearix',   icon: <Network className="w-4 h-4" /> },
+  { id: 'cobranca',         label: 'Cobrança',          icon: <Receipt className="w-4 h-4" /> },
 ];
 
 // Marketing — seção de 1º nível (calendário + redes + engajamento + funil OSI +
@@ -267,7 +268,7 @@ export default function Sidebar({ active, onSelect, mobileOpen = false, onClose 
           Sair
         </button>
         <div className="text-[10px] font-mono text-muted text-center pt-1">
-          Fase 0–1 de 8 · Zero aos Milhões
+          Fase 2 de 8 · Zero aos Milhões
         </div>
       </div>
     </div>

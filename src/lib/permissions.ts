@@ -11,7 +11,7 @@ import type { ModuleId } from '../components/Sidebar';
 // Fail-open: papel desconhecido (null) NÃO é bloqueado — evita trancar o dono
 // caso current_role_code() falhe. A restrição só vale quando o papel é
 // explicitamente um tier mais baixo (staff/viewer).
-export const RESTRICTED_MODULES: ModuleId[] = ['financeiro', 'cadastro-empresa', 'clearix'];
+export const RESTRICTED_MODULES: ModuleId[] = ['financeiro', 'cadastro-empresa', 'clearix', 'cobranca'];
 
 const PRIVILEGED_ROLES = ['super_admin', 'founder', 'admin'];
 

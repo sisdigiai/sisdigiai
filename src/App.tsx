@@ -28,6 +28,7 @@ import TravasMarketing from './modules/TravasMarketing';
 import FluxoOSI from './modules/FluxoOSI';
 import Guia from './modules/Guia';
 import Comercial from './modules/Comercial';
+import Billing from './modules/Billing';
 import { ModuleStub } from './modules/Stub';
 import { useAuth } from './contexts/AuthContext';
 import { canAccessModule } from './lib/permissions';
@@ -41,7 +42,7 @@ const PUBLIC_ROUTES = ['/osi/depoimento', '/osi'];
 // Todos os módulos roteáveis — usado pelo deep-link por hash (#/<modulo>).
 const MODULES: ModuleId[] = [
   'visao', 'portfolio', 'trilha', 'lista-mestra', 'backlog', 'comercial',
-  'cadastro-empresa', 'financeiro', 'academy', 'marketplace', 'clearix',
+  'cadastro-empresa', 'financeiro', 'academy', 'marketplace', 'clearix', 'cobranca',
   'marketing', 'marketing-redes', 'marketing-performance', 'marketing-banco',
   'marketing-prompts', 'marketing-engajamento', 'funil', 'fluxo-osi',
   'marketing-seo', 'marketing-materiais', 'marketing-afiliados', 'travas-marketing',
@@ -62,7 +63,7 @@ const MODULE_LABEL: Record<ModuleId, string> = {
   marketing: 'Calendário', 'marketing-redes': 'Redes', 'marketing-performance': 'Performance',
   'marketing-banco': 'Banco de Ideias', 'marketing-prompts': 'Prompts IA', 'marketing-engajamento': 'Engajamento',
   'marketing-materiais': 'Materiais', 'marketing-afiliados': 'Afiliados',
-  'marketing-seo': 'Marketing & SEO', marketplace: 'Marketplace', clearix: 'Central Clearix',
+  'marketing-seo': 'Marketing & SEO', marketplace: 'Marketplace', clearix: 'Central Clearix', cobranca: 'Cobrança',
   ecossistemas: 'Ecossistemas', decisoes: 'Decisões', biblioteca: 'Biblioteca', brand: 'Brand Guidelines',
   'travas-marketing': 'Travas Marketing', 'referencias-design': 'Referências Design', 'mock-estilos': 'Mock Vendas',
   guia: 'Guia Operacional',
@@ -72,7 +73,7 @@ const MODULE_LABEL: Record<ModuleId, string> = {
 const MODULE_SECTION: Record<ModuleId, string> = {
   visao: 'Operacional', portfolio: 'Operacional', trilha: 'Operacional', 'lista-mestra': 'Operacional',
   backlog: 'Operacional', comercial: 'Operacional', 'cadastro-empresa': 'Operacional', financeiro: 'Operacional',
-  academy: 'Operacional', marketplace: 'Operacional', clearix: 'Operacional',
+  academy: 'Operacional', marketplace: 'Operacional', clearix: 'Operacional', cobranca: 'Operacional',
   marketing: 'Marketing', 'marketing-redes': 'Marketing', 'marketing-performance': 'Marketing',
   'marketing-banco': 'Marketing', 'marketing-prompts': 'Marketing', 'marketing-engajamento': 'Marketing',
   funil: 'Marketing', 'fluxo-osi': 'Marketing', 'marketing-seo': 'Marketing',
@@ -144,6 +145,7 @@ export default function App() {
       case 'brand': return <BrandGuidelines />;
       case 'cadastro-empresa': return <CadastroEmpresa />;
       case 'clearix': return <Clearix />;
+      case 'cobranca': return <Billing />;
       case 'decisoes': return <Decisoes />;
       case 'financeiro': return <Financeiro />;
       case 'academy': return <Academy />;
