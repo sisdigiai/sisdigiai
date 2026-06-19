@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import { FileText, BookOpen, ChevronRight } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { FileText, BookOpen, ChevronRight, ClipboardList, ChevronDown } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
+import { playbookStore, type Playbook } from '../lib/playbookStore';
+import PlaybookView from './comercial/PlaybookView';
 
 type Categoria = 'fundacao' | 'empresa' | 'portfolio' | 'produtos' | 'comercial' | 'marketing' | 'financeiro' | 'operacao' | 'roadmap' | 'governanca';
 
@@ -33,7 +35,7 @@ const DOCS: DocEntry[] = [
   { titulo: 'Proposta Comercial Base Clearix', path: 'docs/04-comercial/proposta-comercial-base-clearix.md', categoria: 'comercial', descricao: 'Proposta pronta para envio a clientes.', status: 'canonico-inicial', revisao: '2026-04-16' },
   { titulo: 'Roteiro de Demo Clearix', path: 'docs/04-comercial/roteiro-de-demo-clearix.md', categoria: 'comercial', descricao: 'Passo a passo para demonstrar o Clearix a clientes.', status: 'canonico-inicial', revisao: '2026-04-16' },
   { titulo: 'Oferta Piloto Clearix', path: 'docs/04-comercial/oferta-piloto-clearix.md', categoria: 'comercial', descricao: 'Condições especiais para primeiros clientes.', status: 'canonico-inicial', revisao: '2026-04-16' },
-  { titulo: 'Pricing Clearix', path: 'docs/04-comercial/pricing-clearix.md', categoria: 'comercial', descricao: '3 planos (Starter R$397, Growth R$797, Ecossistema R$1.497) + add-ons + política de desconto + margem.', status: 'canonico-inicial', revisao: '2026-04-17' },
+  { titulo: 'Pricing Clearix', path: 'docs/04-comercial/pricing-clearix.md', categoria: 'comercial', descricao: '3 planos (Essencial R$349, Controle R$899, Crescimento R$1.499) + add-ons + 30% off no piloto (3 meses) + setup isento no teste. Vigente desde 18/06.', status: 'canonico-inicial', revisao: '2026-06-18' },
   { titulo: 'Onboarding Cliente Clearix', path: 'docs/04-comercial/onboarding-cliente-clearix.md', categoria: 'comercial', descricao: 'Playbook D+0 a D+30: ativação, configuração, go-live, success check.', status: 'canonico-inicial', revisao: '2026-04-17' },
   { titulo: 'Suporte ao Cliente Clearix', path: 'docs/04-comercial/suporte-ao-cliente-clearix.md', categoria: 'comercial', descricao: 'Canais, matriz de severidade S1-S5, SLA por plano, escalação, LGPD.', status: 'canonico-inicial', revisao: '2026-04-17' },
   { titulo: 'Roteiro de Entrevista Mom Test', path: 'docs/04-comercial/template-roteiro-entrevista-mom-test.md', categoria: 'comercial', descricao: 'Roteiro 30min estruturado para validar problema do Clearix com donos de ótica. Base da Fase 0.', status: 'canonico-inicial', revisao: '2026-04-17' },
@@ -87,9 +89,12 @@ const statusBadge: Record<string, string> = {
 const CATS_FILTRO: Array<Categoria | 'todos'> = ['todos', 'fundacao', 'empresa', 'portfolio', 'produtos', 'comercial', 'marketing', 'operacao', 'roadmap', 'governanca'];
 
 export default function Biblioteca() {
-  const [filtro, setFiltro] = useState<Categoria | 'todos'>('todos');
+  const [filtro, setFiltro] = useState<Categoria | 'todos' | 'playbooks'>('todos');
+  const [playbooks, setPlaybooks] = useState<Playbook[]>([]);
+  const [openPb, setOpenPb] = useState<string | null>(null);
+  useEffect(() => { playbookStore.list().then(setPlaybooks); }, []);
 
-  const docs = filtro === 'todos' ? DOCS : DOCS.filter(d => d.categoria === filtro);
+  const docs = filtro === 'playbooks' ? [] : filtro === 'todos' ? DOCS : DOCS.filter(d => d.categoria === filtro);
 
   const grupos = [...new Set(docs.map(d => d.categoria))];
 
@@ -120,9 +125,37 @@ export default function Biblioteca() {
             {c === 'todos' ? 'Todos' : categoriaLabel[c as Categoria]}
           </button>
         ))}
+        <button
+          onClick={() => setFiltro('playbooks')}
+          className={`text-xs px-3 py-1.5 font-mono transition-all inline-flex items-center gap-1.5 ${filtro === 'playbooks' ? 'bg-secondary text-surface' : 'bg-secondary/15 text-secondary hover:bg-secondary/25'}`}
+        >
+          <ClipboardList className="w-3.5 h-3.5" /> Playbooks ({playbooks.length})
+        </button>
       </div>
 
+      {filtro === 'playbooks' && (
+        <div className="space-y-2">
+          {playbooks.length === 0 ? (
+            <div className="text-sm text-muted">Nenhum playbook cadastrado.</div>
+          ) : playbooks.map((pb) => (
+            <div key={pb.id} className="bg-surface-low border border-outline/10">
+              <button onClick={() => setOpenPb(openPb === pb.id ? null : (pb.id ?? null))} className="w-full flex items-center gap-3 px-4 py-3 text-left">
+                <ClipboardList className="w-4 h-4 text-secondary shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-on-surface">{pb.name}</div>
+                  {pb.objective && <div className="text-xs text-on-surface-variant truncate">{pb.objective}</div>}
+                </div>
+                {pb.audience && <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 bg-surface-high text-muted">{pb.audience}</span>}
+                <ChevronDown className={`w-4 h-4 text-muted transition-transform ${openPb === pb.id ? 'rotate-180' : ''}`} />
+              </button>
+              {openPb === pb.id && <div className="px-4 pb-4 border-t border-outline/10 pt-4"><PlaybookView playbook={pb} /></div>}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Grupos */}
+      {filtro !== 'playbooks' && (
       <div className="space-y-6">
         {grupos.map(cat => {
           const catDocs = docs.filter(d => d.categoria === cat);
@@ -156,6 +189,7 @@ export default function Biblioteca() {
           );
         })}
       </div>
+      )}
       </div>
     </div>
   );
