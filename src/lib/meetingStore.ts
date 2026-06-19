@@ -1,5 +1,10 @@
 import { supabase } from './supabase';
 
+export interface ActionItem {
+  text: string;
+  resolved: boolean;
+}
+
 export interface MeetingSession {
   id?: string;
   lead_id?: string | null;
@@ -18,6 +23,13 @@ export interface MeetingSession {
   follow_up_date?: string | null;
   effectiveness?: number | null; // 1-5
   notes?: string;
+  // captura rica (mig 046)
+  interest_plan?: string | null;   // Essencial/Controle/Crescimento
+  interest_apps?: string[];        // apps que interessaram
+  budget_signal?: string;          // sinal de orçamento
+  quotes?: string[];               // falas marcantes
+  action_items?: ActionItem[];     // análises a resolver
+  meet_url?: string | null;        // link da sala
 }
 
 const LS_KEY = 'digiai_meeting_sessions';
@@ -59,20 +71,18 @@ export const meetingStore = {
     return (await this.list()).filter((m) => m.lead_id === leadId);
   },
 
-  // Registra a reunião e propaga stage/próximo passo ao lead (no RPC).
-  async log(session: MeetingSession): Promise<void> {
+  // Registra a reunião e propaga stage/próximo passo ao lead (no RPC). Retorna a sessão com id.
+  async log(session: MeetingSession): Promise<MeetingSession> {
+    const local: MeetingSession = session.id ? session : { ...session, id: crypto.randomUUID() };
     const rows = readLocal();
-    if (session.id) {
-      const i = rows.findIndex((r) => r.id === session.id);
-      if (i >= 0) rows[i] = session; else rows.push(session);
-    } else {
-      rows.push({ ...session, id: crypto.randomUUID() });
-    }
+    const i = rows.findIndex((r) => r.id === local.id);
+    if (i >= 0) rows[i] = local; else rows.push(local);
     writeLocal(rows);
 
-    if (!isSupabaseReady()) return;
-    const { error } = await supabase.rpc('fn_log_meeting', { p: session });
-    if (error) console.error('[meetingStore] log', error);
+    if (!isSupabaseReady()) return local;
+    const { data, error } = await supabase.rpc('fn_log_meeting', { p: session });
+    if (error) { console.error('[meetingStore] log', error); return local; }
+    return { ...local, id: (data as string) ?? local.id };
   },
 
   async remove(id: string): Promise<void> {

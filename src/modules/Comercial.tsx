@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Plus, Trash2, Briefcase, Pencil, X, Play } from 'lucide-react';
+import { Plus, Trash2, Briefcase, Pencil, X, Play, FileText } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { commercialStore, type CommercialLead, type LeadStage } from '../lib/commercialStore';
 import { playbookStore, type Playbook } from '../lib/playbookStore';
 import { meetingStore, type MeetingSession } from '../lib/meetingStore';
+import { proposalStore, type Proposal } from '../lib/proposalStore';
 import MeetingRunner from './comercial/MeetingRunner';
+import ProposalEditor from './comercial/ProposalEditor';
+import { proposalFromMeeting } from './comercial/proposalGen';
 
 const STAGES: { key: LeadStage; label: string; color: string }[] = [
   { key: 'lead', label: 'Lead', color: '#6b7280' },
@@ -31,15 +34,18 @@ export default function Comercial() {
   const [leads, setLeads] = useState<CommercialLead[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<CommercialLead | null>(null);
-  const [tab, setTab] = useState<'pipeline' | 'reunioes'>('pipeline');
+  const [tab, setTab] = useState<'pipeline' | 'reunioes' | 'propostas'>('pipeline');
   const [playbooks, setPlaybooks] = useState<Playbook[]>([]);
   const [meetings, setMeetings] = useState<MeetingSession[]>([]);
+  const [proposals, setProposals] = useState<Proposal[]>([]);
   const [runner, setRunner] = useState<{ lead: CommercialLead | null } | null>(null);
+  const [proposalEditor, setProposalEditor] = useState<{ proposal: Proposal; lead: CommercialLead | null } | null>(null);
 
   const load = () => {
     commercialStore.list().then((rows) => { setLeads(rows); setLoading(false); });
     playbookStore.list().then(setPlaybooks);
     meetingStore.list().then(setMeetings);
+    proposalStore.list().then(setProposals);
   };
   useEffect(load, []);
 
@@ -88,7 +94,7 @@ export default function Comercial() {
 
       {/* Tabs */}
       <div className="flex items-center gap-1 border-b border-outline/10 mb-6">
-        {([['pipeline', 'Pipeline'], ['reunioes', `Reuniões (${meetings.length})`]] as const).map(([k, label]) => (
+        {([['pipeline', 'Pipeline'], ['reunioes', `Reuniões (${meetings.length})`], ['propostas', `Propostas (${proposals.length})`]] as const).map(([k, label]) => (
           <button
             key={k}
             onClick={() => setTab(k)}
@@ -138,6 +144,9 @@ export default function Comercial() {
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
                               <button onClick={() => setRunner({ lead })} aria-label="Iniciar reunião" title="Iniciar reunião" className="text-muted hover:text-secondary">
                                 <Play className="w-3.5 h-3.5" />
+                              </button>
+                              <button onClick={() => setProposalEditor({ proposal: proposalFromMeeting(null, lead), lead })} aria-label="Gerar proposta" title="Gerar proposta" className="text-muted hover:text-secondary">
+                                <FileText className="w-3.5 h-3.5" />
                               </button>
                               <button onClick={() => setEditing(lead)} aria-label="Editar" className="text-muted hover:text-on-surface">
                                 <Pencil className="w-3.5 h-3.5" />
@@ -189,15 +198,38 @@ export default function Comercial() {
                   {m.pain_noted && <div className="text-xs text-on-surface-variant mt-0.5">Dor: {m.pain_noted}</div>}
                   {m.outcome && <div className="text-xs text-muted mt-0.5">{m.outcome}</div>}
                   {m.next_action && <div className="text-[11px] text-secondary mt-0.5">→ {m.next_action}{m.follow_up_date ? ` (${dt(m.follow_up_date)})` : ''}</div>}
+                  {(m.interest_plan || (m.interest_apps?.length ?? 0) > 0) && (
+                    <div className="text-[10px] text-muted mt-0.5">Interesse: {m.interest_plan ?? ''}{m.interest_apps?.length ? ` · ${m.interest_apps.join(', ')}` : ''}</div>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   {m.stage_changed_to && <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 bg-surface-high text-muted">{m.stage_changed_to}</span>}
                   {m.effectiveness ? <span className="text-[10px] font-mono text-amber-400">{'★'.repeat(m.effectiveness)}</span> : null}
+                  <button onClick={() => { const l = leads.find((x) => x.id === m.lead_id) ?? null; setProposalEditor({ proposal: proposalFromMeeting(m, l), lead: l }); }} title="Gerar proposta" className="text-muted hover:text-secondary"><FileText className="w-3.5 h-3.5" /></button>
                   <button onClick={async () => { if (m.id) { await meetingStore.remove(m.id); load(); } }} aria-label="Excluir" className="text-muted hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
             ))
           )}
+        </div>
+      )}
+
+      {tab === 'propostas' && (
+        <div className="space-y-2">
+          {proposals.length === 0 ? (
+            <div className="text-sm text-muted">Nenhuma proposta ainda. Gere uma a partir de um lead (ícone de documento no card) ou de uma reunião.</div>
+          ) : proposals.map((pr) => (
+            <div key={pr.id} className="border border-outline/10 bg-surface-low p-3 flex flex-wrap items-center gap-x-4 gap-y-1">
+              <div className="min-w-0 flex-1">
+                <span className="text-sm font-medium text-on-surface">{pr.title}</span>
+                <span className="text-[11px] text-muted ml-2">{pr.lead_company ?? '—'}</span>
+                <div className="text-xs text-on-surface-variant mt-0.5">{pr.plan} · R$ {pr.monthly_price?.toLocaleString('pt-BR')}/mês · {pr.discount_pct}% off · {pr.trial_days}d teste</div>
+              </div>
+              <span className={`text-[9px] font-mono uppercase px-1.5 py-0.5 ${pr.status === 'enviada' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-surface-high text-muted'}`}>{pr.status}{pr.sent_via ? ` · ${pr.sent_via}` : ''}</span>
+              <button onClick={() => setProposalEditor({ proposal: pr, lead: leads.find((l) => l.id === pr.lead_id) ?? null })} title="Abrir" className="text-muted hover:text-on-surface"><FileText className="w-3.5 h-3.5" /></button>
+              <button onClick={async () => { if (pr.id) { await proposalStore.remove(pr.id); load(); } }} title="Excluir" className="text-muted hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
+            </div>
+          ))}
         </div>
       )}
 
@@ -207,6 +239,16 @@ export default function Comercial() {
           lead={runner.lead}
           playbooks={playbooks}
           onClose={() => setRunner(null)}
+          onSaved={load}
+        />
+      )}
+
+      {/* Editor de proposta */}
+      {proposalEditor && (
+        <ProposalEditor
+          initial={proposalEditor.proposal}
+          lead={proposalEditor.lead}
+          onClose={() => setProposalEditor(null)}
           onSaved={load}
         />
       )}
