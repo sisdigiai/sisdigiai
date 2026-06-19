@@ -31,7 +31,7 @@ const FASES: Fase[] = [
     objetivo: 'Onde estou e pra onde vou — antes de tocar em qualquer coisa.',
     mods: [
       { id: 'visao',     label: 'Visão',     nota: 'Pulso geral + alertas críticos', icon: <Eye className={I} /> },
-      { id: 'portfolio', label: 'Portfólio', nota: '11 frentes · hierarquia canônica', icon: <LayoutGrid className={I} /> },
+      { id: 'portfolio', label: 'Portfólio', nota: '13 frentes · hierarquia canônica', icon: <LayoutGrid className={I} /> },
       { id: 'trilha',    label: 'Roadmap',   nota: 'Fase atual + métrica única',     icon: <Map className={I} /> },
       { id: 'decisoes',  label: 'Decisões',  nota: 'Registra o porquê (ADR)',        icon: <GitBranch className={I} /> },
     ],
