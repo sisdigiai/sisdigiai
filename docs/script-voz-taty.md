@@ -25,7 +25,7 @@
 
 ```
 Oi, eu sou a Taty.
-Tenho mais de quarenta anos atrás do balcão de ótica.
+Tenho 25 anos atrás do balcão de ótica.
 Vou te contar algumas coisas que aprendi atendendo cliente todo dia.
 ```
 
@@ -47,7 +47,7 @@ antes de começar.
 
 ```
 O método dos cinco movimentos não é teoria.
-É o que eu aplico no balcão todo dia há quarenta anos.
+É o que eu aplico no balcão todo dia há 25 anos.
 Funciona porque é prática, não invenção.
 ```
 
@@ -119,7 +119,7 @@ Fecha sem desconto.
 4. Botão **+ Add Voice** → **Instant Voice Cloning**
 5. Configurar:
    - **Voice Name:** `Voz Taty`
-   - **Description:** "Voz da fundadora da Ótica Sem Improviso. 40 anos de balcão. Tom calmo, prático, sem afetação. Brazilian Portuguese."
+   - **Description:** "Voz da fundadora da Ótica Sem Improviso. 25 anos de balcão. Tom calmo, prático, sem afetação. Brazilian Portuguese."
    - **Labels:** `female`, `mature`, `brazilian portuguese`, `warm`, `conversational`
 6. Upload do arquivo `taty-voice-sample-2026-05.m4a`
 7. Aceitar termos → **Add Voice**

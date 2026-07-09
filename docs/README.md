@@ -1,19 +1,17 @@
-# Docs — digiai
+﻿# Docs - digiai
 
-Centro de documentação interna do app **digiai** (app principal da empresa). Orientado a **equipe, treinamento e divulgação** — não para desenvolvedor (esse usa o `README.md` da raiz do app).
+Esta pasta local e apenas ponte documental.
 
-> **Nota importante:** existe também `digiai/docs_sync/` na raiz do app. Apesar do nome, **`docs_sync/` NÃO é documentação de equipe** — é fonte de dados que o app consome em runtime (referenciada por `src/lib/copySeedData.ts`, `src/lib/academyStore.ts`, `src/modules/Biblioteca.tsx` e migration `015_academy_digital_products.sql`). **Não mover, não renomear.**
+A fonte documental operacional fica em:
 
-## O que vai em cada subpasta
+`	xt
+D:\projetos\Cockpit\Apps\digiai\README.md
+`
 
-| Pasta             | Conteúdo                                                          |
-|-------------------|-------------------------------------------------------------------|
-| `treinamentos/`   | Roteiros de onboarding, materiais de capacitação interna          |
-| `aulas/`          | Apostilas, gravações, slides, exercícios de aula                  |
-| `divulgacao/`     | Posts, criativos, copy aprovado, peças de lançamento              |
+Regra de verdade:
 
-## Manutenção
+- O app/codigo/filesystem em D:\projetos\digiai e a verdade factual.
+- O Cockpit e a fonte documental operacional.
+- Se houver divergencia, siga o app real e atualize o Cockpit no mesmo turno.
 
-- Atualizar `changelog.md` toda vez que o app ganha ou perde feature relevante
-- Trocar versões de prints sempre que UI mudar
-- Conteúdo definitivo de marca usa peças de `D:\projetos\Marca\`
+Conteudos locais antigos nesta pasta devem ser tratados como apoio historico ate serem migrados, arquivados ou removidos com confirmacao humana.

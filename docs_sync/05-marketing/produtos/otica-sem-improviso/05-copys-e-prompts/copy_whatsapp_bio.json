@@ -30,9 +30,23 @@
       "id": "msg_lembrete_final",
       "contexto": "Último lembrete antes de encerrar oferta",
       "mensagem": "Oi! Último aviso sobre o Ótica Sem Improviso.\n\nSe faz sentido pra você ter um método de atendimento que funciona em 72 horas — sem depender de improviso ou desconto cedo demais — o link tá aqui: [LINK]\n\nR$ 48,50. Compra única.\n\nSe não fizer sentido, sem problema. Só quis garantir que você soubesse."
+    },
+    {
+      "id": "msg_brinde_calc_abertura",
+      "contexto": "Brinde Clearix Calc — abertura fria de fricção zero, só entrega (sem pedir nada). Trocar [LINK_CALC] por https://clearixcalc.netlify.app/",
+      "mensagem": "Oi! Você trabalha com ótica, então acho que isso vai te servir.\n\nÉ a Clearix Calc — uma calculadora óptica grátis: transposição, espessura de lente (com desenho da lente em corte!), distância ao vértice, DNP/DP… tudo num link só.\n\nSem cadastro, funciona offline, instala no celular do balcão: [LINK_CALC]\n\nUsa à vontade. Qualquer dúvida me chama."
+    },
+    {
+      "id": "msg_brinde_calc_followup",
+      "contexto": "Brinde Clearix Calc — follow-up depois que a pessoa usou a calc, ponte pro OSI",
+      "mensagem": "E aí, conseguiu testar a calculadora?\n\nA de espessura por índice é minha favorita: ela desenha a lente, então você mostra pro cliente por que o índice alto vale — em vez de só falar.\n\nSó que o que faz o cliente fechar o índice alto é como você conduz a conversa. É isso que o Ótica Sem Improviso ensina — Os 5 Movimentos, aplica em 3 dias.\n\nSe quiser dar uma olhada: [LINK] (R$ 48,50, oferta de lançamento)"
     }
   ],
   "whatsapp_status": [
+    {
+      "id": "status_brinde_calc",
+      "texto": "Brinde pra quem trabalha em ótica 👓\n\nClearix Calc — calculadora óptica grátis: espessura por índice (com desenho da lente!), transposição, distância ao vértice, DNP.\n\nSem cadastro, funciona offline. Me chama que te mando o link."
+    },
     {
       "id": "status_dor",
       "texto": "Se o seu orçamento morre no WhatsApp...\n\nTem um método pra retomar com contexto — sem parecer cobrança.\n\nMe chama que explico."

@@ -13,7 +13,7 @@ Use este prompt para gerar, revisar ou adaptar qualquer peça de copy do produto
   "ecossistema": "Manual Visual (PDF) + App de Consulta + Plataforma Nexus com IA",
   "ticket": "R$ 48,50 (50% off lançamento, preço cheio R$ 97)",
   "metodologia": "Os 5 Movimentos",
-  "autoridade": "Tatiana Camargo — mais de 4 décadas de experiência real no balcão de óticas",
+  "autoridade": "Tatiana Camargo — 25 anos de experiência real no balcão de óticas",
   "prazo_resultado": "72 horas (3 dias de aplicação)",
   "tom_de_voz": "Prático, empático, firme (como uma mentora experiente), focado em segurança comercial. Sem hype, sem urgência falsa, sem emoji excessivo. Editorial, não panfletário."
 }
@@ -61,7 +61,7 @@ Transformar o atendimento automático e inseguro em uma consultoria de alta perf
 
 ## Autoridade — Tatiana Camargo
 
-- Mais de 4 décadas no balcão de óticas
+- 25 anos no balcão de óticas
 - Revisou cada página do manual
 - Valida método com: cliente real, objeção real, decisão real
 - Citação: "Você não precisa parecer ensaiado. Precisa ler melhor, perguntar melhor e conduzir melhor."

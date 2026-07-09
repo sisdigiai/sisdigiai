@@ -21,7 +21,10 @@ Arquivos principais:
 - `01-estrategia/funil-osi-clearix-master.md` — **mapa-mestre do funil OSI → Clearix (entrada por aqui)**
 - `01-estrategia/plano-nexus-premium.md` — roadmap técnico das 6 features do gate de 90 dias
 - `01-estrategia/arquitetura-ecossistema-apps-oticas.md`
+- `01-estrategia/narrativa-brinde-calc-osi.md` — **fio condutor do brinde Clearix Calc → OSI → Clearix**
 - `04-operacao-e-venda/plano-configuracao-funil-osi.md`
+- `04-operacao-e-venda/roteiro-comercial-brinde-clearix-calc.md` — **roteiro de venda + WhatsApp usando a calc como abertura**
+- `04-operacao-e-venda/playbook-whatsapp-cliente-novo-osi.md` — **playbook de WhatsApp (manual) com cliente novo: onboarding do comprador + nutrição do lead**
 - `04-operacao-e-venda/regua-recuperacao-carrinho-osi.md`
 - `04-operacao-e-venda/projecao-roas-osi.xlsx`
 - `05-copys-e-prompts/prompt_mestre_copy_osi.md` (prompt para gerar pecas)

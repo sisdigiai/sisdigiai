@@ -1,9 +1,27 @@
-{
+﻿{
   "meta": {
     "produto": "Ótica Sem Improviso",
     "objetivo": "Sequências de e-mail para captação, nutrição e conversão",
     "tom": "Direto, empático, mentora experiente. Sem hype, sem urgência falsa.",
     "data": "2026-04-30"
+  },
+  "brinde_clearix_calc": {
+    "descricao": "Gancho do brinde grátis (Clearix Calc) pra plugar em qualquer e-mail das sequências: assunto, bloco de oferta e assinatura. O brinde permanece grátis e autônomo — nunca condicionar à compra.",
+    "link_calc": "https://clearixcalc.netlify.app/?utm_source=osi&utm_medium=email&utm_campaign=clearix_calc_brinde",
+    "assuntos_gancho": [
+      "Ganhe a calculadora que sua ótica usa todo dia (de graça)",
+      "Um presente pra quem atende em ótica: a Clearix Calc",
+      "Espessura de lente em 2 toques — e de graça"
+    ],
+    "bloco_oferta": "Brinde liberado: Clearix Calc\n\nAntes de qualquer coisa, pega isto de graça: a Clearix Calc, a calculadora óptica que resolve o dia a dia do balcão — transposição, espessura por índice (com o desenho da lente em corte!), distância ao vértice, DNP/DP e mais. Sem cadastro, funciona offline, instala no celular.\n\nUse hoje: [LINK_CALC]\n\nEla resolve o cálculo. O Ótica Sem Improviso resolve a conversa que vende.",
+    "assinatura": "PS: a Clearix Calc é sua de graça pra sempre — [LINK_CALC]. É a mesma precisão do Clearix na palma da mão, pra você experimentar antes de ter o Clearix.",
+    "email_dedicado": {
+      "momento": "Captação dia 2 (entre o e-mail de dor e o de autoridade) OU primeiro toque de lista fria",
+      "assunto": "Ganhe a calculadora que sua ótica usa todo dia (de graça)",
+      "preview": "Sem cadastro. Funciona offline. É só pegar.",
+      "corpo": "Oi, [Nome].\n\nAntes de te falar de método, quero te dar uma ferramenta — de graça, sem pegadinha.\n\nÉ a Clearix Calc: a calculadora óptica que resolve o balcão. Transposição, espessura por índice (ela DESENHA a lente em corte — ótimo pra mostrar pro cliente por que o índice alto vale), distância ao vértice, DNP/DP e mais 8 cálculos. Sem login, funciona offline, instala no celular.\n\nPega aqui: [LINK_CALC]\n\nUse à vontade. E quando quiser que o atendimento venda tanto quanto o cálculo é preciso, o Ótica Sem Improviso te mostra como — Os 5 Movimentos, aplica em 3 dias.\n\nA calculadora resolve o cálculo. O método resolve a conversa.",
+      "cta": "Abrir a Clearix Calc grátis"
+    }
   },
   "sequencias": [
     {

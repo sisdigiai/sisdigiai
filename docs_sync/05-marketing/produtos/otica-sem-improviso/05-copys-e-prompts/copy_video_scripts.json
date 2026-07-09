@@ -1,8 +1,8 @@
-{
+﻿{
   "meta": {
-    "produto": "Ótica Sem Improviso",
-    "objetivo": "Roteiros para vídeos (VSL curto, Reels, YouTube Shorts)",
-    "tom": "Conversacional, direto, ritmo rápido. Como se falasse com um colega de profissão.",
+    "produto": "Ã“tica Sem Improviso",
+    "objetivo": "Roteiros para vÃ­deos (VSL curto, Reels, YouTube Shorts)",
+    "tom": "Conversacional, direto, ritmo rÃ¡pido. Como se falasse com um colega de profissÃ£o.",
     "data": "2026-04-30"
   },
   "videos": [
@@ -16,44 +16,44 @@
         {
           "tempo": "0:00-0:05",
           "fase": "Hook",
-          "texto": "Se você trabalha em ótica e sente que seu atendimento tá no automático... fica comigo por 2 minutos.",
+          "texto": "Se vocÃª trabalha em Ã³tica e sente que seu atendimento tÃ¡ no automÃ¡tico... fica comigo por 2 minutos.",
           "nota_visual": "Close no rosto ou texto na tela"
         },
         {
           "tempo": "0:05-0:25",
           "fase": "Problema",
-          "texto": "O cliente pergunta preço antes de ouvir valor. Você dá desconto porque não sabe sustentar. O orçamento morre no WhatsApp. E todo dia parece a mesma coisa — sem direção, sem método.",
-          "nota_visual": "Cortes rápidos. Pode usar texto sobreposto com cada dor."
+          "texto": "O cliente pergunta preÃ§o antes de ouvir valor. VocÃª dÃ¡ desconto porque nÃ£o sabe sustentar. O orÃ§amento morre no WhatsApp. E todo dia parece a mesma coisa â€” sem direÃ§Ã£o, sem mÃ©todo.",
+          "nota_visual": "Cortes rÃ¡pidos. Pode usar texto sobreposto com cada dor."
         },
         {
           "tempo": "0:25-0:40",
           "fase": "Virada",
-          "texto": "O problema não é falta de boa vontade. É falta de método. E é exatamente isso que o Ótica Sem Improviso resolve.",
-          "nota_visual": "Transição para visual do produto (mockup manual/app)"
+          "texto": "O problema nÃ£o Ã© falta de boa vontade. Ã‰ falta de mÃ©todo. E Ã© exatamente isso que o Ã“tica Sem Improviso resolve.",
+          "nota_visual": "TransiÃ§Ã£o para visual do produto (mockup manual/app)"
         },
         {
           "tempo": "0:40-1:10",
-          "fase": "Solução",
-          "texto": "É um manual visual com 5 Movimentos: Sair do Automático, Ler o Cliente, Indicar com Segurança, Sustentar Valor e WhatsApp que Converte. Você recebe em PDF pra imprimir e em app pra estudar no celular. Aplica em 3 dias.",
+          "fase": "SoluÃ§Ã£o",
+          "texto": "Ã‰ um manual visual com 5 Movimentos: Sair do AutomÃ¡tico, Ler o Cliente, Indicar com SeguranÃ§a, Sustentar Valor e WhatsApp que Converte. VocÃª recebe em PDF pra imprimir e em app pra estudar no celular. Aplica em 3 dias.",
           "nota_visual": "Mostrar os 5 Movimentos na tela. Mockup do PDF e app."
         },
         {
           "tempo": "1:10-1:30",
           "fase": "Autoridade",
-          "texto": "Foi revisado pela Tatiana Camargo — mais de 40 anos de experiência real no balcão de ótica. Não é teoria de guru. É método validado na prática.",
-          "nota_visual": "Foto ou citação da Taty"
+          "texto": "Foi revisado pela Tatiana Camargo â€” 25 anos de experiÃªncia real no balcÃ£o de Ã³tica. NÃ£o Ã© teoria de guru. Ã‰ mÃ©todo validado na prÃ¡tica.",
+          "nota_visual": "Foto ou citaÃ§Ã£o da Taty"
         },
         {
           "tempo": "1:30-1:50",
           "fase": "Oferta",
-          "texto": "Tá em oferta de lançamento: de 97 por 48 e 50. Compra única. Sem assinatura. Ainda vem com 90 dias de apoio complementar na Nexus.",
-          "nota_visual": "Preço na tela com badge 50% off"
+          "texto": "TÃ¡ em oferta de lanÃ§amento: de 97 por 48 e 50. Compra Ãºnica. Sem assinatura. Ainda vem com 90 dias de apoio complementar na Nexus.",
+          "nota_visual": "PreÃ§o na tela com badge 50% off"
         },
         {
           "tempo": "1:50-2:00",
           "fase": "CTA",
-          "texto": "Se você quer parar de atender no improviso, o link tá aqui embaixo. Em 72 horas, você sai do automático.",
-          "nota_visual": "Apontar para link / botão. Texto: 'Link na bio' ou 'Link abaixo'."
+          "texto": "Se vocÃª quer parar de atender no improviso, o link tÃ¡ aqui embaixo. Em 72 horas, vocÃª sai do automÃ¡tico.",
+          "nota_visual": "Apontar para link / botÃ£o. Texto: 'Link na bio' ou 'Link abaixo'."
         }
       ]
     },
@@ -62,22 +62,22 @@
       "tipo": "Reels/Short",
       "duracao": "15-30 segundos",
       "formato": "Vertical (9:16)",
-      "objetivo": "Gerar identificação e tráfego",
+      "objetivo": "Gerar identificaÃ§Ã£o e trÃ¡fego",
       "roteiro": [
         {
           "tempo": "0:00-0:03",
           "fase": "Hook",
-          "texto": "Você dá desconto antes de argumentar?"
+          "texto": "VocÃª dÃ¡ desconto antes de argumentar?"
         },
         {
           "tempo": "0:03-0:08",
           "fase": "Dor",
-          "texto": "O cliente fala 'tá caro' e você já oferece 10% off. Não por generosidade. Por falta de preparo pra sustentar o valor."
+          "texto": "O cliente fala 'tÃ¡ caro' e vocÃª jÃ¡ oferece 10% off. NÃ£o por generosidade. Por falta de preparo pra sustentar o valor."
         },
         {
           "tempo": "0:08-0:13",
-          "fase": "Método",
-          "texto": "Movimento 4 do Ótica Sem Improviso: Sustentar Valor. Você aprende a defender o preço antes de falar o número."
+          "fase": "MÃ©todo",
+          "texto": "Movimento 4 do Ã“tica Sem Improviso: Sustentar Valor. VocÃª aprende a defender o preÃ§o antes de falar o nÃºmero."
         },
         {
           "tempo": "0:13-0:18",
@@ -91,22 +91,22 @@
       "tipo": "Reels/Short",
       "duracao": "15-30 segundos",
       "formato": "Vertical (9:16)",
-      "objetivo": "Dor do WhatsApp → Método",
+      "objetivo": "Dor do WhatsApp â†’ MÃ©todo",
       "roteiro": [
         {
           "tempo": "0:00-0:03",
           "fase": "Hook",
-          "texto": "Mandou o orçamento e o cliente sumiu?"
+          "texto": "Mandou o orÃ§amento e o cliente sumiu?"
         },
         {
           "tempo": "0:03-0:08",
           "fase": "Dor",
-          "texto": "Você manda preço, ele visualiza, e... silêncio. Sem retorno, sem contexto, sem fechamento."
+          "texto": "VocÃª manda preÃ§o, ele visualiza, e... silÃªncio. Sem retorno, sem contexto, sem fechamento."
         },
         {
           "tempo": "0:08-0:13",
-          "fase": "Método",
-          "texto": "Movimento 5: WhatsApp que Converte. Retomada com contexto — sem parecer cobrança. Scripts prontos pra adaptar."
+          "fase": "MÃ©todo",
+          "texto": "Movimento 5: WhatsApp que Converte. Retomada com contexto â€” sem parecer cobranÃ§a. Scripts prontos pra adaptar."
         },
         {
           "tempo": "0:13-0:18",
@@ -120,7 +120,7 @@
       "tipo": "Reels/Short",
       "duracao": "30-45 segundos",
       "formato": "Vertical (9:16)",
-      "objetivo": "Apresentar o método completo",
+      "objetivo": "Apresentar o mÃ©todo completo",
       "roteiro": [
         {
           "tempo": "0:00-0:03",
@@ -130,7 +130,7 @@
         {
           "tempo": "0:03-0:08",
           "fase": "Movimento 1",
-          "texto": "Primeiro: Sair do Automático. Parar de repetir o mesmo script morto."
+          "texto": "Primeiro: Sair do AutomÃ¡tico. Parar de repetir o mesmo script morto."
         },
         {
           "tempo": "0:08-0:13",
@@ -140,22 +140,22 @@
         {
           "tempo": "0:13-0:18",
           "fase": "Movimento 3",
-          "texto": "Terceiro: Indicar com Segurança. Sem travar, sem insegurança."
+          "texto": "Terceiro: Indicar com SeguranÃ§a. Sem travar, sem inseguranÃ§a."
         },
         {
           "tempo": "0:18-0:23",
           "fase": "Movimento 4",
-          "texto": "Quarto: Sustentar Valor. Defender preço sem correr pro desconto."
+          "texto": "Quarto: Sustentar Valor. Defender preÃ§o sem correr pro desconto."
         },
         {
           "tempo": "0:23-0:28",
           "fase": "Movimento 5",
-          "texto": "Quinto: WhatsApp que Converte. Retomar orçamento com método."
+          "texto": "Quinto: WhatsApp que Converte. Retomar orÃ§amento com mÃ©todo."
         },
         {
           "tempo": "0:28-0:35",
           "fase": "CTA",
-          "texto": "Tudo isso num manual visual que você aplica em 72 horas. Link na bio."
+          "texto": "Tudo isso num manual visual que vocÃª aplica em 72 horas. Link na bio."
         }
       ]
     }

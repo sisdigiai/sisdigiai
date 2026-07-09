@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lumina Signage v1.0 - Design System Foundation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#303032",
+                        "primary": "#bcc7de",
+                        "secondary": "#eac33e",
+                        "success": "#10B981",
+                        "error-container": "#93000a",
+                        "on-primary-fixed-variant": "#3c475a",
+                        "surface-container-high": "#2a2a2b",
+                        "surface-dim": "#131315",
+                        "inverse-surface": "#e4e2e3",
+                        "on-tertiary-fixed-variant": "#564427",
+                        "on-tertiary-container": "#a38c6a",
+                        "on-tertiary": "#3e2e13",
+                        "inverse-primary": "#545f73",
+                        "outline-variant": "#45474c",
+                        "surface-container-lowest": "#0e0e0f",
+                        "on-primary-container": "#8590a6",
+                        "on-error": "#690005",
+                        "error": "#EF4444",
+                        "background": "#131315",
+                        "zinc-950": "#09090B",
+                        "primary-container": "#1e293b",
+                        "primary-fixed-dim": "#bcc7de",
+                        "info": "#0EA5E9",
+                        "on-secondary-fixed-variant": "#574500",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#ddc39d",
+                        "pairing": "#F97316",
+                        "surface-container-highest": "#353536",
+                        "on-background": "#e4e2e3",
+                        "surface-bright": "#39393a",
+                        "tertiary-container": "#35260c",
+                        "secondary-container": "#b59200",
+                        "surface-container": "#1f1f21",
+                        "tertiary-fixed": "#fadfb8",
+                        "on-secondary-fixed": "#231b00",
+                        "warning": "#F59E0B",
+                        "secondary-fixed": "#ffe086",
+                        "primary-fixed": "#d8e3fb",
+                        "on-tertiary-fixed": "#271902",
+                        "slate-900": "#0F172A",
+                        "on-primary": "#263143",
+                        "on-secondary": "#3c2f00",
+                        "surface": "#131315",
+                        "on-surface-variant": "#c5c6cd",
+                        "secondary-fixed-dim": "#eac33e",
+                        "surface-variant": "#353536",
+                        "on-secondary-container": "#3a2d00",
+                        "surface-tint": "#bcc7de",
+                        "on-primary-fixed": "#111c2d",
+                        "tertiary": "#ddc39d",
+                        "on-surface": "#e4e2e3",
+                        "surface-container-low": "#1b1b1d",
+                        "outline": "#8f9097",
+                        "slate": { 50: '#F8FAFC', 100: '#F1F5F9', 200: '#E2E8F0', 300: '#CBD5E1', 400: '#94A3B8', 500: '#64748B', 600: '#475569', 700: '#334155', 800: '#1E293B', 900: '#0F172A', 950: '#020617'},
+                        "amber": { 50: '#FFFBEB', 100: '#FEF3C7', 200: '#FDE68A', 300: '#FCD34D', 400: '#FBBF24', 500: '#F59E0B', 600: '#D97706', 700: '#B45309', 800: '#92400E', 900: '#78350F', 950: '#451A03'},
+                        "emerald": { 50: '#ECFDF5', 100: '#D1FAE5', 200: '#A7F3D0', 300: '#6EE7B7', 400: '#34D399', 500: '#10B981', 600: '#059669', 700: '#047857', 800: '#065F46', 900: '#064E3B', 950: '#022C22'},
+                        "red": { 50: '#FEF2F2', 100: '#FEE2E2', 200: '#FECACA', 300: '#FCA5A5', 400: '#F87171', 500: '#EF4444', 600: '#DC2626', 700: '#B91C1C', 800: '#991B1B', 900: '#7F1D1D', 950: '#450A0A'},
+                        "orange": { 50: '#FFF7ED', 100: '#FFEDD5', 200: '#FED7AA', 300: '#FDBA74', 400: '#FB923C', 500: '#F97316', 600: '#EA580C', 700: '#C2410C', 800: '#9A3412', 900: '#7C2D12', 950: '#431407'},
+                        "sky": { 50: '#F0F9FF', 100: '#E0F2FE', 200: '#BAE6FD', 300: '#7DD3FC', 400: '#38BDF8', 500: '#0EA5E9', 600: '#0284C7', 700: '#0369A1', 800: '#075985', 900: '#0C4A6E', 950: '#082F49'},
+                        "stone": { 50: '#FAFAF9', 100: '#F5F5F4', 200: '#E7E5E4', 300: '#D6D3D1', 400: '#A8A29E', 500: '#78716C', 600: '#57534E', 700: '#44403C', 800: '#292524', 900: '#1C1917', 950: '#0C0A09'}
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "scale": "[0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 128]",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "unit": "4px",
+                        "xxl": "48px",
+                        "base": "4px",
+                        "xs": "4px",
+                        "gutter": "16px",
+                        "margin": "24px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-2xl": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "pin-code": ["JetBrains Mono"],
+                        "display-xl": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "label-caps": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20.3px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "26px", "fontWeight": "600" }],
+                        "display-2xl": ["60px", { "lineHeight": "60px", "fontWeight": "700" }],
+                        "display-lg": ["36px", { "lineHeight": "41.4px", "fontWeight": "600" }],
+                        "pin-code": ["64px", { "lineHeight": "64px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "display-xl": ["48px", { "lineHeight": "52.8px", "fontWeight": "700" }],
+                        "data-mono": ["14px", { "lineHeight": "21px", "fontWeight": "500" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-lg": ["24px", { "lineHeight": "30px", "fontWeight": "600" }],
+                        "headline-xl": ["30px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "27px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface w-full sticky top-0 z-50 border-b border-outline-variant dark:border-outline-variant flex items-center justify-between px-margin-mobile md:px-margin-desktop py-6 w-full">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary dark:text-primary cursor-pointer hover:text-primary transition-colors duration-600 ease-in-out duration-600" data-icon="grid_view">grid_view</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg font-display-lg text-display-lg tracking-tighter text-primary dark:text-primary">Lumina Signage v1.0</h1>
+</div>
+<div class="flex items-center gap-4">
+<nav class="hidden md:flex gap-6">
+<a class="text-primary border-b-2 border-primary font-body-md hover:text-primary transition-colors duration-600" href="#cores">Cores</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors duration-600" href="#tipografia">Tipografia</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors duration-600" href="#componentes">Componentes</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors duration-600" href="#fundamentos">Fundamentos</a>
+</nav>
+<span class="material-symbols-outlined text-primary dark:text-primary cursor-pointer hover:text-primary transition-colors duration-600 ease-in-out duration-600" data-icon="settings">settings</span>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- NavigationDrawer -->
+<aside class="bg-surface-container dark:bg-surface-container h-full w-80 fixed left-0 top-0 border-r border-outline-variant hidden lg:flex flex-col gap-unit p-margin-desktop z-40 mt-24">
+<div class="mb-8 px-4">
+<h2 class="font-title-md text-title-md font-headline-lg text-headline-lg text-on-surface">DOCUMENTAÇÃO</h2>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-4 px-4 py-3 bg-primary-container text-on-primary-container rounded-full ease-in-out duration-800 scale-95 active:scale-100" href="#tokens">
+<span class="material-symbols-outlined">palette</span>
+<span class="font-body-md">Design Tokens</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-variant rounded-full hover:bg-surface-variant transition-all duration-300 ease-in-out duration-800 scale-95 active:scale-100" href="#grid">
+<span class="material-symbols-outlined">grid_on</span>
+<span class="font-body-md">Grid System</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-variant rounded-full hover:bg-surface-variant transition-all duration-300 ease-in-out duration-800 scale-95 active:scale-100" href="#components">
+<span class="material-symbols-outlined">extension</span>
+<span class="font-body-md">Componentes</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-variant rounded-full hover:bg-surface-variant transition-all duration-300 ease-in-out duration-800 scale-95 active:scale-100" href="#motion">
+<span class="material-symbols-outlined">movie</span>
+<span class="font-body-md">Motion</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-variant rounded-full hover:bg-surface-variant transition-all duration-300 ease-in-out duration-800 scale-95 active:scale-100" href="#library">
+<span class="material-symbols-outlined">library_books</span>
+<span class="font-body-md">Biblioteca</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto lg:ml-80 p-6 md:p-12 pb-32">
+<div class="max-w-7xl mx-auto space-y-24">
+<!-- Section A: Cores (Camada Base) -->
+<section class="space-y-8" id="cores">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface mb-2">A) Camada Base</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">8 famílias tonais, 11 steps de 50 a 950.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+<!-- Slate -->
+<div class="p-6 bg-surface-container rounded-xl border border-outline-variant">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline-md text-headline-md">Slate <span class="text-sm font-normal text-on-surface-variant">(Primary)</span></h3>
+<span class="material-symbols-outlined text-slate-400">star</span>
+</div>
+<div class="flex h-12 rounded overflow-hidden mb-2">
+<div class="flex-1 bg-slate-50"></div><div class="flex-1 bg-slate-100"></div><div class="flex-1 bg-slate-200"></div><div class="flex-1 bg-slate-300"></div><div class="flex-1 bg-slate-400"></div><div class="flex-1 bg-slate-500"></div><div class="flex-1 bg-slate-600"></div><div class="flex-1 bg-slate-700"></div><div class="flex-1 bg-slate-800 border-b-4 border-amber-300"></div><div class="flex-1 bg-slate-900"></div><div class="flex-1 bg-slate-950"></div>
+</div>
+<p class="font-data-mono text-data-mono text-xs text-on-surface-variant">Anchor: 800 (#1E293B)</p>
+</div>
+<!-- Amber -->
+<div class="p-6 bg-surface-container rounded-xl border border-outline-variant">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline-md text-headline-md">Amber <span class="text-sm font-normal text-on-surface-variant">(Accent)</span></h3>
+<span class="material-symbols-outlined text-amber-300">star</span>
+</div>
+<div class="flex h-12 rounded overflow-hidden mb-2">
+<div class="flex-1 bg-amber-50"></div><div class="flex-1 bg-amber-100"></div><div class="flex-1 bg-amber-200"></div><div class="flex-1 bg-amber-300 border-b-4 border-slate-800"></div><div class="flex-1 bg-amber-400"></div><div class="flex-1 bg-amber-500"></div><div class="flex-1 bg-amber-600"></div><div class="flex-1 bg-amber-700"></div><div class="flex-1 bg-amber-800"></div><div class="flex-1 bg-amber-900"></div><div class="flex-1 bg-amber-950"></div>
+</div>
+<p class="font-data-mono text-data-mono text-xs text-on-surface-variant">Anchor: 300 (#FCD34D)</p>
+</div>
+<!-- Emerald -->
+<div class="p-6 bg-surface-container rounded-xl border border-outline-variant">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline-md text-headline-md">Emerald <span class="text-sm font-normal text-on-surface-variant">(Success)</span></h3>
+</div>
+<div class="flex h-12 rounded overflow-hidden mb-2">
+<div class="flex-1 bg-emerald-50"></div><div class="flex-1 bg-emerald-100"></div><div class="flex-1 bg-emerald-200"></div><div class="flex-1 bg-emerald-300"></div><div class="flex-1 bg-emerald-400"></div><div class="flex-1 bg-emerald-500"></div><div class="flex-1 bg-emerald-600"></div><div class="flex-1 bg-emerald-700"></div><div class="flex-1 bg-emerald-800"></div><div class="flex-1 bg-emerald-900"></div><div class="flex-1 bg-emerald-950"></div>
+</div>
+</div>
+<!-- Red -->
+<div class="p-6 bg-surface-container rounded-xl border border-outline-variant">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline-md text-headline-md">Red <span class="text-sm font-normal text-on-surface-variant">(Error)</span></h3>
+</div>
+<div class="flex h-12 rounded overflow-hidden mb-2">
+<div class="flex-1 bg-red-50"></div><div class="flex-1 bg-red-100"></div><div class="flex-1 bg-red-200"></div><div class="flex-1 bg-red-300"></div><div class="flex-1 bg-red-400"></div><div class="flex-1 bg-red-500"></div><div class="flex-1 bg-red-600"></div><div class="flex-1 bg-red-700"></div><div class="flex-1 bg-red-800"></div><div class="flex-1 bg-red-900"></div><div class="flex-1 bg-red-950"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section B: Camada Semântica -->
+<section class="space-y-8" id="tokens">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface mb-2">B) Camada Semântica</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Tokens lógicos e abstratos.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Typography Tokens -->
+<div class="p-8 bg-surface-container rounded-2xl border border-outline-variant">
+<h3 class="font-headline-md text-headline-md mb-6 border-b border-outline-variant pb-2">Texto</h3>
+<div class="space-y-4">
+<div class="flex justify-between items-center p-3 bg-surface rounded">
+<span class="font-body-md text-primary">text-primary</span>
+<span class="font-data-mono text-data-mono text-xs text-on-surface-variant">Default Legibility</span>
+</div>
+<div class="flex justify-between items-center p-3 bg-surface rounded">
+<span class="font-body-md text-secondary">text-secondary</span>
+<span class="font-data-mono text-data-mono text-xs text-on-surface-variant">Accents &amp; Prominant</span>
+</div>
+<div class="flex justify-between items-center p-3 bg-surface rounded">
+<span class="font-body-md text-on-surface-variant">text-muted</span>
+<span class="font-data-mono text-data-mono text-xs text-on-surface-variant">Secondary Info</span>
+</div>
+</div>
+</div>
+<!-- Surface Tokens -->
+<div class="p-8 bg-surface-container rounded-2xl border border-outline-variant">
+<h3 class="font-headline-md text-headline-md mb-6 border-b border-outline-variant pb-2">Superfícies</h3>
+<div class="space-y-4">
+<div class="flex justify-between items-center p-3 bg-surface rounded border border-outline-variant">
+<span class="font-body-md">surface-base</span>
+<span class="font-data-mono text-data-mono text-xs text-on-surface-variant">Fundação</span>
+</div>
+<div class="flex justify-between items-center p-3 bg-surface-container rounded border border-outline-variant shadow-md">
+<span class="font-body-md">surface-card</span>
+<span class="font-data-mono text-data-mono text-xs text-on-surface-variant">Container Padrão</span>
+</div>
+<div class="flex justify-between items-center p-3 bg-surface-container-high rounded border border-outline-variant shadow-lg shadow-[0_10px_15px_-3px_rgba(0,0,0,0.5)]">
+<span class="font-body-md">surface-elevated</span>
+<span class="font-data-mono text-data-mono text-xs text-on-surface-variant">Modals/Flyouts</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section C: Tipografia -->
+<section class="space-y-8" id="tipografia">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface mb-2">C) Tipografia</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Escala hierárquica baseada em Inter e JetBrains Mono.</p>
+</div>
+<div class="p-8 bg-surface-container rounded-2xl border border-outline-variant">
+<div class="space-y-8">
+<div class="flex flex-col gap-2 border-b border-outline-variant pb-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Display XL</span>
+<h1 class="font-display-xl text-display-xl text-primary">Vitrine do Dia a Dia</h1>
+</div>
+<div class="flex flex-col gap-2 border-b border-outline-variant pb-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Headline LG</span>
+<h2 class="font-headline-lg text-headline-lg text-primary">Lancaster Suzano — Vitrine</h2>
+</div>
+<div class="flex flex-col gap-2 border-b border-outline-variant pb-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Headline MD</span>
+<h3 class="font-headline-md text-headline-md text-primary">Hickmann Eyewear MIA 3</h3>
+</div>
+<div class="pt-4 flex flex-col gap-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">PIN-CODE Especial</span>
+<div class="p-6 bg-surface-container-lowest rounded-xl flex justify-center items-center border border-outline-variant shadow-[0_0_30px_0_rgba(252,211,77,0.1)]">
+<span class="font-pin-code text-pin-code text-amber-300">8 4 9 1 2 7</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section D: Fundamentos -->
+<section class="space-y-8" id="fundamentos">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface mb-2">D) Fundamentos</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Grid, Espaçamento e Componentes base.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Bento 1: Status -->
+<div class="p-6 bg-surface-container rounded-2xl border border-outline-variant row-span-2">
+<h3 class="font-headline-md text-headline-md mb-6">Status Badges</h3>
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between p-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+<span class="font-body-sm text-body-sm text-emerald-400">device-online</span>
+</div>
+<span class="material-symbols-outlined text-emerald-400" style="font-size: 16px;">check_circle</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg border border-red-500/30 bg-red-500/10">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-red-500"></div>
+<span class="font-body-sm text-body-sm text-red-400">device-offline</span>
+</div>
+<span class="material-symbols-outlined text-red-400" style="font-size: 16px;">error</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg border border-orange-500/30 bg-orange-500/10 animate-pulse">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-orange-500"></div>
+<span class="font-body-sm text-body-sm text-orange-400">device-pairing</span>
+</div>
+<span class="material-symbols-outlined text-orange-400" style="font-size: 16px;">sync</span>
+</div>
+</div>
+</div>
+<!-- Bento 2: Cards / Glow -->
+<div class="p-6 bg-surface-container rounded-2xl border border-outline-variant col-span-1 lg:col-span-2 shadow-[0_0_20px_0_rgba(252,211,77,0.15)] transition-all duration-300 hover:shadow-[0_0_30px_5px_rgba(252,211,77,0.3)] relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent z-0"></div>
+<div class="relative z-10">
+<h3 class="font-headline-md text-headline-md mb-2 text-amber-300">Spotlight Media Card</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-6">Exemplo de elevação com Amber glow (media-active).</p>
+<div class="flex gap-4 items-center bg-surface p-4 rounded-xl border border-amber-500/30">
+<div class="w-16 h-16 bg-zinc-800 rounded-lg flex items-center justify-center border border-zinc-700">
+<span class="material-symbols-outlined text-amber-300">play_circle</span>
+</div>
+<div class="flex-1">
+<h4 class="font-body-md text-body-md font-semibold text-primary">Ótica Mello - Campanha Verão</h4>
+<p class="font-data-mono text-data-mono text-xs text-on-surface-variant mt-1">Autor: Junior Mello • 14:32:01</p>
+</div>
+<button class="bg-amber-300 text-slate-800 px-4 py-2 rounded-lg font-label-caps text-label-caps font-bold hover:bg-amber-400 transition-colors">
+                                        PUBLICAR
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+<!-- BottomNavBar -->
+<nav class="bg-surface-container-highest dark:bg-surface-container-highest fixed bottom-0 w-full rounded-t-full border-t border-outline-variant shadow-[0_-40px_40px_2px_rgba(245,158,11,0.3)] lg:hidden fixed bottom-0 w-full z-50 flex justify-around items-center h-20 px-4">
+<a class="flex flex-col items-center justify-center text-secondary font-bold hover:opacity-100 transition-opacity ease-in-out duration-800 scale-110" href="#cores">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">format_paint</span>
+<span class="font-status-label text-status-label font-label-mono text-label-mono mt-1">Cores</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity ease-in-out duration-800 scale-110" href="#tipografia">
+<span class="material-symbols-outlined">text_fields</span>
+<span class="font-status-label text-status-label font-label-mono text-label-mono mt-1">Tipos</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity ease-in-out duration-800 scale-110" href="#fundamentos">
+<span class="material-symbols-outlined">view_quilt</span>
+<span class="font-status-label text-status-label font-label-mono text-label-mono mt-1">Grid</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity ease-in-out duration-800 scale-110" href="#motion">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-status-label text-status-label font-label-mono text-label-mono mt-1">Motion</span>
+</a>
+</nav>
+</body></html>

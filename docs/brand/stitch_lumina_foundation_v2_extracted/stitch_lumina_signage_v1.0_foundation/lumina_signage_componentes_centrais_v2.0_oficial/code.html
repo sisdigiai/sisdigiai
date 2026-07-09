@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-primary-fixed": "#111c2d",
+                "surface-container-high": "#2a2a2b",
+                "inverse-on-surface": "#303032",
+                "error": "#EF4444",
+                "on-surface-variant": "#c5c6cd",
+                "tertiary-fixed-dim": "#ddc39d",
+                "on-tertiary-fixed": "#271902",
+                "warning": "#F59E0B",
+                "background": "#131315",
+                "surface-container": "#1f1f21",
+                "on-secondary-container": "#3a2d00",
+                "outline": "#8f9097",
+                "zinc-950": "#09090B",
+                "inverse-primary": "#545f73",
+                "secondary-fixed-dim": "#eac33e",
+                "surface-container-lowest": "#0e0e0f",
+                "slate-900": "#0F172A",
+                "on-tertiary": "#3e2e13",
+                "error-container": "#93000a",
+                "on-secondary-fixed": "#231b00",
+                "surface-dim": "#131315",
+                "on-secondary-fixed-variant": "#574500",
+                "tertiary": "#ddc39d",
+                "surface-bright": "#39393a",
+                "on-primary": "#263143",
+                "surface-container-highest": "#353536",
+                "on-error": "#690005",
+                "surface-tint": "#bcc7de",
+                "surface-variant": "#353536",
+                "success": "#10B981",
+                "secondary-fixed": "#ffe086",
+                "primary": "#bcc7de",
+                "outline-variant": "#45474c",
+                "on-secondary": "#3c2f00",
+                "info": "#0EA5E9",
+                "primary-fixed": "#d8e3fb",
+                "on-error-container": "#ffdad6",
+                "primary-fixed-dim": "#bcc7de",
+                "primary-container": "#1e293b",
+                "surface": "#131315",
+                "on-tertiary-container": "#a38c6a",
+                "on-primary-container": "#8590a6",
+                "on-primary-fixed-variant": "#3c475a",
+                "tertiary-fixed": "#fadfb8",
+                "pairing": "#F97316",
+                "on-surface": "#e4e2e3",
+                "inverse-surface": "#e4e2e3",
+                "secondary-container": "#b59200",
+                "surface-container-low": "#1b1b1d",
+                "on-tertiary-fixed-variant": "#564427",
+                "on-background": "#e4e2e3",
+                "secondary": "#eac33e",
+                "tertiary-container": "#35260c",
+                "primary-charcoal": "#1E293B",
+                "accent-amber": "#FCD34D"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "unit": "4px",
+                "scale": "[0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 128]",
+                "xxl": "48px",
+                "gutter": "16px",
+                "margin": "24px",
+                "md": "16px",
+                "sm": "8px",
+                "xs": "4px",
+                "base": "4px",
+                "xl": "32px",
+                "lg": "24px"
+        },
+        "fontFamily": {
+                "body-lg": ["Inter"],
+                "headline-xl": ["Inter"],
+                "headline-lg": ["Inter"],
+                "display-xl": ["Inter"],
+                "display-lg": ["Inter"],
+                "body-sm": ["Inter"],
+                "pin-code": ["JetBrains Mono"],
+                "body-md": ["Inter"],
+                "data-mono": ["JetBrains Mono"],
+                "headline-md": ["Inter"],
+                "label-caps": ["Inter"],
+                "display-2xl": ["Inter"]
+        }
+      }
+    }
+  }
+</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .shadow-spotlight {
+            box-shadow: 0 0 20px 2px rgba(252, 211, 77, 0.35);
+        }
+        .dot-pulse {
+            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .5; transform: scale(1.2); }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen">
+<!-- Sidebar & Header -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-surface-container-lowest border-r border-outline-variant py-unit-margin-desktop z-50">
+<div class="px-6 mb-8">
+<h1 class="font-display-lg text-display-lg text-primary tracking-tighter">Lumina Signage</h1>
+<p class="font-body-sm text-on-surface-variant">v1.0 Operacional</p>
+</div>
+<nav class="flex-1">
+<div class="text-primary border-l-4 border-primary bg-primary-container/10 font-bold px-6 py-3 flex items-center gap-4 transition-colors">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+            </div>
+<div class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high px-6 py-3 flex items-center gap-4 transition-colors">
+<span class="material-symbols-outlined">perm_media</span> Biblioteca de Mídia
+            </div>
+<div class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high px-6 py-3 flex items-center gap-4 transition-colors">
+<span class="material-symbols-outlined">playlist_play</span> Playlists
+            </div>
+<div class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high px-6 py-3 flex items-center gap-4 transition-colors">
+<span class="material-symbols-outlined">tv</span> Dispositivos
+            </div>
+</nav>
+<div class="px-6 pt-4 border-t border-outline-variant">
+<div class="text-on-surface-variant hover:text-on-surface py-2 flex items-center gap-4">
+<span class="material-symbols-outlined">settings</span> Configurações
+            </div>
+</div>
+</aside>
+<header class="flex justify-between items-center w-full px-margin-desktop py-4 ml-64 max-w-[calc(100%-16rem)] bg-surface border-b border-outline-variant sticky top-0 z-40">
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface">Lumina Control Room</h2>
+<div class="flex items-center gap-6">
+<button class="bg-primary-charcoal text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:opacity-90">
+<span class="material-symbols-outlined">cloud_upload</span> Upload Rápido
+            </button>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<img alt="Admin" class="w-8 h-8 rounded-full border border-outline" data-alt="A professional headshot of a modern digital signage administrator in a dark studio setting. The lighting is focused and clean, reflecting a high-tech corporate environment with subtle amber accents in the background. The mood is confident and operational." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLPL-T0t97D0G92ZLkiRt7tw-XzjuPUYEsalr9OXJSqjCjB_2WmqV1lsQpcnD2FPH_ryR4WkxnpGgIk0_z1T3k9MIrGRBU2WWLwKHVK48KhTypRk5b6H5lbwWCGwaVcyflwOcaK71nLisP00o57UiGumAaoA72J-9Qvj9IgF899Gz7t2AjuvqdwKXYIB5wjcKe3ozezunrlXQBawCefTP5H0NdAfJydArroD0-2vX_01TT_oVDQsVOLqsejiXKqwhuJdvWgpMRVPb6"/>
+</div>
+</div>
+</header>
+<!-- Main Content Grid -->
+<main class="ml-64 p-margin-desktop space-y-12">
+<!-- Grid Header Section -->
+<section class="border-b border-outline-variant pb-6">
+<h3 class="font-headline-xl text-headline-xl text-on-surface">Componentes Centrais — Visualização de Design</h3>
+<p class="text-on-surface-variant mt-2 font-body-md">Comparação de estados e temas para os componentes do sistema Lumina.</p>
+</section>
+<!-- GRID 2x2 -->
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-12">
+<!-- QUADRANTE 1: Card de Mídia -->
+<div class="space-y-6">
+<div class="flex items-center justify-between border-b border-outline-variant pb-2">
+<h4 class="font-headline-md text-headline-md">Q1: Cards de Mídia (280x340px)</h4>
+<span class="text-label-caps font-label-caps bg-surface-container-high px-2 py-1 rounded">Variações A, B, C</span>
+</div>
+<div class="flex flex-wrap gap-8">
+<!-- Light Mode Variation A: Ativo -->
+<div class="flex flex-col items-center gap-2">
+<span class="text-label-caps font-label-caps text-on-surface-variant">LIGHT - EM USO</span>
+<div class="w-[280px] h-[340px] bg-white rounded-xl shadow-lg flex flex-col overflow-hidden border border-slate-200">
+<div class="relative w-full aspect-video">
+<img alt="Mídia 1" class="w-full h-full object-cover" data-alt="A high-end cinematic close-up of designer eyewear from the Hickmann collection featuring Sabrina Sato. The lighting is warm and glamorous, showcasing luxury materials and sophisticated textures against a soft-focus studio background. The style is premium fashion photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBIXp5TwKjFLW1WczUhTuCT7d4DSLRzaAyunjvBFEG0PmHo-MtItoeSGxsy15j8hrL6FuXYNSJG2BZdKGcMm67WMta9liQhYFFlQC8bx20IkdHNmj1lxm0hQxSVVGKn0bhShauyKur8IVfP5sVoaYWKYrAkV9jJi4kvpk0GSpTj_hEqGtX9IWNuLWlSzieqQo_EosdWX4PXTw6wiMeMmJa4JbN2ZlGlGQFwpPN5eagqEcEUsBNpsV0PwgB4yKrHH_dbbMzP_A_cpiA"/>
+<span class="absolute top-2 left-2 bg-accent-amber text-primary-charcoal font-bold text-[10px] px-2 py-1 rounded uppercase tracking-wider">Em Uso</span>
+<span class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded">00:47</span>
+<span class="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">crop_landscape</span> Horizontal</span>
+</div>
+<div class="p-4 flex-1 flex flex-col justify-between">
+<h5 class="font-headline-md text-slate-900 leading-tight">Hickmann Eyewear MIA 3 — Sabrina Sato</h5>
+<div class="flex items-center gap-2 text-on-surface-variant text-body-sm">
+<span class="material-symbols-outlined text-sm">schedule</span> Atualizado há 2h
+                                </div>
+</div>
+</div>
+</div>
+<!-- Dark Mode Variation C: Selecionado -->
+<div class="flex flex-col items-center gap-2">
+<span class="text-label-caps font-label-caps text-on-surface-variant">DARK - SELECIONADO</span>
+<div class="w-[280px] h-[340px] bg-surface-container rounded-xl shadow-spotlight border-2 border-accent-amber flex flex-col overflow-hidden">
+<div class="relative w-full aspect-video">
+<img alt="Mídia 1" class="w-full h-full object-cover opacity-80" data-alt="A luxurious product shot of Hickmann sunglasses worn by a famous celebrity in a modern urban setting. The color palette features rich golden tones and deep charcoal shadows, creating a sophisticated and elite aesthetic for premium digital signage content." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA215UIPm79QOzAN5qot5Rm5rd7lvTgt9lPJivYCexLBvvBGrbL7U9hYnW2ezfU_rE7KNQFa_fIWvux5Su2orlUxnEhyXiG_6dxe7whLQIxUQh-xiAN2zdnsVlTtR7Rg0svi_MLAGmOmuy3Hdv82eumpiOE3Xe4Qp1w-wPnBbv3-M0K_0eFZKpK29hA-nE_lGcJa6kAhuertNc9uVOfHbCQpZjS9QFQ7dJ7Allqj_KymZn1TEQvkN-hjb_sAARHRjij1H5uTVbAYbbG"/>
+<span class="absolute top-2 left-2 bg-accent-amber text-primary-charcoal font-bold text-[10px] px-2 py-1 rounded uppercase tracking-wider">Em Uso</span>
+<span class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded">00:47</span>
+<div class="absolute inset-0 bg-accent-amber/10 pointer-events-none"></div>
+</div>
+<div class="p-4 flex-1 flex flex-col justify-between">
+<h5 class="font-headline-md text-on-surface leading-tight">Hickmann Eyewear MIA 3 — Sabrina Sato</h5>
+<div class="flex items-center justify-between">
+<span class="text-accent-amber material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-on-surface-variant text-body-sm font-data-mono">1080x1920</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Dark Mode Variation B: Órfã -->
+<div class="flex flex-col items-center gap-2">
+<span class="text-label-caps font-label-caps text-on-surface-variant">DARK - ÓRFÃ</span>
+<div class="w-[280px] h-[340px] bg-surface-container-high rounded-xl shadow-md border border-outline-variant flex flex-col overflow-hidden">
+<div class="relative w-full aspect-video grayscale opacity-60">
+<img alt="Mídia 1" class="w-full h-full object-cover" data-alt="A fashion-forward promotional image of premium eyewear displayed in a minimalist boutique setting. The image is presented with a desaturated, muted aesthetic to indicate an inactive or orphan status within the digital management system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZmSt7TZVaWUR3kijos9pyLRHIeV6t3F8fOPg6jCOgSuJt0Z13fp7Tkz1uZ4HktyxnNdeFUN9SZPxEZgNbptqKU8BxMrjCyEH6kcQX1wBktHXF3rE_BTgef13lqWF7bHfBGdLpVm6S1HhVPwQm9ywuNq_0XW-VdrLIvY_dyInOqfhGS5YauHp5BFreuum0JP8sKQuneHan4eGE4_-M6wI8PevEjEIHWYt2UeLCbJrtLEEEWabUKgXJgoyooo5Xk4Aou6Pg9cXMbjMK"/>
+<span class="absolute top-2 left-2 bg-warning text-primary-charcoal font-bold text-[10px] px-2 py-1 rounded uppercase tracking-wider">Sem Playlist</span>
+<span class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded">00:47</span>
+</div>
+<div class="p-4 flex-1 flex flex-col justify-between">
+<h5 class="font-headline-md text-on-surface-variant leading-tight">Hickmann Eyewear MIA 3 — Sabrina Sato</h5>
+<button class="w-full py-2 border border-outline-variant rounded text-label-caps hover:bg-surface-container-highest transition-all">Adicionar à Playlist</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- QUADRANTE 2: Card de Tela/Device -->
+<div class="space-y-6">
+<div class="flex items-center justify-between border-b border-outline-variant pb-2">
+<h4 class="font-headline-md text-headline-md">Q2: Dispositivos (360x180px)</h4>
+<span class="text-label-caps font-label-caps bg-surface-container-high px-2 py-1 rounded">Variações A, B, C</span>
+</div>
+<div class="flex flex-col gap-6">
+<!-- Variation A: Online (Light) -->
+<div class="w-[360px] h-[180px] bg-white border border-slate-200 rounded-xl p-4 shadow-md flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<div>
+<h5 class="font-headline-md text-slate-900">Lancaster Suzano — Vitrine</h5>
+<p class="text-body-sm text-slate-500 font-data-mono">IP: 192.168.1.144</p>
+</div>
+<div class="flex items-center gap-2 bg-success/10 text-success px-2 py-1 rounded-full">
+<span class="w-2 h-2 bg-success rounded-full dot-pulse"></span>
+<span class="text-label-caps font-bold">ONLINE</span>
+</div>
+</div>
+<div class="flex justify-between items-center border-t border-slate-100 pt-3">
+<span class="text-body-sm text-slate-600 flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">visibility</span> Canal: Promo Primavera</span>
+<div class="flex gap-2">
+<button class="p-1 text-slate-400 hover:text-primary-charcoal transition-colors"><span class="material-symbols-outlined">pause</span></button>
+<button class="p-1 text-slate-400 hover:text-primary-charcoal transition-colors"><span class="material-symbols-outlined">swap_horiz</span></button>
+<button class="p-1 text-slate-400 hover:text-primary-charcoal transition-colors"><span class="material-symbols-outlined">more_vert</span></button>
+</div>
+</div>
+</div>
+<!-- Variation B: Offline (Dark) -->
+<div class="w-[360px] h-[180px] bg-surface-container border border-outline-variant rounded-xl p-4 shadow-md flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<div>
+<h5 class="font-headline-md text-on-surface">Lancaster Suzano — Vitrine</h5>
+<p class="text-body-sm text-on-surface-variant font-data-mono">Desconectado há 45min</p>
+</div>
+<div class="flex items-center gap-2 bg-error/10 text-error px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-[16px]">wifi_off</span>
+<span class="text-label-caps font-bold">OFFLINE</span>
+</div>
+</div>
+<div class="flex justify-between items-center border-t border-outline-variant pt-3">
+<span class="text-body-sm text-error/80 flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">warning</span> Verificar energia/rede</span>
+<div class="flex gap-2">
+<button class="p-1 text-on-surface-variant hover:text-white transition-colors"><span class="material-symbols-outlined">refresh</span></button>
+<button class="p-1 text-on-surface-variant hover:text-white transition-colors"><span class="material-symbols-outlined">more_vert</span></button>
+</div>
+</div>
+</div>
+<!-- Variation C: Pareando (Dark) -->
+<div class="w-[360px] h-[180px] bg-zinc-950 border border-pairing/50 rounded-xl p-4 shadow-2xl flex flex-col items-center justify-center gap-4 relative overflow-hidden">
+<div class="absolute top-2 right-2 flex items-center gap-2 bg-pairing/20 text-pairing px-2 py-1 rounded-full">
+<span class="text-label-caps font-bold">PAREANDO</span>
+</div>
+<p class="text-on-surface-variant font-label-caps uppercase tracking-widest text-xs">PIN DE ACESSO</p>
+<div class="font-pin-code text-pin-code text-accent-amber drop-shadow-[0_0_10px_rgba(252,211,77,0.5)]">
+                            4792
+                        </div>
+<p class="text-body-sm text-on-surface/60">Aguardando conexão do dispositivo...</p>
+</div>
+</div>
+</div>
+<!-- QUADRANTE 3: Modal Upload Mídia -->
+<div class="xl:col-span-1 space-y-6">
+<div class="flex items-center justify-between border-b border-outline-variant pb-2">
+<h4 class="font-headline-md text-headline-md">Q3: Modal de Upload (640x560px)</h4>
+<span class="text-label-caps font-label-caps bg-surface-container-high px-2 py-1 rounded">Estados: Drag &amp; Uploading</span>
+</div>
+<!-- Simulating Backdrop and Modal -->
+<div class="relative w-full aspect-[4/3] bg-zinc-950/80 rounded-2xl flex items-center justify-center overflow-hidden border border-outline-variant">
+<div class="w-[640px] max-w-[90%] bg-surface-container rounded-xl shadow-2xl flex flex-col">
+<div class="p-6 border-b border-outline-variant flex justify-between items-center">
+<h5 class="font-headline-lg text-headline-lg">Enviar Nova Mídia</h5>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">close</span>
+</div>
+<div class="p-8 space-y-6">
+<!-- DRAGGING State -->
+<div class="border-2 border-dashed border-accent-amber bg-accent-amber/5 rounded-xl p-12 flex flex-col items-center justify-center gap-4 text-center group transition-all">
+<div class="w-16 h-16 bg-accent-amber/20 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-accent-amber text-4xl" style="font-variation-settings: 'wght' 600;">cloud_upload</span>
+</div>
+<div>
+<p class="text-headline-md font-bold text-on-surface">Solte o arquivo para iniciar</p>
+<p class="text-on-surface-variant">Formatos aceitos: MP4, MOV (H.264) ou JPG</p>
+</div>
+</div>
+<!-- UPLOADING State (Inline) -->
+<div class="bg-surface-container-high rounded-lg p-4 border border-outline-variant">
+<div class="flex justify-between items-center mb-2">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant">movie</span>
+<span class="text-body-md font-medium">Hickmann_MIA3_V02.mp4</span>
+</div>
+<span class="text-data-mono text-accent-amber">47%</span>
+</div>
+<div class="w-full bg-background rounded-full h-2 overflow-hidden">
+<div class="bg-accent-amber h-full transition-all duration-300" style="width: 47%"></div>
+</div>
+</div>
+</div>
+<div class="p-6 bg-surface-container-lowest border-t border-outline-variant flex justify-end gap-4 rounded-b-xl">
+<button class="px-6 py-2 rounded-lg font-bold text-on-surface-variant hover:bg-surface-container-high transition-colors">Cancelar</button>
+<button class="px-6 py-2 bg-primary-charcoal text-white rounded-lg font-bold shadow-lg hover:opacity-90">Enviar Mídia</button>
+</div>
+</div>
+</div>
+</div>
+<!-- QUADRANTE 4: Estado Offline no Player -->
+<div class="space-y-6">
+<div class="flex items-center justify-between border-b border-outline-variant pb-2">
+<h4 class="font-headline-md text-headline-md">Q4: Estado Offline (Visualização Player)</h4>
+<span class="text-label-caps font-label-caps bg-surface-container-high px-2 py-1 rounded">Layouts 16:9 e 9:16</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Horizontal Player -->
+<div class="flex flex-col gap-2">
+<span class="text-label-caps font-label-caps text-on-surface-variant">Full HD Horizontal (16:9)</span>
+<div class="aspect-video w-full bg-zinc-950 rounded-lg flex flex-col items-center justify-center p-8 text-center border-2 border-outline-variant">
+<span class="material-symbols-outlined text-6xl text-error mb-4">wifi_off</span>
+<h2 class="text-display-lg font-display-lg text-white mb-2">Sem conexão</h2>
+<p class="text-body-lg text-on-surface-variant mb-8">Tentando reconectar à rede Lumina Cloud...</p>
+<div class="bg-surface-container-high rounded-xl p-6 w-full max-w-sm border border-outline-variant text-left">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-success">database</span>
+<span class="text-label-caps font-bold text-on-surface">Cache Local Ativo</span>
+</div>
+<div class="space-y-2 font-data-mono text-sm text-on-surface-variant">
+<p>Arquivos em cache: 14/15</p>
+<p>Última sincronia: 12 Out 2023 14:22</p>
+<p>Próxima tentativa em: 28s</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Vertical Player -->
+<div class="flex flex-col gap-2">
+<span class="text-label-caps font-label-caps text-on-surface-variant">Totem Vertical (9:16)</span>
+<div class="aspect-[9/16] w-[200px] mx-auto bg-zinc-950 rounded-lg flex flex-col items-center justify-center p-4 text-center border-2 border-outline-variant">
+<span class="material-symbols-outlined text-4xl text-error mb-2">signal_disconnected</span>
+<h3 class="text-headline-lg font-headline-lg text-white mb-2 leading-tight">Sem sinal de rede</h3>
+<div class="w-full h-[1px] bg-outline-variant my-4"></div>
+<div class="bg-surface-container-high rounded-lg p-3 w-full border border-outline-variant text-left">
+<p class="text-[10px] uppercase font-bold text-on-surface-variant mb-2">Status do Totem</p>
+<div class="text-[11px] font-data-mono text-on-surface-variant space-y-1">
+<p>ID: MZ-0045</p>
+<p>Cache: 1.2GB</p>
+<p>Uptime: 48h 12m</p>
+</div>
+</div>
+<p class="mt-auto text-[10px] text-on-surface-variant opacity-40">Lumina Signage v1.0 Player</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interaction for the progress bar animation in the upload modal
+        const progressFill = document.querySelector('.bg-accent-amber.h-full');
+        if (progressFill) {
+            let width = 47;
+            setInterval(() => {
+                width = width >= 100 ? 47 : width + 0.1;
+                progressFill.style.width = width + '%';
+                const text = document.querySelector('.text-accent-amber.text-data-mono');
+                if (text) text.innerText = Math.floor(width) + '%';
+            }, 50);
+        }
+
+        // Hover spotlight interaction for selected cards
+        const selectedCards = document.querySelectorAll('.shadow-spotlight');
+        selectedCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const { left, top, width, height } = card.getBoundingClientRect();
+                const x = e.clientX - left;
+                const y = e.clientY - top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+</body></html>

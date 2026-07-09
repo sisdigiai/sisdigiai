@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lumina Signage v1.0 - Padrões Exclusivos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-fixed": "#111c2d",
+                        "on-surface": "#e4e2e3",
+                        "secondary": "#fcd34d",
+                        "on-secondary-fixed": "#231b00",
+                        "surface-bright": "#39393a",
+                        "surface-dim": "#131315",
+                        "zinc-950": "#09090B",
+                        "secondary-container": "#b59200",
+                        "tertiary-container": "#35260c",
+                        "success": "#10B981",
+                        "outline-variant": "#45474c",
+                        "error": "#EF4444",
+                        "primary": "#bcc7de",
+                        "surface-tint": "#bcc7de",
+                        "surface-container": "#1f1f21",
+                        "surface-container-low": "#1b1b1d",
+                        "pairing": "#F97316",
+                        "surface-variant": "#353536",
+                        "warning": "#F59E0B",
+                        "background": "#131315",
+                        "surface": "#131315",
+                        "on-background": "#e4e2e3",
+                        "info": "#0EA5E9",
+                        "on-surface-variant": "#c5c6cd",
+                        "surface-container-lowest": "#0e0e0f",
+                        "slate-900": "#0F172A",
+                        "on-primary": "#263143",
+                        "primary-fixed": "#d8e3fb",
+                        "surface-container-high": "#2a2a2b",
+                        "outline": "#8f9097",
+                        "charcoal": "#1e293b",
+                        "amber-accent": "#fcd34d"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "display-2xl": ["Inter"],
+                        "pin-code": ["JetBrains Mono"],
+                        "headline-md": ["Inter"],
+                        "data-mono": ["JetBrains Mono"]
+                    },
+                    fontSize: {
+                        "headline-lg": ["24px", {"lineHeight": "30px", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20.3px", "fontWeight": "400"}],
+                        "display-lg": ["36px", {"lineHeight": "41.4px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-xl": ["30px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "display-2xl": ["60px", {"lineHeight": "60px", "fontWeight": "700"}],
+                        "pin-code": ["120px", {"lineHeight": "120px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-md": ["20px", {"lineHeight": "26px", "fontWeight": "600"}],
+                        "data-mono": ["14px", {"lineHeight": "21px", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .dot-pattern {
+            background-image: radial-gradient(circle, #2a2a2b 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+        .spotlight-glow {
+            filter: drop-shadow(0 0 20px rgba(252, 211, 77, 0.4));
+        }
+        .glass-panel {
+            background: rgba(19, 19, 21, 0.8);
+            backdrop-filter: blur(12px);
+        }
+        .no-glass {
+            background: #000000;
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-on-surface font-body-md overflow-x-hidden">
+<main class="min-h-screen p-xxl space-y-32">
+<!-- 1. PLAYER OVERLAY SECTION -->
+<section class="space-y-12" id="player-overlay">
+<header class="border-b border-outline-variant pb-6">
+<h2 class="font-headline-xl text-headline-xl text-primary">01. PLAYER OVERLAY</h2>
+<p class="text-on-surface-variant font-body-md">Estados Idle e Active sobre conteúdo dinâmico (Lancaster Suzano — Vitrine).</p>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+<!-- Idle State -->
+<div class="relative aspect-video rounded-xl overflow-hidden shadow-2xl border border-outline-variant group">
+<img class="w-full h-full object-cover" data-alt="A professional high-fashion portrait of a Brazilian model wearing elegant Hickmann Eyewear. The setting is a sophisticated, warm-lit studio with golden hour tones that emphasize the tortoise shell patterns of the glasses. The composition is clean and minimalist, focused entirely on the product and the model's serene expression, maintaining a high-end luxury aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlfDytPFfVVsWMikbWWRA3Rxpq7wqRlpKJZcHbzpv_ntXKm7WOCwkqN9xif-redfllHRLfVEZ2ddDU4ru2qAAbIYP3ZDSY8vPHetr3e_TWo-m059_8Se1hGGm1l60CfsjVs9YeLjPeFLnwVPSxq5818sj-uBRV7LwHG9QWqkacFLCHA0ykp4FmqOBJXuXNFr0QvYNle7Pdpnk4motYqIRWW6YFu2Sa8ToBN1XStF12YtUHLVgovpOUyV_Ss8htK3AwmvXXwIVLB_HE"/>
+<div class="absolute top-8 right-8 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="bg-black/40 px-3 py-1 rounded text-label-caps font-label-caps">ESTADO IDLE (LIMPO)</span>
+</div>
+</div>
+<!-- Active State -->
+<div class="relative aspect-video rounded-xl overflow-hidden shadow-2xl border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional high-fashion portrait of a Brazilian model wearing elegant Hickmann Eyewear. The setting is a sophisticated, warm-lit studio with golden hour tones that emphasize the tortoise shell patterns of the glasses. The composition is clean and minimalist, focused entirely on the product and the model's serene expression, maintaining a high-end luxury aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMuRACBeEfKbHgqLGwPxu4Kp8X92j2GOBH5OiORBkngwkB1tTYvTKazia17UrLPdzIi2FpkX0rrswlv6IviYLxOuWnnFw9H2MASflxn9-XOzwEym-NzGjJiBr_s7AGLpxRsibLa1nA1eTAxEJDIs-lrCYoTHbwbaAluy5QNmDuxE8XqtnJbwTq6bg6akPCD-aVQ0ZpIX7H09K-PRiOuae4sObp1RWL-VNnEJ91ZEHBf0qbFhb_qfyXSup0PHVndinIv9vDjlJUGcJo"/>
+<!-- Overlay Bar -->
+<div class="absolute bottom-0 left-0 w-full h-[80px] bg-black flex items-center px-10 gap-8">
+<!-- Left Content -->
+<div class="flex items-center gap-4 shrink-0">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-white rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-black scale-75" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+</div>
+<span class="font-display-lg text-headline-md tracking-tighter text-white">Lumina</span>
+</div>
+<div class="h-6 w-px bg-white/20"></div>
+<span class="text-white/60 font-label-caps text-label-caps tracking-widest uppercase">LANCASTER SUZANO — VITRINE</span>
+</div>
+<!-- Center Content (Progress) -->
+<div class="flex-grow flex flex-col gap-1">
+<div class="flex justify-between items-end">
+<span class="text-white font-headline-md text-body-md">Hickmann Eyewear MIA 3 — Sabrina Sato</span>
+<span class="text-white/40 font-data-mono text-[12px]">01:24 / 03:45</span>
+</div>
+<div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-amber-accent" style="width: 38%;"></div>
+</div>
+</div>
+<!-- Right Content (Controls) -->
+<div class="flex items-center gap-6 shrink-0">
+<div class="flex items-center gap-4 text-white/80">
+<span class="material-symbols-outlined cursor-pointer hover:text-white">skip_previous</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-white" style="font-variation-settings: 'FILL' 1;">pause</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-white">skip_next</span>
+</div>
+<div class="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
+<div class="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+<span class="text-white font-label-caps text-[10px] tracking-widest">AO VIVO</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Technical Note -->
+<div class="bg-surface-container p-8 rounded-xl border border-outline-variant flex items-start gap-4">
+<span class="material-symbols-outlined text-amber-accent">info</span>
+<div>
+<h4 class="font-headline-md text-body-lg text-on-surface">Compatibilidade Técnica: Legado</h4>
+<p class="text-on-surface-variant font-body-sm mt-2">Para dispositivos sem suporte a hardware-accelerated glassmorphism (TVs legacy), a barra de status utiliza <code class="bg-zinc-950 px-2 py-0.5 rounded text-secondary font-data-mono">bg-black</code> sólido com 100% de opacidade, garantindo legibilidade em painéis de baixo contraste.</p>
+</div>
+</div>
+</section>
+<!-- 2. PAIRING SCREEN SECTION -->
+<section class="space-y-12" id="pairing-screen">
+<header class="border-b border-outline-variant pb-6">
+<h2 class="font-headline-xl text-headline-xl text-primary">02. TELA DE PAREAMENTO</h2>
+<p class="text-on-surface-variant font-body-md">Interface de provisionamento de hardware em modo dark.</p>
+</header>
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-12">
+<!-- Landscape View -->
+<div class="bg-zinc-950 dot-pattern aspect-video rounded-xl border border-outline-variant relative flex flex-col items-center justify-center text-center p-12 overflow-hidden shadow-2xl">
+<!-- Glow background effect -->
+<div class="absolute w-[500px] h-[500px] bg-amber-accent/5 blur-[120px] rounded-full -top-40 -left-40"></div>
+<div class="relative z-10 flex flex-col items-center gap-12">
+<div class="flex items-center gap-4 spotlight-glow">
+<div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-[0_0_40px_rgba(252,211,77,0.3)]">
+<span class="material-symbols-outlined text-zinc-950 text-5xl" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+</div>
+<h1 class="font-display-2xl text-display-xl tracking-tighter text-white">Lumina</h1>
+</div>
+<div class="space-y-4">
+<h2 class="text-on-surface-variant font-headline-lg text-headline-lg uppercase tracking-[0.2em]">Pareie esta tela</h2>
+<p class="text-on-surface-variant/60 max-w-md mx-auto">Acesse o painel Lumina Control Room e insira o código abaixo para vincular este dispositivo à sua rede.</p>
+</div>
+<!-- PIN -->
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<span class="font-pin-code text-pin-code text-amber-accent">8 4 9</span>
+<div class="w-full h-2 bg-amber-accent/30 rounded-full mt-2"></div>
+</div>
+<div class="flex flex-col items-center ml-4">
+<span class="font-pin-code text-pin-code text-amber-accent">1 2 7</span>
+<div class="w-full h-2 bg-amber-accent/30 rounded-full mt-2"></div>
+</div>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-secondary text-sm">settings_remote</span>
+<span class="text-body-sm font-label-caps text-on-surface-variant uppercase">Aguardando comando do servidor...</span>
+</div>
+</div>
+</div>
+<!-- Portrait View -->
+<div class="bg-zinc-950 dot-pattern aspect-[9/16] max-h-[800px] mx-auto rounded-xl border border-outline-variant relative flex flex-col items-center justify-center text-center p-8 overflow-hidden shadow-2xl">
+<div class="relative z-10 flex flex-col items-center gap-16">
+<div class="w-16 h-16 bg-white rounded-xl flex items-center justify-center spotlight-glow">
+<span class="material-symbols-outlined text-zinc-950 text-3xl" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+</div>
+<div class="space-y-4">
+<h2 class="text-on-surface-variant font-headline-md text-headline-md uppercase tracking-widest">Pareie esta tela</h2>
+</div>
+<div class="flex flex-col gap-8">
+<div class="flex flex-col items-center">
+<span class="font-pin-code text-[80px] leading-none text-amber-accent">849</span>
+<div class="w-24 h-1 bg-amber-accent/30 rounded-full mt-4"></div>
+</div>
+<div class="flex flex-col items-center">
+<span class="font-pin-code text-[80px] leading-none text-amber-accent">127</span>
+<div class="w-24 h-1 bg-amber-accent/30 rounded-full mt-4"></div>
+</div>
+</div>
+<p class="text-on-surface-variant/40 text-body-sm max-w-[200px]">Use o Control Room App para escanear ou digitar o código.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. ADMIN SIDEBAR SECTION -->
+<section class="space-y-12" id="sidebar-admin">
+<header class="border-b border-outline-variant pb-6">
+<h2 class="font-headline-xl text-headline-xl text-primary">03. SIDEBAR ADMIN</h2>
+<p class="text-on-surface-variant font-body-md">Estados de navegação do CMS Lumina (Expandido vs. Colapsado).</p>
+</header>
+<div class="flex flex-col lg:flex-row gap-12 items-start">
+<!-- Expanded Light Mode -->
+<div class="w-[240px] h-[720px] bg-white border border-zinc-200 rounded-xl shadow-xl flex flex-col overflow-hidden">
+<div class="p-6">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-8 h-8 bg-charcoal rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-sm">lightbulb</span>
+</div>
+<span class="font-display-lg text-headline-md font-bold text-charcoal">Lumina</span>
+</div>
+<button class="w-full bg-charcoal text-white py-3 px-4 rounded-lg font-label-caps text-label-caps flex items-center justify-center gap-2 mb-8 hover:bg-slate-700 transition-colors shadow-lg">
+<span class="material-symbols-outlined text-sm">add</span>
+                            NOVO CONTEÚDO
+                        </button>
+<nav class="space-y-1">
+<div class="px-3 py-2 text-zinc-400 font-label-caps text-[10px] tracking-widest uppercase mb-2">Workspace</div>
+<div class="flex items-center justify-between bg-zinc-50 border border-zinc-100 p-3 rounded-lg mb-6 cursor-pointer">
+<div class="flex flex-col">
+<span class="text-zinc-900 font-bold text-body-sm">Ótica Mello</span>
+<span class="text-zinc-400 text-[10px]">Admin Principal</span>
+</div>
+<span class="material-symbols-outlined text-zinc-400">unfold_more</span>
+</div>
+<a class="flex items-center gap-3 px-3 py-3 text-zinc-500 hover:bg-zinc-50 transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-body-sm font-medium">Início</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 text-charcoal bg-amber-accent/10 border-l-4 border-amber-accent font-bold transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">monitor</span>
+<span class="text-body-sm">Telas &amp; Dispositivos</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 text-zinc-500 hover:bg-zinc-50 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">perm_media</span>
+<span class="text-body-sm font-medium">Biblioteca</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 text-zinc-500 hover:bg-zinc-50 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-body-sm font-medium">Agendamento</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto p-4 border-t border-zinc-100 bg-zinc-50/50">
+<div class="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-100 cursor-pointer transition-colors">
+<img class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" data-alt="A professional portrait of Junior Mello, a clean-cut businessman with a friendly smile, photographed in a modern office environment with soft bokeh background. He is wearing a minimalist dark polo shirt. The lighting is bright and corporate, projecting a sense of reliability and expertise." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWdWlSbdpj1OHw7rJsMjK8_tbgPAZCpC_cbour1O3rju7h97TQ_63eqwOvarIwY7dtvoZu-exHaET1f5IB15zbJCz8HGFT1z_PcniKV8sK4ajOAqt9ONlyeOooMydhgdgcfMMtpmzu_8TA9U4lDLjOT8x_w4aVQnw0OvH3XocLk8lDBYAlVaHwkk4OJCTMnOBNos89UgiWw8DkzvRgAzMTbcjCdwLH1prmnMP3qsDsnJWc2LqkD1JEVD3zI3_PnENUUGGRtX4RQ-E8"/>
+<div class="flex flex-col">
+<span class="text-charcoal font-bold text-body-sm leading-tight">Junior Mello</span>
+<span class="text-zinc-400 text-[10px]">Configurações</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Collapsed Dark Mode -->
+<div class="w-[64px] h-[720px] bg-[#18181B] border border-outline-variant rounded-xl shadow-2xl flex flex-col items-center py-6 overflow-hidden">
+<div class="w-8 h-8 bg-amber-accent rounded flex items-center justify-center mb-10 spotlight-glow">
+<span class="material-symbols-outlined text-zinc-950 text-sm">lightbulb</span>
+</div>
+<div class="w-10 h-10 bg-charcoal text-white rounded-lg flex items-center justify-center mb-8 cursor-pointer hover:bg-slate-700 transition-all">
+<span class="material-symbols-outlined">add</span>
+</div>
+<nav class="flex flex-col gap-2 w-full px-2">
+<div class="flex items-center justify-center p-3 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors cursor-pointer group relative">
+<span class="material-symbols-outlined">dashboard</span>
+<div class="absolute left-16 bg-zinc-950 border border-outline-variant text-white px-2 py-1 rounded text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Início</div>
+</div>
+<div class="flex items-center justify-center p-3 text-amber-accent bg-amber-accent/5 border-r-4 border-amber-accent transition-all group relative">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">monitor</span>
+<div class="absolute left-16 bg-zinc-950 border border-outline-variant text-white px-2 py-1 rounded text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Telas &amp; Dispositivos</div>
+</div>
+<div class="flex items-center justify-center p-3 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors cursor-pointer group relative">
+<span class="material-symbols-outlined">perm_media</span>
+<div class="absolute left-16 bg-zinc-950 border border-outline-variant text-white px-2 py-1 rounded text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Biblioteca</div>
+</div>
+<div class="flex items-center justify-center p-3 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors cursor-pointer group relative">
+<span class="material-symbols-outlined">calendar_today</span>
+<div class="absolute left-16 bg-zinc-950 border border-outline-variant text-white px-2 py-1 rounded text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Agendamento</div>
+</div>
+</nav>
+<div class="mt-auto pb-4">
+<div class="w-10 h-10 rounded-full border-2 border-outline-variant overflow-hidden cursor-pointer hover:border-amber-accent transition-all">
+<img class="w-full h-full object-cover" data-alt="A professional portrait of Junior Mello." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAh4_M52QwMykLMJFKgAXymwxTlZPafE9g6B3qKFkrvM9t77y9doPLj2wtktsIECSRMrapAI3FckkOikMphf_VEyF4psl7cB-933ya932TSNTs2t8GwwTXRuyQovBW302Abe_YAx1wVg0wiK0dVDyOyXpbro8ecINJ311dryjDcGTJpEus04C_R4gukdg1sv7OY1OBaCflF-NcyQ9nnBrzeq2tMRuW2sErf9bbxA2O7d-W7e8U-2sM2bdPDmLQ6PbC8-rP0JI60PhzT"/>
+</div>
+</div>
+</div>
+<!-- Asymmetric Layout Detail -->
+<div class="flex-grow bg-surface-container p-10 rounded-xl border border-outline-variant relative overflow-hidden h-[720px]">
+<div class="absolute top-0 right-0 w-full h-full opacity-10 pointer-events-none dot-pattern"></div>
+<h3 class="font-headline-lg text-headline-lg mb-8 relative z-10">Monitor de Sistema — Lancaster Suzano</h3>
+<div class="grid grid-cols-2 gap-6 relative z-10">
+<div class="bg-surface-container-high p-6 rounded-xl border border-outline-variant spotlight-glow">
+<span class="text-label-caps font-label-caps text-on-surface-variant">UPTIME</span>
+<div class="text-display-lg text-headline-xl font-data-mono text-amber-accent mt-2">14d 08h 22m</div>
+</div>
+<div class="bg-surface-container-high p-6 rounded-xl border border-outline-variant">
+<span class="text-label-caps font-label-caps text-on-surface-variant">TEMP. PAINEL</span>
+<div class="text-display-lg text-headline-xl font-data-mono text-success mt-2">42.5°C</div>
+</div>
+<div class="col-span-2 bg-charcoal p-8 rounded-xl flex items-center justify-between shadow-2xl">
+<div class="space-y-1">
+<h4 class="text-white font-headline-md">Sincronização de Ativos</h4>
+<p class="text-white/60 text-body-sm">Última atualização em Lancaster Suzano às 14:02</p>
+</div>
+<button class="bg-amber-accent text-charcoal font-bold px-6 py-3 rounded-lg hover:scale-[0.98] transition-transform">FORÇAR REFRESH</button>
+</div>
+</div>
+<div class="mt-12 space-y-6 relative z-10">
+<div class="flex items-center gap-4 p-4 border-b border-outline-variant/30">
+<div class="w-3 h-3 bg-success rounded-full"></div>
+<span class="font-data-mono text-body-sm flex-grow">Download de "Hickmann_MIA3_4K.mp4" completo.</span>
+<span class="text-on-surface-variant/40 text-[12px]">Agora</span>
+</div>
+<div class="flex items-center gap-4 p-4 border-b border-outline-variant/30">
+<div class="w-3 h-3 bg-amber-accent rounded-full"></div>
+<span class="font-data-mono text-body-sm flex-grow">Ajuste de brilho automático: 85%.</span>
+<span class="text-on-surface-variant/40 text-[12px]">10 min atrás</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="p-xl border-t border-outline-variant bg-surface-container-lowest text-center">
+<p class="text-on-surface-variant font-label-caps tracking-widest">LUMINA SIGNAGE v1.0 — SISTEMA OPERACIONAL PROPRIETÁRIO</p>
+</footer>
+<script>
+        // Simple micro-interaction for the PIN code lampejo
+        document.addEventListener('DOMContentLoaded', () => {
+            const pinCodes = document.querySelectorAll('.font-pin-code');
+            setInterval(() => {
+                const randomPin = pinCodes[Math.floor(Math.random() * pinCodes.length)];
+                randomPin.style.opacity = '0.8';
+                setTimeout(() => {
+                    randomPin.style.opacity = '1';
+                }, 100);
+            }, 3000);
+        });
+    </script>
+</body></html>

@@ -49,6 +49,13 @@
         }
       ]
     },
+    "brinde": {
+      "titulo": "Já leva a Clearix Calc enquanto seu acesso chega",
+      "descricao": "A calculadora óptica que sua ótica usa todo dia — espessura por índice (com desenho da lente), transposição, distância ao vértice, DNP/DP e mais. Grátis, sem login, funciona offline. Instale no celular do balcão e use já hoje.",
+      "cta": "Abrir a Clearix Calc",
+      "link": "https://clearixcalc.netlify.app/?utm_source=osi&utm_medium=obrigado&utm_campaign=clearix_calc_brinde",
+      "nota": "Bônus liberado na hora — não depende do e-mail de acesso."
+    },
     "citacao": {
       "texto": "Você não precisa parecer ensaiado. Precisa ler melhor, perguntar melhor e conduzir melhor.",
       "autor": "Tatiana Camargo"

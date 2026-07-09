@@ -6,6 +6,24 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "digiai-local",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port=3100"],
+      "port": 3100
+    },
+    {
+      "name": "digiai-site",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "D:/projetos/digiai-site", "run", "dev"],
+      "port": 4321
+    },
+    {
+      "name": "clearix_calc",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "D:/projetos/clearix_eco_full/clearix_calc", "run", "dev", "--", "-p", "3017"],
+      "port": 3017
     }
   ]
 }

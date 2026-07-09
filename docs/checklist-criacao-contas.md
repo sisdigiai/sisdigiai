@@ -77,7 +77,7 @@ Anti-bot bloqueia automação na criação. **Você faz manual**, eu cadastro de
 ### Bio padrão OSI (usar igual nas 12)
 ```
 🥽 Método de venda pra vendedor de ótica
-👩‍💼 Por @taty_mello — 40 anos no balcão
+👩‍💼 Por @taty_mello — 25 anos no balcão
 📕 Manual: link na bio
 #OticaSemImproviso
 ```
