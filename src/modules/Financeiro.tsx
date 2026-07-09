@@ -10,6 +10,7 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import PageHeader from '../components/PageHeader';
+import { Sparkline, DeltaBadge, deltaPct } from '../components/ChartKit';
 import {
   financeStore,
   CATEGORY_LABELS, CATEGORY_COLORS,
@@ -169,6 +170,10 @@ function DashboardTab() {
   const last12Months = monthSet.slice(-12);
   const categories = [...new Set(expenses.map(e => e.category))] as ExpenseCategory[];
 
+  // Série mensal de gasto total (real) — sparkline + delta mês vs mês nos KPIs
+  const monthlyTotals = last12Months.map(m => Object.values(expByMonthCat[m] || {}).reduce((a, b) => a + b, 0));
+  const gastoDelta = deltaPct(monthlyTotals);
+
   const chartData = {
     labels: last12Months.map(monthLabel),
     datasets: categories.map(cat => ({
@@ -236,9 +241,9 @@ function DashboardTab() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <KpiCard label={`Total Investido${filterProduct !== 'all' ? '' : ' (geral)'}`} value={brl(total12m)} icon={<DollarSign size={20} />} color="text-secondary" />
+        <KpiCard label={`Total Investido${filterProduct !== 'all' ? '' : ' (geral)'}`} value={brl(total12m)} icon={<DollarSign size={20} />} color="text-secondary" spark={monthlyTotals} />
         <KpiCard label="Lançamentos" value={String(expenses.length)} sub="despesas registradas" icon={<TrendingDown size={20} />} color="text-secondary" />
-        <KpiCard label="Burn de Caixa (média)" value={brl(burnRate3m)} sub="/mês · só caixa" icon={<BarChart3 size={20} />} color="text-secondary" />
+        <KpiCard label="Burn de Caixa (média)" value={brl(burnRate3m)} sub="/mês · só caixa" icon={<BarChart3 size={20} />} color="text-secondary" delta={gastoDelta} invert />
         <KpiCard label="Subscriptions ativas" value={brl(monthlySubsTotal)} sub={`${activeSubs.length} serviços`} icon={<Repeat size={20} />} color="text-secondary" />
       </div>
 
@@ -333,15 +338,20 @@ function DashboardTab() {
   );
 }
 
-function KpiCard({ label, value, sub, icon, color }: { label: string; value: string; sub?: string; icon: React.ReactNode; color: string }) {
+function KpiCard({ label, value, sub, icon, color, spark, delta, invert }: { label: string; value: string; sub?: string; icon: React.ReactNode; color: string; spark?: number[]; delta?: number | null; invert?: boolean }) {
   return (
     <div className="bg-surface-lowest border border-outline/15 p-5">
       <div className="flex items-center gap-2 mb-2">
         <span className={color}>{icon}</span>
         <span className="text-xs text-muted uppercase tracking-wide">{label}</span>
       </div>
-      <div className="text-2xl font-bold text-on-surface">{value}</div>
-      {sub && <div className="text-xs text-muted mt-1">{sub}</div>}
+      <div className="flex items-end justify-between gap-2">
+        <div className="text-2xl font-bold text-on-surface tabular-nums">{value}</div>
+        {spark && <Sparkline data={spark} />}
+      </div>
+      {delta != null
+        ? <div className="mt-1"><DeltaBadge pct={delta} invert={invert} /></div>
+        : sub && <div className="text-xs text-muted mt-1">{sub}</div>}
     </div>
   );
 }

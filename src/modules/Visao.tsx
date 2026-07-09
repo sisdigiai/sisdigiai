@@ -6,6 +6,7 @@ import { realtimeStore } from '../lib/realtimeStore';
 import { useRealtimeToasts } from '../contexts/ToastContext';
 import type { ModuleId } from '../components/Sidebar';
 import { initConvergenceMesh } from '../lib/dhMesh';
+import { Sparkline, DeltaBadge, deltaPct } from '../components/ChartKit';
 
 /**
  * Command Center (Visão Geral) — mission control em DIGIAI House.
@@ -92,15 +93,16 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
 
   const focoTask = summary.nextTasks[0];
 
-  const kpis = [
-    { idx: '01', label: 'MRR ATUAL', value: summary.latestMrr != null ? brl(summary.latestMrr) : '—', sub: summary.runwayMonths != null ? `runway ${summary.runwayMonths} meses` : 'preencher cadastro', go: 'financeiro' as ModuleId },
-    { idx: '02', label: 'LEADS NO FUNIL', value: String(activeLeads), sub: `${leads.length} no total`, go: 'comercial' as ModuleId },
-    { idx: '03', label: 'NEGOCIAÇÕES', value: String(negociacoes), sub: `${brl(pipelineValue)} em jogo`, go: 'comercial' as ModuleId },
-    { idx: '04', label: 'CONVERSÃO', value: conversao > 0 ? conversao.toFixed(1).replace('.', ',') + '%' : '—', sub: `${clientes} cliente(s)`, go: 'comercial' as ModuleId },
-  ];
-
   // Gráfico MRR real (dos snapshots). Só desenha com ≥2 pontos.
   const series = summary.mrrSeries || [];
+  const mrrDelta = deltaPct(series);
+
+  const kpis: { idx: string; label: string; value: string; sub: string; go: ModuleId; spark?: number[]; delta?: number | null }[] = [
+    { idx: '01', label: 'MRR ATUAL', value: summary.latestMrr != null ? brl(summary.latestMrr) : '—', sub: summary.runwayMonths != null ? `runway ${summary.runwayMonths} meses` : 'preencher cadastro', go: 'financeiro', spark: series, delta: mrrDelta },
+    { idx: '02', label: 'LEADS NO FUNIL', value: String(activeLeads), sub: `${leads.length} no total`, go: 'comercial' },
+    { idx: '03', label: 'NEGOCIAÇÕES', value: String(negociacoes), sub: `${brl(pipelineValue)} em jogo`, go: 'comercial' },
+    { idx: '04', label: 'CONVERSÃO', value: conversao > 0 ? conversao.toFixed(1).replace('.', ',') + '%' : '—', sub: `${clientes} cliente(s)`, go: 'comercial' },
+  ];
   const hasChart = series.length >= 2;
   let areaLine = '', areaFill = '', dots: { x: number; y: number }[] = [];
   if (hasChart) {
@@ -147,8 +149,13 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
               <span className="absolute -top-px -left-px w-2.5 h-2.5 border-t-2 border-l-2 border-secondary/70" />
               <span className="absolute -top-px -right-px w-2.5 h-2.5 border-t-2 border-r-2 border-secondary/70" />
               <div className="font-mono text-[9px] tracking-[0.12em] text-muted uppercase mb-3">{k.idx} · {k.label}</div>
-              <div className="font-serif font-bold text-[30px] leading-none tracking-tight text-on-surface tabular-nums">{k.value}</div>
-              <div className="font-mono text-[10px] text-muted mt-2.5 truncate">{k.sub}</div>
+              <div className="flex items-end justify-between gap-2">
+                <div className="font-serif font-bold text-[30px] leading-none tracking-tight text-on-surface tabular-nums">{k.value}</div>
+                {k.spark && <Sparkline data={k.spark} />}
+              </div>
+              <div className="font-mono text-[10px] text-muted mt-2.5 truncate">
+                {k.delta != null ? <DeltaBadge pct={k.delta} suffix="vs snapshot anterior" /> : k.sub}
+              </div>
             </button>
           ))}
         </div>
@@ -157,17 +164,28 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
           {/* MRR real */}
           <div className="border border-outline/15 bg-surface-container p-4">
-            <div className="font-mono text-[9px] tracking-[0.14em] text-secondary uppercase">§ 01 — Receita</div>
-            <div className="font-serif text-[17px] text-on-surface mt-1">Evolução do MRR</div>
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="font-mono text-[9px] tracking-[0.14em] text-secondary uppercase">§ 01 — Receita</div>
+                <div className="font-serif text-[17px] text-on-surface mt-1">Evolução do MRR</div>
+              </div>
+              {mrrDelta != null && <span className="font-mono text-[9px] px-2 py-1 border border-outline/20 text-muted uppercase tracking-wider"><DeltaBadge pct={mrrDelta} suffix="" /></span>}
+            </div>
             {hasChart ? (
               <>
-                <svg viewBox="0 0 520 150" preserveAspectRatio="none" className="w-full mt-3" style={{ height: 150 }}>
-                  <line x1="0" y1="40" x2="520" y2="40" stroke="var(--color-outline)" strokeOpacity="0.4" />
-                  <line x1="0" y1="95" x2="520" y2="95" stroke="var(--color-outline)" strokeOpacity="0.4" />
-                  <path d={areaFill} fill="var(--color-forest)" fillOpacity="0.14" />
-                  <path d={areaLine} fill="none" stroke="var(--color-action)" strokeWidth="2.5" />
-                  {dots.map((d, i) => <circle key={i} cx={d.x} cy={d.y} r="3" fill="var(--color-surface)" stroke="var(--color-action)" strokeWidth="2" />)}
-                </svg>
+                <div className="relative mt-3">
+                  <svg viewBox="0 0 520 150" preserveAspectRatio="none" className="w-full block" style={{ height: 150 }}>
+                    <line x1="0" y1="12" x2="520" y2="12" stroke="var(--color-outline)" strokeOpacity="0.35" />
+                    <line x1="0" y1="77" x2="520" y2="77" stroke="var(--color-outline)" strokeOpacity="0.35" />
+                    <line x1="0" y1="142" x2="520" y2="142" stroke="var(--color-outline)" strokeOpacity="0.35" />
+                    <path d={areaFill} fill="var(--color-forest)" fillOpacity="0.14" />
+                    <path d={areaLine} fill="none" stroke="var(--color-action)" strokeWidth="2.5" />
+                    {dots.map((d, i) => <circle key={i} cx={d.x} cy={d.y} r="3" fill="var(--color-surface)" stroke="var(--color-action)" strokeWidth="2" />)}
+                  </svg>
+                  <span className="absolute left-1 top-0 font-mono text-[9px] text-muted">{brl(Math.max(...series))}</span>
+                  <span className="absolute left-1 bottom-0 font-mono text-[9px] text-muted">{brl(Math.min(...series))}</span>
+                  <span className="absolute right-0 -top-1 font-mono text-[10px] px-1.5 py-0.5 bg-secondary-container text-on-secondary-container border border-secondary/40">{summary.latestMrr != null ? brl(summary.latestMrr) : ''}</span>
+                </div>
                 <div className="font-mono text-[9px] text-muted mt-2">Últimos {series.length} snapshots · fonte: financeiro</div>
               </>
             ) : (
