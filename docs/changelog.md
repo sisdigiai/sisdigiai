@@ -4,6 +4,9 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Adicionado (2026-07-09 — Brand Guidelines ganha abas: aba MKT "Ateliê de Convergência")
+- **`/brand` agora tem 2 abas**: "Holding · DIGIAI House" (conteúdo existente, intacto) e "Produto · MKT — Ateliê de Convergência" (`src/components/BrandMktAtelie.tsx`), registrando o tema visual aprovado pro `digiai_mkt`: planos cubistas facetados (clip-path + plano-sombra), céu de dados generativo (`src/lib/atelieCeu.ts`, campo de fluxo estilo Noite Estrelada, herdeiro do dhMesh), pincelada no lugar de glow (semântica ciano=máquina/magenta=humano/trigo=guia mantida da skin Órbita Cyber-Glass de 2026-07-03), assinatura magenta no gate humano e estados vazios como composições cubistas. Cores do tema escopadas em `.atl-root` (conteúdo de produto — hex ok pela regra 5), sem tocar nos tokens globais. Plano de adoção no mkt em 4 fases documentado na própria aba.
+
 ### F1 pausada (2026-06-17 — métricas Meta bloqueadas por config de conta)
 - Tentativa completa de ligar as métricas Meta (ADR-0039 F1). Páginas + IG atribuídos ao system user do BM Digiai; token lê as Páginas. **Bloqueio:** IG não linkado às Páginas no modelo Graph API (`instagram_business_account` vazio) + **duplicação de asset IG do OSI**. Decisão do dono: pausar (risco de mexer na estrutura que já posta > ganho do painel pré-lançamento). Estado completo e passos de retomada em `docs/setup-meta-graph-token.md`. Token temporário apagado.
 

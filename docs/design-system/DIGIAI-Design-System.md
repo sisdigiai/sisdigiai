@@ -11,7 +11,8 @@
 | Tokens (@theme dark+light) | `digiai` app · `src/index.css` | ✅ aplicado |
 | Motor visual (malha + reveal/count-up) | `digiai` app · `src/lib/dhMesh.ts` | ✅ aplicado |
 | Toggle de tema | `digiai` app · `src/hooks/useTheme.ts` + header | ✅ aplicado |
-| Página `/brand` (o sistema) | `digiai` app · `src/components/BrandGuidelines.tsx` | ✅ no sistema |
+| Página `/brand` (o sistema) | `digiai` app · `src/components/BrandGuidelines.tsx` | ✅ no sistema (2 abas desde 2026-07-09) |
+| Aba MKT do `/brand` (tema do produto digiai_mkt) | `digiai` app · `src/components/BrandMktAtelie.tsx` + `src/lib/atelieCeu.ts` | ✅ registrado ("Ateliê de Convergência" — evolução da Órbita Cyber-Glass; aplicação no mkt em 4 fases) |
 | Página `/como-usar` (aplicação) | `digiai` app · `src/modules/ComoUsarDigiaiHouse.tsx` | ⬅ este pacote |
 | `/referencias-design` (benchmark) | `digiai` app | corrigido (card canônico → DIGIAI House) |
 | Landing pública | `digiai-site` (Astro) · `digiai.app.br` | ✅ publicado (v5) |
