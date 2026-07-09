@@ -1,10 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
-import { Download, CheckCircle2, Copy, Layers, Type, Palette, Square, Minus } from 'lucide-react';
+import { Download, CheckCircle2, Copy, Layers, Type, Palette, Square, Minus, Sun, Moon } from 'lucide-react';
 import { Logo } from './Logo';
+import { initConvergenceMesh, initReveal } from '../lib/dhMesh';
+import { useTheme } from '../hooks/useTheme';
 
 export default function BrandGuidelines() {
+  const { theme, toggle } = useTheme();
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => (canvasRef.current ? initConvergenceMesh(canvasRef.current) : undefined), []);
+  useEffect(() => (rootRef.current ? initReveal(rootRef.current) : undefined), []);
 
   const handleCopy = (color: string) => {
     navigator.clipboard.writeText(color);
@@ -14,7 +22,7 @@ export default function BrandGuidelines() {
 
   // Swatches = CONTEÚDO (mostram as cores reais do brand). Hex propositais.
   const ColorCard = ({ name, role, hex, rgb, bg, ring }: { name: string; role: string; hex: string; rgb: string; bg: string; ring?: boolean }) => (
-    <div className="flex flex-col gap-3 group">
+    <div className="flex flex-col gap-3 group" data-reveal>
       <div className={`h-32 w-full relative overflow-hidden border ${ring ? 'border-outline/30' : 'border-outline/10'} ${bg}`}>
         <button
           onClick={() => handleCopy(hex)}
@@ -43,16 +51,28 @@ export default function BrandGuidelines() {
         <span className="font-mono text-[11px] uppercase tracking-[0.2em]">{kicker}</span>
       </div>
       <h2 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight text-on-surface">{title}</h2>
-      <div className="h-px w-24 bg-secondary mt-4" />
+      <div data-draw className="h-0.5 w-24 bg-action mt-4" />
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface selection:bg-secondary selection:text-surface pb-32">
-      {/* Hero */}
-      <section className="pt-20 pb-28 px-6 relative overflow-hidden border-b border-outline/10">
+    <div ref={rootRef} className="min-h-screen bg-surface text-on-surface selection:bg-secondary selection:text-on-action pb-32">
+      {/* Cover — malha de convergência 3D (dhMesh) */}
+      <section className="relative overflow-hidden border-b border-outline/10 min-h-[88vh] flex items-center">
+        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-secondary/[0.04] rounded-full blur-[120px] pointer-events-none" />
-        <div className="max-w-6xl mx-auto relative z-10 flex flex-col items-center text-center">
+
+        {/* Toggle de tema */}
+        <button
+          onClick={toggle}
+          aria-label={theme === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'}
+          className="absolute top-6 right-6 z-20 flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-on-surface-variant border border-outline/30 px-3 py-2 hover:text-on-surface hover:border-action/50 transition-colors bg-surface/40 backdrop-blur-sm"
+        >
+          {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+          {theme === 'dark' ? 'Claro' : 'Escuro'}
+        </button>
+
+        <div className="max-w-6xl mx-auto relative z-10 flex flex-col items-center text-center px-6 py-24 w-full">
           <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-secondary mb-8">Brand System · Geometric Precision</span>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -72,24 +92,41 @@ export default function BrandGuidelines() {
         </div>
       </section>
 
+      {/* Sistema em números — count-up (dhMesh/initReveal) */}
+      <section className="py-16 px-6 border-b border-outline/10">
+        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-px bg-outline/10 border border-outline/10">
+          {[
+            { n: '10', label: 'Marcas no ecossistema' },
+            { n: '3', label: 'Vozes tipográficas' },
+            { n: '6', label: 'Níveis de superfície' },
+            { n: '2', label: 'Temas · claro / escuro' },
+          ].map((m) => (
+            <div key={m.label} className="bg-surface p-8 flex flex-col items-center text-center" data-reveal>
+              <div data-count={m.n} className="font-serif text-5xl md:text-6xl font-semibold tracking-tight text-on-surface">{m.n}</div>
+              <div className="mt-3 text-[10px] font-mono uppercase tracking-[0.2em] text-secondary">{m.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Logo Variations */}
-      <section className="py-24 px-6 border-b border-outline/10 bg-surface-container-low/40">
+      <section className="py-24 px-6 border-b border-outline/10 bg-surface-low/40">
         <div className="max-w-6xl mx-auto">
           <SectionLabel icon={<Layers className="w-4 h-4" />} kicker="Identidade" title="Variações do Logo" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-surface p-12 border border-outline/10 flex flex-col items-center justify-center min-h-[300px] relative">
+            <div className="bg-surface p-12 border border-outline/10 flex flex-col items-center justify-center min-h-[300px] relative" data-reveal>
               <div className="absolute top-6 left-6 text-[10px] font-mono text-muted uppercase tracking-widest">Primário · Escuro</div>
               <Logo variant="horizontal" iconClassName="w-12 h-12" textClassName="text-4xl" />
             </div>
-            <div className="bg-white p-12 border border-outline/10 flex flex-col items-center justify-center min-h-[300px] relative">
+            <div className="bg-white p-12 border border-outline/10 flex flex-col items-center justify-center min-h-[300px] relative" data-reveal>
               <div className="absolute top-6 left-6 text-[10px] font-mono text-black/40 uppercase tracking-widest">Primário · Claro</div>
               <Logo theme="light" variant="horizontal" iconClassName="w-12 h-12" textClassName="text-4xl" />
             </div>
-            <div className="bg-surface p-12 border border-outline/10 flex flex-col items-center justify-center min-h-[400px] relative">
+            <div className="bg-surface p-12 border border-outline/10 flex flex-col items-center justify-center min-h-[400px] relative" data-reveal>
               <div className="absolute top-6 left-6 text-[10px] font-mono text-muted uppercase tracking-widest">Empilhado · Escuro</div>
               <Logo variant="stacked" iconClassName="w-24 h-24" textClassName="text-5xl" />
             </div>
-            <div className="grid grid-rows-2 gap-6">
+            <div className="grid grid-rows-2 gap-6" data-reveal>
               <div className="bg-forest p-12 border border-outline/10 flex flex-col items-center justify-center relative">
                 <div className="absolute top-6 left-6 text-[10px] font-mono text-on-surface/60 uppercase tracking-widest">Mono · Sobre Forest</div>
                 <Logo theme="mono-white" variant="horizontal" iconClassName="w-10 h-10" textClassName="text-3xl" />
@@ -99,7 +136,7 @@ export default function BrandGuidelines() {
                 <Logo theme="mono-dark" variant="horizontal" iconClassName="w-10 h-10" textClassName="text-3xl" />
               </div>
             </div>
-            <div className="bg-surface p-12 border border-outline/10 flex flex-col items-center justify-center relative md:col-span-2">
+            <div className="bg-surface p-12 border border-outline/10 flex flex-col items-center justify-center relative md:col-span-2" data-reveal>
               <div className="absolute top-6 left-6 text-[10px] font-mono text-muted uppercase tracking-widest">Ecossistema & Símbolo</div>
               <div className="flex flex-wrap justify-center gap-16 items-center w-full mt-8">
                 <Logo variant="icon" iconClassName="w-20 h-20" />
@@ -133,11 +170,11 @@ export default function BrandGuidelines() {
       </section>
 
       {/* Typography */}
-      <section className="py-24 px-6 border-b border-outline/10 bg-surface-container-low/40">
+      <section className="py-24 px-6 border-b border-outline/10 bg-surface-low/40">
         <div className="max-w-6xl mx-auto">
           <SectionLabel icon={<Type className="w-4 h-4" />} kicker="Tipografia" title="Três Vozes" />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-px bg-outline/10 border border-outline/10">
-            <div className="bg-surface p-8">
+            <div className="bg-surface p-8" data-reveal>
               <div className="flex items-baseline justify-between mb-6">
                 <h3 className="font-serif text-3xl font-semibold text-on-surface">Source Serif 4</h3>
                 <span className="text-secondary font-mono text-[10px] uppercase tracking-widest">Títulos</span>
@@ -145,7 +182,7 @@ export default function BrandGuidelines() {
               <div className="font-serif text-6xl font-semibold tracking-tight text-on-surface">Aa</div>
               <p className="text-sm text-muted mt-4 leading-relaxed">Autoridade literária e editorial nos títulos. Tracking apertado para um ar "travado".</p>
             </div>
-            <div className="bg-surface p-8">
+            <div className="bg-surface p-8" data-reveal>
               <div className="flex items-baseline justify-between mb-6">
                 <h3 className="font-sans text-3xl font-bold text-on-surface">Inter</h3>
                 <span className="text-secondary font-mono text-[10px] uppercase tracking-widest">Corpo</span>
@@ -153,7 +190,7 @@ export default function BrandGuidelines() {
               <div className="font-sans text-6xl font-semibold tracking-tight text-on-surface">Aa</div>
               <p className="text-sm text-muted mt-4 leading-relaxed">Legibilidade máxima em interfaces densas de dados.</p>
             </div>
-            <div className="bg-surface p-8">
+            <div className="bg-surface p-8" data-reveal>
               <div className="flex items-baseline justify-between mb-6">
                 <h3 className="font-mono text-2xl font-semibold text-on-surface">JetBrains Mono</h3>
                 <span className="text-secondary font-mono text-[10px] uppercase tracking-widest">Metadados</span>
@@ -164,15 +201,15 @@ export default function BrandGuidelines() {
           </div>
 
           {/* Usage Example */}
-          <div className="mt-8 bg-surface p-10 border border-outline/10">
+          <div className="mt-8 bg-surface p-10 border border-outline/10" data-reveal>
             <div className="text-[10px] font-mono text-secondary uppercase tracking-[0.2em] mb-3">Exemplo de uso</div>
             <h1 className="font-serif text-4xl font-semibold tracking-tight mb-4 text-on-surface">Transformando Informação em Decisão</h1>
             <p className="text-lg text-on-surface-variant leading-relaxed mb-6 max-w-2xl">
               A DIGIAI é uma holding tech operada por IA que constrói e escala ecossistemas digitais verticais com inteligência aplicada.
             </p>
             <div className="flex items-center gap-4">
-              <button className="bg-forest text-on-surface px-6 py-3 font-medium hover:bg-secondary-container transition-colors border border-secondary/40">Ação primária</button>
-              <button className="text-on-surface px-6 py-3 font-medium border border-outline/30 hover:border-secondary/50 transition-colors">Secundária</button>
+              <button className="bg-action text-on-action px-6 py-3 font-medium hover:bg-action-hover transition-colors">Ação primária</button>
+              <button className="text-on-surface px-6 py-3 font-medium border border-outline/30 hover:border-action/50 transition-colors">Secundária</button>
             </div>
           </div>
         </div>
@@ -189,7 +226,7 @@ export default function BrandGuidelines() {
               { icon: <Layers className="w-5 h-5" />, t: 'Camadas tonais', d: 'Profundidade por tons de surface, não por elevação física.' },
               { icon: <Type className="w-5 h-5" />, t: 'Chips mono caixa-alta', d: 'Categorização e status sem imitar botões.' },
             ].map((p) => (
-              <div key={p.t} className="bg-surface-container-low border border-outline/10 p-6">
+              <div key={p.t} className="bg-surface-low border border-outline/10 p-6" data-reveal>
                 <div className="text-secondary mb-4">{p.icon}</div>
                 <h3 className="font-serif text-lg font-semibold text-on-surface mb-1.5">{p.t}</h3>
                 <p className="text-sm text-muted leading-relaxed">{p.d}</p>
@@ -210,7 +247,7 @@ export default function BrandGuidelines() {
           <a
             href="/favicon.svg"
             download="digiai-logo.svg"
-            className="inline-flex items-center gap-3 bg-secondary text-surface px-8 py-4 font-semibold text-base hover:bg-secondary/90 transition-colors"
+            className="inline-flex items-center gap-3 bg-action text-on-action px-8 py-4 font-semibold text-base hover:bg-action-hover transition-colors"
           >
             <Download className="w-5 h-5" />
             Baixar logo (SVG)

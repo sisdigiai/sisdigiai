@@ -1,13 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
+/* ============================================================
+   DIGIAI House — @theme (Tailwind 4). DARK é o padrão nativo.
+   Nomes de token MANTIDOS (surface, on-surface, secondary, forest,
+   muted, outline, brand-*) → nenhum módulo existente quebra.
+   Adicionados: -strong, status (success/warning/danger/info) e
+   a paleta de ecossistema. Light mode via [data-theme="light"].
+   ============================================================ */
 @theme {
-  /* Tipografia — rebrand "Geometric Precision" */
+  /* Tipografia — Geometric Precision */
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Source Serif 4", Georgia, serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  /* Paleta do rebrand (dark) */
+  /* Superfícies (dark) */
   --color-surface: #0d131f;
   --color-surface-lowest: #080e1a;
   --color-surface-low: #161c27;
@@ -16,17 +23,75 @@
   --color-surface-highest: #2f3542;
   --color-on-surface: #dde2f3;
   --color-on-surface-variant: #c7c6cd;
-  --color-muted: #7a7c7d;
-  --color-outline: #46464c;
-  --color-secondary: #adcebd;            /* verde-sage: acento sobre o dark */
+  --color-muted: #909097;
+  --color-outline: #2f3542;
+  --color-outline-strong: #46464c;
+
+  /* Ação / acento */
+  --color-secondary: #adcebd;            /* sage — acento sobre dark */
   --color-secondary-container: #314f42;
   --color-on-secondary-container: #9fc0af;
-  --color-forest: #2d4b3e;               /* verde-floresta profundo (ação primária) */
+  --color-forest: #2d4b3e;               /* forest — ação primária */
+  --color-action: #8fb8a1;               /* action-primary NO DARK = tom claro (WCAG 4.5:1) */
+  --color-action-hover: #adcebd;
+  --color-on-action: #0a0f1e;
+  --color-accent: #8fb8a1;
+
+  /* Status (dark) */
+  --color-success: #6ee7b7; --color-success-bg: #022c22; --color-success-bd: #065f46;
+  --color-warning: #fcd34d; --color-warning-bg: #451a03; --color-warning-bd: #92400e;
+  --color-danger:  #fca5a5; --color-danger-bg:  #450a0a; --color-danger-bd:  #991b1b;
+  --color-info:    #dde2f3; --color-info-bg:    #1a202c; --color-info-bd:    #46464c;
+
+  /* Ecossistema — assinatura por produto (nunca UI funcional) */
+  --color-eco-clearix: #10b981;
+  --color-eco-osi: #cb5a43;
+  --color-eco-nexus: #64748b;
+  --color-eco-lumina: #818cf8;
+  --color-eco-pulso: #991b1b;
+  --color-eco-polapetit: #db2777;
+  --color-eco-qualafoto: #7c3aed;
+  --color-eco-nipo: #0d9488;
+  --color-eco-academy: #d97706;
+  --color-eco-app: #94a3b8;
 
   /* Tokens legados — módulos ainda não re-skinados continuam funcionando */
   --color-brand-primary: #2563EB;
   --color-brand-accent: #06B6D4;
   --color-brand-dark: #0A0F1E;
+}
+
+/* ============================================================
+   LIGHT MODE — editorial claro. Ativa com <html data-theme="light">.
+   Sobrescreve os MESMOS nomes de token → todas as utilities Tailwind
+   (bg-surface, text-on-surface, text-secondary, …) viram light juntas.
+   ============================================================ */
+[data-theme="light"] {
+  --color-surface: #f8f9fa;
+  --color-surface-lowest: #eef1f4;
+  --color-surface-low: #ffffff;
+  --color-surface-container: #ffffff;
+  --color-surface-high: #eef1f4;
+  --color-surface-highest: #dde2f3;
+  --color-on-surface: #0a0f1e;
+  --color-on-surface-variant: #46464c;
+  --color-muted: #5a5f6b;
+  --color-outline: #dde2f3;
+  --color-outline-strong: #909097;
+
+  --color-secondary: #243c32;
+  --color-secondary-container: #d6e5dd;
+  --color-on-secondary-container: #243c32;
+  --color-forest: #2d4b3e;
+  --color-action: #2d4b3e;               /* no light, ação = forest-500 sobre off-white */
+  --color-action-hover: #243c32;
+  --color-on-action: #ffffff;
+  --color-accent: #243c32;
+
+  --color-success: #047857; --color-success-bg: #ecfdf5; --color-success-bd: #a7f3d0;
+  --color-warning: #b45309; --color-warning-bg: #fffbeb; --color-warning-bd: #fde68a;
+  --color-danger:  #b91c1c; --color-danger-bg:  #fef2f2; --color-danger-bd:  #fecaca;
+  --color-info:    #334155; --color-info-bg:    #eef1f4; --color-info-bd:    #dde2f3;
 }
 
 body {
@@ -36,11 +101,21 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-::selection {
-  background-color: var(--color-secondary);
-  color: #0d131f;
-}
+::selection { background-color: var(--color-secondary); color: var(--color-on-action); }
+
+/* Foco visível — regra de ouro (nunca remover) */
+*:focus-visible { outline: 2px solid var(--color-action); outline-offset: 2px; }
 
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0d131f; }
-::-webkit-scrollbar-thumb { background: #2f3542; }
+::-webkit-scrollbar-track { background: var(--color-surface); }
+::-webkit-scrollbar-thumb { background: var(--color-outline-strong); }
+
+/* Movimento — respeita reduced-motion globalmente */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
