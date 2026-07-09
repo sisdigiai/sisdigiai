@@ -3,17 +3,17 @@ import { Plus, RefreshCw, Search, X, Save, ExternalLink, Mail, MessageCircle, In
 import { marketingStore, type Affiliate, type AffiliateStatus, type AffiliateTier } from '../../lib/marketingStore';
 
 const STATUS_OPTIONS: { value: AffiliateStatus; label: string; color: string }[] = [
-  { value: 'pending', label: 'Pendente', color: '#F59E0B' },
-  { value: 'active', label: 'Ativo', color: '#10B981' },
-  { value: 'top', label: 'Top', color: '#8B5CF6' },
-  { value: 'inactive', label: 'Inativo', color: '#6B7280' },
-  { value: 'banned', label: 'Banido', color: '#EF4444' },
+  { value: 'pending', label: 'Pendente', color: 'var(--color-warning)' },
+  { value: 'active', label: 'Ativo', color: 'var(--color-success)' },
+  { value: 'top', label: 'Top', color: 'var(--color-action)' },
+  { value: 'inactive', label: 'Inativo', color: 'var(--color-muted)' },
+  { value: 'banned', label: 'Banido', color: 'var(--color-danger)' },
 ];
 
 const TIER_OPTIONS: { value: AffiliateTier; label: string; color: string }[] = [
   { value: 'bronze', label: 'Bronze', color: '#A16207' },
-  { value: 'prata', label: 'Prata', color: '#94A3B8' },
-  { value: 'ouro', label: 'Ouro', color: '#FCD34D' },
+  { value: 'prata', label: 'Prata', color: 'var(--color-muted)' },
+  { value: 'ouro', label: 'Ouro', color: 'var(--color-warning)' },
 ];
 
 export function Afiliados() {
@@ -67,11 +67,11 @@ export function Afiliados() {
 
       {/* Stats */}
       <div className="grid grid-cols-5 gap-3 mb-6">
-        <StatCard label="Total" value={stats.total} color="#adcebd" />
-        <StatCard label="Pendentes" value={stats.pending} color="#F59E0B" />
-        <StatCard label="Ativos" value={stats.active} color="#10B981" />
-        <StatCard label="Vendas" value={stats.sales} color="#8B5CF6" />
-        <StatCard label={`Comissão (R$)`} value={stats.commission.toFixed(2)} color="#FCD34D" />
+        <StatCard label="Total" value={stats.total} color="var(--color-secondary)" />
+        <StatCard label="Pendentes" value={stats.pending} color="var(--color-warning)" />
+        <StatCard label="Ativos" value={stats.active} color="var(--color-success)" />
+        <StatCard label="Vendas" value={stats.sales} color="var(--color-action)" />
+        <StatCard label={`Comissão (R$)`} value={stats.commission.toFixed(2)} color="var(--color-warning)" />
       </div>
 
       {loading ? (

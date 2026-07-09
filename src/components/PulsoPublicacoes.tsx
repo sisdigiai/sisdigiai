@@ -132,7 +132,7 @@ export default function PulsoPublicacoes({ onNavigate }: { onNavigate?: (id: Mod
           </div>
 
           {updates === null && (
-            <div className="mt-3 text-[11px] text-amber-300/90 bg-amber-500/[0.06] border border-amber-500/20 px-3 py-2">
+            <div className="mt-3 text-[11px] text-warning/90 bg-warning/[0.06] border border-warning/20 px-3 py-2">
               Log de publicações indisponível (migration 041 pendente) — números por camada zerados. O pipeline do calendário abaixo segue valendo.
             </div>
           )}

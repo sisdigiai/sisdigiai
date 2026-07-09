@@ -110,24 +110,24 @@ export function Validacao() {
             <StatCard
               label="Vendas totais"
               value={String(stats.sales_total)}
-              color="#10B981"
+              color="var(--color-success)"
               icon={<DollarSign className="w-3.5 h-3.5" />}
             />
             <StatCard
               label="Receita acumulada"
               value={brl(stats.revenue_cents_total)}
-              color="#10B981"
+              color="var(--color-success)"
             />
             <StatCard
               label="Compradores únicos"
               value={String(stats.unique_buyers)}
-              color="#adcebd"
+              color="var(--color-secondary)"
               icon={<Users className="w-3.5 h-3.5" />}
             />
             <StatCard
               label="Última venda"
               value={stats.last_sale_at ? dateBR(stats.last_sale_at) : '—'}
-              color="#8B5CF6"
+              color="var(--color-action)"
               icon={<Calendar className="w-3.5 h-3.5" />}
             />
           </div>
@@ -137,22 +137,22 @@ export function Validacao() {
             <StatCard
               label="Atribuídas a post"
               value={`${stats.attributed_sales} (${attributionRate}%)`}
-              color={attributionRate >= 60 ? '#10B981' : attributionRate >= 30 ? '#F59E0B' : '#EF4444'}
+              color={attributionRate >= 60 ? 'var(--color-success)' : attributionRate >= 30 ? 'var(--color-warning)' : 'var(--color-danger)'}
             />
             <StatCard
               label="Via afiliado"
               value={`${stats.affiliate_sales} de ${stats.unique_affiliates}`}
-              color="#8B5CF6"
+              color="var(--color-action)"
             />
             <StatCard
               label="Reembolsos"
               value={String(stats.refunds_total)}
-              color={stats.refunds_total > 0 ? '#F59E0B' : '#6B7280'}
+              color={stats.refunds_total > 0 ? 'var(--color-warning)' : 'var(--color-muted)'}
             />
             <StatCard
               label="Chargebacks"
               value={String(stats.chargebacks_total)}
-              color={stats.chargebacks_total > 0 ? '#EF4444' : '#6B7280'}
+              color={stats.chargebacks_total > 0 ? 'var(--color-danger)' : 'var(--color-muted)'}
             />
           </div>
 
@@ -215,12 +215,12 @@ export function Validacao() {
                   <div
                     key={p.id}
                     className="bg-surface-low border border-outline/10 p-3 flex items-center gap-3 border-l-4"
-                    style={{ borderLeftColor: p.pillar_color ?? '#adcebd' }}
+                    style={{ borderLeftColor: p.pillar_color ?? 'var(--color-secondary)' }}
                   >
                     <div className="text-2xl font-bold text-muted w-8 text-center">{i + 1}</div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-muted mb-1">
-                        <span style={{ color: p.pillar_color ?? '#adcebd' }}>{p.pillar_name}</span>
+                        <span style={{ color: p.pillar_color ?? 'var(--color-secondary)' }}>{p.pillar_name}</span>
                         <span>·</span>
                         <span>{dateBR(p.scheduled_date)}</span>
                         {p.content_type && <><span>·</span><span>{p.content_type}</span></>}

@@ -6,11 +6,11 @@ type Testimonial = Awaited<ReturnType<typeof marketingStore.listTestimonials>>[n
 type Stats = NonNullable<Awaited<ReturnType<typeof marketingStore.getTestimonialsStats>>>;
 
 const STATUS_COLOR: Record<string, string> = {
-  pending: '#F59E0B',
-  approved: '#10B981',
-  used: '#adcebd',
-  rejected: '#6B7280',
-  spam: '#EF4444',
+  pending: 'var(--color-warning)',
+  approved: 'var(--color-success)',
+  used: 'var(--color-secondary)',
+  rejected: 'var(--color-muted)',
+  spam: 'var(--color-danger)',
 };
 
 const STATUS_LABEL: Record<string, string> = {

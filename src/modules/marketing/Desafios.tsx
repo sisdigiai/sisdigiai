@@ -15,11 +15,11 @@ const MOVEMENT_NAMES: Record<number, string> = {
 };
 
 const MOVEMENT_COLOR: Record<number, string> = {
-  1: '#adcebd', 2: '#8B5CF6', 3: '#10B981', 4: '#F59E0B', 5: '#EC4899',
+  1: 'var(--color-secondary)', 2: 'var(--color-action)', 3: 'var(--color-success)', 4: 'var(--color-warning)', 5: 'var(--color-eco-polapetit)',
 };
 
 const STATUS_COLOR: Record<string, string> = {
-  draft: '#6B7280', active: '#10B981', closed: '#adcebd', cancelled: '#EF4444',
+  draft: 'var(--color-muted)', active: 'var(--color-success)', closed: 'var(--color-secondary)', cancelled: 'var(--color-danger)',
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -27,7 +27,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const PART_STATUS_COLOR: Record<string, string> = {
-  registered: '#6B7280', submitted: '#F59E0B', winner: '#FFD700', runner_up: '#C0C0C0', disqualified: '#EF4444',
+  registered: 'var(--color-muted)', submitted: 'var(--color-warning)', winner: '#FFD700', runner_up: '#C0C0C0', disqualified: 'var(--color-danger)',
 };
 const PART_STATUS_LABEL: Record<string, string> = {
   registered: 'Inscrito', submitted: 'Submeteu prova', winner: '🥇 Vencedor', runner_up: '🥈 Top 3', disqualified: 'Desclassificado',
@@ -140,7 +140,7 @@ export function Desafios() {
 
 function ChallengeCard({ c, onOpen }: { c: Challenge; onOpen: () => void }) {
   const movement = c.movement ?? 0;
-  const movColor = MOVEMENT_COLOR[movement] ?? '#adcebd';
+  const movColor = MOVEMENT_COLOR[movement] ?? 'var(--color-secondary)';
   return (
     <button onClick={onOpen}
       className="bg-surface-low border border-outline/10 p-4 text-left hover:bg-surface-highest border-l-4"

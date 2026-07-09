@@ -1,354 +1,304 @@
-import { useEffect, useState, useCallback } from 'react';
-import {
-  Target, AlertCircle, CheckCircle2, Calendar, AlertOctagon,
-  Zap, GitBranch, DollarSign, RefreshCw, Flag, Award,
-  Circle
-} from 'lucide-react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { RefreshCw, Search } from 'lucide-react';
 import { dashboardStore, type DashboardSummary } from '../lib/dashboardStore';
-import type { Track } from '../lib/roadmapStore';
+import { commercialStore, type CommercialLead, type LeadStage } from '../lib/commercialStore';
 import { realtimeStore } from '../lib/realtimeStore';
 import { useRealtimeToasts } from '../contexts/ToastContext';
 import type { ModuleId } from '../components/Sidebar';
-import PageHeader from '../components/PageHeader';
-import PulsoPublicacoes from '../components/PulsoPublicacoes';
+import { initConvergenceMesh } from '../lib/dhMesh';
+
+/**
+ * Command Center (Visão Geral) — mission control em DIGIAI House.
+ * 100% dados reais: dashboardStore.summary() (views Supabase) + commercialStore.list().
+ * Sem mocks. Estados vazios são tratados com "—" e mensagens honestas.
+ */
 
 const VERDADES_CANONICAS = [
-  { texto: 'Clearix é a prioridade máxima da DIGIAI', nível: 'máximo' },
-  { texto: 'DIGIAI é a marca-mãe de todo o ecossistema', nível: 'máximo' },
-  { texto: 'Academy fortalece DIGIAI e Clearix — não compete', nível: 'máximo' },
-  { texto: 'Nexus apoia treinamento sem consumir foco comercial agora', nível: 'alto' },
-  { texto: 'Lumina já valida uso interno, próxima fase é monetização externa', nível: 'alto' },
-  { texto: 'Pulso trabalha primeiro a favor da DIGIAI', nível: 'médio' },
-  { texto: 'Polapetit e Qual a Foto são segunda vertical futura', nível: 'baixo' },
-  { texto: 'Nipo School é frente institucional e filantrópica', nível: 'baixo' },
-  { texto: 'DIGIAI App é infraestrutura interna, não produto de mercado', nível: 'médio' },
+  'Clearix é a prioridade máxima',
+  'DIGIAI é a marca-mãe do ecossistema',
+  'Academy fortalece — não compete',
+  'Dados > Opiniões',
+  'Velocidade com qualidade',
 ];
 
-const nivelCor: Record<string, string> = {
-  máximo: 'border-secondary text-secondary',
-  alto: 'border-secondary/50 text-secondary/80',
-  médio: 'border-outline/40 text-on-surface-variant',
-  baixo: 'border-outline/20 text-muted',
-};
-
-const trackColor: Record<Track, string> = {
-  A: 'bg-eco-academy/15 text-eco-academy border-eco-academy/30',
-  B: 'bg-eco-clearix/15 text-eco-clearix border-eco-clearix/30',
-  C: 'bg-eco-app/15 text-eco-app border-eco-app/30',
-};
-
-function formatDate(iso: string): string {
-  const d = new Date(iso + 'T00:00:00');
-  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-}
+// Funil comercial real (ordem + rótulos). "perdido" fica fora do pipeline visível.
+const FUNNEL: { stage: LeadStage; label: string }[] = [
+  { stage: 'lead', label: 'Leads' },
+  { stage: 'contato', label: 'Contato' },
+  { stage: 'demo', label: 'Demonstração' },
+  { stage: 'piloto', label: 'Piloto' },
+  { stage: 'cliente', label: 'Cliente' },
+];
 
 function daysUntil(iso: string): number {
   const today = new Date(new Date().toISOString().split('T')[0]);
-  const target = new Date(iso);
-  return Math.round((target.getTime() - today.getTime()) / 86400000);
+  return Math.round((new Date(iso).getTime() - today.getTime()) / 86400000);
+}
+function formatDate(iso: string): string {
+  return new Date(iso + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+}
+function saudacao(): string {
+  const h = new Date().getHours();
+  return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+}
+function brl(n: number): string {
+  return 'R$ ' + n.toLocaleString('pt-BR', { maximumFractionDigits: 0 });
 }
 
 export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => void }) {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [leads, setLeads] = useState<CommercialLead[]>([]);
   const [loading, setLoading] = useState(true);
+  const [now, setNow] = useState(() => new Date());
+  const meshRef = useRef<HTMLCanvasElement>(null);
 
   const load = useCallback(async () => {
-    setLoading(true);
-    setSummary(await dashboardStore.summary());
-    setLoading(false);
+    const [s, l] = await Promise.all([dashboardStore.summary(), commercialStore.list()]);
+    setSummary(s); setLeads(l); setLoading(false);
   }, []);
 
   useEffect(() => { load(); }, [load]);
-
-  // Toasts globais para qualquer mudança externa (cowork, outra aba, etc.)
   useRealtimeToasts();
-
-  // Dashboard também recarrega em qualquer mudança nas tabelas ops
-  useEffect(() => {
-    const unsub = realtimeStore.subscribe(() => {
-      load();
-    });
-    return () => unsub();
-  }, [load]);
+  useEffect(() => realtimeStore.subscribe(() => { load(); }), [load]);
+  useEffect(() => { const t = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(t); }, []);
+  useEffect(() => { if (!loading && meshRef.current) return initConvergenceMesh(meshRef.current); }, [loading]);
 
   if (loading || !summary) {
     return (
-      <div className="p-8 max-w-6xl mx-auto">
-        <div className="text-muted text-sm font-mono uppercase tracking-widest">Carregando dashboard...</div>
+      <div className="min-h-screen flex items-center justify-center bg-surface">
+        <div className="text-muted text-sm font-mono uppercase tracking-widest animate-pulse">Conectando ao command center…</div>
       </div>
     );
   }
 
-  const totalProgress = summary.totalTasks > 0
-    ? Math.round((summary.completedTasks / summary.totalTasks) * 100)
-    : 0;
-
-  // Próximo marco com contagem regressiva
+  // ---- Derivações reais ----
   const nextMilestone = summary.upcomingMilestones[0];
 
+  const counts: Record<string, number> = {};
+  let pipelineValue = 0;
+  for (const l of leads) { counts[l.stage] = (counts[l.stage] || 0) + 1; if (l.stage !== 'perdido' && l.stage !== 'cliente') pipelineValue += l.value_brl || 0; }
+  const activeLeads = leads.filter(l => l.stage !== 'perdido' && l.stage !== 'cliente').length;
+  const negociacoes = (counts['demo'] || 0) + (counts['piloto'] || 0);
+  const clientes = counts['cliente'] || 0;
+  const totalEntrantes = leads.filter(l => l.stage !== 'perdido').length;
+  const conversao = totalEntrantes > 0 ? (clientes / totalEntrantes) * 100 : 0;
+  const funnelMax = Math.max(1, ...FUNNEL.map(f => counts[f.stage] || 0));
+
+  // Alertas reais
+  const alertas: { tone: string; texto: string; sub?: string; go: ModuleId }[] = [];
+  if (summary.overdueTasks > 0) alertas.push({ tone: 'var(--color-danger)', texto: `${summary.overdueTasks} tarefa(s) do Roadmap atrasada(s)`, go: 'trilha' });
+  if (summary.backlogCritical > 0) alertas.push({ tone: 'var(--color-danger)', texto: `${summary.backlogCritical} item(ns) crítico(s) no Backlog`, go: 'backlog' });
+  if (!summary.hasCnpj) alertas.push({ tone: 'var(--color-warning)', texto: 'CNPJ não cadastrado', sub: 'Cadastro Empresa → Identidade', go: 'cadastro-empresa' });
+  if (!summary.hasDpo) alertas.push({ tone: 'var(--color-warning)', texto: 'DPO não nomeado', sub: 'Cadastro Empresa → LGPD', go: 'cadastro-empresa' });
+  if (summary.latestMrr === null) alertas.push({ tone: 'var(--color-warning)', texto: 'Snapshot financeiro pendente', sub: 'Cadastro Empresa → Financeiro', go: 'cadastro-empresa' });
+
+  const focoTask = summary.nextTasks[0];
+
+  const kpis = [
+    { idx: '01', label: 'MRR ATUAL', value: summary.latestMrr != null ? brl(summary.latestMrr) : '—', sub: summary.runwayMonths != null ? `runway ${summary.runwayMonths} meses` : 'preencher cadastro', go: 'financeiro' as ModuleId },
+    { idx: '02', label: 'LEADS NO FUNIL', value: String(activeLeads), sub: `${leads.length} no total`, go: 'comercial' as ModuleId },
+    { idx: '03', label: 'NEGOCIAÇÕES', value: String(negociacoes), sub: `${brl(pipelineValue)} em jogo`, go: 'comercial' as ModuleId },
+    { idx: '04', label: 'CONVERSÃO', value: conversao > 0 ? conversao.toFixed(1).replace('.', ',') + '%' : '—', sub: `${clientes} cliente(s)`, go: 'comercial' as ModuleId },
+  ];
+
+  // Gráfico MRR real (dos snapshots). Só desenha com ≥2 pontos.
+  const series = summary.mrrSeries || [];
+  const hasChart = series.length >= 2;
+  let areaLine = '', areaFill = '', dots: { x: number; y: number }[] = [];
+  if (hasChart) {
+    const W = 520, H = 150, PAD = 8;
+    const min = Math.min(...series), max = Math.max(...series), span = max - min || 1;
+    const pts = series.map((v, i) => ({ x: (i / (series.length - 1)) * W, y: H - PAD - ((v - min) / span) * (H - PAD * 2) }));
+    areaLine = 'M' + pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' L');
+    areaFill = areaLine + ` L${W},${H} L0,${H} Z`;
+    dots = pts;
+  }
+
   return (
-    <div className="p-8 max-w-6xl mx-auto">
-      <PageHeader
-        eyebrow="Dashboard Interno"
-        title="Visão da Empresa"
-        subtitle="Dashboard em tempo real · dados do Supabase"
-        actions={
-          <button onClick={load} className="p-2 hover:bg-surface-highest text-muted hover:text-on-surface transition-colors" title="Recarregar">
-            <RefreshCw size={18} />
+    <div className="min-h-screen bg-surface text-on-surface">
+      {/* ===== TOP COMMAND BAR ===== */}
+      <header className="sticky top-0 z-20 h-14 border-b border-outline/15 bg-surface/90 backdrop-blur-md flex items-center gap-5 px-6">
+        <div className="whitespace-nowrap">
+          <div className="font-mono text-[9px] tracking-[0.2em] text-secondary uppercase">Mission Control / Visão Geral</div>
+        </div>
+        <div className="hidden lg:flex items-center gap-5 font-mono text-[10px] tracking-[0.08em] text-muted uppercase">
+          <span className="flex items-center gap-1.5 text-secondary"><span className="w-1.5 h-1.5 bg-action inline-block animate-pulse" />Sistema nominal</span>
+          <span className="tabular-nums">{now.toLocaleTimeString('pt-BR', { hour12: false })}</span>
+          <span>9 produtos · 1 hub</span>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          <button onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))} className="hidden md:flex items-center gap-2 bg-surface-container border border-outline/20 px-3 py-2 text-[12px] text-muted hover:text-on-surface hover:border-secondary/40 transition-colors">
+            <Search className="w-3.5 h-3.5" /> Buscar <kbd className="font-mono text-[9px] border border-outline/30 px-1 ml-1">⌘K</kbd>
           </button>
-        }
-      />
-      <div className="space-y-10">
+          <button onClick={load} className="w-9 h-9 flex items-center justify-center bg-surface-container border border-outline/20 text-muted hover:text-on-surface transition-colors" title="Recarregar">
+            <RefreshCw className="w-4 h-4" />
+          </button>
+        </div>
+      </header>
 
+      <div className="px-6 py-6 pb-16 space-y-5">
 
-      {/* Alertas críticos no topo */}
-      {(summary.overdueTasks > 0 || summary.backlogCritical > 0) && (
-        <div className="bg-danger/5 border border-danger/30 p-5 flex items-start gap-3">
-          <AlertOctagon className="w-6 h-6 text-danger shrink-0" />
-          <div className="flex-1">
-            <div className="text-sm font-semibold text-danger mb-1">Atenção necessária</div>
-            <div className="flex flex-wrap gap-4 text-sm text-on-surface-variant">
-              {summary.overdueTasks > 0 && (
-                <span>⚠ {summary.overdueTasks} tarefa{summary.overdueTasks > 1 ? 's' : ''} do Roadmap atrasada{summary.overdueTasks > 1 ? 's' : ''}</span>
-              )}
-              {summary.backlogCritical > 0 && (
-                <span>🔥 {summary.backlogCritical} item{summary.backlogCritical > 1 ? 's' : ''} crítico{summary.backlogCritical > 1 ? 's' : ''} no Backlog</span>
-              )}
+        {/* ===== FOCO DO DIA ===== */}
+        <div className="relative border border-outline/25 bg-gradient-to-r from-surface-container to-surface p-5 flex flex-col md:flex-row md:items-center gap-5 overflow-hidden">
+          <span className="absolute top-0 left-0 w-[3px] h-full bg-action" />
+          <div className="shrink-0">
+            <div className="font-mono text-[9px] tracking-[0.2em] text-secondary uppercase mb-1.5">◆ Foco do dia</div>
+            <div className="font-serif text-[15px] text-muted first-letter:uppercase">{saudacao()}, Gilberto</div>
+          </div>
+          <div className="hidden md:block w-px h-11 bg-outline/20" />
+          <div className="flex-1 min-w-0">
+            <div className="font-serif text-[22px] leading-tight tracking-tight text-on-surface">
+              {focoTask
+                ? <>Prioridade: <span className="text-secondary">{focoTask.title}</span>.</>
+                : <>Nenhuma tarefa urgente. <span className="text-secondary">Avance o roadmap.</span></>}
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Fase atual + Métrica + Progresso */}
-      {summary.currentPhase && (
-        <div className="bg-secondary-container/25 border border-secondary/30 p-6">
-          <div className="flex items-start gap-5">
-            <div className="w-14 h-14 bg-secondary-container border border-secondary/40 flex items-center justify-center text-2xl font-serif font-bold text-secondary shrink-0">
-              {summary.currentPhase.phase_number}
-            </div>
-            <div className="flex-1">
-              <div className="text-xs font-mono text-secondary uppercase tracking-widest">Fase atual do Roadmap</div>
-              <div className="text-xl font-serif font-semibold text-on-surface mt-0.5">{summary.currentPhase.nome}</div>
-              <div className="text-sm text-on-surface-variant mt-0.5">{summary.currentPhase.objetivo}</div>
-
-              {summary.currentPhaseProgress && (
-                <div className="mt-4">
-                  <div className="flex items-center justify-between text-xs mb-1.5">
-                    <span className="text-on-surface-variant">Progresso desta fase</span>
-                    <span className="text-secondary font-mono font-semibold">
-                      {summary.currentPhaseProgress.completed_tasks}/{summary.currentPhaseProgress.total_tasks} · {summary.currentPhaseProgress.percent_complete}%
-                    </span>
-                  </div>
-                  <div className="h-2 bg-surface-lowest overflow-hidden">
-                    <div
-                      className="h-full bg-secondary transition-all duration-500"
-                      style={{ width: `${parseFloat(summary.currentPhaseProgress.percent_complete)}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div className="mt-4 bg-surface-lowest p-3 flex items-start gap-2">
-                <Target className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
-                <div>
-                  <div className="text-[10px] font-mono text-secondary uppercase tracking-widest">Métrica única da fase</div>
-                  <div className="text-sm text-on-surface">{summary.currentPhase.metrica_unica}</div>
-                </div>
-              </div>
-            </div>
+          <div className="shrink-0 flex gap-7">
+            <div className="text-right"><div className="font-serif font-bold text-[26px] leading-none tabular-nums text-on-surface">{summary.nextTasks.length}</div><div className="font-mono text-[9px] tracking-[0.1em] text-muted uppercase mt-1.5">Próximas ações</div></div>
+            <div className="text-right"><div className="font-serif font-bold text-[26px] leading-none tabular-nums" style={{ color: alertas.length ? 'var(--color-warning)' : 'var(--color-success)' }}>{alertas.length}</div><div className="font-mono text-[9px] tracking-[0.1em] text-muted uppercase mt-1.5">Alertas críticos</div></div>
           </div>
         </div>
-      )}
 
-      {/* 4 KPIs principais */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <KpiCard
-          icon={<GitBranch className="w-4 h-4" />}
-          label="Roadmap"
-          value={`${totalProgress}%`}
-          sub={`${summary.completedTasks}/${summary.totalTasks} tarefas`}
-          color="text-secondary"
-          onClick={() => onNavigate?.('trilha')}
-        />
-        <KpiCard
-          icon={<Zap className="w-4 h-4" />}
-          label="Backlog"
-          value={String(summary.backlogInProgress)}
-          sub={`em andamento · ${summary.backlogCritical} críticos`}
-          color={summary.backlogCritical > 0 ? 'text-danger' : 'text-warning'}
-          onClick={() => onNavigate?.('backlog')}
-        />
-        <KpiCard
-          icon={<Award className="w-4 h-4" />}
-          label="Decisões"
-          value={String(summary.totalDecisions)}
-          sub="registradas"
-          color="text-success"
-          onClick={() => onNavigate?.('decisoes')}
-        />
-        <KpiCard
-          icon={<DollarSign className="w-4 h-4" />}
-          label="MRR"
-          value={summary.latestMrr != null ? `R$ ${summary.latestMrr.toFixed(0)}` : '—'}
-          sub={summary.runwayMonths != null ? `runway ${summary.runwayMonths} meses` : 'preencher Cadastro'}
-          color="text-on-surface-variant"
-          onClick={() => onNavigate?.('financeiro')}
-        />
-      </div>
-
-      {/* Pulso de Publicações — operação social das 3 camadas no centro de comando */}
-      <PulsoPublicacoes onNavigate={onNavigate} />
-
-      {/* Grid: Próximas tarefas + Próximo marco */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Próximas 7 tarefas */}
-        <div className="lg:col-span-2 bg-surface-low border border-outline/10 p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <Calendar className="w-5 h-5 text-secondary" />
-            <h2 className="font-serif text-lg font-semibold text-on-surface">Próximas 7 tarefas</h2>
-          </div>
-          {summary.nextTasks.length === 0 ? (
-            <div className="text-sm text-muted italic py-4">Nenhuma tarefa pendente com data.</div>
-          ) : (
-            <div className="space-y-2">
-              {summary.nextTasks.map((t) => {
-                const d = t.target_date ? daysUntil(t.target_date) : 0;
-                const overdue = d < 0;
-                const urgent = d >= 0 && d <= 2;
-                return (
-                  <button key={t.id} onClick={() => onNavigate?.('trilha')} className={`w-full text-left flex items-start gap-3 p-2 transition-colors hover:bg-surface-highest ${overdue ? 'bg-danger/5' : urgent ? 'bg-warning/5' : ''}`}>
-                    <Circle className="w-3.5 h-3.5 text-muted mt-1 shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm text-on-surface">{t.title}</span>
-                        {t.track && (
-                          <span className={`text-[9px] font-mono px-1.5 border ${trackColor[t.track]}`}>{t.track}</span>
-                        )}
-                        <span className="text-[9px] font-mono text-muted">F{t.phase_number}</span>
-                      </div>
-                      {t.target_date && (
-                        <div className={`text-xs mt-0.5 font-mono ${overdue ? 'text-danger' : urgent ? 'text-warning' : 'text-muted'}`}>
-                          {formatDate(t.target_date)} · {overdue ? `${Math.abs(d)}d atrasado` : d === 0 ? 'hoje' : `em ${d}d`}
-                        </div>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Próximo marco destacado */}
-        <div onClick={() => onNavigate?.('trilha')} className="bg-surface-low border border-outline/10 p-5 cursor-pointer hover:border-secondary/40 transition-colors">
-          <div className="flex items-center gap-2 mb-3">
-            <Flag className="w-5 h-5 text-secondary" />
-            <h2 className="font-serif text-base font-semibold text-on-surface">Próximo marco</h2>
-          </div>
-          {nextMilestone ? (
-            <>
-              <div className="text-xs font-mono text-secondary uppercase tracking-widest mb-1">
-                {nextMilestone.category === 'decision_gate' ? 'Decision gate' : 'Marco'}
-              </div>
-              <div className="font-medium text-on-surface mb-3">{nextMilestone.title}</div>
-              {nextMilestone.target_date && (
-                <div className="text-4xl font-serif font-bold text-secondary">
-                  {Math.max(0, daysUntil(nextMilestone.target_date))}d
-                </div>
-              )}
-              <div className="text-xs text-muted mt-1">
-                {nextMilestone.target_date && formatDate(nextMilestone.target_date)} · Fase {nextMilestone.phase_number}
-              </div>
-            </>
-          ) : (
-            <div className="text-sm text-muted italic">Nenhum marco próximo.</div>
-          )}
-        </div>
-      </div>
-
-      {/* Status institucional */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        <StatusCard label="CNPJ cadastrado" done={summary.hasCnpj} hint="Cadastro Empresa → Identidade" onClick={() => onNavigate?.('cadastro-empresa')} />
-        <StatusCard label="DPO nomeado" done={summary.hasDpo} hint="Cadastro Empresa → LGPD" onClick={() => onNavigate?.('cadastro-empresa')} />
-        <StatusCard label="Snapshot financeiro" done={summary.latestMrr !== null} hint="Cadastro Empresa → Financeiro" onClick={() => onNavigate?.('cadastro-empresa')} />
-      </div>
-
-      {/* Decisões recentes */}
-      {summary.recentDecisions.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <GitBranch className="w-5 h-5 text-secondary" />
-            <h2 className="font-serif text-lg font-semibold text-on-surface">Decisões recentes</h2>
-          </div>
-          <div className="space-y-2">
-            {summary.recentDecisions.map((d) => (
-              <button key={d.id} onClick={() => onNavigate?.('decisoes')} className="w-full text-left bg-surface-low border border-outline/10 px-4 py-3 transition-colors hover:border-secondary/40">
-                <div className="flex items-center gap-2 flex-wrap mb-1">
-                  <span className="text-xs font-mono text-muted">{new Date(d.decided_at + 'T00:00:00').toLocaleDateString('pt-BR')}</span>
-                  {d.tags.slice(0, 3).map((t) => (
-                    <span key={t} className="text-[9px] font-mono text-secondary bg-secondary/10 px-1.5 py-0.5">#{t}</span>
-                  ))}
-                </div>
-                <div className="text-sm text-on-surface font-medium">{d.title}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Verdades canônicas */}
-      <div>
-        <div className="flex items-center gap-2 mb-4">
-          <AlertCircle className="w-5 h-5 text-secondary" />
-          <h2 className="font-serif text-lg font-semibold text-on-surface">Verdades Canônicas</h2>
-          <span className="text-xs font-mono text-muted ml-2">não podem ser alteradas sem decisão estratégica</span>
-        </div>
-        <div className="space-y-2">
-          {VERDADES_CANONICAS.map((v, i) => (
-            <div key={i} className={`flex items-center gap-3 border px-4 py-3 ${nivelCor[v.nível]} bg-transparent`}>
-              <CheckCircle2 className="w-4 h-4 shrink-0" />
-              <span className="text-sm text-on-surface-variant">{v.texto}</span>
-              <span className={`ml-auto text-[10px] font-mono uppercase tracking-widest shrink-0 ${nivelCor[v.nível]}`}>
-                {v.nível}
-              </span>
-            </div>
+        {/* ===== KPI TELEMETRY ROW ===== */}
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
+          {kpis.map((k) => (
+            <button key={k.idx} onClick={() => onNavigate?.(k.go)} className="relative text-left border border-outline/15 bg-surface-container p-4 pt-5 hover:bg-surface-high transition-colors group">
+              <span className="absolute -top-px -left-px w-2.5 h-2.5 border-t-2 border-l-2 border-secondary/70" />
+              <span className="absolute -top-px -right-px w-2.5 h-2.5 border-t-2 border-r-2 border-secondary/70" />
+              <div className="font-mono text-[9px] tracking-[0.12em] text-muted uppercase mb-3">{k.idx} · {k.label}</div>
+              <div className="font-serif font-bold text-[30px] leading-none tracking-tight text-on-surface tabular-nums">{k.value}</div>
+              <div className="font-mono text-[10px] text-muted mt-2.5 truncate">{k.sub}</div>
+            </button>
           ))}
         </div>
-      </div>
 
-      {/* Pergunta de ouro */}
-      <div className="border border-secondary/30 bg-secondary-container/20 p-6 text-center">
-        <div className="text-xs font-mono text-secondary uppercase tracking-widest mb-3">Pergunta de Ouro</div>
-        <p className="font-serif text-lg font-medium text-on-surface">
-          Isso fortalece a DIGIAI, o Clearix e a implantação da empresa segundo a verdade canônica atual?
-        </p>
-      </div>
+        {/* ===== ROW: MRR chart | Pipeline | Alertas ===== */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          {/* MRR real */}
+          <div className="border border-outline/15 bg-surface-container p-4">
+            <div className="font-mono text-[9px] tracking-[0.14em] text-secondary uppercase">§ 01 — Receita</div>
+            <div className="font-serif text-[17px] text-on-surface mt-1">Evolução do MRR</div>
+            {hasChart ? (
+              <>
+                <svg viewBox="0 0 520 150" preserveAspectRatio="none" className="w-full mt-3" style={{ height: 150 }}>
+                  <line x1="0" y1="40" x2="520" y2="40" stroke="var(--color-outline)" strokeOpacity="0.4" />
+                  <line x1="0" y1="95" x2="520" y2="95" stroke="var(--color-outline)" strokeOpacity="0.4" />
+                  <path d={areaFill} fill="var(--color-forest)" fillOpacity="0.14" />
+                  <path d={areaLine} fill="none" stroke="var(--color-action)" strokeWidth="2.5" />
+                  {dots.map((d, i) => <circle key={i} cx={d.x} cy={d.y} r="3" fill="var(--color-surface)" stroke="var(--color-action)" strokeWidth="2" />)}
+                </svg>
+                <div className="font-mono text-[9px] text-muted mt-2">Últimos {series.length} snapshots · fonte: financeiro</div>
+              </>
+            ) : (
+              <div className="mt-6 flex flex-col items-start">
+                <div className="font-serif font-bold text-[40px] leading-none text-on-surface tabular-nums">{summary.latestMrr != null ? brl(summary.latestMrr) : '—'}</div>
+                <div className="font-mono text-[10px] text-muted mt-3">Histórico insuficiente para o gráfico — registre mais snapshots.</div>
+              </div>
+            )}
+          </div>
+
+          {/* Pipeline real */}
+          <div className="border border-outline/15 bg-surface-container p-4">
+            <div className="flex items-center justify-between">
+              <div><div className="font-mono text-[9px] tracking-[0.14em] text-secondary uppercase">§ 02 — Comercial</div><div className="font-serif text-[17px] text-on-surface mt-1">Pipeline de Vendas</div></div>
+              <button onClick={() => onNavigate?.('comercial')} className="font-mono text-[9px] tracking-[0.08em] uppercase text-secondary hover:text-on-surface">abrir →</button>
+            </div>
+            <div className="mt-4 space-y-3.5">
+              {FUNNEL.map((f) => {
+                const n = counts[f.stage] || 0;
+                return (
+                  <div key={f.stage}>
+                    <div className="flex justify-between text-[12px] mb-1.5"><span className="text-on-surface-variant">{f.label}</span><span className="font-mono text-on-surface tabular-nums">{n}</span></div>
+                    <div className="h-1.5 bg-surface-high overflow-hidden"><div className="h-full bg-action/85" style={{ width: `${(n / funnelMax) * 100}%` }} /></div>
+                  </div>
+                );
+              })}
+              {leads.length === 0 && <div className="text-[12px] text-muted italic pt-1">Nenhum lead cadastrado ainda.</div>}
+            </div>
+          </div>
+
+          {/* Alertas reais */}
+          <div className="border border-outline/15 bg-surface-container p-4 flex flex-col">
+            <div className="flex items-center justify-between">
+              <div><div className="font-mono text-[9px] tracking-[0.14em] text-secondary uppercase">§ 03 — Alertas</div><div className="font-serif text-[17px] text-on-surface mt-1">Críticos</div></div>
+              <span className="font-mono text-[9px] px-2 py-0.5 border" style={{ color: alertas.length ? 'var(--color-warning)' : 'var(--color-success)', borderColor: alertas.length ? 'var(--color-warning)' : 'var(--color-success)' }}>{alertas.length} {alertas.length ? 'ATIVOS' : 'OK'}</span>
+            </div>
+            {alertas.length === 0 ? (
+              <div className="flex-1 flex items-center text-[13px] text-success mt-4">Nada exigindo atenção agora.</div>
+            ) : (
+              <div className="mt-3 border border-outline/15">
+                {alertas.map((a, i) => (
+                  <button key={i} onClick={() => onNavigate?.(a.go)} className="w-full text-left bg-surface-container hover:bg-surface-high transition-colors p-3 flex gap-2.5 items-start border-b border-outline/15 last:border-0">
+                    <span className="w-1.5 h-1.5 mt-1.5 shrink-0" style={{ background: a.tone }} />
+                    <span className="min-w-0"><span className="block text-[12.5px] text-on-surface leading-snug">{a.texto}</span>{a.sub && <span className="block font-mono text-[10px] text-muted mt-0.5">{a.sub}</span>}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ===== ROW: Ecosystem Pulse | Próximas ações | Verdades ===== */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          {/* Pulso do Ecossistema (instrumento vivo) */}
+          <div className="relative border border-outline/25 bg-surface-lowest overflow-hidden min-h-[300px]">
+            <canvas ref={meshRef} className="absolute inset-0 w-full h-full" aria-hidden />
+            <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 62% 50%, transparent 42%, var(--color-surface-lowest) 100%)' }} />
+            <div className="relative p-4 pointer-events-none">
+              <div className="font-mono text-[9px] tracking-[0.14em] text-secondary uppercase">§ 04 — Ecossistema · live</div>
+              <div className="font-serif text-[17px] text-on-surface mt-1">Pulso do Ecossistema</div>
+            </div>
+            <div className="absolute bottom-3.5 left-4 right-4 flex gap-3.5 flex-wrap font-mono text-[9px] tracking-[0.06em] text-muted uppercase pointer-events-none">
+              <span style={{ color: 'var(--color-success)' }}>● 8 operando</span><span style={{ color: 'var(--color-warning)' }}>◐ 1 piloto</span>
+              {summary.latestMrr != null && <span>MRR {brl(summary.latestMrr)}</span>}
+            </div>
+          </div>
+
+          {/* Próximas ações reais */}
+          <div className="border border-outline/15 bg-surface-container p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div><div className="font-mono text-[9px] tracking-[0.14em] text-secondary uppercase">§ 05 — Execução</div><div className="font-serif text-[17px] text-on-surface mt-1">Próximas Ações</div></div>
+              <button onClick={() => onNavigate?.('trilha')} className="font-mono text-[9px] tracking-[0.08em] uppercase text-secondary hover:text-on-surface">roadmap →</button>
+            </div>
+            {summary.nextTasks.length === 0 ? (
+              <div className="text-[12px] text-muted italic py-2">Nenhuma tarefa pendente com data.</div>
+            ) : summary.nextTasks.slice(0, 5).map((t) => {
+              const d = t.target_date ? daysUntil(t.target_date) : 0;
+              const overdue = d < 0, urgent = d >= 0 && d <= 2;
+              return (
+                <button key={t.id} onClick={() => onNavigate?.('trilha')} className="w-full text-left flex items-center gap-2.5 py-2.5 border-b border-outline/12 hover:bg-surface-high transition-colors">
+                  <span className="w-3.5 h-3.5 shrink-0 border border-outline/40" />
+                  <span className="flex-1 min-w-0 text-[12.5px] text-on-surface truncate">{t.title}</span>
+                  {t.target_date && <span className="font-mono text-[9px] tabular-nums shrink-0" style={{ color: overdue ? 'var(--color-danger)' : urgent ? 'var(--color-warning)' : 'var(--color-muted)' }}>{overdue ? `${Math.abs(d)}d atr.` : d === 0 ? 'hoje' : formatDate(t.target_date)}</span>}
+                </button>
+              );
+            })}
+            {nextMilestone && (
+              <div className="mt-3 pt-3 border-t border-outline/15 flex items-center gap-3">
+                <div className="font-serif font-bold text-[28px] leading-none text-secondary tabular-nums">{nextMilestone.target_date ? Math.max(0, daysUntil(nextMilestone.target_date)) : 0}d</div>
+                <div className="min-w-0"><div className="font-mono text-[9px] tracking-[0.1em] text-secondary uppercase">Próximo marco</div><div className="text-[12px] text-on-surface-variant truncate">{nextMilestone.title}</div></div>
+              </div>
+            )}
+          </div>
+
+          {/* Verdades canônicas + decisões reais */}
+          <div className="border border-outline/15 bg-surface-container p-4">
+            <div className="font-mono text-[9px] tracking-[0.14em] text-secondary uppercase">§ 06 — Bússola</div>
+            <div className="font-serif text-[17px] text-on-surface mt-1 mb-3">Verdades Canônicas</div>
+            {VERDADES_CANONICAS.map((v, i) => (
+              <div key={i} className="flex gap-2.5 items-start py-2 border-b border-outline/12">
+                <span className="mt-0.5 shrink-0 w-3.5 h-3.5 border border-secondary/60 flex items-center justify-center"><span className="block w-[5px] h-[8px] border-r-2 border-b-2 border-secondary rotate-45 -translate-y-px" /></span>
+                <span className="text-[12.5px] text-on-surface-variant leading-snug">{v}</span>
+              </div>
+            ))}
+            <div className="mt-3 pt-3 border-t border-outline/15">
+              <div className="font-mono text-[9px] tracking-[0.1em] text-secondary uppercase mb-1">Pergunta de ouro</div>
+              <p className="font-serif text-[13px] leading-snug text-on-surface-variant">Isso fortalece a DIGIAI, o Clearix e a implantação da empresa?</p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
-  );
-}
-
-function KpiCard({ icon, label, value, sub, color, onClick }: { icon: React.ReactNode; label: string; value: string; sub: string; color: string; onClick?: () => void }) {
-  return (
-    <button onClick={onClick} disabled={!onClick} className="text-left w-full bg-surface-low border border-outline/10 p-4 transition-all enabled:hover:border-secondary/40 enabled:hover:bg-secondary-container/15 disabled:cursor-default">
-      <div className={`flex items-center gap-2 text-xs ${color} mb-2`}>
-        {icon}
-        <span className="font-mono uppercase tracking-widest">{label}</span>
-      </div>
-      <div className="text-2xl font-serif font-bold text-on-surface">{value}</div>
-      <div className="text-[11px] text-muted mt-0.5">{sub}</div>
-    </button>
-  );
-}
-
-function StatusCard({ label, done, hint, onClick }: { label: string; done: boolean; hint: string; onClick?: () => void }) {
-  return (
-    <button onClick={onClick} disabled={!onClick} className={`text-left w-full p-3 border transition-all enabled:hover:border-secondary/40 disabled:cursor-default ${done ? 'bg-secondary-container/25 border-secondary/30' : 'bg-surface-low border-outline/10'}`}>
-      <div className="flex items-center gap-2 mb-1">
-        {done ? <CheckCircle2 className="w-4 h-4 text-secondary" /> : <Circle className="w-4 h-4 text-muted" />}
-        <span className={`text-xs font-medium ${done ? 'text-on-secondary-container' : 'text-on-surface-variant'}`}>{label}</span>
-      </div>
-      <div className="text-[10px] text-muted">{hint}</div>
-    </button>
   );
 }

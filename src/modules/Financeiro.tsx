@@ -95,6 +95,18 @@ function DashboardTab() {
   const [filterProduct, setFilterProduct] = useState<string>('all');
   const [excludeAporte, setExcludeAporte] = useState(false);
 
+  // Cores do chart.js seguem o tema (canvas não lê var() — resolve por data-theme)
+  const [themeAttr, setThemeAttr] = useState(() => document.documentElement.getAttribute('data-theme'));
+  useEffect(() => {
+    const mo = new MutationObserver(() => setThemeAttr(document.documentElement.getAttribute('data-theme')));
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => mo.disconnect();
+  }, []);
+  const isLight = themeAttr === 'light';
+  const chartTick = isLight ? '#5a5f6b' : '#64748b';
+  const chartGrid = isLight ? '#dde2f3' : '#1e293b';
+  const chartLegend = isLight ? '#46464c' : '#94a3b8';
+
   const load = useCallback(async () => {
     setLoading(true);
     const [e, m, v, s, p] = await Promise.all([
@@ -241,14 +253,14 @@ function DashboardTab() {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                  legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 12, font: { size: 11 } } },
+                  legend: { position: 'bottom', labels: { color: chartLegend, boxWidth: 12, font: { size: 11 } } },
                   tooltip: {
                     callbacks: { label: (ctx) => `${ctx.dataset.label}: ${brl(ctx.parsed.y)}` },
                   },
                 },
                 scales: {
-                  x: { stacked: true, ticks: { color: '#64748b' }, grid: { display: false } },
-                  y: { stacked: true, ticks: { color: '#64748b', callback: (v) => `R$${v}` }, grid: { color: '#1e293b' } },
+                  x: { stacked: true, ticks: { color: chartTick }, grid: { display: false } },
+                  y: { stacked: true, ticks: { color: chartTick, callback: (v) => `R$${v}` }, grid: { color: chartGrid } },
                 },
               }}
             />

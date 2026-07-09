@@ -18,8 +18,8 @@ type Leader = Awaited<ReturnType<typeof marketingStore.getAffiliateLeaderboard>>
 type Payout = Awaited<ReturnType<typeof marketingStore.listAffiliatePayouts>>[number];
 
 const STATUS_COLOR: Record<string, string> = {
-  pending: '#F59E0B', active: '#10B981', top: '#FFD700',
-  inactive: '#6B7280', banned: '#EF4444',
+  pending: 'var(--color-warning)', active: 'var(--color-success)', top: '#FFD700',
+  inactive: 'var(--color-muted)', banned: 'var(--color-danger)',
 };
 const STATUS_LABEL: Record<string, string> = {
   pending: 'Pendente', active: 'Ativo', top: '🥇 Top',
@@ -138,15 +138,15 @@ export function AfiliadosDashboard() {
       {stats && (
         <>
           <div className="grid grid-cols-4 gap-3 mb-3">
-            <StatCard label="Afiliados" value={String(stats.total_affiliates)} color="#adcebd" />
-            <StatCard label="Com vendas" value={String(stats.with_sales)} color="#10B981" />
-            <StatCard label="Vendas totais" value={String(stats.sales_total)} color="#8B5CF6" />
-            <StatCard label="Receita gerada" value={brl(stats.commission_total_cents * 100 / 30)} color="#F59E0B" />
+            <StatCard label="Afiliados" value={String(stats.total_affiliates)} color="var(--color-secondary)" />
+            <StatCard label="Com vendas" value={String(stats.with_sales)} color="var(--color-success)" />
+            <StatCard label="Vendas totais" value={String(stats.sales_total)} color="var(--color-action)" />
+            <StatCard label="Receita gerada" value={brl(stats.commission_total_cents * 100 / 30)} color="var(--color-warning)" />
           </div>
           <div className="grid grid-cols-3 gap-3 mb-6">
-            <StatCard label="Comissão acumulada" value={brl(stats.commission_total_cents)} color="#F59E0B" icon={<DollarSign className="w-3.5 h-3.5" />} />
-            <StatCard label="Já pago" value={brl(stats.commission_paid_cents)} color="#10B981" icon={<Check className="w-3.5 h-3.5" />} />
-            <StatCard label="A pagar (saldo devido)" value={brl(stats.commission_due_total_cents)} color={stats.commission_due_total_cents > 0 ? '#EF4444' : '#6B7280'} icon={<Receipt className="w-3.5 h-3.5" />} />
+            <StatCard label="Comissão acumulada" value={brl(stats.commission_total_cents)} color="var(--color-warning)" icon={<DollarSign className="w-3.5 h-3.5" />} />
+            <StatCard label="Já pago" value={brl(stats.commission_paid_cents)} color="var(--color-success)" icon={<Check className="w-3.5 h-3.5" />} />
+            <StatCard label="A pagar (saldo devido)" value={brl(stats.commission_due_total_cents)} color={stats.commission_due_total_cents > 0 ? 'var(--color-danger)' : 'var(--color-muted)'} icon={<Receipt className="w-3.5 h-3.5" />} />
           </div>
         </>
       )}
@@ -244,10 +244,10 @@ function AffiliateCard({ a, onRequestPayout, onChanged }: { a: DashRow; onReques
       </div>
 
       <div className="grid grid-cols-4 gap-2 mt-3 mb-3">
-        <MiniStat label="Vendas" value={String(a.total_sales ?? 0)} color="#adcebd" />
-        <MiniStat label="Comissão total" value={brl(a.total_commission_cents)} color="#F59E0B" />
-        <MiniStat label="Já pago" value={brl(a.commission_paid_total_cents)} color="#10B981" />
-        <MiniStat label="A pagar" value={brl(a.commission_due_cents)} color={a.commission_due_cents > 0 ? '#EF4444' : '#6B7280'} />
+        <MiniStat label="Vendas" value={String(a.total_sales ?? 0)} color="var(--color-secondary)" />
+        <MiniStat label="Comissão total" value={brl(a.total_commission_cents)} color="var(--color-warning)" />
+        <MiniStat label="Já pago" value={brl(a.commission_paid_total_cents)} color="var(--color-success)" />
+        <MiniStat label="A pagar" value={brl(a.commission_due_cents)} color={a.commission_due_cents > 0 ? 'var(--color-danger)' : 'var(--color-muted)'} />
       </div>
 
       <div className="flex items-center gap-2 pt-2 border-t border-outline/10 flex-wrap">

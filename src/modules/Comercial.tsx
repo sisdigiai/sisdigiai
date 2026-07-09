@@ -10,12 +10,12 @@ import ProposalEditor from './comercial/ProposalEditor';
 import { proposalFromMeeting } from './comercial/proposalGen';
 
 const STAGES: { key: LeadStage; label: string; color: string }[] = [
-  { key: 'lead', label: 'Lead', color: '#6b7280' },
-  { key: 'contato', label: 'Contato', color: '#3b82f6' },
-  { key: 'demo', label: 'Demo', color: '#8b5cf6' },
-  { key: 'piloto', label: 'Piloto', color: '#f59e0b' },
-  { key: 'cliente', label: 'Cliente', color: '#10b981' },
-  { key: 'perdido', label: 'Perdido', color: '#ef4444' },
+  { key: 'lead', label: 'Lead', color: 'var(--color-muted)' },
+  { key: 'contato', label: 'Contato', color: 'var(--color-info)' },
+  { key: 'demo', label: 'Demo', color: 'var(--color-action)' },
+  { key: 'piloto', label: 'Piloto', color: 'var(--color-warning)' },
+  { key: 'cliente', label: 'Cliente', color: 'var(--color-success)' },
+  { key: 'perdido', label: 'Perdido', color: 'var(--color-danger)' },
 ];
 
 const PRODUCTS = ['clearix', 'osi', 'academy', 'outro'];

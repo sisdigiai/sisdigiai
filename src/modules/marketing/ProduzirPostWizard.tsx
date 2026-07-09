@@ -11,13 +11,13 @@ interface Props {
 }
 
 const STEPS = [
-  { id: 1, category: 'text',  label: 'Roteiro / Copy',  icon: FileText, color: '#adcebd',
+  { id: 1, category: 'text',  label: 'Roteiro / Copy',  icon: FileText, color: 'var(--color-secondary)',
     templates: ['chatgpt-reel-roteiro','chatgpt-instagram-feed','chatgpt-carrossel-10-slides','chatgpt-email-lista','chatgpt-whatsapp-1msg'] },
-  { id: 2, category: 'image', label: 'Capa / Arte',     icon: ImagePlus, color: '#8B5CF6',
+  { id: 2, category: 'image', label: 'Capa / Arte',     icon: ImagePlus, color: 'var(--color-action)',
     templates: ['midjourney-capa-quadrada','midjourney-story-vertical','midjourney-infografico','dalle-capa-quadrada'] },
-  { id: 3, category: 'audio', label: 'Voz / Narração',  icon: Mic, color: '#F59E0B',
+  { id: 3, category: 'audio', label: 'Voz / Narração',  icon: Mic, color: 'var(--color-warning)',
     templates: ['elevenlabs-voiceover-reel'] },
-  { id: 4, category: 'video', label: 'Vídeo / Trilha',  icon: Film, color: '#EC4899',
+  { id: 4, category: 'video', label: 'Vídeo / Trilha',  icon: Film, color: 'var(--color-eco-polapetit)',
     templates: ['sora-reel-balcao-30s','suno-trilha-reel'] },
 ] as const;
 
@@ -152,7 +152,7 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
                     }`}
                   >
                     <div className={`w-7 h-7 flex items-center justify-center text-xs font-bold ${done ? '' : 'bg-surface-high text-muted'}`}
-                      style={done ? { background: s.color, color: '#0d131f' } : {}}>
+                      style={done ? { background: s.color, color: 'var(--color-on-action)' } : {}}>
                       {done ? <Check className="w-3.5 h-3.5" /> : s.id}
                     </div>
                     <div className="text-left min-w-0">

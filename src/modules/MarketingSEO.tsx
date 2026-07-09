@@ -56,11 +56,11 @@ export default function MarketingSEO() {
                 }`}
               >
                 <span className="inline-flex items-center gap-2">
-                  <span className="w-2 h-2 shrink-0" style={{ background: s.color ?? '#6b7280' }} />
+                  <span className="w-2 h-2 shrink-0" style={{ background: s.color ?? 'var(--color-muted)' }} />
                   {s.label}
                   <span className="font-mono text-[10px] text-muted hidden sm:inline">{s.site}</span>
                 </span>
-                {on && <span className="absolute left-0 right-0 -bottom-px h-0.5" style={{ background: s.color ?? '#6b7280' }} />}
+                {on && <span className="absolute left-0 right-0 -bottom-px h-0.5" style={{ background: s.color ?? 'var(--color-muted)' }} />}
               </button>
             );
           })}

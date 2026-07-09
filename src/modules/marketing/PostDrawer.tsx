@@ -31,11 +31,11 @@ interface Props {
 }
 
 const STATUS_OPTIONS: { value: CalendarStatus; label: string; color: string }[] = [
-  { value: 'planned', label: 'Planejado', color: '#adcebd' },
-  { value: 'in_production', label: 'Em produção', color: '#F59E0B' },
-  { value: 'ready', label: 'Pronto', color: '#8B5CF6' },
-  { value: 'published', label: 'Publicado', color: '#10B981' },
-  { value: 'cancelled', label: 'Cancelado', color: '#6B7280' },
+  { value: 'planned', label: 'Planejado', color: 'var(--color-secondary)' },
+  { value: 'in_production', label: 'Em produção', color: 'var(--color-warning)' },
+  { value: 'ready', label: 'Pronto', color: 'var(--color-action)' },
+  { value: 'published', label: 'Publicado', color: 'var(--color-success)' },
+  { value: 'cancelled', label: 'Cancelado', color: 'var(--color-muted)' },
 ];
 
 const ART_TYPES = ['cover', 'story', 'reel', 'carrossel', 'video', 'thumb', 'outro'];
@@ -150,7 +150,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
         {/* Header */}
         <div className="sticky top-0 z-10 bg-surface-container border-b border-outline/10 px-6 py-4 flex items-center justify-between">
           <div className="flex-1">
-            <div className="text-[10px] uppercase tracking-widest font-bold" style={{ color: draft.pillar_color ?? '#adcebd' }}>
+            <div className="text-[10px] uppercase tracking-widest font-bold" style={{ color: draft.pillar_color ?? 'var(--color-secondary)' }}>
               {draft.pillar_name ?? 'Sem pilar'}
             </div>
             <h2 className="text-lg font-semibold mt-1">{draft.hook ?? 'Sem hook'}</h2>
@@ -317,17 +317,17 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
             {/* Vendas atribuídas */}
             {sales && sales.sales_count > 0 ? (
               <div className="mt-3 grid grid-cols-3 gap-2">
-                <StatPill label="Vendas" value={String(sales.sales_count)} color="#10B981" icon={<DollarSign className="w-3 h-3" />} />
-                <StatPill label="Receita" value={brl(sales.revenue_cents)} color="#10B981" />
-                <StatPill label="Comissão" value={brl(sales.commission_cents)} color="#adcebd" />
+                <StatPill label="Vendas" value={String(sales.sales_count)} color="var(--color-success)" icon={<DollarSign className="w-3 h-3" />} />
+                <StatPill label="Receita" value={brl(sales.revenue_cents)} color="var(--color-success)" />
+                <StatPill label="Comissão" value={brl(sales.commission_cents)} color="var(--color-secondary)" />
                 {sales.refunds_count > 0 && (
-                  <StatPill label="Reembolsos" value={String(sales.refunds_count)} color="#F59E0B" />
+                  <StatPill label="Reembolsos" value={String(sales.refunds_count)} color="var(--color-warning)" />
                 )}
                 {sales.chargebacks_count > 0 && (
-                  <StatPill label="Chargebacks" value={String(sales.chargebacks_count)} color="#EF4444" />
+                  <StatPill label="Chargebacks" value={String(sales.chargebacks_count)} color="var(--color-danger)" />
                 )}
                 {sales.affiliate_sales_count > 0 && (
-                  <StatPill label="Via afiliado" value={String(sales.affiliate_sales_count)} color="#8B5CF6" />
+                  <StatPill label="Via afiliado" value={String(sales.affiliate_sales_count)} color="var(--color-action)" />
                 )}
               </div>
             ) : (

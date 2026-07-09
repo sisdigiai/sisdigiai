@@ -6,7 +6,7 @@ type Member = Awaited<ReturnType<typeof marketingStore.listCommunityMembers>>[nu
 type Stats = NonNullable<Awaited<ReturnType<typeof marketingStore.getCommunityStats>>>;
 
 const STATUS_COLOR: Record<string, string> = {
-  active: '#10B981', vip: '#F59E0B', inactive: '#6B7280', blocked: '#EF4444', refunded: '#8B5CF6',
+  active: 'var(--color-success)', vip: 'var(--color-warning)', inactive: 'var(--color-muted)', blocked: 'var(--color-danger)', refunded: 'var(--color-action)',
 };
 const STATUS_LABEL: Record<string, string> = {
   active: 'Ativo', vip: 'VIP', inactive: 'Inativo', blocked: 'Bloqueado', refunded: 'Reembolsado',
@@ -95,18 +95,18 @@ export function Comunidade() {
       {/* Stats */}
       {stats && (
         <div className="grid grid-cols-4 gap-3 mb-3">
-          <StatCard label="Total membros" value={String(stats.total)} color="#adcebd" icon={<Users className="w-3.5 h-3.5" />} />
-          <StatCard label="Ativos" value={String(stats.active)} color="#10B981" />
-          <StatCard label="VIPs" value={String(stats.vip)} color="#F59E0B" icon={<Crown className="w-3.5 h-3.5" />} />
-          <StatCard label="Novos 7d" value={String(stats.new_last_7d)} color="#8B5CF6" />
+          <StatCard label="Total membros" value={String(stats.total)} color="var(--color-secondary)" icon={<Users className="w-3.5 h-3.5" />} />
+          <StatCard label="Ativos" value={String(stats.active)} color="var(--color-success)" />
+          <StatCard label="VIPs" value={String(stats.vip)} color="var(--color-warning)" icon={<Crown className="w-3.5 h-3.5" />} />
+          <StatCard label="Novos 7d" value={String(stats.new_last_7d)} color="var(--color-action)" />
         </div>
       )}
       {stats && (
         <div className="grid grid-cols-4 gap-3 mb-6">
-          <StatCard label="Ativos últimos 30d" value={String(stats.active_last_30d)} color="#10B981" />
-          <StatCard label="Reembolsados" value={String(stats.refunded)} color="#8B5CF6" />
+          <StatCard label="Ativos últimos 30d" value={String(stats.active_last_30d)} color="var(--color-success)" />
+          <StatCard label="Reembolsados" value={String(stats.refunded)} color="var(--color-action)" />
           <StatCard label="WhatsApp opt-in" value={`${stats.whatsapp_optin} / ${stats.total}`} color="#25D366" />
-          <StatCard label="Email opt-in" value={`${stats.email_optin} / ${stats.total}`} color="#6366F1" />
+          <StatCard label="Email opt-in" value={`${stats.email_optin} / ${stats.total}`} color="var(--color-info)" />
         </div>
       )}
 
@@ -190,7 +190,7 @@ function MemberCard({ m, busy, onPromoteVip, onSetActive, onSetInactive, onBlock
           <div className="text-[10px] text-muted">
             Comprou em {dateBR(m.joined_at)}
             {m.hotmart_value_cents != null && ` · ${brl(m.hotmart_value_cents)}`}
-            {m.pillar_code && <> · veio do pilar <b style={{ color: m.pillar_color ?? '#adcebd' }}>{m.pillar_name}</b></>}
+            {m.pillar_code && <> · veio do pilar <b style={{ color: m.pillar_color ?? 'var(--color-secondary)' }}>{m.pillar_name}</b></>}
             {m.attributed_post_hook && <> · post: "{m.attributed_post_hook.slice(0, 40)}..."</>}
             {m.city && ` · ${m.city}/${m.state}`}
           </div>

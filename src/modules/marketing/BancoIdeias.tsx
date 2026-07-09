@@ -106,10 +106,10 @@ export function BancoIdeias() {
 
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <StatCard label="Total no banco" value={stats.total} color="#adcebd" />
-        <StatCard label="Disponíveis" value={stats.available} color="#10B981" />
-        <StatCard label="Agendadas" value={stats.scheduled} color="#F59E0B" />
-        <StatCard label="Já usadas" value={stats.used} color="#8B5CF6" />
+        <StatCard label="Total no banco" value={stats.total} color="var(--color-secondary)" />
+        <StatCard label="Disponíveis" value={stats.available} color="var(--color-success)" />
+        <StatCard label="Agendadas" value={stats.scheduled} color="var(--color-warning)" />
+        <StatCard label="Já usadas" value={stats.used} color="var(--color-action)" />
       </div>
 
       {savedAt && (
@@ -197,10 +197,10 @@ function IdeaCard({ idea, onSchedule }: { idea: ContentIdea; onSchedule: (date: 
   }, []);
 
   const statusColors: Record<string, string> = {
-    available: '#10B981',
-    scheduled: '#F59E0B',
-    used: '#8B5CF6',
-    archived: '#6B7280',
+    available: 'var(--color-success)',
+    scheduled: 'var(--color-warning)',
+    used: 'var(--color-action)',
+    archived: 'var(--color-muted)',
   };
 
   return (
@@ -209,9 +209,9 @@ function IdeaCard({ idea, onSchedule }: { idea: ContentIdea; onSchedule: (date: 
       {idea.pillar_name && (
         <div
           className="text-[10px] uppercase tracking-widest font-bold mb-2 flex items-center gap-1.5"
-          style={{ color: idea.pillar_color ?? '#adcebd' }}
+          style={{ color: idea.pillar_color ?? 'var(--color-secondary)' }}
         >
-          <span className="w-1.5 h-1.5" style={{ background: idea.pillar_color ?? '#adcebd' }} />
+          <span className="w-1.5 h-1.5" style={{ background: idea.pillar_color ?? 'var(--color-secondary)' }} />
           {idea.pillar_name}
         </div>
       )}

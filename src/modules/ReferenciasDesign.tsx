@@ -35,24 +35,24 @@ interface Sistema {
 const SISTEMAS: Sistema[] = [
   // ═══════════════ IA-ÓBVIO (atual) ═══════════════
   {
-    id: 'clearix',
+    id: 'digiai-house',
     categoria: 'ia-obvio',
-    nome: 'Clearix Lens',
-    empresa: 'DIGIAI (interno)',
+    nome: 'DIGIAI House',
+    empresa: 'DIGIAI (interno · canônico)',
     ano: 'v1.0 · 2026',
-    url: 'D:\\projetos\\clearix_design\\',
-    tagline: 'Design system canônico DIGIAI — B2B ótica',
+    url: 'https://digiai.app.br',
+    tagline: 'Design system canônico DIGIAI — Geometric Precision / Quiet Tech',
     cores: [
-      { hex: '#2563EB', nome: 'blue-500', uso: 'action-primary (light)' },
-      { hex: '#93C5FD', nome: 'blue-300', uso: 'action-primary (dark) WCAG 4.5:1' },
-      { hex: '#06B6D4', nome: 'cyan-500', uso: 'accent/destaque' },
-      { hex: '#1C1917', nome: 'neutral-900', uso: 'text-primary' },
-      { hex: '#FAFAF9', nome: 'neutral-50', uso: 'surface-base' },
+      { hex: '#2D4B3E', nome: 'forest-500', uso: 'ação primária' },
+      { hex: '#8FB8A1', nome: 'forest-300', uso: 'ação no dark (WCAG 4.5:1)' },
+      { hex: '#0A0F1E', nome: 'navy-950', uso: 'base / surface' },
+      { hex: '#1A202C', nome: 'navy-800', uso: 'container' },
+      { hex: '#DDE2F3', nome: 'clarity', uso: 'texto / ícones' },
     ],
-    fonte: { ui: 'Inter', fonteUiFamily: 'Inter, system-ui, sans-serif', mono: 'JetBrains Mono', fonteMonoFamily: '"JetBrains Mono", monospace' },
-    pros: ['Já é o oficial (R-014)', 'W3C Tokens + tabular-nums + tri-state filter', 'Decisões rastreadas (Apêndice B)'],
-    contras: ['Falta lib React', 'Falta WCAG CI', 'Sem CHANGELOG formal'],
-    veredito: 'Já adotado. v1.1 resolve os 3 gaps.',
+    fonte: { ui: 'Inter + Source Serif 4', fonteUiFamily: '"Source Serif 4", Inter, serif', mono: 'JetBrains Mono', fonteMonoFamily: '"JetBrains Mono", monospace' },
+    pros: ['O oficial adotado (aposenta o Clearix Lens azul)', 'Tokens @theme dark+light + malha de convergência', 'Vivo em /brand + landing digiai.app.br'],
+    contras: ['Rollout dos módulos legados em andamento', 'Lib de componentes React a formalizar'],
+    veredito: 'Adotado — fonte da verdade do ecossistema DIGIAI (v1.0).',
     destacado: true,
   },
   {
@@ -609,7 +609,7 @@ export default function ReferenciasDesign() {
         subtitle={
           <>
             <strong className="text-on-surface">15 referências organizadas em 5 categorias</strong> para inspirar a evolução do
-            {' '}<strong className="text-on-surface">Clearix Lens v1.0</strong> (R-014). Use as abas para alternar entre
+            {' '}<strong className="text-on-surface">DIGIAI House v1.0</strong> (adotado). Use as abas para alternar entre
             categorias. O foco vai além do "IA-óbvio" — incluí <strong className="text-on-surface">eyewear premium</strong>,
             {' '}<strong className="text-on-surface">bento hub</strong>, <strong className="text-on-surface">brasileiros</strong> e
             {' '}<strong className="text-on-surface">healthcare humano</strong>. Logo abaixo, os <strong className="text-on-surface">3 experimentos ativos</strong> rodando no laboratório Import.
@@ -805,10 +805,10 @@ export default function ReferenciasDesign() {
               </p>
             </div>
           </div>
-          <div className="mt-4 p-3 bg-[#2563EB]/10 border border-[#2563EB]/30 text-sm text-on-surface">
-            <strong>🎯 Recomendação prática:</strong> próxima iteração do <code className="bg-surface-lowest px-1.5 py-0.5 rounded text-xs">clearix_design v1.1</code> deveria
-            puxar <strong>bento grid (Apple) + 1 acento radical (Mykita) + warmth brasileira (Tátil)</strong> sem perder os
-            tokens W3C atuais nem o Inter/JetBrains Mono.
+          <div className="mt-4 p-3 bg-secondary/10 border border-secondary/30 text-sm text-on-surface">
+            <strong>🎯 Recomendação prática:</strong> o <code className="bg-surface-lowest px-1.5 py-0.5 rounded text-xs">DIGIAI House v1.0</code> é o
+            sistema adotado (Geometric Precision · forest/navy · Source Serif + Inter + JetBrains Mono). Evoluções podem
+            explorar <strong>bento grid (Apple) + warmth brasileira (Tátil)</strong> sem ferir os princípios (cantos retos, sem neon, forest só em ação).
           </div>
         </div>
       )}

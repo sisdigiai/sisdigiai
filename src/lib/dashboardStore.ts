@@ -32,6 +32,7 @@ export type DashboardSummary = {
   latestMrr: number | null;
   latestBurn: number | null;
   runwayMonths: number | null;
+  mrrSeries: number[]; // MRR real dos últimos snapshots (ordem cronológica), p/ o gráfico
 
   // Company
   hasCnpj: boolean;
@@ -54,6 +55,7 @@ const emptySummary: DashboardSummary = {
   latestMrr: null,
   latestBurn: null,
   runwayMonths: null,
+  mrrSeries: [],
   hasCnpj: false,
   hasDpo: false,
 };
@@ -132,6 +134,14 @@ export const dashboardStore = {
     const hasCnpj = !!(identityRes.data as any)?.cnpj;
     const hasDpo = !!(legalRes.data as any)?.dpo_nomeado;
 
+    // Série de MRR real dos snapshots (do mais antigo ao mais recente), só valores válidos.
+    // `snapshots[0]` é o mais recente (mesma ordem usada acima) → invertemos p/ cronológico.
+    const mrrSeries = [...snapshots]
+      .reverse()
+      .map((s) => Number(s?.mrr_total_brl))
+      .filter((n) => Number.isFinite(n))
+      .slice(-6);
+
     return {
       currentPhase,
       currentPhaseProgress: currentProg,
@@ -148,6 +158,7 @@ export const dashboardStore = {
       latestMrr,
       latestBurn,
       runwayMonths,
+      mrrSeries,
       hasCnpj,
       hasDpo,
     };

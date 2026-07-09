@@ -16,8 +16,8 @@ export type ModuleId =
   | 'visao' | 'portfolio' | 'trilha' | 'lista-mestra'
   | 'backlog' | 'comercial' | 'academy' | 'funil' | 'financeiro'
   | 'decisoes' | 'biblioteca' | 'brand' | 'cadastro-empresa'
-  | 'clearix' | 'cobranca' | 'referencias-design' | 'mock-estilos' | 'marketing'
-  | 'marketing-seo' | 'marketplace' | 'ecossistemas' | 'travas-marketing'
+  | 'clearix' | 'cobranca' | 'referencias-design' | 'como-usar' | 'mock-estilos' | 'marketing'
+  | 'marketing-seo' | 'marketplace' | 'ecossistemas' | 'mapa-vivo' | 'travas-marketing'
   | 'fluxo-osi' | 'guia'
   | 'marketing-redes' | 'marketing-performance' | 'marketing-banco'
   | 'marketing-prompts' | 'marketing-engajamento' | 'marketing-materiais'
@@ -105,6 +105,7 @@ const sistema: NavItem[] = [
   { id: 'biblioteca',         label: 'Biblioteca',          icon: <Library className="w-4 h-4" /> },
   { id: 'brand',              label: 'Brand Guidelines',    icon: <Palette className="w-4 h-4" /> },
   { id: 'referencias-design', label: 'Referências Design',  icon: <Palette className="w-4 h-4" /> },
+  { id: 'como-usar',          label: 'Como usar o DS',      icon: <BookOpen className="w-4 h-4" /> },
   { id: 'mock-estilos',       label: 'Mock Vendas',         icon: <Palette className="w-4 h-4" /> },
 ];
 
@@ -121,7 +122,7 @@ const SISTEMA_IDS = sistema.map(i => i.id) as ModuleId[];
 const MARKETING_IDS = marketing.map(i => i.id) as ModuleId[];
 
 function sectionOf(id: ModuleId): SectionKey {
-  if (id === 'ecossistemas') return 'ecossistemas';
+  if (id === 'ecossistemas' || id === 'mapa-vivo') return 'ecossistemas';
   if (MARKETING_IDS.includes(id)) return 'marketing';
   if (SISTEMA_IDS.includes(id)) return 'sistema';
   return 'operacional';
@@ -223,6 +224,7 @@ export default function Sidebar({ active, onSelect, mobileOpen = false, onClose 
           {isOpen('ecossistemas') && (
             <>
               <div className="space-y-0.5">
+                <NavButton item={{ id: 'mapa-vivo', label: 'Mapa Vivo', icon: <Network className="w-4 h-4" /> }} />
                 <NavButton item={{ id: 'ecossistemas', label: 'Painel', icon: <Boxes className="w-4 h-4" /> }} />
                 {ecossistemas.map(e => (
                   <EcossistemaLink
@@ -262,7 +264,7 @@ export default function Sidebar({ active, onSelect, mobileOpen = false, onClose 
         )}
         <button
           onClick={() => signOut()}
-          className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-on-surface-variant hover:text-white hover:bg-red-500/10 hover:border-red-500/30 border border-transparent transition-all duration-150"
+          className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-on-surface-variant hover:text-danger hover:bg-danger/10 hover:border-danger/30 border border-transparent transition-all duration-150"
         >
           <LogOut className="w-4 h-4" />
           Sair

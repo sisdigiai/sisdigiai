@@ -147,10 +147,10 @@ export function CalendarioEditorial() {
 
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <StatCard label="Planejados" value={stats.planned} color="#adcebd" />
-        <StatCard label="Em produção" value={stats.in_production} color="#F59E0B" />
-        <StatCard label="Prontos" value={stats.ready} color="#8B5CF6" />
-        <StatCard label="Publicados" value={stats.published} color="#10B981" />
+        <StatCard label="Planejados" value={stats.planned} color="var(--color-secondary)" />
+        <StatCard label="Em produção" value={stats.in_production} color="var(--color-warning)" />
+        <StatCard label="Prontos" value={stats.ready} color="var(--color-action)" />
+        <StatCard label="Publicados" value={stats.published} color="var(--color-success)" />
       </div>
 
       {loading ? (
@@ -249,11 +249,11 @@ function DateGroup({ date, posts, onAdvance, onEdit }: { date: string; posts: Ca
 
 function PostCard({ post, onAdvance, onEdit }: { post: CalendarPost; onAdvance: (p: CalendarPost) => void; onEdit: (p: CalendarPost) => void }) {
   const statusColors: Record<CalendarStatus, string> = {
-    planned: '#adcebd',
-    in_production: '#F59E0B',
-    ready: '#8B5CF6',
-    published: '#10B981',
-    cancelled: '#6B7280',
+    planned: 'var(--color-secondary)',
+    in_production: 'var(--color-warning)',
+    ready: 'var(--color-action)',
+    published: 'var(--color-success)',
+    cancelled: 'var(--color-muted)',
   };
 
   const statusLabels: Record<CalendarStatus, string> = {
@@ -267,14 +267,14 @@ function PostCard({ post, onAdvance, onEdit }: { post: CalendarPost; onAdvance: 
   return (
     <div
       className="bg-surface-low border border-outline/10 p-4 border-l-4"
-      style={{ borderLeftColor: post.pillar_color ?? '#adcebd' }}
+      style={{ borderLeftColor: post.pillar_color ?? 'var(--color-secondary)' }}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           {post.pillar_name && (
             <div
               className="text-[10px] uppercase tracking-widest font-bold mb-1"
-              style={{ color: post.pillar_color ?? '#adcebd' }}
+              style={{ color: post.pillar_color ?? 'var(--color-secondary)' }}
             >
               {post.pillar_name}
             </div>
@@ -431,9 +431,9 @@ function MonthView({ monthCursor, onMonthChange, posts, onEdit }: {
                     onClick={() => onEdit(p)}
                     className="w-full text-left text-[10px] truncate px-1 py-0.5 hover:brightness-125 transition-all"
                     style={{
-                      background: `${p.pillar_color ?? '#adcebd'}25`,
-                      color: p.pillar_color ?? '#adcebd',
-                      borderLeft: `2px solid ${p.pillar_color ?? '#adcebd'}`,
+                      background: `${p.pillar_color ?? 'var(--color-secondary)'}25`,
+                      color: p.pillar_color ?? 'var(--color-secondary)',
+                      borderLeft: `2px solid ${p.pillar_color ?? 'var(--color-secondary)'}`,
                     }}
                     title={`${p.content_type ?? 'post'}: ${p.hook ?? ''}`}
                   >
