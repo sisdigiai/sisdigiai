@@ -51,9 +51,9 @@ export function Afiliados() {
       <div className="flex items-center gap-4 mb-6 flex-wrap">
         <div className="flex items-center gap-2 flex-1 min-w-[260px]">
           <Search className="w-4 h-4 text-muted" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar nome ou email..." className="flex-1 bg-surface-low border border-outline/10 px-3 py-1.5 text-sm focus:outline-none focus:border-secondary/40" />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar nome ou email..." className="flex-1 bg-surface-container border border-outline/15 px-3 py-1.5 text-sm focus:outline-none focus:border-secondary/40" />
         </div>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm">
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-surface-container border border-outline/15 px-3 py-1.5 text-sm">
           <option value="all">Todos status</option>
           {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
@@ -102,7 +102,7 @@ export function Afiliados() {
 
 function StatCard({ label, value, color }: { label: string; value: number | string; color: string }) {
   return (
-    <div className="bg-surface-low border border-outline/10 p-4">
+    <div className="bg-surface-container border border-outline/15 p-4">
       <div className="text-2xl font-semibold" style={{ color }}>{value}</div>
       <div className="text-[11px] text-muted mt-1">{label}</div>
     </div>
@@ -113,7 +113,7 @@ function AffiliateRow({ affiliate, onClick }: { affiliate: Affiliate; onClick: (
   const status = STATUS_OPTIONS.find(s => s.value === affiliate.status);
   const tier = TIER_OPTIONS.find(t => t.value === affiliate.tier);
   return (
-    <button onClick={onClick} className="w-full text-left bg-surface-low border border-outline/10 p-4 hover:bg-surface-highest transition-colors">
+    <button onClick={onClick} className="w-full text-left bg-surface-container border border-outline/15 p-4 hover:bg-surface-highest transition-colors">
       <div className="flex items-center gap-4">
         <div className="w-10 h-10 bg-surface-high flex items-center justify-center font-semibold text-sm">{affiliate.full_name.charAt(0).toUpperCase()}</div>
         <div className="flex-1 min-w-0">
@@ -158,7 +158,7 @@ function AffiliateForm({ affiliate, onClose, onSaved }: { affiliate: Affiliate |
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-lowest p-4" onClick={onClose}>
-      <div className="bg-surface-container border border-outline/10 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+      <div className="bg-surface-container border border-outline/15 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="sticky top-0 bg-surface-container border-b border-outline/10 px-6 py-4 flex items-center justify-between">
           <h3 className="font-semibold">{affiliate ? 'Editar afiliado' : 'Novo afiliado'}</h3>
           <div className="flex items-center gap-2">
@@ -202,7 +202,7 @@ function AffiliateForm({ affiliate, onClose, onSaved }: { affiliate: Affiliate |
   );
 }
 
-const inputCls = 'w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-secondary/40 text-on-surface placeholder:text-muted';
+const inputCls = 'w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm focus:outline-none focus:border-secondary/40 text-on-surface placeholder:text-muted';
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

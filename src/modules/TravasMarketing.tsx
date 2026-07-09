@@ -105,7 +105,7 @@ export function TravasBanner() {
 
 export default function TravasMarketing() {
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto">
       <PageHeader
         eyebrow="Governança"
         title="Travas de Marketing"

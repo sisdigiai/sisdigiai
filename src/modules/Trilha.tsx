@@ -130,7 +130,7 @@ export default function Trilha() {
 
   if (loading) {
     return (
-      <div className="p-8 max-w-6xl mx-auto">
+      <div className="p-8 max-w-7xl mx-auto">
         <div className="text-muted text-sm">Carregando Roadmap...</div>
       </div>
     );
@@ -138,7 +138,7 @@ export default function Trilha() {
 
   if (phases.length === 0) {
     return (
-      <div className="p-8 max-w-6xl mx-auto">
+      <div className="p-8 max-w-7xl mx-auto">
         <div className="bg-warning/10 border border-warning/30 p-5">
           <div className="text-warning font-semibold mb-2">Roadmap sem dados</div>
           <p className="text-sm text-on-surface-variant">
@@ -150,7 +150,7 @@ export default function Trilha() {
   }
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto">
       <PageHeader
         eyebrow="Plano Mestre"
         title="Roadmap — Do Zero aos Milhões"

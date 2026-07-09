@@ -29,7 +29,7 @@ export function MetricCard({ title, icon, period, provider, site, externalUrl, e
   }
 
   return (
-    <div className="bg-surface-low border border-outline/10 p-5 flex flex-col gap-4">
+    <div className="bg-surface-container border border-outline/15 p-5 flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-secondary shrink-0">{icon}</span>

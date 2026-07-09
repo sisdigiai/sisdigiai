@@ -110,7 +110,7 @@ export default function Funil() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-8">
+    <div className="max-w-7xl mx-auto p-8">
       <PageHeader
         eyebrow="Aquisição & Conversão"
         title="Engenharia de Funil OSI"
@@ -220,7 +220,7 @@ function DashboardTab({
       </section>
 
       <div className="grid grid-cols-1 xl:grid-cols-[1.1fr_0.9fr] gap-5">
-        <section className="bg-surface-low border border-outline/10 p-5">
+        <section className="bg-surface-container border border-outline/15 p-5">
           <div className="flex items-center justify-between gap-3 mb-5">
             <div>
               <h2 className="text-xl font-semibold">Projecao do microteste</h2>
@@ -237,7 +237,7 @@ function DashboardTab({
           </div>
         </section>
 
-        <section className="bg-surface-low border border-outline/10 p-5 space-y-5">
+        <section className="bg-surface-container border border-outline/15 p-5 space-y-5">
           <div>
             <h2 className="text-xl font-semibold">Premissas rapidas</h2>
             <p className="text-sm text-on-surface-variant mt-1">Editar aqui muda todo o dashboard.</p>
@@ -301,7 +301,7 @@ function ControleTab({
       </section>
 
       <section className="grid grid-cols-1 xl:grid-cols-[1fr_0.85fr] gap-5">
-        <div className="bg-surface-low border border-outline/10 p-5">
+        <div className="bg-surface-container border border-outline/15 p-5">
           <h2 className="text-xl font-semibold">Entradas reais do teste</h2>
           <p className="text-sm text-on-surface-variant mt-1 mb-5">Preencha estes campos depois de cada leitura do Ads/Hotmart/CRM.</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -329,7 +329,7 @@ function ControleTab({
             </div>
           </section>
 
-          <section className="bg-surface-low border border-outline/10 p-5">
+          <section className="bg-surface-container border border-outline/15 p-5">
             <h2 className="text-xl font-semibold">Regras de caminho</h2>
             <div className="space-y-3 mt-4">
               <Callout icon={<CheckCircle2 size={16} />} text="ROAS acima da meta e 3+ compras: duplicar vencedor e escalar devagar." />
@@ -347,7 +347,7 @@ function ControleTab({
 function ProdutoTab() {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-[0.9fr_1.1fr] gap-5">
-      <section className="bg-surface-low border border-outline/10 p-6 space-y-5">
+      <section className="bg-surface-container border border-outline/15 p-6 space-y-5">
         <div>
           <div className="text-xs font-mono text-secondary uppercase tracking-widest">Produto-isca ativo</div>
           <h2 className="text-2xl font-bold mt-2">Otica Sem Improviso</h2>
@@ -371,7 +371,7 @@ function ProdutoTab() {
         </div>
       </section>
 
-      <section className="bg-surface-low border border-outline/10 p-6 space-y-5">
+      <section className="bg-surface-container border border-outline/15 p-6 space-y-5">
         <h2 className="text-xl font-semibold">Como o produto abre ponte pro Clearix</h2>
         <div className="space-y-3">
           <BridgeRow from="Atendimento sem metodo" to="App de scripts e conducoes por situacao" />
@@ -410,7 +410,7 @@ function OfertaTab({
         <KpiCard icon={<Save size={18} />} label="Funcao real" value="Aquisicao" sub="comprar compradores qualificados" color="text-on-surface-variant" />
       </section>
 
-      <section className="bg-surface-low border border-outline/10 overflow-hidden">
+      <section className="bg-surface-container border border-outline/15 overflow-hidden">
         <div className="grid grid-cols-[1.1fr_120px_120px_1.4fr] gap-0 bg-surface-low text-xs font-mono uppercase tracking-widest text-muted">
           <div className="p-3">Item</div>
           <div className="p-3">Preco</div>
@@ -466,7 +466,7 @@ function TrafegoTab({ workspace }: { workspace: FunnelWorkspace }) {
         <KpiCard icon={<Activity size={18} />} label="Gasto teste" value={brl(a.adsetBudgetDay * a.testDays * a.adsets)} sub={`${a.adsets} conjuntos`} color="text-warning" />
       </section>
 
-      <section className="bg-surface-low border border-outline/10 overflow-hidden">
+      <section className="bg-surface-container border border-outline/15 overflow-hidden">
         <div className="grid grid-cols-[1fr_1.4fr_90px_90px_110px_1.2fr] bg-surface-low text-xs font-mono uppercase tracking-widest text-muted">
           <div className="p-3">Angulo</div>
           <div className="p-3">Gancho</div>
@@ -502,7 +502,7 @@ function AutomacaoTab({ workspace }: { workspace: FunnelWorkspace }) {
     <div className="grid grid-cols-1 xl:grid-cols-[1fr_0.85fr] gap-5">
       <section className="space-y-3">
         {workspace.automation.map((step) => (
-          <div key={step.id} className="bg-surface-low border border-outline/10 p-5">
+          <div key={step.id} className="bg-surface-container border border-outline/15 p-5">
             <div className="flex items-start gap-4">
               <div className={`w-10 h-10 flex items-center justify-center border ${
                 step.channel === 'WhatsApp' ? 'border-success/30 bg-success/10 text-success' : 'border-secondary/40 bg-secondary/15 text-secondary'
@@ -534,7 +534,7 @@ function AutomacaoTab({ workspace }: { workspace: FunnelWorkspace }) {
             'Voce quer usar sozinho ou padronizar uma equipe?',
             'Hoje voces usam algum app para acompanhar atendimento e orcamentos?',
           ].map((question) => (
-            <div key={question} className="bg-surface-lowest border border-outline/10 p-3 text-sm text-on-surface-variant">
+            <div key={question} className="bg-surface-lowest border border-outline/15 p-3 text-sm text-on-surface-variant">
               {question}
             </div>
           ))}
@@ -553,7 +553,7 @@ function GuiasTab({ workspace }: { workspace: FunnelWorkspace }) {
             ? 'bg-secondary-container/40 border-secondary/40'
             : guide.role === 'isca_paga'
               ? 'bg-secondary/15 border-secondary/40'
-              : 'bg-surface-low border-outline/10'
+              : 'bg-surface-container border-outline/10'
         }`}>
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -592,7 +592,7 @@ function ProximosTab({
     <div className="grid grid-cols-1 xl:grid-cols-[1fr_0.85fr] gap-5">
       <section className="space-y-3">
         {workspace.tasks.map((task) => (
-          <div key={task.id} className="bg-surface-low border border-outline/10 p-5">
+          <div key={task.id} className="bg-surface-container border border-outline/15 p-5">
             <div className="flex items-start gap-4">
               <button
                 onClick={() => updateTaskStatus(task.id, task.status === 'done' ? 'next' : 'done')}
@@ -632,7 +632,7 @@ function ProximosTab({
                     <div className="text-sm text-on-surface-variant">{task.decisionRule}</div>
                   </div>
                 </div>
-                <div className="mt-4 bg-surface-lowest border border-outline/10 p-3">
+                <div className="mt-4 bg-surface-lowest border border-outline/15 p-3">
                   <div className="text-[10px] font-mono uppercase tracking-widest text-muted mb-3">Checklist de execucao</div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {task.checklist.map((item) => (
@@ -657,7 +657,7 @@ function ProximosTab({
           </div>
         ))}
       </section>
-      <section className="bg-surface-low border border-outline/10 p-5 h-fit">
+      <section className="bg-surface-container border border-outline/15 p-5 h-fit">
         <h2 className="text-xl font-semibold">Veredito operacional</h2>
         <p className="text-sm text-on-surface-variant mt-3">
           O app vira o controle da empresa quando cada estrategia vira uma fila de decisao, tarefa e metrica.
@@ -675,7 +675,7 @@ function ProximosTab({
 
 function KpiCard({ icon, label, value, sub, color }: { icon: ReactNode; label: string; value: string; sub: string; color: string }) {
   return (
-    <div className="bg-surface-low border border-outline/10 p-4">
+    <div className="bg-surface-container border border-outline/15 p-4">
       <div className={`flex items-center gap-2 text-xs ${color} mb-2`}>
         {icon}
         <span className="font-mono uppercase tracking-widest">{label}</span>

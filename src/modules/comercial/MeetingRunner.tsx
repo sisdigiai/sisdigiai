@@ -101,7 +101,7 @@ export default function MeetingRunner({
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-      <div className="bg-surface-low border border-outline/20 w-full max-w-6xl h-[92vh] flex flex-col">
+      <div className="bg-surface-container border border-outline/15 w-full max-w-7xl h-[92vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center gap-3 px-5 py-3 border-b border-outline/10 shrink-0">
           <Play className="w-4 h-4 text-secondary" />
@@ -145,7 +145,7 @@ export default function MeetingRunner({
               <select
                 value={pbId}
                 onChange={(e) => setPbId(e.target.value)}
-                className="mb-4 bg-surface-high border border-outline/10 px-2.5 py-1.5 text-sm text-on-surface"
+                className="mb-4 bg-surface-high border border-outline/15 px-2.5 py-1.5 text-sm text-on-surface"
               >
                 {playbooks.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
@@ -160,7 +160,7 @@ export default function MeetingRunner({
             <label className="block">
               <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Sala (link do Meet)</span>
               <input value={meetUrl} onChange={(e) => setMeetUrl(e.target.value)} placeholder="cole o link do Meet aqui"
-                className="w-full mt-1 bg-surface-high border border-outline/10 px-2.5 py-1.5 text-sm text-on-surface focus:border-secondary/50 outline-none" />
+                className="w-full mt-1 bg-surface-high border border-outline/15 px-2.5 py-1.5 text-sm text-on-surface focus:border-secondary/50 outline-none" />
             </label>
 
             <Area label="Dor principal (anote o que ouvir)" value={pain} onChange={setPain} rows={3} />
@@ -182,7 +182,7 @@ export default function MeetingRunner({
             {/* Escolhas / sinais */}
             <label className="block">
               <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Plano de interesse</span>
-              <select value={interestPlan} onChange={(e) => setInterestPlan(e.target.value)} className="w-full mt-1 bg-surface-high border border-outline/10 px-2.5 py-1.5 text-sm text-on-surface">
+              <select value={interestPlan} onChange={(e) => setInterestPlan(e.target.value)} className="w-full mt-1 bg-surface-high border border-outline/15 px-2.5 py-1.5 text-sm text-on-surface">
                 <option value="">—</option>
                 {PLANS.map((p) => <option key={p} value={p}>{p}</option>)}
               </select>
@@ -203,7 +203,7 @@ export default function MeetingRunner({
               <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Citações (o que foi dito)</span>
               <div className="flex gap-1 mt-1">
                 <input value={quoteInput} onChange={(e) => setQuoteInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addQuote()} placeholder="frase do cliente…"
-                  className="flex-1 bg-surface-high border border-outline/10 px-2 py-1.5 text-sm text-on-surface outline-none" />
+                  className="flex-1 bg-surface-high border border-outline/15 px-2 py-1.5 text-sm text-on-surface outline-none" />
                 <button onClick={addQuote} className="px-2 border border-outline/20 text-secondary hover:bg-surface-high"><Plus className="w-4 h-4" /></button>
               </div>
               {quotes.length > 0 && (
@@ -225,7 +225,7 @@ export default function MeetingRunner({
               <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Análises a resolver</span>
               <div className="flex gap-1 mt-1">
                 <input value={actionInput} onChange={(e) => setActionInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addAction()} placeholder="pendência / análise…"
-                  className="flex-1 bg-surface-high border border-outline/10 px-2 py-1.5 text-sm text-on-surface outline-none" />
+                  className="flex-1 bg-surface-high border border-outline/15 px-2 py-1.5 text-sm text-on-surface outline-none" />
                 <button onClick={addAction} className="px-2 border border-outline/20 text-secondary hover:bg-surface-high"><Plus className="w-4 h-4" /></button>
               </div>
               {actionItems.length > 0 && (
@@ -243,7 +243,7 @@ export default function MeetingRunner({
 
             <label className="block">
               <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Novo estágio do lead</span>
-              <select value={stage} onChange={(e) => setStage(e.target.value as LeadStage)} className="w-full mt-1 bg-surface-high border border-outline/10 px-2.5 py-1.5 text-sm text-on-surface">
+              <select value={stage} onChange={(e) => setStage(e.target.value as LeadStage)} className="w-full mt-1 bg-surface-high border border-outline/15 px-2.5 py-1.5 text-sm text-on-surface">
                 {STAGES.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
               </select>
             </label>
@@ -251,7 +251,7 @@ export default function MeetingRunner({
             <Line label="Próximo passo" value={nextAction} onChange={setNextAction} />
             <label className="block">
               <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Data do follow-up</span>
-              <input type="date" value={followUp} onChange={(e) => setFollowUp(e.target.value)} className="w-full mt-1 bg-surface-high border border-outline/10 px-2.5 py-1.5 text-sm text-on-surface" />
+              <input type="date" value={followUp} onChange={(e) => setFollowUp(e.target.value)} className="w-full mt-1 bg-surface-high border border-outline/15 px-2.5 py-1.5 text-sm text-on-surface" />
             </label>
 
             <div>
@@ -280,7 +280,7 @@ function Area({ label, value, onChange, rows }: { label: string; value: string; 
   return (
     <label className="block">
       <span className="text-[10px] font-mono uppercase tracking-widest text-muted">{label}</span>
-      <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={rows} className="w-full mt-1 bg-surface-high border border-outline/10 px-2.5 py-1.5 text-sm text-on-surface focus:border-secondary/50 outline-none resize-none" />
+      <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={rows} className="w-full mt-1 bg-surface-high border border-outline/15 px-2.5 py-1.5 text-sm text-on-surface focus:border-secondary/50 outline-none resize-none" />
     </label>
   );
 }
@@ -289,7 +289,7 @@ function Line({ label, value, onChange }: { label: string; value: string; onChan
   return (
     <label className="block">
       <span className="text-[10px] font-mono uppercase tracking-widest text-muted">{label}</span>
-      <input value={value} onChange={(e) => onChange(e.target.value)} className="w-full mt-1 bg-surface-high border border-outline/10 px-2.5 py-1.5 text-sm text-on-surface focus:border-secondary/50 outline-none" />
+      <input value={value} onChange={(e) => onChange(e.target.value)} className="w-full mt-1 bg-surface-high border border-outline/15 px-2.5 py-1.5 text-sm text-on-surface focus:border-secondary/50 outline-none" />
     </label>
   );
 }

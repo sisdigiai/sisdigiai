@@ -83,7 +83,7 @@ export function Performance() {
             {(accounts ?? []).map(a => {
               const s = statusByCode.get(a.account_code);
               return (
-                <div key={a.account_code} className="bg-surface-low border border-outline/10 p-4">
+                <div key={a.account_code} className="bg-surface-container border border-outline/15 p-4">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-[10px] uppercase tracking-widest font-bold text-muted">{CAMADA_LABEL[a.camada]} · {a.platform}</span>
                     {a.public_url && <a href={a.public_url} target="_blank" rel="noopener noreferrer" className="text-secondary hover:text-on-surface"><ExternalLink className="w-3 h-3" /></a>}

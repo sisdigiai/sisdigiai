@@ -20,7 +20,7 @@ export default function MarketingSEO() {
   const current: SeoSite | undefined = sites.find(s => s.site === activeSite) ?? sites[0];
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto">
       <PageHeader
         eyebrow="SEO & Conteúdo"
         title="Marketing & SEO"

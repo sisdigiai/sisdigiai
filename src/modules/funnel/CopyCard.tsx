@@ -98,7 +98,7 @@ export default function CopyCard({
               )}
             </>
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-surface-low border-2 border-dashed border-outline/30">
+            <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-surface-container border-2 border-dashed border-outline/30">
               <Images size={16} className="text-muted" />
               <span className="text-[10px] text-muted text-center leading-tight">
                 Adicionar<br />imagens

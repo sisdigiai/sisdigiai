@@ -105,7 +105,7 @@ export function PromptsIA() {
         <div className="flex-1" />
 
         <Filter className="w-4 h-4 text-muted" />
-        <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm">
+        <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="bg-surface-container border border-outline/15 px-3 py-1.5 text-sm">
           <option value="all">Todas categorias</option>
           <option value="text">Texto</option>
           <option value="image">Imagem</option>
@@ -113,7 +113,7 @@ export function PromptsIA() {
           <option value="audio">Áudio</option>
           <option value="music">Música</option>
         </select>
-        <select value={targetFilter} onChange={e => setTargetFilter(e.target.value)} className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm">
+        <select value={targetFilter} onChange={e => setTargetFilter(e.target.value)} className="bg-surface-container border border-outline/15 px-3 py-1.5 text-sm">
           <option value="all">Todas IAs</option>
           {targets.map(t => <option key={t} value={t}>{TARGET_LABEL[t] ?? t}</option>)}
         </select>
@@ -140,7 +140,7 @@ export function PromptsIA() {
                 <button
                   key={t.id}
                   onClick={() => handleSelectTemplate(t)}
-                  className={`w-full text-left bg-surface-low border p-3 hover:bg-surface-highest transition-colors border-l-4 ${selected?.id === t.id ? 'border-outline/30 ring-1 ring-secondary/40' : 'border-outline/10'}`}
+                  className={`w-full text-left bg-surface-container border p-3 hover:bg-surface-highest transition-colors border-l-4 ${selected?.id === t.id ? 'border-outline/30 ring-1 ring-secondary/40' : 'border-outline/10'}`}
                   style={{ borderLeftColor: color }}
                 >
                   <div className="flex items-center justify-between gap-2 mb-1">
@@ -159,12 +159,12 @@ export function PromptsIA() {
           {/* Preview/Render */}
           <div>
             {!selected ? (
-              <div className="bg-surface-low border border-outline/10 p-12 text-center text-muted">
+              <div className="bg-surface-container border border-outline/15 p-12 text-center text-muted">
                 <Sparkles className="w-10 h-10 mx-auto mb-3 opacity-30" />
                 <p className="text-sm">Escolha um template à esquerda para renderizar.</p>
               </div>
             ) : (
-              <div className="bg-surface-low border border-outline/10 p-5 space-y-4 sticky top-4">
+              <div className="bg-surface-container border border-outline/15 p-5 space-y-4 sticky top-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <h3 className="text-base font-semibold">{selected.name}</h3>
@@ -187,7 +187,7 @@ export function PromptsIA() {
 
                 <div>
                   <label className="text-[10px] uppercase tracking-widest font-bold text-muted block mb-1">Contexto (ideia do banco — opcional)</label>
-                  <select value={selectedIdeaId} onChange={e => handleIdeaChange(e.target.value)} className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm">
+                  <select value={selectedIdeaId} onChange={e => handleIdeaChange(e.target.value)} className="w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm">
                     <option value="">(sem ideia — usar apenas travas da marca)</option>
                     {ideas.map(i => (
                       <option key={i.id} value={i.id}>
@@ -211,10 +211,10 @@ export function PromptsIA() {
                   <>
                     <div>
                       <div className="text-[10px] uppercase tracking-widest font-bold text-muted mb-2">Prompt renderizado</div>
-                      <pre className="text-xs text-on-surface bg-surface-lowest border border-outline/10 p-3 whitespace-pre-wrap font-mono max-h-[50vh] overflow-y-auto">{rendered.rendered_prompt}</pre>
+                      <pre className="text-xs text-on-surface bg-surface-lowest border border-outline/15 p-3 whitespace-pre-wrap font-mono max-h-[50vh] overflow-y-auto">{rendered.rendered_prompt}</pre>
                     </div>
 
-                    <details className="bg-surface-low border border-outline/10 p-3">
+                    <details className="bg-surface-container border border-outline/15 p-3">
                       <summary className="text-[10px] uppercase tracking-widest font-bold text-muted cursor-pointer">Variáveis injetadas ({Object.keys(rendered.vars_used).length})</summary>
                       <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[11px]">
                         {Object.entries(rendered.vars_used).map(([k, v]) => (

@@ -294,13 +294,13 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
 
           {/* Link Hotmart com UTM + Vendas atribuídas */}
           <Section title="Link de venda Hotmart (com UTM)">
-            <div className="bg-surface-lowest border border-outline/10 p-3">
+            <div className="bg-surface-lowest border border-outline/15 p-3">
               <div className="flex items-center gap-2 mb-2">
                 <LinkIcon className="w-3.5 h-3.5 text-secondary" />
                 <span className="text-[10px] uppercase tracking-widest font-bold text-muted">URL pronta pra colar na bio/stories/post</span>
               </div>
               <div className="flex items-center gap-2">
-                <code className="flex-1 text-[11px] text-on-surface-variant bg-surface-lowest border border-outline/10 px-2 py-1.5 font-mono break-all">{hotmartUrl}</code>
+                <code className="flex-1 text-[11px] text-on-surface-variant bg-surface-lowest border border-outline/15 px-2 py-1.5 font-mono break-all">{hotmartUrl}</code>
                 <button
                   onClick={handleCopyUrl}
                   className="flex items-center gap-1 text-[11px] bg-secondary text-surface font-medium px-3 py-1.5 hover:bg-secondary/90 shrink-0"
@@ -387,7 +387,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
           <Section title="Artes (links externos — Canva, Drive, etc.)">
             <div className="space-y-2">
               {(draft.arts ?? []).map((art, idx) => (
-                <div key={idx} className="flex items-center gap-2 bg-surface-low border border-outline/10 p-2">
+                <div key={idx} className="flex items-center gap-2 bg-surface-container border border-outline/15 p-2">
                   <select value={art.type} onChange={e => updateArt(idx, { type: e.target.value })} className="bg-transparent text-xs border border-outline/10 px-2 py-1">
                     {ART_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
@@ -464,7 +464,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
   );
 }
 
-const inputCls = 'w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-secondary/40 text-on-surface placeholder:text-muted';
+const inputCls = 'w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm focus:outline-none focus:border-secondary/40 text-on-surface placeholder:text-muted';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -486,7 +486,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function StatPill({ label, value, color, icon }: { label: string; value: string; color: string; icon?: React.ReactNode }) {
   return (
-    <div className="bg-surface-low border border-outline/10 px-2 py-1.5">
+    <div className="bg-surface-container border border-outline/15 px-2 py-1.5">
       <div className="flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold text-muted">
         {icon} {label}
       </div>

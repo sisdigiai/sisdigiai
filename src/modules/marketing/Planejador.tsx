@@ -125,7 +125,7 @@ export function Planejador() {
       )}
 
       {/* Form */}
-      <div className="bg-surface-low border border-outline/10 p-5 mb-6 space-y-4">
+      <div className="bg-surface-container border border-outline/15 p-5 mb-6 space-y-4">
         <h3 className="text-[10px] uppercase tracking-widest font-bold text-muted">Configuração</h3>
 
         <div className="grid grid-cols-3 gap-3">
@@ -208,7 +208,7 @@ export function Planejador() {
 
       {/* Preview */}
       {preview && (
-        <div className="bg-surface-low border border-outline/10 p-5">
+        <div className="bg-surface-container border border-outline/15 p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold flex items-center gap-2">
               <Layers className="w-4 h-4 text-action" /> Prévia da agenda
@@ -223,7 +223,7 @@ export function Planejador() {
             <div className="text-[10px] uppercase tracking-widest font-bold text-muted mb-2">Distribuição por pilar</div>
             <div className="flex flex-wrap gap-2">
               {Object.entries(preview.by_pillar).map(([code, count]) => (
-                <span key={code} className="text-xs bg-surface-low border border-outline/10 px-2 py-1">
+                <span key={code} className="text-xs bg-surface-container border border-outline/15 px-2 py-1">
                   <b>{code}</b> · {count}
                 </span>
               ))}
@@ -249,7 +249,7 @@ export function Planejador() {
   );
 }
 
-const inputCls = 'w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-action/50 text-on-surface';
+const inputCls = 'w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm focus:outline-none focus:border-action/50 text-on-surface';
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -262,7 +262,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function StatCard({ label, value, color }: { label: string; value: string; color: string }) {
   return (
-    <div className="bg-surface-low border border-outline/10 p-3">
+    <div className="bg-surface-container border border-outline/15 p-3">
       <div className="text-[10px] uppercase tracking-widest font-bold text-muted">{label}</div>
       <div className="text-2xl font-semibold mt-1" style={{ color }}>{value}</div>
     </div>

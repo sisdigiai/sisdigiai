@@ -155,9 +155,9 @@ export function AfiliadosDashboard() {
         <div className="flex items-center gap-2 flex-1 min-w-[260px]">
           <Search className="w-4 h-4 text-muted" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Nome / email / código Hotmart..."
-            className="flex-1 bg-surface-low border border-outline/10 px-3 py-1.5 text-sm focus:outline-none" />
+            className="flex-1 bg-surface-container border border-outline/15 px-3 py-1.5 text-sm focus:outline-none" />
         </div>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm">
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-surface-container border border-outline/15 px-3 py-1.5 text-sm">
           <option value="all">Todos status</option>
           {Object.entries(STATUS_LABEL).map(([v,l]) => <option key={v} value={v}>{l}</option>)}
         </select>
@@ -166,7 +166,7 @@ export function AfiliadosDashboard() {
       {loading ? (
         <div className="text-center py-12 text-muted text-sm">Carregando...</div>
       ) : filtered.length === 0 ? (
-        <div className="bg-surface-low border border-outline/10 p-12 text-center text-muted">
+        <div className="bg-surface-container border border-outline/15 p-12 text-center text-muted">
           <Trophy className="w-10 h-10 mx-auto mb-3 opacity-30" />
           <p className="text-sm">{rows.length === 0 ? 'Nenhum afiliado ainda. Clica em "Novo afiliado" pra começar.' : 'Nenhum match.'}</p>
         </div>
@@ -211,7 +211,7 @@ function AffiliateCard({ a, onRequestPayout, onChanged }: { a: DashRow; onReques
   };
 
   return (
-    <div className="bg-surface-low border border-outline/10 p-4 border-l-4"
+    <div className="bg-surface-container border border-outline/15 p-4 border-l-4"
       style={{ borderLeftColor: STATUS_COLOR[a.status] }}>
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex-1 min-w-0">
@@ -425,7 +425,7 @@ function LeaderboardModal({ leaders, onClose }: { leaders: Leader[]; onClose: ()
       ) : (
         <div className="space-y-2">
           {leaders.map(l => (
-            <div key={l.id} className="flex items-center gap-3 bg-surface-low border border-outline/10 p-3">
+            <div key={l.id} className="flex items-center gap-3 bg-surface-container border border-outline/15 p-3">
               <div className="text-2xl font-bold text-muted w-8 text-center">#{l.rank}</div>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold">{l.full_name}</div>
@@ -447,7 +447,7 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-surface-lowest" />
-      <div className="relative bg-surface-container border border-outline/10 p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+      <div className="relative bg-surface-container border border-outline/15 p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">{title}</h3>
           <button onClick={onClose} className="p-1 text-on-surface-variant hover:text-on-surface"><X className="w-5 h-5" /></button>
@@ -458,7 +458,7 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
   );
 }
 
-const inputCls = 'w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-eco-academy/50 text-on-surface placeholder:text-muted';
+const inputCls = 'w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm focus:outline-none focus:border-eco-academy/50 text-on-surface placeholder:text-muted';
 
 function Input({ label, v, on, type='text', placeholder, max }: { label: string; v: string; on: (v: string) => void; type?: string; placeholder?: string; max?: number }) {
   return (
@@ -471,7 +471,7 @@ function Input({ label, v, on, type='text', placeholder, max }: { label: string;
 
 function StatCard({ label, value, color, icon }: { label: string; value: string; color: string; icon?: React.ReactNode }) {
   return (
-    <div className="bg-surface-low border border-outline/10 p-3">
+    <div className="bg-surface-container border border-outline/15 p-3">
       <div className="flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold text-muted mb-1">
         {icon} {label}
       </div>
@@ -482,7 +482,7 @@ function StatCard({ label, value, color, icon }: { label: string; value: string;
 
 function MiniStat({ label, value, color }: { label: string; value: string; color: string }) {
   return (
-    <div className="bg-surface-low border border-outline/10 px-2 py-1.5">
+    <div className="bg-surface-container border border-outline/15 px-2 py-1.5">
       <div className="text-[9px] uppercase tracking-widest font-bold text-muted">{label}</div>
       <div className="text-sm font-semibold mt-0.5" style={{ color }}>{value}</div>
     </div>

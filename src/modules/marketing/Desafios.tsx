@@ -89,12 +89,12 @@ export function Desafios() {
         <div className="grid grid-cols-5 gap-3 mb-6">
           {(['active','draft','closed','cancelled'] as const).map(s => (
             <button key={s} onClick={() => setStatusFilter(s)}
-              className={`bg-surface-low border p-3 text-left ${statusFilter === s ? 'border-outline/30 ring-1 ring-outline/30' : 'border-outline/10 hover:bg-surface-highest'}`}>
+              className={`bg-surface-container border p-3 text-left ${statusFilter === s ? 'border-outline/30 ring-1 ring-outline/30' : 'border-outline/10 hover:bg-surface-highest'}`}>
               <div className="text-[10px] uppercase tracking-widest font-bold text-muted">{STATUS_LABEL[s]}</div>
               <div className="text-2xl font-semibold mt-1" style={{ color: STATUS_COLOR[s] }}>{stats[s] ?? 0}</div>
             </button>
           ))}
-          <div className="bg-surface-low border border-outline/10 p-3">
+          <div className="bg-surface-container border border-outline/15 p-3">
             <div className="text-[10px] uppercase tracking-widest font-bold text-muted">Vencedores totais</div>
             <div className="text-2xl font-semibold mt-1 text-eco-academy">{stats.total_winners}</div>
           </div>
@@ -111,7 +111,7 @@ export function Desafios() {
       {loading ? (
         <div className="text-center py-12 text-muted text-sm">Carregando...</div>
       ) : filtered.length === 0 ? (
-        <div className="bg-surface-low border border-outline/10 p-12 text-center text-muted">
+        <div className="bg-surface-container border border-outline/15 p-12 text-center text-muted">
           <Trophy className="w-10 h-10 mx-auto mb-3 opacity-30" />
           <p className="text-sm">Nenhum desafio ainda. Clica em "Novo desafio" pra lançar o primeiro.</p>
           <p className="text-xs mt-2 text-muted">
@@ -143,7 +143,7 @@ function ChallengeCard({ c, onOpen }: { c: Challenge; onOpen: () => void }) {
   const movColor = MOVEMENT_COLOR[movement] ?? 'var(--color-secondary)';
   return (
     <button onClick={onOpen}
-      className="bg-surface-low border border-outline/10 p-4 text-left hover:bg-surface-highest border-l-4"
+      className="bg-surface-container border border-outline/15 p-4 text-left hover:bg-surface-highest border-l-4"
       style={{ borderLeftColor: STATUS_COLOR[c.status] }}>
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-2">
@@ -208,7 +208,7 @@ function NewChallengeModal({ onClose, onSaved }: { onClose: () => void; onSaved:
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-surface-lowest" />
-      <div className="relative bg-surface-container border border-outline/10 p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+      <div className="relative bg-surface-container border border-outline/15 p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Novo desafio</h3>
           <button onClick={onClose} className="p-1 text-on-surface-variant hover:text-on-surface"><X className="w-5 h-5" /></button>
@@ -368,13 +368,13 @@ function ChallengeDetailDrawer({ challenge, onClose, onChanged }: { challenge: C
             {loading ? (
               <div className="text-xs text-muted">Carregando...</div>
             ) : participations.length === 0 ? (
-              <div className="bg-surface-low border border-outline/10 p-4 text-xs text-muted text-center">
+              <div className="bg-surface-container border border-outline/15 p-4 text-xs text-muted text-center">
                 Nenhum inscrito ainda.
               </div>
             ) : (
               <div className="space-y-2">
                 {participations.map((p, i) => (
-                  <div key={p.id} className="bg-surface-low border border-outline/10 p-3 border-l-4"
+                  <div key={p.id} className="bg-surface-container border border-outline/15 p-3 border-l-4"
                     style={{ borderLeftColor: PART_STATUS_COLOR[p.status] }}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
@@ -426,7 +426,7 @@ function ChallengeDetailDrawer({ challenge, onClose, onChanged }: { challenge: C
   );
 }
 
-const inputCls = 'w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-eco-academy/50 text-on-surface placeholder:text-muted';
+const inputCls = 'w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm focus:outline-none focus:border-eco-academy/50 text-on-surface placeholder:text-muted';
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>

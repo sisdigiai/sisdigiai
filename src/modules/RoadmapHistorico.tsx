@@ -152,7 +152,7 @@ export default function RoadmapHistorico() {
       ) : (
         <div className="space-y-1">
           {filtered.map((log) => (
-            <div key={log.id} className="bg-surface-low border border-outline/10 px-3 py-2 flex items-start gap-3 hover:bg-surface-highest transition-colors">
+            <div key={log.id} className="bg-surface-container border border-outline/15 px-3 py-2 flex items-start gap-3 hover:bg-surface-highest transition-colors">
               <div className="mt-0.5 shrink-0">{ACTION_ICONS[log.action]}</div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">

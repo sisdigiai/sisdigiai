@@ -31,7 +31,7 @@ export default function PageHeader({ eyebrow, title, subtitle, actions, children
           <h1 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight text-on-surface">
             {title}
           </h1>
-          <div className="h-px w-24 bg-secondary mt-4" />
+          <div className="h-0.5 w-24 bg-action mt-4" />
           {subtitle && (
             <p className="text-on-surface-variant mt-3 text-sm max-w-2xl leading-relaxed">
               {subtitle}

@@ -91,6 +91,12 @@ export default function App() {
   const { theme, toggle: toggleTheme } = useTheme();
   const [activeModule, setActiveModule] = useState<ModuleId>(moduleFromHash);
   const [navOpen, setNavOpen] = useState(false);
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
 
   // Deep links: refresh mantém o módulo + back/forward do navegador funcionam.
   useEffect(() => {
@@ -195,8 +201,9 @@ export default function App() {
     <div className="flex h-screen bg-surface text-on-surface overflow-hidden">
       <Sidebar active={activeModule} onSelect={navigate} mobileOpen={navOpen} onClose={() => setNavOpen(false)} />
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="shrink-0 z-20 h-20 flex items-center border-b border-outline/10 bg-surface/80 backdrop-blur-md">
-          <div className="w-full max-w-6xl mx-auto flex items-center gap-3 px-4 md:px-8">
+        {/* Barra de comando — testeira única de todos os módulos (gramática mission-control) */}
+        <header className="shrink-0 z-20 h-12 flex items-center border-b border-outline/15 bg-surface/90 backdrop-blur-md">
+          <div className="w-full max-w-7xl mx-auto flex items-center gap-4 px-4 md:px-8">
             <button
               onClick={() => setNavOpen(true)}
               className="md:hidden p-1.5 -ml-1 text-on-surface-variant hover:text-on-surface hover:bg-surface-highest"
@@ -204,24 +211,23 @@ export default function App() {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div className="flex flex-col min-w-0">
-              <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-secondary leading-none mb-2">
-                {MODULE_SECTION[activeModule] ?? 'Operacional'}
-              </span>
-              <h1 className="font-serif text-xl font-semibold uppercase text-on-surface leading-none truncate">
-                {MODULE_LABEL[activeModule] ?? 'Visão'}
-              </h1>
+            <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary truncate">
+              {MODULE_SECTION[activeModule] ?? 'Operacional'} <span className="text-muted">/</span> <span className="text-on-surface">{MODULE_LABEL[activeModule] ?? 'Visão'}</span>
+            </div>
+            <div className="hidden lg:flex items-center gap-5 font-mono text-[10px] tracking-[0.08em] text-muted uppercase">
+              <span className="flex items-center gap-1.5 text-secondary"><span className="w-1.5 h-1.5 bg-action inline-block animate-pulse" />Sistema nominal</span>
+              <span className="tabular-nums">{now.toLocaleTimeString('pt-BR', { hour12: false })}</span>
             </div>
             <button
               onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
-              className="ml-auto hidden md:flex items-center gap-1.5 text-[11px] text-muted border border-outline/30 px-3 py-2 hover:text-on-surface hover:border-secondary/50 transition-colors"
+              className="ml-auto hidden md:flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-muted border border-outline/30 px-2.5 py-1.5 hover:text-on-surface hover:border-secondary/50 transition-colors"
             >
-              <Search className="w-3.5 h-3.5" /> Buscar <kbd className="font-mono text-[10px] text-muted border border-outline/30 px-1">Ctrl K</kbd>
+              <Search className="w-3 h-3" /> Buscar <kbd className="font-mono text-[9px] text-muted border border-outline/30 px-1">⌘K</kbd>
             </button>
             <button
               onClick={toggleTheme}
               aria-label={theme === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'}
-              className="ml-auto md:ml-0 p-2 text-muted border border-outline/30 hover:text-on-surface hover:border-action/50 transition-colors"
+              className="ml-auto md:ml-0 p-1.5 text-muted border border-outline/30 hover:text-on-surface hover:border-action/50 transition-colors"
             >
               {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
             </button>

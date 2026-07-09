@@ -290,7 +290,7 @@ export default function Academy() {
 
   if (loading || !workspace || !productDraft) {
     return (
-      <div className="p-8 max-w-6xl mx-auto">
+      <div className="p-8 max-w-7xl mx-auto">
         <div className="text-muted text-sm">Carregando workspace do Academy...</div>
       </div>
     );
@@ -404,7 +404,7 @@ export default function Academy() {
   };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto">
       <PageHeader
         eyebrow="Educação"
         title="Academy"
@@ -454,7 +454,7 @@ export default function Academy() {
         </div>
       )}
 
-      <section className="bg-surface-low border border-outline/10 p-6 space-y-5">
+      <section className="bg-surface-container border border-outline/15 p-6 space-y-5">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
             <h2 className="text-xl font-semibold">Produto em foco</h2>
@@ -552,7 +552,7 @@ export default function Academy() {
       </section>
 
       <section className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <div className="bg-surface-low border border-outline/10 p-6 space-y-5">
+        <div className="bg-surface-container border border-outline/15 p-6 space-y-5">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <div className="flex items-center gap-2">
@@ -676,7 +676,7 @@ export default function Academy() {
           </div>
         </div>
 
-        <div className="bg-surface-low border border-outline/10 p-6 space-y-5">
+        <div className="bg-surface-container border border-outline/15 p-6 space-y-5">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <div className="flex items-center gap-2">
@@ -804,7 +804,7 @@ export default function Academy() {
         </div>
       </section>
 
-      <section className="bg-surface-low border border-outline/10 p-6 space-y-5">
+      <section className="bg-surface-container border border-outline/15 p-6 space-y-5">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
             <div className="flex items-center gap-2">
@@ -918,7 +918,7 @@ export default function Academy() {
       </section>
 
       <section className="grid grid-cols-1 xl:grid-cols-[1.2fr_0.8fr] gap-6">
-        <div className="bg-surface-low border border-outline/10 p-6 space-y-5">
+        <div className="bg-surface-container border border-outline/15 p-6 space-y-5">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <div className="flex items-center gap-2">
@@ -1001,7 +1001,7 @@ export default function Academy() {
           </div>
         </div>
 
-        <div className="bg-surface-low border border-outline/10 p-6 space-y-5">
+        <div className="bg-surface-container border border-outline/15 p-6 space-y-5">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <div className="flex items-center gap-2">
@@ -1087,7 +1087,7 @@ export default function Academy() {
         </div>
       </section>
 
-      <section className="bg-surface-low border border-outline/10 p-6 space-y-5">
+      <section className="bg-surface-container border border-outline/15 p-6 space-y-5">
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-5 h-5 text-secondary" />
           <h2 className="text-xl font-semibold">Auditoria de persistencia do frontend</h2>
@@ -1107,7 +1107,7 @@ export default function Academy() {
                   ? 'text-warning bg-warning/10 border-warning/30'
                   : item.tone === 'bad'
                   ? 'text-danger bg-danger/10 border-danger/30'
-                  : 'text-on-surface-variant bg-surface-low border-outline/10'
+                  : 'text-on-surface-variant bg-surface-container border-outline/10'
               }`}>
                 {item.target}
               </div>

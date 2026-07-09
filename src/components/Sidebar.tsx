@@ -255,7 +255,7 @@ export default function Sidebar({ active, onSelect, mobileOpen = false, onClose 
 
       <div className="p-3 border-t border-outline/10 space-y-2">
         {user && (
-          <div className="px-3 py-2 bg-surface-high border border-outline/10">
+          <div className="px-3 py-2 bg-surface-high border border-outline/15">
             <div className="text-[10px] font-mono text-muted uppercase tracking-widest">Logado</div>
             <div className="text-xs text-on-surface-variant truncate" title={user.email ?? ''}>
               {user.email}

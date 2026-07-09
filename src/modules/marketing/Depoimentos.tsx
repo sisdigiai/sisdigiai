@@ -101,7 +101,7 @@ export function Depoimentos() {
       <div className="bg-eco-osi/5 border border-eco-osi/20 p-4 mb-6">
         <div className="text-[10px] uppercase tracking-widest font-bold text-eco-osi mb-2">URL pública pra divulgar</div>
         <div className="flex items-center gap-2">
-          <code className="flex-1 text-xs text-on-surface bg-surface-lowest border border-outline/10 px-2 py-1.5 font-mono break-all">{publicUrl}</code>
+          <code className="flex-1 text-xs text-on-surface bg-surface-lowest border border-outline/15 px-2 py-1.5 font-mono break-all">{publicUrl}</code>
           <a href={publicUrl} target="_blank" rel="noreferrer" className="text-on-surface-variant hover:text-on-surface p-2"><ExternalLink className="w-4 h-4" /></a>
           <button onClick={copyPublicUrl} className="flex items-center gap-1 text-xs bg-eco-osi text-white px-3 py-1.5 hover:bg-eco-osi/90 shrink-0">
             {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
@@ -120,7 +120,7 @@ export function Depoimentos() {
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              className={`bg-surface-low border p-3 text-left transition-colors ${statusFilter === s ? 'border-outline/30 ring-1 ring-outline/30' : 'border-outline/10 hover:bg-surface-highest'}`}
+              className={`bg-surface-container border p-3 text-left transition-colors ${statusFilter === s ? 'border-outline/30 ring-1 ring-outline/30' : 'border-outline/10 hover:bg-surface-highest'}`}
             >
               <div className="text-[10px] uppercase tracking-widest font-bold text-muted">{STATUS_LABEL[s].split(' (')[0]}</div>
               <div className="text-2xl font-semibold mt-1" style={{ color: STATUS_COLOR[s] }}>{stats[s] ?? 0}</div>
@@ -145,7 +145,7 @@ export function Depoimentos() {
       {loading ? (
         <div className="text-center py-12 text-muted text-sm">Carregando...</div>
       ) : filtered.length === 0 ? (
-        <div className="bg-surface-low border border-outline/10 p-12 text-center text-muted">
+        <div className="bg-surface-container border border-outline/15 p-12 text-center text-muted">
           <MessageSquareQuote className="w-10 h-10 mx-auto mb-3 opacity-30" />
           <p className="text-sm">Nenhum depoimento {statusFilter !== 'all' && `com status "${STATUS_LABEL[statusFilter]}"`}.</p>
         </div>
@@ -178,7 +178,7 @@ function TestimonialCard({ t, busy, onApprove, onReject, onSpam, onPromote }: {
 }) {
   const date = new Date(t.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
   return (
-    <div className="bg-surface-low border border-outline/10 p-4 border-l-4" style={{ borderLeftColor: STATUS_COLOR[t.status] }}>
+    <div className="bg-surface-container border border-outline/15 p-4 border-l-4" style={{ borderLeftColor: STATUS_COLOR[t.status] }}>
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">

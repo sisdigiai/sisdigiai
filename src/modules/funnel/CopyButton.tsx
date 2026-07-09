@@ -269,7 +269,7 @@ export default function CopyButton({ content, asset, compact }: Props) {
       </div>
 
       {showMenu && (
-        <div className="absolute bottom-full left-0 mb-1 bg-surface-high border border-outline/10 py-1 z-50 min-w-[140px]">
+        <div className="absolute bottom-full left-0 mb-1 bg-surface-high border border-outline/15 py-1 z-50 min-w-[140px]">
           {(Object.keys(MODE_LABELS) as CopyMode[]).map((mode) => (
             <button
               key={mode}

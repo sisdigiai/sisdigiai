@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { RefreshCw, Search } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { dashboardStore, type DashboardSummary } from '../lib/dashboardStore';
 import { commercialStore, type CommercialLead, type LeadStage } from '../lib/commercialStore';
 import { realtimeStore } from '../lib/realtimeStore';
@@ -49,7 +49,6 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [leads, setLeads] = useState<CommercialLead[]>([]);
   const [loading, setLoading] = useState(true);
-  const [now, setNow] = useState(() => new Date());
   const meshRef = useRef<HTMLCanvasElement>(null);
 
   const load = useCallback(async () => {
@@ -60,7 +59,6 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
   useEffect(() => { load(); }, [load]);
   useRealtimeToasts();
   useEffect(() => realtimeStore.subscribe(() => { load(); }), [load]);
-  useEffect(() => { const t = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(t); }, []);
   useEffect(() => { if (!loading && meshRef.current) return initConvergenceMesh(meshRef.current); }, [loading]);
 
   if (loading || !summary) {
@@ -115,28 +113,8 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
   }
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface">
-      {/* ===== TOP COMMAND BAR ===== */}
-      <header className="sticky top-0 z-20 h-14 border-b border-outline/15 bg-surface/90 backdrop-blur-md flex items-center gap-5 px-6">
-        <div className="whitespace-nowrap">
-          <div className="font-mono text-[9px] tracking-[0.2em] text-secondary uppercase">Mission Control / Visão Geral</div>
-        </div>
-        <div className="hidden lg:flex items-center gap-5 font-mono text-[10px] tracking-[0.08em] text-muted uppercase">
-          <span className="flex items-center gap-1.5 text-secondary"><span className="w-1.5 h-1.5 bg-action inline-block animate-pulse" />Sistema nominal</span>
-          <span className="tabular-nums">{now.toLocaleTimeString('pt-BR', { hour12: false })}</span>
-          <span>9 produtos · 1 hub</span>
-        </div>
-        <div className="ml-auto flex items-center gap-2">
-          <button onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))} className="hidden md:flex items-center gap-2 bg-surface-container border border-outline/20 px-3 py-2 text-[12px] text-muted hover:text-on-surface hover:border-secondary/40 transition-colors">
-            <Search className="w-3.5 h-3.5" /> Buscar <kbd className="font-mono text-[9px] border border-outline/30 px-1 ml-1">⌘K</kbd>
-          </button>
-          <button onClick={load} className="w-9 h-9 flex items-center justify-center bg-surface-container border border-outline/20 text-muted hover:text-on-surface transition-colors" title="Recarregar">
-            <RefreshCw className="w-4 h-4" />
-          </button>
-        </div>
-      </header>
-
-      <div className="px-6 py-6 pb-16 space-y-5">
+    <div className="text-on-surface">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 pb-16 space-y-5">
 
         {/* ===== FOCO DO DIA ===== */}
         <div className="relative border border-outline/25 bg-gradient-to-r from-surface-container to-surface p-5 flex flex-col md:flex-row md:items-center gap-5 overflow-hidden">
@@ -153,6 +131,9 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
                 : <>Nenhuma tarefa urgente. <span className="text-secondary">Avance o roadmap.</span></>}
             </div>
           </div>
+          <button onClick={load} className="absolute top-3 right-3 p-1.5 text-muted hover:text-on-surface transition-colors" title="Recarregar" aria-label="Recarregar dados">
+            <RefreshCw className="w-3.5 h-3.5" />
+          </button>
           <div className="shrink-0 flex gap-7">
             <div className="text-right"><div className="font-serif font-bold text-[26px] leading-none tabular-nums text-on-surface">{summary.nextTasks.length}</div><div className="font-mono text-[9px] tracking-[0.1em] text-muted uppercase mt-1.5">Próximas ações</div></div>
             <div className="text-right"><div className="font-serif font-bold text-[26px] leading-none tabular-nums" style={{ color: alertas.length ? 'var(--color-warning)' : 'var(--color-success)' }}>{alertas.length}</div><div className="font-mono text-[9px] tracking-[0.1em] text-muted uppercase mt-1.5">Alertas críticos</div></div>

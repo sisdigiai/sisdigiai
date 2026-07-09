@@ -112,7 +112,7 @@ export default function Biblioteca() {
   const grupos = [...new Set(docs.map(d => d.categoria))];
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto">
       <PageHeader
         eyebrow="Acervo Canônico"
         title="Biblioteca Central"
@@ -180,7 +180,7 @@ export default function Biblioteca() {
           {playbooks.length === 0 ? (
             <div className="text-sm text-muted">Nenhum playbook cadastrado.</div>
           ) : playbooks.map((pb) => (
-            <div key={pb.id} className="bg-surface-low border border-outline/10">
+            <div key={pb.id} className="bg-surface-container border border-outline/15">
               <button onClick={() => setOpenPb(openPb === pb.id ? null : (pb.id ?? null))} className="w-full flex items-center gap-3 px-4 py-3 text-left">
                 <ClipboardList className="w-4 h-4 text-secondary shrink-0" />
                 <div className="flex-1 min-w-0">
@@ -210,7 +210,7 @@ export default function Biblioteca() {
                 {catDocs.map((doc) => (
                   <div
                     key={doc.path}
-                    className="bg-surface-low border border-outline/10 px-4 py-3 flex items-start gap-3 hover:border-outline/30 transition-colors"
+                    className="bg-surface-container border border-outline/15 px-4 py-3 flex items-start gap-3 hover:border-outline/30 transition-colors"
                   >
                     <FileText className="w-4 h-4 text-muted mt-0.5 shrink-0" />
                     <div className="flex-1 min-w-0">

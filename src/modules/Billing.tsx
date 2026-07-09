@@ -48,7 +48,7 @@ export default function Billing() {
   const inadimplentes = mrr?.inadimplentes ?? 0;
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto">
       <PageHeader
         eyebrow="Control Plane · Cobrança"
         title="Cobrança Clearix"
@@ -81,7 +81,7 @@ export default function Billing() {
         )}
 
         {/* Tabela */}
-        <div className="bg-surface-low border border-outline/10">
+        <div className="bg-surface-container border border-outline/15">
           <div className="flex items-center gap-2 p-4 border-b border-outline/10">
             <Receipt className="w-5 h-5 text-secondary" />
             <h2 className="font-serif text-lg font-semibold text-on-surface">Assinantes</h2>
@@ -141,7 +141,7 @@ export default function Billing() {
       {/* Form */}
       {showForm && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setShowForm(false)}>
-          <div className="bg-surface-container border border-outline/20 w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-surface-container border border-outline/15 w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-serif text-lg font-semibold text-on-surface">Novo / editar assinante</h3>
               <button onClick={() => setShowForm(false)} className="text-muted hover:text-on-surface"><X size={18} /></button>
@@ -177,7 +177,7 @@ export default function Billing() {
 
 function Kpi({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string; color: string }) {
   return (
-    <div className="bg-surface-low border border-outline/10 p-4">
+    <div className="bg-surface-container border border-outline/15 p-4">
       <div className={`flex items-center gap-2 text-xs ${color} mb-2`}>
         {icon}
         <span className="font-mono uppercase tracking-widest">{label}</span>

@@ -181,7 +181,7 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
                     <button
                       key={t.id}
                       onClick={() => handlePick(t)}
-                      className="bg-surface-low border border-outline/10 p-3 text-left hover:bg-surface-highest border-l-4"
+                      className="bg-surface-container border border-outline/15 p-3 text-left hover:bg-surface-highest border-l-4"
                       style={{ borderLeftColor: currentStep.color }}
                     >
                       <div className="flex items-center justify-between gap-2 mb-1">
@@ -202,7 +202,7 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
                   </div>
                   <div className="space-y-2">
                     {stepOutputs.map(o => (
-                      <div key={o.id} className="bg-surface-low border border-outline/10 p-3">
+                      <div key={o.id} className="bg-surface-container border border-outline/15 p-3">
                         <div className="flex items-center justify-between gap-2 mb-1">
                           <span className="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">
                             {o.template_name ?? o.template_code} · {o.ai_provider}
@@ -234,7 +234,7 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
               </div>
 
               {/* Prompt + copiar */}
-              <div className="bg-surface-lowest border border-outline/10 p-3">
+              <div className="bg-surface-lowest border border-outline/15 p-3">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] uppercase tracking-widest font-bold text-muted">
                     Prompt pronto pra colar em {selectedTemplate.ai_target}
@@ -262,7 +262,7 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
                   <label className="text-xs text-on-surface-variant block mb-1">Cole aqui a resposta da {selectedTemplate.ai_target}:</label>
                   <textarea value={outputText} onChange={e => setOutputText(e.target.value)} rows={10}
                     placeholder='Ctrl+V depois de copiar a resposta no ChatGPT/Claude'
-                    className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-xs focus:outline-none focus:border-secondary/40 text-on-surface font-mono" />
+                    className="w-full bg-surface-container border border-outline/15 px-3 py-2 text-xs focus:outline-none focus:border-secondary/40 text-on-surface font-mono" />
                 </div>
               )}
 
@@ -272,11 +272,11 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
                     <label className="text-xs text-on-surface-variant block mb-1">URL da arte / vídeo / áudio gerado:</label>
                     <input value={outputUrl} onChange={e => setOutputUrl(e.target.value)}
                       placeholder='https://i.imgur.com/... ou Canva/Drive'
-                      className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-xs focus:outline-none text-on-surface" />
+                      className="w-full bg-surface-container border border-outline/15 px-3 py-2 text-xs focus:outline-none text-on-surface" />
                   </div>
                   <div>
                     <label className="text-xs text-on-surface-variant block mb-1">OU upload direto (até 50MB):</label>
-                    <label className="flex items-center justify-center gap-2 w-full bg-surface-low border border-dashed border-outline/30 px-3 py-2 text-xs text-on-surface-variant hover:bg-surface-highest cursor-pointer">
+                    <label className="flex items-center justify-center gap-2 w-full bg-surface-container border border-dashed border-outline/30 px-3 py-2 text-xs text-on-surface-variant hover:bg-surface-highest cursor-pointer">
                       {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
                       {uploading ? 'Subindo...' : 'Escolher arquivo'}
                       <input type="file" className="hidden" onChange={handleUpload}
@@ -287,7 +287,7 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
                     <label className="text-xs text-on-surface-variant block mb-1">Notas (opcional):</label>
                     <textarea value={outputText} onChange={e => setOutputText(e.target.value)} rows={2}
                       placeholder='Ex: usei a 3ª variação do Midjourney'
-                      className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-xs text-on-surface" />
+                      className="w-full bg-surface-container border border-outline/15 px-3 py-2 text-xs text-on-surface" />
                   </div>
                 </div>
               )}

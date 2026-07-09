@@ -113,7 +113,7 @@ export function CalendarioEditorial() {
         <select
           value={pillarFilter}
           onChange={(e) => setPillarFilter(e.target.value)}
-          className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm focus:outline-none"
+          className="bg-surface-container border border-outline/15 px-3 py-1.5 text-sm focus:outline-none"
         >
           <option value="all">Todos os pilares</option>
           {pillars.map((p) => (
@@ -126,7 +126,7 @@ export function CalendarioEditorial() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm focus:outline-none"
+          className="bg-surface-container border border-outline/15 px-3 py-1.5 text-sm focus:outline-none"
         >
           <option value="all">Todos status</option>
           <option value="planned">Planejado</option>
@@ -201,7 +201,7 @@ export function CalendarioEditorial() {
 
 function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className="bg-surface-low border border-outline/10 p-4">
+    <div className="bg-surface-container border border-outline/15 p-4">
       <div className="text-2xl font-semibold" style={{ color }}>
         {value}
       </div>
@@ -266,7 +266,7 @@ function PostCard({ post, onAdvance, onEdit }: { post: CalendarPost; onAdvance: 
 
   return (
     <div
-      className="bg-surface-low border border-outline/10 p-4 border-l-4"
+      className="bg-surface-container border border-outline/15 p-4 border-l-4"
       style={{ borderLeftColor: post.pillar_color ?? 'var(--color-secondary)' }}
     >
       <div className="flex items-start justify-between gap-3">
@@ -418,7 +418,7 @@ function MonthView({ monthCursor, onMonthChange, posts, onEdit }: {
             <div
               key={i}
               className={`min-h-[100px] border p-1.5 ${
-                inMonth ? 'bg-surface-low border-outline/10' : 'bg-transparent border-outline/10 opacity-40'
+                inMonth ? 'bg-surface-container border-outline/10' : 'bg-transparent border-outline/10 opacity-40'
               } ${isToday ? 'ring-1 ring-secondary' : ''}`}
             >
               <div className={`text-[10px] mb-1 ${isToday ? 'text-secondary font-bold' : 'text-muted'}`}>

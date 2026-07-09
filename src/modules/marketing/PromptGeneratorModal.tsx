@@ -84,7 +84,7 @@ export function PromptGeneratorModal({ source, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex" onClick={onClose}>
       <div className="absolute inset-0 bg-surface-lowest" />
-      <div className="relative m-auto w-full max-w-5xl h-[85vh] bg-surface-container border border-outline/10 overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+      <div className="relative m-auto w-full max-w-5xl h-[85vh] bg-surface-container border border-outline/15 overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
 
         <div className="border-b border-outline/10 px-6 py-4 flex items-center justify-between">
           <div>
@@ -104,7 +104,7 @@ export function PromptGeneratorModal({ source, onClose }: Props) {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="w-full bg-surface-low border border-outline/10 px-2 py-1.5 text-xs focus:outline-none"
+                className="w-full bg-surface-container border border-outline/15 px-2 py-1.5 text-xs focus:outline-none"
               >
                 <option value="all">Todas categorias</option>
                 <option value="text">Texto</option>
@@ -191,11 +191,11 @@ export function PromptGeneratorModal({ source, onClose }: Props) {
                   <>
                     <div>
                       <div className="text-[10px] uppercase tracking-widest font-bold text-muted mb-2">Prompt renderizado</div>
-                      <pre className="text-xs text-on-surface bg-surface-lowest border border-outline/10 p-3 whitespace-pre-wrap font-mono max-h-[40vh] overflow-y-auto">{rendered.rendered_prompt}</pre>
+                      <pre className="text-xs text-on-surface bg-surface-lowest border border-outline/15 p-3 whitespace-pre-wrap font-mono max-h-[40vh] overflow-y-auto">{rendered.rendered_prompt}</pre>
                     </div>
 
                     {Object.keys(rendered.vars_used).length > 0 && (
-                      <details className="bg-surface-low border border-outline/10 p-3">
+                      <details className="bg-surface-container border border-outline/15 p-3">
                         <summary className="text-[10px] uppercase tracking-widest font-bold text-muted cursor-pointer">Variáveis usadas ({Object.keys(rendered.vars_used).length})</summary>
                         <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[11px]">
                           {Object.entries(rendered.vars_used).map(([k, v]) => (

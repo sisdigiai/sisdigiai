@@ -80,7 +80,7 @@ function SectionLabel({ icon, kicker, title }: { icon: React.ReactNode; kicker: 
 
 export default function ComoUsarDigiaiHouse() {
   return (
-    <div className="max-w-6xl mx-auto p-8 pb-24">
+    <div className="max-w-7xl mx-auto p-8 pb-24">
       <PageHeader
         eyebrow="Sistema · Design · Como usar"
         title="Como usar o DIGIAI House"

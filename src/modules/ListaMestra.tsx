@@ -91,7 +91,7 @@ export default function ListaMestra() {
     }`;
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto">
       <PageHeader
         eyebrow="Implantação"
         title="Lista Mestra"
@@ -130,7 +130,7 @@ export default function ListaMestra() {
               value={busca}
               onChange={e => setBusca(e.target.value)}
               placeholder="Buscar item ou área…"
-              className="bg-surface-low border border-outline/10 pl-9 pr-3 py-2 text-sm text-on-surface w-64 focus:outline-none focus:border-secondary/40"
+              className="bg-surface-container border border-outline/15 pl-9 pr-3 py-2 text-sm text-on-surface w-64 focus:outline-none focus:border-secondary/40"
             />
           </div>
         </div>

@@ -134,7 +134,7 @@ export function Redes() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {CONTAS_SOCIAIS.filter(c => c.camada === camada.id).map(conta => (
-                  <div key={conta.code} className="bg-surface-low border border-outline/10 p-4 space-y-2">
+                  <div key={conta.code} className="bg-surface-container border border-outline/15 p-4 space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="text-sm font-semibold">{conta.rede}</div>
                       {conta.navegador ? (
@@ -174,7 +174,7 @@ export function Redes() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="border border-outline/10">
-            <div className="px-4 py-2 bg-surface-low border-b border-outline/10 text-xs font-bold uppercase tracking-widest">Semana 1 — implantação</div>
+            <div className="px-4 py-2 bg-surface-container border-b border-outline/10 text-xs font-bold uppercase tracking-widest">Semana 1 — implantação</div>
             <div className="divide-y divide-outline/10">
               {SEMANA_1.map(item => (
                 <div key={item.dia} className="px-4 py-2.5 flex gap-3 items-start">
@@ -189,7 +189,7 @@ export function Redes() {
           </div>
 
           <div className="border border-outline/10">
-            <div className="px-4 py-2 bg-surface-low border-b border-outline/10 text-xs font-bold uppercase tracking-widest">Rotina permanente (semana 2+)</div>
+            <div className="px-4 py-2 bg-surface-container border-b border-outline/10 text-xs font-bold uppercase tracking-widest">Rotina permanente (semana 2+)</div>
             <div className="divide-y divide-outline/10">
               {ROTINA.map(item => (
                 <div key={item.freq} className="px-4 py-2.5 flex gap-3 items-start">
@@ -210,7 +210,7 @@ export function Redes() {
         <h3 className="font-semibold text-base mb-2">Stack de criativos (T-4)</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           {STACK_CRIATIVOS.map(s => (
-            <div key={s.tipo} className="bg-surface-low border border-outline/10 px-4 py-2.5 flex items-baseline justify-between gap-3">
+            <div key={s.tipo} className="bg-surface-container border border-outline/15 px-4 py-2.5 flex items-baseline justify-between gap-3">
               <span className="text-sm">{s.tipo}</span>
               <span className="text-[11px] text-muted text-right">{s.ferramenta}</span>
             </div>
@@ -286,13 +286,13 @@ export function Redes() {
       {/* Modal registrar */}
       {showForm && (
         <div className="fixed inset-0 bg-surface-lowest flex items-center justify-center z-50 p-4" onClick={() => setShowForm(false)}>
-          <div className="bg-surface-container border border-outline/10 p-6 max-w-md w-full space-y-3" onClick={e => e.stopPropagation()}>
+          <div className="bg-surface-container border border-outline/15 p-6 max-w-md w-full space-y-3" onClick={e => e.stopPropagation()}>
             <h3 className="font-semibold">Registrar atualização de rede</h3>
 
             <div>
               <label className="text-xs text-on-surface-variant block mb-1">Conta</label>
               <select value={form.account_code} onChange={e => setForm({ ...form, account_code: e.target.value })}
-                className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none">
+                className="w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm focus:outline-none">
                 {CONTAS_SOCIAIS.map(c => <option key={c.code} value={c.code}>{c.rede} · {c.handle}</option>)}
               </select>
             </div>
@@ -301,33 +301,33 @@ export function Redes() {
               <div>
                 <label className="text-xs text-on-surface-variant block mb-1">Tipo</label>
                 <select value={form.update_type} onChange={e => setForm({ ...form, update_type: e.target.value as SocialUpdateType })}
-                  className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none">
+                  className="w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm focus:outline-none">
                   {UPDATE_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-xs text-on-surface-variant block mb-1">Data (vazio = hoje)</label>
                 <input type="date" value={form.happened_on} onChange={e => setForm({ ...form, happened_on: e.target.value })}
-                  className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-secondary/40" />
+                  className="w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm focus:outline-none focus:border-secondary/40" />
               </div>
             </div>
 
             <div>
               <label className="text-xs text-on-surface-variant block mb-1">Título *</label>
               <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Ex: Post build in public — migração crm_erp"
-                className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-secondary/40" />
+                className="w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm focus:outline-none focus:border-secondary/40" />
             </div>
 
             <div>
               <label className="text-xs text-on-surface-variant block mb-1">URL (opcional)</label>
               <input value={form.url} onChange={e => setForm({ ...form, url: e.target.value })} placeholder="Link do post publicado"
-                className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-secondary/40" />
+                className="w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm focus:outline-none focus:border-secondary/40" />
             </div>
 
             <div>
               <label className="text-xs text-on-surface-variant block mb-1">Notas (opcional)</label>
               <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={2}
-                className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-secondary/40" />
+                className="w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm focus:outline-none focus:border-secondary/40" />
             </div>
 
             <div className="flex gap-2 justify-end pt-1">

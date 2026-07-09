@@ -299,7 +299,7 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
   );
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto">
       <PageHeader
         eyebrow="Espinha do ecossistema"
         title="Mapa OSI"
@@ -398,7 +398,7 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
               {order.map((code) => {
                 const f = byCode[code];
                 return (
-                  <div key={code} className="bg-surface-lowest border border-outline/10 px-3 py-2">
+                  <div key={code} className="bg-surface-lowest border border-outline/15 px-3 py-2">
                     <div className="text-[11px] text-muted truncate">{FUNNEL_LABEL[code] ?? code}</div>
                     <div className="text-lg font-bold text-on-surface tabular-nums">
                       {f?.n_7d ?? 0}<span className="text-xs text-muted font-normal"> /7d</span>
@@ -435,7 +435,7 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
         ) : (
           <ul className="space-y-1">
             {leads.map((l) => (
-              <li key={l.id} className="flex items-center gap-3 bg-surface-lowest border border-outline/10 px-3 py-2 text-xs">
+              <li key={l.id} className="flex items-center gap-3 bg-surface-lowest border border-outline/15 px-3 py-2 text-xs">
                 <span className="text-on-surface font-medium truncate">{l.name ?? 'Sem nome'}</span>
                 <span className="text-muted truncate">{l.email ?? l.phone_e164 ?? '—'}</span>
                 {l.utm_source && <span className="text-on-surface-variant font-mono text-[10px]">via {l.utm_source}</span>}

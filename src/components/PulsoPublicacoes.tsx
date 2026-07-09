@@ -88,7 +88,7 @@ export default function PulsoPublicacoes({ onNavigate }: { onNavigate?: (id: Mod
   }, [posts, today, weekStart]);
 
   return (
-    <div className="bg-surface-low border border-outline/10 p-5">
+    <div className="bg-surface-container border border-outline/15 p-5">
       <div className="flex items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-2">
           <Radio className="w-5 h-5 text-secondary" />

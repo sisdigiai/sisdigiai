@@ -95,7 +95,7 @@ export function Validacao() {
       ) : !stats ? (
         <div className="text-center py-12 text-muted text-sm">Sem dados ainda.</div>
       ) : stats.sales_total === 0 ? (
-        <div className="bg-surface-low border border-outline/10 p-12 text-center">
+        <div className="bg-surface-container border border-outline/15 p-12 text-center">
           <AlertCircle className="w-10 h-10 mx-auto mb-3 text-muted" />
           <h3 className="text-sm font-semibold mb-2">Nenhuma venda registrada ainda</h3>
           <p className="text-xs text-muted max-w-md mx-auto">
@@ -161,7 +161,7 @@ export function Validacao() {
             <h3 className="text-[10px] uppercase tracking-widest font-bold text-muted mb-3">
               Receita por pilar (ranking)
             </h3>
-            <div className="bg-surface-low border border-outline/10 p-4 space-y-3">
+            <div className="bg-surface-container border border-outline/15 p-4 space-y-3">
               {ranking.length === 0 ? (
                 <div className="text-xs text-muted">Sem ranking ainda.</div>
               ) : (
@@ -206,7 +206,7 @@ export function Validacao() {
               Top 10 posts por receita
             </h3>
             {topPosts.length === 0 ? (
-              <div className="bg-surface-low border border-outline/10 p-8 text-center text-xs text-muted">
+              <div className="bg-surface-container border border-outline/15 p-8 text-center text-xs text-muted">
                 Nenhum post com venda atribuída ainda.
               </div>
             ) : (
@@ -214,7 +214,7 @@ export function Validacao() {
                 {topPosts.map((p, i) => (
                   <div
                     key={p.id}
-                    className="bg-surface-low border border-outline/10 p-3 flex items-center gap-3 border-l-4"
+                    className="bg-surface-container border border-outline/15 p-3 flex items-center gap-3 border-l-4"
                     style={{ borderLeftColor: p.pillar_color ?? 'var(--color-secondary)' }}
                   >
                     <div className="text-2xl font-bold text-muted w-8 text-center">{i + 1}</div>
@@ -247,7 +247,7 @@ export function Validacao() {
 
 function StatCard({ label, value, color, icon }: { label: string; value: string; color: string; icon?: React.ReactNode }) {
   return (
-    <div className="bg-surface-low border border-outline/10 p-3">
+    <div className="bg-surface-container border border-outline/15 p-3">
       <div className="flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold text-muted mb-1">
         {icon} {label}
       </div>

@@ -115,9 +115,9 @@ export function Comunidade() {
         <div className="flex items-center gap-2 flex-1 min-w-[260px]">
           <Search className="w-4 h-4 text-muted" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Nome / email / cidade..."
-            className="flex-1 bg-surface-low border border-outline/10 px-3 py-1.5 text-sm focus:outline-none" />
+            className="flex-1 bg-surface-container border border-outline/15 px-3 py-1.5 text-sm focus:outline-none" />
         </div>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm">
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-surface-container border border-outline/15 px-3 py-1.5 text-sm">
           <option value="all">Todos status</option>
           <option value="active">Ativo</option>
           <option value="vip">VIP</option>
@@ -125,7 +125,7 @@ export function Comunidade() {
           <option value="refunded">Reembolsado</option>
           <option value="blocked">Bloqueado</option>
         </select>
-        <select value={tierFilter} onChange={e => setTierFilter(e.target.value)} className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm">
+        <select value={tierFilter} onChange={e => setTierFilter(e.target.value)} className="bg-surface-container border border-outline/15 px-3 py-1.5 text-sm">
           <option value="all">Todos tiers</option>
           <option value="bronze">Bronze</option>
           <option value="prata">Prata</option>
@@ -137,7 +137,7 @@ export function Comunidade() {
       {loading ? (
         <div className="text-center py-12 text-muted text-sm">Carregando...</div>
       ) : filtered.length === 0 ? (
-        <div className="bg-surface-low border border-outline/10 p-12 text-center text-muted">
+        <div className="bg-surface-container border border-outline/15 p-12 text-center text-muted">
           <Users className="w-10 h-10 mx-auto mb-3 opacity-30" />
           <p className="text-sm">
             {members.length === 0 ? 'Nenhum membro ainda — a 1ª venda Hotmart cria o primeiro automaticamente.' : 'Nenhum match nos filtros.'}
@@ -172,7 +172,7 @@ function MemberCard({ m, busy, onPromoteVip, onSetActive, onSetInactive, onBlock
 }) {
   const isVip = m.status === 'vip';
   return (
-    <div className="bg-surface-low border border-outline/10 p-4 border-l-4"
+    <div className="bg-surface-container border border-outline/15 p-4 border-l-4"
       style={{ borderLeftColor: STATUS_COLOR[m.status] }}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
@@ -250,17 +250,17 @@ function AddMemberModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-surface-lowest" />
-      <div className="relative bg-surface-container border border-outline/10 p-6 max-w-md w-full" onClick={e => e.stopPropagation()}>
+      <div className="relative bg-surface-container border border-outline/15 p-6 max-w-md w-full" onClick={e => e.stopPropagation()}>
         <h3 className="text-lg font-semibold mb-4">Adicionar membro manual</h3>
         <div className="space-y-3">
-          <input value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} placeholder="Nome completo *" className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm" />
-          <input value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="Email *" type="email" className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm" />
-          <input value={form.whatsapp} onChange={e => setForm({ ...form, whatsapp: e.target.value })} placeholder="WhatsApp +55 11 99999-0000" className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm" />
+          <input value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} placeholder="Nome completo *" className="w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm" />
+          <input value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="Email *" type="email" className="w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm" />
+          <input value={form.whatsapp} onChange={e => setForm({ ...form, whatsapp: e.target.value })} placeholder="WhatsApp +55 11 99999-0000" className="w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm" />
           <div className="grid grid-cols-2 gap-2">
-            <input value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} placeholder="Cidade" className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm" />
-            <input value={form.state} onChange={e => setForm({ ...form, state: e.target.value.toUpperCase() })} placeholder="UF" maxLength={2} className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm" />
+            <input value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} placeholder="Cidade" className="w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm" />
+            <input value={form.state} onChange={e => setForm({ ...form, state: e.target.value.toUpperCase() })} placeholder="UF" maxLength={2} className="w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm" />
           </div>
-          <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} placeholder="Notas internas" rows={3} className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm" />
+          <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} placeholder="Notas internas" rows={3} className="w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm" />
           <label className="flex items-center gap-2 text-xs text-on-surface-variant">
             <input type="checkbox" checked={form.whatsapp_consent} onChange={e => setForm({ ...form, whatsapp_consent: e.target.checked })} className="accent-eco-academy" />
             Autorizou contato pelo WhatsApp
@@ -279,7 +279,7 @@ function AddMemberModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
 
 function StatCard({ label, value, color, icon }: { label: string; value: string; color: string; icon?: React.ReactNode }) {
   return (
-    <div className="bg-surface-low border border-outline/10 p-3">
+    <div className="bg-surface-container border border-outline/15 p-3">
       <div className="flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold text-muted mb-1">
         {icon} {label}
       </div>

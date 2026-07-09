@@ -3,14 +3,18 @@ import { motion } from 'motion/react';
 import { Download, CheckCircle2, Copy, Layers, Type, Palette, Square, Minus } from 'lucide-react';
 import { Logo } from './Logo';
 import { initConvergenceMesh, initReveal } from '../lib/dhMesh';
+import BrandMktAtelie from './BrandMktAtelie';
+
+type BrandTab = 'house' | 'mkt';
 
 export default function BrandGuidelines() {
+  const [tab, setTab] = useState<BrandTab>('house');
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => (canvasRef.current ? initConvergenceMesh(canvasRef.current) : undefined), []);
-  useEffect(() => (rootRef.current ? initReveal(rootRef.current) : undefined), []);
+  useEffect(() => (tab === 'house' && canvasRef.current ? initConvergenceMesh(canvasRef.current) : undefined), [tab]);
+  useEffect(() => (tab === 'house' && rootRef.current ? initReveal(rootRef.current) : undefined), [tab]);
 
   const handleCopy = (color: string) => {
     navigator.clipboard.writeText(color);
@@ -53,14 +57,36 @@ export default function BrandGuidelines() {
     </div>
   );
 
+  const TabButton = ({ id, kicker, label }: { id: BrandTab; kicker: string; label: string }) => (
+    <button
+      onClick={() => setTab(id)}
+      aria-current={tab === id ? 'page' : undefined}
+      className={`px-5 py-3 font-mono text-[11px] uppercase tracking-[0.2em] border-b-2 transition-colors ${
+        tab === id
+          ? 'border-action text-on-surface'
+          : 'border-transparent text-muted hover:text-on-surface-variant'
+      }`}
+    >
+      <span className="opacity-60">{kicker} · </span>{label}
+    </button>
+  );
+
   return (
+    <div className="min-h-screen bg-surface text-on-surface">
+      {/* Abas: identidade da holding + temas de produto registrados no brand */}
+      <nav className="sticky top-0 z-20 bg-surface/95 backdrop-blur-sm border-b border-outline/20 px-6 flex gap-2" aria-label="Abas do Brand Guidelines">
+        <TabButton id="house" kicker="Holding" label="DIGIAI House" />
+        <TabButton id="mkt" kicker="Produto" label="MKT · Ateliê de Convergência" />
+      </nav>
+
+      {tab === 'mkt' ? <BrandMktAtelie /> : (
     <div ref={rootRef} className="min-h-screen bg-surface text-on-surface selection:bg-secondary selection:text-on-action pb-32">
       {/* Cover — malha de convergência 3D (dhMesh) */}
       <section className="relative overflow-hidden border-b border-outline/10 min-h-[88vh] flex items-center">
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-secondary/[0.04] blur-[120px] pointer-events-none" />
 
-        <div className="max-w-6xl mx-auto relative z-10 flex flex-col items-center text-center px-6 py-24 w-full">
+        <div className="max-w-7xl mx-auto relative z-10 flex flex-col items-center text-center px-6 py-24 w-full">
           <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-secondary mb-8">Brand System · Geometric Precision</span>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -82,7 +108,7 @@ export default function BrandGuidelines() {
 
       {/* Sistema em números — count-up (dhMesh/initReveal) */}
       <section className="py-16 px-6 border-b border-outline/10">
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-px bg-outline/10 border border-outline/10">
+        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-px bg-outline/10 border border-outline/10">
           {[
             { n: '10', label: 'Marcas no ecossistema' },
             { n: '3', label: 'Vozes tipográficas' },
@@ -99,7 +125,7 @@ export default function BrandGuidelines() {
 
       {/* Logo Variations */}
       <section className="py-24 px-6 border-b border-outline/10 bg-surface-low/40">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <SectionLabel icon={<Layers className="w-4 h-4" />} kicker="Identidade" title="Variações do Logo" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-surface p-12 border border-outline/10 flex flex-col items-center justify-center min-h-[300px] relative" data-reveal>
@@ -142,7 +168,7 @@ export default function BrandGuidelines() {
 
       {/* Color Palette */}
       <section className="py-24 px-6 border-b border-outline/10">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <SectionLabel icon={<Palette className="w-4 h-4" />} kicker="Paleta" title="Cores" />
           <p className="text-on-surface-variant max-w-2xl mb-12 -mt-6 leading-relaxed">
             Fundação monocromática profunda para transmitir estabilidade. O verde-floresta entra com parcimônia, como contraponto orgânico ao base técnico — só em ações primárias e indicadores de status.
@@ -159,7 +185,7 @@ export default function BrandGuidelines() {
 
       {/* Typography */}
       <section className="py-24 px-6 border-b border-outline/10 bg-surface-low/40">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <SectionLabel icon={<Type className="w-4 h-4" />} kicker="Tipografia" title="Três Vozes" />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-px bg-outline/10 border border-outline/10">
             <div className="bg-surface p-8" data-reveal>
@@ -205,7 +231,7 @@ export default function BrandGuidelines() {
 
       {/* Principles */}
       <section className="py-24 px-6 border-b border-outline/10">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <SectionLabel icon={<Square className="w-4 h-4" />} kicker="Princípios" title="Geometric Precision" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
@@ -214,7 +240,7 @@ export default function BrandGuidelines() {
               { icon: <Layers className="w-5 h-5" />, t: 'Camadas tonais', d: 'Profundidade por tons de surface, não por elevação física.' },
               { icon: <Type className="w-5 h-5" />, t: 'Chips mono caixa-alta', d: 'Categorização e status sem imitar botões.' },
             ].map((p) => (
-              <div key={p.t} className="bg-surface-low border border-outline/10 p-6" data-reveal>
+              <div key={p.t} className="bg-surface-container border border-outline/15 p-6" data-reveal>
                 <div className="text-secondary mb-4">{p.icon}</div>
                 <h3 className="font-serif text-lg font-semibold text-on-surface mb-1.5">{p.t}</h3>
                 <p className="text-sm text-muted leading-relaxed">{p.d}</p>
@@ -226,7 +252,7 @@ export default function BrandGuidelines() {
 
       {/* Assets */}
       <section className="py-24 px-6">
-        <div className="max-w-6xl mx-auto text-center">
+        <div className="max-w-7xl mx-auto text-center">
           <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-secondary">Recursos</span>
           <h2 className="font-serif text-3xl font-semibold tracking-tight mt-3 mb-6 text-on-surface">Brand Assets</h2>
           <p className="text-on-surface-variant max-w-2xl mx-auto mb-12 leading-relaxed">
@@ -242,6 +268,8 @@ export default function BrandGuidelines() {
           </a>
         </div>
       </section>
+    </div>
+      )}
     </div>
   );
 }

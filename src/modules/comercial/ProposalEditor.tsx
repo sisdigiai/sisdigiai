@@ -46,7 +46,7 @@ export default function ProposalEditor({
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-      <div className="bg-surface-low border border-outline/20 w-full max-w-4xl h-[88vh] flex flex-col">
+      <div className="bg-surface-container border border-outline/15 w-full max-w-4xl h-[88vh] flex flex-col">
         <div className="flex items-center gap-3 px-5 py-3 border-b border-outline/10 shrink-0">
           <FileText className="w-4 h-4 text-secondary" />
           <div className="text-sm font-bold text-on-surface">Proposta {lead ? `· ${lead.company}` : ''}</div>
@@ -60,7 +60,7 @@ export default function ProposalEditor({
             <Line label="Título" value={p.title ?? ''} onChange={(v) => set({ title: v })} />
             <label className="block">
               <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Plano</span>
-              <select value={p.plan ?? ''} onChange={(e) => setPlan(e.target.value)} className="w-full mt-1 bg-surface-high border border-outline/10 px-2.5 py-1.5 text-sm text-on-surface">
+              <select value={p.plan ?? ''} onChange={(e) => setPlan(e.target.value)} className="w-full mt-1 bg-surface-high border border-outline/15 px-2.5 py-1.5 text-sm text-on-surface">
                 {PLANS.map((pl) => <option key={pl} value={pl}>{pl}</option>)}
               </select>
             </label>
@@ -81,7 +81,7 @@ export default function ProposalEditor({
             <textarea
               value={p.body ?? ''}
               onChange={(e) => set({ body: e.target.value })}
-              className="flex-1 min-h-[300px] bg-surface-high border border-outline/10 px-3 py-2.5 text-sm text-on-surface leading-relaxed focus:border-secondary/50 outline-none resize-none whitespace-pre-wrap"
+              className="flex-1 min-h-[300px] bg-surface-high border border-outline/15 px-3 py-2.5 text-sm text-on-surface leading-relaxed focus:border-secondary/50 outline-none resize-none whitespace-pre-wrap"
             />
           </div>
         </div>
@@ -110,7 +110,7 @@ function Line({ label, value, onChange }: { label: string; value: string; onChan
   return (
     <label className="block">
       <span className="text-[10px] font-mono uppercase tracking-widest text-muted">{label}</span>
-      <input value={value} onChange={(e) => onChange(e.target.value)} className="w-full mt-1 bg-surface-high border border-outline/10 px-2.5 py-1.5 text-sm text-on-surface focus:border-secondary/50 outline-none" />
+      <input value={value} onChange={(e) => onChange(e.target.value)} className="w-full mt-1 bg-surface-high border border-outline/15 px-2.5 py-1.5 text-sm text-on-surface focus:border-secondary/50 outline-none" />
     </label>
   );
 }

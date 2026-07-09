@@ -101,7 +101,7 @@ export default function Marketplace() {
   };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto">
       <PageHeader
         eyebrow="Operacional · canal primário"
         title="Marketplace"

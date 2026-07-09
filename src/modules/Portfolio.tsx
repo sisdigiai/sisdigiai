@@ -221,7 +221,7 @@ export default function Portfolio() {
   const liveCount = (nome: string) => liveSites[OWNER_BY_NAME[nome] ?? ''] || 0;
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto">
       <PageHeader
         eyebrow="Hierarquia Canônica"
         title="Portfólio de Produtos"

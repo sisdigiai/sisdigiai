@@ -46,7 +46,7 @@ export default function Financeiro() {
   const [tab, setTab] = useState<TabId>('dashboard');
 
   return (
-    <div className="max-w-6xl mx-auto p-8">
+    <div className="max-w-7xl mx-auto p-8">
       <PageHeader
         eyebrow="Investimento Real"
         title="Financeiro"
@@ -244,7 +244,7 @@ function DashboardTab() {
 
       {/* Stacked bar chart */}
       {last12Months.length > 0 && (
-        <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+        <div className="bg-surface-lowest border border-outline/15 p-6">
           <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Despesas Mensais por Categoria</h3>
           <div className="h-72">
             <Bar
@@ -270,7 +270,7 @@ function DashboardTab() {
 
       {/* Top vendors */}
       {topVendors.length > 0 && (
-        <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+        <div className="bg-surface-lowest border border-outline/15 p-6">
           <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Top 10 Vendors por Gasto</h3>
           <div className="space-y-3">
             {topVendors.map((v) => (
@@ -291,7 +291,7 @@ function DashboardTab() {
 
       {/* Recent expenses */}
       {expenses.length > 0 && (
-        <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+        <div className="bg-surface-lowest border border-outline/15 p-6">
           <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Últimos Lançamentos</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -335,7 +335,7 @@ function DashboardTab() {
 
 function KpiCard({ label, value, sub, icon, color }: { label: string; value: string; sub?: string; icon: React.ReactNode; color: string }) {
   return (
-    <div className="bg-surface-lowest/50 border border-outline/10 p-5">
+    <div className="bg-surface-lowest border border-outline/15 p-5">
       <div className="flex items-center gap-2 mb-2">
         <span className={color}>{icon}</span>
         <span className="text-xs text-muted uppercase tracking-wide">{label}</span>
@@ -461,7 +461,7 @@ function LancarTab() {
   return (
     <div className="space-y-6">
       {/* Form */}
-      <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+      <div className="bg-surface-lowest border border-outline/15 p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-on-surface-variant">Nova Despesa</h3>
           <button
@@ -578,7 +578,7 @@ function LancarTab() {
 
       {/* Recent list */}
       {expenses.length > 0 && (
-        <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+        <div className="bg-surface-lowest border border-outline/15 p-6">
           <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Últimas Despesas</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -720,7 +720,7 @@ function SubscriptionsTab() {
       {msg && <div className={`text-sm ${msg.startsWith('Erro') ? 'text-danger' : 'text-success'}`}>{msg}</div>}
 
       {showForm && (
-        <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+        <div className="bg-surface-lowest border border-outline/15 p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-on-surface-variant">Nova Subscription</h3>
             <button onClick={() => setShowForm(false)} className="text-muted hover:text-on-surface"><X size={16} /></button>
@@ -763,7 +763,7 @@ function SubscriptionsTab() {
       )}
 
       {/* Active subs */}
-      <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+      <div className="bg-surface-lowest border border-outline/15 p-6">
         <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Ativas</h3>
         {activeSubs.length === 0 ? (
           <div className="text-muted text-sm">Nenhuma subscription ativa.</div>
@@ -804,7 +804,7 @@ function SubscriptionsTab() {
 
       {/* Inactive subs */}
       {inactiveSubs.length > 0 && (
-        <div className="bg-surface-lowest/50 border border-outline/10 p-6 opacity-60">
+        <div className="bg-surface-lowest border border-outline/15 p-6 opacity-60">
           <h3 className="text-sm font-semibold text-muted mb-4">Encerradas</h3>
           <table className="w-full text-sm">
             <tbody>
@@ -940,7 +940,7 @@ function RelatorioTab() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* By category */}
         {sortedCats.length > 0 && (
-          <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+          <div className="bg-surface-lowest border border-outline/15 p-6">
             <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Por Categoria</h3>
             <div className="space-y-3">
               {sortedCats.map(([cat, total]) => {
@@ -965,7 +965,7 @@ function RelatorioTab() {
 
         {/* By vendor */}
         {sortedVendors.length > 0 && (
-          <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+          <div className="bg-surface-lowest border border-outline/15 p-6">
             <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Por Vendor</h3>
             <div className="space-y-3">
               {sortedVendors.map((v) => {
@@ -988,7 +988,7 @@ function RelatorioTab() {
 
       {/* Monthly breakdown */}
       {sortedMonths.length > 0 && (
-        <div className="bg-surface-lowest/50 border border-outline/10 p-6">
+        <div className="bg-surface-lowest border border-outline/15 p-6">
           <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Por Mês</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {sortedMonths.map(([month, total]) => (

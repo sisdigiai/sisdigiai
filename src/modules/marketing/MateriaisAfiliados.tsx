@@ -53,13 +53,13 @@ export function MateriaisAfiliados() {
       <div className="flex items-center gap-4 mb-6 flex-wrap">
         <div className="flex items-center gap-2 flex-1 min-w-[260px]">
           <Search className="w-4 h-4 text-muted" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar material..." className="flex-1 bg-surface-low border border-outline/10 px-3 py-1.5 text-sm focus:outline-none focus:border-secondary/40" />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar material..." className="flex-1 bg-surface-container border border-outline/15 px-3 py-1.5 text-sm focus:outline-none focus:border-secondary/40" />
         </div>
-        <select value={pillarFilter} onChange={e => setPillarFilter(e.target.value)} className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm">
+        <select value={pillarFilter} onChange={e => setPillarFilter(e.target.value)} className="bg-surface-container border border-outline/15 px-3 py-1.5 text-sm">
           <option value="all">Todos pilares</option>
           {pillars.map(p => <option key={p.id} value={p.code}>{p.name}</option>)}
         </select>
-        <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm">
+        <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className="bg-surface-container border border-outline/15 px-3 py-1.5 text-sm">
           <option value="all">Todos tipos</option>
           {types.map(t => <option key={t} value={t}>{TYPE_LABELS[t] ?? t}</option>)}
         </select>
@@ -75,7 +75,7 @@ export function MateriaisAfiliados() {
       ) : (
         <div className="space-y-3">
           {filtered.map(m => (
-            <div key={m.id} className="bg-surface-low border border-outline/10 p-4 border-l-4" style={{ borderLeftColor: m.pillar_color ?? 'var(--color-secondary)' }}>
+            <div key={m.id} className="bg-surface-container border border-outline/15 p-4 border-l-4" style={{ borderLeftColor: m.pillar_color ?? 'var(--color-secondary)' }}>
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">

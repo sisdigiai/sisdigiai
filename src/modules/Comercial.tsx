@@ -169,7 +169,7 @@ export default function Comercial() {
                           <select
                             value={lead.stage}
                             onChange={(e) => moveStage(lead, e.target.value as LeadStage)}
-                            className="w-full text-[10px] bg-surface-high border border-outline/10 px-1.5 py-1 text-on-surface-variant mt-1"
+                            className="w-full text-[10px] bg-surface-high border border-outline/15 px-1.5 py-1 text-on-surface-variant mt-1"
                           >
                             {STAGES.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
                           </select>
@@ -256,7 +256,7 @@ export default function Comercial() {
       {/* Form modal */}
       {editing && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setEditing(null)}>
-          <div className="bg-surface-low border border-outline/20 w-full max-w-lg p-5 space-y-3" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-surface-container border border-outline/15 w-full max-w-lg p-5 space-y-3" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-on-surface flex items-center gap-2">
                 <Briefcase className="w-4 h-4 text-secondary" /> {editing.id ? 'Editar lead' : 'Novo lead'}
@@ -293,7 +293,7 @@ function Field({ label, value, onChange }: { label: string; value: string; onCha
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full mt-1 bg-surface-high border border-outline/10 px-2.5 py-1.5 text-sm text-on-surface focus:border-secondary/50 outline-none"
+        className="w-full mt-1 bg-surface-high border border-outline/15 px-2.5 py-1.5 text-sm text-on-surface focus:border-secondary/50 outline-none"
       />
     </label>
   );
@@ -306,7 +306,7 @@ function SelectField({ label, value, options, onChange }: { label: string; value
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full mt-1 bg-surface-high border border-outline/10 px-2.5 py-1.5 text-sm text-on-surface capitalize focus:border-secondary/50 outline-none"
+        className="w-full mt-1 bg-surface-high border border-outline/15 px-2.5 py-1.5 text-sm text-on-surface capitalize focus:border-secondary/50 outline-none"
       >
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
       </select>

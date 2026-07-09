@@ -20,7 +20,7 @@ export default function CadastroEmpresa() {
   const online = companyStore.isOnline();
 
   return (
-    <div className="max-w-6xl mx-auto p-8">
+    <div className="max-w-7xl mx-auto p-8">
       <PageHeader
         eyebrow="Registro Canônico"
         title="Cadastro Empresa"
@@ -287,7 +287,7 @@ function ContatosTab() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {contacts.map((c) => (
-          <div key={c.id} className="bg-surface-lowest border border-outline/10 p-4">
+          <div key={c.id} className="bg-surface-lowest border border-outline/15 p-4">
             <div className="flex justify-between items-start mb-2">
               <div>
                 <div className="text-xs uppercase text-secondary font-semibold">{c.tipo}</div>

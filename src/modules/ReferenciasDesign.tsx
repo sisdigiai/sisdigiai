@@ -602,7 +602,7 @@ export default function ReferenciasDesign() {
   const categoriaAtual = CATEGORIAS.find(c => c.id === categoria)!;
 
   return (
-    <div className="max-w-6xl mx-auto p-8">
+    <div className="max-w-7xl mx-auto p-8">
       <PageHeader
         eyebrow="Sistema · Design · Benchmark"
         title="Referências de Design System"
@@ -696,7 +696,7 @@ export default function ReferenciasDesign() {
           </div>
         </div>
 
-        <div className="mt-4 p-3 bg-surface-low border border-outline/10">
+        <div className="mt-4 p-3 bg-surface-container border border-outline/15">
           <div className="text-[10px] uppercase tracking-wider text-muted mb-1.5 font-semibold">💡 Pergunta de Ouro de cada briefing (adaptada ao destino)</div>
           <ul className="space-y-1.5 text-xs text-on-surface-variant leading-relaxed">
             <li><strong className="text-[#34D399]">Stone-Lens → Clearix Import (lab) → Vendas:</strong> "Funciona pra AMBOS (Mello + ótica de bairro) sem perder identidade Clearix?" (R-018: testa primeiro no Import)</li>
@@ -773,7 +773,7 @@ export default function ReferenciasDesign() {
 
       {/* Resumo decisório dinâmico */}
       {categoria === 'todos' && (
-        <div className="mt-12 p-6 bg-surface-low border border-outline/10">
+        <div className="mt-12 p-6 bg-surface-container border border-outline/15">
           <h2 className="text-lg font-bold text-on-surface mb-4">📊 Síntese cruzada — 5 categorias</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-on-surface-variant">
             <div className="p-4 bg-surface-low">

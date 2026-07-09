@@ -73,7 +73,7 @@ function ModChip({ m, onNavigate }: { m: Mod; onNavigate?: (id: ModuleId) => voi
   return (
     <button
       onClick={() => onNavigate?.(m.id)}
-      className="group flex items-start gap-3 text-left w-full bg-surface-low border border-outline/10 p-4 transition-all hover:border-secondary/40 hover:bg-secondary-container/15"
+      className="group flex items-start gap-3 text-left w-full bg-surface-container border border-outline/15 p-4 transition-all hover:border-secondary/40 hover:bg-secondary-container/15"
     >
       <span className="text-secondary mt-0.5 shrink-0">{m.icon}</span>
       <span className="min-w-0 flex-1">
@@ -98,7 +98,7 @@ function Connector({ label }: { label?: string }) {
 
 export default function Guia({ onNavigate }: { onNavigate?: (id: ModuleId) => void }) {
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto">
       <PageHeader
         eyebrow="Como Operar"
         title="Guia Operacional"

@@ -62,7 +62,7 @@ export default function Marketing({ view = 'calendario' }: { view?: MarketingVie
   const tabs = view === 'calendario' ? CALENDARIO_TABS : view === 'engajamento' ? ENGAJAMENTO_TABS : null;
 
   return (
-    <div className="h-full flex flex-col max-w-6xl mx-auto w-full">
+    <div className="h-full flex flex-col max-w-7xl mx-auto w-full">
       <div className="px-8 pt-8">
         <PageHeader eyebrow={meta.eyebrow} title={meta.title} subtitle={meta.subtitle} />
         <TravasBanner />

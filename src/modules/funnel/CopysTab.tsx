@@ -107,7 +107,7 @@ export default function CopysTab() {
 
       {/* KPI row */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-surface-low border border-outline/10 p-4 text-center">
+        <div className="bg-surface-container border border-outline/15 p-4 text-center">
           <div className="text-2xl font-bold text-on-surface-variant">{stats.pendente}</div>
           <div className="text-xs text-muted mt-1">Pendentes</div>
         </div>
@@ -129,7 +129,7 @@ export default function CopysTab() {
         const catAprovados = assets.filter((a) => a.status === 'aprovado').length;
 
         return (
-          <section key={cat} className="bg-surface-low border border-outline/10 overflow-hidden">
+          <section key={cat} className="bg-surface-container border border-outline/15 overflow-hidden">
             <button
               onClick={() => toggleCategory(cat)}
               className="w-full flex items-center justify-between p-5 cursor-pointer hover:bg-surface-highest transition-colors"

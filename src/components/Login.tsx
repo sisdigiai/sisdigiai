@@ -27,7 +27,7 @@ export default function Login() {
           <div className="mt-3 text-[11px] text-secondary font-mono tracking-[0.25em] uppercase">Painel Operacional</div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-surface-container border border-outline/10 p-8 space-y-5">
+        <form onSubmit={handleSubmit} className="bg-surface-container border border-outline/15 p-8 space-y-5">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 bg-secondary-container border border-secondary/40 flex items-center justify-center">
               <Lock size={18} className="text-secondary" />

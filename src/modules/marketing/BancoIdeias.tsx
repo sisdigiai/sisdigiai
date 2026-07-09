@@ -66,14 +66,14 @@ export function BancoIdeias() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar no hook..."
-            className="flex-1 bg-surface-low border border-outline/10 px-3 py-1.5 text-sm focus:outline-none focus:border-secondary/40"
+            className="flex-1 bg-surface-container border border-outline/15 px-3 py-1.5 text-sm focus:outline-none focus:border-secondary/40"
           />
         </div>
 
         <select
           value={pillarFilter}
           onChange={(e) => setPillarFilter(e.target.value)}
-          className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm focus:outline-none"
+          className="bg-surface-container border border-outline/15 px-3 py-1.5 text-sm focus:outline-none"
         >
           <option value="all">Todos os pilares</option>
           {pillars.map((p) => (
@@ -86,7 +86,7 @@ export function BancoIdeias() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-surface-low border border-outline/10 px-3 py-1.5 text-sm focus:outline-none"
+          className="bg-surface-container border border-outline/15 px-3 py-1.5 text-sm focus:outline-none"
         >
           <option value="all">Todos status</option>
           <option value="available">Disponíveis</option>
@@ -143,7 +143,7 @@ export function BancoIdeias() {
           onClick={() => setScheduling(null)}
         >
           <div
-            className="bg-surface-container border border-outline/10 p-6 max-w-md w-full"
+            className="bg-surface-container border border-outline/15 p-6 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="font-semibold mb-1">Agendar postagem</h3>
@@ -154,7 +154,7 @@ export function BancoIdeias() {
               type="date"
               value={scheduling.date}
               onChange={(e) => setScheduling({ ...scheduling, date: e.target.value })}
-              className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-secondary/40 mb-4"
+              className="w-full bg-surface-container border border-outline/15 px-3 py-2 text-sm focus:outline-none focus:border-secondary/40 mb-4"
             />
 
             <div className="flex gap-2 justify-end">
@@ -180,7 +180,7 @@ export function BancoIdeias() {
 
 function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className="bg-surface-low border border-outline/10 p-4">
+    <div className="bg-surface-container border border-outline/15 p-4">
       <div className="text-2xl font-semibold" style={{ color }}>
         {value}
       </div>
@@ -204,7 +204,7 @@ function IdeaCard({ idea, onSchedule }: { idea: ContentIdea; onSchedule: (date: 
   };
 
   return (
-    <div className="bg-surface-low border border-outline/10 p-4 flex flex-col">
+    <div className="bg-surface-container border border-outline/15 p-4 flex flex-col">
       {/* Pillar tag */}
       {idea.pillar_name && (
         <div

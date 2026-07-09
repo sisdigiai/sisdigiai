@@ -13,8 +13,8 @@ const priorityConfig: Record<PriorityLabel, { label: string; className: string }
   critico: { label: 'Crítico', className: 'text-danger bg-danger/10 border-danger/20' },
   alto: { label: 'Alto', className: 'text-warning bg-warning/10 border-warning/20' },
   medio: { label: 'Médio', className: 'text-secondary bg-secondary/15 border-secondary/40' },
-  baixo: { label: 'Baixo', className: 'text-muted bg-surface-low border-outline/10' },
-  minimo: { label: 'Mínimo', className: 'text-muted bg-surface-low border-outline/10' },
+  baixo: { label: 'Baixo', className: 'text-muted bg-surface-container border-outline/10' },
+  minimo: { label: 'Mínimo', className: 'text-muted bg-surface-container border-outline/10' },
 };
 
 const statusConfig: Record<BacklogStatus, { label: string; icon: React.ReactNode }> = {
@@ -108,7 +108,7 @@ export default function Backlog() {
   };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto">
       <PageHeader
         eyebrow="Execução"
         title="Backlog Executivo"
@@ -226,7 +226,7 @@ export default function Backlog() {
             const pConf = priorityConfig[pLabel];
             const sConf = statusConfig[item.status];
             return (
-              <div key={item.id} className={`bg-surface-low border p-4 ${item.priority === 1 && item.status !== 'done' ? 'border-danger/15' : item.status === 'in_progress' ? 'border-secondary/40' : 'border-outline/10'}`}>
+              <div key={item.id} className={`bg-surface-container border p-4 ${item.priority === 1 && item.status !== 'done' ? 'border-danger/15' : item.status === 'in_progress' ? 'border-secondary/40' : 'border-outline/10'}`}>
                 <div className="flex items-start gap-3">
                   <button onClick={() => toggleStatus(item)} className="mt-0.5 hover:scale-110 transition-transform" title="Ciclar status">
                     {sConf?.icon}

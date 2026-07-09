@@ -117,7 +117,7 @@ export default function CopyModal({
                 <span className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-2">Slides</span>
                 <div className="space-y-2">
                   {(content.slides as Array<Record<string, unknown>>).map((slide, i) => (
-                    <div key={i} className="bg-surface-low border border-outline/10 p-3">
+                    <div key={i} className="bg-surface-container border border-outline/15 p-3">
                       <span className="text-[10px] font-bold text-secondary">
                         Slide {(slide.slide as number) || i + 1}
                         {slide.tipo && ` — ${slide.tipo}`}
