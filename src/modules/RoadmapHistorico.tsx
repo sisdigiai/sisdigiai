@@ -25,9 +25,9 @@ const RESOURCE_LABELS: Record<string, string> = {
 };
 
 const ACTION_ICONS: Record<string, React.ReactNode> = {
-  INSERT: <Plus size={13} className="text-emerald-400" />,
+  INSERT: <Plus size={13} className="text-success" />,
   UPDATE: <Edit size={13} className="text-secondary" />,
-  DELETE: <Trash2 size={13} className="text-red-400" />,
+  DELETE: <Trash2 size={13} className="text-danger" />,
 };
 
 const ACTION_LABELS: Record<string, string> = {

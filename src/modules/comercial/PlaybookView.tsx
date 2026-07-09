@@ -114,7 +114,7 @@ export default function PlaybookView({ playbook }: { playbook: Playbook }) {
             {access.perfis?.length ? (
               <div className="text-[11px] text-muted">{access.perfis.join(' · ')}</div>
             ) : null}
-            {access.senha_nota && <div className="text-[11px] text-amber-400/90 italic">{access.senha_nota}</div>}
+            {access.senha_nota && <div className="text-[11px] text-warning/90 italic">{access.senha_nota}</div>}
           </div>
         </Section>
       )}

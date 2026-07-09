@@ -82,7 +82,7 @@ export default function CommandPalette({ onNavigate }: { onNavigate: (id: Module
 
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[12vh] bg-black/60" onClick={() => setOpen(false)}>
-      <div className="w-full max-w-lg bg-surface-container border border-outline/20 shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
+      <div className="w-full max-w-lg bg-surface-container border border-outline-strong overflow-hidden" onClick={e => e.stopPropagation()}>
         <div className="flex items-center gap-3 px-4 py-3 border-b border-outline/10">
           <Search className="w-4 h-4 text-muted" />
           <input

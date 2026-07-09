@@ -48,8 +48,8 @@ export default function ClearixAuthGate({ children }: { children: ReactNode }) {
   if (!clearixConfigured) {
     return (
       <div className="p-8 max-w-2xl">
-        <div className="border border-amber-500/30 bg-amber-500/5 p-5">
-          <div className="flex items-center gap-2 mb-2 text-amber-300">
+        <div className="border border-warning/30 bg-warning/5 p-5">
+          <div className="flex items-center gap-2 mb-2 text-warning">
             <ShieldAlert size={18} />
             <div className="font-medium">Clearix não configurado</div>
           </div>
@@ -113,7 +113,7 @@ export default function ClearixAuthGate({ children }: { children: ReactNode }) {
               required
               className="w-full bg-surface-lowest border border-outline/30 px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-secondary/40"
             />
-            {error && <div className="text-xs text-rose-400">{error}</div>}
+            {error && <div className="text-xs text-danger">{error}</div>}
             <button
               type="submit"
               disabled={signingIn}
@@ -130,8 +130,8 @@ export default function ClearixAuthGate({ children }: { children: ReactNode }) {
   if (roleCode !== 'super_admin') {
     return (
       <div className="p-8 max-w-2xl">
-        <div className="border border-rose-500/30 bg-rose-500/5 p-5">
-          <div className="flex items-center gap-2 mb-2 text-rose-300">
+        <div className="border border-danger/30 bg-danger/5 p-5">
+          <div className="flex items-center gap-2 mb-2 text-danger">
             <ShieldAlert size={18} />
             <div className="font-medium">Acesso negado</div>
           </div>
@@ -159,7 +159,7 @@ export default function ClearixAuthGate({ children }: { children: ReactNode }) {
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-6 py-2 border-b border-outline/10 text-[11px] text-on-surface-variant">
         <div className="flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <div className="w-1.5 h-1.5 bg-success" />
           <span>Clearix: <span className="text-on-surface-variant font-mono">{email}</span></span>
           <span className="text-muted">·</span>
           <span>super_admin</span>

@@ -19,8 +19,8 @@ const OWNER_LABEL: Record<string, string> = {
 };
 
 const STATUS_STYLE: Record<string, { label: string; cls: string }> = {
-  ativo:              { label: 'Ativo',       cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
-  a_registrar:        { label: 'A registrar', cls: 'bg-amber-500/15 text-amber-300 border-amber-500/30' },
+  ativo:              { label: 'Ativo',       cls: 'bg-success/15 text-success border-success/30' },
+  a_registrar:        { label: 'A registrar', cls: 'bg-warning/15 text-warning border-warning/30' },
   registrado_sem_uso: { label: 'Sem uso',     cls: 'bg-surface-high text-on-surface-variant border-outline/10' },
   arquivado:          { label: 'Arquivado',   cls: 'bg-surface-low text-muted border-outline/10' },
 };

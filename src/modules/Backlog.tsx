@@ -10,8 +10,8 @@ const PRIORITY_MAP: Record<number, PriorityLabel> = { 1: 'critico', 2: 'alto', 3
 const PRIORITY_NUM: Record<PriorityLabel, number> = { critico: 1, alto: 2, medio: 3, baixo: 4, minimo: 5 };
 
 const priorityConfig: Record<PriorityLabel, { label: string; className: string }> = {
-  critico: { label: 'Crítico', className: 'text-red-400 bg-red-400/10 border-red-400/20' },
-  alto: { label: 'Alto', className: 'text-amber-400 bg-amber-400/10 border-amber-400/20' },
+  critico: { label: 'Crítico', className: 'text-danger bg-danger/10 border-danger/20' },
+  alto: { label: 'Alto', className: 'text-warning bg-warning/10 border-warning/20' },
   medio: { label: 'Médio', className: 'text-secondary bg-secondary/15 border-secondary/40' },
   baixo: { label: 'Baixo', className: 'text-muted bg-surface-low border-outline/10' },
   minimo: { label: 'Mínimo', className: 'text-muted bg-surface-low border-outline/10' },
@@ -20,8 +20,8 @@ const priorityConfig: Record<PriorityLabel, { label: string; className: string }
 const statusConfig: Record<BacklogStatus, { label: string; icon: React.ReactNode }> = {
   pending: { label: 'Pendente', icon: <Circle className="w-4 h-4 text-muted" /> },
   in_progress: { label: 'Em andamento', icon: <Clock className="w-4 h-4 text-secondary" /> },
-  done: { label: 'Concluído', icon: <CheckCircle2 className="w-4 h-4 text-emerald-400" /> },
-  blocked: { label: 'Bloqueado', icon: <AlertTriangle className="w-4 h-4 text-red-400" /> },
+  done: { label: 'Concluído', icon: <CheckCircle2 className="w-4 h-4 text-success" /> },
+  blocked: { label: 'Bloqueado', icon: <AlertTriangle className="w-4 h-4 text-danger" /> },
   cancelled: { label: 'Cancelado', icon: <X className="w-4 h-4 text-muted" /> },
 };
 
@@ -127,10 +127,10 @@ export default function Backlog() {
 
       <div className="space-y-6">
       {criticos > 0 && (
-        <div className="bg-red-400/5 border border-red-400/20 p-4 flex items-start gap-3">
-          <Zap className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+        <div className="bg-danger/5 border border-danger/20 p-4 flex items-start gap-3">
+          <Zap className="w-5 h-5 text-danger shrink-0 mt-0.5" />
           <div>
-            <div className="text-sm font-semibold text-red-400">{criticos} item(s) crítico(s) pendente(s)</div>
+            <div className="text-sm font-semibold text-danger">{criticos} item(s) crítico(s) pendente(s)</div>
             <div className="text-xs text-on-surface-variant mt-0.5">Resolva esses itens antes de avançar para as próximas fases do Roadmap</div>
           </div>
         </div>
@@ -141,7 +141,7 @@ export default function Backlog() {
         <div className="bg-surface-lowest border border-secondary p-5 space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-sm">{editingId ? 'Editar item' : 'Novo item'}</h3>
-            <button onClick={() => { setDraft(null); setEditingId(null); }} className="p-1 hover:bg-surface-highest rounded"><X size={16} /></button>
+            <button onClick={() => { setDraft(null); setEditingId(null); }} className="p-1 hover:bg-surface-highest"><X size={16} /></button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="md:col-span-3">
@@ -226,14 +226,14 @@ export default function Backlog() {
             const pConf = priorityConfig[pLabel];
             const sConf = statusConfig[item.status];
             return (
-              <div key={item.id} className={`bg-surface-low border p-4 ${item.priority === 1 && item.status !== 'done' ? 'border-red-400/15' : item.status === 'in_progress' ? 'border-secondary/40' : 'border-outline/10'}`}>
+              <div key={item.id} className={`bg-surface-low border p-4 ${item.priority === 1 && item.status !== 'done' ? 'border-danger/15' : item.status === 'in_progress' ? 'border-secondary/40' : 'border-outline/10'}`}>
                 <div className="flex items-start gap-3">
                   <button onClick={() => toggleStatus(item)} className="mt-0.5 hover:scale-110 transition-transform" title="Ciclar status">
                     {sConf?.icon}
                   </button>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className={`text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded border ${pConf.className}`}>{pConf.label}</span>
+                      <span className={`text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 border ${pConf.className}`}>{pConf.label}</span>
                       {item.area && <span className="text-[10px] font-mono text-muted uppercase">{areaLabel[item.area] || item.area}</span>}
                       {item.due_date && <span className="text-[10px] font-mono text-muted">📅 {new Date(item.due_date + 'T00:00:00').toLocaleDateString('pt-BR')}</span>}
                     </div>
@@ -241,15 +241,15 @@ export default function Backlog() {
                     {item.description && <div className="text-xs text-on-surface-variant mt-1">{item.description}</div>}
                     {item.blocker && (
                       <div className="flex items-center gap-1.5 mt-2">
-                        <AlertTriangle className="w-3 h-3 text-amber-400 shrink-0" />
-                        <span className="text-xs text-amber-400/70">{item.blocker}</span>
+                        <AlertTriangle className="w-3 h-3 text-warning shrink-0" />
+                        <span className="text-xs text-warning/70">{item.blocker}</span>
                       </div>
                     )}
                     {item.origem && <div className="text-[10px] font-mono text-muted mt-2">origem: {item.origem}</div>}
                   </div>
                   <div className="flex gap-1 shrink-0">
-                    <button onClick={() => startEdit(item)} className="p-1.5 hover:bg-surface-highest rounded text-muted hover:text-on-surface text-sm">✎</button>
-                    <button onClick={() => remove(item.id)} className="p-1.5 hover:bg-red-500/10 rounded text-muted hover:text-red-400"><Trash2 size={12} /></button>
+                    <button onClick={() => startEdit(item)} className="p-1.5 hover:bg-surface-highest text-muted hover:text-on-surface text-sm">✎</button>
+                    <button onClick={() => remove(item.id)} className="p-1.5 hover:bg-danger/10 text-muted hover:text-danger"><Trash2 size={12} /></button>
                   </div>
                 </div>
               </div>

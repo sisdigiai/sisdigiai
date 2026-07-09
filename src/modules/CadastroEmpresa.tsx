@@ -27,7 +27,7 @@ export default function CadastroEmpresa() {
         subtitle="Registro único e canônico da DIGIAI — dados reais usados em contratos, propostas e snapshots para agentes."
         actions={
           <>
-            <span className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 ${online ? 'bg-green-500/10 text-green-400 border border-green-500/30' : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30'}`}>
+            <span className={`px-3 py-1.5 text-xs font-medium flex items-center gap-2 ${online ? 'bg-success/10 text-success border border-success/30' : 'bg-warning/10 text-warning border border-warning/30'}`}>
               {online ? <Cloud size={14} /> : <HardDrive size={14} />}
               {online ? 'Supabase conectado' : 'localStorage (offline)'}
             </span>
@@ -250,7 +250,7 @@ function IdentidadeTab() {
         <button onClick={save} className="px-6 py-2.5 bg-secondary hover:bg-secondary/90 text-surface font-medium">
           Salvar
         </button>
-        {saved && <span className="text-green-400 text-sm">✓ Salvo</span>}
+        {saved && <span className="text-success text-sm">✓ Salvo</span>}
       </div>
     </div>
   );
@@ -296,7 +296,7 @@ function ContatosTab() {
               </div>
               <div className="flex gap-1">
                 <button onClick={() => setEditing(c)} className="p-1.5 hover:bg-surface-highest">✎</button>
-                <button onClick={() => c.id && companyStore.deleteContact(c.id).then(load)} className="p-1.5 hover:bg-surface-highest text-red-400">
+                <button onClick={() => c.id && companyStore.deleteContact(c.id).then(load)} className="p-1.5 hover:bg-surface-highest text-danger">
                   <Trash2 size={14} />
                 </button>
               </div>
@@ -412,11 +412,11 @@ function DigitalTab() {
               <td className="font-medium">{a.rotulo}</td>
               <td className="text-on-surface-variant">{a.valor || '—'}</td>
               <td className="text-muted">{a.owner_product || '—'}</td>
-              <td><span className={`text-xs px-2 py-0.5 ${a.status === 'ativo' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{a.status}</span></td>
+              <td><span className={`text-xs px-2 py-0.5 ${a.status === 'ativo' ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>{a.status}</span></td>
               <td>{a.custo_mensal_brl ? `R$ ${a.custo_mensal_brl}/mês` : '—'}</td>
               <td className="flex gap-1 py-3">
                 <button onClick={() => setEditing(a)} className="p-1 hover:bg-surface-highest">✎</button>
-                <button onClick={() => a.id && companyStore.deleteDigitalAsset(a.id).then(load)} className="p-1 hover:bg-surface-highest text-red-400">
+                <button onClick={() => a.id && companyStore.deleteDigitalAsset(a.id).then(load)} className="p-1 hover:bg-surface-highest text-danger">
                   <Trash2 size={14} />
                 </button>
               </td>
@@ -543,10 +543,10 @@ function FerramentasTab() {
               <td>{t.custo_mensal_brl ? `${t.moeda} ${t.custo_mensal_brl}` : '—'}</td>
               <td><span className="text-xs px-2 py-0.5 bg-surface-high text-on-surface-variant">{t.frequencia_cobranca || 'mensal'}</span></td>
               <td className="text-muted">{t.proximo_vencimento || '—'}</td>
-              <td><span className={`text-xs px-2 py-0.5 ${t.status === 'ativo' ? 'bg-green-500/20 text-green-400' : 'bg-surface-high text-muted'}`}>{t.status}</span></td>
+              <td><span className={`text-xs px-2 py-0.5 ${t.status === 'ativo' ? 'bg-success/20 text-success' : 'bg-surface-high text-muted'}`}>{t.status}</span></td>
               <td className="flex gap-1 py-3">
                 <button onClick={() => setEditing(t)} className="p-1 hover:bg-surface-highest">✎</button>
-                <button onClick={() => t.id && companyStore.deleteTool(t.id).then(load)} className="p-1 hover:bg-surface-highest text-red-400"><Trash2 size={14} /></button>
+                <button onClick={() => t.id && companyStore.deleteTool(t.id).then(load)} className="p-1 hover:bg-surface-highest text-danger"><Trash2 size={14} /></button>
               </td>
             </tr>
           ))}
@@ -693,8 +693,8 @@ function FinanceiroTab() {
               <tr key={s.id || s.month} className="border-b border-outline/10">
                 <td className="py-3 font-medium">{s.month}</td>
                 <td className="text-secondary">R$ {s.mrr_total_brl.toFixed(2)}</td>
-                <td className="text-red-400">R$ {custoTotal.toFixed(2)}</td>
-                <td className={resultado >= 0 ? 'text-green-400' : 'text-red-400'}>R$ {resultado.toFixed(2)}</td>
+                <td className="text-danger">R$ {custoTotal.toFixed(2)}</td>
+                <td className={resultado >= 0 ? 'text-success' : 'text-danger'}>R$ {resultado.toFixed(2)}</td>
                 <td>{s.clientes_pagantes}</td>
                 <td>{s.saldo_conta_pj_brl ? `R$ ${s.saldo_conta_pj_brl.toFixed(2)}` : '—'}</td>
                 <td><button onClick={() => setEditing(s)} className="p-1 hover:bg-surface-highest">✎</button></td>
@@ -788,7 +788,7 @@ function LgpdTab() {
           <span className="text-sm">Progresso LGPD</span>
           <span className="text-sm text-secondary font-semibold">{progress}/14</span>
         </div>
-        <div className="h-2 bg-surface-high rounded-full overflow-hidden">
+        <div className="h-2 bg-surface-high overflow-hidden">
           <div className="h-full bg-secondary" style={{ width: `${(progress / 14) * 100}%` }} />
         </div>
       </div>
@@ -840,7 +840,7 @@ function LgpdTab() {
 
       <div className="flex items-center gap-4">
         <button onClick={save} className="px-6 py-2.5 bg-secondary hover:bg-secondary/90 text-surface font-medium">Salvar</button>
-        {saved && <span className="text-green-400 text-sm">✓ Salvo</span>}
+        {saved && <span className="text-success text-sm">✓ Salvo</span>}
       </div>
     </div>
   );

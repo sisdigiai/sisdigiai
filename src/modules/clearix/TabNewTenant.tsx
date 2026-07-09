@@ -65,8 +65,8 @@ export default function TabNewTenant({ onCreated }: Props) {
   if (success) {
     return (
       <div className="p-6 max-w-xl">
-        <div className="border border-emerald-500/30 bg-emerald-500/5 p-5 space-y-3">
-          <div className="flex items-center gap-2 text-emerald-300">
+        <div className="border border-success/30 bg-success/5 p-5 space-y-3">
+          <div className="flex items-center gap-2 text-success">
             <CheckCircle2 size={18} />
             <div className="font-medium">Tenant criado</div>
           </div>
@@ -179,7 +179,7 @@ export default function TabNewTenant({ onCreated }: Props) {
         </label>
 
         {error && (
-          <div className="border border-rose-500/30 bg-rose-500/5 p-3 text-sm text-rose-300">
+          <div className="border border-danger/30 bg-danger/5 p-3 text-sm text-danger">
             {error}
           </div>
         )}

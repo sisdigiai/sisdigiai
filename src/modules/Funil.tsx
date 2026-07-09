@@ -56,16 +56,16 @@ const statusLabel: Record<FunnelStepStatus, string> = {
 };
 
 const statusClass: Record<FunnelStepStatus, string> = {
-  done: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300',
+  done: 'border-success/30 bg-success/10 text-success',
   doing: 'border-secondary/40 bg-secondary/15 text-secondary',
   next: 'border-outline/10 bg-surface-low text-on-surface-variant',
-  blocked: 'border-red-400/30 bg-red-400/10 text-red-300',
+  blocked: 'border-danger/30 bg-danger/10 text-danger',
 };
 
 const creativeClass: Record<CreativeStatus, string> = {
-  validar: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300',
-  ajustar: 'border-amber-400/30 bg-amber-400/10 text-amber-300',
-  cortar: 'border-red-400/30 bg-red-400/10 text-red-300',
+  validar: 'border-success/30 bg-success/10 text-success',
+  ajustar: 'border-warning/30 bg-warning/10 text-warning',
+  cortar: 'border-danger/30 bg-danger/10 text-danger',
 };
 
 const inputClass = 'w-full bg-surface-lowest border border-outline/30 px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-secondary';
@@ -203,9 +203,9 @@ function DashboardTab({
   return (
     <div className="space-y-7">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <KpiCard icon={<DollarSign size={18} />} label="Ticket medio" value={brl(summary.averageOrderValue)} sub="principal + bumps + upsell" color="text-emerald-300" />
+        <KpiCard icon={<DollarSign size={18} />} label="Ticket medio" value={brl(summary.averageOrderValue)} sub="principal + bumps + upsell" color="text-success" />
         <KpiCard icon={<Target size={18} />} label="CPA maximo" value={brl(summary.maxCpaTarget)} sub={`ROAS alvo ${a.roasTarget.toFixed(1)}`} color="text-secondary" />
-        <KpiCard icon={<TrendingUp size={18} />} label="ROAS microteste" value={summary.projectedRoas.toFixed(2)} sub={`${brl(summary.projectedRevenue)} receita proj.`} color={summary.projectedRoas >= a.roasTarget ? 'text-emerald-300' : 'text-amber-300'} />
+        <KpiCard icon={<TrendingUp size={18} />} label="ROAS microteste" value={summary.projectedRoas.toFixed(2)} sub={`${brl(summary.projectedRevenue)} receita proj.`} color={summary.projectedRoas >= a.roasTarget ? 'text-success' : 'text-warning'} />
         <KpiCard icon={<Activity size={18} />} label="Execucao" value={`${progress}%`} sub={`${summary.completedTasks}/${summary.totalTasks} tarefas feitas`} color="text-on-surface-variant" />
       </div>
 
@@ -294,9 +294,9 @@ function ControleTab({
   return (
     <div className="space-y-6">
       <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <KpiCard icon={<DollarSign size={18} />} label="Receita liquida" value={brl(summary.actualNetRevenue)} sub={`taxas estimadas ${brl(summary.actualFees)}`} color="text-emerald-300" />
-        <KpiCard icon={<TrendingUp size={18} />} label="ROAS real" value={summary.actualRoas.toFixed(2)} sub={summary.actualRoas >= workspace.assumptions.roasTarget ? 'acima da meta' : 'abaixo/sem volume'} color={summary.actualRoas >= workspace.assumptions.roasTarget ? 'text-emerald-300' : 'text-amber-300'} />
-        <KpiCard icon={<Target size={18} />} label="CPA real" value={brl(summary.actualCpa)} sub={`teto ${brl(summary.maxCpaTarget)}`} color={summary.actualCpa > 0 && summary.actualCpa <= summary.maxCpaTarget ? 'text-emerald-300' : 'text-on-surface-variant'} />
+        <KpiCard icon={<DollarSign size={18} />} label="Receita liquida" value={brl(summary.actualNetRevenue)} sub={`taxas estimadas ${brl(summary.actualFees)}`} color="text-success" />
+        <KpiCard icon={<TrendingUp size={18} />} label="ROAS real" value={summary.actualRoas.toFixed(2)} sub={summary.actualRoas >= workspace.assumptions.roasTarget ? 'acima da meta' : 'abaixo/sem volume'} color={summary.actualRoas >= workspace.assumptions.roasTarget ? 'text-success' : 'text-warning'} />
+        <KpiCard icon={<Target size={18} />} label="CPA real" value={brl(summary.actualCpa)} sub={`teto ${brl(summary.maxCpaTarget)}`} color={summary.actualCpa > 0 && summary.actualCpa <= summary.maxCpaTarget ? 'text-success' : 'text-on-surface-variant'} />
         <KpiCard icon={<Network size={18} />} label="Candidatos app" value={pct(summary.ecosystemCandidateRate)} sub={`${actual.ecosystemCandidates} de ${actual.purchases} compradores`} color="text-secondary" />
       </section>
 
@@ -405,7 +405,7 @@ function OfertaTab({
   return (
     <div className="space-y-5">
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <KpiCard icon={<ShoppingCart size={18} />} label="AOV calculado" value={brl(summary.averageOrderValue)} sub="ticket medio esperado" color="text-emerald-300" />
+        <KpiCard icon={<ShoppingCart size={18} />} label="AOV calculado" value={brl(summary.averageOrderValue)} sub="ticket medio esperado" color="text-success" />
         <KpiCard icon={<Target size={18} />} label="CPA alvo" value={brl(summary.maxCpaTarget)} sub="teto para ROAS 2.5" color="text-secondary" />
         <KpiCard icon={<Save size={18} />} label="Funcao real" value="Aquisicao" sub="comprar compradores qualificados" color="text-on-surface-variant" />
       </section>
@@ -461,9 +461,9 @@ function TrafegoTab({ workspace }: { workspace: FunnelWorkspace }) {
     <div className="space-y-5">
       <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <KpiCard icon={<Target size={18} />} label="CPV max." value={brl(a.cpvMax)} sub="limite de corte" color="text-secondary" />
-        <KpiCard icon={<TrendingUp size={18} />} label="CTR minimo" value={pct(a.ctrMin)} sub="validacao de criativo" color="text-emerald-300" />
+        <KpiCard icon={<TrendingUp size={18} />} label="CTR minimo" value={pct(a.ctrMin)} sub="validacao de criativo" color="text-success" />
         <KpiCard icon={<DollarSign size={18} />} label="Budget/adset" value={brl(a.adsetBudgetDay)} sub={`${a.testDays} dias ABO`} color="text-on-surface-variant" />
-        <KpiCard icon={<Activity size={18} />} label="Gasto teste" value={brl(a.adsetBudgetDay * a.testDays * a.adsets)} sub={`${a.adsets} conjuntos`} color="text-amber-300" />
+        <KpiCard icon={<Activity size={18} />} label="Gasto teste" value={brl(a.adsetBudgetDay * a.testDays * a.adsets)} sub={`${a.adsets} conjuntos`} color="text-warning" />
       </section>
 
       <section className="bg-surface-low border border-outline/10 overflow-hidden">
@@ -484,7 +484,7 @@ function TrafegoTab({ workspace }: { workspace: FunnelWorkspace }) {
               <div className="p-4 text-sm">{pct(creative.ctr)}</div>
               <div className="p-4 text-sm">{brl(creative.cpv)}</div>
               <div className="p-4">
-                <span className={`text-[10px] font-mono uppercase tracking-widest border rounded-full px-2 py-1 ${creativeClass[decision]}`}>
+                <span className={`text-[10px] font-mono uppercase tracking-widest border px-2 py-1 ${creativeClass[decision]}`}>
                   {decision}
                 </span>
               </div>
@@ -505,7 +505,7 @@ function AutomacaoTab({ workspace }: { workspace: FunnelWorkspace }) {
           <div key={step.id} className="bg-surface-low border border-outline/10 p-5">
             <div className="flex items-start gap-4">
               <div className={`w-10 h-10 flex items-center justify-center border ${
-                step.channel === 'WhatsApp' ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300' : 'border-secondary/40 bg-secondary/15 text-secondary'
+                step.channel === 'WhatsApp' ? 'border-success/30 bg-success/10 text-success' : 'border-secondary/40 bg-secondary/15 text-secondary'
               }`}>
                 {step.channel === 'WhatsApp' ? <MessageCircle size={18} /> : <Mail size={18} />}
               </div>
@@ -559,13 +559,13 @@ function GuiasTab({ workspace }: { workspace: FunnelWorkspace }) {
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="text-lg font-bold">{guide.name}</h2>
-                <span className={`text-[10px] font-mono uppercase tracking-widest border rounded-full px-2 py-1 ${statusClass[guide.status]}`}>
+                <span className={`text-[10px] font-mono uppercase tracking-widest border px-2 py-1 ${statusClass[guide.status]}`}>
                   {statusLabel[guide.status]}
                 </span>
               </div>
               <p className="text-sm text-on-surface-variant mt-2">{guide.promise}</p>
             </div>
-            <span className="text-[10px] font-mono uppercase tracking-widest text-muted border border-outline/10 rounded-full px-2 py-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted border border-outline/10 px-2 py-1">
               {guide.role}
             </span>
           </div>
@@ -599,11 +599,11 @@ function ProximosTab({
                 className="mt-0.5"
                 title="Alternar feito"
               >
-                {task.status === 'done' ? <CheckCircle2 className="w-5 h-5 text-emerald-300" /> : <Circle className="w-5 h-5 text-muted" />}
+                {task.status === 'done' ? <CheckCircle2 className="w-5 h-5 text-success" /> : <Circle className="w-5 h-5 text-muted" />}
               </button>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`text-[10px] font-mono uppercase tracking-widest border rounded-full px-2 py-1 ${statusClass[task.status]}`}>
+                  <span className={`text-[10px] font-mono uppercase tracking-widest border px-2 py-1 ${statusClass[task.status]}`}>
                     {statusLabel[task.status]}
                   </span>
                   <span className="text-[10px] font-mono text-muted">{task.area}</span>
@@ -621,7 +621,7 @@ function ProximosTab({
                     <ul className="space-y-1.5">
                       {task.acceptanceCriteria.map((item) => (
                         <li key={item} className="text-sm text-on-surface-variant flex gap-2">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300 mt-0.5 shrink-0" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-success mt-0.5 shrink-0" />
                           <span>{item}</span>
                         </li>
                       ))}
@@ -695,7 +695,7 @@ function MetricRow({ label, value, max, current }: { label: string; value: strin
         <span className="text-on-surface-variant">{label}</span>
         <span className="font-mono text-on-surface">{value}</span>
       </div>
-      <div className="h-2 bg-surface-lowest rounded-full overflow-hidden">
+      <div className="h-2 bg-surface-lowest overflow-hidden">
         <div className="h-full bg-secondary" style={{ width: `${width}%` }} />
       </div>
     </div>

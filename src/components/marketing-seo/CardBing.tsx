@@ -32,8 +32,8 @@ export function CardBing({ site }: { site: SeoSite }) {
             <MetricStat label="Impressions" value={impressions7d ?? '—'} />
           </div>
           {aiPerf ? (
-            <div className="bg-violet-500/10 border border-violet-500/30 p-3">
-              <div className="text-[10px] font-mono uppercase tracking-widest text-violet-300 mb-1">Copilot · BETA</div>
+            <div className="bg-info-bg border border-info-bd p-3">
+              <div className="text-[10px] font-mono uppercase tracking-widest text-info mb-1">Copilot · BETA</div>
               <div className="text-xs text-on-surface-variant">{aiPerf.value_text ?? `${aiPerf.value_numeric} citações`}</div>
             </div>
           ) : (

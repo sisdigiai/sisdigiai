@@ -62,7 +62,7 @@ export default function ImageUploader({ imageUrl, onUpload, onRemove }: Props) {
             await onRemove();
             setLoading(false);
           }}
-          className="absolute top-1 right-1 w-6 h-6 bg-black/70 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+          className="absolute top-1 right-1 w-6 h-6 bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
           title="Remover imagem"
         >
           {loading ? <Loader2 size={12} className="animate-spin text-on-surface" /> : <X size={12} className="text-on-surface" />}
@@ -100,7 +100,7 @@ export default function ImageUploader({ imageUrl, onUpload, onRemove }: Props) {
         onChange={handleChange}
         className="hidden"
       />
-      {error && <p className="text-[10px] text-red-400 mt-1 max-w-[112px]">{error}</p>}
+      {error && <p className="text-[10px] text-danger mt-1 max-w-[112px]">{error}</p>}
     </div>
   );
 }

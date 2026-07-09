@@ -131,7 +131,7 @@ export default function Comercial() {
                 return (
                   <div key={stage.key} className="border border-outline/10 bg-surface-low/50 min-h-[120px]">
                     <div className="flex items-center gap-2 px-3 py-2 border-b border-outline/10">
-                      <span className="w-2 h-2 rounded-full" style={{ background: stage.color }} />
+                      <span className="w-2 h-2" style={{ background: stage.color }} />
                       <span className="text-xs font-semibold text-on-surface">{stage.label}</span>
                       <span className="ml-auto text-[10px] font-mono text-muted tabular-nums">{items.length}</span>
                     </div>
@@ -151,7 +151,7 @@ export default function Comercial() {
                               <button onClick={() => setEditing(lead)} aria-label="Editar" className="text-muted hover:text-on-surface">
                                 <Pencil className="w-3.5 h-3.5" />
                               </button>
-                              <button onClick={() => remove(lead.id)} aria-label="Excluir" className="text-muted hover:text-red-400">
+                              <button onClick={() => remove(lead.id)} aria-label="Excluir" className="text-muted hover:text-danger">
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
@@ -204,9 +204,9 @@ export default function Comercial() {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   {m.stage_changed_to && <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 bg-surface-high text-muted">{m.stage_changed_to}</span>}
-                  {m.effectiveness ? <span className="text-[10px] font-mono text-amber-400">{'★'.repeat(m.effectiveness)}</span> : null}
+                  {m.effectiveness ? <span className="text-[10px] font-mono text-warning">{'★'.repeat(m.effectiveness)}</span> : null}
                   <button onClick={() => { const l = leads.find((x) => x.id === m.lead_id) ?? null; setProposalEditor({ proposal: proposalFromMeeting(m, l), lead: l }); }} title="Gerar proposta" className="text-muted hover:text-secondary"><FileText className="w-3.5 h-3.5" /></button>
-                  <button onClick={async () => { if (m.id) { await meetingStore.remove(m.id); load(); } }} aria-label="Excluir" className="text-muted hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
+                  <button onClick={async () => { if (m.id) { await meetingStore.remove(m.id); load(); } }} aria-label="Excluir" className="text-muted hover:text-danger"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
             ))
@@ -225,9 +225,9 @@ export default function Comercial() {
                 <span className="text-[11px] text-muted ml-2">{pr.lead_company ?? '—'}</span>
                 <div className="text-xs text-on-surface-variant mt-0.5">{pr.plan} · R$ {pr.monthly_price?.toLocaleString('pt-BR')}/mês · {pr.discount_pct}% off · {pr.trial_days}d teste</div>
               </div>
-              <span className={`text-[9px] font-mono uppercase px-1.5 py-0.5 ${pr.status === 'enviada' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-surface-high text-muted'}`}>{pr.status}{pr.sent_via ? ` · ${pr.sent_via}` : ''}</span>
+              <span className={`text-[9px] font-mono uppercase px-1.5 py-0.5 ${pr.status === 'enviada' ? 'bg-success/15 text-success' : 'bg-surface-high text-muted'}`}>{pr.status}{pr.sent_via ? ` · ${pr.sent_via}` : ''}</span>
               <button onClick={() => setProposalEditor({ proposal: pr, lead: leads.find((l) => l.id === pr.lead_id) ?? null })} title="Abrir" className="text-muted hover:text-on-surface"><FileText className="w-3.5 h-3.5" /></button>
-              <button onClick={async () => { if (pr.id) { await proposalStore.remove(pr.id); load(); } }} title="Excluir" className="text-muted hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
+              <button onClick={async () => { if (pr.id) { await proposalStore.remove(pr.id); load(); } }} title="Excluir" className="text-muted hover:text-danger"><Trash2 className="w-3.5 h-3.5" /></button>
             </div>
           ))}
         </div>

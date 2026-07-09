@@ -27,8 +27,8 @@ type Props = {
 };
 
 const ADDON_STATUS_COLORS: Record<string, string> = {
-  active: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20',
-  pending_review: 'bg-amber-500/10 text-amber-300 border-amber-500/20',
+  active: 'bg-success/10 text-success border-success/20',
+  pending_review: 'bg-warning/10 text-warning border-warning/20',
   cancelled: 'bg-surface-low text-muted border-outline/10',
 };
 
@@ -192,7 +192,7 @@ export default function TabTenantDetail({ tenantId, onBack }: Props) {
   if (error) {
     return (
       <div className="p-6">
-        <div className="border border-rose-500/30 bg-rose-500/5 p-3 text-sm text-rose-300">{error}</div>
+        <div className="border border-danger/30 bg-danger/5 p-3 text-sm text-danger">{error}</div>
       </div>
     );
   }
@@ -235,11 +235,11 @@ export default function TabTenantDetail({ tenantId, onBack }: Props) {
       </div>
 
       {tenant.tenant_status === 'suspended' && (
-        <div className="border border-amber-500/30 bg-amber-500/5 p-4">
+        <div className="border border-warning/30 bg-warning/5 p-4">
           <div className="flex items-start gap-2">
-            <AlertTriangle size={16} className="text-amber-300 mt-0.5 shrink-0" />
+            <AlertTriangle size={16} className="text-warning mt-0.5 shrink-0" />
             <div className="flex-1 min-w-0">
-              <div className="text-sm text-amber-300 font-medium">Tenant suspenso</div>
+              <div className="text-sm text-warning font-medium">Tenant suspenso</div>
               {tenant.suspended_reason && (
                 <div className="text-xs text-on-surface-variant mt-1">Motivo: {tenant.suspended_reason}</div>
               )}
@@ -292,7 +292,7 @@ export default function TabTenantDetail({ tenantId, onBack }: Props) {
               </div>
               <button
                 onClick={() => openModal('suspend')}
-                className="w-full inline-flex items-center justify-center gap-1.5 border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-sm text-amber-300 hover:bg-amber-500/10"
+                className="w-full inline-flex items-center justify-center gap-1.5 border border-warning/30 bg-warning/5 px-3 py-2 text-sm text-warning hover:bg-warning/10"
               >
                 <Ban size={13} /> Suspender acesso
               </button>
@@ -304,7 +304,7 @@ export default function TabTenantDetail({ tenantId, onBack }: Props) {
               </div>
               <button
                 onClick={() => openModal('reactivate')}
-                className="w-full inline-flex items-center justify-center gap-1.5 border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-sm text-emerald-300 hover:bg-emerald-500/10"
+                className="w-full inline-flex items-center justify-center gap-1.5 border border-success/30 bg-success/5 px-3 py-2 text-sm text-success hover:bg-success/10"
               >
                 <PlayCircle size={13} /> Reativar tenant
               </button>
@@ -364,7 +364,7 @@ export default function TabTenantDetail({ tenantId, onBack }: Props) {
                       <div className="text-on-surface">{addon.name}</div>
                       <div className="text-[11px] text-muted">{addon.slug}</div>
                       {!tierOk && (
-                        <div className="text-[10px] text-amber-300/80 mt-0.5">
+                        <div className="text-[10px] text-warning/80 mt-0.5">
                           Requer pacote {addon.min_package_name} ou superior
                         </div>
                       )}
@@ -394,7 +394,7 @@ export default function TabTenantDetail({ tenantId, onBack }: Props) {
                         <button
                           onClick={() => handleApprove(addon.slug)}
                           disabled={busy}
-                          className="inline-flex items-center gap-1 text-[11px] border border-emerald-500/30 bg-emerald-500/5 px-2 py-1 text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-50"
+                          className="inline-flex items-center gap-1 text-[11px] border border-success/30 bg-success/5 px-2 py-1 text-success hover:bg-success/10 disabled:opacity-50"
                         >
                           <CheckCircle2 size={11} /> Aprovar
                         </button>
@@ -403,7 +403,7 @@ export default function TabTenantDetail({ tenantId, onBack }: Props) {
                         <button
                           onClick={() => handleCancel(addon.slug)}
                           disabled={busy}
-                          className="inline-flex items-center gap-1 text-[11px] border border-rose-500/30 bg-rose-500/5 px-2 py-1 text-rose-300 hover:bg-rose-500/10 disabled:opacity-50"
+                          className="inline-flex items-center gap-1 text-[11px] border border-danger/30 bg-danger/5 px-2 py-1 text-danger hover:bg-danger/10 disabled:opacity-50"
                         >
                           <XCircle size={11} /> Cancelar
                         </button>
@@ -441,9 +441,9 @@ export default function TabTenantDetail({ tenantId, onBack }: Props) {
           busy={modalBusy}
           error={modalError}
           submitLabel="Suspender"
-          submitClass="bg-amber-600 hover:bg-amber-500"
+          submitClass="bg-warning hover:bg-warning"
           onSubmit={confirmSuspend}
-          icon={<Ban size={16} className="text-amber-300" />}
+          icon={<Ban size={16} className="text-warning" />}
         >
           <p className="text-sm text-on-surface-variant mb-3">
             Trava o acesso de <span className="text-on-surface">{tenant.tenant_name}</span> aos apps Clearix.
@@ -469,9 +469,9 @@ export default function TabTenantDetail({ tenantId, onBack }: Props) {
           busy={modalBusy}
           error={modalError}
           submitLabel="Reativar"
-          submitClass="bg-emerald-600 hover:bg-emerald-500"
+          submitClass="bg-success hover:bg-success"
           onSubmit={confirmReactivate}
-          icon={<PlayCircle size={16} className="text-emerald-300" />}
+          icon={<PlayCircle size={16} className="text-success" />}
         >
           <p className="text-sm text-on-surface-variant mb-3">
             Restaura o acesso de <span className="text-on-surface">{tenant.tenant_name}</span> aos apps Clearix
@@ -551,11 +551,11 @@ export default function TabTenantDetail({ tenantId, onBack }: Props) {
 function StatusBadge({ status }: { status: string }) {
   const cls =
     status === 'active'
-      ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20'
+      ? 'bg-success/10 text-success border-success/20'
       : status === 'suspended'
-      ? 'bg-amber-500/10 text-amber-300 border-amber-500/20'
+      ? 'bg-warning/10 text-warning border-warning/20'
       : status === 'cancelled'
-      ? 'bg-rose-500/10 text-rose-300 border-rose-500/20'
+      ? 'bg-danger/10 text-danger border-danger/20'
       : 'bg-surface-low text-on-surface-variant border-outline/10';
   return (
     <span className={`inline-flex text-[10px] font-mono uppercase px-1.5 py-0.5 border ${cls}`}>
@@ -579,7 +579,7 @@ type ModalProps = {
 function Modal({ title, icon, onClose, onSubmit, submitLabel, submitClass, busy, error, children }: ModalProps) {
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-surface-lowest/70 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md border border-outline/10 bg-surface-container shadow-2xl">
+      <div className="w-full max-w-md border border-outline-strong bg-surface-container">
         <div className="flex items-center justify-between px-4 py-3 border-b border-outline/10">
           <div className="flex items-center gap-2">
             {icon}
@@ -596,7 +596,7 @@ function Modal({ title, icon, onClose, onSubmit, submitLabel, submitClass, busy,
         <div className="p-4">
           {children}
           {error && (
-            <div className="mt-3 border border-rose-500/30 bg-rose-500/5 p-2 text-xs text-rose-300">
+            <div className="mt-3 border border-danger/30 bg-danger/5 p-2 text-xs text-danger">
               {error}
             </div>
           )}

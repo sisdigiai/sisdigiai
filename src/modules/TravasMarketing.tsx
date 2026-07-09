@@ -86,10 +86,10 @@ export const TRAVAS: Trava[] = [
 // Banner compacto — plantar no topo de Marketing, Funil e Academy.
 export function TravasBanner() {
   return (
-    <div className="border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3">
+    <div className="border border-warning/20 bg-warning/[0.06] px-4 py-3">
       <div className="flex items-center gap-2 mb-2">
-        <ShieldCheck className="w-4 h-4 text-amber-300" />
-        <span className="text-xs font-semibold text-amber-200/90 uppercase tracking-wide">Travas de marketing ativas</span>
+        <ShieldCheck className="w-4 h-4 text-warning" />
+        <span className="text-xs font-semibold text-warning/90 uppercase tracking-wide">Travas de marketing ativas</span>
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-on-surface-variant">
         <span><b className="text-on-surface">AI produz / humano publica</b> (R-011)</span>
@@ -127,7 +127,7 @@ export default function TravasMarketing() {
               <ul className="space-y-1.5">
                 {t.regras.map((r, i) => (
                   <li key={i} className="text-sm text-on-surface flex gap-2">
-                    <span className="text-amber-300/70 shrink-0">▪</span> {r}
+                    <span className="text-warning/70 shrink-0">▪</span> {r}
                   </li>
                 ))}
               </ul>

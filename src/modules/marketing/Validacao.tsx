@@ -75,7 +75,7 @@ export function Validacao() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-[#10B981]" />
+            <TrendingUp className="w-5 h-5 text-success" />
             <h2 className="text-lg font-semibold">Validação de hipóteses</h2>
           </div>
           <p className="text-xs text-muted mt-1">
@@ -228,7 +228,7 @@ export function Validacao() {
                       <div className="text-sm truncate">{p.hook ?? '(sem hook)'}</div>
                     </div>
                     <div className="text-right">
-                      <div className="text-base font-semibold text-[#10B981] flex items-center gap-1 justify-end">
+                      <div className="text-base font-semibold text-success flex items-center gap-1 justify-end">
                         <ArrowUpRight className="w-3.5 h-3.5" />
                         {brl(p.revenue_cents)}
                       </div>

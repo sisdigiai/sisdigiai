@@ -75,7 +75,7 @@ export function Comunidade() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="flex items-center gap-2">
-            <Users className="w-5 h-5 text-[#F59E0B]" />
+            <Users className="w-5 h-5 text-eco-academy" />
             <h2 className="text-lg font-semibold">Comunidade OSI</h2>
           </div>
           <p className="text-xs text-muted mt-1">
@@ -83,7 +83,7 @@ export function Comunidade() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#F59E0B] text-surface font-medium hover:bg-[#F59E0B]/90">
+          <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-eco-academy text-surface font-medium hover:bg-eco-academy/90">
             <Plus className="w-4 h-4" /> Adicionar manual
           </button>
           <button onClick={refresh} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-outline/10 hover:bg-surface-highest">
@@ -178,7 +178,7 @@ function MemberCard({ m, busy, onPromoteVip, onSetActive, onSetInactive, onBlock
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="font-semibold">{m.full_name}</span>
-            {isVip && <Crown className="w-3.5 h-3.5 text-[#F59E0B]" />}
+            {isVip && <Crown className="w-3.5 h-3.5 text-eco-academy" />}
             <span className="text-[10px] uppercase tracking-widest font-bold px-1.5 py-0.5"
               style={{ background: `${TIER_COLOR[m.tier]}30`, color: TIER_COLOR[m.tier] }}>
               {m.tier}
@@ -214,13 +214,13 @@ function MemberCard({ m, busy, onPromoteVip, onSetActive, onSetInactive, onBlock
         )}
         {!isVip && (
           <button onClick={onPromoteVip} disabled={busy}
-            className="flex items-center gap-1 text-xs border border-[#F59E0B]/40 text-[#F59E0B] px-3 py-1.5 hover:bg-[#F59E0B]/10 disabled:opacity-50">
+            className="flex items-center gap-1 text-xs border border-eco-academy/40 text-eco-academy px-3 py-1.5 hover:bg-eco-academy/10 disabled:opacity-50">
             {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Crown className="w-3 h-3" />} VIP
           </button>
         )}
         {m.status === 'inactive' && (
           <button onClick={onSetActive} disabled={busy}
-            className="flex items-center gap-1 text-xs border border-[#10B981]/40 text-[#10B981] px-3 py-1.5 hover:bg-[#10B981]/10 disabled:opacity-50">
+            className="flex items-center gap-1 text-xs border border-success/40 text-success px-3 py-1.5 hover:bg-success/10 disabled:opacity-50">
             <CheckCircle2 className="w-3 h-3" /> Reativar
           </button>
         )}
@@ -262,12 +262,12 @@ function AddMemberModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
           </div>
           <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} placeholder="Notas internas" rows={3} className="w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm" />
           <label className="flex items-center gap-2 text-xs text-on-surface-variant">
-            <input type="checkbox" checked={form.whatsapp_consent} onChange={e => setForm({ ...form, whatsapp_consent: e.target.checked })} className="accent-[#F59E0B]" />
+            <input type="checkbox" checked={form.whatsapp_consent} onChange={e => setForm({ ...form, whatsapp_consent: e.target.checked })} className="accent-eco-academy" />
             Autorizou contato pelo WhatsApp
           </label>
         </div>
         <div className="flex items-center gap-2 mt-5">
-          <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#F59E0B] text-surface font-medium hover:bg-[#F59E0B]/90 text-sm disabled:opacity-50">
+          <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-eco-academy text-surface font-medium hover:bg-eco-academy/90 text-sm disabled:opacity-50">
             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Adicionar
           </button>
           <button onClick={onClose} className="px-4 py-2 border border-outline/10 text-on-surface-variant hover:bg-surface-highest text-sm">Cancelar</button>

@@ -114,7 +114,7 @@ export default function TabRequests({ onSelectTenant }: Props) {
       </div>
 
       {error && (
-        <div className="border border-rose-500/30 bg-rose-500/5 p-3 text-sm text-rose-300">{error}</div>
+        <div className="border border-danger/30 bg-danger/5 p-3 text-sm text-danger">{error}</div>
       )}
 
       <section className="space-y-3">
@@ -163,14 +163,14 @@ export default function TabRequests({ onSelectTenant }: Props) {
                         <button
                           onClick={() => wrapAction(key, () => approveTenantAddon(r.tenant_id, r.addon_slug))}
                           disabled={isBusy}
-                          className="inline-flex items-center gap-1 text-[11px] border border-emerald-500/30 bg-emerald-500/5 px-2 py-1 text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-50"
+                          className="inline-flex items-center gap-1 text-[11px] border border-success/30 bg-success/5 px-2 py-1 text-success hover:bg-success/10 disabled:opacity-50"
                         >
                           <CheckCircle2 size={11} /> Aprovar
                         </button>
                         <button
                           onClick={() => wrapAction(key, () => cancelTenantAddon(r.tenant_id, r.addon_slug))}
                           disabled={isBusy}
-                          className="inline-flex items-center gap-1 text-[11px] border border-rose-500/30 bg-rose-500/5 px-2 py-1 text-rose-300 hover:bg-rose-500/10 disabled:opacity-50"
+                          className="inline-flex items-center gap-1 text-[11px] border border-danger/30 bg-danger/5 px-2 py-1 text-danger hover:bg-danger/10 disabled:opacity-50"
                         >
                           <XCircle size={11} /> Rejeitar
                         </button>
@@ -234,14 +234,14 @@ export default function TabRequests({ onSelectTenant }: Props) {
                         <button
                           onClick={() => wrapAction(busyKey, () => approvePackageChangeRequest(r.id, note || null))}
                           disabled={isBusy}
-                          className="flex-1 inline-flex items-center justify-center gap-1 text-[11px] border border-emerald-500/30 bg-emerald-500/5 px-2 py-1 text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-50"
+                          className="flex-1 inline-flex items-center justify-center gap-1 text-[11px] border border-success/30 bg-success/5 px-2 py-1 text-success hover:bg-success/10 disabled:opacity-50"
                         >
                           <CheckCircle2 size={11} /> Aprovar
                         </button>
                         <button
                           onClick={() => wrapAction(busyKey, () => rejectPackageChangeRequest(r.id, note || null))}
                           disabled={isBusy}
-                          className="flex-1 inline-flex items-center justify-center gap-1 text-[11px] border border-rose-500/30 bg-rose-500/5 px-2 py-1 text-rose-300 hover:bg-rose-500/10 disabled:opacity-50"
+                          className="flex-1 inline-flex items-center justify-center gap-1 text-[11px] border border-danger/30 bg-danger/5 px-2 py-1 text-danger hover:bg-danger/10 disabled:opacity-50"
                         >
                           <XCircle size={11} /> Rejeitar
                         </button>

@@ -92,7 +92,7 @@ export default function ProposalEditor({
             <Save className="w-4 h-4" /> Salvar rascunho
           </button>
           <div className="ml-auto flex items-center gap-2">
-            <button onClick={() => send('whatsapp')} disabled={busy} className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium bg-emerald-600 text-white hover:opacity-90 disabled:opacity-40">
+            <button onClick={() => send('whatsapp')} disabled={busy} className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium bg-success text-on-action hover:opacity-90 disabled:opacity-40">
               <MessageCircle className="w-4 h-4" /> Enviar no WhatsApp
             </button>
             <button onClick={() => send('email')} disabled={busy} className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium bg-secondary text-on-secondary hover:opacity-90 disabled:opacity-40">

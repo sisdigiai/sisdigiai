@@ -53,11 +53,11 @@ export function MetricCard({ title, icon, period, provider, site, externalUrl, e
 
       <div className="flex-1 min-h-[120px]">
         {status && !status.configured && (
-          <div className="bg-amber-500/10 border border-amber-500/30 p-3 mb-3 text-xs">
+          <div className="bg-warning/10 border border-warning/30 p-3 mb-3 text-xs">
             <div className="flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <AlertCircle className="w-4 h-4 text-warning shrink-0 mt-0.5" />
               <div className="min-w-0">
-                <div className="text-amber-200 font-medium">Credenciais não configuradas</div>
+                <div className="text-warning font-medium">Credenciais não configuradas</div>
                 <div className="text-on-surface-variant mt-1">{status.message ?? 'Cadastre as credenciais para começar.'}</div>
                 {status.doc && (
                   <code className="block mt-2 text-[10px] font-mono text-muted break-all">{status.doc}</code>
@@ -67,11 +67,11 @@ export function MetricCard({ title, icon, period, provider, site, externalUrl, e
           </div>
         )}
         {status && status.ok && status.configured && (
-          <div className="bg-emerald-500/10 border border-emerald-500/30 p-3 mb-3 text-xs">
+          <div className="bg-success/10 border border-success/30 p-3 mb-3 text-xs">
             <div className="flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-4 h-4 text-success shrink-0 mt-0.5" />
               <div className="min-w-0">
-                <div className="text-emerald-200 font-medium">
+                <div className="text-success font-medium">
                   {status.todo ? 'Credenciais OK · stub respondendo' : 'Sincronizado agora'}
                 </div>
                 <div className="text-on-surface-variant mt-1">
@@ -88,11 +88,11 @@ export function MetricCard({ title, icon, period, provider, site, externalUrl, e
           </div>
         )}
         {status && status.error && (
-          <div className="bg-red-500/10 border border-red-500/30 p-3 mb-3 text-xs">
+          <div className="bg-danger/10 border border-danger/30 p-3 mb-3 text-xs">
             <div className="flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+              <AlertCircle className="w-4 h-4 text-danger shrink-0 mt-0.5" />
               <div className="min-w-0">
-                <div className="text-red-200 font-medium">Erro ao sincronizar</div>
+                <div className="text-danger font-medium">Erro ao sincronizar</div>
                 <div className="text-on-surface-variant mt-1 font-mono break-all">{status.error}</div>
               </div>
             </div>
@@ -131,7 +131,7 @@ export function MetricStat({ label, value, hint }: { label: string; value: React
 export function EmptyHint({ children }: { children: React.ReactNode }) {
   return (
     <div className="text-xs text-muted italic flex items-center gap-2 py-4">
-      <div className="w-1.5 h-1.5 rounded-full bg-surface-high" />
+      <div className="w-1.5 h-1.5 bg-surface-high" />
       {children}
     </div>
   );

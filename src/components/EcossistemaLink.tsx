@@ -12,9 +12,9 @@ interface Props {
 
 const STATUS_STYLE: Record<EcossistemaStatus, { label: string; dotClass: string; textClass: string }> = {
   ativo:          { label: 'Ativo',     dotClass: 'bg-secondary',         textClass: 'text-secondary' },
-  em_construcao:  { label: 'Em obra',   dotClass: 'bg-amber-400',         textClass: 'text-amber-300/80' },
+  em_construcao:  { label: 'Em obra',   dotClass: 'bg-warning',         textClass: 'text-warning/80' },
   em_concepcao:   { label: 'Concepção', dotClass: 'bg-muted/60',          textClass: 'text-muted' },
-  pausado:        { label: 'Pausado',   dotClass: 'bg-rose-400/70',       textClass: 'text-rose-300/70' },
+  pausado:        { label: 'Pausado',   dotClass: 'bg-danger/70',       textClass: 'text-danger/70' },
 };
 
 export default function EcossistemaLink({ icone, nome, url, status }: Props) {
@@ -27,7 +27,7 @@ export default function EcossistemaLink({ icone, nome, url, status }: Props) {
       <span className="flex-1 flex items-center gap-2 min-w-0">
         <span className={`truncate ${isClickable ? '' : 'text-muted'}`}>{nome}</span>
         <span className={`shrink-0 inline-flex items-center gap-1 text-[9px] font-mono uppercase tracking-wider ${style.textClass}`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${style.dotClass}`} />
+          <span className={`w-1.5 h-1.5 ${style.dotClass}`} />
           {style.label}
         </span>
       </span>

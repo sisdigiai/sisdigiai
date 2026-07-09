@@ -8,8 +8,8 @@ type Props = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  active: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20',
-  suspended: 'bg-amber-500/10 text-amber-300 border-amber-500/20',
+  active: 'bg-success/10 text-success border-success/20',
+  suspended: 'bg-warning/10 text-warning border-warning/20',
   inactive: 'bg-surface-low text-on-surface-variant border-outline/10',
   trial: 'bg-secondary/15 text-secondary border-secondary/40',
 };
@@ -76,7 +76,7 @@ export default function TabTenants({ onSelectTenant }: Props) {
           <div className="text-xs text-on-surface-variant mt-0.5">
             {rows.length} tenant{rows.length === 1 ? '' : 's'}
             {pendingAddons > 0 && (
-              <> · <span className="text-amber-300">{pendingAddons} add-on{pendingAddons === 1 ? '' : 's'} em análise</span></>
+              <> · <span className="text-warning">{pendingAddons} add-on{pendingAddons === 1 ? '' : 's'} em análise</span></>
             )}
           </div>
         </div>
@@ -136,7 +136,7 @@ export default function TabTenants({ onSelectTenant }: Props) {
       {loading ? (
         <div className="text-sm text-on-surface-variant">Carregando…</div>
       ) : error ? (
-        <div className="border border-rose-500/30 bg-rose-500/5 p-3 text-sm text-rose-300">{error}</div>
+        <div className="border border-danger/30 bg-danger/5 p-3 text-sm text-danger">{error}</div>
       ) : filtered.length === 0 ? (
         <div className="text-sm text-on-surface-variant py-8 text-center">
           Nenhum tenant bate com o filtro.
@@ -180,7 +180,7 @@ export default function TabTenants({ onSelectTenant }: Props) {
                     <td className="px-3 py-2.5 text-xs text-on-surface-variant">
                       {active > 0 && <span>{active} ativo{active === 1 ? '' : 's'}</span>}
                       {active > 0 && pending > 0 && <span className="text-muted"> · </span>}
-                      {pending > 0 && <span className="text-amber-300">{pending} análise</span>}
+                      {pending > 0 && <span className="text-warning">{pending} análise</span>}
                       {active === 0 && pending === 0 && <span className="text-muted">—</span>}
                     </td>
                     <td className="px-3 py-2.5 text-muted">

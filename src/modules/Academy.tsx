@@ -54,10 +54,10 @@ const scenarioStatusLabel: Record<AcademyScenarioStatus, string> = {
 };
 
 const scenarioStatusClass: Record<AcademyScenarioStatus, string> = {
-  recommended: 'bg-emerald-400/10 text-emerald-300 border-emerald-400/30',
+  recommended: 'bg-success/10 text-success border-success/30',
   testing: 'bg-secondary/15 text-secondary border-secondary/40',
   draft: 'bg-secondary-container/40 text-secondary border-secondary/40',
-  hold: 'bg-amber-400/10 text-amber-300 border-amber-400/30',
+  hold: 'bg-warning/10 text-warning border-warning/30',
   rejected: 'bg-surface-low text-muted border-outline/10',
 };
 
@@ -71,8 +71,8 @@ const questionStatusLabel: Record<AcademyQuestionStatus, string> = {
 const questionStatusClass: Record<AcademyQuestionStatus, string> = {
   open: 'bg-surface-low text-on-surface-variant border-outline/10',
   deciding: 'bg-secondary-container/40 text-secondary border-secondary/40',
-  blocked: 'bg-red-400/10 text-red-300 border-red-400/30',
-  done: 'bg-emerald-400/10 text-emerald-300 border-emerald-400/30',
+  blocked: 'bg-danger/10 text-danger border-danger/30',
+  done: 'bg-success/10 text-success border-success/30',
 };
 
 const checklistAreaLabel: Record<AcademyChecklistArea, string> = {
@@ -418,10 +418,10 @@ export default function Academy() {
         }
         actions={
           <>
-            <span className={`px-3 py-1.5 rounded-full text-xs font-medium border flex items-center gap-2 ${
+            <span className={`px-3 py-1.5 text-xs font-medium border flex items-center gap-2 ${
               academyStore.isOnline()
-                ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300'
-                : 'border-amber-400/30 bg-amber-400/10 text-amber-300'
+                ? 'border-success/30 bg-success/10 text-success'
+                : 'border-warning/30 bg-warning/10 text-warning'
             }`}>
               {academyStore.isOnline() ? <Cloud size={14} /> : <HardDrive size={14} />}
               {academyStore.isOnline() ? 'Academy pronto para Supabase' : 'Academy em fallback local'}
@@ -449,7 +449,7 @@ export default function Academy() {
       <TravasBanner />
 
       {saveMessage && (
-        <div className="bg-emerald-400/10 border border-emerald-400/30 px-4 py-3 text-sm text-emerald-300">
+        <div className="bg-success/10 border border-success/30 px-4 py-3 text-sm text-success">
           {saveMessage}
         </div>
       )}
@@ -647,14 +647,14 @@ export default function Academy() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium text-on-surface">{asset.title}</span>
-                      <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-surface-low text-muted border border-outline/10">
+                      <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 bg-surface-low text-muted border border-outline/10">
                         {assetTypeLabel[asset.asset_type]}
                       </span>
-                      <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-secondary/15 text-secondary border border-secondary/40">
+                      <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 bg-secondary/15 text-secondary border border-secondary/40">
                         {assetStatusLabel[asset.status]}
                       </span>
                       {asset.is_primary && (
-                        <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-emerald-400/10 text-emerald-300 border border-emerald-400/30">
+                        <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 bg-success/10 text-success border border-success/30">
                           principal
                         </span>
                       )}
@@ -666,7 +666,7 @@ export default function Academy() {
                   </div>
                   <div className="flex gap-1 shrink-0">
                     <button onClick={() => setAssetDraft({ ...asset })} className="p-1.5 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface text-sm">Edit</button>
-                    <button onClick={() => removeAsset(asset.id)} className="p-1.5 hover:bg-red-500/10 rounded text-muted hover:text-red-400">
+                    <button onClick={() => removeAsset(asset.id)} className="p-1.5 hover:bg-danger/10 text-muted hover:text-danger">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -748,7 +748,7 @@ export default function Academy() {
                   </div>
                   <div className="flex gap-1.5 flex-wrap">
                     {creationDraft.tags.map((tag) => (
-                      <span key={tag} className="text-xs px-2 py-1 bg-secondary/15 text-secondary rounded flex items-center gap-1">
+                      <span key={tag} className="text-xs px-2 py-1 bg-secondary/15 text-secondary flex items-center gap-1">
                         #{tag}
                         <button onClick={() => removeTag(tag)}><X size={10} /></button>
                       </span>
@@ -770,10 +770,10 @@ export default function Academy() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium text-on-surface">{record.title}</span>
-                      <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-surface-low text-muted border border-outline/10">
+                      <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 bg-surface-low text-muted border border-outline/10">
                         {creationTypeLabel[record.record_type]}
                       </span>
-                      <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-secondary-container/40 text-secondary border border-secondary/40">
+                      <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 bg-secondary-container/40 text-secondary border border-secondary/40">
                         {assetStatusLabel[record.status]}
                       </span>
                     </div>
@@ -783,7 +783,7 @@ export default function Academy() {
                     {record.tags.length > 0 && (
                       <div className="flex gap-1.5 flex-wrap mt-2">
                         {record.tags.map((tag) => (
-                          <span key={tag} className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-secondary/15 text-secondary border border-secondary/40">
+                          <span key={tag} className="text-[10px] font-mono px-2 py-0.5 bg-secondary/15 text-secondary border border-secondary/40">
                             #{tag}
                           </span>
                         ))}
@@ -793,7 +793,7 @@ export default function Academy() {
                   </div>
                   <div className="flex gap-1 shrink-0">
                     <button onClick={() => { setCreationDraft({ ...record }); setTagInput(''); }} className="p-1.5 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface text-sm">Edit</button>
-                    <button onClick={() => removeCreationRecord(record.id)} className="p-1.5 hover:bg-red-500/10 rounded text-muted hover:text-red-400">
+                    <button onClick={() => removeCreationRecord(record.id)} className="p-1.5 hover:bg-danger/10 text-muted hover:text-danger">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -885,7 +885,7 @@ export default function Academy() {
             <div key={scenario.id} className="bg-surface border border-outline/10 p-5 space-y-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <div className={`inline-flex px-2 py-1 rounded-full text-[10px] font-mono uppercase tracking-widest border ${scenarioStatusClass[scenario.status]}`}>
+                  <div className={`inline-flex px-2 py-1 text-[10px] font-mono uppercase tracking-widest border ${scenarioStatusClass[scenario.status]}`}>
                     {scenarioStatusLabel[scenario.status]}
                   </div>
                   <h3 className="text-lg font-semibold mt-2">{scenario.name}</h3>
@@ -893,7 +893,7 @@ export default function Academy() {
                 </div>
                 <div className="flex gap-1">
                   <button onClick={() => setScenarioDraft({ ...scenario })} className="p-1.5 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface text-sm">Edit</button>
-                  <button onClick={() => removeScenario(scenario.id)} className="p-1.5 hover:bg-red-500/10 rounded text-muted hover:text-red-400">
+                  <button onClick={() => removeScenario(scenario.id)} className="p-1.5 hover:bg-danger/10 text-muted hover:text-danger">
                     <Trash2 size={14} />
                   </button>
                 </div>
@@ -981,7 +981,7 @@ export default function Academy() {
               <div key={question.id} className="bg-surface border border-outline/10 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
-                    <div className={`inline-flex px-2 py-1 rounded-full text-[10px] font-mono uppercase tracking-widest border ${questionStatusClass[question.status]}`}>
+                    <div className={`inline-flex px-2 py-1 text-[10px] font-mono uppercase tracking-widest border ${questionStatusClass[question.status]}`}>
                       {questionStatusLabel[question.status]}
                     </div>
                     <div className="font-medium text-on-surface mt-2">{question.title}</div>
@@ -991,7 +991,7 @@ export default function Academy() {
                   </div>
                   <div className="flex gap-1 shrink-0">
                     <button onClick={() => setQuestionDraft({ ...question })} className="p-1.5 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface text-sm">Edit</button>
-                    <button onClick={() => removeQuestion(question.id)} className="p-1.5 hover:bg-red-500/10 rounded text-muted hover:text-red-400">
+                    <button onClick={() => removeQuestion(question.id)} className="p-1.5 hover:bg-danger/10 text-muted hover:text-danger">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -1030,7 +1030,7 @@ export default function Academy() {
               <span className="text-on-surface-variant">Progresso</span>
               <span className="font-mono text-secondary">{checklistProgress}%</span>
             </div>
-            <div className="h-2 bg-surface-lowest rounded-full overflow-hidden">
+            <div className="h-2 bg-surface-lowest overflow-hidden">
               <div className="h-full bg-secondary" style={{ width: `${checklistProgress}%` }} />
             </div>
           </div>
@@ -1045,7 +1045,7 @@ export default function Academy() {
                     title="Alternar status"
                   >
                     {item.done ? (
-                      <CheckCircle2 className="w-5 h-5 text-emerald-300" />
+                      <CheckCircle2 className="w-5 h-5 text-success" />
                     ) : (
                       <Circle className="w-5 h-5 text-muted" />
                     )}
@@ -1100,13 +1100,13 @@ export default function Academy() {
           {persistenceAudit.map((item) => (
             <div key={item.module} className="bg-surface border border-outline/10 p-4 space-y-2">
               <div className="font-medium text-on-surface">{item.module}</div>
-              <div className={`text-xs inline-flex px-2 py-1 rounded-full border ${
+              <div className={`text-xs inline-flex px-2 py-1 border ${
                 item.tone === 'good'
-                  ? 'text-emerald-300 bg-emerald-400/10 border-emerald-400/30'
+                  ? 'text-success bg-success/10 border-success/30'
                   : item.tone === 'warn'
-                  ? 'text-amber-300 bg-amber-400/10 border-amber-400/30'
+                  ? 'text-warning bg-warning/10 border-warning/30'
                   : item.tone === 'bad'
-                  ? 'text-red-300 bg-red-400/10 border-red-400/30'
+                  ? 'text-danger bg-danger/10 border-danger/30'
                   : 'text-on-surface-variant bg-surface-low border-outline/10'
               }`}>
                 {item.target}

@@ -38,8 +38,8 @@ export function Performance() {
   if (accounts === null && !loading) {
     return (
       <div className="p-8">
-        <div className="border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3 flex gap-3 items-start">
-          <AlertTriangle className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
+        <div className="border border-warning/20 bg-warning/[0.06] px-4 py-3 flex gap-3 items-start">
+          <AlertTriangle className="w-4 h-4 text-warning shrink-0 mt-0.5" />
           <div className="text-sm text-on-surface-variant">
             <b className="text-on-surface">Fundação indisponível.</b> Migration 042 (Central de Postagens) ainda não aplicada no banco.
           </div>
@@ -62,8 +62,8 @@ export function Performance() {
         </p>
 
         {!anyEnabled && (
-          <div className="border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3 flex gap-3 items-start mb-5">
-            <AlertTriangle className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
+          <div className="border border-warning/20 bg-warning/[0.06] px-4 py-3 flex gap-3 items-start mb-5">
+            <AlertTriangle className="w-4 h-4 text-warning shrink-0 mt-0.5" />
             <div className="text-sm text-on-surface-variant">
               <b className="text-on-surface">Aguardando configuração (F1).</b> Nenhuma conta tem coleta de métricas ligada ainda.
               Falta cadastrar o token de leitura Meta (BM Digiai) — passo a passo em{' '}

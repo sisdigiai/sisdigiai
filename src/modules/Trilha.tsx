@@ -16,27 +16,27 @@ const TRACK_INFO: Record<Track, { nome: string; descricao: string; cor: string; 
   A: {
     nome: 'Academy Low-Ticket',
     descricao: 'Renda imediata + audiência + autoridade',
-    cor: 'from-fuchsia-500/20 to-pink-500/10 border-fuchsia-500/30 text-fuchsia-300',
-    badge: 'bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/30',
+    cor: 'border-eco-academy/40 text-eco-academy',
+    badge: 'bg-eco-academy/15 text-eco-academy border-eco-academy/30',
   },
   B: {
     nome: 'Clearix B2B',
     descricao: 'MRR recorrente + case studies + enterprise path',
-    cor: 'border-secondary/40 text-secondary',
-    badge: 'bg-secondary/15 text-secondary border-secondary/40',
+    cor: 'border-eco-clearix/40 text-eco-clearix',
+    badge: 'bg-eco-clearix/15 text-eco-clearix border-eco-clearix/30',
   },
   C: {
     nome: 'Empresa / Ops',
     descricao: 'Infra legal + financeira + operacional',
-    cor: 'from-emerald-500/20 to-teal-500/10 border-emerald-500/30 text-emerald-300',
-    badge: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+    cor: 'border-eco-app/40 text-eco-app',
+    badge: 'bg-eco-app/15 text-eco-app border-eco-app/30',
   },
 };
 
 function TrackBadge({ track, compact = false }: { track: Track; compact?: boolean }) {
   const info = TRACK_INFO[track];
   return (
-    <span className={`inline-flex items-center justify-center ${compact ? 'w-5 h-5 text-[9px]' : 'w-6 h-6 text-[10px]'} rounded font-mono font-bold border ${info.badge}`}>
+    <span className={`inline-flex items-center justify-center ${compact ? 'w-5 h-5 text-[9px]' : 'w-6 h-6 text-[10px]'} font-mono font-bold border ${info.badge}`}>
       {track}
     </span>
   );
@@ -139,8 +139,8 @@ export default function Trilha() {
   if (phases.length === 0) {
     return (
       <div className="p-8 max-w-6xl mx-auto">
-        <div className="bg-amber-500/10 border border-amber-500/30 p-5">
-          <div className="text-amber-400 font-semibold mb-2">Roadmap sem dados</div>
+        <div className="bg-warning/10 border border-warning/30 p-5">
+          <div className="text-warning font-semibold mb-2">Roadmap sem dados</div>
           <p className="text-sm text-on-surface-variant">
             Não há fases cadastradas no banco. Confirme que a migration 014 foi aplicada e que o usuário está autenticado como staff.
           </p>
@@ -213,11 +213,11 @@ export default function Trilha() {
       {view === 'timeline' && (
       <>
       {/* Banner com script sync */}
-      <div className="bg-fuchsia-500/5 border border-fuchsia-500/20 p-3 flex items-center gap-3 text-xs">
-        <RefreshCw size={14} className="text-fuchsia-400 shrink-0" />
+      <div className="bg-action/5 border border-action/20 p-3 flex items-center gap-3 text-xs">
+        <RefreshCw size={14} className="text-action shrink-0" />
         <div className="flex-1">
           <span className="text-on-surface-variant">Sincronizar manifest do cowork com o banco: </span>
-          <code className="text-fuchsia-300 font-mono">cd D:/projetos/digiai && node scripts/sync-manifest.cjs</code>
+          <code className="text-action font-mono">cd D:/projetos/digiai && node scripts/sync-manifest.cjs</code>
         </div>
       </div>
 
@@ -242,7 +242,7 @@ export default function Trilha() {
       {currentPhase && currentProgress && (
         <div className="bg-secondary-container/40 border border-secondary/40 p-5">
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-full bg-secondary-container/40 border border-secondary/40 flex items-center justify-center text-lg font-bold text-secondary">
+            <div className="w-10 h-10 bg-secondary-container/40 border border-secondary/40 flex items-center justify-center text-lg font-bold text-secondary">
               {currentPhase.phase_number}
             </div>
             <div className="flex-1">
@@ -252,7 +252,7 @@ export default function Trilha() {
                 <span className="text-[10px] font-mono text-muted">líder</span>
                 <span className="text-[10px] font-mono text-muted">· {currentPhase.duracao_estimada}</span>
                 {currentProgress.overdue_tasks > 0 && (
-                  <span className="text-[10px] font-mono text-red-400 bg-red-500/10 px-2 py-0.5 rounded flex items-center gap-1">
+                  <span className="text-[10px] font-mono text-danger bg-danger/10 px-2 py-0.5 flex items-center gap-1">
                     <AlertOctagon size={10} /> {currentProgress.overdue_tasks} atrasada{currentProgress.overdue_tasks > 1 ? 's' : ''}
                   </span>
                 )}
@@ -268,7 +268,7 @@ export default function Trilha() {
                     {currentProgress.completed_tasks}/{currentProgress.total_tasks} · {currentProgress.percent_complete}%
                   </span>
                 </div>
-                <div className="h-2 bg-surface-lowest rounded-full overflow-hidden">
+                <div className="h-2 bg-surface-lowest overflow-hidden">
                   <div
                     className="h-full bg-secondary transition-all duration-300"
                     style={{ width: `${parseFloat(currentProgress.percent_complete)}%` }}
@@ -285,8 +285,8 @@ export default function Trilha() {
                   {(() => {
                     const d = daysUntil(currentProgress.next_target_date);
                     if (d === null) return null;
-                    if (d < 0) return <span className="text-red-400">· {Math.abs(d)}d atrasado</span>;
-                    if (d === 0) return <span className="text-amber-400">· hoje</span>;
+                    if (d < 0) return <span className="text-danger">· {Math.abs(d)}d atrasado</span>;
+                    if (d === 0) return <span className="text-warning">· hoje</span>;
                     return <span className="text-muted">· em {d}d</span>;
                   })()}
                 </div>
@@ -325,10 +325,10 @@ export default function Trilha() {
 
             if (isCompleted) {
               statusLabel = 'Concluída';
-              statusClasses = 'text-emerald-400 bg-emerald-400/10';
-              dotColor = 'bg-emerald-400';
-              borderColor = 'border-emerald-400/20 bg-emerald-400/5';
-              statusIcon = <CheckCircle2 className="w-5 h-5 text-emerald-400" />;
+              statusClasses = 'text-success bg-success/10';
+              dotColor = 'bg-success';
+              borderColor = 'border-success/20 bg-success/5';
+              statusIcon = <CheckCircle2 className="w-5 h-5 text-success" />;
             } else if (isActive) {
               statusLabel = 'Em andamento';
               statusClasses = 'text-secondary bg-secondary-container/40';
@@ -337,15 +337,15 @@ export default function Trilha() {
               statusIcon = <Clock className="w-5 h-5 text-secondary" />;
             } else if ((pp?.completed_tasks ?? 0) > 0) {
               statusLabel = 'Iniciada';
-              statusClasses = 'text-amber-400 bg-amber-400/10';
-              dotColor = 'bg-amber-400';
-              borderColor = 'border-amber-400/20 bg-amber-400/5';
-              statusIcon = <AlertCircle className="w-5 h-5 text-amber-400" />;
+              statusClasses = 'text-warning bg-warning/10';
+              dotColor = 'bg-warning';
+              borderColor = 'border-warning/20 bg-warning/5';
+              statusIcon = <AlertCircle className="w-5 h-5 text-warning" />;
             }
 
             return (
               <div key={fase.phase_number} className="relative pl-14">
-                <div className={`absolute left-3.5 top-5 w-3 h-3 rounded-full border-2 border-surface ${dotColor}`} />
+                <div className={`absolute left-3.5 top-5 w-3 h-3 border-2 border-surface ${dotColor}`} />
 
                 <div className={`border ${borderColor} overflow-hidden`}>
                   <button
@@ -360,7 +360,7 @@ export default function Trilha() {
                         <span className="font-semibold text-sm">{fase.nome}</span>
                         <span className="text-[10px] font-mono text-muted">· {fase.duracao_estimada}</span>
                         {hasOverdue && (
-                          <span className="text-[10px] font-mono text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded flex items-center gap-1">
+                          <span className="text-[10px] font-mono text-danger bg-danger/10 px-1.5 py-0.5 flex items-center gap-1">
                             <AlertOctagon size={9} /> {pp?.overdue_tasks}
                           </span>
                         )}
@@ -368,7 +368,7 @@ export default function Trilha() {
                       <div className="text-xs text-muted mt-0.5 truncate">{fase.objetivo}</div>
                       {pp && pp.total_tasks > 0 && (
                         <div className="mt-2 flex items-center gap-2">
-                          <div className="flex-1 max-w-[200px] h-1.5 bg-surface-lowest rounded-full overflow-hidden">
+                          <div className="flex-1 max-w-[200px] h-1.5 bg-surface-lowest overflow-hidden">
                             <div
                               className="h-full bg-secondary transition-all duration-300"
                               style={{ width: `${parseFloat(pp.percent_complete)}%` }}
@@ -402,9 +402,9 @@ export default function Trilha() {
                       {/* Playbook SV */}
                       {fase.playbook_sv && (
                         <div className="flex items-start gap-2">
-                          <BookOpen className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
+                          <BookOpen className="w-4 h-4 text-warning mt-0.5 shrink-0" />
                           <div>
-                            <div className="text-[10px] font-mono text-amber-400 uppercase tracking-widest">Playbook aplicado</div>
+                            <div className="text-[10px] font-mono text-warning uppercase tracking-widest">Playbook aplicado</div>
                             <div className="text-sm text-on-surface-variant">{fase.playbook_sv}</div>
                           </div>
                         </div>
@@ -433,10 +433,10 @@ export default function Trilha() {
                                     const isGate = task.category === 'decision_gate';
                                     const isMilestone = task.category === 'milestone';
                                     return (
-                                      <div key={task.id} className={`flex items-start gap-2 group ${overdue ? 'bg-red-500/5 -mx-2 px-2 py-1 rounded' : ''}`}>
+                                      <div key={task.id} className={`flex items-start gap-2 group ${overdue ? 'bg-danger/5 -mx-2 px-2 py-1' : ''}`}>
                                         <button
                                           onClick={() => handleToggle(task)}
-                                          className={`mt-0.5 shrink-0 transition-colors ${done ? 'text-emerald-400' : 'text-muted hover:text-on-surface-variant'}`}
+                                          className={`mt-0.5 shrink-0 transition-colors ${done ? 'text-success' : 'text-muted hover:text-on-surface-variant'}`}
                                           title={done ? 'Marcar como pendente' : 'Marcar como concluída'}
                                         >
                                           {done ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
@@ -447,12 +447,12 @@ export default function Trilha() {
                                               {task.title}
                                             </span>
                                             {isGate && !done && (
-                                              <span className="text-[9px] font-mono uppercase text-emerald-400 bg-emerald-500/10 px-1.5 rounded">
+                                              <span className="text-[9px] font-mono uppercase text-success bg-success/10 px-1.5">
                                                 Gate
                                               </span>
                                             )}
                                             {isMilestone && !done && (
-                                              <span className="text-[9px] font-mono uppercase text-amber-400 bg-amber-500/10 px-1.5 rounded">
+                                              <span className="text-[9px] font-mono uppercase text-warning bg-warning/10 px-1.5">
                                                 Marco
                                               </span>
                                             )}
@@ -462,8 +462,8 @@ export default function Trilha() {
                                           )}
                                           {task.target_date && (
                                             <div className="flex items-center gap-1 mt-0.5">
-                                              <Calendar size={10} className={overdue ? 'text-red-400' : done ? 'text-muted' : 'text-muted'} />
-                                              <span className={`text-[10px] font-mono ${overdue ? 'text-red-400' : done ? 'text-muted' : 'text-on-surface-variant'}`}>
+                                              <Calendar size={10} className={overdue ? 'text-danger' : done ? 'text-muted' : 'text-muted'} />
+                                              <span className={`text-[10px] font-mono ${overdue ? 'text-danger' : done ? 'text-muted' : 'text-on-surface-variant'}`}>
                                                 {formatDate(task.target_date)}
                                                 {overdue && ' · atrasada'}
                                                 {done && task.completed_at && ` · feito ${formatDate(task.completed_at)}`}
@@ -489,10 +489,10 @@ export default function Trilha() {
 
                       {/* Decision gate */}
                       {fase.decision_gate && (
-                        <div className="bg-emerald-500/5 border border-emerald-500/20 p-3 flex items-start gap-2">
-                          <Flag className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                        <div className="bg-success/5 border border-success/20 p-3 flex items-start gap-2">
+                          <Flag className="w-4 h-4 text-success mt-0.5 shrink-0" />
                           <div>
-                            <div className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest">Decision gate (para avançar)</div>
+                            <div className="text-[10px] font-mono text-success uppercase tracking-widest">Decision gate (para avançar)</div>
                             <div className="text-sm text-on-surface">{fase.decision_gate}</div>
                           </div>
                         </div>
@@ -502,13 +502,13 @@ export default function Trilha() {
                       {fase.anti_patterns && fase.anti_patterns.length > 0 && (
                         <div>
                           <div className="flex items-center gap-1.5 mb-2">
-                            <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
-                            <div className="text-[10px] font-mono text-red-400 uppercase tracking-widest">Anti-patterns</div>
+                            <AlertTriangle className="w-3.5 h-3.5 text-danger" />
+                            <div className="text-[10px] font-mono text-danger uppercase tracking-widest">Anti-patterns</div>
                           </div>
                           <div className="space-y-1">
                             {fase.anti_patterns.map((ap, i) => (
                               <div key={i} className="flex items-start gap-2">
-                                <span className="text-red-400/70 mt-0.5 text-xs">✗</span>
+                                <span className="text-danger/70 mt-0.5 text-xs">✗</span>
                                 <span className="text-xs text-on-surface-variant">{ap}</span>
                               </div>
                             ))}

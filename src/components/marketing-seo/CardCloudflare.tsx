@@ -46,7 +46,7 @@ export function CardCloudflare({ site }: { site: SeoSite }) {
           </div>
           {sslStatus && (
             <div className="text-xs text-on-surface-variant">
-              SSL: <span className="font-mono text-emerald-300">{sslStatus}</span>
+              SSL: <span className="font-mono text-success">{sslStatus}</span>
             </div>
           )}
           {topCountries.length > 0 && (

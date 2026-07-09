@@ -159,7 +159,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowWizard(true)}
-              className="flex items-center gap-2 px-3 py-2 bg-[#10B981] text-surface font-medium hover:bg-[#10B981]/90 text-sm"
+              className="flex items-center gap-2 px-3 py-2 bg-success text-surface font-medium hover:bg-success/90 text-sm"
               title="Wizard 4 steps: roteiro / capa / voz / vídeo. Salva tudo no banco."
             >
               <Wand2 className="w-4 h-4" />
@@ -177,7 +177,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
               onClick={handlePromote}
               disabled={promoting}
               title={promotedMaterialId ? 'Já promovido — clique pra abrir' : 'Promover este post como material para afiliados'}
-              className={`flex items-center gap-2 px-3 py-2 border text-sm disabled:opacity-50 ${promotedMaterialId ? 'border-[#10B981]/40 text-[#10B981] hover:bg-[#10B981]/10' : 'border-[#8B5CF6]/40 text-[#8B5CF6] hover:bg-[#8B5CF6]/10'}`}
+              className={`flex items-center gap-2 px-3 py-2 border text-sm disabled:opacity-50 ${promotedMaterialId ? 'border-success/40 text-success hover:bg-success/10' : 'border-action/40 text-action hover:bg-action/10'}`}
             >
               {promoting ? <Loader2 className="w-4 h-4 animate-spin" /> : promotedMaterialId ? <Check className="w-4 h-4" /> : <Package className="w-4 h-4" />}
               {promotedMaterialId ? 'Já é material' : 'Virar material afiliado'}
@@ -208,15 +208,15 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
               ))}
             </div>
             {draft.status === 'published' && !gatePassed && (
-              <p className="text-[11px] text-amber-300/80 mt-2">⚠ Publicar exige confirmar as travas de marketing ao salvar.</p>
+              <p className="text-[11px] text-warning/80 mt-2">⚠ Publicar exige confirmar as travas de marketing ao salvar.</p>
             )}
           </Section>
 
           {gateOpen && (
             <div className="fixed inset-0 z-[60] flex items-center justify-center bg-surface-lowest p-4" onClick={(e) => { e.stopPropagation(); setGateOpen(false); }}>
-              <div className="w-full max-w-md border border-amber-500/30 bg-surface-container p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+              <div className="w-full max-w-md border border-warning/30 bg-surface-container p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-amber-300" />
+                  <ShieldCheck className="w-5 h-5 text-warning" />
                   <h3 className="font-bold text-base">Travas de marketing — confirmar antes de publicar</h3>
                 </div>
                 <p className="text-xs text-on-surface-variant">Marcar como <b className="text-on-surface">Publicado</b> exige confirmar as travas (R-011 / R-013). AI não publica sozinha.</p>
@@ -238,7 +238,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
                   <button
                     disabled={!gatePassed}
                     onClick={() => { setGateOpen(false); handleSave(); }}
-                    className="px-4 py-2 text-sm font-medium bg-[#10B981] text-surface disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="px-4 py-2 text-sm font-medium bg-success text-surface disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     Confirmar e publicar
                   </button>
@@ -282,10 +282,10 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
               })}
             </div>
             {(draft.platforms ?? []).length > 1 && (
-              <div className="mt-3 bg-[#8B5CF6]/5 border border-[#8B5CF6]/20 p-2 text-[11px] text-on-surface-variant flex items-start gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-[#8B5CF6] shrink-0 mt-0.5" />
+              <div className="mt-3 bg-action/5 border border-action/20 p-2 text-[11px] text-on-surface-variant flex items-start gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-action shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-[#8B5CF6]">Estratégia inundação:</strong> esse post vai em {(draft.platforms ?? []).length} canais.
+                  <strong className="text-action">Estratégia inundação:</strong> esse post vai em {(draft.platforms ?? []).length} canais.
                   Use "Gerar prompts IA" no topo pra criar a copy adaptada de cada formato (feed/reel/story/carrossel/email/etc) com mesmo nucleus.
                 </span>
               </div>
@@ -394,7 +394,7 @@ export function PostDrawer({ post, pillars, platforms, onClose, onSaved }: Props
                   <input value={art.format ?? ''} onChange={e => updateArt(idx, { format: e.target.value })} placeholder="1080x1080" className="bg-transparent text-xs border border-outline/10 px-2 py-1 w-24" />
                   <input value={art.url} onChange={e => updateArt(idx, { url: e.target.value })} placeholder="https://canva.com/..." className="flex-1 bg-transparent text-xs border border-outline/10 px-2 py-1" />
                   {art.url && <a href={art.url} target="_blank" rel="noreferrer" className="text-muted hover:text-on-surface"><ExternalLink className="w-3.5 h-3.5" /></a>}
-                  <button onClick={() => removeArt(idx)} className="text-muted hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => removeArt(idx)} className="text-muted hover:text-danger"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               ))}
               <button onClick={addArt} className="flex items-center gap-1 text-xs text-secondary hover:text-on-surface">

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar, { ModuleId } from './components/Sidebar';
 import CommandPalette from './components/CommandPalette';
-import { Menu, Search } from 'lucide-react';
+import { Menu, Search, Sun, Moon } from 'lucide-react';
 import BrandGuidelines from './components/BrandGuidelines';
+import { useTheme } from './hooks/useTheme';
 import Login from './components/Login';
 import TestimonialPublicForm from './components/TestimonialPublicForm';
 import OsiPublicLanding from './components/OsiPublicLanding';
@@ -85,6 +86,7 @@ const MODULE_SECTION: Record<ModuleId, string> = {
 
 export default function App() {
   const { session, role, loading } = useAuth();
+  const { theme, toggle: toggleTheme } = useTheme();
   const [activeModule, setActiveModule] = useState<ModuleId>(moduleFromHash);
   const [navOpen, setNavOpen] = useState(false);
 
@@ -211,6 +213,13 @@ export default function App() {
               className="ml-auto hidden md:flex items-center gap-1.5 text-[11px] text-muted border border-outline/30 px-3 py-2 hover:text-on-surface hover:border-secondary/50 transition-colors"
             >
               <Search className="w-3.5 h-3.5" /> Buscar <kbd className="font-mono text-[10px] text-muted border border-outline/30 px-1">Ctrl K</kbd>
+            </button>
+            <button
+              onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'}
+              className="ml-auto md:ml-0 p-2 text-muted border border-outline/30 hover:text-on-surface hover:border-action/50 transition-colors"
+            >
+              {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
             </button>
           </div>
         </header>

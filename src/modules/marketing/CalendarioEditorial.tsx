@@ -230,7 +230,7 @@ function DateGroup({ date, posts, onAdvance, onEdit }: { date: string; posts: Ca
           {formatted}
         </h3>
         {isToday && (
-          <span className="px-2 py-0.5 text-[10px] bg-secondary/15 text-secondary rounded-full font-bold uppercase">
+          <span className="px-2 py-0.5 text-[10px] bg-secondary/15 text-secondary font-bold uppercase">
             Hoje
           </span>
         )}

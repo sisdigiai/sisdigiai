@@ -32,9 +32,9 @@ const nivelCor: Record<string, string> = {
 };
 
 const trackColor: Record<Track, string> = {
-  A: 'bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/30',
-  B: 'bg-secondary/15 text-secondary border-secondary/30',
-  C: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+  A: 'bg-eco-academy/15 text-eco-academy border-eco-academy/30',
+  B: 'bg-eco-clearix/15 text-eco-clearix border-eco-clearix/30',
+  C: 'bg-eco-app/15 text-eco-app border-eco-app/30',
 };
 
 function formatDate(iso: string): string {
@@ -103,10 +103,10 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
 
       {/* Alertas críticos no topo */}
       {(summary.overdueTasks > 0 || summary.backlogCritical > 0) && (
-        <div className="bg-red-500/5 border border-red-500/30 p-5 flex items-start gap-3">
-          <AlertOctagon className="w-6 h-6 text-red-400 shrink-0" />
+        <div className="bg-danger/5 border border-danger/30 p-5 flex items-start gap-3">
+          <AlertOctagon className="w-6 h-6 text-danger shrink-0" />
           <div className="flex-1">
-            <div className="text-sm font-semibold text-red-400 mb-1">Atenção necessária</div>
+            <div className="text-sm font-semibold text-danger mb-1">Atenção necessária</div>
             <div className="flex flex-wrap gap-4 text-sm text-on-surface-variant">
               {summary.overdueTasks > 0 && (
                 <span>⚠ {summary.overdueTasks} tarefa{summary.overdueTasks > 1 ? 's' : ''} do Roadmap atrasada{summary.overdueTasks > 1 ? 's' : ''}</span>
@@ -175,7 +175,7 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
           label="Backlog"
           value={String(summary.backlogInProgress)}
           sub={`em andamento · ${summary.backlogCritical} críticos`}
-          color={summary.backlogCritical > 0 ? 'text-red-400' : 'text-amber-400'}
+          color={summary.backlogCritical > 0 ? 'text-danger' : 'text-warning'}
           onClick={() => onNavigate?.('backlog')}
         />
         <KpiCard
@@ -183,7 +183,7 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
           label="Decisões"
           value={String(summary.totalDecisions)}
           sub="registradas"
-          color="text-emerald-400"
+          color="text-success"
           onClick={() => onNavigate?.('decisoes')}
         />
         <KpiCard
@@ -216,7 +216,7 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
                 const overdue = d < 0;
                 const urgent = d >= 0 && d <= 2;
                 return (
-                  <button key={t.id} onClick={() => onNavigate?.('trilha')} className={`w-full text-left flex items-start gap-3 p-2 transition-colors hover:bg-surface-highest ${overdue ? 'bg-red-500/5' : urgent ? 'bg-amber-500/5' : ''}`}>
+                  <button key={t.id} onClick={() => onNavigate?.('trilha')} className={`w-full text-left flex items-start gap-3 p-2 transition-colors hover:bg-surface-highest ${overdue ? 'bg-danger/5' : urgent ? 'bg-warning/5' : ''}`}>
                     <Circle className="w-3.5 h-3.5 text-muted mt-1 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -227,7 +227,7 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
                         <span className="text-[9px] font-mono text-muted">F{t.phase_number}</span>
                       </div>
                       {t.target_date && (
-                        <div className={`text-xs mt-0.5 font-mono ${overdue ? 'text-red-400' : urgent ? 'text-amber-400' : 'text-muted'}`}>
+                        <div className={`text-xs mt-0.5 font-mono ${overdue ? 'text-danger' : urgent ? 'text-warning' : 'text-muted'}`}>
                           {formatDate(t.target_date)} · {overdue ? `${Math.abs(d)}d atrasado` : d === 0 ? 'hoje' : `em ${d}d`}
                         </div>
                       )}

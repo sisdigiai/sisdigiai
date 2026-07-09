@@ -113,7 +113,7 @@ export function BancoIdeias() {
       </div>
 
       {savedAt && (
-        <div className="mb-4 px-4 py-2 bg-green-500/10 border border-green-500/30 text-sm text-green-300">
+        <div className="mb-4 px-4 py-2 bg-success/10 border border-success/30 text-sm text-success">
           Agendamento salvo no calendário ✓
         </div>
       )}
@@ -211,7 +211,7 @@ function IdeaCard({ idea, onSchedule }: { idea: ContentIdea; onSchedule: (date: 
           className="text-[10px] uppercase tracking-widest font-bold mb-2 flex items-center gap-1.5"
           style={{ color: idea.pillar_color ?? '#adcebd' }}
         >
-          <span className="w-1.5 h-1.5 rounded-full" style={{ background: idea.pillar_color ?? '#adcebd' }} />
+          <span className="w-1.5 h-1.5" style={{ background: idea.pillar_color ?? '#adcebd' }} />
           {idea.pillar_name}
         </div>
       )}

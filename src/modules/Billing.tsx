@@ -10,11 +10,11 @@ const fmtDate = (iso: string | null) =>
   !iso ? '—' : new Date(iso + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
 
 const STAGE: Record<DunningStage, { label: string; cls: string }> = {
-  em_dia:   { label: 'Em dia',    cls: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300' },
-  aviso:    { label: 'Aviso (D+3)',     cls: 'border-amber-400/30 bg-amber-400/10 text-amber-300' },
-  restrito: { label: 'Restrito (D+7)',  cls: 'border-orange-400/30 bg-orange-400/10 text-orange-300' },
-  bloqueio: { label: 'Bloqueio (D+15)', cls: 'border-red-400/30 bg-red-400/10 text-red-300' },
-  suspenso: { label: 'Suspenso (D+30)', cls: 'border-red-500/40 bg-red-500/15 text-red-400' },
+  em_dia:   { label: 'Em dia',    cls: 'border-success/30 bg-success/10 text-success' },
+  aviso:    { label: 'Aviso (D+3)',     cls: 'border-warning/30 bg-warning/10 text-warning' },
+  restrito: { label: 'Restrito (D+7)',  cls: 'border-warning/30 bg-warning/10 text-warning' },
+  bloqueio: { label: 'Bloqueio (D+15)', cls: 'border-danger/30 bg-danger/10 text-danger' },
+  suspenso: { label: 'Suspenso (D+30)', cls: 'border-danger/40 bg-danger/15 text-danger' },
 };
 
 const EMPTY = { name: '', email: '', phone: '', plan_name: '', plan_amount_brl: '', mp_preapproval_id: '', tenant_ref: '', next_due_on: '' };
@@ -68,14 +68,14 @@ export default function Billing() {
       <div className="space-y-8">
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <Kpi icon={<DollarSign className="w-4 h-4" />} label="MRR (assinaturas ativas)" value={brl(mrr?.mrr_brl ?? 0)} color="text-emerald-400" />
+          <Kpi icon={<DollarSign className="w-4 h-4" />} label="MRR (assinaturas ativas)" value={brl(mrr?.mrr_brl ?? 0)} color="text-success" />
           <Kpi icon={<Users className="w-4 h-4" />} label="Assinantes ativos" value={String(mrr?.ativos ?? 0)} color="text-secondary" />
-          <Kpi icon={<AlertOctagon className="w-4 h-4" />} label="Inadimplentes" value={String(inadimplentes)} color={inadimplentes > 0 ? 'text-red-400' : 'text-muted'} />
+          <Kpi icon={<AlertOctagon className="w-4 h-4" />} label="Inadimplentes" value={String(inadimplentes)} color={inadimplentes > 0 ? 'text-danger' : 'text-muted'} />
         </div>
 
         {inadimplentes > 0 && (
-          <div className="bg-red-500/5 border border-red-500/30 p-4 flex items-center gap-3 text-sm">
-            <AlertOctagon className="w-5 h-5 text-red-400 shrink-0" />
+          <div className="bg-danger/5 border border-danger/30 p-4 flex items-center gap-3 text-sm">
+            <AlertOctagon className="w-5 h-5 text-danger shrink-0" />
             <span className="text-on-surface-variant">{inadimplentes} assinante(s) em atraso — a régua já aplicou o estágio. Acompanhe abaixo.</span>
           </div>
         )}
@@ -121,7 +121,7 @@ export default function Billing() {
                         {s.status !== 'active' && <span className="ml-1 text-[10px] text-muted">({s.status})</span>}
                       </td>
                       <td className="px-4 py-2.5 font-mono text-muted">{fmtDate(s.next_due_on)}</td>
-                      <td className={`px-4 py-2.5 text-right font-mono tabular-nums ${(s.dias_atraso ?? 0) > 0 ? 'text-red-400' : 'text-muted'}`}>
+                      <td className={`px-4 py-2.5 text-right font-mono tabular-nums ${(s.dias_atraso ?? 0) > 0 ? 'text-danger' : 'text-muted'}`}>
                         {s.dias_atraso ? `${s.dias_atraso}d` : '—'}
                       </td>
                     </tr>

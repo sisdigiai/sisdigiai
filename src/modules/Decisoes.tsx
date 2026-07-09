@@ -158,7 +158,7 @@ export default function Decisoes() {
           <div className="mt-4 flex gap-1.5 flex-wrap">
             <button
               onClick={() => setTagFilter(null)}
-              className={`text-xs px-2.5 py-1 rounded-full font-mono ${!tagFilter ? 'bg-secondary/15 text-secondary' : 'bg-surface-low text-muted hover:text-on-surface-variant'}`}
+              className={`text-xs px-2.5 py-1 font-mono ${!tagFilter ? 'bg-secondary/15 text-secondary' : 'bg-surface-low text-muted hover:text-on-surface-variant'}`}
             >
               todas
             </button>
@@ -166,7 +166,7 @@ export default function Decisoes() {
               <button
                 key={t}
                 onClick={() => setTagFilter(tagFilter === t ? null : t)}
-                className={`text-xs px-2.5 py-1 rounded-full font-mono ${tagFilter === t ? 'bg-secondary/15 text-secondary' : 'bg-surface-low text-muted hover:text-on-surface-variant'}`}
+                className={`text-xs px-2.5 py-1 font-mono ${tagFilter === t ? 'bg-secondary/15 text-secondary' : 'bg-surface-low text-muted hover:text-on-surface-variant'}`}
               >
                 #{t}
               </button>
@@ -223,7 +223,7 @@ export default function Decisoes() {
             </div>
             <div className="flex gap-1.5 flex-wrap">
               {draft.tags.map((t) => (
-                <span key={t} className="text-xs px-2 py-1 bg-secondary/15 text-secondary rounded flex items-center gap-1">
+                <span key={t} className="text-xs px-2 py-1 bg-secondary/15 text-secondary flex items-center gap-1">
                   #{t} <button onClick={() => removeTag(t)}><X size={10} /></button>
                 </span>
               ))}
@@ -255,7 +255,7 @@ export default function Decisoes() {
                     <Calendar size={12} className="text-muted" />
                     <span className="text-xs font-mono text-muted">{new Date(d.decided_at + 'T00:00:00').toLocaleDateString('pt-BR')}</span>
                     {d.tags.map((t) => (
-                      <span key={t} className="text-[10px] font-mono text-secondary bg-secondary/15 px-1.5 py-0.5 rounded flex items-center gap-1">
+                      <span key={t} className="text-[10px] font-mono text-secondary bg-secondary/15 px-1.5 py-0.5 flex items-center gap-1">
                         <Tag size={9} /> {t}
                       </span>
                     ))}
@@ -264,7 +264,7 @@ export default function Decisoes() {
                 </div>
                 <div className="flex gap-1 shrink-0">
                   <button onClick={() => startEdit(d)} className="p-1.5 hover:bg-surface-highest text-muted hover:text-on-surface text-sm" title="Editar">✎</button>
-                  <button onClick={() => remove(d.id)} className="p-1.5 hover:bg-red-500/10 rounded text-muted hover:text-red-400" title="Arquivar">
+                  <button onClick={() => remove(d.id)} className="p-1.5 hover:bg-danger/10 text-muted hover:text-danger" title="Arquivar">
                     <Trash2 size={14} />
                   </button>
                 </div>
@@ -287,7 +287,7 @@ export default function Decisoes() {
                 )}
                 {d.expected_impact && (
                   <div>
-                    <div className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest mb-0.5">Impacto esperado</div>
+                    <div className="text-[10px] font-mono text-success uppercase tracking-widest mb-0.5">Impacto esperado</div>
                     <div className="text-on-surface-variant">{d.expected_impact}</div>
                   </div>
                 )}

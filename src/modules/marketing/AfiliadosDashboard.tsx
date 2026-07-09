@@ -83,7 +83,7 @@ export function AfiliadosDashboard() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-[#F59E0B]" />
+            <Trophy className="w-5 h-5 text-eco-academy" />
             <h2 className="text-lg font-semibold">Programa de Afiliados — Ativo</h2>
           </div>
           <p className="text-xs text-muted mt-1">
@@ -91,10 +91,10 @@ export function AfiliadosDashboard() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowLeaderboard(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-[#F59E0B]/40 text-[#F59E0B] hover:bg-[#F59E0B]/10">
+          <button onClick={() => setShowLeaderboard(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-eco-academy/40 text-eco-academy hover:bg-eco-academy/10">
             <Award className="w-4 h-4" /> Leaderboard
           </button>
-          <button onClick={() => setShowNewForm(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#F59E0B] text-surface font-medium hover:bg-[#F59E0B]/90">
+          <button onClick={() => setShowNewForm(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-eco-academy text-surface font-medium hover:bg-eco-academy/90">
             <Plus className="w-4 h-4" /> Novo afiliado
           </button>
           <button onClick={refresh} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-outline/10 hover:bg-surface-highest">
@@ -104,10 +104,10 @@ export function AfiliadosDashboard() {
       </div>
 
       {stats && stats.sales_total === 0 && (
-        <div className="mb-4 border border-amber-500/30 bg-amber-500/[0.08] px-4 py-3 flex items-start gap-3">
-          <AlertTriangle className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
+        <div className="mb-4 border border-warning/30 bg-warning/[0.08] px-4 py-3 flex items-start gap-3">
+          <AlertTriangle className="w-4 h-4 text-warning shrink-0 mt-0.5" />
           <div className="text-xs text-on-surface-variant leading-relaxed">
-            <b className="text-amber-200">Aguarde a 1ª prova social antes de recrutar afiliados agressivamente.</b>{' '}
+            <b className="text-warning">Aguarde a 1ª prova social antes de recrutar afiliados agressivamente.</b>{' '}
             Plano-mestre §12 passo 10: afiliado bom busca produto que vende. Recrutar antes da 1ª venda real
             desperdiça tempo e queima reputação.{' '}
             <span className="text-muted">(Cadastrar 2-3 parceiros próximos antes do lançamento está ok.)</span>
@@ -116,8 +116,8 @@ export function AfiliadosDashboard() {
       )}
 
       {candidates.length > 0 && (
-        <div className="mb-4 border border-[#10B981]/30 bg-[#10B981]/[0.06] px-4 py-3">
-          <div className="text-xs font-mono uppercase tracking-widest text-[#10B981] mb-2">
+        <div className="mb-4 border border-success/30 bg-success/[0.06] px-4 py-3">
+          <div className="text-xs font-mono uppercase tracking-widest text-success mb-2">
             Candidatos a afiliado · form "Quero ser afiliado" ({candidates.length})
           </div>
           <ul className="space-y-1">
@@ -227,9 +227,9 @@ function AffiliateCard({ a, onRequestPayout, onChanged }: { a: DashRow; onReques
           </div>
           <div className="text-[10px] text-muted flex flex-wrap gap-2">
             {a.hotmart_code ? (
-              <span>Hotmart code: <code className="text-[#F59E0B]">{a.hotmart_code}</code></span>
+              <span>Hotmart code: <code className="text-eco-academy">{a.hotmart_code}</code></span>
             ) : (
-              <span className="text-[#F59E0B]">⚠ Sem código Hotmart</span>
+              <span className="text-eco-academy">⚠ Sem código Hotmart</span>
             )}
             <span>· Tier: <b>{a.tier}</b></span>
             <span>· Cadastrado em {dateBR(a.joined_at)}</span>
@@ -252,7 +252,7 @@ function AffiliateCard({ a, onRequestPayout, onChanged }: { a: DashRow; onReques
 
       <div className="flex items-center gap-2 pt-2 border-t border-outline/10 flex-wrap">
         <button onClick={handleCopyLink} disabled={loadingLink}
-          className="flex items-center gap-1 text-xs bg-[#F59E0B] text-surface font-medium px-3 py-1.5 hover:bg-[#F59E0B]/90 disabled:opacity-50">
+          className="flex items-center gap-1 text-xs bg-eco-academy text-surface font-medium px-3 py-1.5 hover:bg-eco-academy/90 disabled:opacity-50">
           {loadingLink ? <Loader2 className="w-3 h-3 animate-spin" /> : copied ? <Check className="w-3 h-3" /> : <LinkIcon className="w-3 h-3" />}
           {copied ? 'Link copiado!' : 'Copiar link Hotmart'}
         </button>
@@ -264,7 +264,7 @@ function AffiliateCard({ a, onRequestPayout, onChanged }: { a: DashRow; onReques
         )}
         {a.commission_due_cents > 0 && (
           <button onClick={onRequestPayout}
-            className="flex items-center gap-1 text-xs border border-[#10B981]/40 text-[#10B981] px-3 py-1.5 hover:bg-[#10B981]/10">
+            className="flex items-center gap-1 text-xs border border-success/40 text-success px-3 py-1.5 hover:bg-success/10">
             <DollarSign className="w-3 h-3" /> Registrar pagamento
           </button>
         )}
@@ -331,7 +331,7 @@ function NewAffiliateModal({ onClose, onSaved }: { onClose: () => void; onSaved:
         </div>
       </div>
       <div className="flex items-center gap-2 mt-5">
-        <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#F59E0B] text-surface font-medium hover:bg-[#F59E0B]/90 text-sm disabled:opacity-50">
+        <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-eco-academy text-surface font-medium hover:bg-eco-academy/90 text-sm disabled:opacity-50">
           {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Cadastrar
         </button>
         <button onClick={onClose} className="px-4 py-2 border border-outline/10 text-on-surface-variant hover:bg-surface-highest text-sm">Cancelar</button>
@@ -369,9 +369,9 @@ function PayoutModal({ affiliate, onClose, onSaved }: { affiliate: DashRow; onCl
 
   return (
     <Modal title={`Pagamento — ${affiliate.full_name}`} onClose={onClose}>
-      <div className="bg-[#F59E0B]/10 border border-[#F59E0B]/30 rounded p-3 mb-4">
-        <div className="text-[10px] uppercase tracking-widest font-bold text-[#F59E0B] mb-1">Saldo devido</div>
-        <div className="text-2xl font-bold text-[#F59E0B]">{brl(due)}</div>
+      <div className="bg-eco-academy/10 border border-eco-academy/30 p-3 mb-4">
+        <div className="text-[10px] uppercase tracking-widest font-bold text-eco-academy mb-1">Saldo devido</div>
+        <div className="text-2xl font-bold text-eco-academy">{brl(due)}</div>
       </div>
       <div className="space-y-3">
         <Input label="Valor a pagar (R$)" v={amount} on={setAmount} placeholder="Ex: 850,00" />
@@ -398,7 +398,7 @@ function PayoutModal({ affiliate, onClose, onSaved }: { affiliate: DashRow; onCl
             {payouts.map(p => (
               <div key={p.id} className="flex items-center justify-between text-xs bg-surface-low px-2 py-1.5">
                 <span>{dateBR(p.payout_date)} · {p.method.toUpperCase()}</span>
-                <span className="font-semibold text-[#10B981]">{brl(p.amount_cents)}</span>
+                <span className="font-semibold text-success">{brl(p.amount_cents)}</span>
               </div>
             ))}
           </div>
@@ -406,7 +406,7 @@ function PayoutModal({ affiliate, onClose, onSaved }: { affiliate: DashRow; onCl
       )}
 
       <div className="flex items-center gap-2 mt-5">
-        <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#10B981] text-surface font-medium hover:bg-[#10B981]/90 text-sm disabled:opacity-50">
+        <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-success text-surface font-medium hover:bg-success/90 text-sm disabled:opacity-50">
           {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <DollarSign className="w-4 h-4" />} Registrar pagamento
         </button>
         <button onClick={onClose} className="px-4 py-2 border border-outline/10 text-on-surface-variant hover:bg-surface-highest text-sm">Cancelar</button>
@@ -429,10 +429,10 @@ function LeaderboardModal({ leaders, onClose }: { leaders: Leader[]; onClose: ()
               <div className="text-2xl font-bold text-muted w-8 text-center">#{l.rank}</div>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold">{l.full_name}</div>
-                <div className="text-[10px] text-muted">{l.email} · código <code className="text-[#F59E0B]">{l.hotmart_code}</code></div>
+                <div className="text-[10px] text-muted">{l.email} · código <code className="text-eco-academy">{l.hotmart_code}</code></div>
               </div>
               <div className="text-right">
-                <div className="text-base font-semibold text-[#F59E0B]">{brl(l.total_commission_cents)}</div>
+                <div className="text-base font-semibold text-eco-academy">{brl(l.total_commission_cents)}</div>
                 <div className="text-[10px] text-muted">{l.total_sales} vendas</div>
               </div>
             </div>
@@ -458,7 +458,7 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
   );
 }
 
-const inputCls = 'w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-[#F59E0B]/50 text-on-surface placeholder:text-muted';
+const inputCls = 'w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-eco-academy/50 text-on-surface placeholder:text-muted';
 
 function Input({ label, v, on, type='text', placeholder, max }: { label: string; v: string; on: (v: string) => void; type?: string; placeholder?: string; max?: number }) {
   return (

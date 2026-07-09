@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
-import { Download, CheckCircle2, Copy, Layers, Type, Palette, Square, Minus, Sun, Moon } from 'lucide-react';
+import { Download, CheckCircle2, Copy, Layers, Type, Palette, Square, Minus } from 'lucide-react';
 import { Logo } from './Logo';
 import { initConvergenceMesh, initReveal } from '../lib/dhMesh';
-import { useTheme } from '../hooks/useTheme';
 
 export default function BrandGuidelines() {
-  const { theme, toggle } = useTheme();
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -60,17 +58,7 @@ export default function BrandGuidelines() {
       {/* Cover — malha de convergência 3D (dhMesh) */}
       <section className="relative overflow-hidden border-b border-outline/10 min-h-[88vh] flex items-center">
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-secondary/[0.04] rounded-full blur-[120px] pointer-events-none" />
-
-        {/* Toggle de tema */}
-        <button
-          onClick={toggle}
-          aria-label={theme === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'}
-          className="absolute top-6 right-6 z-20 flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-on-surface-variant border border-outline/30 px-3 py-2 hover:text-on-surface hover:border-action/50 transition-colors bg-surface/40 backdrop-blur-sm"
-        >
-          {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-          {theme === 'dark' ? 'Claro' : 'Escuro'}
-        </button>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-secondary/[0.04] blur-[120px] pointer-events-none" />
 
         <div className="max-w-6xl mx-auto relative z-10 flex flex-col items-center text-center px-6 py-24 w-full">
           <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-secondary mb-8">Brand System · Geometric Precision</span>

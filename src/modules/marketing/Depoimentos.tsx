@@ -85,7 +85,7 @@ export function Depoimentos() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="flex items-center gap-2">
-            <MessageSquareQuote className="w-5 h-5 text-[#EC4899]" />
+            <MessageSquareQuote className="w-5 h-5 text-eco-osi" />
             <h2 className="text-lg font-semibold">Depoimentos de vendedores</h2>
           </div>
           <p className="text-xs text-muted mt-1">
@@ -98,12 +98,12 @@ export function Depoimentos() {
       </div>
 
       {/* Link público */}
-      <div className="bg-[#EC4899]/5 border border-[#EC4899]/20 p-4 mb-6">
-        <div className="text-[10px] uppercase tracking-widest font-bold text-[#EC4899] mb-2">URL pública pra divulgar</div>
+      <div className="bg-eco-osi/5 border border-eco-osi/20 p-4 mb-6">
+        <div className="text-[10px] uppercase tracking-widest font-bold text-eco-osi mb-2">URL pública pra divulgar</div>
         <div className="flex items-center gap-2">
           <code className="flex-1 text-xs text-on-surface bg-surface-lowest border border-outline/10 px-2 py-1.5 font-mono break-all">{publicUrl}</code>
           <a href={publicUrl} target="_blank" rel="noreferrer" className="text-on-surface-variant hover:text-on-surface p-2"><ExternalLink className="w-4 h-4" /></a>
-          <button onClick={copyPublicUrl} className="flex items-center gap-1 text-xs bg-[#EC4899] text-white px-3 py-1.5 hover:bg-[#EC4899]/90 shrink-0">
+          <button onClick={copyPublicUrl} className="flex items-center gap-1 text-xs bg-eco-osi text-white px-3 py-1.5 hover:bg-eco-osi/90 shrink-0">
             {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
             {copied ? 'Copiado!' : 'Copiar'}
           </button>
@@ -133,7 +133,7 @@ export function Depoimentos() {
       <div className="flex items-center gap-2 mb-4">
         <button
           onClick={() => setStatusFilter('all')}
-          className={`text-xs px-3 py-1 rounded-full border ${statusFilter === 'all' ? 'border-outline/30 text-on-surface' : 'border-outline/10 text-on-surface-variant hover:border-outline/30'}`}
+          className={`text-xs px-3 py-1 border ${statusFilter === 'all' ? 'border-outline/30 text-on-surface' : 'border-outline/10 text-on-surface-variant hover:border-outline/30'}`}
         >
           Ver todos ({stats?.total ?? 0})
         </button>
@@ -186,7 +186,7 @@ function TestimonialCard({ t, busy, onApprove, onReject, onSpam, onPromote }: {
             {t.optica_name && <span className="text-xs text-on-surface-variant">· {t.optica_name}</span>}
             {(t.city || t.state) && <span className="text-xs text-muted">· {[t.city, t.state].filter(Boolean).join('/')}</span>}
             {t.rating && (
-              <span className="text-[#F59E0B] text-xs flex items-center gap-0.5">
+              <span className="text-eco-academy text-xs flex items-center gap-0.5">
                 {Array.from({ length: t.rating }).map((_, i) => <Star key={i} className="w-3 h-3 fill-current" />)}
               </span>
             )}
@@ -237,7 +237,7 @@ function TestimonialCard({ t, busy, onApprove, onReject, onSpam, onPromote }: {
         {t.status === 'pending' && (
           <>
             <button onClick={onApprove} disabled={busy}
-              className="flex items-center gap-1 text-xs bg-[#10B981] text-surface font-medium px-3 py-1.5 hover:bg-[#10B981]/90 disabled:opacity-50">
+              className="flex items-center gap-1 text-xs bg-success text-surface font-medium px-3 py-1.5 hover:bg-success/90 disabled:opacity-50">
               {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />} Aprovar
             </button>
             <button onClick={onReject} disabled={busy}
@@ -245,7 +245,7 @@ function TestimonialCard({ t, busy, onApprove, onReject, onSpam, onPromote }: {
               <X className="w-3 h-3" /> Rejeitar
             </button>
             <button onClick={onSpam} disabled={busy}
-              className="text-xs text-red-400/70 hover:text-red-400 px-2 py-1.5 disabled:opacity-50">
+              className="text-xs text-danger/70 hover:text-danger px-2 py-1.5 disabled:opacity-50">
               Spam
             </button>
           </>

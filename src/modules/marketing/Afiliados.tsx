@@ -115,7 +115,7 @@ function AffiliateRow({ affiliate, onClick }: { affiliate: Affiliate; onClick: (
   return (
     <button onClick={onClick} className="w-full text-left bg-surface-low border border-outline/10 p-4 hover:bg-surface-highest transition-colors">
       <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-full bg-surface-high flex items-center justify-center font-semibold text-sm">{affiliate.full_name.charAt(0).toUpperCase()}</div>
+        <div className="w-10 h-10 bg-surface-high flex items-center justify-center font-semibold text-sm">{affiliate.full_name.charAt(0).toUpperCase()}</div>
         <div className="flex-1 min-w-0">
           <div className="font-medium">{affiliate.full_name}</div>
           <div className="text-xs text-muted flex items-center gap-3 mt-0.5">

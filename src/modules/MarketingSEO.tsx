@@ -56,7 +56,7 @@ export default function MarketingSEO() {
                 }`}
               >
                 <span className="inline-flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full shrink-0" style={{ background: s.color ?? '#6b7280' }} />
+                  <span className="w-2 h-2 shrink-0" style={{ background: s.color ?? '#6b7280' }} />
                   {s.label}
                   <span className="font-mono text-[10px] text-muted hidden sm:inline">{s.site}</span>
                 </span>

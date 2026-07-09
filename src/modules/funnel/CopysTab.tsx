@@ -115,9 +115,9 @@ export default function CopysTab() {
           <div className="text-2xl font-bold text-secondary">{stats.criado}</div>
           <div className="text-xs text-secondary/60 mt-1">Criados</div>
         </div>
-        <div className="bg-emerald-400/5 border border-emerald-400/20 p-4 text-center">
-          <div className="text-2xl font-bold text-emerald-300">{stats.aprovado}</div>
-          <div className="text-xs text-emerald-300/60 mt-1">Aprovados</div>
+        <div className="bg-success/5 border border-success/20 p-4 text-center">
+          <div className="text-2xl font-bold text-success">{stats.aprovado}</div>
+          <div className="text-xs text-success/60 mt-1">Aprovados</div>
         </div>
       </div>
 

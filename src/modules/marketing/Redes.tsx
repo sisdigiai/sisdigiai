@@ -138,9 +138,9 @@ export function Redes() {
                     <div className="flex items-center justify-between">
                       <div className="text-sm font-semibold">{conta.rede}</div>
                       {conta.navegador ? (
-                        <span className="text-[10px] px-1.5 py-0.5 bg-green-500/10 text-green-300 border border-green-500/30 uppercase tracking-wider">{conta.navegador}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 bg-success/10 text-success border border-success/30 uppercase tracking-wider">{conta.navegador}</span>
                       ) : (
-                        <span className="text-[10px] px-1.5 py-0.5 bg-amber-500/10 text-amber-300 border border-amber-500/30 uppercase tracking-wider">navegador a validar</span>
+                        <span className="text-[10px] px-1.5 py-0.5 bg-warning/10 text-warning border border-warning/30 uppercase tracking-wider">navegador a validar</span>
                       )}
                     </div>
                     <div className="text-xs text-on-surface-variant flex items-center gap-1.5">
@@ -236,7 +236,7 @@ export function Redes() {
         </div>
 
         {savedAt && (
-          <div className="mb-3 px-4 py-2 bg-green-500/10 border border-green-500/30 text-sm text-green-300">
+          <div className="mb-3 px-4 py-2 bg-success/10 border border-success/30 text-sm text-success">
             Atualização registrada ✓
           </div>
         )}
@@ -244,8 +244,8 @@ export function Redes() {
         {loading ? (
           <div className="text-center py-10 text-muted text-sm">Carregando log...</div>
         ) : updates === null ? (
-          <div className="border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3 flex gap-3 items-start">
-            <AlertTriangle className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
+          <div className="border border-warning/20 bg-warning/[0.06] px-4 py-3 flex gap-3 items-start">
+            <AlertTriangle className="w-4 h-4 text-warning shrink-0 mt-0.5" />
             <div className="text-sm text-on-surface-variant">
               <b className="text-on-surface">Log indisponível — migration 041 pendente.</b>{' '}
               Renovar o <span className="font-mono">SUPABASE_TOKEN</span> (Management API, 401 desde ~05/06) e aplicar{' '}

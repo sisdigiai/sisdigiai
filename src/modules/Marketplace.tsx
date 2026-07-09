@@ -85,7 +85,7 @@ export default function Marketplace() {
   const PriceRow = ({ label, value, expected, source }: { label: string; value: number | null; expected: number; source: string }) => {
     const ok = value === expected;
     const Icon = value == null ? Circle : ok ? CheckCircle2 : AlertTriangle;
-    const cls = value == null ? 'text-muted' : ok ? 'text-emerald-400' : 'text-amber-300';
+    const cls = value == null ? 'text-muted' : ok ? 'text-success' : 'text-warning';
     return (
       <li className="flex items-center justify-between text-sm">
         <span className="flex items-center gap-2">
@@ -117,11 +117,11 @@ export default function Marketplace() {
         <TravasBanner />
 
         {/* Reconciliação de preço — divergência §13 do plano-mestre */}
-        <div className={`border p-5 space-y-3 ${allMatch ? 'border-emerald-500/30 bg-emerald-500/[0.05]' : 'border-amber-500/30 bg-amber-500/[0.06]'}`}>
+        <div className={`border p-5 space-y-3 ${allMatch ? 'border-success/30 bg-success/[0.05]' : 'border-warning/30 bg-warning/[0.06]'}`}>
           <div className="flex items-center gap-2">
-            {allMatch ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <AlertTriangle className="w-4 h-4 text-amber-300" />}
+            {allMatch ? <CheckCircle2 className="w-4 h-4 text-success" /> : <AlertTriangle className="w-4 h-4 text-warning" />}
             <span className="text-xs font-mono uppercase tracking-widest text-muted">Reconciliação de preço</span>
-            <span className={`ml-auto text-[11px] font-mono tabular-nums ${allMatch ? 'text-emerald-300' : 'text-amber-200'}`}>
+            <span className={`ml-auto text-[11px] font-mono tabular-nums ${allMatch ? 'text-success' : 'text-warning'}`}>
               {allMatch ? '✓ tudo bate' : '⚠ divergência'}
             </span>
           </div>
@@ -170,7 +170,7 @@ export default function Marketplace() {
                   <Store className="w-4 h-4 text-secondary" />
                   <span className="text-base font-bold text-on-surface capitalize">{key}</span>
                   {item?.status && (
-                    <span className={`ml-auto text-[10px] font-mono uppercase px-2 py-0.5 ${item.status === 'ativo' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-muted/20 text-muted'}`}>
+                    <span className={`ml-auto text-[10px] font-mono uppercase px-2 py-0.5 ${item.status === 'ativo' ? 'bg-success/20 text-success' : 'bg-muted/20 text-muted'}`}>
                       {item.status}
                     </span>
                   )}

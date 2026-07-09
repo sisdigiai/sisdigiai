@@ -121,11 +121,11 @@ export default function ImageGallery({ images, onUpload, onRemove, onReorder }: 
             >
               <img src={img.url} alt={`Imagem ${i + 1}`} className="w-full h-full object-cover" />
               {/* Numeração */}
-              <div className="absolute bottom-1 left-1 bg-black/70 text-on-surface text-[10px] font-mono px-1 rounded">
+              <div className="absolute bottom-1 left-1 bg-black/70 text-on-surface text-[10px] font-mono px-1">
                 {i + 1}
               </div>
               {/* Drag handle */}
-              <div className="absolute top-1 left-1 opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 rounded p-0.5 cursor-grab active:cursor-grabbing">
+              <div className="absolute top-1 left-1 opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 p-0.5 cursor-grab active:cursor-grabbing">
                 <GripVertical size={10} className="text-on-surface" />
               </div>
               {/* Remover */}
@@ -133,7 +133,7 @@ export default function ImageGallery({ images, onUpload, onRemove, onReorder }: 
                 type="button"
                 onClick={() => handleRemove(i)}
                 disabled={removing}
-                className="absolute top-1 right-1 w-5 h-5 bg-black/70 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:cursor-wait"
+                className="absolute top-1 right-1 w-5 h-5 bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:cursor-wait"
                 title="Remover imagem"
               >
                 {removing ? <Loader2 size={10} className="animate-spin text-on-surface" /> : <X size={10} className="text-on-surface" />}
@@ -180,7 +180,7 @@ export default function ImageGallery({ images, onUpload, onRemove, onReorder }: 
         </div>
       </div>
 
-      {error && <p className="text-[10px] text-red-400">{error}</p>}
+      {error && <p className="text-[10px] text-danger">{error}</p>}
       {images.length > 1 && (
         <p className="text-[10px] text-muted">
           {images.length} imagens · arraste para reordenar

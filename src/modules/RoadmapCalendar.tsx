@@ -9,15 +9,15 @@ const MESES = [
 const DIAS_CURTOS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
 const TRACK_COLOR: Record<Track, string> = {
-  A: 'bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/40',
+  A: 'bg-eco-academy/20 text-eco-academy border-eco-academy/40',
   B: 'bg-secondary-container/40 text-secondary border-secondary/40',
-  C: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+  C: 'bg-success/20 text-success border-success/40',
 };
 
 const TRACK_DOT: Record<Track, string> = {
-  A: 'bg-fuchsia-400',
+  A: 'bg-eco-academy',
   B: 'bg-secondary',
-  C: 'bg-emerald-400',
+  C: 'bg-success',
 };
 
 function toISODate(d: Date): string {
@@ -105,9 +105,9 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
           <h2 className="text-2xl font-bold">{MESES[month]} {year}</h2>
           <div className="text-xs text-on-surface-variant mt-1 flex items-center gap-3 flex-wrap">
             <span>{monthStats.total} tarefas</span>
-            <span className="text-emerald-400">{monthStats.done} feitas</span>
+            <span className="text-success">{monthStats.done} feitas</span>
             {monthStats.overdue > 0 && (
-              <span className="text-red-400 flex items-center gap-1">
+              <span className="text-danger flex items-center gap-1">
                 <AlertOctagon size={12} /> {monthStats.overdue} atrasadas
               </span>
             )}
@@ -129,19 +129,19 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
       {/* Legenda de tracks */}
       <div className="flex items-center gap-4 text-xs text-on-surface-variant">
         <div className="flex items-center gap-1.5">
-          <span className={`w-2 h-2 rounded-full ${TRACK_DOT.A}`} /> Academy
+          <span className={`w-2 h-2 ${TRACK_DOT.A}`} /> Academy
         </div>
         <div className="flex items-center gap-1.5">
-          <span className={`w-2 h-2 rounded-full ${TRACK_DOT.B}`} /> Clearix
+          <span className={`w-2 h-2 ${TRACK_DOT.B}`} /> Clearix
         </div>
         <div className="flex items-center gap-1.5">
-          <span className={`w-2 h-2 rounded-full ${TRACK_DOT.C}`} /> Empresa
+          <span className={`w-2 h-2 ${TRACK_DOT.C}`} /> Empresa
         </div>
       </div>
 
       {/* Cabeçalho dos dias da semana */}
       <div>
-        <div className="grid grid-cols-7 gap-px bg-surface-low rounded-t-lg overflow-hidden">
+        <div className="grid grid-cols-7 gap-px bg-surface-low overflow-hidden">
           {DIAS_CURTOS.map((d) => (
             <div key={d} className="bg-surface text-center py-2 text-[10px] font-mono text-muted uppercase tracking-widest">
               {d}
@@ -150,7 +150,7 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
         </div>
 
         {/* Grade do mês */}
-        <div className="grid grid-cols-7 gap-px bg-surface-low rounded-b-lg overflow-hidden">
+        <div className="grid grid-cols-7 gap-px bg-surface-low overflow-hidden">
           {cells.map((cell, i) => {
             const tasksOfDay = tasksByDate.get(cell.date) ?? [];
             const isToday = cell.date === todayISO;
@@ -166,15 +166,15 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
                 className={`relative bg-surface min-h-[84px] p-1.5 text-left transition-all hover:bg-surface-highest
                   ${!cell.inMonth ? 'opacity-25' : ''}
                   ${isSelected ? 'ring-2 ring-secondary ring-inset z-10' : ''}
-                  ${hasOverdue ? 'bg-red-500/5' : ''}
-                  ${allDone ? 'bg-emerald-500/5' : ''}
+                  ${hasOverdue ? 'bg-danger/5' : ''}
+                  ${allDone ? 'bg-success/5' : ''}
                 `}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className={`text-xs font-mono ${isToday ? 'text-secondary font-bold bg-secondary/15 px-1.5 rounded' : 'text-on-surface-variant'}`}>
+                  <span className={`text-xs font-mono ${isToday ? 'text-secondary font-bold bg-secondary/15 px-1.5' : 'text-on-surface-variant'}`}>
                     {cell.dayNum}
                   </span>
-                  {hasMilestone && <Flag size={9} className="text-amber-400" />}
+                  {hasMilestone && <Flag size={9} className="text-warning" />}
                 </div>
                 <div className="space-y-0.5">
                   {tasksOfDay.slice(0, 3).map((t) => {
@@ -182,7 +182,7 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
                     return (
                       <div
                         key={t.id}
-                        className={`text-[9.5px] px-1 py-0.5 rounded border truncate flex items-center gap-1
+                        className={`text-[9.5px] px-1 py-0.5 border truncate flex items-center gap-1
                           ${TRACK_COLOR[t.track || 'C']}
                           ${done ? 'opacity-50 line-through' : ''}
                         `}
@@ -210,7 +210,7 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
           <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
             <h3 className="text-sm font-semibold">
               {selectedDateObj.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
-              {selectedDate === todayISO && <span className="ml-2 text-xs text-secondary bg-secondary/15 px-2 py-0.5 rounded font-mono">HOJE</span>}
+              {selectedDate === todayISO && <span className="ml-2 text-xs text-secondary bg-secondary/15 px-2 py-0.5 font-mono">HOJE</span>}
             </h3>
             {selectedTasks.length > 0 && (
               <span className="text-xs text-muted">
@@ -230,13 +230,13 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
                   <div
                     key={t.id}
                     className={`flex items-start gap-3 p-2 transition-colors
-                      ${overdue ? 'bg-red-500/5' : ''}
+                      ${overdue ? 'bg-danger/5' : ''}
                       hover:bg-surface-highest
                     `}
                   >
                     <button
                       onClick={() => onToggle(t)}
-                      className={`mt-0.5 shrink-0 transition-colors ${done ? 'text-emerald-400' : 'text-muted hover:text-on-surface-variant'}`}
+                      className={`mt-0.5 shrink-0 transition-colors ${done ? 'text-success' : 'text-muted hover:text-on-surface-variant'}`}
                     >
                       {done ? <CheckSquare size={16} /> : <Square size={16} />}
                     </button>
@@ -246,18 +246,18 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
                           {t.title}
                         </span>
                         {t.track && (
-                          <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border ${TRACK_COLOR[t.track]}`}>
+                          <span className={`text-[9px] font-mono px-1.5 py-0.5 border ${TRACK_COLOR[t.track]}`}>
                             Track {t.track}
                           </span>
                         )}
                         <span className="text-[10px] text-muted font-mono">Fase {t.phase_number}</span>
                         {t.category === 'milestone' && (
-                          <span className="text-[9px] font-mono uppercase text-amber-400 bg-amber-500/10 px-1.5 rounded flex items-center gap-1">
+                          <span className="text-[9px] font-mono uppercase text-warning bg-warning/10 px-1.5 flex items-center gap-1">
                             <Award size={9} /> Marco
                           </span>
                         )}
                         {t.category === 'decision_gate' && (
-                          <span className="text-[9px] font-mono uppercase text-emerald-400 bg-emerald-500/10 px-1.5 rounded flex items-center gap-1">
+                          <span className="text-[9px] font-mono uppercase text-success bg-success/10 px-1.5 flex items-center gap-1">
                             <Flag size={9} /> Gate
                           </span>
                         )}

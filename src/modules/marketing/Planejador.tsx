@@ -107,7 +107,7 @@ export function Planejador() {
   return (
     <div className="p-8 max-w-5xl">
       <div className="flex items-center gap-2 mb-2">
-        <Wand2 className="w-5 h-5 text-[#8B5CF6]" />
+        <Wand2 className="w-5 h-5 text-action" />
         <h2 className="text-lg font-semibold">Planejador de agenda</h2>
       </div>
       <p className="text-xs text-muted mb-6">
@@ -136,13 +136,13 @@ export function Planejador() {
           <Field label={`Semanas: ${weeks}`}>
             <input type="range" min={4} max={24} value={weeks}
               onChange={e => setWeeks(parseInt(e.target.value))}
-              className="w-full accent-[#8B5CF6]" />
+              className="w-full accent-action" />
             <div className="text-[10px] text-muted mt-1">{phaseLabel(weeks)}</div>
           </Field>
           <Field label={`Posts por semana: ${perWeek}`}>
             <input type="range" min={3} max={7} value={perWeek}
               onChange={e => setPerWeek(parseInt(e.target.value))}
-              className="w-full accent-[#8B5CF6]" />
+              className="w-full accent-action" />
             <div className="text-[10px] text-muted mt-1">{perWeek}×/sem · {totalPosts} posts no total</div>
           </Field>
         </div>
@@ -158,8 +158,8 @@ export function Planejador() {
               return (
                 <label key={p.code}
                   className={`flex items-center gap-2 px-3 py-2 border cursor-pointer text-xs
-                    ${checked ? 'border-[#8B5CF6]/50 bg-[#8B5CF6]/10' : 'border-outline/10 hover:border-outline/30'}`}>
-                  <input type="checkbox" checked={checked} onChange={() => toggleChannel(p.code)} className="accent-[#8B5CF6]" />
+                    ${checked ? 'border-action/50 bg-action/10' : 'border-outline/10 hover:border-outline/30'}`}>
+                  <input type="checkbox" checked={checked} onChange={() => toggleChannel(p.code)} className="accent-action" />
                   <span style={{ color: p.color ?? '#fff' }}>{p.name}</span>
                 </label>
               );
@@ -170,7 +170,7 @@ export function Planejador() {
 
       {/* Aviso quando faltam ideias */}
       {!canSchedule && scheduledStats && totalPosts > 0 && (
-        <div className="bg-[#F59E0B]/10 border border-[#F59E0B]/30 p-3 mb-4 text-xs text-[#F59E0B] flex items-center gap-2">
+        <div className="bg-eco-academy/10 border border-eco-academy/30 p-3 mb-4 text-xs text-eco-academy flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>
             Você quer agendar <b>{totalPosts}</b> posts mas só tem <b>{scheduledStats.available}</b> ideias disponíveis.
@@ -187,21 +187,21 @@ export function Planejador() {
           Visualizar prévia
         </button>
         <button onClick={handleSchedule} disabled={busy || !preview || selectedChannels.length === 0}
-          className="flex items-center gap-2 px-4 py-2 bg-[#8B5CF6] text-white font-medium hover:bg-[#8B5CF6]/90 text-sm disabled:opacity-50">
+          className="flex items-center gap-2 px-4 py-2 bg-action text-on-action font-medium hover:bg-action/90 text-sm disabled:opacity-50">
           {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Calendar className="w-4 h-4" />}
           Gerar agenda real
         </button>
         <div className="flex-1" />
         {(scheduledStats?.planned ?? 0) > 0 && (
           <button onClick={handleClear} disabled={busy}
-            className="flex items-center gap-2 px-3 py-2 border border-red-500/30 text-red-300 text-sm hover:bg-red-500/10 disabled:opacity-50">
+            className="flex items-center gap-2 px-3 py-2 border border-danger/30 text-danger text-sm hover:bg-danger/10 disabled:opacity-50">
             <Trash2 className="w-3.5 h-3.5" /> Limpar agenda
           </button>
         )}
       </div>
 
       {confirmation && (
-        <div className="bg-[#10B981]/10 border border-[#10B981]/30 p-3 mb-6 text-sm text-[#10B981] flex items-center gap-2">
+        <div className="bg-success/10 border border-success/30 p-3 mb-6 text-sm text-success flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4" /> {confirmation}
         </div>
       )}
@@ -211,7 +211,7 @@ export function Planejador() {
         <div className="bg-surface-low border border-outline/10 p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold flex items-center gap-2">
-              <Layers className="w-4 h-4 text-[#8B5CF6]" /> Prévia da agenda
+              <Layers className="w-4 h-4 text-action" /> Prévia da agenda
             </h3>
             <span className="text-xs text-on-surface-variant">
               {preview.posts_created} posts · {preview.first_date} → {preview.last_date} · {preview.channels_count} canais
@@ -249,7 +249,7 @@ export function Planejador() {
   );
 }
 
-const inputCls = 'w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-[#8B5CF6]/50 text-on-surface';
+const inputCls = 'w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-action/50 text-on-surface';
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

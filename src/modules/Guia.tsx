@@ -159,14 +159,14 @@ export default function Guia({ onNavigate }: { onNavigate?: (id: ModuleId) => vo
                     <div className="md:pl-14 mt-3">
                       <button
                         onClick={() => onNavigate?.('travas-marketing')}
-                        className="group flex items-center gap-2 w-full text-left bg-amber-500/5 border border-amber-500/30 px-4 py-3 transition-colors hover:bg-amber-500/10"
+                        className="group flex items-center gap-2 w-full text-left bg-warning/5 border border-warning/30 px-4 py-3 transition-colors hover:bg-warning/10"
                       >
-                        <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
+                        <ShieldCheck className="w-4 h-4 text-warning shrink-0" />
                         <span className="text-sm text-on-surface">
                           <span className="font-medium">Travas de Marketing</span>
                           <span className="text-muted"> — gate inegociável: nada publica sem passar por aqui</span>
                         </span>
-                        <ChevronRight className="w-3.5 h-3.5 text-muted ml-auto group-hover:text-amber-400 transition-colors" />
+                        <ChevronRight className="w-3.5 h-3.5 text-muted ml-auto group-hover:text-warning transition-colors" />
                       </button>
                     </div>
                   )}

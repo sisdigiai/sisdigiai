@@ -249,7 +249,7 @@ export default function Portfolio() {
                 className="w-full flex items-center gap-4 p-5 text-left"
                 onClick={() => setExpandido(isOpen ? null : p.nome)}
               >
-                <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${prioridadeDot[p.prioridade]}`} />
+                <div className={`w-2.5 h-2.5 shrink-0 ${prioridadeDot[p.prioridade]}`} />
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 flex-wrap">
@@ -258,8 +258,8 @@ export default function Portfolio() {
                       {badge.label}
                     </span>
                     {liveCount(p.nome) > 0 && (
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 inline-flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> {liveCount(p.nome)} no ar
+                      <span className="text-[10px] font-mono px-2 py-0.5 border border-success/30 bg-success/10 text-success inline-flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 bg-success" /> {liveCount(p.nome)} no ar
                       </span>
                     )}
                   </div>
@@ -302,7 +302,7 @@ export default function Portfolio() {
                           href={p.site}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-sm font-mono text-emerald-300 hover:text-emerald-200 transition-colors"
+                          className="inline-flex items-center gap-1.5 text-sm font-mono text-success hover:text-success transition-colors"
                         >
                           {p.site.replace(/^https?:\/\//, '')}
                           <ExternalLink className="w-3.5 h-3.5" />
@@ -311,8 +311,8 @@ export default function Portfolio() {
                     )}
                     {p.bloqueio && (
                       <div className="md:col-span-2">
-                        <div className="text-[10px] font-mono text-amber-400/70 uppercase tracking-widest mb-1">Bloqueio</div>
-                        <div className="text-sm text-amber-400/80">{p.bloqueio}</div>
+                        <div className="text-[10px] font-mono text-warning/70 uppercase tracking-widest mb-1">Bloqueio</div>
+                        <div className="text-sm text-warning/80">{p.bloqueio}</div>
                       </div>
                     )}
                   </div>

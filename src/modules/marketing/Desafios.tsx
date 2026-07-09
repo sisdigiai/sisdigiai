@@ -68,7 +68,7 @@ export function Desafios() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-[#F59E0B]" />
+            <Trophy className="w-5 h-5 text-eco-academy" />
             <h2 className="text-lg font-semibold">Desafios mensais (gamificação)</h2>
           </div>
           <p className="text-xs text-muted mt-1">
@@ -76,7 +76,7 @@ export function Desafios() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowNew(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#F59E0B] text-surface font-medium hover:bg-[#F59E0B]/90">
+          <button onClick={() => setShowNew(true)} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-eco-academy text-surface font-medium hover:bg-eco-academy/90">
             <Plus className="w-4 h-4" /> Novo desafio
           </button>
           <button onClick={refresh} className="flex items-center gap-2 px-3 py-1.5 text-sm border border-outline/10 hover:bg-surface-highest">
@@ -96,14 +96,14 @@ export function Desafios() {
           ))}
           <div className="bg-surface-low border border-outline/10 p-3">
             <div className="text-[10px] uppercase tracking-widest font-bold text-muted">Vencedores totais</div>
-            <div className="text-2xl font-semibold mt-1 text-[#F59E0B]">{stats.total_winners}</div>
+            <div className="text-2xl font-semibold mt-1 text-eco-academy">{stats.total_winners}</div>
           </div>
         </div>
       )}
 
       <div className="flex items-center gap-2 mb-4">
         <button onClick={() => setStatusFilter('all')}
-          className={`text-xs px-3 py-1 rounded-full border ${statusFilter === 'all' ? 'border-outline/30 text-on-surface' : 'border-outline/10 text-on-surface-variant hover:border-outline/30'}`}>
+          className={`text-xs px-3 py-1 border ${statusFilter === 'all' ? 'border-outline/30 text-on-surface' : 'border-outline/10 text-on-surface-variant hover:border-outline/30'}`}>
           Ver todos
         </button>
       </div>
@@ -178,11 +178,11 @@ function ChallengeCard({ c, onOpen }: { c: Challenge; onOpen: () => void }) {
           <Users className="w-3 h-3" /> {c.participants_count} inscritos
         </span>
         {c.submissions_count > 0 && (
-          <span className="flex items-center gap-1 text-[#F59E0B]">
+          <span className="flex items-center gap-1 text-eco-academy">
             <Award className="w-3 h-3" /> {c.submissions_count} provas
           </span>
         )}
-        {c.winners_count > 0 && <span className="text-[#FFD700]">🏆 {c.winners_count}</span>}
+        {c.winners_count > 0 && <span className="text-warning">🏆 {c.winners_count}</span>}
       </div>
     </button>
   );
@@ -255,7 +255,7 @@ function NewChallengeModal({ onClose, onSaved }: { onClose: () => void; onSaved:
           </Field>
         </div>
         <div className="flex items-center gap-2 mt-5">
-          <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-[#F59E0B] text-surface font-medium hover:bg-[#F59E0B]/90 text-sm disabled:opacity-50">
+          <button onClick={handleSave} disabled={busy} className="flex items-center gap-2 px-4 py-2 bg-eco-academy text-surface font-medium hover:bg-eco-academy/90 text-sm disabled:opacity-50">
             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Criar
           </button>
           <button onClick={onClose} className="px-4 py-2 border border-outline/10 text-on-surface-variant hover:bg-surface-highest text-sm">Cancelar</button>
@@ -320,12 +320,12 @@ function ChallengeDetailDrawer({ challenge, onClose, onChanged }: { challenge: C
           </div>
           <div className="flex items-center gap-2">
             {challenge.status === 'draft' && (
-              <button onClick={handleActivate} disabled={busy} className="flex items-center gap-1 px-3 py-2 bg-[#10B981] text-surface font-medium text-sm disabled:opacity-50">
+              <button onClick={handleActivate} disabled={busy} className="flex items-center gap-1 px-3 py-2 bg-success text-surface font-medium text-sm disabled:opacity-50">
                 {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Flag className="w-4 h-4" />} Ativar
               </button>
             )}
             {challenge.status === 'active' && (
-              <button onClick={handleFinalize} disabled={busy} className="flex items-center gap-1 px-3 py-2 bg-[#F59E0B] text-surface font-medium text-sm disabled:opacity-50">
+              <button onClick={handleFinalize} disabled={busy} className="flex items-center gap-1 px-3 py-2 bg-eco-academy text-surface font-medium text-sm disabled:opacity-50">
                 {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trophy className="w-4 h-4" />} Finalizar
               </button>
             )}
@@ -343,7 +343,7 @@ function ChallengeDetailDrawer({ challenge, onClose, onChanged }: { challenge: C
           {challenge.prize_description && (
             <div>
               <div className="text-[10px] uppercase tracking-widest font-bold text-muted mb-1 flex items-center gap-1">
-                <Award className="w-3 h-3 text-[#F59E0B]" /> Prêmio
+                <Award className="w-3 h-3 text-eco-academy" /> Prêmio
               </div>
               <p className="text-sm text-on-surface">{challenge.prize_description}</p>
             </div>
@@ -357,7 +357,7 @@ function ChallengeDetailDrawer({ challenge, onClose, onChanged }: { challenge: C
           {challenge.hashtag && (
             <div>
               <div className="text-[10px] uppercase tracking-widest font-bold text-muted mb-1">Hashtag oficial</div>
-              <code className="text-sm text-[#F59E0B] bg-surface-lowest px-2 py-1">#{challenge.hashtag}</code>
+              <code className="text-sm text-eco-academy bg-surface-lowest px-2 py-1">#{challenge.hashtag}</code>
             </div>
           )}
 
@@ -398,7 +398,7 @@ function ChallengeDetailDrawer({ challenge, onClose, onChanged }: { challenge: C
                         <div className="text-[10px] text-muted mt-1 flex gap-3">
                           <span>Inscrito em {dateBR(p.joined_at)}</span>
                           {p.sales_amount_cents != null && <span>Venda: {brl(p.sales_amount_cents)}</span>}
-                          {p.score != null && <span className="text-[#F59E0B]">Score: {p.score}</span>}
+                          {p.score != null && <span className="text-eco-academy">Score: {p.score}</span>}
                         </div>
                       </div>
                       <div className="flex flex-col gap-1 shrink-0">
@@ -426,7 +426,7 @@ function ChallengeDetailDrawer({ challenge, onClose, onChanged }: { challenge: C
   );
 }
 
-const inputCls = 'w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-[#F59E0B]/50 text-on-surface placeholder:text-muted';
+const inputCls = 'w-full bg-surface-low border border-outline/10 px-3 py-2 text-sm focus:outline-none focus:border-eco-academy/50 text-on-surface placeholder:text-muted';
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>

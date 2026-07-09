@@ -189,7 +189,7 @@ function DashboardTab() {
           <div className="flex gap-1 flex-wrap">
             <button
               onClick={() => setFilterProduct('all')}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+              className={`px-3 py-1 text-xs font-medium transition-colors ${
                 filterProduct === 'all' ? 'bg-secondary-container/40 text-on-surface border border-secondary/40' : 'bg-surface-high text-muted hover:text-on-surface'
               }`}
             >
@@ -199,7 +199,7 @@ function DashboardTab() {
               <button
                 key={p.id}
                 onClick={() => setFilterProduct(p.id)}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                className={`px-3 py-1 text-xs font-medium transition-colors ${
                   filterProduct === p.id ? 'bg-secondary-container/40 text-on-surface border border-secondary/40' : 'bg-surface-high text-muted hover:text-on-surface'
                 }`}
               >
@@ -212,9 +212,9 @@ function DashboardTab() {
         <button
           onClick={() => setExcludeAporte(v => !v)}
           title={`Aporte intelectual do fundador: ${brl(aporteTotal)} em despesas valoradas — clique para ocultar/mostrar`}
-          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors border ${
+          className={`px-3 py-1 text-xs font-medium transition-colors border ${
             excludeAporte
-              ? 'bg-orange-500/15 text-orange-300 border-orange-500/40'
+              ? 'bg-warning/15 text-warning border-warning/40'
               : 'bg-surface-high text-muted hover:text-on-surface border-transparent'
           }`}
         >
@@ -264,9 +264,9 @@ function DashboardTab() {
             {topVendors.map((v) => (
               <div key={v.name} className="flex items-center gap-3">
                 <div className="w-32 text-sm text-on-surface-variant truncate">{v.name}</div>
-                <div className="flex-1 h-5 bg-surface-high rounded-full overflow-hidden">
+                <div className="flex-1 h-5 bg-surface-high overflow-hidden">
                   <div
-                    className="h-full bg-secondary rounded-full"
+                    className="h-full bg-secondary"
                     style={{ width: `${(v.total / maxVendor) * 100}%` }}
                   />
                 </div>
@@ -299,7 +299,7 @@ function DashboardTab() {
                     <td className="py-2 text-on-surface">{e.description}</td>
                     <td className="py-2 text-muted">{e.product_name}</td>
                     <td className="py-2">
-                      <span className="px-2 py-0.5 rounded-full text-xs bg-surface-high text-on-surface-variant">
+                      <span className="px-2 py-0.5 text-xs bg-surface-high text-on-surface-variant">
                         {e.category_label}
                       </span>
                     </td>
@@ -560,7 +560,7 @@ function LancarTab() {
           >
             {saving ? 'Salvando...' : 'Salvar Despesa'}
           </button>
-          {msg && <span className={`text-sm ${msg.startsWith('Erro') ? 'text-red-400' : 'text-green-400'}`}>{msg}</span>}
+          {msg && <span className={`text-sm ${msg.startsWith('Erro') ? 'text-danger' : 'text-success'}`}>{msg}</span>}
         </div>
       </div>
 
@@ -588,12 +588,12 @@ function LancarTab() {
                     <td className="py-2 text-on-surface">{e.description}</td>
                     <td className="py-2 text-muted">{e.product_name}</td>
                     <td className="py-2">
-                      <span className="px-2 py-0.5 rounded-full text-xs bg-surface-high text-on-surface-variant">{e.category_label}</span>
+                      <span className="px-2 py-0.5 text-xs bg-surface-high text-on-surface-variant">{e.category_label}</span>
                     </td>
                     <td className="py-2 text-muted">{e.kind === 'subscription' ? 'Sub' : e.kind === 'aporte_intelectual' ? 'Aporte' : 'One-time'}</td>
                     <td className="py-2 text-right font-mono text-on-surface">{brl(Number(e.amount_brl))}</td>
                     <td className="py-2 text-right">
-                      <button onClick={() => handleDelete(e.id)} className="text-muted hover:text-red-400 transition-colors">
+                      <button onClick={() => handleDelete(e.id)} className="text-muted hover:text-danger transition-colors">
                         <Trash2 size={14} />
                       </button>
                     </td>
@@ -705,7 +705,7 @@ function SubscriptionsTab() {
         </div>
       </div>
 
-      {msg && <div className={`text-sm ${msg.startsWith('Erro') ? 'text-red-400' : 'text-green-400'}`}>{msg}</div>}
+      {msg && <div className={`text-sm ${msg.startsWith('Erro') ? 'text-danger' : 'text-success'}`}>{msg}</div>}
 
       {showForm && (
         <div className="bg-surface-lowest/50 border border-outline/10 p-6">
@@ -778,7 +778,7 @@ function SubscriptionsTab() {
                   <td className="py-2 text-right">
                     <button
                       onClick={() => handleClose(s.id)}
-                      className="text-xs text-muted hover:text-red-400 flex items-center gap-1 ml-auto"
+                      className="text-xs text-muted hover:text-danger flex items-center gap-1 ml-auto"
                     >
                       <XCircle size={14} /> Encerrar
                     </button>
@@ -895,7 +895,7 @@ function RelatorioTab() {
         <div className="flex gap-1 flex-wrap">
           <button
             onClick={() => setFilterProduct('all')}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+            className={`px-3 py-1 text-xs font-medium transition-colors ${
               filterProduct === 'all' ? 'bg-secondary-container/40 text-on-surface border border-secondary/40' : 'bg-surface-high text-muted hover:text-on-surface'
             }`}
           >
@@ -905,7 +905,7 @@ function RelatorioTab() {
             <button
               key={p.id}
               onClick={() => setFilterProduct(p.id)}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+              className={`px-3 py-1 text-xs font-medium transition-colors ${
                 filterProduct === p.id ? 'bg-secondary-container/40 text-on-surface border border-secondary/40' : 'bg-surface-high text-muted hover:text-on-surface'
               }`}
             >
@@ -936,9 +936,9 @@ function RelatorioTab() {
                 return (
                   <div key={cat} className="flex items-center gap-3">
                     <div className="w-36 text-sm text-on-surface-variant truncate">{CATEGORY_LABELS[cat as ExpenseCategory] || cat}</div>
-                    <div className="flex-1 h-4 bg-surface-high rounded-full overflow-hidden">
+                    <div className="flex-1 h-4 bg-surface-high overflow-hidden">
                       <div
-                        className="h-full rounded-full"
+                        className="h-full"
                         style={{ width: `${pct}%`, backgroundColor: CATEGORY_COLORS[cat as ExpenseCategory] || '#64748b' }}
                       />
                     </div>
@@ -961,8 +961,8 @@ function RelatorioTab() {
                 return (
                   <div key={v.name} className="flex items-center gap-3">
                     <div className="w-36 text-sm text-on-surface-variant truncate">{v.name}</div>
-                    <div className="flex-1 h-4 bg-surface-high rounded-full overflow-hidden">
-                      <div className="h-full rounded-full bg-secondary" style={{ width: `${pct}%` }} />
+                    <div className="flex-1 h-4 bg-surface-high overflow-hidden">
+                      <div className="h-full bg-secondary" style={{ width: `${pct}%` }} />
                     </div>
                     <div className="w-24 text-right text-sm font-mono text-on-surface-variant">{brl(v.total)}</div>
                     <div className="w-12 text-right text-xs text-muted">{v.count}x</div>

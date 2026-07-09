@@ -321,7 +321,7 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
         return (
           <div className="border border-outline/10 bg-surface-low p-5 space-y-3">
             <div className="flex items-center gap-2">
-              <Rocket className="w-4 h-4 text-amber-300" />
+              <Rocket className="w-4 h-4 text-warning" />
               <span className="text-xs font-mono uppercase tracking-widest text-muted">FASE 0 · Lançamento OSI 01/06</span>
               <span className="ml-auto text-[11px] text-on-surface-variant font-mono tabular-nums">{done}/{total} prontos</span>
             </div>
@@ -331,7 +331,7 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
             <ul className="space-y-3">
               {fase0.map(i => {
                 const Icon = i.status === 'done' ? CheckCircle2 : i.status === 'partial' ? AlertCircle : Circle;
-                const colorClass = i.status === 'done' ? 'text-emerald-400' : i.status === 'partial' ? 'text-amber-300' : 'text-muted';
+                const colorClass = i.status === 'done' ? 'text-success' : i.status === 'partial' ? 'text-warning' : 'text-muted';
                 return (
                   <li key={i.key} className="text-sm">
                     <details className="group" open={i.status !== 'done'}>
@@ -409,7 +409,7 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
               })}
             </div>
             {totalAll === 0 && (
-              <div className="bg-amber-500/[0.08] border border-amber-500/20 px-3 py-2 text-xs text-on-surface-variant">
+              <div className="bg-warning/[0.08] border border-warning/20 px-3 py-2 text-xs text-on-surface-variant">
                 Ainda sem eventos — o funil popula assim que a landing receber tráfego (pixels + sink first-party já no ar).
               </div>
             )}
@@ -429,7 +429,7 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
           Cada um é follow-up de WhatsApp/e-mail pendente.
         </div>
         {leads.length === 0 ? (
-          <div className="bg-amber-500/[0.08] border border-amber-500/20 px-3 py-2 text-xs text-on-surface-variant">
+          <div className="bg-warning/[0.08] border border-warning/20 px-3 py-2 text-xs text-on-surface-variant">
             Nenhum lead capturado ainda — o form "Receba o Movimento 1" está no ar na landing e na /osi.
           </div>
         ) : (
@@ -469,8 +469,8 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
                 ({suzano.community_count} comunidade · {suzano.affiliate_count} afiliados · {suzano.testimonial_count} depoimentos)
               </div>
             ) : (
-              <div className="bg-amber-500/[0.08] border border-amber-500/20 px-3 py-2 text-xs text-on-surface-variant">
-                <b className="text-amber-200">Suzano-SP ainda sem registros.</b> Cold-start começa aqui — comunicar localmente antes de escalar mídia paga.
+              <div className="bg-warning/[0.08] border border-warning/20 px-3 py-2 text-xs text-on-surface-variant">
+                <b className="text-warning">Suzano-SP ainda sem registros.</b> Cold-start começa aqui — comunicar localmente antes de escalar mídia paga.
               </div>
             )}
             <ul className="space-y-1">
@@ -507,12 +507,12 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
             )}
           </div>
           {!nexusReady ? (
-            <div className="text-xs text-amber-200 leading-relaxed">
+            <div className="text-xs text-warning leading-relaxed">
               <b>VITE_NEXUS_SUPABASE_URL / VITE_NEXUS_SUPABASE_ANON_KEY ausentes no .env.</b> Adicione pra ativar leitura cross-DB do banco Nexus.
             </div>
           ) : nexus.error === 'view_not_created_in_nexus' ? (
             <div className="text-xs text-on-surface-variant leading-relaxed space-y-1.5">
-              <div className="text-amber-200"><b>View <code className="font-mono">v_osi_onboarding_summary</code> ainda não existe no Nexus.</b></div>
+              <div className="text-warning"><b>View <code className="font-mono">v_osi_onboarding_summary</code> ainda não existe no Nexus.</b></div>
               <div>Credencial cross-DB OK (anon key configurada e respondendo). Falta criar a view no repo Nexus com este formato:</div>
               <pre className="font-mono text-[10px] bg-surface-lowest p-2 overflow-x-auto whitespace-pre">{`CREATE VIEW public.v_osi_onboarding_summary AS
 SELECT
@@ -527,7 +527,7 @@ GRANT SELECT ON public.v_osi_onboarding_summary TO anon, authenticated;`}</pre>
               <div className="text-muted">arquitetura-de-venda-e-entrega §38-46 / §88-107 · plano-mestre §11 (fundo de funil).</div>
             </div>
           ) : nexus.error ? (
-            <div className="text-xs text-red-300">Erro inesperado: {nexus.error}</div>
+            <div className="text-xs text-danger">Erro inesperado: {nexus.error}</div>
           ) : nexus.data ? (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
               <Metric label="Compradores OSI" value={String(nexus.data.total_buyers)} />

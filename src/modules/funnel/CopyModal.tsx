@@ -78,7 +78,7 @@ export default function CopyModal({
             <div className="flex items-center gap-3 mt-1">
               <span className="text-xs text-muted font-mono">{asset.format}</span>
               {asset.angulo && (
-                <span className="text-xs text-secondary/70 bg-secondary/15 px-2 py-0.5 rounded">
+                <span className="text-xs text-secondary/70 bg-secondary/15 px-2 py-0.5">
                   {asset.angulo}
                 </span>
               )}

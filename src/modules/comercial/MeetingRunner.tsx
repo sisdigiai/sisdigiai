@@ -211,7 +211,7 @@ export default function MeetingRunner({
                   {quotes.map((q, i) => (
                     <li key={i} className="flex items-start gap-1.5 text-xs text-on-surface-variant">
                       <span className="text-secondary">“</span><span className="flex-1 leading-snug">{q}”</span>
-                      <button onClick={() => setQuotes(quotes.filter((_, j) => j !== i))} className="text-muted hover:text-red-400"><X className="w-3 h-3" /></button>
+                      <button onClick={() => setQuotes(quotes.filter((_, j) => j !== i))} className="text-muted hover:text-danger"><X className="w-3 h-3" /></button>
                     </li>
                   ))}
                 </ul>
@@ -234,7 +234,7 @@ export default function MeetingRunner({
                     <li key={i} className="flex items-start gap-2 text-xs">
                       <input type="checkbox" checked={it.resolved} onChange={() => setActionItems(actionItems.map((x, j) => j === i ? { ...x, resolved: !x.resolved } : x))} className="mt-0.5 accent-current" />
                       <span className={`flex-1 leading-snug ${it.resolved ? 'line-through text-muted' : 'text-on-surface-variant'}`}>{it.text}</span>
-                      <button onClick={() => setActionItems(actionItems.filter((_, j) => j !== i))} className="text-muted hover:text-red-400"><X className="w-3 h-3" /></button>
+                      <button onClick={() => setActionItems(actionItems.filter((_, j) => j !== i))} className="text-muted hover:text-danger"><X className="w-3 h-3" /></button>
                     </li>
                   ))}
                 </ul>

@@ -237,7 +237,7 @@ export default function CopyButton({ content, asset, compact }: Props) {
       <button
         onClick={() => handleCopy('text')}
         className={`flex items-center gap-1 text-xs transition-colors cursor-pointer ${
-          copied ? 'text-emerald-300' : 'text-muted hover:text-on-surface-variant'
+          copied ? 'text-success' : 'text-muted hover:text-on-surface-variant'
         }`}
         title="Copiar texto"
       >
@@ -251,8 +251,8 @@ export default function CopyButton({ content, asset, compact }: Props) {
       <div className="flex items-center">
         <button
           onClick={() => handleCopy('json_en')}
-          className={`flex items-center gap-1.5 text-xs font-medium transition-colors cursor-pointer px-2 py-1 rounded-l-md hover:bg-surface-highest ${
-            copied ? 'text-emerald-300' : 'text-muted hover:text-on-surface-variant'
+          className={`flex items-center gap-1.5 text-xs font-medium transition-colors cursor-pointer px-2 py-1 hover:bg-surface-highest ${
+            copied ? 'text-success' : 'text-muted hover:text-on-surface-variant'
           }`}
           title="Copiar JSON (EN) — prompt para agent visual"
         >
@@ -261,7 +261,7 @@ export default function CopyButton({ content, asset, compact }: Props) {
         </button>
         <button
           onClick={() => setShowMenu(!showMenu)}
-          className="px-1 py-1 text-muted hover:text-on-surface-variant hover:bg-surface-highest rounded-r-md transition-colors cursor-pointer border-l border-outline/10"
+          className="px-1 py-1 text-muted hover:text-on-surface-variant hover:bg-surface-highest transition-colors cursor-pointer border-l border-outline/10"
           title="Opções de cópia"
         >
           <ChevronDown size={12} />
@@ -269,7 +269,7 @@ export default function CopyButton({ content, asset, compact }: Props) {
       </div>
 
       {showMenu && (
-        <div className="absolute bottom-full left-0 mb-1 bg-[#141B2D] border border-outline/10 shadow-xl py-1 z-50 min-w-[140px]">
+        <div className="absolute bottom-full left-0 mb-1 bg-surface-high border border-outline/10 py-1 z-50 min-w-[140px]">
           {(Object.keys(MODE_LABELS) as CopyMode[]).map((mode) => (
             <button
               key={mode}

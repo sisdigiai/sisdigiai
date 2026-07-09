@@ -151,7 +151,7 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
                       isCurrent ? 'border-outline/30 bg-surface-low' : 'border-outline/10 hover:bg-surface-low'
                     }`}
                   >
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${done ? '' : 'bg-surface-high text-muted'}`}
+                    <div className={`w-7 h-7 flex items-center justify-center text-xs font-bold ${done ? '' : 'bg-surface-high text-muted'}`}
                       style={done ? { background: s.color, color: '#0d131f' } : {}}>
                       {done ? <Check className="w-3.5 h-3.5" /> : s.id}
                     </div>
@@ -295,7 +295,7 @@ export function ProduzirPostWizard({ post, onClose, onChanged }: Props) {
               {/* Salvar */}
               <div className="flex items-center gap-2 pt-2 border-t border-outline/10">
                 <button onClick={handleSave} disabled={saving || (!outputText.trim() && !outputUrl.trim())}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#10B981] text-surface font-medium hover:bg-[#10B981]/90 text-sm disabled:opacity-50">
+                  className="flex items-center gap-2 px-4 py-2 bg-success text-surface font-medium hover:bg-success/90 text-sm disabled:opacity-50">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                   Salvar output
                 </button>

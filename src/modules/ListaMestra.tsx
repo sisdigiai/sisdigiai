@@ -20,11 +20,11 @@ interface MasterItem {
 }
 
 const STATUS_STYLE: Record<StatusNorm, { label: string; cls: string }> = {
-  done:        { label: 'Concluído',   cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
+  done:        { label: 'Concluído',   cls: 'bg-success/15 text-success border-success/30' },
   in_progress: { label: 'Em andamento',cls: 'bg-secondary-container/40 text-secondary border-secondary/40' },
   pending:     { label: 'Pendente',    cls: 'bg-surface-high text-on-surface-variant border-outline/10' },
-  blocked:     { label: 'Bloqueado',   cls: 'bg-rose-500/15 text-rose-300 border-rose-500/30' },
-  atrasado:    { label: 'Atrasado',    cls: 'bg-amber-500/15 text-amber-300 border-amber-500/30' },
+  blocked:     { label: 'Bloqueado',   cls: 'bg-danger/15 text-danger border-danger/30' },
+  atrasado:    { label: 'Atrasado',    cls: 'bg-warning/15 text-warning border-warning/30' },
   cancelled:   { label: 'Cancelado',   cls: 'bg-surface-low text-muted border-outline/10' },
 };
 
@@ -98,7 +98,7 @@ export default function ListaMestra() {
         subtitle={
           <>
             {items === null ? 'Carregando…' : `${items.length} itens de implantação`} · unifica Backlog + Roadmap
-            {atrasados > 0 && <span className="text-amber-300"> · {atrasados} atrasados</span>}
+            {atrasados > 0 && <span className="text-warning"> · {atrasados} atrasados</span>}
           </>
         }
       />
@@ -162,7 +162,7 @@ export default function ListaMestra() {
                     <span className={`text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 border ${st.cls}`}>{st.label}</span>
                   </td>
                   <td className="px-3 py-2.5 text-on-surface-variant text-xs">{i.owner}</td>
-                  <td className={`px-3 py-2.5 font-mono text-xs ${i.status === 'atrasado' ? 'text-amber-300' : 'text-muted'}`}>{i.prazo || '—'}</td>
+                  <td className={`px-3 py-2.5 font-mono text-xs ${i.status === 'atrasado' ? 'text-warning' : 'text-muted'}`}>{i.prazo || '—'}</td>
                 </tr>
               );
             })}

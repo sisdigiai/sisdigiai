@@ -41,7 +41,7 @@ export default function CopyCard({
             <div className="flex items-center gap-2 mt-1">
               <span className="text-[10px] text-muted font-mono">{asset.format}</span>
               {asset.angulo && (
-                <span className="text-[10px] text-secondary/70 bg-secondary/15 px-1.5 py-0.5 rounded">
+                <span className="text-[10px] text-secondary/70 bg-secondary/15 px-1.5 py-0.5">
                   {asset.angulo}
                 </span>
               )}

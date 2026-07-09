@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FileText, BookOpen, ChevronRight, ClipboardList, ChevronDown } from 'lucide-react';
+import { FileText, BookOpen, ChevronRight, ClipboardList, ChevronDown, Download, BookMarked } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { playbookStore, type Playbook } from '../lib/playbookStore';
 import PlaybookView from './comercial/PlaybookView';
@@ -73,6 +73,19 @@ const DOCS: DocEntry[] = [
   { titulo: 'Changelog Executivo DIGIAI', path: 'docs/09-governanca/changelog-executivo-digiai.md', categoria: 'governanca', descricao: 'Histórico datado das mudanças estruturais da empresa. Substitui memória humana.', status: 'canonico-inicial', revisao: '2026-04-17' },
 ];
 
+interface MaterialEntry {
+  titulo: string;
+  arquivo: string;
+  descricao: string;
+  badge: string;
+  tamanho: string;
+}
+
+const MATERIAIS: MaterialEntry[] = [
+  { titulo: 'Manual Clearix — Bíblia do App', arquivo: 'Manual-Clearix-Biblia.pdf', descricao: 'Manual completo do ecossistema: o Hub e os 17 apps, tela por tela, com passo a passo, sacadas e cuidados. Onboarding e apoio à venda.', badge: 'manual', tamanho: '~5 MB · PDF' },
+  { titulo: 'Pitch Clearix — Óticas', arquivo: 'Clearix-Pitch-Oticas.pdf', descricao: 'Deck B2B para donos de ótica: dores, solução, planos, prova com a ótica piloto e a oferta de teste.', badge: 'pitch', tamanho: '~1 MB · PDF' },
+];
+
 const categoriaLabel: Record<Categoria, string> = {
   fundacao: '00 Fundação', empresa: '01 Empresa', portfolio: '02 Portfólio',
   produtos: '03 Produtos', comercial: '04 Comercial', marketing: '05 Marketing',
@@ -80,21 +93,21 @@ const categoriaLabel: Record<Categoria, string> = {
 };
 
 const statusBadge: Record<string, string> = {
-  validado: 'text-emerald-400 bg-emerald-400/10',
+  validado: 'text-success bg-success/10',
   'canonico-inicial': 'text-secondary bg-secondary/15',
-  rascunho: 'text-amber-400 bg-amber-400/10',
+  rascunho: 'text-warning bg-warning/10',
   'em-revisao': 'text-muted bg-surface-low',
 };
 
 const CATS_FILTRO: Array<Categoria | 'todos'> = ['todos', 'fundacao', 'empresa', 'portfolio', 'produtos', 'comercial', 'marketing', 'operacao', 'roadmap', 'governanca'];
 
 export default function Biblioteca() {
-  const [filtro, setFiltro] = useState<Categoria | 'todos' | 'playbooks'>('todos');
+  const [filtro, setFiltro] = useState<Categoria | 'todos' | 'playbooks' | 'materiais'>('todos');
   const [playbooks, setPlaybooks] = useState<Playbook[]>([]);
   const [openPb, setOpenPb] = useState<string | null>(null);
   useEffect(() => { playbookStore.list().then(setPlaybooks); }, []);
 
-  const docs = filtro === 'playbooks' ? [] : filtro === 'todos' ? DOCS : DOCS.filter(d => d.categoria === filtro);
+  const docs = (filtro === 'playbooks' || filtro === 'materiais') ? [] : filtro === 'todos' ? DOCS : DOCS.filter(d => d.categoria === filtro);
 
   const grupos = [...new Set(docs.map(d => d.categoria))];
 
@@ -131,7 +144,36 @@ export default function Biblioteca() {
         >
           <ClipboardList className="w-3.5 h-3.5" /> Playbooks ({playbooks.length})
         </button>
+        <button
+          onClick={() => setFiltro('materiais')}
+          className={`text-xs px-3 py-1.5 font-mono transition-all inline-flex items-center gap-1.5 ${filtro === 'materiais' ? 'bg-secondary text-surface' : 'bg-secondary/15 text-secondary hover:bg-secondary/25'}`}
+        >
+          <BookMarked className="w-3.5 h-3.5" /> Manuais ({MATERIAIS.length})
+        </button>
       </div>
+
+      {(filtro === 'todos' || filtro === 'materiais') && (
+        <div className="space-y-2">
+          <div className="text-xs font-mono text-muted uppercase tracking-widest mb-1 px-1">Manuais &amp; Materiais</div>
+          {MATERIAIS.map((m) => (
+            <div key={m.arquivo} className="bg-secondary/[0.06] border border-secondary/30 px-4 py-3 flex items-start gap-3 hover:border-secondary/50 transition-colors">
+              <BookMarked className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                  <span className="text-sm font-medium text-on-surface">{m.titulo}</span>
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 text-secondary bg-secondary/15">{m.badge}</span>
+                </div>
+                <div className="text-xs text-on-surface-variant">{m.descricao}</div>
+                <div className="text-[10px] font-mono text-muted mt-1">{m.tamanho}</div>
+              </div>
+              <a href={`${import.meta.env.BASE_URL}materiais/${m.arquivo}`} target="_blank" rel="noopener noreferrer"
+                 className="shrink-0 inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 bg-secondary text-surface hover:opacity-90 transition-opacity">
+                <Download className="w-3.5 h-3.5" /> Abrir PDF
+              </a>
+            </div>
+          ))}
+        </div>
+      )}
 
       {filtro === 'playbooks' && (
         <div className="space-y-2">
