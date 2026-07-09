@@ -11,3 +11,6 @@ coverage/
 .mcp.json
 !.mcp.json.example
 .meta-token.tmp
+
+# Codex config contém SUPABASE_ACCESS_TOKEN — nunca commitar
+.codex/

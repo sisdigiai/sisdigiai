@@ -1,13 +1,13 @@
--- ╔════════════════════════════════════════════════════════════════╗
--- ║  Marketing — Fase 2 (operação completa)                        ║
--- ║  Adiciona: copy completa, brief, artes, plataformas multi,    ║
--- ║           materiais de afiliados, cadastro de afiliados,      ║
--- ║           performance tracking, RPCs auxiliares                ║
--- ╚════════════════════════════════════════════════════════════════╝
+﻿-- â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+-- â•‘  Marketing â€” Fase 2 (operaÃ§Ã£o completa)                        â•‘
+-- â•‘  Adiciona: copy completa, brief, artes, plataformas multi,    â•‘
+-- â•‘           materiais de afiliados, cadastro de afiliados,      â•‘
+-- â•‘           performance tracking, RPCs auxiliares                â•‘
+-- â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 -- FASE A: expandir marketing.content_calendar
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 ALTER TABLE marketing.content_calendar
   ADD COLUMN IF NOT EXISTS platforms              text[]   DEFAULT '{}',
@@ -26,15 +26,15 @@ ALTER TABLE marketing.content_calendar
   ADD COLUMN IF NOT EXISTS link_clicks            int,
   ADD COLUMN IF NOT EXISTS conversions            int;
 
-COMMENT ON COLUMN marketing.content_calendar.platforms     IS 'Códigos de plataformas: instagram_feed, instagram_reels, instagram_stories, tiktok, etc.';
+COMMENT ON COLUMN marketing.content_calendar.platforms     IS 'CÃ³digos de plataformas: instagram_feed, instagram_reels, instagram_stories, tiktok, etc.';
 COMMENT ON COLUMN marketing.content_calendar.copy_full     IS 'Copy completa pronta para colar (texto final, com quebras e emojis)';
-COMMENT ON COLUMN marketing.content_calendar.arts          IS 'Array de objetos [{type, format, url, label}] — links externos (Canva, Drive)';
+COMMENT ON COLUMN marketing.content_calendar.arts          IS 'Array de objetos [{type, format, url, label}] â€” links externos (Canva, Drive)';
 COMMENT ON COLUMN marketing.content_calendar.posting_brief IS 'Brief criativo / ideia inicial para quem produz';
 COMMENT ON COLUMN marketing.content_calendar.tools_used    IS 'Lista de ferramentas usadas: Canva, CapCut, Photoshop, etc.';
 
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 -- FASE B: marketing.platforms (lookup)
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 CREATE TABLE IF NOT EXISTS marketing.platforms (
   code              text PRIMARY KEY,
@@ -85,9 +85,9 @@ CREATE OR REPLACE VIEW public.v_marketing_platforms AS
   SELECT * FROM marketing.platforms WHERE is_active = true ORDER BY sort_order;
 GRANT SELECT ON public.v_marketing_platforms TO authenticated;
 
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 -- FASE C: marketing.affiliate_materials
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 CREATE TABLE IF NOT EXISTS marketing.affiliate_materials (
   id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -127,9 +127,9 @@ CREATE OR REPLACE VIEW public.v_marketing_affiliate_materials AS
   ORDER BY m.created_at DESC;
 GRANT SELECT ON public.v_marketing_affiliate_materials TO authenticated;
 
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 -- FASE D: marketing.affiliates + downloads
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 CREATE TABLE IF NOT EXISTS marketing.affiliates (
   id                       uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -183,9 +183,9 @@ CREATE OR REPLACE VIEW public.v_marketing_affiliates AS
   ORDER BY a.total_sales DESC, a.created_at DESC;
 GRANT SELECT ON public.v_marketing_affiliates TO authenticated;
 
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 -- RPCs Fase A (atualizar create/update calendar para suportar novos campos)
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 CREATE OR REPLACE FUNCTION public.marketing_create_calendar_post(
   p_scheduled_date date,
@@ -236,7 +236,7 @@ END;
 $$;
 GRANT EXECUTE ON FUNCTION public.marketing_create_calendar_post TO authenticated, service_role;
 
--- Update já é genérico via jsonb patch; precisa só estender o COALESCE no marketing_update_calendar_post.
+-- Update jÃ¡ Ã© genÃ©rico via jsonb patch; precisa sÃ³ estender o COALESCE no marketing_update_calendar_post.
 CREATE OR REPLACE FUNCTION public.marketing_update_calendar_post(
   p_id uuid,
   p_patch jsonb
@@ -288,9 +288,9 @@ END;
 $$;
 GRANT EXECUTE ON FUNCTION public.marketing_update_calendar_post TO authenticated, service_role;
 
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 -- RPCs Fase C (affiliate_materials)
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 CREATE OR REPLACE FUNCTION public.marketing_create_material(
   p_type text,
@@ -363,9 +363,9 @@ BEGIN
 END; $$;
 GRANT EXECUTE ON FUNCTION public.marketing_track_material_download TO authenticated, service_role;
 
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 -- RPCs Fase D (affiliates)
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 CREATE OR REPLACE FUNCTION public.marketing_create_affiliate(
   p_full_name text,
@@ -424,9 +424,9 @@ BEGIN
 END; $$;
 GRANT EXECUTE ON FUNCTION public.marketing_update_affiliate TO authenticated, service_role;
 
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 -- FASE E: RPC kit de boas-vindas (retorna materiais ativos)
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 CREATE OR REPLACE FUNCTION public.marketing_get_affiliate_kit(p_affiliate_id uuid)
 RETURNS TABLE (
@@ -459,78 +459,78 @@ BEGIN
 END; $$;
 GRANT EXECUTE ON FUNCTION public.marketing_get_affiliate_kit TO authenticated, service_role;
 
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 -- SEED: 8 materiais iniciais para afiliados
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 WITH p AS (SELECT code, id FROM marketing.content_pillars)
 INSERT INTO marketing.affiliate_materials (pillar_id, type, title, description, copy_short, copy_medium, copy_long, platforms, is_active) VALUES
 
 ((SELECT id FROM p WHERE code='oferta'),
- 'banner', 'Banner principal — Ótica Sem Improviso (Quadrado 1080)',
- 'Banner quadrado para feed do Instagram, Facebook ou anúncio',
+ 'banner', 'Banner principal â€” Ã“tica Sem Improviso (Quadrado 1080)',
+ 'Banner quadrado para feed do Instagram, Facebook ou anÃºncio',
  'Pare de atender no improviso. Manual visual + app + 90 dias de apoio. R$ 48,50.',
- 'Manual visual de atendimento para quem trabalha em ótica. PDF + app + 90 dias na Nexus. Lançamento R$ 48,50.',
- 'Ótica Sem Improviso: o manual visual prático para vendedor, atendente e consultor que querem vender melhor sem depender de improviso. PDF para imprimir + app no celular + 90 dias de apoio complementar na Nexus. Lançamento por R$ 48,50 (50% off do preço de R$ 97).',
+ 'Manual visual de atendimento para quem trabalha em Ã³tica. PDF + app + 90 dias na Nexus. LanÃ§amento R$ 48,50.',
+ 'Ã“tica Sem Improviso: o manual visual prÃ¡tico para vendedor, atendente e consultor que querem vender melhor sem depender de improviso. PDF para imprimir + app no celular + 90 dias de apoio complementar na Nexus. LanÃ§amento por R$ 48,50 (50% off do preÃ§o de R$ 97).',
  ARRAY['instagram_feed','facebook_feed'], true),
 
 ((SELECT id FROM p WHERE code='oferta'),
- 'banner', 'Banner Story — Ótica Sem Improviso (1080x1920)',
+ 'banner', 'Banner Story â€” Ã“tica Sem Improviso (1080x1920)',
  'Banner vertical para Stories e Reels',
- 'Pare de atender no improviso 🎯 Link na bio.',
- 'Manual visual + app + 90 dias de apoio. Lançamento R$ 48,50. Link na bio.',
- 'O método que tira você do atendimento no improviso e te coloca no controle do balcão e do WhatsApp. Pacote completo: manual PDF + app + 90 dias na Nexus. Lançamento por R$ 48,50. Link na bio.',
+ 'Pare de atender no improviso ðŸŽ¯ Link na bio.',
+ 'Manual visual + app + 90 dias de apoio. LanÃ§amento R$ 48,50. Link na bio.',
+ 'O mÃ©todo que tira vocÃª do atendimento no improviso e te coloca no controle do balcÃ£o e do WhatsApp. Pacote completo: manual PDF + app + 90 dias na Nexus. LanÃ§amento por R$ 48,50. Link na bio.',
  ARRAY['instagram_stories','instagram_reels','whatsapp_status','tiktok'], true),
 
 ((SELECT id FROM p WHERE code='dor'),
- 'post_copy', 'Copy: "tá caro" sem argumento',
+ 'post_copy', 'Copy: "tÃ¡ caro" sem argumento',
  'Texto pronto para post de feed (pilar Dor)',
- 'Cliente diz "tá caro" — e você não tem nem 1 argumento pronto. Conhece?',
- 'Cliente diz "tá caro" — e você não tem nem 1 argumento pronto. Acontece comigo todo dia. Por isso comecei a estudar atendimento de ótica com método. Comenta "QUERO" e te mando o link.',
- 'Cliente diz "tá caro" — e você não tem nem 1 argumento pronto. Quem trabalha em ótica conhece essa cena. Você até treinou produto, sabe a diferença de cada lente, mas na hora de sustentar valor, trava. Não é falta de informação — é falta de método. Comenta "QUERO" que eu te mando o link do material que mudou meu jogo no balcão.',
+ 'Cliente diz "tÃ¡ caro" â€” e vocÃª nÃ£o tem nem 1 argumento pronto. Conhece?',
+ 'Cliente diz "tÃ¡ caro" â€” e vocÃª nÃ£o tem nem 1 argumento pronto. Acontece comigo todo dia. Por isso comecei a estudar atendimento de Ã³tica com mÃ©todo. Comenta "QUERO" e te mando o link.',
+ 'Cliente diz "tÃ¡ caro" â€” e vocÃª nÃ£o tem nem 1 argumento pronto. Quem trabalha em Ã³tica conhece essa cena. VocÃª atÃ© treinou produto, sabe a diferenÃ§a de cada lente, mas na hora de sustentar valor, trava. NÃ£o Ã© falta de informaÃ§Ã£o â€” Ã© falta de mÃ©todo. Comenta "QUERO" que eu te mando o link do material que mudou meu jogo no balcÃ£o.',
  ARRAY['instagram_feed','facebook_feed','linkedin'], true),
 
 ((SELECT id FROM p WHERE code='valor'),
  'reel', 'Reel: 3 perguntas que mudam a venda',
  'Roteiro de Reel de 30 segundos para o pilar Valor',
- '3 perguntas que mudam a conversa de venda no balcão 👇',
- '3 perguntas que mudam a conversa de venda no balcão 👇 Salva e usa amanhã.',
- 'Roteiro: (0-3s) Hook "3 perguntas que mudam a venda no balcão" / (3-10s) #1 "Pra que você usa óculos hoje?" / (10-17s) #2 "O que mais te incomoda no seu atual?" / (17-24s) #3 "Se eu te mostrar uma opção que resolve isso, faz sentido?" / (24-30s) CTA "Salva e usa amanhã. Link na bio pro método completo." Mostra você falando frente câmera, com texto na tela em cada pergunta.',
+ '3 perguntas que mudam a conversa de venda no balcÃ£o ðŸ‘‡',
+ '3 perguntas que mudam a conversa de venda no balcÃ£o ðŸ‘‡ Salva e usa amanhÃ£.',
+ 'Roteiro: (0-3s) Hook "3 perguntas que mudam a venda no balcÃ£o" / (3-10s) #1 "Pra que vocÃª usa Ã³culos hoje?" / (10-17s) #2 "O que mais te incomoda no seu atual?" / (17-24s) #3 "Se eu te mostrar uma opÃ§Ã£o que resolve isso, faz sentido?" / (24-30s) CTA "Salva e usa amanhÃ£. Link na bio pro mÃ©todo completo." Mostra vocÃª falando frente cÃ¢mera, com texto na tela em cada pergunta.',
  ARRAY['instagram_reels','tiktok','youtube_shorts'], true),
 
 ((SELECT id FROM p WHERE code='conversa'),
  'carrossel', 'Carrossel: WhatsApp que retoma sem ser chato',
  'Carrossel 6 slides para Feed Instagram',
- 'WhatsApp que retoma cliente que sumiu — sem parecer cobrança.',
- 'WhatsApp: 4 mensagens curtas que destravam orçamento parado. Salva e adapta.',
- 'Slides do carrossel: (1) Capa "WhatsApp que retoma sem ser chato" / (2) "Mensagem 1: Oi [nome], lembrei de você por causa da [observação real]." / (3) "Mensagem 2: Você comentou que precisava resolver [problema X]. Posso te mandar uma opção?" / (4) "Mensagem 3: Se não fizer sentido agora, sem problema. Posso te chamar quando tiver novidade." / (5) "Mensagem 4: Resposta dela: você reagende e mantém a conversa viva." / (6) CTA "Salva. Link na bio pro método completo."',
+ 'WhatsApp que retoma cliente que sumiu â€” sem parecer cobranÃ§a.',
+ 'WhatsApp: 4 mensagens curtas que destravam orÃ§amento parado. Salva e adapta.',
+ 'Slides do carrossel: (1) Capa "WhatsApp que retoma sem ser chato" / (2) "Mensagem 1: Oi [nome], lembrei de vocÃª por causa da [observaÃ§Ã£o real]." / (3) "Mensagem 2: VocÃª comentou que precisava resolver [problema X]. Posso te mandar uma opÃ§Ã£o?" / (4) "Mensagem 3: Se nÃ£o fizer sentido agora, sem problema. Posso te chamar quando tiver novidade." / (5) "Mensagem 4: Resposta dela: vocÃª reagende e mantÃ©m a conversa viva." / (6) CTA "Salva. Link na bio pro mÃ©todo completo."',
  ARRAY['instagram_carrossel','linkedin'], true),
 
 ((SELECT id FROM p WHERE code='oferta'),
- 'email', 'Email de afiliado — apresentação do material',
- 'Texto pronto para o afiliado enviar para a própria lista',
- 'O método de atendimento que faltava pra você vender mais.',
- 'Oi! Conheci um material que mudou meu jeito de atender na ótica e quis te indicar.',
- E'Oi!\n\nVocê trabalha no balcão de ótica ou conhece alguém que trabalha? Então essa indicação é pra você.\n\nO Ótica Sem Improviso é o manual visual prático que ensina vendedor, atendente e consultor a vender melhor — sem depender de improviso. Em vez de "tentar lembrar o discurso", você aplica um método de 5 movimentos que cabe em qualquer atendimento.\n\nO pacote tem: PDF visual + app no celular + 90 dias de apoio complementar na Nexus (uma plataforma onde você revisa o método e tira dúvidas com o Doug, um veterano de balcão).\n\nNo lançamento sai por R$ 48,50 (50% off do preço cheio de R$ 97).\n\nLink: [SEU_LINK_AFILIADO]\n\nAbraço',
+ 'email', 'Email de afiliado â€” apresentaÃ§Ã£o do material',
+ 'Texto pronto para o afiliado enviar para a prÃ³pria lista',
+ 'O mÃ©todo de atendimento que faltava pra vocÃª vender mais.',
+ 'Oi! Conheci um material que mudou meu jeito de atender na Ã³tica e quis te indicar.',
+ E'Oi!\n\nVocÃª trabalha no balcÃ£o de Ã³tica ou conhece alguÃ©m que trabalha? EntÃ£o essa indicaÃ§Ã£o Ã© pra vocÃª.\n\nO Ã“tica Sem Improviso Ã© o manual visual prÃ¡tico que ensina vendedor, atendente e consultor a vender melhor â€” sem depender de improviso. Em vez de "tentar lembrar o discurso", vocÃª aplica um mÃ©todo de 5 movimentos que cabe em qualquer atendimento.\n\nO pacote tem: PDF visual + app no celular + 90 dias de apoio complementar na Nexus (uma plataforma onde vocÃª revisa o mÃ©todo e tira dÃºvidas com o Doug, um veterano de balcÃ£o).\n\nNo lanÃ§amento sai por R$ 48,50 (50% off do preÃ§o cheio de R$ 97).\n\nLink: [SEU_LINK_AFILIADO]\n\nAbraÃ§o',
  ARRAY['email'], true),
 
 ((SELECT id FROM p WHERE code='oferta'),
- 'whatsapp_msg', 'WhatsApp do afiliado — 1º contato',
+ 'whatsapp_msg', 'WhatsApp do afiliado â€” 1Âº contato',
  'Texto pronto para enviar via WhatsApp pessoal/lista',
- 'Oi! Tem um material novo de atendimento de ótica que tá ajudando muita gente. R$ 48,50. Quer o link?',
- 'Oi! Conheci um material novo de atendimento pra quem trabalha em ótica. PDF + app + 90 dias de apoio. Lançamento R$ 48,50. Quer que eu te mande o link?',
- E'Oi! Tudo bem?\n\nQuero te indicar um material novo que tô vendo dar resultado pra gente que trabalha em ótica.\n\nSe chama Ótica Sem Improviso — é o manual visual de atendimento pra quem quer vender melhor sem depender de improviso. Tem o PDF pra ler, o app pra estudar pelo celular e 90 dias de apoio na Nexus (com o Doug, um veterano de balcão que tira dúvidas).\n\nTá em lançamento por R$ 48,50 (preço normal vai pra R$ 97).\n\nLink: [SEU_LINK]\n\nSe fizer sentido, dá uma olhada!',
+ 'Oi! Tem um material novo de atendimento de Ã³tica que tÃ¡ ajudando muita gente. R$ 48,50. Quer o link?',
+ 'Oi! Conheci um material novo de atendimento pra quem trabalha em Ã³tica. PDF + app + 90 dias de apoio. LanÃ§amento R$ 48,50. Quer que eu te mande o link?',
+ E'Oi! Tudo bem?\n\nQuero te indicar um material novo que tÃ´ vendo dar resultado pra gente que trabalha em Ã³tica.\n\nSe chama Ã“tica Sem Improviso â€” Ã© o manual visual de atendimento pra quem quer vender melhor sem depender de improviso. Tem o PDF pra ler, o app pra estudar pelo celular e 90 dias de apoio na Nexus (com o Doug, um veterano de balcÃ£o que tira dÃºvidas).\n\nTÃ¡ em lanÃ§amento por R$ 48,50 (preÃ§o normal vai pra R$ 97).\n\nLink: [SEU_LINK]\n\nSe fizer sentido, dÃ¡ uma olhada!',
  ARRAY['whatsapp_status'], true),
 
 ((SELECT id FROM p WHERE code='autoridade'),
- 'reel', 'Reel: Quem é a Taty (autoridade)',
- 'Roteiro de Reel de 45s apresentando a autoridade do método',
- 'Quem é a Taty: 40+ anos de balcão, sem nunca ter parado.',
- 'Quem é a Taty: 40+ anos de balcão. Conhece o método que ela ensina?',
- 'Roteiro: (0-5s) Hook "Quem é a Taty?" sobre foto/vídeo dela atendendo / (5-15s) "Ela trabalhou 40 anos no balcão da Mello Óticas, sem nunca ter parado." / (15-25s) "Atendeu literalmente milhares de clientes — e foi de balcão a referência interna em vendas e treinamento." / (25-35s) "Hoje colocou tudo isso num manual prático: o Ótica Sem Improviso." / (35-45s) CTA "Conhece? Link na bio pro método dela." Use B-rolls do balcão real ou fotos.',
+ 'reel', 'Reel: Quem Ã© a Taty (autoridade)',
+ 'Roteiro de Reel de 45s apresentando a autoridade do mÃ©todo',
+ 'Quem Ã© a Taty: 25 anos de balcÃ£o, sem nunca ter parado.',
+ 'Quem Ã© a Taty: 25 anos de balcÃ£o. Conhece o mÃ©todo que ela ensina?',
+ 'Roteiro: (0-5s) Hook "Quem Ã© a Taty?" sobre foto/vÃ­deo dela atendendo / (5-15s) "Ela trabalhou 25 anos no balcÃ£o da Mello Ã“ticas, sem nunca ter parado." / (15-25s) "Atendeu literalmente milhares de clientes â€” e foi de balcÃ£o a referÃªncia interna em vendas e treinamento." / (25-35s) "Hoje colocou tudo isso num manual prÃ¡tico: o Ã“tica Sem Improviso." / (35-45s) CTA "Conhece? Link na bio pro mÃ©todo dela." Use B-rolls do balcÃ£o real ou fotos.',
  ARRAY['instagram_reels','tiktok','youtube_shorts'], true);
 
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 -- FIM
--- ════════════════════════════════════════════════════════════════════
+-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 SELECT 'OK marketing fase 2' AS result;
