@@ -26,19 +26,19 @@
 | 16 | Easy Idiomas | Incubação | TRAVADO | **nenhum** | sem plataforma de deploy definida |
 | 17 | DIGIAI MKT | Infra | TRAVADO | não definido | fases centrais (publicação/coleta/painel) não implementadas |
 
-## ⚠ Erros de rota (sidebar aponta pra URL errada/morta)
+## URLs da sidebar — a confirmar online (não são erros)
 
-O `Sidebar.tsx` usa fallbacks de URL que divergem do deploy real:
+As URLs abaixo o levantamento de pastas não conseguiu confirmar 100% (só há config de deploy, não a URL pública viva). **Não são links errados** — o dono confirmou que Polapetit tem app + landing separados e que o link do Easy está correto; falta só validar o acesso online de cada um numa próxima rodada.
 
-| Marca | App aponta pra | Real | Ação |
-|---|---|---|---|
-| Easy Idiomas | `easyidioma.netlify.app` | **não existe** (sem deploy) | remover link ou marcar "em construção" |
-| Polapetit | `polapetit.netlify.app` | `polapettiapp.netlify.app` (app) · `polapetit.com.br` (landing) | corrigir URL |
-| Pulso | `pulsoprojects.vercel.app` | Vercel (URL a confirmar) + `pulso_hub` Netlify | confirmar e corrigir |
-| Qual a Foto | `qualfoto.netlify.app` | deploy não confirmado | confirmar |
-| Lumina | `luminabox.netlify.app` | Netlify siteId ok, URL a confirmar | confirmar |
+| Marca | App aponta pra | Observação |
+|---|---|---|
+| Easy Idiomas | `easyidioma.netlify.app` | dono confirma que está certo — validar acesso online |
+| Polapetit | `polapetit.netlify.app` | tem app (`polapettiapp`) + landing (`polapetit.com.br`); confirmar qual o link do menu deve abrir |
+| Pulso | `pulsoprojects.vercel.app` | control (Vercel) + hub (Netlify) — confirmar URL viva |
+| Qual a Foto | `qualfoto.netlify.app` | deploy configurado — confirmar URL |
+| Lumina | `luminabox.netlify.app` | Netlify siteId ok — confirmar URL |
 
-> Fonte canônica das URLs deveria ser `company.digital_assets` (via `useEcosystemUrls`, ADR-0029). Os fallbacks no código estão desatualizados.
+> Fonte canônica das URLs é `company.digital_assets` (via `useEcosystemUrls`, ADR-0029). Próxima rodada: abrir cada uma online e alinhar o banco/fallback com o que estiver no ar.
 
 ---
 
