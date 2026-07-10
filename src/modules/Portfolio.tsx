@@ -49,16 +49,6 @@ const APPS: App[] = [
     urls: [{ label: 'oticasemimproviso.netlify.app', url: 'https://oticasemimproviso.netlify.app' }],
   },
   {
-    nome: 'DIGIAI Academy', mono: 'AC', cor: 'var(--color-eco-academy)', tagline: 'Enxame de guias low-ticket que educam o varejo óptico',
-    tier: 'alavanca', estado: 'prototipo', maturidade: 35, funcao: '1 isca no ar (OSI) · 0 aulas gravadas',
-    stack: 'Guias pagos · app de apoio · Nexus · Meta Ads · CRM/WhatsApp',
-    repos: '(sem repositório próprio — company-level, ADR-0037)',
-    git: '—',
-    proximo: 'Gravar as 4–6 aulas · rodar OSI como isca e capturar dores',
-    bloqueio: 'Conteúdo (aulas) ainda não produzido',
-    urls: [],
-  },
-  {
     nome: 'Pulso', mono: 'PU', cor: 'var(--color-eco-pulso)', tagline: 'Produção de vídeos curtos faceless — produto autônomo',
     tier: 'autonomo', estado: 'no-ar', maturidade: 75, funcao: '~65 publicações · ~25k views · 4 redes',
     stack: 'Next 16 · React 19 · Supabase · pg_cron · OpenAI/Claude · ElevenLabs',
@@ -79,8 +69,8 @@ const APPS: App[] = [
     urls: [{ label: 'luminabox.netlify.app', url: 'https://luminabox.netlify.app' }],
   },
   {
-    nome: 'Nexus', mono: 'NX', cor: 'var(--color-eco-nexus)', tagline: 'Camada de aprendizado AI-first (OSI + Clearix University)',
-    tier: 'suporte', estado: 'no-ar', maturidade: 55, funcao: 'Landing no ar · adoção zero',
+    nome: 'Nexus', mono: 'NX', cor: 'var(--color-eco-nexus)', tagline: 'Plataforma de aprendizado AI-first — abriga a Clearix Academy (Clearix University)',
+    tier: 'suporte', estado: 'no-ar', maturidade: 55, funcao: 'Abriga a Clearix Academy · adoção zero',
     stack: 'React 19 · Vite · Express · Supabase · Firebase · Gemini',
     repos: 'D:\\projetos\\nexus (126 tabelas)',
     git: '3224d3f 01/jul/2026 (14 módulos Clearix Uni)',
@@ -210,7 +200,6 @@ const BADGE = new Set(['Pulso', 'Nipo School', 'Mello Eyewear']);
 const HOST: Record<string, string> = {
   'Clearix': 'Netlify · polyrepo (17 repos)',
   'Ótica Sem Improviso': 'Netlify (leitor + landing)',
-  'DIGIAI Academy': 'Company-level · sem app próprio',
   'Pulso': 'Vercel (control) · Netlify (hub)',
   'Lumina': 'Netlify · Supabase',
   'Nexus': 'Netlify · Supabase',
