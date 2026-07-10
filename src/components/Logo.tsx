@@ -48,10 +48,10 @@ export const Logo: React.FC<LogoProps> = ({
 
   const Text = (
     <div className={`flex flex-col ${variant === 'stacked' ? 'items-center' : 'items-start'}`}>
-      <div className={`font-sans font-bold tracking-[0.05em] leading-none ${textColor} ${textClassName} flex items-center gap-2`}>
+      <div className={`font-serif font-bold tracking-[0.05em] leading-none ${textColor} ${textClassName} flex items-center gap-2`}>
         DIGIAI
         {productName && (
-          <span className="font-normal opacity-80 tracking-normal">{productName}</span>
+          <span className="font-sans font-normal opacity-80 tracking-normal">{productName}</span>
         )}
       </div>
       {tagline && (
