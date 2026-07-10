@@ -200,7 +200,7 @@ const LOGO: Record<string, string> = {
   'Pulso': '/brand/pulso.png',
   'Lumina': '/brand/lumina.svg',
   'Nipo School': '/brand/nipo.svg',
-  'Mello Eyewear': '/brand/mello.svg',
+  'Mello Eyewear': '/brand/mello.png',
   'Qual a Foto': '/brand/qualfoto.png',
 };
 
