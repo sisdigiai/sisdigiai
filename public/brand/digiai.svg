@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none" role="img" aria-label="DIGIAI">
+  <title>DIGIAI — símbolo (convergência) mono white</title>
+  <rect x="12" y="12" width="40" height="40" stroke="#F8F9FA" stroke-width="3"/>
+  <rect x="27" y="12" width="10" height="10" fill="#F8F9FA"/>
+  <rect x="27" y="42" width="10" height="10" fill="#F8F9FA"/>
+  <rect x="12" y="27" width="10" height="10" fill="#F8F9FA"/>
+  <rect x="42" y="27" width="10" height="10" fill="#F8F9FA"/>
+  <rect x="27" y="27" width="10" height="10" fill="#F8F9FA"/>
+</svg>

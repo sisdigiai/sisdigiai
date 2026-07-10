@@ -185,6 +185,17 @@ const OWNER_BY_NAME: Record<string, string> = {
   'Pulso': 'pulso', 'Polapetit': 'polapetit', 'DIGIAI App': 'digiai',
 };
 
+// Logos reais (brancos, sobre o quadrado eco). Sem logo → monograma.
+// Faltam criar no designer: Pulso, Polapetit, Qual a Foto, Easy, Nipo, Lumina, Mello, Academy.
+const LOGO: Record<string, string> = {
+  'Clearix': '/brand/clearix.svg',
+  'Ótica Sem Improviso': '/brand/osi.png',
+  'Nexus': '/brand/nexus.svg',
+  'DIGIAI App': '/brand/digiai.svg',
+  'DIGIAI Site': '/brand/digiai.svg',
+  'DIGIAI MKT': '/brand/digiai.svg',
+};
+
 // Onde cada frente vive (hospedagem real — levantamento 2026-07-10).
 const HOST: Record<string, string> = {
   'Clearix': 'Netlify · polyrepo (17 repos)',
@@ -250,7 +261,9 @@ export default function Portfolio() {
 
                   <div className="flex items-start justify-between gap-3">
                     <div className="w-12 h-12 flex items-center justify-center font-mono font-bold shrink-0" style={{ background: a.cor, color: 'var(--color-on-action)' }}>
-                      {a.mono}
+                      {LOGO[a.nome]
+                        ? <img src={LOGO[a.nome]} alt="" className="w-7 h-7 object-contain" />
+                        : a.mono}
                     </div>
                     <span className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border ${est.cls}`}>{est.label}</span>
                   </div>
@@ -290,7 +303,11 @@ export default function Portfolio() {
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
           <div className="relative w-full max-w-md h-full bg-surface border-l border-outline/20 overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="sticky top-0 bg-surface/95 backdrop-blur-md border-b border-outline/15 p-5 flex items-start gap-3">
-              <div className="w-12 h-12 flex items-center justify-center font-mono font-bold shrink-0" style={{ background: sel.cor, color: 'var(--color-on-action)' }}>{sel.mono}</div>
+              <div className="w-12 h-12 flex items-center justify-center font-mono font-bold shrink-0" style={{ background: sel.cor, color: 'var(--color-on-action)' }}>
+                {LOGO[sel.nome]
+                  ? <img src={LOGO[sel.nome]} alt="" className="w-7 h-7 object-contain" />
+                  : sel.mono}
+              </div>
               <div className="flex-1 min-w-0">
                 <div className="font-serif text-xl font-semibold text-on-surface">{sel.nome}</div>
                 <div className="text-[12px] text-muted mt-0.5">{sel.tagline}</div>
