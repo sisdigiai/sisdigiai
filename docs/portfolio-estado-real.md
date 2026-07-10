@@ -20,25 +20,47 @@
 | 10 | Polapetit (app) | Incubação | NO AR | Netlify | — |
 | 11 | Polapetit Landing | Incubação | NO AR | Netlify | — |
 | 12 | Nexus | Suporte | NO AR (parcial) | Netlify | dev ativo, adoção zero |
-| 13 | Nipo School | Institucional | TRAVADO | Vercel (config) | bug tabela `profiles` + checklist piloto |
-| 14 | Mello Eyewear | Autônomo | FUNCIONA | Netlify | DNS/domínio a confirmar |
-| 15 | Qual a Foto | Incubação | FUNCIONA LOCAL | Netlify (config) | worker IA é local; deploy não confirmado |
-| 16 | Easy Idiomas | Incubação | TRAVADO | **nenhum** | sem plataforma de deploy definida |
+| 13 | Nipo School | Institucional | landing NO AR / piloto TRAVADO | Vercel | bug tabela `profiles` + checklist piloto |
+| 14 | Mello Eyewear | Autônomo | NO AR | Netlify | — (mellooticas.com.br vendendo) |
+| 15 | Qual a Foto | Incubação | NO AR | Netlify | worker IA roda local |
+| 16 | Easy Idiomas | Incubação | NO AR | Netlify | — (Easy Aula+ logado) |
 | 17 | DIGIAI MKT | Infra | TRAVADO | não definido | fases centrais (publicação/coleta/painel) não implementadas |
 
-## URLs da sidebar — a confirmar online (não são erros)
+## ✅ Verificação online (Chrome Junior, 2026-07-10)
 
-As URLs abaixo o levantamento de pastas não conseguiu confirmar 100% (só há config de deploy, não a URL pública viva). **Não são links errados** — o dono confirmou que Polapetit tem app + landing separados e que o link do Easy está correto; falta só validar o acesso online de cada um numa próxima rodada.
+Cada URL foi aberta no navegador. Resultado real:
 
-| Marca | App aponta pra | Observação |
+| Marca | URL testada | Online |
 |---|---|---|
-| Easy Idiomas | `easyidioma.netlify.app` | dono confirma que está certo — validar acesso online |
-| Polapetit | `polapetit.netlify.app` | tem app (`polapettiapp`) + landing (`polapetit.com.br`); confirmar qual o link do menu deve abrir |
-| Pulso | `pulsoprojects.vercel.app` | control (Vercel) + hub (Netlify) — confirmar URL viva |
-| Qual a Foto | `qualfoto.netlify.app` | deploy configurado — confirmar URL |
-| Lumina | `luminabox.netlify.app` | Netlify siteId ok — confirmar URL |
+| Clearix site | `clearix.app.br` | ✅ vivo |
+| Clearix Hub | `clearixhub.netlify.app` | ✅ vivo (login) |
+| Clearix Atlas | `digiaiatlas.netlify.app` | ✅ vivo (atrás do SSO; `returnTo` aponta pra localhost — bug de config) |
+| OSI leitor | `oticasemimproviso.netlify.app` | ✅ vivo |
+| OSI landing | `landingoticasemimproviso.netlify.app` | ✅ vivo |
+| Nexus | `sisnexus.netlify.app` | ✅ vivo |
+| Lumina | `luminabox.netlify.app` | ✅ vivo (dashboard logado) |
+| Pulso Control | `pulsoprojects.vercel.app` | ✅ vivo |
+| Polapetit | `polapetit.netlify.app` | ✅ **vivo (landing)** — sidebar já estava certa |
+| Polapetit (.com.br) | `polapetit.com.br` | ❌ DNS não resolve (domínio não configurado) |
+| Polapetit (app) | `polapettiapp.netlify.app` | ❌ Site not found |
+| Qual a Foto | `qualfoto.netlify.app` | ✅ vivo |
+| Easy Idiomas | `easyidioma.netlify.app` | ✅ **VIVO e logado (Easy Aula+)** — correção: NÃO estava sem deploy |
+| Nipo School | `niposchool.vercel.app` | ✅ landing viva (piloto interno é que trava) |
+| Mello Eyewear | `mellooticas.com.br` | ✅ vivo, vendendo |
+| DIGIAI Site | `digiai.app.br` | ✅ vivo |
+| DIGIAI App | `sisdigiai.netlify.app` | ✅ vivo (gate de login) |
 
-> Fonte canônica das URLs é `company.digital_assets` (via `useEcosystemUrls`, ADR-0029). Próxima rodada: abrir cada uma online e alinhar o banco/fallback com o que estiver no ar.
+**Correções aplicadas ao card do Portfólio:**
+- Easy Idiomas: `travado/sem deploy` → **NO AR** (Easy Aula+ funcional).
+- Polapetit: URL do card ajustada pra `polapetit.netlify.app` (viva); removidos `.com.br` e `polapettiapp` (fora).
+- Qual a Foto: `funciona local` → **NO AR** (site publicado; só o worker IA é local).
+- Pulso, Lumina, Nipo: URLs vivas adicionadas ao card.
+
+**Pendências reais que sobraram (não são erro de rota):**
+- Polapetit: configurar DNS de `polapetit.com.br` (opcional; landing já roda no netlify).
+- Clearix Atlas: `returnTo=localhost:5173` no launch SSO — corrigir pra apontar pro deploy.
+
+> Fonte canônica das URLs é `company.digital_assets` (via `useEcosystemUrls`, ADR-0029).
 
 ---
 
