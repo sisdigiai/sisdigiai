@@ -17,8 +17,16 @@ export function useTheme() {
     return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
   });
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
+    const el = document.documentElement;
+    // Desliga transições durante a troca — evita repaint travado de
+    // background-color via var() com transition-colors (bug de engine).
+    el.classList.add('dh-theme-switching');
+    el.setAttribute('data-theme', theme);
     localStorage.setItem('dh-theme', theme);
+    const id = requestAnimationFrame(() =>
+      requestAnimationFrame(() => el.classList.remove('dh-theme-switching'))
+    );
+    return () => cancelAnimationFrame(id);
   }, [theme]);
   return { theme, setTheme, toggle: () => setTheme(t => (t === 'dark' ? 'light' : 'dark')) };
 }

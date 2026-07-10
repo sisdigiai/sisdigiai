@@ -106,6 +106,9 @@ body {
 /* Foco visível — regra de ouro (nunca remover) */
 *:focus-visible { outline: 2px solid var(--color-action); outline-offset: 2px; }
 
+/* Troca de tema: mata transições por 1 frame p/ o background via var() repintar */
+.dh-theme-switching, .dh-theme-switching * { transition: none !important; }
+
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--color-surface); }
 ::-webkit-scrollbar-thumb { background: var(--color-outline-strong); }

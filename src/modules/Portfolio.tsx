@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ExternalLink, X, GitBranch, AlertTriangle, ArrowRight } from 'lucide-react';
+import { ExternalLink, X, AlertTriangle, ArrowRight, Server } from 'lucide-react';
 import { companyStore } from '../lib/companyStore';
 import type { DigitalAsset } from '../lib/supabase';
 import PageHeader from '../components/PageHeader';
@@ -185,6 +185,24 @@ const OWNER_BY_NAME: Record<string, string> = {
   'Pulso': 'pulso', 'Polapetit': 'polapetit', 'DIGIAI App': 'digiai',
 };
 
+// Onde cada frente vive (hospedagem real — levantamento 2026-07-10).
+const HOST: Record<string, string> = {
+  'Clearix': 'Netlify · polyrepo (17 repos)',
+  'Ótica Sem Improviso': 'Netlify (leitor + landing)',
+  'DIGIAI Academy': 'Company-level · sem app próprio',
+  'Pulso': 'Vercel (control) · Netlify (hub)',
+  'Lumina': 'Netlify · Supabase',
+  'Nexus': 'Netlify · Supabase',
+  'Polapetit': 'Netlify (app + landing)',
+  'Qual a Foto': 'Netlify (web) · worker local',
+  'Easy Idiomas': 'Netlify · Supabase',
+  'Nipo School': 'Vercel · Supabase',
+  'Mello Eyewear': 'Netlify + Functions · Supabase',
+  'DIGIAI App': 'Netlify · Supabase',
+  'DIGIAI Site': 'Cloudflare Pages',
+  'DIGIAI MKT': 'Local (:3001) · sem deploy',
+};
+
 export default function Portfolio() {
   const [sel, setSel] = useState<App | null>(null);
   const [liveSites, setLiveSites] = useState<Record<string, number>>({});
@@ -217,24 +235,32 @@ export default function Portfolio() {
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">{TIER_LABEL[tier]}</span>
             <span className="h-px flex-1 bg-outline/15" />
           </div>
-          <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>
+          <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
             {APPS.filter(a => a.tier === tier).map(a => {
               const est = ESTADO_META[a.estado];
               return (
                 <button
                   key={a.nome}
                   onClick={() => setSel(a)}
-                  className="text-left border border-outline/15 bg-surface-container p-4 hover:bg-surface-high transition-colors group relative"
-                  style={{ boxShadow: `inset 3px 0 0 ${a.cor}` }}
+                  className="relative text-left border border-outline/15 bg-surface-container p-5 pt-6 hover:bg-surface-high transition-colors group"
                 >
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="w-11 h-11 flex items-center justify-center font-mono font-bold text-sm shrink-0" style={{ background: a.cor, color: 'var(--color-on-action)' }}>
+                  {/* Cantos com bracket — gramática Geometric Precision (/brand) */}
+                  <span className="absolute -top-px -left-px w-3 h-3 border-t-2 border-l-2" style={{ borderColor: a.cor }} />
+                  <span className="absolute -top-px -right-px w-3 h-3 border-t-2 border-r-2 border-outline/40" />
+
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="w-12 h-12 flex items-center justify-center font-mono font-bold shrink-0" style={{ background: a.cor, color: 'var(--color-on-action)' }}>
                       {a.mono}
                     </div>
                     <span className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border ${est.cls}`}>{est.label}</span>
                   </div>
-                  <div className="font-serif text-lg font-semibold text-on-surface leading-tight">{a.nome}</div>
+
+                  <div className="mt-4 font-serif text-xl font-semibold text-on-surface leading-tight tracking-tight">{a.nome}</div>
                   <div className="text-[12px] text-muted mt-1 leading-snug line-clamp-2 min-h-[2.5em]">{a.tagline}</div>
+
+                  <div className="mt-3 flex items-center gap-1.5 font-mono text-[10px] text-on-surface-variant truncate">
+                    <Server className="w-3 h-3 text-muted shrink-0" /> {HOST[a.nome] ?? '—'}
+                  </div>
 
                   <div className="mt-3">
                     <div className="flex items-center justify-between text-[10px] font-mono text-muted mb-1">
@@ -247,9 +273,10 @@ export default function Portfolio() {
 
                   <div className="mt-3 pt-3 border-t border-outline/10 flex items-center justify-between gap-2">
                     <span className="text-[11px] text-on-surface-variant truncate">{a.funcao}</span>
-                    {liveCount(a.nome) > 0 && <span className="font-mono text-[9px] text-success shrink-0 flex items-center gap-1"><span className="w-1.5 h-1.5 bg-success" />{liveCount(a.nome)}</span>}
+                    {liveCount(a.nome) > 0
+                      ? <span className="font-mono text-[9px] text-success shrink-0 flex items-center gap-1"><span className="w-1.5 h-1.5 bg-success" />{liveCount(a.nome)}</span>
+                      : <span className="font-mono text-[9px] text-secondary opacity-0 group-hover:opacity-100 transition-opacity shrink-0 flex items-center gap-1">detalhes <ArrowRight className="w-3 h-3" /></span>}
                   </div>
-                  {a.bloqueio && <span className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity" />}
                 </button>
               );
             })}
@@ -280,6 +307,14 @@ export default function Portfolio() {
               <div>
                 <div className="flex items-center justify-between text-[11px] font-mono text-muted mb-1"><span>Maturidade</span><span className="tabular-nums">{sel.maturidade}%</span></div>
                 <div className="h-1.5 bg-surface-lowest overflow-hidden"><div className="h-full" style={{ width: `${sel.maturidade}%`, background: sel.cor }} /></div>
+              </div>
+
+              <div className="border border-outline/15 bg-surface-lowest p-3 flex items-start gap-2.5">
+                <Server className="w-4 h-4 text-secondary shrink-0 mt-0.5" />
+                <div>
+                  <div className="text-[10px] font-mono text-secondary uppercase tracking-widest mb-0.5">Onde está</div>
+                  <div className="text-sm text-on-surface">{HOST[sel.nome] ?? '—'}</div>
+                </div>
               </div>
 
               <Field label="Stack" value={sel.stack} />
