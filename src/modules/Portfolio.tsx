@@ -191,6 +191,7 @@ const OWNER_BY_NAME: Record<string, string> = {
 // Filtro CSS deixa todos brancos sobre o quadrado eco. Faltam: Polapetit, Easy, Academy.
 const LOGO: Record<string, string> = {
   'Clearix': '/brand/clearix.svg',
+  'Clearix Calc': '/brand/clearix.svg', // veste a cara do Clearix (é a isca)
   'Ótica Sem Improviso': '/brand/osi.png',
   'Nexus': '/brand/nexus.svg',
   'DIGIAI App': '/brand/digiai.svg',
