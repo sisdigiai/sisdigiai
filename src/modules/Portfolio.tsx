@@ -187,6 +187,8 @@ const OWNER_BY_NAME: Record<string, string> = {
 
 // Logos reais (brancos, sobre o quadrado eco). Sem logo → monograma.
 // Faltam criar no designer: Pulso, Polapetit, Qual a Foto, Easy, Nipo, Lumina, Mello, Academy.
+// Brand book (brancos) para os prontos; public/ de cada app para os demais.
+// Filtro CSS deixa todos brancos sobre o quadrado eco. Faltam: Polapetit, Easy, Academy.
 const LOGO: Record<string, string> = {
   'Clearix': '/brand/clearix.svg',
   'Ótica Sem Improviso': '/brand/osi.png',
@@ -194,7 +196,15 @@ const LOGO: Record<string, string> = {
   'DIGIAI App': '/brand/digiai.svg',
   'DIGIAI Site': '/brand/digiai.svg',
   'DIGIAI MKT': '/brand/digiai.svg',
+  'Pulso': '/brand/pulso.png',
+  'Lumina': '/brand/lumina.svg',
+  'Nipo School': '/brand/nipo.svg',
+  'Mello Eyewear': '/brand/mello.svg',
+  'Qual a Foto': '/brand/qualfoto.png',
 };
+
+// Logos "badge" (têm fundo próprio) → mostrados inteiros no tile, sem filtro branco.
+const BADGE = new Set(['Pulso', 'Nipo School', 'Mello Eyewear']);
 
 // Onde cada frente vive (hospedagem real — levantamento 2026-07-10).
 const HOST: Record<string, string> = {
@@ -260,9 +270,9 @@ export default function Portfolio() {
                   <span className="absolute -top-px -right-px w-3 h-3 border-t-2 border-r-2 border-outline/40" />
 
                   <div className="flex items-start justify-between gap-3">
-                    <div className="w-12 h-12 flex items-center justify-center font-mono font-bold shrink-0" style={{ background: a.cor, color: 'var(--color-on-action)' }}>
+                    <div className="w-12 h-12 flex items-center justify-center overflow-hidden font-mono font-bold shrink-0" style={BADGE.has(a.nome) ? undefined : { background: a.cor, color: 'var(--color-on-action)' }}>
                       {LOGO[a.nome]
-                        ? <img src={LOGO[a.nome]} alt="" className="w-7 h-7 object-contain" />
+                        ? <img src={LOGO[a.nome]} alt="" className={BADGE.has(a.nome) ? 'w-12 h-12 object-cover' : 'w-7 h-7 object-contain'} style={BADGE.has(a.nome) ? undefined : { filter: 'brightness(0) invert(1)' }} />
                         : a.mono}
                     </div>
                     <span className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border ${est.cls}`}>{est.label}</span>
@@ -303,9 +313,9 @@ export default function Portfolio() {
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
           <div className="relative w-full max-w-md h-full bg-surface border-l border-outline/20 overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="sticky top-0 bg-surface/95 backdrop-blur-md border-b border-outline/15 p-5 flex items-start gap-3">
-              <div className="w-12 h-12 flex items-center justify-center font-mono font-bold shrink-0" style={{ background: sel.cor, color: 'var(--color-on-action)' }}>
+              <div className="w-12 h-12 flex items-center justify-center overflow-hidden font-mono font-bold shrink-0" style={BADGE.has(sel.nome) ? undefined : { background: sel.cor, color: 'var(--color-on-action)' }}>
                 {LOGO[sel.nome]
-                  ? <img src={LOGO[sel.nome]} alt="" className="w-7 h-7 object-contain" />
+                  ? <img src={LOGO[sel.nome]} alt="" className={BADGE.has(sel.nome) ? 'w-12 h-12 object-cover' : 'w-7 h-7 object-contain'} style={BADGE.has(sel.nome) ? undefined : { filter: 'brightness(0) invert(1)' }} />
                   : sel.mono}
               </div>
               <div className="flex-1 min-w-0">
