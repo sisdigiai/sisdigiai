@@ -59,12 +59,12 @@ const APPS: App[] = [
   },
   {
     nome: 'Pulso', mono: 'PU', cor: 'var(--color-eco-pulso)', tagline: 'Produção de vídeos curtos faceless — produto autônomo',
-    tier: 'autonomo', estado: 'no-ar', maturidade: 75, funcao: '~65 publicações · ~25k views · 4 redes',
+    tier: 'autonomo', estado: 'no-ar', maturidade: 82, funcao: '248 posts · 124k views · 5 redes · esteira viva',
     stack: 'Next 16 · React 19 · Supabase · pg_cron · OpenAI/Claude · ElevenLabs',
     repos: 'pulso_control (app) · pulso_hub (site público, protótipo)',
     git: 'control 5fac8e3 07/jul · hub 7d3e072 29/jun',
-    proximo: 'Manter a fila de vídeos prontos · publicar o Pulso Hub',
-    bloqueio: 'Site público (hub) ainda sem domínio definido',
+    proximo: 'Aprovar roteiros + publicar a fila · automatizar FB/TikTok/YT (só IG é API)',
+    bloqueio: 'Só IG publica via API; FB/TikTok/YouTube/Kwai ainda assistidos · Pulso Hub sem domínio',
     urls: [{ label: 'pulsoprojects.vercel.app', url: 'https://pulsoprojects.vercel.app' }],
   },
   {
