@@ -195,11 +195,12 @@ const APPS: App[] = [
   },
   {
     nome: 'DIGIAI MKT', mono: 'MK', cor: 'var(--color-eco-app)', tagline: 'Central de marketing multimarca — ideias → arte → agenda → publicação por IA',
-    tier: 'infra', estado: 'no-ar', maturidade: 85, funcao: 'Pipeline ideias→roteiro→brief→imagem/vídeo/áudio (edge functions IA) · 5 marcas · custo IA · acesso restrito (conta DIGIAI)',
+    tier: 'infra', estado: 'no-ar', maturidade: 88, funcao: 'Mission-control vivo (orbita://nucleo): pipeline 198→132→49→81→88 no ar · 5 marcas · custo IA real ($6.79/$40) · 4 robôs cron · campanha 100 dias (dia 6) · TikTok+LinkedIn',
     stack: 'React 19 · Vite 6 · Tailwind 4 · Supabase (schema mkt) · pg_cron · edge functions IA · Ateliê de Convergência',
     repos: 'D:\\projetos\\digiai_mkt',
     git: '0a0437a 09/jul/2026 (skin Ateliê de Convergência)',
-    proximo: 'Publicação híbrida: LinkedIn via API (oauth+publish cabeados) · IG/FB ainda manual-guiado (legenda .txt) · fluxo ideias→mkt ainda não automático',
+    proximo: 'Reconectar 2 tokens TikTok expirados (Mello Óticas + Pessoal) · escoar 49 mídias do acervo · fluxo ideias(digiai)→mkt ainda manual',
+    bloqueio: '2 tokens TikTok expirados travam publicação dessas marcas · cota diária da campanha 100 dias ainda 0 hoje',
     urls: [{ label: 'digiaimkt.netlify.app', url: 'https://digiaimkt.netlify.app' }],
   },
 ];
