@@ -39,6 +39,15 @@ const APPS: App[] = [
     urls: [{ label: 'clearix.app.br', url: 'https://clearix.app.br' }, { label: 'Atlas (admin)', url: 'https://digiaiatlas.netlify.app' }],
   },
   {
+    nome: 'Clearix Site', mono: 'CS', cor: 'var(--color-eco-clearix)', tagline: 'Landing institucional pública do ecossistema Clearix',
+    tier: 'institucional', estado: 'no-ar', maturidade: 80, funcao: 'No ar · Cloudflare · clearix.app.br',
+    stack: 'Astro 5 (SSG) · Tailwind 3 · TypeScript · sem banco',
+    repos: 'D:\\projetos\\clearix-site',
+    git: '88fd99f 08/jun/2026 (minuta DPA)',
+    proximo: 'Manter em sincronia com o produto e o jurídico',
+    urls: [{ label: 'clearix.app.br', url: 'https://clearix.app.br' }],
+  },
+  {
     nome: 'Ótica Sem Improviso', mono: 'OSI', cor: 'var(--color-eco-osi)', tagline: 'Primeira isca paga — funil pro Clearix',
     tier: 'alavanca', estado: 'no-ar', maturidade: 70, funcao: 'Funil 100% no ar · 0 vendas ainda',
     stack: 'React 19 · Vite 6 · Tailwind 4 · Hotmart+Kiwify · pixels Meta/TikTok',
@@ -192,6 +201,7 @@ const OWNER_BY_NAME: Record<string, string> = {
 const LOGO: Record<string, string> = {
   'Clearix': '/brand/clearix.svg',
   'Clearix Calc': '/brand/clearix.svg', // veste a cara do Clearix (é a isca)
+  'Clearix Site': '/brand/clearix.svg',
   'Ótica Sem Improviso': '/brand/osi.png',
   'Nexus': '/brand/nexus.svg',
   'DIGIAI App': '/brand/digiai.svg',
@@ -222,6 +232,7 @@ const HOST: Record<string, string> = {
   'Mello Eyewear': 'Netlify + Functions · Supabase',
   'DIGIAI App': 'Netlify · Supabase',
   'DIGIAI Site': 'Cloudflare Pages',
+  'Clearix Site': 'Cloudflare Pages',
   'DIGIAI MKT': 'Local (:3001) · sem deploy',
 };
 
