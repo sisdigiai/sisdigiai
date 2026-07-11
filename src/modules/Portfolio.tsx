@@ -167,12 +167,12 @@ const APPS: App[] = [
   },
   {
     nome: 'DIGIAI App', mono: 'DA', cor: 'var(--color-secondary)', tagline: 'Painel de comando interno da holding (este app)',
-    tier: 'infra', estado: 'no-ar', maturidade: 85, funcao: '33 módulos · RBAC · SEO · /health 200',
+    tier: 'infra', estado: 'no-ar', maturidade: 88, funcao: '33 módulos reais (0 stubs) · RBAC · tema DIGIAI House (claro/escuro) · painel de comando da holding',
     stack: 'React 19 · Vite · TS · Tailwind 4 · Supabase · Chart.js',
     repos: 'D:\\projetos\\digiai',
-    git: 'main atualizada (jul/2026)',
-    proximo: 'Publicar drafts legais · rotação de credenciais',
-    bloqueio: 'CNPJ em transição na RFB',
+    git: 'f11fc2c 11/jul/2026 (revisão do Portfólio)',
+    proximo: 'Publicar drafts legais (LGPD/ToS) · alimentar Roadmap com as pendências levantadas dos apps',
+    bloqueio: 'CNPJ em transição na RFB · credenciais a rotacionar (ver task de segurança do Nexus)',
     urls: [{ label: 'sisdigiai.netlify.app', url: 'https://sisdigiai.netlify.app' }],
   },
   {
@@ -195,11 +195,11 @@ const APPS: App[] = [
   },
   {
     nome: 'DIGIAI MKT', mono: 'MK', cor: 'var(--color-eco-app)', tagline: 'Central de marketing multimarca — ideias → arte → agenda → publicação por IA',
-    tier: 'infra', estado: 'no-ar', maturidade: 85, funcao: 'Pipeline 198→90 no ar · 5 marcas · robôs + custo IA',
-    stack: 'React 19 · Vite 6 · Tailwind 4 · Supabase (schema mkt) · pg_cron · IA · Ateliê de Convergência',
+    tier: 'infra', estado: 'no-ar', maturidade: 85, funcao: 'Pipeline ideias→roteiro→brief→imagem/vídeo/áudio (edge functions IA) · 5 marcas · custo IA · acesso restrito (conta DIGIAI)',
+    stack: 'React 19 · Vite 6 · Tailwind 4 · Supabase (schema mkt) · pg_cron · edge functions IA · Ateliê de Convergência',
     repos: 'D:\\projetos\\digiai_mkt',
     git: '0a0437a 09/jul/2026 (skin Ateliê de Convergência)',
-    proximo: 'Publicação híbrida: API onde há (em teste), manual-guiado via navegador logado onde não há (ex.: Pessoal)',
+    proximo: 'Publicação híbrida: LinkedIn via API (oauth+publish cabeados) · IG/FB ainda manual-guiado (legenda .txt) · fluxo ideias→mkt ainda não automático',
     urls: [{ label: 'digiaimkt.netlify.app', url: 'https://digiaimkt.netlify.app' }],
   },
 ];
