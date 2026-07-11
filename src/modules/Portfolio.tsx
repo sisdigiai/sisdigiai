@@ -227,7 +227,7 @@ const BADGE = new Set(['Pulso', 'Pulso Hub', 'Nipo School', 'Mello Eyewear']);
 
 // Onde cada frente vive (hospedagem real — levantamento 2026-07-10).
 const HOST: Record<string, string> = {
-  'Clearix': 'Netlify · polyrepo (17 repos)',
+  'Clearix': 'Netlify · polyrepo (19 sub-apps)',
   'Ótica Sem Improviso': 'Netlify (leitor + landing)',
   'Pulso': 'Vercel · control',
   'Pulso Hub': 'Vercel · /hub (Supabase read-only)',
