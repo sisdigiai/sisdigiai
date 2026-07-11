@@ -59,7 +59,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Pulso', mono: 'PU', cor: 'var(--color-eco-pulso)', tagline: 'Produção de vídeos curtos faceless — produto autônomo',
-    tier: 'autonomo', estado: 'no-ar', maturidade: 84, funcao: '248 posts · 124k views · 5 redes · esteira viva',
+    tier: 'autonomo', estado: 'no-ar', maturidade: 90, funcao: '248 posts · 124k views · 5 redes · esteira viva',
     stack: 'Next 16 · React 19 · Supabase · pg_cron · OpenAI/Claude · ElevenLabs',
     repos: 'D:\\projetos\\pulso_control',
     git: 'control 5fac8e3 07/jul/2026',
@@ -165,7 +165,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Pulso Hub', mono: 'PH', cor: 'var(--color-eco-pulso)', tagline: 'Site público do Pulso — catálogo de vídeos e redes',
-    tier: 'institucional', estado: 'no-ar', maturidade: 70, funcao: 'No ar em /hub · catálogo + "em alta"',
+    tier: 'institucional', estado: 'no-ar', maturidade: 95, funcao: 'No ar em /hub · catálogo + "em alta"',
     stack: 'Next 16 · Tailwind 4 · Supabase (anon read-only)',
     repos: 'D:\\projetos\\pulso_hub',
     git: '7d3e072 29/jun/2026',
@@ -174,7 +174,7 @@ const APPS: App[] = [
   },
   {
     nome: 'DIGIAI MKT', mono: 'MK', cor: 'var(--color-eco-app)', tagline: 'Central de marketing multimarca — ideias → arte → agenda → publicação por IA',
-    tier: 'infra', estado: 'no-ar', maturidade: 80, funcao: 'Pipeline 198→90 no ar · 5 marcas · robôs + custo IA',
+    tier: 'infra', estado: 'no-ar', maturidade: 85, funcao: 'Pipeline 198→90 no ar · 5 marcas · robôs + custo IA',
     stack: 'React 19 · Vite 6 · Tailwind 4 · Supabase (schema mkt) · pg_cron · IA · Ateliê de Convergência',
     repos: 'D:\\projetos\\digiai_mkt',
     git: '0a0437a 09/jul/2026 (skin Ateliê de Convergência)',
