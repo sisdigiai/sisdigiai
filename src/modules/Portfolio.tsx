@@ -175,12 +175,11 @@ const APPS: App[] = [
   },
   {
     nome: 'DIGIAI MKT', mono: 'MK', cor: 'var(--color-eco-app)', tagline: 'Central de marketing multimarca — ideias → arte → agenda → publicação por IA',
-    tier: 'infra', estado: 'no-ar', maturidade: 78, funcao: 'Pipeline 198→90 no ar · 5 marcas · robôs + custo IA',
+    tier: 'infra', estado: 'no-ar', maturidade: 80, funcao: 'Pipeline 198→90 no ar · 5 marcas · robôs + custo IA',
     stack: 'React 19 · Vite 6 · Tailwind 4 · Supabase (schema mkt) · pg_cron · IA · Ateliê de Convergência',
     repos: 'D:\\projetos\\digiai_mkt',
     git: '0a0437a 09/jul/2026 (skin Ateliê de Convergência)',
-    proximo: 'Ligar publicação automática nos canais que ainda são manual-guiados',
-    bloqueio: 'Parte da publicação depende de passo manual por canal',
+    proximo: 'Publicação híbrida: API onde há (em teste), manual-guiado via navegador logado onde não há (ex.: Pessoal)',
     urls: [{ label: 'digiaimkt.netlify.app', url: 'https://digiaimkt.netlify.app' }],
   },
 ];
