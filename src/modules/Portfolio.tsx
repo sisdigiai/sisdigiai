@@ -60,12 +60,12 @@ const APPS: App[] = [
   },
   {
     nome: 'Clearix Site', mono: 'CS', cor: 'var(--color-eco-clearix)', tagline: 'Landing institucional pública do ecossistema Clearix',
-    tier: 'institucional', estado: 'no-ar', maturidade: 78, funcao: 'No ar (marca Clearix): hero de dor + 4 planos (349/899/1499/sob consulta) + add-ons + ecossistema · WhatsApp',
+    tier: 'institucional', estado: 'no-ar', maturidade: 82, funcao: 'No ar (marca Clearix): hero de dor + 4 planos canônicos ADR-0022 (349/899/1499/sob consulta) + add-ons + ecossistema · WhatsApp',
     stack: 'Astro 5 (SSG) · Tailwind 3 · TypeScript · Cloudflare · sem banco',
     repos: 'D:\\projetos\\clearix-site',
     git: 'd8fc51e 11/jul/2026 (repo de deploy no README)',
-    proximo: 'Reconciliar preços site (349/899/1499) × Mercado Pago (397/797/1497 + pilotos) · confirmar self-serve do "grátis 30 dias"',
-    bloqueio: 'Preços públicos divergem dos planos ativos no Mercado Pago · 1ª venda externa depende de DPA (ADR-0020)',
+    proximo: 'Confirmar self-serve do "grátis 30 dias" (provisiona trial?) · manter sincronia com produto/jurídico',
+    bloqueio: '1ª venda externa depende de DPA (ADR-0020) · planos no Mercado Pago ainda no pricing antigo (397/797/1497) — recriar p/ bater com o site (billing, não é defeito do site)',
     urls: [{ label: 'clearix.app.br', url: 'https://clearix.app.br' }],
   },
   {
