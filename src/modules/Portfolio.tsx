@@ -211,6 +211,9 @@ const TIER_LABEL: Record<Tier, string> = {
 };
 const TIER_ORDER: Tier[] = ['ancora', 'alavanca', 'suporte', 'autonomo', 'incubacao', 'institucional', 'infra'];
 
+// Faixa de maturidade (placar): pronto ≥85 · em obra 60–84 · cedo <60
+const faixaCor = (m: number) => m >= 85 ? 'var(--color-success)' : m >= 60 ? 'var(--color-warning)' : 'var(--color-danger)';
+
 const ESTADO_META: Record<Estado, { label: string; cls: string; dot: string }> = {
   'no-ar':     { label: 'No ar',     cls: 'text-success border-success/40 bg-success/10',  dot: 'bg-success' },
   funciona:    { label: 'Funciona',  cls: 'text-secondary border-secondary/40 bg-secondary/10', dot: 'bg-secondary' },
@@ -269,6 +272,7 @@ const HOST: Record<string, string> = {
 
 export default function Portfolio() {
   const [sel, setSel] = useState<App | null>(null);
+  const [modo, setModo] = useState<'placar' | 'detalhe'>('placar');
   const [liveSites, setLiveSites] = useState<Record<string, number>>({});
 
   useEffect(() => {
@@ -284,6 +288,9 @@ export default function Portfolio() {
 
   const noAr = APPS.filter(a => a.estado === 'no-ar').length;
   const travados = APPS.filter(a => a.estado === 'travado').length;
+  const mediaMaturidade = Math.round(APPS.reduce((s, a) => s + a.maturidade, 0) / APPS.length);
+  const comBloqueio = APPS.filter(a => a.bloqueio).length;
+  const ranking = [...APPS].sort((a, b) => b.maturidade - a.maturidade);
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
@@ -293,7 +300,84 @@ export default function Portfolio() {
         subtitle={`${APPS.length} frentes · ${noAr} no ar · ${travados} travadas · estado real 2026-07-10`}
       />
 
-      {TIER_ORDER.filter(t => APPS.some(a => a.tier === t)).map(tier => (
+      {/* Alternador de visão */}
+      <div className="flex items-center gap-1 mb-6 border border-outline/15 w-fit p-0.5">
+        {(['placar', 'detalhe'] as const).map(m => (
+          <button
+            key={m}
+            onClick={() => setModo(m)}
+            className={`font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 transition-colors ${modo === m ? 'bg-secondary text-on-action' : 'text-muted hover:text-on-surface'}`}
+          >
+            {m === 'placar' ? 'Placar' : 'Detalhe'}
+          </button>
+        ))}
+      </div>
+
+      {/* PLACAR — visão-resumo de uma página */}
+      {modo === 'placar' && (
+        <div className="mb-8">
+          {/* KPIs-âncora */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            {[
+              { label: 'Produtos', valor: String(APPS.length), cor: 'text-on-surface' },
+              { label: 'No ar', valor: `${noAr}`, sub: `${travados} travado`, cor: 'text-success' },
+              { label: 'Maturidade média', valor: `${mediaMaturidade}%`, cor: 'text-on-surface' },
+              { label: 'Com bloqueio', valor: `${comBloqueio}`, cor: 'text-warning' },
+            ].map(k => (
+              <div key={k.label} className="border border-outline/15 bg-surface-container p-4">
+                <div className="font-mono text-[10px] uppercase tracking-widest text-muted">{k.label}</div>
+                <div className={`font-serif text-3xl font-semibold tabular-nums mt-1 ${k.cor}`}>
+                  {k.valor}{k.sub && <span className="font-sans text-[11px] font-normal text-muted ml-1">/ {k.sub}</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Legenda das faixas */}
+          <div className="flex flex-wrap items-center gap-4 mb-3 font-mono text-[10px] uppercase tracking-wider text-muted">
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5" style={{ background: 'var(--color-success)' }} />pronto ≥85</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5" style={{ background: 'var(--color-warning)' }} />em obra 60–84</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5" style={{ background: 'var(--color-danger)' }} />cedo &lt;60</span>
+            <span className="flex items-center gap-1.5"><AlertTriangle className="w-3 h-3 text-warning" />tem bloqueio</span>
+          </div>
+
+          {/* Lista ranqueada por maturidade */}
+          <div className="border border-outline/15 bg-surface-container">
+            {ranking.map(a => {
+              const isBadge = BADGE.has(a.nome);
+              const cor = faixaCor(a.maturidade);
+              return (
+                <button
+                  key={a.nome}
+                  onClick={() => setSel(a)}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 border-b border-outline/10 last:border-b-0 hover:bg-surface-high transition-colors text-left group"
+                >
+                  <div className="w-9 h-9 flex items-center justify-center overflow-hidden font-mono text-[11px] font-bold shrink-0" style={isBadge ? undefined : { background: a.cor, color: 'var(--color-on-action)' }}>
+                    {LOGO[a.nome]
+                      ? <img src={LOGO[a.nome]} alt="" className={isBadge ? 'w-9 h-9 object-cover' : 'w-5 h-5 object-contain'} style={isBadge ? undefined : { filter: 'brightness(0) invert(1)' }} />
+                      : a.mono}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-serif text-[15px] font-semibold text-on-surface truncate">{a.nome}</span>
+                      {a.estado === 'travado' && <span className="font-mono text-[9px] uppercase tracking-wider text-danger border border-danger/40 px-1 py-px shrink-0">travado</span>}
+                    </div>
+                    <span className="font-mono text-[10px] uppercase tracking-wider text-muted">{TIER_LABEL[a.tier]}</span>
+                  </div>
+                  <div className="hidden sm:block w-24 md:w-32 h-1.5 bg-surface-lowest overflow-hidden shrink-0">
+                    <div className="h-full" style={{ width: `${a.maturidade}%`, background: cor }} />
+                  </div>
+                  <span className="font-mono text-sm font-semibold tabular-nums w-11 text-right shrink-0" style={{ color: cor }}>{a.maturidade}%</span>
+                  <span className="w-5 flex justify-center shrink-0">{a.bloqueio && <AlertTriangle className="w-3.5 h-3.5 text-warning" />}</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {modo === 'detalhe' && TIER_ORDER.filter(t => APPS.some(a => a.tier === t)).map(tier => (
         <div key={tier} className="mb-8">
           <div className="flex items-center gap-3 mb-4">
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">{TIER_LABEL[tier]}</span>
