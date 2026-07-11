@@ -118,7 +118,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Nipo School', mono: 'NP', cor: 'var(--color-eco-nipo)', tagline: 'Ensino musical comunitário · ADNIPO Suzano',
-    tier: 'institucional', estado: 'travado', maturidade: 50, funcao: 'Landing no ar · piloto interno travado',
+    tier: 'incubacao', estado: 'travado', maturidade: 50, funcao: 'Landing no ar · piloto interno travado',
     stack: 'Next 16 · React 19 · TS · Supabase · OpenAI',
     repos: 'D:\\projetos\\nipo_school',
     git: '3e4afe4 31/mai/2026 (design system DIGIAI)',
