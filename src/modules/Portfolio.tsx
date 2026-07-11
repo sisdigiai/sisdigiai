@@ -69,13 +69,13 @@ const APPS: App[] = [
   },
   {
     nome: 'Ótica Sem Improviso', mono: 'OSI', cor: 'var(--color-eco-osi)', tagline: 'Primeira isca paga — funil pro Clearix',
-    tier: 'alavanca', estado: 'no-ar', maturidade: 70, funcao: 'Funil 100% no ar · 0 vendas ainda',
-    stack: 'React 19 · Vite 6 · Tailwind 4 · Hotmart+Kiwify · pixels Meta/TikTok',
-    repos: 'app_oticasemimproviso (leitor) · otica_sem_improviso (landing)',
-    git: 'leitor 6f5840a · landing 2d12fbc (jun/2026)',
-    proximo: 'Tráfego: contatar óticas-alvo + ativar afiliados',
-    bloqueio: 'Sem tráfego qualificado; fix de tracking/leads pendente de deploy',
-    urls: [{ label: 'oticasemimproviso.netlify.app', url: 'https://oticasemimproviso.netlify.app' }],
+    tier: 'alavanca', estado: 'no-ar', maturidade: 90, funcao: 'Build 100% (landing + app + checkout) · fase VENDER · 0 vendas',
+    stack: 'React 19 · Vite 6 · Tailwind 4 · Hotmart+Kiwify · pixels Meta/TikTok · ebook-v3.pdf',
+    repos: 'otica_sem_improviso (landing 20 seções + gerador PDF) · app_oticasemimproviso (leitor 28 págs/5 módulos)',
+    git: 'landing 2d12fbc · leitor 6f5840a (jun/2026)',
+    proximo: 'VENDER: prospecção ativa (WhatsApp óticas Suzano) + ativar afiliados',
+    bloqueio: 'Falta tráfego/vendas (build 100%) · Central do Afiliado ainda sem material',
+    urls: [{ label: 'landing', url: 'https://landingoticasemimproviso.netlify.app' }, { label: 'app leitor', url: 'https://oticasemimproviso.netlify.app' }],
   },
   {
     nome: 'Pulso', mono: 'PU', cor: 'var(--color-eco-pulso)', tagline: 'Produção de vídeos curtos faceless — produto autônomo',
@@ -248,7 +248,7 @@ const BADGE = new Set(['Pulso', 'Pulso Hub', 'Nipo School', 'Mello Eyewear']);
 // Onde cada frente vive (hospedagem real — levantamento 2026-07-10).
 const HOST: Record<string, string> = {
   'Clearix': 'Netlify · polyrepo (17 sub-apps)',
-  'Ótica Sem Improviso': 'Netlify (leitor + landing)',
+  'Ótica Sem Improviso': 'Netlify (landing + app leitor)',
   'Pulso': 'Vercel · control',
   'Pulso Hub': 'Vercel · /hub (Supabase read-only)',
   'Lumina': 'Netlify · Supabase',
