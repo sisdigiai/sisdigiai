@@ -7,8 +7,8 @@ import PageHeader from '../components/PageHeader';
 // Estado real levantado das pastas em D:\projetos (docs/portfolio-estado-real.md, 2026-07-10).
 // Maturidade = estimativa editorial do avanço (não é métrica automática).
 
-type Estado = 'no-ar' | 'funciona' | 'travado' | 'prototipo';
-type Tier = 'ancora' | 'alavanca' | 'suporte' | 'incubacao' | 'autonomo' | 'institucional' | 'infra';
+export type Estado = 'no-ar' | 'funciona' | 'travado' | 'prototipo';
+export type Tier = 'ancora' | 'alavanca' | 'suporte' | 'incubacao' | 'autonomo' | 'institucional' | 'infra';
 
 interface App {
   nome: string;
@@ -269,6 +269,42 @@ const HOST: Record<string, string> = {
   'Clearix Site': 'Cloudflare Pages',
   'DIGIAI MKT': 'Netlify · Supabase (schema mkt)',
 };
+
+// Slug canônico por produto = product_id no Backlog (ops.backlog_items).
+const SLUG: Record<string, string> = {
+  'Clearix': 'clearix', 'Clearix Site': 'clearix-site', 'Ótica Sem Improviso': 'osi',
+  'Pulso': 'pulso', 'Lumina': 'lumina', 'Nexus': 'nexus', 'Clearix Calc': 'clearix-calc',
+  'Polapetit': 'polapetit', 'Qual a Foto': 'qual-a-foto', 'Easy Idiomas': 'easy-idiomas',
+  'Nipo School': 'nipo-school', 'Mello Eyewear': 'mello-eyewear', 'DIGIAI App': 'digiai-app',
+  'DIGIAI Site': 'digiai-site', 'Pulso Hub': 'pulso-hub', 'DIGIAI MKT': 'digiai-mkt',
+};
+
+// Degrau na escada de prontidão (1 construído · 2 no ar · 3 uso real · 4 comercial · 5 escala).
+// Só produtos de mercado; sites/infra não usam a escada (undefined).
+const DEGRAU: Record<string, number> = {
+  'Clearix': 3, 'Ótica Sem Improviso': 2, 'Pulso': 3, 'Lumina': 3, 'Nexus': 2,
+  'Clearix Calc': 2, 'Polapetit': 2, 'Qual a Foto': 1, 'Easy Idiomas': 2,
+  'Nipo School': 1, 'Mello Eyewear': 2,
+};
+
+export const DEGRAU_LABEL: Record<number, string> = {
+  1: 'Construído', 2: 'No ar', 3: 'Uso real', 4: 'Comercial', 5: 'Escala',
+};
+
+export type ProdutoInfo = {
+  slug: string; nome: string; maturidade: number; estado: Estado; tier: Tier;
+  cor: string; mono: string; logo?: string; badge: boolean; degrau?: number;
+};
+
+export const PRODUTOS: ProdutoInfo[] = APPS.map(a => ({
+  slug: SLUG[a.nome] ?? a.nome.toLowerCase().replace(/\s+/g, '-'),
+  nome: a.nome, maturidade: a.maturidade, estado: a.estado, tier: a.tier,
+  cor: a.cor, mono: a.mono, logo: LOGO[a.nome], badge: BADGE.has(a.nome),
+  degrau: DEGRAU[a.nome],
+}));
+
+export const PRODUTO_BY_SLUG: Record<string, ProdutoInfo> =
+  Object.fromEntries(PRODUTOS.map(p => [p.slug, p]));
 
 export default function Portfolio() {
   const [sel, setSel] = useState<App | null>(null);

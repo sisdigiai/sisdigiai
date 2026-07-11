@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, AlertTriangle, LayoutList, Boxes } from 'lucide-react';
 import { backlogStore } from '../lib/backlogStore';
 import { roadmapStore } from '../lib/roadmapStore';
+import { PRODUTO_BY_SLUG, DEGRAU_LABEL, type ProdutoInfo } from './Portfolio';
 import PageHeader from '../components/PageHeader';
 
 type Fonte = 'Backlog' | 'Roadmap';
 type StatusNorm = 'done' | 'in_progress' | 'pending' | 'blocked' | 'atrasado' | 'cancelled';
+type Vista = 'lista' | 'produto';
 
 interface MasterItem {
   id: string;
@@ -17,6 +19,8 @@ interface MasterItem {
   status: StatusNorm;
   owner: string;
   prazo: string | null;
+  productId: string | null;
+  blocker: string | null;
 }
 
 const STATUS_STYLE: Record<StatusNorm, { label: string; cls: string }> = {
@@ -30,8 +34,61 @@ const STATUS_STYLE: Record<StatusNorm, { label: string; cls: string }> = {
 
 const PRIO_LABEL: Record<number, string> = { 1: 'P1 crítico', 2: 'P2 alto', 3: 'P3 médio', 4: 'P4 baixo' };
 
+const NOME_LIVRE: Record<string, string> = {
+  'digiai': 'DIGIAI · holding',
+  'sem-produto': 'Sem produto',
+};
+
+function nomeDoGrupo(slug: string, info?: ProdutoInfo): string {
+  if (info) return info.nome;
+  return NOME_LIVRE[slug] ?? slug;
+}
+
+function ProdutoTile({ info, slug }: { info?: ProdutoInfo; slug: string }) {
+  if (info) {
+    return (
+      <div
+        className="w-9 h-9 flex items-center justify-center overflow-hidden font-mono text-[11px] font-bold shrink-0"
+        style={info.badge ? undefined : { background: info.cor, color: 'var(--color-on-action)' }}
+      >
+        {info.logo
+          ? <img src={info.logo} alt="" className={info.badge ? 'w-9 h-9 object-cover' : 'w-5 h-5 object-contain'} style={info.badge ? undefined : { filter: 'brightness(0) invert(1)' }} />
+          : info.mono}
+      </div>
+    );
+  }
+  return (
+    <div className="w-9 h-9 flex items-center justify-center font-mono text-[11px] font-bold shrink-0 bg-surface-high text-muted">
+      {slug.slice(0, 2).toUpperCase()}
+    </div>
+  );
+}
+
+function Escada({ degrau }: { degrau: number }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map(i => (
+          <span
+            key={i}
+            title={DEGRAU_LABEL[i]}
+            className="w-2 h-2 rounded-full"
+            style={
+              i < degrau ? { background: 'var(--color-success)' }
+              : i === degrau ? { background: 'var(--color-warning)', boxShadow: '0 0 0 2px color-mix(in srgb, var(--color-warning) 22%, transparent)' }
+              : { border: '1px solid var(--color-muted)' }
+            }
+          />
+        ))}
+      </div>
+      <span className="font-mono text-[9px] uppercase tracking-wider text-warning">{DEGRAU_LABEL[degrau]}</span>
+    </div>
+  );
+}
+
 export default function ListaMestra() {
   const [items, setItems] = useState<MasterItem[] | null>(null);
+  const [vista, setVista] = useState<Vista>('produto');
   const [fonte, setFonte] = useState<'todos' | Fonte>('todos');
   const [status, setStatus] = useState<'todos' | StatusNorm>('todos');
   const [prio, setPrio] = useState<'todas' | number>('todas');
@@ -51,6 +108,8 @@ export default function ListaMestra() {
           status: (x.status === 'cancelled' ? 'cancelled' : x.status) as StatusNorm,
           owner: x.owner || '—',
           prazo: x.due_date,
+          productId: x.product_id,
+          blocker: x.blocker,
         }));
         const r: MasterItem[] = tasks.map(t => {
           let st: StatusNorm = 'pending';
@@ -66,6 +125,8 @@ export default function ListaMestra() {
             status: st,
             owner: t.track ? `Track ${t.track}` : '—',
             prazo: t.target_date,
+            productId: null,
+            blocker: null,
           };
         });
         setItems([...b, ...r]);
@@ -73,15 +134,45 @@ export default function ListaMestra() {
       .catch(() => setItems([]));
   }, []);
 
-  const filtrados = useMemo(() => {
+  const passaFiltro = (i: MasterItem) => {
     const q = busca.trim().toLowerCase();
-    return (items ?? []).filter(i =>
-      (fonte === 'todos' || i.fonte === fonte) &&
+    return (
       (status === 'todos' || i.status === status) &&
       (prio === 'todas' || i.prioridade === prio) &&
-      (q === '' || i.title.toLowerCase().includes(q) || i.area.toLowerCase().includes(q))
-    ).sort((a, b) => a.prioridade - b.prioridade || a.fase.localeCompare(b.fase));
-  }, [items, fonte, status, prio, busca]);
+      (q === '' || i.title.toLowerCase().includes(q) || i.area.toLowerCase().includes(q) || (i.productId ?? '').includes(q))
+    );
+  };
+
+  const filtrados = useMemo(() =>
+    (items ?? [])
+      .filter(i => (fonte === 'todos' || i.fonte === fonte) && passaFiltro(i))
+      .sort((a, b) => a.prioridade - b.prioridade || a.fase.localeCompare(b.fase)),
+  [items, fonte, status, prio, busca]);
+
+  const grupos = useMemo(() => {
+    const backlog = (items ?? []).filter(i => i.fonte === 'Backlog' && passaFiltro(i));
+    const map = new Map<string, MasterItem[]>();
+    for (const it of backlog) {
+      const key = it.productId || 'sem-produto';
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(it);
+    }
+    const arr = [...map.entries()].map(([slug, its]) => {
+      const info = PRODUTO_BY_SLUG[slug];
+      const abertos = its.filter(i => i.status !== 'done' && i.status !== 'cancelled').length;
+      const bloqueados = its.filter(i => i.status === 'blocked').length;
+      return {
+        slug,
+        info,
+        nome: nomeDoGrupo(slug, info),
+        items: its.sort((a, b) => a.prioridade - b.prioridade),
+        abertos,
+        bloqueados,
+      };
+    });
+    arr.sort((a, b) => b.bloqueados - a.bloqueados || b.abertos - a.abertos || (a.info?.maturidade ?? 0) - (b.info?.maturidade ?? 0));
+    return arr;
+  }, [items, status, prio, busca]);
 
   const atrasados = (items ?? []).filter(i => i.status === 'atrasado').length;
 
@@ -97,87 +188,168 @@ export default function ListaMestra() {
         title="Lista Mestra"
         subtitle={
           <>
-            {items === null ? 'Carregando…' : `${items.length} itens de implantação`} · unifica Backlog + Roadmap
+            {items === null ? 'Carregando…' : `${items.length} itens`} · o que falta em cada produto (Backlog) + estratégia (Roadmap)
             {atrasados > 0 && <span className="text-warning"> · {atrasados} atrasados</span>}
           </>
         }
       />
 
       <div className="space-y-5">
-      <div className="space-y-3">
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-[10px] font-mono uppercase tracking-widest text-muted mr-1">Fonte</span>
-          {(['todos', 'Backlog', 'Roadmap'] as const).map(f => (
-            <button key={f} className={chip(fonte === f)} onClick={() => setFonte(f)}>{f === 'todos' ? 'Todas' : f}</button>
-          ))}
+        {/* Alternador de visão */}
+        <div className="flex items-center gap-1 border border-outline/15 w-fit p-0.5">
+          <button
+            onClick={() => setVista('produto')}
+            className={`font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 flex items-center gap-1.5 transition-colors ${vista === 'produto' ? 'bg-secondary text-on-action' : 'text-muted hover:text-on-surface'}`}
+          >
+            <Boxes className="w-3.5 h-3.5" /> Por produto
+          </button>
+          <button
+            onClick={() => setVista('lista')}
+            className={`font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 flex items-center gap-1.5 transition-colors ${vista === 'lista' ? 'bg-secondary text-on-action' : 'text-muted hover:text-on-surface'}`}
+          >
+            <LayoutList className="w-3.5 h-3.5" /> Lista
+          </button>
         </div>
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-[10px] font-mono uppercase tracking-widest text-muted mr-1">Status</span>
-          <button className={chip(status === 'todos')} onClick={() => setStatus('todos')}>Todos</button>
-          {(Object.keys(STATUS_STYLE) as StatusNorm[]).map(s => (
-            <button key={s} className={chip(status === s)} onClick={() => setStatus(s)}>{STATUS_STYLE[s].label}</button>
-          ))}
-        </div>
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-[10px] font-mono uppercase tracking-widest text-muted mr-1">Prioridade</span>
-          <button className={chip(prio === 'todas')} onClick={() => setPrio('todas')}>Todas</button>
-          {[1, 2, 3, 4].map(p => (
-            <button key={p} className={chip(prio === p)} onClick={() => setPrio(p)}>{PRIO_LABEL[p]}</button>
-          ))}
-          <div className="relative ml-auto">
-            <Search className="w-4 h-4 text-muted absolute left-3 top-2.5" />
-            <input
-              value={busca}
-              onChange={e => setBusca(e.target.value)}
-              placeholder="Buscar item ou área…"
-              className="bg-surface-container border border-outline/15 pl-9 pr-3 py-2 text-sm text-on-surface w-64 focus:outline-none focus:border-secondary/40"
-            />
+
+        {/* Filtros */}
+        <div className="space-y-3">
+          {vista === 'lista' && (
+            <div className="flex flex-wrap gap-2 items-center">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-muted mr-1">Fonte</span>
+              {(['todos', 'Backlog', 'Roadmap'] as const).map(f => (
+                <button key={f} className={chip(fonte === f)} onClick={() => setFonte(f)}>{f === 'todos' ? 'Todas' : f}</button>
+              ))}
+            </div>
+          )}
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted mr-1">Status</span>
+            <button className={chip(status === 'todos')} onClick={() => setStatus('todos')}>Todos</button>
+            {(Object.keys(STATUS_STYLE) as StatusNorm[]).map(s => (
+              <button key={s} className={chip(status === s)} onClick={() => setStatus(s)}>{STATUS_STYLE[s].label}</button>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted mr-1">Prioridade</span>
+            <button className={chip(prio === 'todas')} onClick={() => setPrio('todas')}>Todas</button>
+            {[1, 2, 3, 4].map(p => (
+              <button key={p} className={chip(prio === p)} onClick={() => setPrio(p)}>{PRIO_LABEL[p]}</button>
+            ))}
+            <div className="relative ml-auto">
+              <Search className="w-4 h-4 text-muted absolute left-3 top-2.5" />
+              <input
+                value={busca}
+                onChange={e => setBusca(e.target.value)}
+                placeholder="Buscar item, área ou produto…"
+                className="bg-surface-container border border-outline/15 pl-9 pr-3 py-2 text-sm text-on-surface w-64 focus:outline-none focus:border-secondary/40"
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="border border-outline/10 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-surface-low text-[10px] font-mono uppercase tracking-widest text-on-surface-variant">
-              <th className="text-left px-4 py-2.5 font-medium">Item</th>
-              <th className="text-left px-3 py-2.5 font-medium">Fonte</th>
-              <th className="text-left px-3 py-2.5 font-medium">Área / Fase</th>
-              <th className="text-left px-3 py-2.5 font-medium">Prio</th>
-              <th className="text-left px-3 py-2.5 font-medium">Status</th>
-              <th className="text-left px-3 py-2.5 font-medium">Resp.</th>
-              <th className="text-left px-3 py-2.5 font-medium">Prazo</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtrados.map(i => {
-              const st = STATUS_STYLE[i.status];
-              return (
-                <tr key={i.id} className="border-t border-outline/10 hover:bg-surface-low">
-                  <td className="px-4 py-2.5 text-on-surface">{i.title}</td>
-                  <td className="px-3 py-2.5 text-muted font-mono text-xs">{i.fonte}</td>
-                  <td className="px-3 py-2.5 text-on-surface-variant text-xs">{i.fonte === 'Roadmap' ? i.fase : i.area}</td>
-                  <td className="px-3 py-2.5 text-on-surface-variant font-mono text-xs">P{i.prioridade}</td>
-                  <td className="px-3 py-2.5">
-                    <span className={`text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 border ${st.cls}`}>{st.label}</span>
-                  </td>
-                  <td className="px-3 py-2.5 text-on-surface-variant text-xs">{i.owner}</td>
-                  <td className={`px-3 py-2.5 font-mono text-xs ${i.status === 'atrasado' ? 'text-warning' : 'text-muted'}`}>{i.prazo || '—'}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        {items !== null && filtrados.length === 0 && (
-          <div className="px-4 py-8 text-center text-sm text-muted">Nenhum item com esses filtros.</div>
-        )}
         {items === null && <div className="px-4 py-8 text-center text-sm text-muted">Carregando itens do banco…</div>}
-      </div>
 
-      <div className="text-[11px] text-muted">
-        Fonte: <span className="font-mono">v_backlog_items</span> + <span className="font-mono">v_roadmap_tasks</span> (vivo).
-        Editar é feito nos módulos Backlog e Roadmap; aqui é a visão consolidada filtrável.
-      </div>
+        {/* VISTA: Por produto */}
+        {items !== null && vista === 'produto' && (
+          <div className="space-y-4">
+            <div className="text-[11px] text-muted">
+              O que falta em cada produto, do Backlog (<span className="font-mono">ops.backlog_items</span>) agrupado por <span className="font-mono">product_id</span>.
+              A estratégia 0→milhão vive no módulo <span className="text-on-surface">Roadmap</span>.
+            </div>
+            {grupos.length === 0 && <div className="px-4 py-8 text-center text-sm text-muted">Nenhum item com esses filtros.</div>}
+            {grupos.map(g => (
+              <div key={g.slug} className="border border-outline/15 bg-surface-container">
+                {/* Cabeçalho do produto */}
+                <div className="flex items-center gap-3 p-4 border-b border-outline/10">
+                  <ProdutoTile info={g.info} slug={g.slug} />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-serif text-base font-semibold text-on-surface truncate">{g.nome}</div>
+                    <div className="mt-1 flex items-center gap-3">
+                      {g.info?.degrau
+                        ? <Escada degrau={g.info.degrau} />
+                        : g.info
+                          ? <div className="h-1.5 w-28 bg-surface-lowest overflow-hidden"><div className="h-full" style={{ width: `${g.info.maturidade}%`, background: g.info.cor }} /></div>
+                          : <span className="font-mono text-[9px] uppercase tracking-wider text-muted">frente da holding</span>}
+                      {g.info && <span className="font-mono text-[10px] text-muted tabular-nums">{g.info.maturidade}%</span>}
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="font-mono text-sm font-semibold text-on-surface tabular-nums">{g.abertos} <span className="text-[10px] font-normal text-muted">abertos</span></div>
+                    {g.bloqueados > 0 && (
+                      <div className="font-mono text-[10px] text-danger flex items-center gap-1 justify-end mt-0.5">
+                        <AlertTriangle className="w-3 h-3" /> {g.bloqueados} bloqueado{g.bloqueados > 1 ? 's' : ''}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {/* Itens do produto */}
+                <div className="divide-y divide-outline/10">
+                  {g.items.map(i => {
+                    const st = STATUS_STYLE[i.status];
+                    return (
+                      <div key={i.id} className="flex items-start gap-3 px-4 py-2.5">
+                        <span className="font-mono text-[10px] text-muted tabular-nums mt-1 w-6 shrink-0">P{i.prioridade}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className={`text-sm ${i.status === 'done' ? 'text-muted line-through' : 'text-on-surface'}`}>{i.title}</span>
+                            <span className={`text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 border ${st.cls}`}>{st.label}</span>
+                          </div>
+                          {i.blocker && <div className="text-[11px] text-muted mt-0.5 leading-snug">{i.blocker}</div>}
+                        </div>
+                        {i.prazo && <span className="font-mono text-[10px] text-muted shrink-0 mt-1">{i.prazo}</span>}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* VISTA: Lista (tabela consolidada) */}
+        {items !== null && vista === 'lista' && (
+          <>
+            <div className="border border-outline/10 overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-surface-low text-[10px] font-mono uppercase tracking-widest text-on-surface-variant">
+                    <th className="text-left px-4 py-2.5 font-medium">Item</th>
+                    <th className="text-left px-3 py-2.5 font-medium">Fonte</th>
+                    <th className="text-left px-3 py-2.5 font-medium">Área / Fase</th>
+                    <th className="text-left px-3 py-2.5 font-medium">Prio</th>
+                    <th className="text-left px-3 py-2.5 font-medium">Status</th>
+                    <th className="text-left px-3 py-2.5 font-medium">Resp.</th>
+                    <th className="text-left px-3 py-2.5 font-medium">Prazo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtrados.map(i => {
+                    const st = STATUS_STYLE[i.status];
+                    return (
+                      <tr key={i.id} className="border-t border-outline/10 hover:bg-surface-low">
+                        <td className="px-4 py-2.5 text-on-surface">{i.title}</td>
+                        <td className="px-3 py-2.5 text-muted font-mono text-xs">{i.fonte}</td>
+                        <td className="px-3 py-2.5 text-on-surface-variant text-xs">{i.fonte === 'Roadmap' ? i.fase : i.area}</td>
+                        <td className="px-3 py-2.5 text-on-surface-variant font-mono text-xs">P{i.prioridade}</td>
+                        <td className="px-3 py-2.5">
+                          <span className={`text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 border ${st.cls}`}>{st.label}</span>
+                        </td>
+                        <td className="px-3 py-2.5 text-on-surface-variant text-xs">{i.owner}</td>
+                        <td className={`px-3 py-2.5 font-mono text-xs ${i.status === 'atrasado' ? 'text-warning' : 'text-muted'}`}>{i.prazo || '—'}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              {filtrados.length === 0 && (
+                <div className="px-4 py-8 text-center text-sm text-muted">Nenhum item com esses filtros.</div>
+              )}
+            </div>
+            <div className="text-[11px] text-muted">
+              Fonte: <span className="font-mono">v_backlog_items</span> + <span className="font-mono">v_roadmap_tasks</span> (vivo).
+              Editar é feito nos módulos Backlog e Roadmap; aqui é a visão consolidada filtrável.
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

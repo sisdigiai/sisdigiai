@@ -33,6 +33,11 @@ const TRACK_INFO: Record<Track, { nome: string; descricao: string; cor: string; 
   },
 };
 
+const SHORT_FASE: Record<number, string> = {
+  0: 'Validação', 1: 'Ramen · Academy', 2: 'Clearix Pilot', 3: '10 clientes', 4: 'PMF',
+  5: 'Growth', 6: 'Escala', 7: 'Expansão', 8: 'Unicorn',
+};
+
 function TrackBadge({ track, compact = false }: { track: Track; compact?: boolean }) {
   const info = TRACK_INFO[track];
   return (
@@ -212,6 +217,35 @@ export default function Trilha() {
       {/* View: Timeline — continua abaixo */}
       {view === 'timeline' && (
       <>
+      {/* Trilha horizontal — você está aqui */}
+      <div className="border border-outline/15 bg-surface-container p-5">
+        <div className="flex items-center justify-between mb-4">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">A trilha · do zero aos milhões</span>
+          <span className="font-mono text-[10px] text-muted">fase {currentPhase?.phase_number} de {phases.length - 1}</span>
+        </div>
+        <div className="relative">
+          <div className="absolute top-[13px] left-[5%] right-[5%] h-px bg-outline/25" />
+          <div className="flex justify-between relative">
+            {phases.map((f) => {
+              const isCompleted = !!f.completed_at;
+              const isActive = f.phase_number === currentPhase?.phase_number;
+              let dot = <span className="w-2.5 h-2.5 rounded-full border border-muted/60" />;
+              if (isCompleted) dot = <span className="w-[26px] h-[26px] rounded-full bg-success flex items-center justify-center"><CheckCircle2 className="w-3.5 h-3.5 text-on-action" /></span>;
+              else if (isActive) dot = <span className="w-[26px] h-[26px] rounded-full bg-surface border-2 border-secondary" style={{ boxShadow: '0 0 0 4px color-mix(in srgb, var(--color-secondary) 20%, transparent)' }} />;
+              return (
+                <div key={f.phase_number} className="flex-1 text-center px-0.5 min-w-0">
+                  <div className="h-[26px] flex items-center justify-center">{dot}</div>
+                  <div className={`mt-2 text-[10px] leading-tight truncate ${isActive ? 'text-on-surface font-medium' : isCompleted ? 'text-on-surface-variant' : 'text-muted'}`}>
+                    {f.phase_number}. {SHORT_FASE[f.phase_number] ?? f.nome}
+                  </div>
+                  {isActive && <div className="mt-1 font-mono text-[8px] uppercase tracking-wider text-secondary">você está aqui</div>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
       {/* Banner com script sync */}
       <div className="bg-action/5 border border-action/20 p-3 flex items-center gap-3 text-xs">
         <RefreshCw size={14} className="text-action shrink-0" />
