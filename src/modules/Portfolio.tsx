@@ -341,38 +341,41 @@ export default function Portfolio() {
             <span className="flex items-center gap-1.5"><AlertTriangle className="w-3 h-3 text-warning" />tem bloqueio</span>
           </div>
 
-          {/* Lista ranqueada por maturidade */}
-          <div className="border border-outline/15 bg-surface-container">
-            {ranking.map(a => {
-              const isBadge = BADGE.has(a.nome);
-              const cor = faixaCor(a.maturidade);
-              return (
-                <button
-                  key={a.nome}
-                  onClick={() => setSel(a)}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 border-b border-outline/10 last:border-b-0 hover:bg-surface-high transition-colors text-left group"
-                >
-                  <div className="w-9 h-9 flex items-center justify-center overflow-hidden font-mono text-[11px] font-bold shrink-0" style={isBadge ? undefined : { background: a.cor, color: 'var(--color-on-action)' }}>
-                    {LOGO[a.nome]
-                      ? <img src={LOGO[a.nome]} alt="" className={isBadge ? 'w-9 h-9 object-cover' : 'w-5 h-5 object-contain'} style={isBadge ? undefined : { filter: 'brightness(0) invert(1)' }} />
-                      : a.mono}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-serif text-[15px] font-semibold text-on-surface truncate">{a.nome}</span>
-                      {a.estado === 'travado' && <span className="font-mono text-[9px] uppercase tracking-wider text-danger border border-danger/40 px-1 py-px shrink-0">travado</span>}
-                    </div>
-                    <span className="font-mono text-[10px] uppercase tracking-wider text-muted">{TIER_LABEL[a.tier]}</span>
-                  </div>
-                  <div className="hidden sm:block w-24 md:w-32 h-1.5 bg-surface-lowest overflow-hidden shrink-0">
-                    <div className="h-full" style={{ width: `${a.maturidade}%`, background: cor }} />
-                  </div>
-                  <span className="font-mono text-sm font-semibold tabular-nums w-11 text-right shrink-0" style={{ color: cor }}>{a.maturidade}%</span>
-                  <span className="w-5 flex justify-center shrink-0">{a.bloqueio && <AlertTriangle className="w-3.5 h-3.5 text-warning" />}</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                </button>
-              );
-            })}
+          {/* Lista ranqueada por maturidade — 2 colunas (top na esquerda) */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            {[ranking.slice(0, Math.ceil(ranking.length / 2)), ranking.slice(Math.ceil(ranking.length / 2))].map((coluna, ci) => (
+              <div key={ci} className="border border-outline/15 bg-surface-container">
+                {coluna.map(a => {
+                  const isBadge = BADGE.has(a.nome);
+                  const cor = faixaCor(a.maturidade);
+                  return (
+                    <button
+                      key={a.nome}
+                      onClick={() => setSel(a)}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 border-b border-outline/10 last:border-b-0 hover:bg-surface-high transition-colors text-left group"
+                    >
+                      <div className="w-8 h-8 flex items-center justify-center overflow-hidden font-mono text-[10px] font-bold shrink-0" style={isBadge ? undefined : { background: a.cor, color: 'var(--color-on-action)' }}>
+                        {LOGO[a.nome]
+                          ? <img src={LOGO[a.nome]} alt="" className={isBadge ? 'w-8 h-8 object-cover' : 'w-[18px] h-[18px] object-contain'} style={isBadge ? undefined : { filter: 'brightness(0) invert(1)' }} />
+                          : a.mono}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-serif text-sm font-semibold text-on-surface truncate">{a.nome}</span>
+                          {a.estado === 'travado' && <span className="font-mono text-[8px] uppercase tracking-wider text-danger border border-danger/40 px-1 shrink-0">travado</span>}
+                        </div>
+                        <span className="font-mono text-[9px] uppercase tracking-wider text-muted">{TIER_LABEL[a.tier]}</span>
+                      </div>
+                      <div className="hidden sm:block w-16 xl:w-24 h-1.5 bg-surface-lowest overflow-hidden shrink-0">
+                        <div className="h-full" style={{ width: `${a.maturidade}%`, background: cor }} />
+                      </div>
+                      <span className="font-mono text-sm font-semibold tabular-nums w-10 text-right shrink-0" style={{ color: cor }}>{a.maturidade}%</span>
+                      <span className="w-4 flex justify-center shrink-0">{a.bloqueio && <AlertTriangle className="w-3.5 h-3.5 text-warning" />}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
           </div>
         </div>
       )}
