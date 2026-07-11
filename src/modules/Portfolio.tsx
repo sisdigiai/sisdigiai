@@ -88,13 +88,13 @@ const APPS: App[] = [
   },
   {
     nome: 'Lumina', mono: 'LU', cor: 'var(--color-eco-lumina)', tagline: 'Digital signage — plus do ecossistema Clearix',
-    tier: 'suporte', estado: 'no-ar', maturidade: 70, funcao: 'Produção interna (Lancaster Suzano ~50d)',
-    stack: 'React 19 · Vite · TS · Supabase · Lumina Signage DS v1.0',
+    tier: 'suporte', estado: 'no-ar', maturidade: 72, funcao: 'Produção real (Lancaster: 2 telas · 48 mídias · ~50d) · player PIN + offline',
+    stack: 'React 19 · Vite · TS · Supabase (Realtime) · player web · Lumina Signage DS v1.0',
     repos: 'D:\\projetos\\lumina_box',
     git: '90586c2 17/jun/2026 (heartbeat online/offline)',
-    proximo: 'Monetização externa como plus do Clearix',
-    bloqueio: 'Falta oferta comercial externa',
-    urls: [{ label: 'luminabox.netlify.app', url: 'https://luminabox.netlify.app' }],
+    proximo: 'Externalizar: multitenancy/RLS + baseline de migrations + camada comercial',
+    bloqueio: 'Single-workspace (sem multitenancy real) trava vender pra vários clientes',
+    urls: [{ label: 'luminabox.netlify.app (landing + painel)', url: 'https://luminabox.netlify.app' }],
   },
   {
     nome: 'Nexus', mono: 'NX', cor: 'var(--color-eco-nexus)', tagline: 'Plataforma de aprendizado AI-first — abriga a Clearix Academy (Clearix University)',
