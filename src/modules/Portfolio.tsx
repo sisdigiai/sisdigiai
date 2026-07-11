@@ -108,12 +108,12 @@ const APPS: App[] = [
   },
   {
     nome: 'Clearix Calc', mono: 'CC', cor: 'var(--color-eco-clearix)', tagline: 'Calculadora de grau — PWA pública, grátis, sem login (isca do Clearix)',
-    tier: 'suporte', estado: 'no-ar', maturidade: 60, funcao: 'Grátis · sem login · 100% client-side',
-    stack: 'Next 16 · React 19 · Tailwind 4 · Clearix Lens · sem banco/auth',
+    tier: 'suporte', estado: 'no-ar', maturidade: 85, funcao: '12 calculadoras ópticas · fórmula + exemplo + enviar no WhatsApp · offline · isca Clearix/OSI',
+    stack: 'Next 16 · React 19 · Tailwind 4 · Clearix Lens · PWA (sw.js) · sem banco/auth',
     repos: 'D:\\projetos\\clearix_eco_full\\clearix_calc',
     git: 'b14c5e6 16/jun/2026 (desenho da lente)',
-    proximo: 'Domínio calc.clearix.app.br (SSL) · captura de lead via digiai',
-    bloqueio: 'Domínio custom ainda não ativo (usar netlify.app na copy)',
+    proximo: 'Captura de lead via digiai · ampliar tabela de lentes de contato · histórico opcional',
+    bloqueio: 'Domínio custom calc.clearix.app.br ainda não ativo (SSL) — usar netlify.app na copy',
     urls: [{ label: 'clearixcalc.netlify.app', url: 'https://clearixcalc.netlify.app' }],
   },
   {
