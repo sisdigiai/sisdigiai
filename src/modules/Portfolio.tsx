@@ -156,12 +156,12 @@ const APPS: App[] = [
   },
   {
     nome: 'Mello Eyewear', mono: 'ME', cor: 'var(--color-eco-app)', tagline: 'E-commerce de óculos + clube de fidelidade (∞ Club)',
-    estado: 'no-ar', tier: 'autonomo', maturidade: 80, funcao: 'Loja no ar: catálogo Mello real, carrinho, 10x s/ juros, checkout Mercado Pago + CEP (ViaCEP), ∞ Club',
-    stack: 'React 19 · Vite · Express · Supabase · Mercado Pago · Gemini · 5 functions Netlify (webhook MP, checkout, newsletter, order-status)',
+    estado: 'no-ar', tier: 'autonomo', maturidade: 72, funcao: 'Software pronto (catálogo Clearix real 772 armações, carrinho, checkout MP blindado, webhook→ERP, auth, ∞ Club) — falta operacional pré-go-live',
+    stack: 'React 19 · Vite · Express · Supabase (estoque Clearix) · Mercado Pago (prod) · Resend · Gemini · 5 functions Netlify',
     repos: 'D:\\projetos\\melloeyewear',
     git: '2eeba03 10/jul/2026 (autopreenchimento CEP ViaCEP)',
-    proximo: 'Sincronizar catálogo/estoque com Clearix (ADR-0002/0040) · finalizar lentes oftálmicas (WIP)',
-    bloqueio: 'Catálogo ainda standalone (não puxa estoque do Clearix) · fluxo de lentes oftálmicas em WIP',
+    proximo: 'Fotografar catálogo (grifes→Mello→Solar) · publicar Lentes Oftálmicas (receita+preço) · verificar domínio Resend · QA + 1 compra real+estorno',
+    bloqueio: '🔴 Produtos sem foto (cards mostram placeholder) · categoria Óculos de Sol vazia · Lentes Oftálmicas "em construção" · e-mail transacional sem domínio verificado · compra real nunca validada',
     urls: [{ label: 'mellooticas.com.br', url: 'https://mellooticas.com.br' }],
   },
   {
