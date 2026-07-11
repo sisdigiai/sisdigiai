@@ -25,18 +25,38 @@ interface App {
   proximo: string;
   bloqueio?: string;
   urls: { label: string; url: string }[];
+  subApps?: { nome: string; desc: string }[]; // suítes (ex.: Clearix) — detalhe no drawer
 }
 
 const APPS: App[] = [
   {
     nome: 'Clearix', mono: 'CX', cor: 'var(--color-eco-clearix)', tagline: 'Ecossistema SaaS para varejo óptico — produto-âncora',
-    tier: 'ancora', estado: 'no-ar', maturidade: 85, funcao: 'Suíte multi-tenant em produção · 1 cliente real (Mello) · dados vivos',
-    stack: 'Polyrepo (19 sub-apps) · Next 16 / SvelteKit · React 19 · Supabase · SSO (AES-256)',
-    repos: 'D:\\projetos\\clearix_eco_full — hub, vendas, estoque, lens, finance, dcl, clínicos, paciente, bi, crm, fone, rh, loyalty, ar, marketing, express, import, atlas, calc',
-    git: 'hub 17/jun · vendas/estoque 08/jul · lens/import 07/jul (2026)',
+    tier: 'ancora', estado: 'no-ar', maturidade: 85, funcao: 'Suíte de 17 apps multi-tenant em produção · 1 cliente real (Mello)',
+    stack: 'Polyrepo (17 sub-apps) · Next 16 / SvelteKit · React 19 · Supabase · SSO (AES-256)',
+    repos: 'D:\\projetos\\clearix_eco_full (17 sub-apps — ver lista abaixo)',
+    git: 'hub 17/jun · vendas/estoque 08/jul · lens 07/jul (2026)',
     proximo: 'Fechar 1º piloto externo — entrevistas com óticas de Suzano',
     bloqueio: 'Jurídico: minuta DPA / gap ADR-0020 trava a 1ª venda externa',
-    urls: [{ label: 'clearix.app.br', url: 'https://clearix.app.br' }, { label: 'Atlas (admin)', url: 'https://digiaiatlas.netlify.app' }],
+    urls: [{ label: 'clearix.app.br', url: 'https://clearix.app.br' }, { label: 'hub', url: 'https://clearixhub.netlify.app' }],
+    subApps: [
+      { nome: 'Hub', desc: 'Gateway SSO + admin multi-tenant (tenants, usuários, papéis)' },
+      { nome: 'Vendas', desc: 'PDV: pedidos, caixa, carnês, entregas, financiamento' },
+      { nome: 'Estoque', desc: 'Inventário, barcode, etiquetas QR, fotos de catálogo' },
+      { nome: 'Lens', desc: 'Catálogo de lentes + pricing engine por tenant' },
+      { nome: 'Finance', desc: 'DRE, fluxo, NF-e, conciliação, leitura fiscal por IA' },
+      { nome: 'DCL / Lab', desc: 'Kanban de produção de lentes (receita → entrega)' },
+      { nome: 'Clínicos', desc: 'Agenda, anamnese, prescrições, prontuário' },
+      { nome: 'Paciente', desc: 'Portal B2C sem login (por token): receitas, histórico' },
+      { nome: 'BI', desc: 'Command center executivo cross-app (~20 painéis)' },
+      { nome: 'CRM', desc: 'Atendimento WhatsApp multicanal + chatbot builder' },
+      { nome: 'Fone', desc: 'Ligações, campanhas telefônicas, follow-ups (RFM)' },
+      { nome: 'RH', desc: 'Ponto, escalas, férias, comissões, folha' },
+      { nome: 'Marketing', desc: 'Growth: campanhas, leads, estúdio criativo IA' },
+      { nome: 'Express', desc: 'PDV rápido — converte lead de campanha em venda' },
+      { nome: 'Loyalty', desc: 'Fidelidade: pontos, cashback, cupons, níveis' },
+      { nome: 'AR Vision', desc: 'Prova virtual de armações (AR) + pupilometria' },
+      { nome: 'Import', desc: 'Migração de legados — onboarding de tenant novo' },
+    ],
   },
   {
     nome: 'Clearix Site', mono: 'CS', cor: 'var(--color-eco-clearix)', tagline: 'Landing institucional pública do ecossistema Clearix',
@@ -227,7 +247,7 @@ const BADGE = new Set(['Pulso', 'Pulso Hub', 'Nipo School', 'Mello Eyewear']);
 
 // Onde cada frente vive (hospedagem real — levantamento 2026-07-10).
 const HOST: Record<string, string> = {
-  'Clearix': 'Netlify · polyrepo (19 sub-apps)',
+  'Clearix': 'Netlify · polyrepo (17 sub-apps)',
   'Ótica Sem Improviso': 'Netlify (leitor + landing)',
   'Pulso': 'Vercel · control',
   'Pulso Hub': 'Vercel · /hub (Supabase read-only)',
@@ -366,6 +386,24 @@ export default function Portfolio() {
               </div>
 
               <Field label="Stack" value={sel.stack} />
+
+              {sel.subApps && sel.subApps.length > 0 && (
+                <div>
+                  <div className="text-[10px] font-mono text-secondary uppercase tracking-widest mb-2">Sub-apps ({sel.subApps.length}) · todos em produção</div>
+                  <div className="border border-outline/15 divide-y divide-outline/10">
+                    {sel.subApps.map((s, i) => (
+                      <div key={s.nome} className="flex items-start gap-3 px-3 py-2">
+                        <span className="font-mono text-[10px] text-muted tabular-nums mt-0.5 w-5 shrink-0">{String(i + 1).padStart(2, '0')}</span>
+                        <div className="min-w-0">
+                          <span className="text-[13px] font-medium text-on-surface">{s.nome}</span>
+                          <span className="block text-[11px] text-muted leading-snug">{s.desc}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <Field label="Repositórios" value={sel.repos} mono />
               <Field label="Git" value={sel.git} mono />
               <div>

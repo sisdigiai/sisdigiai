@@ -1,4 +1,4 @@
-# Clearix — Estado Real do Ecossistema (19 sub-apps)
+# Clearix — Estado Real do Ecossistema (17 sub-apps)
 
 > Levantamento código + navegação online (Chrome logado, tenant Grupo Mello Óticas).
 > Data: 2026-07-11. Polyrepo em `D:\projetos\clearix_eco_full` (cada sub-app = repo próprio, Netlify/Vercel).
@@ -37,13 +37,22 @@
 | **Loyalty** | clearixloyalty.netlify.app | Next 15 | Fidelidade: pontos, cashback, cupons, níveis, família, regras, campanhas | NO AR (pendências) |
 | **AR Vision** | clearixarvision.netlify.app | Next 15 | Prova virtual de armações (AR, MediaPipe + Three.js) + pupilometria por câmera, face-shape, espessura | NO AR (pre-1.0) |
 
-## Infra / interno
+## Infra da suíte (interno)
 
 | Sub-app | URL | Stack | O que faz | Estado |
 |---|---|---|---|---|
-| **Atlas** | digiaiatlas.netlify.app | Vite/React Flow | Organograma visual da suíte (20+ apps, schemas, deps, matriz de migração, catálogo RPC, health) — uso interno | NO AR |
 | **Import** | interno (on-demand) | Next 15 | "Canivete suíço" de migração de legados (WhatsApp, pacientes, vendas) — onboarding de tenant novo, depois desligado | DEV / interno |
-| **Calc** | clearixcalc.netlify.app | Next 16 | Calculadora de grau (PWA grátis, sem login) — isca; 13 calculadoras (espessura, vértice, prentice, DNP…) | NO AR (card próprio) |
+
+> Total da **suíte Clearix = 17 sub-apps** (os 12 do núcleo + 4 de crescimento + Import).
+
+## ⚠ Apps SEPARADOS (não contam nos 17 da suíte)
+
+Vivem na pasta `clearix_eco_full/` mas são produtos/ferramentas à parte:
+
+| App | URL | O que é | Onde aparece |
+|---|---|---|---|
+| **Clearix Calc** | clearixcalc.netlify.app | Calculadora de grau (PWA grátis, sem login) — isca do Clearix; 13 calculadoras | **card próprio** no Portfólio (Suporte) |
+| **Atlas** | digiaiatlas.netlify.app | Organograma visual da suíte (schemas, deps, RPCs, health) — ferramenta interna de arquitetura | app à parte (não é da suíte comercial) |
 
 ## Notas
 
