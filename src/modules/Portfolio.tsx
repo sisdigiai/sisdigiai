@@ -98,12 +98,12 @@ const APPS: App[] = [
   },
   {
     nome: 'Nexus', mono: 'NX', cor: 'var(--color-eco-nexus)', tagline: 'Plataforma de aprendizado AI-first — abriga a Clearix Academy (Clearix University)',
-    tier: 'suporte', estado: 'no-ar', maturidade: 60, funcao: 'Landing vende OSI (R$48,50) · 18 módulos + gamificação IA (Nex/Doug) · adoção zero',
-    stack: 'Vite · React 19 · Express · Supabase (próprio + Clearix read-only) · Firebase · Gemini',
-    repos: 'D:\\projetos\\nexus (Clearix University 9 telas + OSI 3 telas)',
+    tier: 'suporte', estado: 'no-ar', maturidade: 70, funcao: 'Universidade Clearix: 18 módulos · 196 lições · 74 workshops · gamificação + certificados',
+    stack: 'Vite · React 19 · Express · Supabase (próprio + Clearix read-only) · Firebase · Gemini (Nex/Doug)',
+    repos: 'D:\\projetos\\nexus (Universidade Clearix + Manual OSI · landing vende OSI R$48,50)',
     git: '3224d3f 01/jul/2026 (módulos do Manual Clearix)',
-    proximo: 'Ativar uso real (dono/equipe treina) · corrigir SSO → /clearix',
-    bloqueio: '⚠ 4 chaves de API expostas no .env (rotacionar) · adoção zero (0/18) · SSO /clearix quebrado',
+    proximo: 'Levar a equipe a treinar (dono já em 21%) · corrigir SSO → /clearix',
+    bloqueio: '⚠ 4 chaves de API expostas no .env (rotacionar) · adoção ainda só o dono · SSO /clearix quebrado',
     urls: [{ label: 'sisnexus.netlify.app', url: 'https://sisnexus.netlify.app' }],
   },
   {
