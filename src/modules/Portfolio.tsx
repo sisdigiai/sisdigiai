@@ -166,13 +166,13 @@ const APPS: App[] = [
   },
   {
     nome: 'DIGIAI MKT', mono: 'MK', cor: 'var(--color-eco-app)', tagline: 'Motor de marketing — prepara e reconcilia publicações',
-    tier: 'infra', estado: 'travado', maturidade: 20, funcao: 'Só fundação (F0) · roda local :3001',
+    tier: 'infra', estado: 'no-ar', maturidade: 55, funcao: 'No ar · ideias → produção → publicação → analytics',
     stack: 'React 19 · Vite 6 · Tailwind 4 · Supabase (schema mkt)',
     repos: 'D:\\projetos\\digiai_mkt',
-    git: '0a0437a 09/jul/2026',
-    proximo: 'Implementar F1–F5 (coleta, publicação, reconciliação, painel)',
-    bloqueio: 'Fases centrais não implementadas; deploy não definido',
-    urls: [],
+    git: '0a0437a 09/jul/2026 (skin Ateliê de Convergência)',
+    proximo: 'Concluir as fases em andamento (coleta, publicação, reconciliação)',
+    bloqueio: 'Fases F1/F2/F6/F7 ainda em construção',
+    urls: [{ label: 'digiaimkt.netlify.app', url: 'https://digiaimkt.netlify.app' }],
   },
 ];
 
@@ -233,7 +233,7 @@ const HOST: Record<string, string> = {
   'DIGIAI App': 'Netlify · Supabase',
   'DIGIAI Site': 'Cloudflare Pages',
   'Clearix Site': 'Cloudflare Pages',
-  'DIGIAI MKT': 'Local (:3001) · sem deploy',
+  'DIGIAI MKT': 'Netlify · Supabase (schema mkt)',
 };
 
 export default function Portfolio() {

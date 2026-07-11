@@ -24,7 +24,7 @@
 | 14 | Mello Eyewear | Autônomo | NO AR | Netlify | — (mellooticas.com.br vendendo) |
 | 15 | Qual a Foto | Incubação | NO AR | Netlify | worker IA roda local |
 | 16 | Easy Idiomas | Incubação | NO AR | Netlify | — (Easy Aula+ logado) |
-| 17 | DIGIAI MKT | Infra | TRAVADO | não definido | fases centrais (publicação/coleta/painel) não implementadas |
+| 17 | DIGIAI MKT | Infra | NO AR | Netlify | fases F1/F2/F6/F7 em construção (app já rodando) |
 
 ## ✅ Verificação online (Chrome Junior, 2026-07-10)
 
@@ -176,6 +176,6 @@ Cada URL foi aberta no navegador. Resultado real:
 ### 17. DIGIAI MKT (infraestrutura de marketing)
 - **Propósito:** motor de marketing (prepara publicações multi-marca com gate humano + coleta métricas) que alimenta o hub digiai.
 - **Stack:** React 19 · Vite 6 · Tailwind 4 · Supabase (schema `mkt`).
-- **Deploy:** não definido (roda local :3001). Git: `0a0437a` 2026-07-09.
-- **Estado:** TRAVADO/PROTÓTIPO — só F0 (fundação) concluída; F1–F5 (coleta/publicação/reconciliação/multi-plataforma/painel) pendentes.
+- **Deploy:** Netlify — `digiaimkt.netlify.app` (auto-deploy via GitHub). Git: `0a0437a` 2026-07-09 (skin Ateliê de Convergência).
+- **Estado:** NO AR — app rodando em `/dashboard` com módulos Ideias, Produção, Acervo, Aprovação, Calendário, Publicação, Analytics, Aprendizado. Fases F1/F2/F6/F7 ainda em construção. (Correção: verificado online 2026-07-10 — não estava travado.)
 </content>
