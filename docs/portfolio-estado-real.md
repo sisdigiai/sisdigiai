@@ -16,7 +16,7 @@
 | 6 | Clearix Site | Âncora (site) | NO AR | Cloudflare | — |
 | 7 | Lumina Box | Suporte | NO AR (interno) | Netlify | URL pública a confirmar; falta monetização |
 | 8 | Pulso Control | Autônomo | NO AR | Vercel | manter fila de vídeos |
-| 9 | Pulso Hub (site) | Autônomo | PROTÓTIPO | Netlify (config) | URL/domínio ainda placeholder |
+| 9 | Pulso Hub (site) | Autônomo | NO AR | Vercel /hub | — (pulsoprojects.vercel.app/hub) |
 | 10 | Polapetit (app) | Incubação | NO AR | Netlify | — |
 | 11 | Polapetit Landing | Incubação | NO AR | Netlify | — |
 | 12 | Nexus | Suporte | NO AR (parcial) | Netlify | dev ativo, adoção zero |
