@@ -61,11 +61,11 @@ const APPS: App[] = [
     nome: 'Pulso', mono: 'PU', cor: 'var(--color-eco-pulso)', tagline: 'Produção de vídeos curtos faceless — produto autônomo',
     tier: 'autonomo', estado: 'no-ar', maturidade: 82, funcao: '248 posts · 124k views · 5 redes · esteira viva',
     stack: 'Next 16 · React 19 · Supabase · pg_cron · OpenAI/Claude · ElevenLabs',
-    repos: 'pulso_control (app) · pulso_hub (site público, no ar em /hub)',
-    git: 'control 5fac8e3 07/jul · hub 7d3e072 29/jun',
+    repos: 'D:\\projetos\\pulso_control',
+    git: 'control 5fac8e3 07/jul/2026',
     proximo: 'Aprovar roteiros + publicar a fila · automatizar FB/TikTok/YT (só IG é API)',
     bloqueio: 'Só IG publica via API; FB/TikTok/YouTube/Kwai ainda assistidos',
-    urls: [{ label: 'control', url: 'https://pulsoprojects.vercel.app' }, { label: 'hub público', url: 'https://pulsoprojects.vercel.app/hub' }],
+    urls: [{ label: 'pulsoprojects.vercel.app', url: 'https://pulsoprojects.vercel.app' }],
   },
   {
     nome: 'Lumina', mono: 'LU', cor: 'var(--color-eco-lumina)', tagline: 'Digital signage — plus do ecossistema Clearix',
@@ -165,6 +165,15 @@ const APPS: App[] = [
     urls: [{ label: 'digiai.app.br', url: 'https://digiai.app.br' }],
   },
   {
+    nome: 'Pulso Hub', mono: 'PH', cor: 'var(--color-eco-pulso)', tagline: 'Site público do Pulso — catálogo de vídeos e redes',
+    tier: 'institucional', estado: 'no-ar', maturidade: 70, funcao: 'No ar em /hub · catálogo + "em alta"',
+    stack: 'Next 16 · Tailwind 4 · Supabase (anon read-only)',
+    repos: 'D:\\projetos\\pulso_hub',
+    git: '7d3e072 29/jun/2026',
+    proximo: 'Definir domínio próprio (hoje servido em /hub)',
+    urls: [{ label: 'pulsoprojects.vercel.app/hub', url: 'https://pulsoprojects.vercel.app/hub' }],
+  },
+  {
     nome: 'DIGIAI MKT', mono: 'MK', cor: 'var(--color-eco-app)', tagline: 'Central de marketing multimarca — ideias → arte → agenda → publicação por IA',
     tier: 'infra', estado: 'no-ar', maturidade: 78, funcao: 'Pipeline 198→90 no ar · 5 marcas · robôs + custo IA',
     stack: 'React 19 · Vite 6 · Tailwind 4 · Supabase (schema mkt) · pg_cron · IA · Ateliê de Convergência',
@@ -208,6 +217,7 @@ const LOGO: Record<string, string> = {
   'DIGIAI Site': '/brand/digiai.svg',
   'DIGIAI MKT': '/brand/digiai.svg',
   'Pulso': '/brand/pulso.png',
+  'Pulso Hub': '/brand/pulso.png',
   'Lumina': '/brand/lumina.svg',
   'Nipo School': '/brand/nipo.svg',
   'Mello Eyewear': '/brand/mello.png',
@@ -215,13 +225,14 @@ const LOGO: Record<string, string> = {
 };
 
 // Logos "badge" (têm fundo próprio) → mostrados inteiros no tile, sem filtro branco.
-const BADGE = new Set(['Pulso', 'Nipo School', 'Mello Eyewear']);
+const BADGE = new Set(['Pulso', 'Pulso Hub', 'Nipo School', 'Mello Eyewear']);
 
 // Onde cada frente vive (hospedagem real — levantamento 2026-07-10).
 const HOST: Record<string, string> = {
   'Clearix': 'Netlify · polyrepo (17 repos)',
   'Ótica Sem Improviso': 'Netlify (leitor + landing)',
-  'Pulso': 'Vercel (control) · Netlify (hub)',
+  'Pulso': 'Vercel · control',
+  'Pulso Hub': 'Vercel · /hub (Supabase read-only)',
   'Lumina': 'Netlify · Supabase',
   'Nexus': 'Netlify · Supabase',
   'Clearix Calc': 'Netlify · PWA client-side (sem banco)',
