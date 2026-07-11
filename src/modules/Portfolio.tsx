@@ -30,10 +30,10 @@ interface App {
 const APPS: App[] = [
   {
     nome: 'Clearix', mono: 'CX', cor: 'var(--color-eco-clearix)', tagline: 'Ecossistema SaaS para varejo óptico — produto-âncora',
-    tier: 'ancora', estado: 'no-ar', maturidade: 80, funcao: '17 sub-apps · 1 cliente real (Mello)',
-    stack: 'Polyrepo · Next 16 / SvelteKit · React 19 · Supabase (SSO gateway)',
-    repos: 'D:\\projetos\\clearix_eco_full (hub, vendas, finance, bi, estoque, paciente, client, calc, atlas, lens…)',
-    git: 'Atlas no ar · vendas/estoque commit 08/jul/2026',
+    tier: 'ancora', estado: 'no-ar', maturidade: 85, funcao: 'Suíte multi-tenant em produção · 1 cliente real (Mello) · dados vivos',
+    stack: 'Polyrepo (19 sub-apps) · Next 16 / SvelteKit · React 19 · Supabase · SSO (AES-256)',
+    repos: 'D:\\projetos\\clearix_eco_full — hub, vendas, estoque, lens, finance, dcl, clínicos, paciente, bi, crm, fone, rh, loyalty, ar, marketing, express, import, atlas, calc',
+    git: 'hub 17/jun · vendas/estoque 08/jul · lens/import 07/jul (2026)',
     proximo: 'Fechar 1º piloto externo — entrevistas com óticas de Suzano',
     bloqueio: 'Jurídico: minuta DPA / gap ADR-0020 trava a 1ª venda externa',
     urls: [{ label: 'clearix.app.br', url: 'https://clearix.app.br' }, { label: 'Atlas (admin)', url: 'https://digiaiatlas.netlify.app' }],
