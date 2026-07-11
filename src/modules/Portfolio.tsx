@@ -88,7 +88,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Lumina', mono: 'LU', cor: 'var(--color-eco-lumina)', tagline: 'Digital signage — plus do ecossistema Clearix',
-    tier: 'suporte', estado: 'no-ar', maturidade: 72, funcao: 'Produção real (Lancaster: 2 telas · 48 mídias · ~50d) · player PIN + offline',
+    tier: 'suporte', estado: 'no-ar', maturidade: 72, funcao: 'Produção real · 4 telas (1 online) · 67 mídias · playlist ativa',
     stack: 'React 19 · Vite · TS · Supabase (Realtime) · player web · Lumina Signage DS v1.0',
     repos: 'D:\\projetos\\lumina_box',
     git: '90586c2 17/jun/2026 (heartbeat online/offline)',
