@@ -166,12 +166,12 @@ const APPS: App[] = [
   },
   {
     nome: 'DIGIAI MKT', mono: 'MK', cor: 'var(--color-eco-app)', tagline: 'Motor de marketing — prepara e reconcilia publicações',
-    tier: 'infra', estado: 'no-ar', maturidade: 55, funcao: 'No ar · ideias → produção → publicação → analytics',
-    stack: 'React 19 · Vite 6 · Tailwind 4 · Supabase (schema mkt)',
+    tier: 'infra', estado: 'no-ar', maturidade: 62, funcao: 'No ar · 12 módulos + RBAC (ideias → publicação → analytics)',
+    stack: 'React 19 · Vite 6 · Tailwind 4 · react-router · Supabase (schema mkt) · Ateliê de Convergência',
     repos: 'D:\\projetos\\digiai_mkt',
     git: '0a0437a 09/jul/2026 (skin Ateliê de Convergência)',
-    proximo: 'Concluir as fases em andamento (coleta, publicação, reconciliação)',
-    bloqueio: 'Fases F1/F2/F6/F7 ainda em construção',
+    proximo: 'Finalizar integrações (coleta Meta, publicação, reconciliação)',
+    bloqueio: 'Integrações externas (coleta/publicação) em finalização',
     urls: [{ label: 'digiaimkt.netlify.app', url: 'https://digiaimkt.netlify.app' }],
   },
 ];
