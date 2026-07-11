@@ -4,8 +4,9 @@ import { Download, CheckCircle2, Copy, Layers, Type, Palette, Square, Minus } fr
 import { Logo } from './Logo';
 import { initConvergenceMesh, initReveal } from '../lib/dhMesh';
 import BrandMktAtelie from './BrandMktAtelie';
+import BrandClearixLens from './BrandClearixLens';
 
-type BrandTab = 'house' | 'mkt';
+type BrandTab = 'house' | 'clearix' | 'mkt';
 
 export default function BrandGuidelines() {
   const [tab, setTab] = useState<BrandTab>('house');
@@ -76,10 +77,11 @@ export default function BrandGuidelines() {
       {/* Abas: identidade da holding + temas de produto registrados no brand */}
       <nav className="sticky top-0 z-20 bg-surface/95 backdrop-blur-sm border-b border-outline/20 px-6 flex gap-2" aria-label="Abas do Brand Guidelines">
         <TabButton id="house" kicker="Holding" label="DIGIAI House" />
+        <TabButton id="clearix" kicker="Marca" label="Clearix" />
         <TabButton id="mkt" kicker="Produto" label="MKT · Ateliê de Convergência" />
       </nav>
 
-      {tab === 'mkt' ? <BrandMktAtelie /> : (
+      {tab === 'clearix' ? <BrandClearixLens /> : tab === 'mkt' ? <BrandMktAtelie /> : (
     <div ref={rootRef} className="min-h-screen bg-surface text-on-surface selection:bg-secondary selection:text-on-action pb-32">
       {/* Cover — malha de convergência 3D (dhMesh) */}
       <section className="relative overflow-hidden border-b border-outline/10 min-h-[88vh] flex items-center">

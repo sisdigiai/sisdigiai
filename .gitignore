@@ -14,3 +14,6 @@ coverage/
 
 # Codex config contém SUPABASE_ACCESS_TOKEN — nunca commitar
 .codex/
+
+# Pacotes de entrega do designer (referência local, não versionar)
+/export/
