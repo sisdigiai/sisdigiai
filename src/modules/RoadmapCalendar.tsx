@@ -32,9 +32,10 @@ function parseISODateLocal(iso: string): Date {
 type Props = {
   tasks: RoadmapTask[];
   onToggle: (task: RoadmapTask) => Promise<void> | void;
+  onReschedule?: (task: RoadmapTask, newDate: string | null) => Promise<void> | void;
 };
 
-export default function RoadmapCalendar({ tasks, onToggle }: Props) {
+export default function RoadmapCalendar({ tasks, onToggle, onReschedule }: Props) {
   const [cursor, setCursor] = useState(() => {
     const d = new Date();
     return new Date(d.getFullYear(), d.getMonth(), 1);
@@ -97,6 +98,22 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
   const selectedTasks = selectedDate ? (tasksByDate.get(selectedDate) ?? []) : [];
   const selectedDateObj = selectedDate ? parseISODateLocal(selectedDate) : null;
 
+  // Atrasadas de QUALQUER mês (não só o visível) — sempre à vista
+  const overdueAll = useMemo(() =>
+    tasks
+      .filter((t) => t.target_date && !t.completed_at && t.target_date < todayISO)
+      .sort((a, b) => (a.target_date! < b.target_date! ? -1 : 1)),
+  [tasks, todayISO]);
+
+  // Tarefas do roadmap ainda sem data (invisíveis na grade)
+  const undated = useMemo(() => tasks.filter((t) => !t.target_date && !t.completed_at), [tasks]);
+
+  const jumpTo = (iso: string) => {
+    const d = parseISODateLocal(iso);
+    setCursor(new Date(d.getFullYear(), d.getMonth(), 1));
+    setSelectedDate(iso);
+  };
+
   return (
     <div className="space-y-5">
       {/* Header do mês */}
@@ -138,6 +155,51 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
           <span className={`w-2 h-2 ${TRACK_DOT.C}`} /> Empresa
         </div>
       </div>
+
+      {/* Atrasadas — sempre visíveis, de qualquer mês */}
+      {overdueAll.length > 0 && (
+        <div className="border border-danger/30 bg-danger/5">
+          <div className="px-3 py-2 border-b border-danger/20 flex items-center gap-2">
+            <AlertOctagon size={13} className="text-danger" />
+            <span className="text-[10px] font-mono uppercase tracking-widest text-danger">
+              {overdueAll.length} atrasada{overdueAll.length > 1 ? 's' : ''} — remarcar ou concluir
+            </span>
+          </div>
+          <div className="divide-y divide-danger/10">
+            {overdueAll.map((t) => (
+              <div key={t.id} className="flex items-center gap-2 px-3 py-1.5">
+                <button
+                  onClick={() => onToggle(t)}
+                  className="shrink-0 text-muted hover:text-success transition-colors"
+                  title="Marcar como concluída"
+                >
+                  <Square size={14} />
+                </button>
+                <button
+                  onClick={() => jumpTo(t.target_date!)}
+                  className="flex-1 min-w-0 text-left text-sm text-on-surface truncate hover:text-secondary transition-colors"
+                  title="Ver no calendário"
+                >
+                  {t.title}
+                </button>
+                <span className="font-mono text-[10px] text-danger shrink-0">
+                  {parseISODateLocal(t.target_date!).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                </span>
+                {onReschedule && (
+                  <input
+                    type="date"
+                    value={t.target_date ?? ''}
+                    min={todayISO}
+                    onChange={(e) => e.target.value && onReschedule(t, e.target.value)}
+                    className="shrink-0 bg-surface-container border border-outline/20 text-on-surface text-[11px] font-mono px-1.5 py-0.5 focus:outline-none focus:border-secondary/40"
+                    title="Remarcar para outra data"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Cabeçalho dos dias da semana */}
       <div>
@@ -266,11 +328,48 @@ export default function RoadmapCalendar({ tasks, onToggle }: Props) {
                         <div className="text-xs text-on-surface-variant mt-1">{t.description}</div>
                       )}
                     </div>
+                    {onReschedule && !done && (
+                      <input
+                        type="date"
+                        value={t.target_date ?? ''}
+                        onChange={(e) => e.target.value && onReschedule(t, e.target.value)}
+                        className="shrink-0 bg-surface-container border border-outline/20 text-on-surface text-[11px] font-mono px-1.5 py-0.5 focus:outline-none focus:border-secondary/40"
+                        title="Remarcar esta tarefa"
+                      />
+                    )}
                   </div>
                 );
               })}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Tarefas sem data — invisíveis na grade até serem agendadas */}
+      {undated.length > 0 && (
+        <div className="border border-outline/15 bg-surface-container">
+          <div className="px-3 py-2 border-b border-outline/10">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted">
+              {undated.length} tarefa{undated.length > 1 ? 's' : ''} sem data — agendar para aparecer no calendário
+            </span>
+          </div>
+          <div className="divide-y divide-outline/10">
+            {undated.map((t) => (
+              <div key={t.id} className="flex items-center gap-2 px-3 py-1.5">
+                <span className="flex-1 min-w-0 text-sm text-on-surface truncate">{t.title}</span>
+                <span className="font-mono text-[10px] text-muted shrink-0">Fase {t.phase_number}</span>
+                {onReschedule && (
+                  <input
+                    type="date"
+                    min={todayISO}
+                    onChange={(e) => e.target.value && onReschedule(t, e.target.value)}
+                    className="shrink-0 bg-surface-container border border-outline/20 text-on-surface text-[11px] font-mono px-1.5 py-0.5 focus:outline-none focus:border-secondary/40"
+                    title="Agendar esta tarefa"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

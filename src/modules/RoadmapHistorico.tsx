@@ -1,7 +1,8 @@
-import { useEffect, useState, useCallback } from 'react';
-import { History, CheckSquare, Edit, Plus, Trash2, RefreshCw, Filter } from 'lucide-react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import { History, CheckSquare, Edit, Plus, Trash2, RefreshCw, Filter, CheckCircle2, Flag } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { realtimeStore } from '../lib/realtimeStore';
+import type { RoadmapPhase, RoadmapTask } from '../lib/roadmapStore';
 
 type AuditLog = {
   id: string;
@@ -80,10 +81,34 @@ function summarizeChange(log: AuditLog): string {
 
 type FilterScope = 'todos' | 'roadmap' | 'decisoes' | 'backlog';
 
-export default function RoadmapHistorico() {
+function fmtData(iso: string | null): string {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+type Props = {
+  phases?: RoadmapPhase[];
+  tasks?: RoadmapTask[];
+};
+
+export default function RoadmapHistorico({ phases = [], tasks = [] }: Props) {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<FilterScope>('todos');
+  // Dentro do módulo Roadmap (com fases), o audit abre já filtrado no roadmap
+  const [filter, setFilter] = useState<FilterScope>(phases.length > 0 ? 'roadmap' : 'todos');
+
+  // Jornada: fases com atividade (iniciadas/concluídas), em ordem
+  const jornada = useMemo(() =>
+    [...phases].sort((a, b) => a.phase_number - b.phase_number),
+  [phases]);
+
+  // Conquistas: tarefas concluídas, mais recentes primeiro
+  const conquistas = useMemo(() =>
+    tasks
+      .filter((t) => t.completed_at)
+      .sort((a, b) => (a.completed_at! > b.completed_at! ? -1 : 1))
+      .slice(0, 15),
+  [tasks]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -113,6 +138,69 @@ export default function RoadmapHistorico() {
 
   return (
     <div className="space-y-4">
+      {/* Jornada da trilha — o caminho percorrido no 0→milhão */}
+      {jornada.length > 0 && (
+        <div className="border border-outline/15 bg-surface-container p-5">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-secondary mb-4">Jornada da trilha · 0→milhão</div>
+          <div className="relative">
+            <div className="absolute left-[9px] top-2 bottom-2 w-px bg-outline/25" />
+            <div className="space-y-3">
+              {jornada.map((f) => {
+                const done = !!f.completed_at;
+                const started = !!f.started_at;
+                return (
+                  <div key={f.phase_number} className="relative pl-8">
+                    <span className="absolute left-0 top-0.5">
+                      {done
+                        ? <CheckCircle2 className="w-[19px] h-[19px] text-success" />
+                        : started
+                          ? <span className="block w-[19px] h-[19px] rounded-full bg-surface border-2 border-secondary" />
+                          : <span className="block w-[11px] h-[11px] mt-1 ml-1 rounded-full border border-muted/60" />}
+                    </span>
+                    <div className="flex items-baseline gap-2 flex-wrap">
+                      <span className={`text-sm font-medium ${done ? 'text-on-surface' : started ? 'text-on-surface' : 'text-muted'}`}>
+                        Fase {f.phase_number} · {f.nome}
+                      </span>
+                      <span className="font-mono text-[10px] text-muted">
+                        {done
+                          ? `${fmtData(f.started_at)} → concluída ${fmtData(f.completed_at)}`
+                          : started
+                            ? `iniciada ${fmtData(f.started_at)} · em andamento`
+                            : 'não iniciada'}
+                      </span>
+                      {f.decision_gate_met_at && (
+                        <span className="font-mono text-[9px] uppercase text-success bg-success/10 px-1.5 py-0.5 flex items-center gap-1">
+                          <Flag size={8} /> gate {fmtData(f.decision_gate_met_at)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Conquistas — tarefas concluídas mais recentes */}
+      {conquistas.length > 0 && (
+        <div className="border border-outline/15 bg-surface-container">
+          <div className="px-4 py-2.5 border-b border-outline/10">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Conquistas recentes ({conquistas.length})</span>
+          </div>
+          <div className="divide-y divide-outline/10">
+            {conquistas.map((t) => (
+              <div key={t.id} className="flex items-center gap-2.5 px-4 py-2">
+                <CheckSquare size={14} className="text-success shrink-0" />
+                <span className="flex-1 min-w-0 text-sm text-on-surface truncate">{t.title}</span>
+                <span className="font-mono text-[10px] text-muted shrink-0">Fase {t.phase_number}</span>
+                <span className="font-mono text-[10px] text-success shrink-0">{fmtData(t.completed_at)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <div className="flex items-center gap-2">

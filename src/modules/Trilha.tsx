@@ -73,7 +73,7 @@ export default function Trilha() {
   const [phases, setPhases] = useState<RoadmapPhase[]>([]);
   const [tasks, setTasks] = useState<RoadmapTask[]>([]);
   const [progress, setProgress] = useState<PhaseProgress[]>([]);
-  const [expandido, setExpandido] = useState<number | null>(0);
+  const [expandido, setExpandido] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [internalUserId, setInternalUserId] = useState<string | null>(null);
 
@@ -87,6 +87,9 @@ export default function Trilha() {
     setPhases(p);
     setTasks(t);
     setProgress(pr);
+    // Abre na fase atual (primeira não-concluída com tarefas), não na Fase 0
+    const atual = p.find((f) => !f.completed_at && pr.some((x) => x.phase_number === f.phase_number && x.total_tasks > 0)) ?? p[0];
+    setExpandido((prev) => prev ?? atual?.phase_number ?? 0);
     setLoading(false);
   }, []);
 
@@ -119,6 +122,13 @@ export default function Trilha() {
     } : t));
     await roadmapStore.toggleTask(task.id, newCompleted, internalUserId);
     // Refresh progress stats
+    const pr = await roadmapStore.listProgress();
+    setProgress(pr);
+  };
+
+  const handleReschedule = async (task: RoadmapTask, newDate: string | null) => {
+    setTasks((prev) => prev.map((t) => t.id === task.id ? { ...t, target_date: newDate } : t));
+    await roadmapStore.updateTargetDate(task.id, newDate);
     const pr = await roadmapStore.listProgress();
     setProgress(pr);
   };
@@ -208,11 +218,11 @@ export default function Trilha() {
 
       {/* View: Calendário */}
       {view === 'calendar' && (
-        <RoadmapCalendar tasks={tasks} onToggle={handleToggle} />
+        <RoadmapCalendar tasks={tasks} onToggle={handleToggle} onReschedule={handleReschedule} />
       )}
 
       {/* View: Histórico */}
-      {view === 'historico' && <RoadmapHistorico />}
+      {view === 'historico' && <RoadmapHistorico phases={phases} tasks={tasks} />}
 
       {/* View: Timeline — continua abaixo */}
       {view === 'timeline' && (

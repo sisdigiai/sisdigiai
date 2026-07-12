@@ -61,6 +61,10 @@
   --color-brand-dark: #0A0F1E;
 }
 
+/* Controles nativos (date picker, scrollbar) seguem o tema */
+:root { color-scheme: dark; }
+:root[data-theme="light"] { color-scheme: light; }
+
 /* ============================================================
    LIGHT MODE — editorial claro. Ativa com <html data-theme="light">.
    Sobrescreve os MESMOS nomes de token → todas as utilities Tailwind
