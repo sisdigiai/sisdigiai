@@ -25,7 +25,8 @@ const VERDADES_CANONICAS = [
 // Funil comercial real (ordem + rótulos). "perdido" fica fora do pipeline visível.
 const FUNNEL: { stage: LeadStage; label: string }[] = [
   { stage: 'lead', label: 'Leads' },
-  { stage: 'contato', label: 'Contato' },
+  { stage: 'contatado', label: 'Contatado' },
+  { stage: 'conversa', label: 'Conversa' },
   { stage: 'demo', label: 'Demonstração' },
   { stage: 'piloto', label: 'Piloto' },
   { stage: 'cliente', label: 'Cliente' },

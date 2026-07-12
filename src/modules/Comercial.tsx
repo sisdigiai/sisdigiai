@@ -1,22 +1,32 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Plus, Trash2, Briefcase, Pencil, X, Play, FileText } from 'lucide-react';
+import { Plus, Trash2, Briefcase, Pencil, X, Play, FileText, Search, Target, AlertTriangle, Clock } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { commercialStore, type CommercialLead, type LeadStage } from '../lib/commercialStore';
 import { playbookStore, type Playbook } from '../lib/playbookStore';
 import { meetingStore, type MeetingSession } from '../lib/meetingStore';
 import { proposalStore, type Proposal } from '../lib/proposalStore';
+import { roadmapStore, type RoadmapPhase } from '../lib/roadmapStore';
 import MeetingRunner from './comercial/MeetingRunner';
 import ProposalEditor from './comercial/ProposalEditor';
 import { proposalFromMeeting } from './comercial/proposalGen';
 
+// Funil real do banco: lead → contatado → conversa → demo → piloto → cliente/perdido
 const STAGES: { key: LeadStage; label: string; color: string }[] = [
   { key: 'lead', label: 'Lead', color: 'var(--color-muted)' },
-  { key: 'contato', label: 'Contato', color: 'var(--color-info)' },
+  { key: 'contatado', label: 'Contatado', color: 'var(--color-info)' },
+  { key: 'conversa', label: 'Conversa', color: 'var(--color-secondary)' },
   { key: 'demo', label: 'Demo', color: 'var(--color-action)' },
   { key: 'piloto', label: 'Piloto', color: 'var(--color-warning)' },
   { key: 'cliente', label: 'Cliente', color: 'var(--color-success)' },
   { key: 'perdido', label: 'Perdido', color: 'var(--color-danger)' },
 ];
+
+const COL_CAP = 8; // cards visíveis por coluna antes do "+N mais" (232 leads numa coluna só = inutilizável)
+
+function diasParado(updatedAt?: string): number | null {
+  if (!updatedAt) return null;
+  return Math.floor((Date.now() - new Date(updatedAt).getTime()) / 86400000);
+}
 
 const PRODUCTS = ['clearix', 'osi', 'academy', 'outro'];
 
@@ -40,22 +50,49 @@ export default function Comercial() {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [runner, setRunner] = useState<{ lead: CommercialLead | null } | null>(null);
   const [proposalEditor, setProposalEditor] = useState<{ proposal: Proposal; lead: CommercialLead | null } | null>(null);
+  const [busca, setBusca] = useState('');
+  const [filtroProduto, setFiltroProduto] = useState<string>('todos');
+  const [expandidas, setExpandidas] = useState<Set<LeadStage>>(new Set());
+  const [faseAtual, setFaseAtual] = useState<RoadmapPhase | null>(null);
 
   const load = () => {
     commercialStore.list().then((rows) => { setLeads(rows); setLoading(false); });
     playbookStore.list().then(setPlaybooks);
     meetingStore.list().then(setMeetings);
     proposalStore.list().then(setProposals);
+    roadmapStore.listPhases().then((ps) => setFaseAtual(ps.find((p) => !p.completed_at && p.started_at) ?? null));
   };
   useEffect(load, []);
 
+  const visiveis = useMemo(() => {
+    const q = busca.trim().toLowerCase();
+    return leads.filter((l) =>
+      (filtroProduto === 'todos' || l.product === filtroProduto) &&
+      (q === '' || l.company.toLowerCase().includes(q) || (l.name || '').toLowerCase().includes(q) || (l.source || '').toLowerCase().includes(q))
+    );
+  }, [leads, busca, filtroProduto]);
+
   const kpis = useMemo(() => {
     const byStage = (s: LeadStage) => leads.filter((l) => l.stage === s).length;
+    const contatados = leads.filter((l) => l.stage !== 'lead' && l.stage !== 'perdido').length;
     const openValue = leads
       .filter((l) => l.stage !== 'perdido' && l.stage !== 'cliente')
       .reduce((sum, l) => sum + (l.value_brl || 0), 0);
-    return { total: leads.length, pilotos: byStage('piloto'), clientes: byStage('cliente'), openValue };
+    return { total: leads.length, contatados, emConversa: byStage('conversa') + byStage('demo'), pilotos: byStage('piloto'), clientes: byStage('cliente'), openValue };
   }, [leads]);
+
+  // Painel de ação: o que precisa de atenção HOJE
+  const acao = useMemo(() => {
+    const hoje = new Date().toISOString().slice(0, 10);
+    const followupsVencidos = meetings.filter((m) => m.follow_up_date && m.follow_up_date <= hoje && m.next_action);
+    const trabalhados = leads.filter((l) => ['contatado', 'conversa', 'demo', 'piloto'].includes(l.stage));
+    const parados = trabalhados
+      .map((l) => ({ lead: l, dias: diasParado(l.updated_at) ?? 0 }))
+      .filter((x) => x.dias >= 7)
+      .sort((a, b) => b.dias - a.dias);
+    const semNextStep = trabalhados.filter((l) => !l.next_step?.trim()).length;
+    return { followupsVencidos, parados, semNextStep };
+  }, [meetings, leads]);
 
   const save = async () => {
     if (!editing || !editing.company.trim()) return;
@@ -107,36 +144,109 @@ export default function Comercial() {
 
       {tab === 'pipeline' && (
         <>
-          {/* KPIs */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          {/* Meta da fase — o Comercial existe pra cumprir o gate do Roadmap */}
+          {faseAtual && (
+            <div className="border border-secondary/40 bg-secondary-container/20 p-4 mb-5 flex items-start gap-3 flex-wrap">
+              <Target className="w-4 h-4 text-secondary shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <div className="font-mono text-[10px] uppercase tracking-widest text-secondary">Meta da Fase {faseAtual.phase_number} · {faseAtual.nome}</div>
+                <div className="text-sm text-on-surface mt-0.5">{faseAtual.metrica_unica}</div>
+              </div>
+              <div className="flex items-center gap-4 shrink-0">
+                <div className="text-center">
+                  <div className="font-serif text-2xl font-semibold tabular-nums text-warning">{kpis.pilotos}</div>
+                  <div className="font-mono text-[9px] uppercase tracking-wider text-muted">pilotos</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-serif text-2xl font-semibold tabular-nums text-success">{kpis.clientes}</div>
+                  <div className="font-mono text-[9px] uppercase tracking-wider text-muted">clientes</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Ação hoje — follow-ups vencidos + leads esfriando */}
+          {(acao.followupsVencidos.length > 0 || acao.parados.length > 0 || acao.semNextStep > 0) && (
+            <div className="border border-warning/30 bg-warning/5 mb-5">
+              <div className="px-4 py-2 border-b border-warning/20 flex items-center gap-2">
+                <Clock className="w-3.5 h-3.5 text-warning" />
+                <span className="font-mono text-[10px] uppercase tracking-widest text-warning">Ação hoje</span>
+                {acao.semNextStep > 0 && <span className="ml-auto font-mono text-[10px] text-muted">{acao.semNextStep} trabalhado(s) sem próximo passo</span>}
+              </div>
+              <div className="divide-y divide-outline/10">
+                {acao.followupsVencidos.slice(0, 5).map((m) => (
+                  <div key={m.id} className="flex items-center gap-3 px-4 py-2">
+                    <span className="font-mono text-[10px] text-danger shrink-0">{dt(m.follow_up_date ?? undefined)}</span>
+                    <span className="text-sm text-on-surface truncate flex-1">{m.lead_company ?? 'Avulsa'} — {m.next_action}</span>
+                    <span className="font-mono text-[9px] uppercase text-muted shrink-0">follow-up vencido</span>
+                  </div>
+                ))}
+                {acao.parados.slice(0, 5).map(({ lead, dias }) => (
+                  <div key={lead.id} className="flex items-center gap-3 px-4 py-2">
+                    <span className={`font-mono text-[10px] shrink-0 ${dias >= 14 ? 'text-danger' : 'text-warning'}`}>{dias}d parado</span>
+                    <span className="text-sm text-on-surface truncate flex-1">{lead.company}{lead.next_step ? ` — → ${lead.next_step}` : ''}</span>
+                    <button onClick={() => setEditing(lead)} className="font-mono text-[9px] uppercase text-secondary hover:underline shrink-0">retomar</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* KPIs — o funil em números */}
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-5">
             {[
-              { label: 'Total no pipeline', value: kpis.total },
-              { label: 'Pilotos ativos', value: kpis.pilotos },
+              { label: 'Base total', value: kpis.total },
+              { label: 'Contatados', value: kpis.contatados },
+              { label: 'Conversa + demo', value: kpis.emConversa },
+              { label: 'Pilotos', value: kpis.pilotos },
               { label: 'Clientes', value: kpis.clientes },
               { label: 'Valor em aberto', value: brl(kpis.openValue) },
             ].map((k) => (
-              <div key={k.label} className="border border-outline/10 bg-surface-low p-4">
+              <div key={k.label} className="border border-outline/10 bg-surface-low p-3">
                 <div className="text-[10px] font-mono uppercase tracking-widest text-muted">{k.label}</div>
                 <div className="text-xl font-semibold tabular-nums text-on-surface mt-1">{k.value}</div>
               </div>
             ))}
           </div>
 
+          {/* Busca + filtro por produto */}
+          <div className="flex flex-wrap items-center gap-3 mb-5">
+            <div className="relative">
+              <Search className="w-4 h-4 text-muted absolute left-2.5 top-2" />
+              <input
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                placeholder="Buscar ótica, contato ou origem…"
+                className="bg-surface-container border border-outline/15 pl-8 pr-3 py-1.5 text-sm text-on-surface w-64 focus:outline-none focus:border-secondary/40"
+              />
+            </div>
+            <div className="flex gap-1">
+              {['todos', ...PRODUCTS].map((p) => (
+                <button key={p} onClick={() => setFiltroProduto(p)} className={`px-2.5 py-1 text-xs font-medium capitalize transition-colors ${filtroProduto === p ? 'bg-secondary-container/40 text-on-surface border border-secondary/40' : 'bg-surface-high text-muted hover:text-on-surface'}`}>
+                  {p}
+                </button>
+              ))}
+            </div>
+            {busca && <span className="font-mono text-[10px] text-muted">{visiveis.length} resultado(s)</span>}
+          </div>
+
           {loading ? (
             <div className="text-sm text-muted">Carregando pipeline…</div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-3">
               {STAGES.map((stage) => {
-                const items = leads.filter((l) => l.stage === stage.key);
+                const all = visiveis.filter((l) => l.stage === stage.key);
+                const aberta = expandidas.has(stage.key) || busca !== '';
+                const items = aberta ? all : all.slice(0, COL_CAP);
                 return (
                   <div key={stage.key} className="border border-outline/10 bg-surface-low/50 min-h-[120px]">
                     <div className="flex items-center gap-2 px-3 py-2 border-b border-outline/10">
                       <span className="w-2 h-2" style={{ background: stage.color }} />
                       <span className="text-xs font-semibold text-on-surface">{stage.label}</span>
-                      <span className="ml-auto text-[10px] font-mono text-muted tabular-nums">{items.length}</span>
+                      <span className="ml-auto text-[10px] font-mono text-muted tabular-nums">{all.length}</span>
                     </div>
                     <div className="p-2 space-y-2">
-                      {items.length === 0 && <div className="text-[11px] text-muted italic px-1 py-2">—</div>}
+                      {all.length === 0 && <div className="text-[11px] text-muted italic px-1 py-2">—</div>}
                       {items.map((lead) => (
                         <div key={lead.id} className="border border-outline/10 bg-surface-low p-2.5 space-y-1.5 group">
                           <div className="flex items-start justify-between gap-1">
@@ -166,6 +276,13 @@ export default function Comercial() {
                             )}
                           </div>
                           {lead.next_step && <div className="text-[10px] text-muted leading-snug">→ {lead.next_step}</div>}
+                          {(() => {
+                            const d = diasParado(lead.updated_at);
+                            if (d != null && d >= 7 && !['lead', 'cliente', 'perdido'].includes(lead.stage)) {
+                              return <div className={`text-[9px] font-mono uppercase tracking-wider ${d >= 14 ? 'text-danger' : 'text-warning'}`}>parado há {d}d</div>;
+                            }
+                            return null;
+                          })()}
                           <select
                             value={lead.stage}
                             onChange={(e) => moveStage(lead, e.target.value as LeadStage)}
@@ -175,6 +292,22 @@ export default function Comercial() {
                           </select>
                         </div>
                       ))}
+                      {all.length > COL_CAP && !aberta && (
+                        <button
+                          onClick={() => setExpandidas((prev) => new Set(prev).add(stage.key))}
+                          className="w-full text-[10px] font-mono uppercase tracking-wider text-secondary hover:bg-surface-high py-1.5 transition-colors"
+                        >
+                          + {all.length - COL_CAP} mais
+                        </button>
+                      )}
+                      {aberta && all.length > COL_CAP && busca === '' && (
+                        <button
+                          onClick={() => setExpandidas((prev) => { const n = new Set(prev); n.delete(stage.key); return n; })}
+                          className="w-full text-[10px] font-mono uppercase tracking-wider text-muted hover:bg-surface-high py-1.5 transition-colors"
+                        >
+                          recolher
+                        </button>
+                      )}
                     </div>
                   </div>
                 );

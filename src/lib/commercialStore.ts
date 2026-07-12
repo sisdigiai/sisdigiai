@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
 
-export type LeadStage = 'lead' | 'contato' | 'demo' | 'piloto' | 'cliente' | 'perdido';
+// Estágios espelham o funil REAL do banco: lead → contatado → conversa → demo → piloto → cliente/perdido
+export type LeadStage = 'lead' | 'contatado' | 'conversa' | 'demo' | 'piloto' | 'cliente' | 'perdido';
 
 export interface CommercialLead {
   id?: string;
@@ -14,6 +15,7 @@ export interface CommercialLead {
   owner: string;
   next_step: string;
   notes: string;
+  updated_at?: string;
 }
 
 const LS_KEY = 'digiai_commercial_leads';

@@ -7,7 +7,8 @@ import PlaybookView from './PlaybookView';
 
 const STAGES: { key: LeadStage; label: string }[] = [
   { key: 'lead', label: 'Lead' },
-  { key: 'contato', label: 'Contato' },
+  { key: 'contatado', label: 'Contatado' },
+  { key: 'conversa', label: 'Conversa' },
   { key: 'demo', label: 'Demo' },
   { key: 'piloto', label: 'Piloto' },
   { key: 'cliente', label: 'Cliente' },
