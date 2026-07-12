@@ -1,16 +1,18 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Search, AlertTriangle, LayoutList, Boxes } from 'lucide-react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
+import { Search, AlertTriangle, LayoutList, Boxes, CheckSquare, Square, CheckCircle2 } from 'lucide-react';
 import { backlogStore } from '../lib/backlogStore';
 import { roadmapStore } from '../lib/roadmapStore';
-import { PRODUTO_BY_SLUG, DEGRAU_LABEL, type ProdutoInfo } from './Portfolio';
+import { realtimeStore } from '../lib/realtimeStore';
+import { PRODUTOS, PRODUTO_BY_SLUG, DEGRAU_LABEL, type ProdutoInfo } from './Portfolio';
 import PageHeader from '../components/PageHeader';
 
 type Fonte = 'Backlog' | 'Roadmap';
 type StatusNorm = 'done' | 'in_progress' | 'pending' | 'blocked' | 'atrasado' | 'cancelled';
-type Vista = 'lista' | 'produto';
+type Vista = 'produto' | 'lista';
 
 interface MasterItem {
   id: string;
+  rawId: string;
   fonte: Fonte;
   title: string;
   area: string;
@@ -39,26 +41,23 @@ const NOME_LIVRE: Record<string, string> = {
   'sem-produto': 'Sem produto',
 };
 
-function nomeDoGrupo(slug: string, info?: ProdutoInfo): string {
-  if (info) return info.nome;
-  return NOME_LIVRE[slug] ?? slug;
-}
-
-function ProdutoTile({ info, slug }: { info?: ProdutoInfo; slug: string }) {
+function ProdutoTile({ info, slug, size = 9 }: { info?: ProdutoInfo; slug: string; size?: 7 | 9 }) {
+  const px = size === 9 ? 'w-9 h-9' : 'w-7 h-7';
+  const logoPx = size === 9 ? 'w-5 h-5' : 'w-4 h-4';
   if (info) {
     return (
       <div
-        className="w-9 h-9 flex items-center justify-center overflow-hidden font-mono text-[11px] font-bold shrink-0"
+        className={`${px} flex items-center justify-center overflow-hidden font-mono text-[11px] font-bold shrink-0`}
         style={info.badge ? undefined : { background: info.cor, color: 'var(--color-on-action)' }}
       >
         {info.logo
-          ? <img src={info.logo} alt="" className={info.badge ? 'w-9 h-9 object-cover' : 'w-5 h-5 object-contain'} style={info.badge ? undefined : { filter: 'brightness(0) invert(1)' }} />
+          ? <img src={info.logo} alt="" className={info.badge ? `${px} object-cover` : `${logoPx} object-contain`} style={info.badge ? undefined : { filter: 'brightness(0) invert(1)' }} />
           : info.mono}
       </div>
     );
   }
   return (
-    <div className="w-9 h-9 flex items-center justify-center font-mono text-[11px] font-bold shrink-0 bg-surface-high text-muted">
+    <div className={`${px} flex items-center justify-center font-mono text-[11px] font-bold shrink-0 bg-surface-high text-muted`}>
       {slug.slice(0, 2).toUpperCase()}
     </div>
   );
@@ -94,92 +93,136 @@ export default function ListaMestra() {
   const [prio, setPrio] = useState<'todas' | number>('todas');
   const [busca, setBusca] = useState('');
 
-  useEffect(() => {
+  const load = useCallback(async () => {
     const hoje = new Date().toISOString().slice(0, 10);
-    Promise.all([backlogStore.list(), roadmapStore.listTasks()])
-      .then(([backlog, tasks]) => {
-        const b: MasterItem[] = backlog.map(x => ({
-          id: `b-${x.id}`,
-          fonte: 'Backlog',
-          title: x.title,
-          area: x.area || '—',
-          fase: '—',
-          prioridade: x.priority,
-          status: (x.status === 'cancelled' ? 'cancelled' : x.status) as StatusNorm,
-          owner: x.owner || '—',
-          prazo: x.due_date,
-          productId: x.product_id,
-          blocker: x.blocker,
-        }));
-        const r: MasterItem[] = tasks.map(t => {
-          let st: StatusNorm = 'pending';
-          if (t.completed_at) st = 'done';
-          else if (t.target_date && t.target_date < hoje) st = 'atrasado';
-          return {
-            id: `r-${t.id}`,
-            fonte: 'Roadmap',
-            title: t.title,
-            area: t.track ? `Track ${t.track}` : '—',
-            fase: `Fase ${t.phase_number}`,
-            prioridade: t.priority,
-            status: st,
-            owner: t.track ? `Track ${t.track}` : '—',
-            prazo: t.target_date,
-            productId: null,
-            blocker: null,
-          };
-        });
-        setItems([...b, ...r]);
-      })
-      .catch(() => setItems([]));
+    try {
+      const [backlog, tasks] = await Promise.all([backlogStore.list(), roadmapStore.listTasks()]);
+      const b: MasterItem[] = backlog.map(x => ({
+        id: `b-${x.id}`,
+        rawId: x.id,
+        fonte: 'Backlog',
+        title: x.title,
+        area: x.area || '—',
+        fase: '—',
+        prioridade: x.priority,
+        status: (x.status === 'cancelled' ? 'cancelled' : x.status) as StatusNorm,
+        owner: x.owner || '—',
+        prazo: x.due_date,
+        productId: x.product_id,
+        blocker: x.blocker,
+      }));
+      const r: MasterItem[] = tasks.map(t => {
+        let st: StatusNorm = 'pending';
+        if (t.completed_at) st = 'done';
+        else if (t.target_date && t.target_date < hoje) st = 'atrasado';
+        return {
+          id: `r-${t.id}`,
+          rawId: t.id,
+          fonte: 'Roadmap',
+          title: t.title,
+          area: t.track ? `Track ${t.track}` : '—',
+          fase: `Fase ${t.phase_number}`,
+          prioridade: t.priority,
+          status: st,
+          owner: t.track ? `Track ${t.track}` : '—',
+          prazo: t.target_date,
+          productId: null,
+          blocker: null,
+        };
+      });
+      setItems([...b, ...r]);
+    } catch {
+      setItems([]);
+    }
   }, []);
 
-  const passaFiltro = (i: MasterItem) => {
+  useEffect(() => { load(); }, [load]);
+
+  // Vivo: mudanças no Backlog ou no Roadmap (feitas em qualquer módulo) refletem aqui
+  useEffect(() => {
+    const unsub = realtimeStore.subscribe((event) => {
+      if (event.table === 'backlog_items' || event.table === 'roadmap_tasks' || event.table === 'roadmap_phases') {
+        load();
+      }
+    });
+    return () => unsub();
+  }, [load]);
+
+  // Concluir/reabrir direto daqui — grava na fonte certa (Backlog ou Roadmap)
+  const toggleItem = async (i: MasterItem) => {
+    const done = i.status === 'done';
+    setItems(prev => (prev ?? []).map(x => x.id === i.id ? { ...x, status: done ? 'pending' : 'done' } : x));
+    if (i.fonte === 'Backlog') {
+      await backlogStore.updateStatus(i.rawId, done ? 'pending' : 'done');
+    } else {
+      await roadmapStore.toggleTask(i.rawId, !done, null);
+    }
+  };
+
+  const passaFiltro = useCallback((i: MasterItem) => {
     const q = busca.trim().toLowerCase();
     return (
       (status === 'todos' || i.status === status) &&
       (prio === 'todas' || i.prioridade === prio) &&
       (q === '' || i.title.toLowerCase().includes(q) || i.area.toLowerCase().includes(q) || (i.productId ?? '').includes(q))
     );
-  };
+  }, [busca, status, prio]);
 
   const filtrados = useMemo(() =>
     (items ?? [])
       .filter(i => (fonte === 'todos' || i.fonte === fonte) && passaFiltro(i))
       .sort((a, b) => a.prioridade - b.prioridade || a.fase.localeCompare(b.fase)),
-  [items, fonte, status, prio, busca]);
+  [items, fonte, passaFiltro]);
 
-  const grupos = useMemo(() => {
+  // Por produto: TODOS os produtos do Portfólio + frentes livres do Backlog (digiai, sem-produto)
+  const { grupos, emDia } = useMemo(() => {
     const backlog = (items ?? []).filter(i => i.fonte === 'Backlog' && passaFiltro(i));
-    const map = new Map<string, MasterItem[]>();
+    const porSlug = new Map<string, MasterItem[]>();
     for (const it of backlog) {
       const key = it.productId || 'sem-produto';
-      if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(it);
+      if (!porSlug.has(key)) porSlug.set(key, []);
+      porSlug.get(key)!.push(it);
     }
-    const arr = [...map.entries()].map(([slug, its]) => {
+    const slugs = new Set<string>([...PRODUTOS.map(p => p.slug), ...porSlug.keys()]);
+    const all = [...slugs].map(slug => {
       const info = PRODUTO_BY_SLUG[slug];
+      const its = (porSlug.get(slug) ?? []).sort((a, b) => a.prioridade - b.prioridade);
       const abertos = its.filter(i => i.status !== 'done' && i.status !== 'cancelled').length;
       const bloqueados = its.filter(i => i.status === 'blocked').length;
       return {
         slug,
         info,
-        nome: nomeDoGrupo(slug, info),
-        items: its.sort((a, b) => a.prioridade - b.prioridade),
+        nome: info?.nome ?? NOME_LIVRE[slug] ?? slug,
+        items: its,
         abertos,
         bloqueados,
       };
     });
-    arr.sort((a, b) => b.bloqueados - a.bloqueados || b.abertos - a.abertos || (a.info?.maturidade ?? 0) - (b.info?.maturidade ?? 0));
-    return arr;
-  }, [items, status, prio, busca]);
+    const comPendencia = all.filter(g => g.items.length > 0)
+      .sort((a, b) => b.bloqueados - a.bloqueados || b.abertos - a.abertos || (a.info?.maturidade ?? 0) - (b.info?.maturidade ?? 0));
+    const semPendencia = all.filter(g => g.items.length === 0)
+      .sort((a, b) => (b.info?.maturidade ?? 0) - (a.info?.maturidade ?? 0));
+    return { grupos: comPendencia, emDia: semPendencia };
+  }, [items, passaFiltro]);
 
+  const abertosTotal = (items ?? []).filter(i => i.status !== 'done' && i.status !== 'cancelled').length;
+  const bloqueadosTotal = (items ?? []).filter(i => i.status === 'blocked').length;
   const atrasados = (items ?? []).filter(i => i.status === 'atrasado').length;
 
   const chip = (active: boolean) =>
     `px-3 py-1 text-xs font-medium border transition-all ${
       active ? 'bg-secondary-container/40 text-on-surface border-secondary/40' : 'text-on-surface-variant border-outline/10 hover:text-on-surface'
     }`;
+
+  const CheckBtn = ({ i }: { i: MasterItem }) => (
+    <button
+      onClick={() => toggleItem(i)}
+      className={`shrink-0 transition-colors ${i.status === 'done' ? 'text-success' : 'text-muted hover:text-success'}`}
+      title={i.status === 'done' ? 'Reabrir' : 'Concluir'}
+    >
+      {i.status === 'done' ? <CheckSquare size={15} /> : <Square size={15} />}
+    </button>
+  );
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -188,8 +231,10 @@ export default function ListaMestra() {
         title="Lista Mestra"
         subtitle={
           <>
-            {items === null ? 'Carregando…' : `${items.length} itens`} · o que falta em cada produto (Backlog) + estratégia (Roadmap)
+            {items === null ? 'Carregando…' : `${abertosTotal} abertos`}
+            {bloqueadosTotal > 0 && <span className="text-danger"> · {bloqueadosTotal} bloqueados</span>}
             {atrasados > 0 && <span className="text-warning"> · {atrasados} atrasados</span>}
+            {' '}· o que falta por produto (Backlog) + estratégia (Roadmap) · vivo
           </>
         }
       />
@@ -253,7 +298,7 @@ export default function ListaMestra() {
           <div className="space-y-4">
             <div className="text-[11px] text-muted">
               O que falta em cada produto, do Backlog (<span className="font-mono">ops.backlog_items</span>) agrupado por <span className="font-mono">product_id</span>.
-              A estratégia 0→milhão vive no módulo <span className="text-on-surface">Roadmap</span>.
+              A estratégia 0→milhão vive no módulo <span className="text-on-surface">Roadmap</span>. Concluir aqui grava na fonte.
             </div>
             {grupos.length === 0 && <div className="px-4 py-8 text-center text-sm text-muted">Nenhum item com esses filtros.</div>}
             {grupos.map(g => (
@@ -287,13 +332,14 @@ export default function ListaMestra() {
                     const st = STATUS_STYLE[i.status];
                     return (
                       <div key={i.id} className="flex items-start gap-3 px-4 py-2.5">
+                        <span className="mt-0.5"><CheckBtn i={i} /></span>
                         <span className="font-mono text-[10px] text-muted tabular-nums mt-1 w-6 shrink-0">P{i.prioridade}</span>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className={`text-sm ${i.status === 'done' ? 'text-muted line-through' : 'text-on-surface'}`}>{i.title}</span>
                             <span className={`text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 border ${st.cls}`}>{st.label}</span>
                           </div>
-                          {i.blocker && <div className="text-[11px] text-muted mt-0.5 leading-snug">{i.blocker}</div>}
+                          {i.blocker && i.status !== 'done' && <div className="text-[11px] text-muted mt-0.5 leading-snug">{i.blocker}</div>}
                         </div>
                         {i.prazo && <span className="font-mono text-[10px] text-muted shrink-0 mt-1">{i.prazo}</span>}
                       </div>
@@ -302,6 +348,30 @@ export default function ListaMestra() {
                 </div>
               </div>
             ))}
+
+            {/* Produtos em dia — sem pendência aberta no Backlog */}
+            {emDia.length > 0 && (
+              <div className="border border-outline/15 bg-surface-container">
+                <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-success" />
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-muted">
+                    Sem pendência no Backlog ({emDia.length}) — cobertura completa do portfólio
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-outline/10">
+                  {emDia.map(g => (
+                    <div key={g.slug} className="bg-surface-container flex items-center gap-2.5 px-3 py-2">
+                      <ProdutoTile info={g.info} slug={g.slug} size={7} />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[13px] font-medium text-on-surface truncate">{g.nome}</div>
+                        {g.info && <span className="font-mono text-[9px] text-muted tabular-nums">{g.info.maturidade}% · {g.info.degrau ? DEGRAU_LABEL[g.info.degrau] : g.info.tier}</span>}
+                      </div>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -312,7 +382,8 @@ export default function ListaMestra() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-surface-low text-[10px] font-mono uppercase tracking-widest text-on-surface-variant">
-                    <th className="text-left px-4 py-2.5 font-medium">Item</th>
+                    <th className="px-3 py-2.5 w-8" aria-label="Concluir" />
+                    <th className="text-left px-2 py-2.5 font-medium">Item</th>
                     <th className="text-left px-3 py-2.5 font-medium">Fonte</th>
                     <th className="text-left px-3 py-2.5 font-medium">Área / Fase</th>
                     <th className="text-left px-3 py-2.5 font-medium">Prio</th>
@@ -326,7 +397,8 @@ export default function ListaMestra() {
                     const st = STATUS_STYLE[i.status];
                     return (
                       <tr key={i.id} className="border-t border-outline/10 hover:bg-surface-low">
-                        <td className="px-4 py-2.5 text-on-surface">{i.title}</td>
+                        <td className="px-3 py-2.5"><CheckBtn i={i} /></td>
+                        <td className={`px-2 py-2.5 ${i.status === 'done' ? 'text-muted line-through' : 'text-on-surface'}`}>{i.title}</td>
                         <td className="px-3 py-2.5 text-muted font-mono text-xs">{i.fonte}</td>
                         <td className="px-3 py-2.5 text-on-surface-variant text-xs">{i.fonte === 'Roadmap' ? i.fase : i.area}</td>
                         <td className="px-3 py-2.5 text-on-surface-variant font-mono text-xs">P{i.prioridade}</td>
@@ -345,8 +417,8 @@ export default function ListaMestra() {
               )}
             </div>
             <div className="text-[11px] text-muted">
-              Fonte: <span className="font-mono">v_backlog_items</span> + <span className="font-mono">v_roadmap_tasks</span> (vivo).
-              Editar é feito nos módulos Backlog e Roadmap; aqui é a visão consolidada filtrável.
+              Fonte: <span className="font-mono">v_backlog_items</span> + <span className="font-mono">v_roadmap_tasks</span> (vivo, realtime).
+              Concluir aqui grava na fonte (Backlog/Roadmap); criar e editar itens é nos módulos de origem.
             </div>
           </>
         )}
