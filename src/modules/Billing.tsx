@@ -190,6 +190,7 @@ export default function Billing() {
                     <th className="text-left px-4 py-2 font-medium">Status</th>
                     <th className="text-left px-4 py-2 font-medium">Próx. venc.</th>
                     <th className="text-right px-4 py-2 font-medium">Atraso</th>
+                    <th className="text-right px-4 py-2 font-medium" aria-label="Ação" />
                   </tr>
                 </thead>
                 <tbody>
@@ -212,6 +213,23 @@ export default function Billing() {
                       <td className={`px-4 py-2.5 text-right font-mono tabular-nums ${(s.dias_atraso ?? 0) > 0 ? 'text-danger' : 'text-muted'}`}>
                         {s.dias_atraso ? `${s.dias_atraso}d` : '—'}
                       </td>
+                      <td className="px-4 py-2.5 text-right">
+                        {(s.dunning_stage === 'bloqueio' || s.dunning_stage === 'suspenso') && (
+                          s.tenant_ref ? (
+                            <button
+                              onClick={() => { window.location.hash = '#/clearix'; }}
+                              className="text-[10px] font-mono uppercase tracking-wider px-2 py-1 border border-danger/40 text-danger bg-danger/10 hover:bg-danger/20 transition-colors"
+                              title={`Régua recomenda suspensão — suspender o tenant ${s.tenant_ref} na Central Clearix (você autoriza, com motivo e auditoria)`}
+                            >
+                              Suspender na Central →
+                            </button>
+                          ) : (
+                            <span className="text-[10px] font-mono text-warning" title="Sem tenant_ref — vincule a assinatura ao tenant do Clearix para habilitar a suspensão">
+                              vincular tenant
+                            </span>
+                          )
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -221,8 +239,9 @@ export default function Billing() {
         </div>
 
         <p className="text-[11px] text-muted leading-relaxed">
-          Fonte viva: <span className="font-mono">billing.subscribers</span> (Mercado Pago via webhook) · régua D+3/D+7/D+15/D+30 roda diária via cron.
-          A suspensão de acesso real do tenant no Clearix é a próxima fase (cross-sistema).
+          Fonte viva: <span className="font-mono">billing.subscribers</span> (Mercado Pago via webhook + sync) · régua D+3/D+7/D+15/D+30 roda diária via cron.
+          Enforcement <strong className="text-on-surface-variant">semi-automático</strong>: em bloqueio/suspenso a régua recomenda e o humano suspende na Central Clearix
+          (1 clique — o SSO do Hub já nega acesso a tenant suspenso em todos os apps). Reativação automática no pagamento = Fase C-2 (ponte dedicada, no Backlog).
         </p>
       </div>
 
