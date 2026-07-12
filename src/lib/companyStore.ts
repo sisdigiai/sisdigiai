@@ -4,6 +4,14 @@ import type {
   FinancialSnapshot, LegalStatus
 } from './supabase';
 
+export type CompanyPartner = {
+  id: string;
+  nome: string;
+  cpf: string | null;
+  papel: string | null;
+  percent_cotas: number | null;
+};
+
 const LS_KEY = 'digiai_company_data';
 
 type LocalData = {
@@ -90,6 +98,13 @@ export const companyStore = {
     } else {
       await supabase.schema('company').from('identity').insert(identity);
     }
+  },
+
+  // ========== Partners (quadro societário — leitura) ==========
+  async listPartners(): Promise<CompanyPartner[]> {
+    if (!isSupabaseReady()) return [];
+    const { data } = await supabase.from('v_company_partners').select('*');
+    return (data as CompanyPartner[]) || [];
   },
 
   // ========== Contacts ==========

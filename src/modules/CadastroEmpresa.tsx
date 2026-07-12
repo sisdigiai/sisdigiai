@@ -1,22 +1,24 @@
 import { useEffect, useState } from 'react';
-import { Building2, Users, Globe, Wrench, DollarSign, Shield, Download, Plus, Trash2, Cloud, HardDrive } from 'lucide-react';
-import { companyStore } from '../lib/companyStore';
+import { Building2, Users, Globe, Wrench, DollarSign, Shield, Download, Plus, Trash2, Cloud, HardDrive, FileText, BookOpen, Pencil, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
+import { companyStore, type CompanyPartner } from '../lib/companyStore';
 import PageHeader from '../components/PageHeader';
 import type { CompanyIdentity, CompanyContact, DigitalAsset, Tool, FinancialSnapshot, LegalStatus } from '../lib/supabase';
 
-type TabId = 'identidade' | 'contatos' | 'digital' | 'ferramentas' | 'financeiro' | 'lgpd';
+type TabId = 'ficha' | 'docs' | 'identidade' | 'contatos' | 'digital' | 'ferramentas' | 'financeiro' | 'lgpd';
 
 const TABS: Array<{ id: TabId; label: string; icon: typeof Building2 }> = [
-  { id: 'identidade', label: 'Identidade Legal', icon: Building2 },
+  { id: 'ficha', label: 'Ficha Técnica', icon: BookOpen },
+  { id: 'docs', label: 'Documentos', icon: FileText },
   { id: 'contatos', label: 'Contatos', icon: Users },
   { id: 'digital', label: 'Identidade Digital', icon: Globe },
   { id: 'ferramentas', label: 'Ferramentas', icon: Wrench },
-  { id: 'financeiro', label: 'Financeiro', icon: DollarSign },
+  { id: 'financeiro', label: 'Snapshots', icon: DollarSign },
   { id: 'lgpd', label: 'LGPD e Jurídico', icon: Shield },
+  { id: 'identidade', label: 'Editar Dados', icon: Pencil },
 ];
 
 export default function CadastroEmpresa() {
-  const [tab, setTab] = useState<TabId>('identidade');
+  const [tab, setTab] = useState<TabId>('ficha');
   const online = companyStore.isOnline();
 
   return (
@@ -67,6 +69,8 @@ export default function CadastroEmpresa() {
       </nav>
 
       <section>
+        {tab === 'ficha' && <FichaTab onEditar={() => setTab('identidade')} />}
+        {tab === 'docs' && <DocsTab />}
         {tab === 'identidade' && <IdentidadeTab />}
         {tab === 'contatos' && <ContatosTab />}
         {tab === 'digital' && <DigitalTab />}
@@ -91,6 +95,259 @@ function Field({ label, children, col = 1 }: { label: string; children: React.Re
 
 const inputClass = 'w-full bg-surface-lowest border border-outline/30 px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-secondary/40';
 const selectClass = inputClass;
+
+// =========== Ficha Técnica (leitura — a cara do módulo) ===========
+function Item({ label, value, mono = false }: { label: string; value?: string | number | null; mono?: boolean }) {
+  return (
+    <div>
+      <div className="font-mono text-[10px] uppercase tracking-widest text-muted mb-0.5">{label}</div>
+      <div className={`text-sm text-on-surface ${mono ? 'font-mono' : ''}`}>{value ?? '—'}</div>
+    </div>
+  );
+}
+
+function Bloco({ titulo, children, acao }: { titulo: string; children: React.ReactNode; acao?: React.ReactNode }) {
+  return (
+    <div className="border border-outline/15 bg-surface-container">
+      <div className="px-5 py-3 border-b border-outline/10 flex items-center justify-between">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">{titulo}</span>
+        {acao}
+      </div>
+      <div className="p-5">{children}</div>
+    </div>
+  );
+}
+
+function brlFmt(v?: number | null): string {
+  return v == null ? '—' : v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function dataFmt(iso?: string | null): string {
+  if (!iso) return '—';
+  return new Date(iso + (iso.length === 10 ? 'T00:00:00' : '')).toLocaleDateString('pt-BR');
+}
+
+const PAPEL_LABEL: Record<string, string> = {
+  socio_administrador: 'Sócio-administrador',
+  socio: 'Sócio',
+  administrador: 'Administrador',
+};
+
+function FichaTab({ onEditar }: { onEditar: () => void }) {
+  const [identity, setIdentity] = useState<CompanyIdentity | null>(null);
+  const [partners, setPartners] = useState<CompanyPartner[]>([]);
+  const [contacts, setContacts] = useState<CompanyContact[]>([]);
+  const [ls, setLs] = useState<LegalStatus | null>(null);
+  const [tools, setTools] = useState<Tool[]>([]);
+  const [assets, setAssets] = useState<DigitalAsset[]>([]);
+
+  useEffect(() => {
+    companyStore.getIdentity().then(setIdentity);
+    companyStore.listPartners().then(setPartners);
+    companyStore.listContacts().then(setContacts);
+    companyStore.getLegalStatus().then(setLs);
+    companyStore.listTools().then(setTools);
+    companyStore.listDigitalAssets().then(setAssets);
+  }, []);
+
+  if (!identity) return <div className="text-muted text-sm py-8">Carregando ficha…</div>;
+
+  const emTransicao = (identity.notes || '').toLowerCase().includes('transição');
+  const lgpdChecks = ls ? [
+    ls.dpo_nomeado, ls.politica_privacidade_publicada, ls.tos_publicado, ls.msa_template_pronto,
+    ls.dpa_template_pronto, ls.advogado_revisao_feita, ls.registro_operacoes_tratamento,
+    ls.canal_titular_ativo, ls.plano_incidentes_pronto, ls.criptografia_repouso,
+    ls.criptografia_transito, ls.controle_acesso_minimo_privilegio, ls.backup_definido, ls.treinamento_lgpd_time,
+  ].filter(Boolean).length : 0;
+  const toolsAtivas = tools.filter(t => t.status === 'ativo');
+  const custoFerramentas = toolsAtivas.reduce((s, t) => s + (t.custo_mensal_brl || 0), 0);
+  const assetsAtivos = assets.filter(a => a.status === 'ativo').length;
+
+  return (
+    <div className="space-y-5">
+      {/* Cabeçalho da ficha */}
+      <div className="border border-outline/15 bg-surface-container p-6">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <div className="font-serif text-2xl font-semibold text-on-surface">{identity.razao_social || identity.nome_fantasia}</div>
+            <div className="font-mono text-xs text-muted mt-1">{identity.nome_fantasia} · CNPJ {identity.cnpj || '—'}</div>
+          </div>
+          <button onClick={onEditar} className="px-3 py-1.5 text-xs font-mono uppercase tracking-widest border border-outline/20 text-muted hover:text-on-surface hover:bg-surface-high transition-colors flex items-center gap-1.5">
+            <Pencil size={12} /> Editar dados
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-2 mt-4">
+          <span className="font-mono text-[10px] uppercase tracking-wider px-2 py-1 border border-outline/20 text-on-surface-variant">{identity.natureza_juridica || identity.forma_juridica || '—'}</span>
+          <span className="font-mono text-[10px] uppercase tracking-wider px-2 py-1 border border-outline/20 text-on-surface-variant">Microempresa (LC 123/2006)</span>
+          <span className="font-mono text-[10px] uppercase tracking-wider px-2 py-1 border border-success/40 text-success bg-success/10">Simples · Anexo {identity.simples_anexo || '—'} · {identity.aliquota_estimada ?? '—'}%</span>
+          {emTransicao && <span className="font-mono text-[10px] uppercase tracking-wider px-2 py-1 border border-warning/40 text-warning bg-warning/10 flex items-center gap-1"><AlertTriangle size={10} /> CNPJ em transição na RFB</span>}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <Bloco titulo="Identificação">
+          <div className="grid grid-cols-2 gap-4">
+            <Item label="CNPJ" value={identity.cnpj} mono />
+            <Item label="Abertura (contrato social)" value={dataFmt(identity.data_abertura)} mono />
+            <Item label="Capital social" value={brlFmt(identity.capital_social)} mono />
+            <Item label="Inscrição Estadual" value={identity.inscricao_estadual} mono />
+            <Item label="Inscrição Municipal" value={identity.inscricao_municipal} mono />
+            <Item label="Certificado digital" value={identity.certificado_digital_tipo ? `e-CNPJ ${identity.certificado_digital_tipo}${identity.certificado_digital_vencimento ? ` · vence ${dataFmt(identity.certificado_digital_vencimento)}` : ''}` : '—'} />
+          </div>
+        </Bloco>
+
+        <Bloco titulo="Endereço fiscal">
+          <div className="text-sm text-on-surface leading-relaxed">
+            {identity.endereco_logradouro}, {identity.endereco_numero}{identity.endereco_complemento ? ` — ${identity.endereco_complemento}` : ''}<br />
+            {identity.endereco_bairro} · {identity.endereco_cidade}/{identity.endereco_uf} · CEP {identity.endereco_cep}
+          </div>
+        </Bloco>
+
+        <Bloco titulo="Quadro societário">
+          {partners.length === 0 ? <div className="text-sm text-muted">Nenhum sócio registrado.</div> : (
+            <div className="space-y-3">
+              {partners.map(p => (
+                <div key={p.id} className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-sm font-medium text-on-surface">{p.nome}</div>
+                    <div className="font-mono text-[11px] text-muted">{PAPEL_LABEL[p.papel || ''] || p.papel} · CPF {p.cpf}</div>
+                  </div>
+                  <div className="font-serif text-xl font-semibold text-secondary tabular-nums">{p.percent_cotas ?? '—'}%</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Bloco>
+
+        <Bloco titulo="Representante legal">
+          <div className="grid grid-cols-2 gap-4">
+            <Item label="Nome" value={identity.representante_nome} />
+            <Item label="CPF" value={identity.representante_cpf} mono />
+            <Item label="RG" value={identity.representante_rg} mono />
+            <Item label="E-mail" value={identity.representante_email} mono />
+          </div>
+        </Bloco>
+      </div>
+
+      <Bloco titulo="Atividades (CNAE)">
+        <div className="space-y-2">
+          <div className="flex items-start gap-3">
+            <span className="font-mono text-[10px] uppercase px-1.5 py-0.5 bg-secondary text-on-action shrink-0 mt-0.5">principal</span>
+            <div className="text-sm text-on-surface"><span className="font-mono text-muted mr-2">{identity.cnae_principal_codigo}</span>{identity.cnae_principal_descricao}</div>
+          </div>
+          {(identity.cnaes_secundarios || []).map(c => (
+            <div key={c.codigo} className="flex items-start gap-3">
+              <span className="font-mono text-[10px] uppercase px-1.5 py-0.5 bg-surface-high text-muted shrink-0 mt-0.5">secundário</span>
+              <div className="text-sm text-on-surface-variant"><span className="font-mono text-muted mr-2">{c.codigo}</span>{c.descricao}</div>
+            </div>
+          ))}
+        </div>
+      </Bloco>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <Bloco titulo="Rede de apoio (contatos ativos)">
+          <div className="space-y-2">
+            {contacts.filter(c => c.ativo !== false).map(c => (
+              <div key={c.id || c.nome} className="flex items-center gap-3">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-secondary w-40 shrink-0">{c.tipo}</span>
+                <span className="text-sm text-on-surface truncate">{c.nome}</span>
+              </div>
+            ))}
+            {contacts.length === 0 && <div className="text-sm text-muted">Nenhum contato.</div>}
+          </div>
+        </Bloco>
+
+        <Bloco titulo="Situação operacional">
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <Item label="LGPD" value={ls ? `${lgpdChecks}/14 checks` : '—'} mono />
+            <Item label="Ativos digitais" value={`${assetsAtivos} ativos`} mono />
+            <Item label="Ferramentas" value={`${toolsAtivas.length} · ${brlFmt(custoFerramentas)}/mês`} mono />
+          </div>
+          <div className="h-1.5 bg-surface-lowest overflow-hidden">
+            <div className="h-full bg-secondary" style={{ width: `${(lgpdChecks / 14) * 100}%` }} />
+          </div>
+        </Bloco>
+      </div>
+
+      {identity.notes && (
+        <Bloco titulo="Histórico e observações (registro canônico)">
+          <div className="text-[13px] text-on-surface-variant leading-relaxed whitespace-pre-line">{identity.notes}</div>
+        </Bloco>
+      )}
+    </div>
+  );
+}
+
+// =========== Documentos (dossiê derivado do banco) ===========
+type DocStatus = 'ok' | 'pendente' | 'atencao';
+
+function DocsTab() {
+  const [identity, setIdentity] = useState<CompanyIdentity | null>(null);
+  const [ls, setLs] = useState<LegalStatus | null>(null);
+
+  useEffect(() => {
+    companyStore.getIdentity().then(setIdentity);
+    companyStore.getLegalStatus().then(setLs);
+  }, []);
+
+  if (!identity || !ls) return <div className="text-muted text-sm py-8">Carregando documentos…</div>;
+
+  const emTransicao = (identity.notes || '').toLowerCase().includes('transição');
+  const docs: Array<{ nome: string; status: DocStatus; detalhe: string; url?: string | null; grupo: string }> = [
+    { grupo: 'Constituição', nome: 'Contrato social', status: identity.data_abertura ? 'ok' : 'pendente', detalhe: identity.data_abertura ? `Assinado em ${dataFmt(identity.data_abertura)} · capital ${brlFmt(identity.capital_social)} · 100% Gilberto` : 'Não registrado' },
+    { grupo: 'Constituição', nome: 'Cartão CNPJ', status: emTransicao ? 'atencao' : identity.cnpj ? 'ok' : 'pendente', detalhe: emTransicao ? `${identity.cnpj} — migração de natureza jurídica/endereço em andamento (JUCESP/RFB)` : identity.cnpj || 'Sem CNPJ' },
+    { grupo: 'Constituição', nome: 'Inscrição Estadual', status: identity.inscricao_estadual ? 'ok' : 'pendente', detalhe: identity.inscricao_estadual || 'Não obtida' },
+    { grupo: 'Constituição', nome: 'Inscrição Municipal (CCM Suzano)', status: identity.inscricao_municipal ? 'ok' : 'pendente', detalhe: identity.inscricao_municipal ? `${identity.inscricao_municipal} — habilita NFS-e (ISS)` : 'Não obtida — bloqueia NFS-e' },
+    { grupo: 'Constituição', nome: 'Certificado digital e-CNPJ', status: identity.certificado_digital_tipo === 'nao_possui' || !identity.certificado_digital_tipo ? 'pendente' : identity.certificado_digital_vencimento ? 'ok' : 'atencao', detalhe: identity.certificado_digital_tipo ? `Tipo ${identity.certificado_digital_tipo}${identity.certificado_digital_vencimento ? ` · vence ${dataFmt(identity.certificado_digital_vencimento)}` : ' · vencimento não informado'}` : 'Não possui' },
+    { grupo: 'Tributário', nome: 'Enquadramento Simples Nacional', status: identity.regime_tributario === 'simples_nacional' ? 'ok' : 'pendente', detalhe: `Anexo ${identity.simples_anexo || '—'} via Fator R · alíquota efetiva ${identity.aliquota_estimada ?? '—'}% — confirmar com contador antes da 1ª NF` },
+    { grupo: 'Legal · público', nome: 'Política de Privacidade', status: ls.politica_privacidade_publicada ? 'ok' : 'pendente', detalhe: ls.politica_privacidade_publicada ? `Publicada${ls.politica_privacidade_versao ? ` · v${ls.politica_privacidade_versao}` : ''}` : 'Minuta existe; publicar exige advogado resolver [A DEFINIR] + controles pendentes', url: ls.politica_privacidade_url },
+    { grupo: 'Legal · público', nome: 'Termos de Uso', status: ls.tos_publicado ? 'ok' : 'pendente', detalhe: ls.tos_publicado ? `Publicados${ls.tos_versao ? ` · v${ls.tos_versao}` : ''}` : 'Minuta existe; mesma trava da Política', url: ls.tos_url },
+    { grupo: 'Legal · contratos', nome: 'MSA (contrato SaaS)', status: ls.msa_template_pronto ? 'ok' : 'pendente', detalhe: ls.msa_template_pronto ? 'Template pronto' : 'Template não finalizado' },
+    { grupo: 'Legal · contratos', nome: 'DPA (tratamento de dados)', status: ls.dpa_template_pronto ? 'ok' : 'pendente', detalhe: ls.dpa_template_pronto ? 'Template pronto' : 'Template não finalizado — trava a 1ª venda externa do Clearix (ADR-0020)' },
+    { grupo: 'Legal · contratos', nome: 'Revisão de advogado', status: ls.advogado_revisao_feita ? 'ok' : 'pendente', detalhe: ls.advogado_revisao_feita ? 'Documentos revisados' : 'Nenhum documento revisado por advogado humano' },
+    { grupo: 'LGPD operacional', nome: 'DPO nomeado', status: ls.dpo_nomeado ? 'ok' : 'pendente', detalhe: ls.dpo_nomeado ? `${ls.dpo_nome || ''} ${ls.dpo_email ? `· ${ls.dpo_email}` : ''}`.trim() || 'Nomeado' : 'Não nomeado' },
+    { grupo: 'LGPD operacional', nome: 'Registro de operações (art. 37)', status: ls.registro_operacoes_tratamento ? 'ok' : 'pendente', detalhe: ls.registro_operacoes_tratamento ? 'Mantido' : 'Não iniciado' },
+    { grupo: 'LGPD operacional', nome: 'Plano de resposta a incidentes (72h)', status: ls.plano_incidentes_pronto ? 'ok' : 'pendente', detalhe: ls.plano_incidentes_pronto ? 'Pronto' : 'Não elaborado' },
+    { grupo: 'LGPD operacional', nome: 'Canal do titular', status: ls.canal_titular_ativo ? 'ok' : 'pendente', detalhe: ls.canal_titular_ativo ? 'Ativo' : 'Não ativo' },
+  ];
+
+  const grupos = [...new Set(docs.map(d => d.grupo))];
+  const okCount = docs.filter(d => d.status === 'ok').length;
+
+  const ICON: Record<DocStatus, React.ReactNode> = {
+    ok: <CheckCircle2 size={15} className="text-success" />,
+    pendente: <XCircle size={15} className="text-danger" />,
+    atencao: <AlertTriangle size={15} className="text-warning" />,
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center justify-between border border-outline/15 bg-surface-container p-4">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-muted">Dossiê documental — derivado do registro canônico (banco), não é upload</span>
+        <span className="font-serif text-lg font-semibold text-on-surface tabular-nums">{okCount}<span className="text-muted text-sm font-sans">/{docs.length} ok</span></span>
+      </div>
+      {grupos.map(g => (
+        <Bloco key={g} titulo={g}>
+          <div className="divide-y divide-outline/10 -my-2">
+            {docs.filter(d => d.grupo === g).map(d => (
+              <div key={d.nome} className="flex items-start gap-3 py-2.5">
+                <span className="mt-0.5 shrink-0">{ICON[d.status]}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-on-surface">{d.nome}</div>
+                  <div className="text-[12px] text-muted leading-snug">{d.detalhe}</div>
+                </div>
+                {d.url && <a href={d.url} target="_blank" rel="noreferrer" className="font-mono text-[10px] text-secondary hover:underline shrink-0 mt-1">abrir ↗</a>}
+              </div>
+            ))}
+          </div>
+        </Bloco>
+      ))}
+      <div className="text-[11px] text-muted">
+        Status vem de <span className="font-mono">company.identity</span> + <span className="font-mono">company.legal_status</span> — atualizar é nas abas "LGPD e Jurídico" e "Editar Dados".
+      </div>
+    </div>
+  );
+}
 
 // =========== Tab 1: Identidade Legal ===========
 function IdentidadeTab() {

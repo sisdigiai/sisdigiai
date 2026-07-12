@@ -121,6 +121,14 @@ export type FounderTime = {
   notes?: string;
 };
 
+export type RevenueRow = {
+  month: string;
+  product_id: string;
+  mrr_brl: number;
+  one_time_brl: number;
+  active_subscriptions: number;
+};
+
 // ========== Store ==========
 
 export const financeStore = {
@@ -192,6 +200,18 @@ export const financeStore = {
   },
 
   // --- Founder time (view) ---
+  // --- Receita (finance.revenue — sem view pública; leitura direta com fallback) ---
+  async listRevenue(): Promise<RevenueRow[]> {
+    if (!isSupabaseReady()) return [];
+    const { data, error } = await supabase
+      .schema('finance')
+      .from('revenue')
+      .select('month, product_id, mrr_brl, one_time_brl, active_subscriptions')
+      .is('deleted_at', null);
+    if (error) return [];
+    return (data as RevenueRow[]) || [];
+  },
+
   async listFounderTime(): Promise<FounderTime[]> {
     if (!isSupabaseReady()) return [];
     const { data } = await supabase

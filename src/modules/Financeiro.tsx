@@ -16,6 +16,7 @@ import {
   CATEGORY_LABELS, CATEGORY_COLORS,
   type Product, type Vendor, type Expense, type Subscription,
   type VendorSpend, type MonthlyByCategory, type ExpenseCategory,
+  type RevenueRow, type FounderTime,
 } from '../lib/financeStore';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
@@ -108,20 +109,27 @@ function DashboardTab() {
   const chartGrid = isLight ? '#dde2f3' : '#1e293b';
   const chartLegend = isLight ? '#46464c' : '#94a3b8';
 
+  const [revenue, setRevenue] = useState<RevenueRow[]>([]);
+  const [founder, setFounder] = useState<FounderTime[]>([]);
+
   const load = useCallback(async () => {
     setLoading(true);
-    const [e, m, v, s, p] = await Promise.all([
+    const [e, m, v, s, p, r, f] = await Promise.all([
       financeStore.listExpenses(5000),
       financeStore.listMonthlyByCategory(),
       financeStore.listVendorSpend(),
       financeStore.listSubscriptions(),
       financeStore.listProducts(),
+      financeStore.listRevenue(),
+      financeStore.listFounderTime(),
     ]);
     setAllExpenses(e);
     setMonthlyByCat(m);
     setVendorSpend(v);
     setAllSubs(s);
     setProducts(p);
+    setRevenue(r);
+    setFounder(f);
     setLoading(false);
   }, []);
 
@@ -159,6 +167,18 @@ function DashboardTab() {
 
   const activeSubs = subs.filter(s => s.is_active);
   const monthlySubsTotal = activeSubs.reduce((a, s) => a + Number(s.monthly_amount_brl), 0);
+
+  // ===== Saúde financeira: receita × caixa × fundador =====
+  const filteredRevenue = filterProduct === 'all' ? revenue : revenue.filter(r => r.product_id === filterProduct);
+  const receitaTotal = filteredRevenue.reduce((a, r) => a + Number(r.mrr_brl || 0) + Number(r.one_time_brl || 0), 0);
+  const ultimoMesReceita = [...filteredRevenue].sort((a, b) => b.month.localeCompare(a.month))[0]?.month;
+  const mrrAtual = filteredRevenue.filter(r => r.month === ultimoMesReceita).reduce((a, r) => a + Number(r.mrr_brl || 0), 0);
+  // Caixa = tudo que saiu de verdade (exclui aporte intelectual, que é não-caixa)
+  const caixaTotal = expenses.filter(e => e.kind !== 'aporte_intelectual').reduce((a, e) => a + Number(e.amount_brl), 0);
+  const resultadoCaixa = receitaTotal - caixaTotal;
+  const founderHoras = founder.reduce((a, f) => a + Number(f.hours_worked || 0), 0);
+  const founderValor = founder.reduce((a, f) => a + Number(f.valued_amount_brl || 0), 0);
+  const preReceita = receitaTotal === 0;
 
   // Chart data — recompute from filtered expenses (not from monthlyByCat view which has no product filter)
   const expByMonthCat: Record<string, Record<string, number>> = {};
@@ -245,6 +265,38 @@ function DashboardTab() {
         <KpiCard label="Lançamentos" value={String(expenses.length)} sub="despesas registradas" icon={<TrendingDown size={20} />} color="text-secondary" />
         <KpiCard label="Burn de Caixa (média)" value={brl(burnRate3m)} sub="/mês · só caixa" icon={<BarChart3 size={20} />} color="text-secondary" delta={gastoDelta} invert />
         <KpiCard label="Subscriptions ativas" value={brl(monthlySubsTotal)} sub={`${activeSubs.length} serviços`} icon={<Repeat size={20} />} color="text-secondary" />
+      </div>
+
+      {/* Saúde financeira: receita × caixa */}
+      <div className="border border-outline/15 bg-surface-container">
+        <div className="px-5 py-3 border-b border-outline/10 flex items-center justify-between flex-wrap gap-2">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Saúde financeira — receita × caixa</span>
+          {preReceita && (
+            <span className="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 border border-warning/40 text-warning bg-warning/10">
+              pré-receita · MRR virá do billing (Mercado Pago) e vendas OSI
+            </span>
+          )}
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-outline/10">
+          <div className="p-4">
+            <div className="font-mono text-[10px] uppercase tracking-widest text-muted">Receita acumulada</div>
+            <div className="font-serif text-2xl font-semibold tabular-nums mt-1 text-on-surface">{brl(receitaTotal)}</div>
+          </div>
+          <div className="p-4">
+            <div className="font-mono text-[10px] uppercase tracking-widest text-muted">MRR atual</div>
+            <div className="font-serif text-2xl font-semibold tabular-nums mt-1 text-on-surface">{brl(mrrAtual)}</div>
+          </div>
+          <div className="p-4">
+            <div className="font-mono text-[10px] uppercase tracking-widest text-muted">Resultado de caixa</div>
+            <div className={`font-serif text-2xl font-semibold tabular-nums mt-1 ${resultadoCaixa >= 0 ? 'text-success' : 'text-danger'}`}>{brl(resultadoCaixa)}</div>
+            <div className="text-[10px] text-muted mt-0.5">receita − caixa investido ({brl(caixaTotal)})</div>
+          </div>
+          <div className="p-4">
+            <div className="font-mono text-[10px] uppercase tracking-widest text-muted">Fundador (sweat equity)</div>
+            <div className="font-serif text-2xl font-semibold tabular-nums mt-1 text-on-surface">{founderHoras.toLocaleString('pt-BR')}h</div>
+            <div className="text-[10px] text-muted mt-0.5">{brl(founderValor)} valorados (não-caixa)</div>
+          </div>
+        </div>
       </div>
 
       {/* Stacked bar chart */}
