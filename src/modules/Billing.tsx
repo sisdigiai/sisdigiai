@@ -1,7 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Receipt, RefreshCw, AlertOctagon, DollarSign, Users, Plus, X } from 'lucide-react';
+import { Receipt, RefreshCw, AlertOctagon, DollarSign, Users, Plus, X, Plug, CheckCircle2, XCircle } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { billingStore, type BillingSubscriber, type BillingMrr, type DunningStage } from '../lib/billingStore';
+import { supabase } from '../lib/supabase';
+
+type MpConn = { has_access_token: boolean; has_webhook_secret: boolean; webhook_url: string };
+type MpSyncResult = { ok: boolean; preapprovals?: number; payments?: number; erros?: string[]; reason?: string };
+type WebhookStatus = { source: string; eventos: number; ultimo_evento: string | null; processados: number };
 
 const brl = (v: number | null | undefined) =>
   v == null ? '—' : `R$ ${Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -26,14 +31,37 @@ export default function Billing() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<Record<string, string>>({ ...EMPTY });
   const [saving, setSaving] = useState(false);
+  const [conn, setConn] = useState<MpConn | null>(null);
+  const [mpEventos, setMpEventos] = useState<WebhookStatus | null>(null);
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<MpSyncResult | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     const [s, m] = await Promise.all([billingStore.list(), billingStore.mrr()]);
     setSubs(s); setMrr(m); setLoading(false);
+    supabase.functions.invoke('mp-sync', { method: 'GET' })
+      .then(({ data }) => data && setConn(data as MpConn))
+      .catch(() => {});
+    supabase.from('v_marketplace_webhook_status').select('*').eq('source', 'mercadopago').maybeSingle()
+      .then(({ data }) => data && setMpEventos(data as WebhookStatus));
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  const syncMp = async () => {
+    setSyncing(true);
+    setSyncResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('mp-sync', { method: 'POST' });
+      if (error) setSyncResult({ ok: false, reason: error.message });
+      else setSyncResult(data as MpSyncResult);
+    } catch (e: any) {
+      setSyncResult({ ok: false, reason: e?.message || 'falha' });
+    }
+    setSyncing(false);
+    load();
+  };
 
   const save = async () => {
     if (!form.name && !form.email) return;
@@ -66,6 +94,60 @@ export default function Billing() {
       />
 
       <div className="space-y-8">
+        {/* Conexão Mercado Pago — API (pull) + webhook (push) */}
+        <div className="border border-outline/15 bg-surface-container">
+          <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2 flex-wrap">
+            <Plug className="w-3.5 h-3.5 text-secondary" />
+            <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Conexão Mercado Pago</span>
+            <button
+              onClick={syncMp}
+              disabled={syncing || !conn?.has_access_token}
+              className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-xs bg-secondary-container text-on-secondary-container border border-secondary/40 hover:bg-secondary-container/70 transition-colors disabled:opacity-50"
+              title={conn?.has_access_token ? 'Puxa assinaturas e pagamentos da API do MP' : 'MP_ACCESS_TOKEN não configurado'}
+            >
+              <RefreshCw size={13} className={syncing ? 'animate-spin' : ''} /> {syncing ? 'Sincronizando…' : 'Sincronizar com Mercado Pago'}
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-outline/10 text-sm">
+            <div className="p-4 flex items-start gap-2">
+              {conn === null ? <span className="text-muted text-xs">verificando…</span> : conn.has_access_token
+                ? <CheckCircle2 className="w-4 h-4 text-success shrink-0 mt-0.5" />
+                : <XCircle className="w-4 h-4 text-danger shrink-0 mt-0.5" />}
+              {conn !== null && (
+                <div>
+                  <div className="text-on-surface">API (pull) — MP_ACCESS_TOKEN</div>
+                  <div className="text-[11px] text-muted">{conn.has_access_token ? 'Configurado — sincronização manual disponível' : 'Não configurado nos secrets do projeto'}</div>
+                </div>
+              )}
+            </div>
+            <div className="p-4 flex items-start gap-2">
+              {conn === null ? <span className="text-muted text-xs">…</span> : conn.has_webhook_secret
+                ? <CheckCircle2 className="w-4 h-4 text-success shrink-0 mt-0.5" />
+                : <AlertOctagon className="w-4 h-4 text-warning shrink-0 mt-0.5" />}
+              {conn !== null && (
+                <div>
+                  <div className="text-on-surface">Webhook (push) — assinatura</div>
+                  <div className="text-[11px] text-muted">
+                    {conn.has_webhook_secret ? 'MP_WEBHOOK_SECRET configurado' : 'Sem MP_WEBHOOK_SECRET — eventos aceitos sem validar assinatura'}
+                    {mpEventos && ` · ${mpEventos.eventos} evento(s) recebido(s)`}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="p-4">
+              <div className="text-on-surface text-[12px]">URL do webhook (registrar no painel MP)</div>
+              <div className="font-mono text-[10px] text-muted break-all mt-0.5">{conn?.webhook_url ?? '—'}</div>
+            </div>
+          </div>
+          {syncResult && (
+            <div className={`px-4 py-2 border-t border-outline/10 text-xs ${syncResult.ok ? 'text-success' : 'text-danger'}`}>
+              {syncResult.ok
+                ? `✓ Sincronizado: ${syncResult.preapprovals ?? 0} assinatura(s) + ${syncResult.payments ?? 0} pagamento(s) ingeridos da API`
+                : `Falha: ${syncResult.reason || (syncResult.erros || []).join(' · ') || 'erro desconhecido'}`}
+            </div>
+          )}
+        </div>
+
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <Kpi icon={<DollarSign className="w-4 h-4" />} label="MRR (assinaturas ativas)" value={brl(mrr?.mrr_brl ?? 0)} color="text-success" />

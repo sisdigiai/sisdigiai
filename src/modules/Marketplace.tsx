@@ -1,9 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Store, ExternalLink, AlertTriangle, CheckCircle2, Circle } from 'lucide-react';
+import { Store, ExternalLink, AlertTriangle, CheckCircle2, Circle, Plug, ShoppingBag } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { TravasBanner } from './TravasMarketing';
 import { supabase } from '../lib/supabase';
 import { academyStore } from '../lib/academyStore';
+
+interface WebhookStatus { source: string; eventos: number; ultimo_evento: string | null; processados: number }
+interface HotmartSale {
+  id: string; hotmart_transaction: string | null; product_name: string | null; status: string | null;
+  buyer_name: string | null; price_value_cents: number | null; affiliate_name: string | null;
+  payment_type: string | null; purchase_date: string | null; platform: string | null;
+}
 
 // M4.1 (RECONCILIACAO_marketing_2026-05-31.md) — esqueleto sem API:
 // lê digital_assets (URL/observações) + academy.products (preço canônico).
@@ -35,9 +42,20 @@ export default function Marketplace() {
   const [appPrice, setAppPrice] = useState<number | null>(null);
   const [hot, setHot] = useState<HotmartStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [conexoes, setConexoes] = useState<WebhookStatus[]>([]);
+  const [vendas, setVendas] = useState<HotmartSale[]>([]);
 
   useEffect(() => {
     (async () => {
+      try {
+        const { data } = await supabase.from('v_marketplace_webhook_status').select('*');
+        setConexoes(((data ?? []) as WebhookStatus[]).filter(c => c.source !== 'mercadopago'));
+      } catch { /* silencioso */ }
+
+      try {
+        const { data } = await supabase.from('v_marketing_hotmart_sales').select('*').limit(20);
+        setVendas((data ?? []) as HotmartSale[]);
+      } catch { /* silencioso */ }
       try {
         const { data } = await supabase
           .from('v_company_digital_assets')
@@ -133,6 +151,77 @@ export default function Marketplace() {
             <PriceRow label="App (academy.products.price_brl)" value={appPrice} expected={DOC_PRICE_BRL} source="banco" />
             <PriceRow label="Hotmart (listing real)" value={hotmartPrice} expected={DOC_PRICE_BRL} source="digital_assets.observacoes" />
           </ul>
+        </div>
+
+        {/* Conexões — estado real dos webhooks por marketplace */}
+        <div className="border border-outline/15 bg-surface-container">
+          <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2">
+            <Plug className="w-3.5 h-3.5 text-secondary" />
+            <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Conexões (webhooks)</span>
+            <span className="ml-auto font-mono text-[10px] text-muted">fonte: v_marketplace_webhook_status</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-outline/10 text-sm">
+            {(['hotmart', 'kiwify'] as const).map(src => {
+              const c = conexoes.find(x => x.source === src);
+              const recebeu = (c?.eventos ?? 0) > 0;
+              return (
+                <div key={src} className="p-4 flex items-start gap-2.5">
+                  {recebeu
+                    ? <CheckCircle2 className="w-4 h-4 text-success shrink-0 mt-0.5" />
+                    : <AlertTriangle className="w-4 h-4 text-warning shrink-0 mt-0.5" />}
+                  <div>
+                    <div className="text-on-surface capitalize">{src} — webhook ativo (edge function no ar)</div>
+                    <div className="text-[11px] text-muted">
+                      {recebeu
+                        ? `${c!.eventos} evento(s) · ${c!.processados} processado(s) · último ${c!.ultimo_evento ? new Date(c!.ultimo_evento).toLocaleString('pt-BR') : '—'}`
+                        : '0 eventos recebidos até hoje — confirmar registro do webhook no painel do marketplace'}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Compras OSI — linha a linha (webhook → marketing.hotmart_sales) */}
+        <div className="border border-outline/15 bg-surface-container">
+          <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2">
+            <ShoppingBag className="w-3.5 h-3.5 text-secondary" />
+            <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Compras OSI (reais)</span>
+            <span className="ml-auto font-mono text-[10px] text-muted">{vendas.length} registro(s)</span>
+          </div>
+          {vendas.length === 0 ? (
+            <div className="p-4 text-xs text-muted italic">
+              Nenhuma compra registrada — a lista popula pelo webhook Hotmart/Kiwify a cada venda. Fase VENDER: o gargalo é tráfego/prospecção, não o encanamento.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-[10px] font-mono text-muted uppercase tracking-widest border-b border-outline/10">
+                    <th className="text-left px-4 py-2 font-medium">Data</th>
+                    <th className="text-left px-4 py-2 font-medium">Comprador</th>
+                    <th className="text-left px-4 py-2 font-medium">Status</th>
+                    <th className="text-right px-4 py-2 font-medium">Valor</th>
+                    <th className="text-left px-4 py-2 font-medium">Afiliado</th>
+                    <th className="text-left px-4 py-2 font-medium">Plataforma</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {vendas.map(v => (
+                    <tr key={v.id} className="border-b border-outline/5">
+                      <td className="px-4 py-2 font-mono text-muted">{v.purchase_date ? new Date(v.purchase_date).toLocaleDateString('pt-BR') : '—'}</td>
+                      <td className="px-4 py-2 text-on-surface">{v.buyer_name || '—'}</td>
+                      <td className="px-4 py-2 text-on-surface-variant">{v.status || '—'}</td>
+                      <td className="px-4 py-2 text-right font-mono tabular-nums">{v.price_value_cents != null ? `R$ ${(v.price_value_cents / 100).toFixed(2).replace('.', ',')}` : '—'}</td>
+                      <td className="px-4 py-2 text-muted">{v.affiliate_name || '—'}</td>
+                      <td className="px-4 py-2 text-muted capitalize">{v.platform || 'hotmart'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* Vendas reais (Hotmart) — alimentado pelo webhook hotmart-webhook */}
