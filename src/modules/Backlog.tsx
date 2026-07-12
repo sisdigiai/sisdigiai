@@ -2,7 +2,14 @@ import { useEffect, useState, useCallback } from 'react';
 import { Zap, AlertTriangle, Clock, CheckCircle2, Circle, Plus, X, RefreshCw, Trash2 } from 'lucide-react';
 import { backlogStore, type BacklogItem, type BacklogStatus, type NewBacklogItem } from '../lib/backlogStore';
 import { realtimeStore } from '../lib/realtimeStore';
+import { PRODUTOS, PRODUTO_BY_SLUG } from './Portfolio';
 import PageHeader from '../components/PageHeader';
+
+const PRODUTO_LIVRE: Record<string, string> = { 'digiai': 'DIGIAI · holding' };
+
+function nomeProduto(slug: string): string {
+  return PRODUTO_BY_SLUG[slug]?.nome ?? PRODUTO_LIVRE[slug] ?? slug;
+}
 
 type PriorityLabel = 'critico' | 'alto' | 'medio' | 'baixo' | 'minimo';
 
@@ -38,6 +45,7 @@ const EMPTY_DRAFT: Partial<NewBacklogItem> = {
   priority: 3,
   status: 'pending',
   area: 'docs',
+  product_id: null,
   tags: [],
   origem: null,
   blocker: null,
@@ -50,6 +58,7 @@ export default function Backlog() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [filtroArea, setFiltroArea] = useState<string>('todos');
   const [filtroStatus, setFiltroStatus] = useState<BacklogStatus | 'todos'>('todos');
+  const [filtroProduto, setFiltroProduto] = useState<string>('todos');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -67,10 +76,15 @@ export default function Backlog() {
   }, [load]);
 
   const areas = Array.from(new Set(items.map((i) => i.area).filter(Boolean))) as string[];
+  const produtos = Array.from(new Set(items.map((i) => i.product_id).filter(Boolean))) as string[];
 
+  // Abertos primeiro (por prioridade); concluídos/cancelados no fim
+  const peso = (i: BacklogItem) => (i.status === 'done' || i.status === 'cancelled' ? 1 : 0);
   const filtered = items
     .filter((i) => filtroArea === 'todos' || i.area === filtroArea)
-    .filter((i) => filtroStatus === 'todos' || i.status === filtroStatus);
+    .filter((i) => filtroStatus === 'todos' || i.status === filtroStatus)
+    .filter((i) => filtroProduto === 'todos' || (filtroProduto === 'sem-produto' ? !i.product_id : i.product_id === filtroProduto))
+    .sort((a, b) => peso(a) - peso(b) || a.priority - b.priority);
 
   const criticos = items.filter((i) => i.priority === 1 && i.status !== 'done').length;
   const emAndamento = items.filter((i) => i.status === 'in_progress').length;
@@ -96,7 +110,13 @@ export default function Backlog() {
   };
 
   const toggleStatus = async (i: BacklogItem) => {
-    const next: BacklogStatus = i.status === 'done' ? 'pending' : i.status === 'pending' ? 'in_progress' : i.status === 'in_progress' ? 'done' : i.status;
+    // pending → in_progress → done → pending · blocked destrava para in_progress
+    const next: BacklogStatus =
+      i.status === 'done' ? 'pending'
+      : i.status === 'pending' ? 'in_progress'
+      : i.status === 'in_progress' ? 'done'
+      : i.status === 'blocked' ? 'in_progress'
+      : i.status;
     await backlogStore.updateStatus(i.id, next);
     load();
   };
@@ -176,6 +196,17 @@ export default function Backlog() {
               <label className="block text-xs text-on-surface-variant mb-1">Área</label>
               <input className={inputClass} value={draft.area || ''} onChange={(e) => setDraft({ ...draft, area: e.target.value })} placeholder="docs / clearix / app / academy / comercial / infra" />
             </div>
+            <div>
+              <label className="block text-xs text-on-surface-variant mb-1">Produto (liga à Lista Mestra)</label>
+              <select className={inputClass} value={draft.product_id || ''} onChange={(e) => setDraft({ ...draft, product_id: e.target.value || null })}>
+                <option value="">— sem produto —</option>
+                {PRODUTOS.map((p) => <option key={p.slug} value={p.slug}>{p.nome}</option>)}
+                <option value="digiai">DIGIAI · holding</option>
+                {draft.product_id && !PRODUTO_BY_SLUG[draft.product_id] && draft.product_id !== 'digiai' && (
+                  <option value={draft.product_id}>{draft.product_id}</option>
+                )}
+              </select>
+            </div>
             <div className="md:col-span-2">
               <label className="block text-xs text-on-surface-variant mb-1">Origem (qual fase/doc originou esse item)</label>
               <input className={inputClass} value={draft.origem || ''} onChange={(e) => setDraft({ ...draft, origem: e.target.value || null })} />
@@ -212,6 +243,19 @@ export default function Backlog() {
             {s === 'todos' ? 'Todos status' : statusConfig[s as BacklogStatus]?.label}
           </button>
         ))}
+        <div className="w-px bg-surface-high mx-1" />
+        <select
+          value={filtroProduto}
+          onChange={(e) => setFiltroProduto(e.target.value)}
+          className={`text-xs px-2 py-1.5 font-mono border-0 focus:outline-none ${filtroProduto !== 'todos' ? 'bg-secondary text-surface' : 'bg-surface-low text-muted'}`}
+          title="Filtrar por produto"
+        >
+          <option value="todos">Todos produtos</option>
+          {produtos.sort((a, b) => nomeProduto(a).localeCompare(nomeProduto(b))).map((p) => (
+            <option key={p} value={p}>{nomeProduto(p)}</option>
+          ))}
+          <option value="sem-produto">— sem produto —</option>
+        </select>
       </div>
 
       {/* Lista */}
@@ -234,6 +278,15 @@ export default function Backlog() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <span className={`text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 border ${pConf.className}`}>{pConf.label}</span>
+                      {item.product_id && (
+                        <span className="flex items-center gap-1.5 text-[10px] font-mono text-on-surface-variant">
+                          <span
+                            className="w-2.5 h-2.5 inline-block"
+                            style={{ background: PRODUTO_BY_SLUG[item.product_id]?.cor ?? 'var(--color-muted)' }}
+                          />
+                          {nomeProduto(item.product_id)}
+                        </span>
+                      )}
                       {item.area && <span className="text-[10px] font-mono text-muted uppercase">{areaLabel[item.area] || item.area}</span>}
                       {item.due_date && <span className="text-[10px] font-mono text-muted">📅 {new Date(item.due_date + 'T00:00:00').toLocaleDateString('pt-BR')}</span>}
                     </div>
