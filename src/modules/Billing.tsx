@@ -90,7 +90,13 @@ export default function Billing() {
           {loading ? (
             <div className="p-6 text-sm text-muted font-mono uppercase tracking-widest">Carregando…</div>
           ) : subs.length === 0 ? (
-            <div className="p-6 text-sm text-muted italic">Nenhum assinante ainda. Quando uma ótica assinar no Mercado Pago, o webhook popula aqui automaticamente — ou adicione manualmente.</div>
+            <div className="p-6 space-y-2">
+              <div className="text-sm text-muted italic">Nenhum assinante ainda. Quando uma ótica assinar no Mercado Pago, o webhook popula aqui automaticamente — ou adicione manualmente.</div>
+              <div className="text-[11px] text-warning flex items-center gap-1.5">
+                <AlertOctagon className="w-3.5 h-3.5 shrink-0" />
+                Pendência conhecida: os planos no Mercado Pago ainda estão no pricing antigo (397/797/1497) — recriar no canônico ADR-0022 (349/899/1499 · piloto 90d/30%). Item rastreado no Backlog.
+              </div>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -149,7 +155,7 @@ export default function Billing() {
             <div className="space-y-3">
               {([
                 ['name', 'Nome da ótica'], ['email', 'E-mail'], ['phone', 'WhatsApp'],
-                ['plan_name', 'Plano (Starter/Growth/Ecossistema)'], ['plan_amount_brl', 'Mensal (R$)'],
+                ['plan_name', 'Plano (Essencial/Controle/Crescimento — ADR-0022)'], ['plan_amount_brl', 'Mensal (R$)'],
                 ['mp_preapproval_id', 'ID da assinatura MP (preapproval)'], ['tenant_ref', 'Tenant no Clearix (ref)'],
                 ['next_due_on', 'Próximo vencimento (AAAA-MM-DD)'],
               ] as [string, string][]).map(([k, label]) => (
