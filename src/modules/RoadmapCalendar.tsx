@@ -29,6 +29,13 @@ function parseISODateLocal(iso: string): Date {
   return new Date(y, m - 1, d);
 }
 
+// input[type=date] dispara onChange a cada segmento digitado — ignora anos parciais (0002, 0202, 20072…)
+function safeDate(v: string): string | null {
+  if (!v) return null;
+  const y = Number(v.split('-')[0]);
+  return y >= 2020 && y <= 2099 ? v : null;
+}
+
 type Props = {
   tasks: RoadmapTask[];
   onToggle: (task: RoadmapTask) => Promise<void> | void;
@@ -190,7 +197,7 @@ export default function RoadmapCalendar({ tasks, onToggle, onReschedule }: Props
                     type="date"
                     value={t.target_date ?? ''}
                     min={todayISO}
-                    onChange={(e) => e.target.value && onReschedule(t, e.target.value)}
+                    onChange={(e) => { const v = safeDate(e.target.value); if (v) onReschedule(t, v); }}
                     className="shrink-0 bg-surface-container border border-outline/20 text-on-surface text-[11px] font-mono px-1.5 py-0.5 focus:outline-none focus:border-secondary/40"
                     title="Remarcar para outra data"
                   />
@@ -332,7 +339,7 @@ export default function RoadmapCalendar({ tasks, onToggle, onReschedule }: Props
                       <input
                         type="date"
                         value={t.target_date ?? ''}
-                        onChange={(e) => e.target.value && onReschedule(t, e.target.value)}
+                        onChange={(e) => { const v = safeDate(e.target.value); if (v) onReschedule(t, v); }}
                         className="shrink-0 bg-surface-container border border-outline/20 text-on-surface text-[11px] font-mono px-1.5 py-0.5 focus:outline-none focus:border-secondary/40"
                         title="Remarcar esta tarefa"
                       />
@@ -362,7 +369,7 @@ export default function RoadmapCalendar({ tasks, onToggle, onReschedule }: Props
                   <input
                     type="date"
                     min={todayISO}
-                    onChange={(e) => e.target.value && onReschedule(t, e.target.value)}
+                    onChange={(e) => { const v = safeDate(e.target.value); if (v) onReschedule(t, v); }}
                     className="shrink-0 bg-surface-container border border-outline/20 text-on-surface text-[11px] font-mono px-1.5 py-0.5 focus:outline-none focus:border-secondary/40"
                     title="Agendar esta tarefa"
                   />
