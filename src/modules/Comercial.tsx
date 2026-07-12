@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Plus, Trash2, Briefcase, Pencil, X, Play, FileText, Search, Target, AlertTriangle, Clock } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
-import { commercialStore, type CommercialLead, type LeadStage } from '../lib/commercialStore';
+import { commercialStore, type CommercialLead, type LeadStage, type OutreachItem } from '../lib/commercialStore';
 import { playbookStore, type Playbook } from '../lib/playbookStore';
 import { meetingStore, type MeetingSession } from '../lib/meetingStore';
 import { proposalStore, type Proposal } from '../lib/proposalStore';
@@ -54,12 +54,14 @@ export default function Comercial() {
   const [filtroProduto, setFiltroProduto] = useState<string>('todos');
   const [expandidas, setExpandidas] = useState<Set<LeadStage>>(new Set());
   const [faseAtual, setFaseAtual] = useState<RoadmapPhase | null>(null);
+  const [outreach, setOutreach] = useState<OutreachItem[]>([]);
 
   const load = () => {
     commercialStore.list().then((rows) => { setLeads(rows); setLoading(false); });
     playbookStore.list().then(setPlaybooks);
     meetingStore.list().then(setMeetings);
     proposalStore.list().then(setProposals);
+    commercialStore.listOutreach().then(setOutreach);
     roadmapStore.listPhases().then((ps) => setFaseAtual(ps.find((p) => !p.completed_at && p.started_at) ?? null));
   };
   useEffect(load, []);
@@ -91,8 +93,17 @@ export default function Comercial() {
       .filter((x) => x.dias >= 7)
       .sort((a, b) => b.dias - a.dias);
     const semNextStep = trabalhados.filter((l) => !l.next_step?.trim()).length;
-    return { followupsVencidos, parados, semNextStep };
-  }, [meetings, leads]);
+    // Esteira de prospecção (outreach WhatsApp): agendados que passaram da data
+    const outreachVencido = outreach.filter((o) => o.status === 'agendado' && o.scheduled_date < hoje);
+    const outreachPorKind = outreachVencido.reduce<Record<string, number>>((acc, o) => {
+      acc[o.kind] = (acc[o.kind] || 0) + 1;
+      return acc;
+    }, {});
+    const outreachDatas = outreachVencido.length > 0
+      ? { de: outreachVencido[0].scheduled_date, ate: outreachVencido[outreachVencido.length - 1].scheduled_date }
+      : null;
+    return { followupsVencidos, parados, semNextStep, outreachVencido, outreachPorKind, outreachDatas };
+  }, [meetings, leads, outreach]);
 
   const save = async () => {
     if (!editing || !editing.company.trim()) return;
@@ -165,8 +176,8 @@ export default function Comercial() {
             </div>
           )}
 
-          {/* Ação hoje — follow-ups vencidos + leads esfriando */}
-          {(acao.followupsVencidos.length > 0 || acao.parados.length > 0 || acao.semNextStep > 0) && (
+          {/* Ação hoje — follow-ups vencidos + leads esfriando + esteira de prospecção parada */}
+          {(acao.followupsVencidos.length > 0 || acao.parados.length > 0 || acao.semNextStep > 0 || acao.outreachVencido.length > 0) && (
             <div className="border border-warning/30 bg-warning/5 mb-5">
               <div className="px-4 py-2 border-b border-warning/20 flex items-center gap-2">
                 <Clock className="w-3.5 h-3.5 text-warning" />
@@ -174,6 +185,16 @@ export default function Comercial() {
                 {acao.semNextStep > 0 && <span className="ml-auto font-mono text-[10px] text-muted">{acao.semNextStep} trabalhado(s) sem próximo passo</span>}
               </div>
               <div className="divide-y divide-outline/10">
+                {acao.outreachVencido.length > 0 && acao.outreachDatas && (
+                  <div className="flex items-center gap-3 px-4 py-2 bg-danger/5">
+                    <AlertTriangle className="w-3.5 h-3.5 text-danger shrink-0" />
+                    <span className="text-sm text-on-surface flex-1">
+                      Esteira de prospecção parada: <strong>{acao.outreachVencido.length} mensagens agendadas vencidas</strong>
+                      {' '}({dt(acao.outreachDatas.de)} – {dt(acao.outreachDatas.ate)}) — {Object.entries(acao.outreachPorKind).map(([k, n]) => `${n} ${k.replace('_', ' ')}`).join(' · ')}
+                    </span>
+                    <span className="font-mono text-[9px] uppercase text-muted shrink-0">marketing.outreach_schedule</span>
+                  </div>
+                )}
                 {acao.followupsVencidos.slice(0, 5).map((m) => (
                   <div key={m.id} className="flex items-center gap-3 px-4 py-2">
                     <span className="font-mono text-[10px] text-danger shrink-0">{dt(m.follow_up_date ?? undefined)}</span>

@@ -38,8 +38,30 @@ function writeLocal(rows: CommercialLead[]) {
   localStorage.setItem(LS_KEY, JSON.stringify(rows));
 }
 
+export interface OutreachItem {
+  id: string;
+  kind: string;
+  scheduled_date: string;
+  variation: string | null;
+  status: string;
+  sent_at: string | null;
+  lead_company: string | null;
+  lead_stage: string | null;
+}
+
 export const commercialStore = {
   isOnline: isSupabaseReady,
+
+  // Agenda de prospecção (marketing.outreach_schedule via view) — a esteira VENDER
+  async listOutreach(): Promise<OutreachItem[]> {
+    if (!isSupabaseReady()) return [];
+    const { data, error } = await supabase.from('v_marketing_outreach').select('*');
+    if (error) {
+      console.error('[commercialStore] listOutreach', error);
+      return [];
+    }
+    return (data ?? []) as OutreachItem[];
+  },
 
   async list(): Promise<CommercialLead[]> {
     if (!isSupabaseReady()) return readLocal();
