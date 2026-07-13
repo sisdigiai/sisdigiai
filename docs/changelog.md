@@ -4,6 +4,10 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Verificado (2026-07-13 — Nipo School: análise logada nos 3 papéis + fix dos seed users)
+- **Admin, Sensei e Aluno verificados ao vivo** (dono fez os logins): Painel Administrativo com dados reais (4 professores, 6 turmas, 26 matrículas, 67 instrumentos), ano letivo 2025 **completo** no sistema (29 aulas concluídas até o Show Final 19/dez) e Ano 2/2026 agendado até a Formatura 11/dez; Sensei com SpeedGrader funcional e agenda semanal; Aluno com gamificação, 40+ desafios e feed. Zero erro de console nos 3 papéis.
+- **2º bug de login achado e corrigido**: seed users (aluno1-24@niposchool.seed) tinham campos de token NULL em auth.users (INSERT manual da migration 030b) → GoTrue "Database error querying schema". Fix aplicado em produção pelo dono via SQL Editor (UPDATE COALESCE, 24 rows); item no Backlog pra corrigir a migration na fonte. Achados menores no Backlog: KPI 26 matrículas vs 2 perfis de aluno; seed misturado com dado real.
+
 ### Corrigido (2026-07-13 — ritual Nipo School: login voltou + card com estado real)
 - **Causa-raiz do login quebrado encontrada e resolvida**: o projeto Supabase do deploy (`tqlwkgiytdikumtcnizf`, org niposchool-design, Free) estava **pausado por inatividade** — auth respondia 503 e o app mostrava "Failed to fetch". Restaurado via dashboard (navegador do Nipo); teste ao vivo confirmou auth respondendo 400 pra credencial inválida = circuito funcional. Detalhe: o `.env` local aponta pra um projeto **diferente e deletado** (`eehidnwlwrzqzgytbfsd`, DNS morto) — por isso o diagnóstico local também falhava.
 - **Card Nipo School**: sai de Travado → **No ar** (degrau 2), maturidade 50→55 — plataforma multi-tenant de ensino musical com 66 rotas, gamificação, presença QR, IA pedagógica. Bloqueios reais registrados: free tier volta a pausar, piloto ADNIPO parado, branch do piloto Nipo Wa só local. 3 itens no Backlog (`nipo-school`) + Spec atualizada.
