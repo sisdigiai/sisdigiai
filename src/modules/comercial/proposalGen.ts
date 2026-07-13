@@ -20,9 +20,11 @@ PLANO ${p.plan ?? ''} — R$ ${brl(price)}/mês
 • Teste de ${p.trial_days ?? 90} dias com a sua empresa (cadastro real, funcionalidades completas)
 • ${p.discount_pct ?? 30}% OFF nos 3 primeiros meses ao virar cliente
 • ${p.setup_note ?? 'Implantação isenta no teste; cobrada ao virar plano.'}
-• Migração de dados orçada por volume
+• Migração guiada, orçada por volume — trazemos seu histórico, nada se perde
+• Pagamento mensal via Mercado Pago — sem cartão preso, sem fidelidade (cancela quando quiser)
 ${apps}${dor}
 Acesso de demonstração: clearix.app.br (login enviado em separado).
+Manual completo (o ecossistema tela por tela): manual-clearix.netlify.app
 
 Qualquer dúvida, estou à disposição.
 ${CONSULTOR.nome} — ${CONSULTOR.whatsapp}`;
