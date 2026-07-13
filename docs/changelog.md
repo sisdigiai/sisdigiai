@@ -4,6 +4,10 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Corrigido (2026-07-13 — ritual Qual a Foto: Supabase restaurado a 21 dias do prazo final)
+- **Mesma causa-raiz do Nipo**: projeto Supabase `qual_foto?` (org tgjphotos, Free) pausado por inatividade — restaurado via dashboard no Chrome do Junior **faltando 21 dias** pro limite (03/ago; depois, só download dos dados). Verificado logado pós-restore: dashboard do fotógrafo com 10 galerias, 82 fotos e **81 com análise IA rodada** (scores por galeria) — a IA de curadoria funcionou, ao contrário do que card e Spec diziam; o que roda local é o worker de edição pesada (RawTherapee).
+- **Card Qual a Foto**: maturidade 50→55, função real, bloqueios atualizados (free tier pausa + worker local). Achados no Backlog (`qual-a-foto`): keep-alive (P2), botão "Entrar" da landing mudo (P3), pendências não commitadas AGENTS.md/docs-brand (P3); item antigo de validação (abril) fechado como done. Spec atualizada. **Fecha o ritual código→online dos 4 apps de incubação** (Polapetit, Easy, Nipo, Qual Foto).
+
 ### Verificado (2026-07-13 — Nipo School: análise logada nos 3 papéis + fix dos seed users)
 - **Admin, Sensei e Aluno verificados ao vivo** (dono fez os logins): Painel Administrativo com dados reais (4 professores, 6 turmas, 26 matrículas, 67 instrumentos), ano letivo 2025 **completo** no sistema (29 aulas concluídas até o Show Final 19/dez) e Ano 2/2026 agendado até a Formatura 11/dez; Sensei com SpeedGrader funcional e agenda semanal; Aluno com gamificação, 40+ desafios e feed. Zero erro de console nos 3 papéis.
 - **2º bug de login achado e corrigido**: seed users (aluno1-24@niposchool.seed) tinham campos de token NULL em auth.users (INSERT manual da migration 030b) → GoTrue "Database error querying schema". Fix aplicado em produção pelo dono via SQL Editor (UPDATE COALESCE, 24 rows); item no Backlog pra corrigir a migration na fonte. Achados menores no Backlog: KPI 26 matrículas vs 2 perfis de aluno; seed misturado com dado real.

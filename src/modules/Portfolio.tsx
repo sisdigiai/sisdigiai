@@ -138,12 +138,12 @@ const APPS: App[] = [
   },
   {
     nome: 'Qual a Foto', mono: 'QF', cor: 'var(--color-eco-qualafoto)', tagline: 'Aprovação de fotos para fotógrafos',
-    tier: 'incubacao', estado: 'no-ar', maturidade: 50, funcao: 'Site no ar · worker IA roda local',
-    stack: 'SvelteKit (web) · Worker Python (RawTherapee) · Supabase',
+    tier: 'incubacao', estado: 'no-ar', maturidade: 55, funcao: 'Plataforma no ar e logada: dashboard do fotógrafo, 10 galerias, 82 fotos, análise IA RODADA (81 fotos com score), magic link sem cadastro · dados de teste do dono',
+    stack: 'SvelteKit (web) · Worker Python (RawTherapee) · Supabase · Gemini',
     repos: 'D:\\projetos\\qual_foto (monorepo apps/web + worker)',
-    git: '2d4d389 29/mai/2026',
-    proximo: 'Fechar UI de galeria · confirmar worker IA em produção',
-    bloqueio: 'Worker de processamento roda local (não hospedado)',
+    git: '2d4d389 29/mai/2026 · AGENTS.md + docs/brand não commitados',
+    proximo: 'Keep-alive do Supabase free · corrigir botão Entrar da landing · hospedar worker',
+    bloqueio: 'Supabase free pausou (restaurado 13/jul FALTANDO 21 DIAS pro prazo final) · worker roda local (não hospedado)',
     urls: [{ label: 'qualfoto.netlify.app', url: 'https://qualfoto.netlify.app' }],
   },
   {
