@@ -2,100 +2,44 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, ExternalLink } from 'lucide-react';
 import type { ModuleId } from '../components/Sidebar';
 import { initEcosystemMesh, initReveal, type EcoMeshNode } from '../lib/dhMesh';
+import { PRODUTOS, TIER_LABEL_CURTO, DEGRAU_LABEL, type ProdutoInfo } from './Portfolio';
+import { roadmapStore } from '../lib/roadmapStore';
 
-// Telemetria estática v1 — retrato manual do portfólio (2026-07).
-// Próxima iteração liga aos stores (financeiro, funil, marketing, clearix).
+// Verdade única: os nós derivam do índice PRODUTOS do Portfólio (mesma fonte do
+// Placar e da Lista Mestra). Nada de retrato manual — mudou lá, mudou aqui.
 
 interface Marca extends EcoMeshNode {
-  tierLabel: string;
-  descricao: string;
-  metricas: { label: string; valor: string; destaque?: boolean }[];
+  produto: ProdutoInfo;
   modulo?: ModuleId;
-  url?: string;
 }
 
-const MARCAS: Marca[] = [
-  {
-    id: 'clearix', label: 'Clearix', colorVar: '--color-eco-clearix', foco: true, tierLabel: 'Produto-âncora',
-    descricao: 'ERP/CRM B2B para óticas. Prioridade máxima da casa: 1 tenant piloto vivo, planos publicados no Mercado Pago e régua de cobrança ativa.',
-    metricas: [
-      { label: 'MRR piloto', valor: 'R$ 198,50', destaque: true },
-      { label: 'Planos MP', valor: '3 tabela + 3 piloto' },
-      { label: 'Próximo marco', valor: '3 tenants pagantes' },
-    ],
-    modulo: 'clearix',
-  },
-  {
-    id: 'osi', label: 'OSI', colorVar: '--color-eco-osi', foco: true, tierLabel: 'Em lançamento',
-    descricao: 'Ótica Sem Improviso — curso low-ticket da Academy. Setup 100% pronto; fase atual é VENDER: chamar óticas no WhatsApp.',
-    metricas: [
-      { label: 'Checkout', valor: 'R$ 48,50 · 2 canais', destaque: true },
-      { label: 'Fase', valor: 'VENDER' },
-      { label: 'Funil', valor: 'módulo Funil OSI' },
-    ],
-    modulo: 'funil',
-  },
-  {
-    id: 'pulso', label: 'Pulso', colorVar: '--color-eco-pulso', foco: true, tierLabel: 'Publicando',
-    descricao: 'Frente editorial de conteúdo. SO editorial completo rodando em 4 redes, alimentando audiência para o resto do portfólio.',
-    metricas: [
-      { label: 'Views 30d', valor: '~25 mil', destaque: true },
-      { label: 'Redes', valor: '4 ativas' },
-      { label: 'Cadência', valor: 'SO editorial' },
-    ],
-    modulo: 'marketing',
-  },
-  {
-    id: 'academy', label: 'Academy', colorVar: '--color-eco-academy', foco: false, tierLabel: 'No ar',
-    descricao: 'Educação low-ticket da DIGIAI. O OSI é o primeiro produto; a esteira de cursos vem na sequência.',
-    metricas: [
-      { label: '1º produto', valor: 'OSI (no ar)' },
-      { label: 'Telemetria', valor: 'a ligar' },
-    ],
-    modulo: 'academy',
-  },
-  {
-    id: 'nexus', label: 'Nexus', colorVar: '--color-eco-nexus', foco: false, tierLabel: 'No ar',
-    descricao: 'Frente de gestão educacional. App no ar com banco e auth próprios (ADR-0029).',
-    metricas: [{ label: 'Telemetria', valor: 'a ligar' }],
-    url: 'https://sisnexus.netlify.app',
-  },
-  {
-    id: 'nipo', label: 'Nipo', colorVar: '--color-eco-nipo', foco: false, tierLabel: 'No ar',
-    descricao: 'Nipo School — ensino musical. App no ar; frente sem foco comercial neste ciclo.',
-    metricas: [{ label: 'Telemetria', valor: 'a ligar' }],
-    url: 'https://niposchool.vercel.app',
-  },
-  {
-    id: 'qualafoto', label: 'Qual a Foto', colorVar: '--color-eco-qualafoto', foco: false, tierLabel: 'No ar',
-    descricao: 'Jogo/dinâmica de fotos. No ar, aguardando ciclo de tração.',
-    metricas: [{ label: 'Telemetria', valor: 'a ligar' }],
-    url: 'https://qualfoto.netlify.app',
-  },
-  {
-    id: 'app', label: 'App', colorVar: '--color-eco-app', foco: false, tierLabel: 'Infra interna',
-    descricao: 'Este painel. Infraestrutura interna da holding — não é produto de mercado neste estágio.',
-    metricas: [{ label: 'Módulos', valor: '30+' }],
-    modulo: 'visao',
-  },
-  {
-    id: 'lumina', label: 'Lumina', colorVar: '--color-eco-lumina', foco: false, tierLabel: 'No ar',
-    descricao: 'Frente Lumina. App no ar com identidade própria em construção.',
-    metricas: [{ label: 'Telemetria', valor: 'a ligar' }],
-    url: 'https://luminabox.netlify.app',
-  },
-  {
-    id: 'polapetit', label: 'Polapetit', colorVar: '--color-eco-polapetit', foco: false, tierLabel: 'No ar',
-    descricao: 'Festas infantis. App no ar; frente sem foco comercial neste ciclo.',
-    metricas: [{ label: 'Telemetria', valor: 'a ligar' }],
-    url: 'https://polapetit.netlify.app',
-  },
-];
+// Frente com tração = uso real pra cima (degrau ≥ 3) ou alavanca de lançamento
+function temTracao(p: ProdutoInfo): boolean {
+  return (p.degrau ?? 0) >= 3 || p.tier === 'alavanca';
+}
+
+// Onde abre dentro do painel (senão, abre o app externo pela URL do Portfólio)
+const MODULO_INTERNO: Partial<Record<string, ModuleId>> = {
+  'clearix': 'clearix',
+  'osi': 'funil',
+  'digiai-mkt': 'marketing',
+  'digiai-app': 'visao',
+};
+
+const MARCAS: Marca[] = PRODUTOS.map((p) => ({
+  id: p.slug,
+  label: p.nome,
+  colorVar: p.cor.replace(/^var\(/, '').replace(/\)$/, ''),
+  foco: temTracao(p),
+  produto: p,
+  modulo: MODULO_INTERNO[p.slug],
+}));
 
 interface Props { onNavigate?: (id: ModuleId) => void }
 
 export default function MapaVivo({ onNavigate }: Props) {
   const [selecionada, setSelecionada] = useState<Marca>(MARCAS[0]);
+  const [faseAtual, setFaseAtual] = useState<number | null>(null);
   const selRef = useRef(MARCAS[0].id);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -113,8 +57,16 @@ export default function MapaVivo({ onNavigate }: Props) {
     );
   }, []);
   useEffect(() => (rootRef.current ? initReveal(rootRef.current) : undefined), []);
+  useEffect(() => {
+    roadmapStore.listPhases().then((ps) => {
+      const atual = ps.find((f) => !f.completed_at && f.started_at);
+      if (atual) setFaseAtual(atual.phase_number);
+    });
+  }, []);
 
   const foco = MARCAS.filter(m => m.foco);
+  const noAr = PRODUTOS.filter(p => p.estado === 'no-ar').length;
+  const sel = selecionada.produto;
 
   return (
     <div ref={rootRef} className="min-h-full flex flex-col">
@@ -128,18 +80,18 @@ export default function MapaVivo({ onNavigate }: Props) {
           <h2 className="font-serif text-2xl font-semibold tracking-tight text-on-surface">Mapa Vivo</h2>
         </div>
 
-        {/* Contadores discretos */}
+        {/* Contadores vivos (mesma fonte do Placar) */}
         <div className="absolute top-6 right-6 flex gap-6 pointer-events-none text-right">
           <div>
-            <div className="font-serif text-2xl font-semibold text-on-surface leading-none">10</div>
+            <div className="font-serif text-2xl font-semibold text-on-surface leading-none">{noAr}<span className="text-muted text-base">/{PRODUTOS.length}</span></div>
             <div className="mt-1 text-[9px] font-mono uppercase tracking-[0.18em] text-muted">no ar</div>
           </div>
           <div>
-            <div className="font-serif text-2xl font-semibold text-on-surface leading-none">3</div>
+            <div className="font-serif text-2xl font-semibold text-on-surface leading-none">{foco.length}</div>
             <div className="mt-1 text-[9px] font-mono uppercase tracking-[0.18em] text-muted">com tração</div>
           </div>
           <div>
-            <div className="font-serif text-2xl font-semibold text-on-surface leading-none">2<span className="text-muted text-base">/8</span></div>
+            <div className="font-serif text-2xl font-semibold text-on-surface leading-none">{faseAtual ?? '—'}<span className="text-muted text-base">/8</span></div>
             <div className="mt-1 text-[9px] font-mono uppercase tracking-[0.18em] text-muted">fase</div>
           </div>
         </div>
@@ -148,17 +100,23 @@ export default function MapaVivo({ onNavigate }: Props) {
         <div key={selecionada.id} className="absolute right-6 bottom-6 w-[340px] max-w-[calc(100%-3rem)] border border-outline/30 bg-surface/85 backdrop-blur-md">
           <div className="p-5">
             <div className="flex items-center gap-2 mb-3">
-              <span className="w-2.5 h-2.5 shrink-0" style={{ background: `var(${selecionada.colorVar})` }} />
-              <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">{selecionada.label} · {selecionada.tierLabel}</span>
+              <span className="w-2.5 h-2.5 shrink-0" style={{ background: sel.cor }} />
+              <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">{sel.nome} · {TIER_LABEL_CURTO[sel.tier]}</span>
             </div>
-            <p className="font-serif text-base leading-relaxed text-on-surface mb-4">{selecionada.descricao}</p>
+            <p className="font-serif text-base leading-relaxed text-on-surface mb-4">{sel.tagline}</p>
             <div className="mb-4">
-              {selecionada.metricas.map(mt => (
-                <div key={mt.label} className="flex items-baseline justify-between gap-4 border-t border-outline/15 py-2">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-muted">{mt.label}</span>
-                  <span className={`text-sm text-right ${mt.destaque ? 'text-success font-medium' : 'text-on-surface'}`}>{mt.valor}</span>
-                </div>
-              ))}
+              <div className="flex items-baseline justify-between gap-4 border-t border-outline/15 py-2">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Maturidade</span>
+                <span className="text-sm text-right text-success font-medium tabular-nums">{sel.maturidade}%</span>
+              </div>
+              <div className="flex items-baseline justify-between gap-4 border-t border-outline/15 py-2">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Estado</span>
+                <span className="text-sm text-right text-on-surface">{sel.estado === 'no-ar' ? 'No ar' : sel.estado === 'travado' ? 'Travado' : sel.estado === 'funciona' ? 'Funciona' : 'Protótipo'}{sel.degrau ? ` · ${DEGRAU_LABEL[sel.degrau]}` : ''}</span>
+              </div>
+              <div className="border-t border-outline/15 py-2">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Função hoje</span>
+                <p className="text-[12px] text-on-surface leading-snug mt-1 line-clamp-3">{sel.funcao}</p>
+              </div>
             </div>
             {selecionada.modulo && (
               <button
@@ -168,9 +126,9 @@ export default function MapaVivo({ onNavigate }: Props) {
                 Abrir no painel <ArrowRight className="w-4 h-4" />
               </button>
             )}
-            {!selecionada.modulo && selecionada.url && (
+            {!selecionada.modulo && sel.url && (
               <a
-                href={selecionada.url} target="_blank" rel="noreferrer"
+                href={sel.url} target="_blank" rel="noreferrer"
                 className="w-full flex items-center justify-center gap-2 border border-outline/30 text-on-surface px-4 py-2.5 text-sm font-medium hover:border-action/50 transition-colors"
               >
                 Abrir app externo <ExternalLink className="w-4 h-4" />
@@ -181,12 +139,12 @@ export default function MapaVivo({ onNavigate }: Props) {
 
         {/* Legenda */}
         <div className="absolute left-6 bottom-6 pointer-events-none text-[10px] font-mono text-muted leading-relaxed">
-          linha sage = frente com tração · nó apagado = no ar, sem foco<br />arraste o mouse pra orbitar · clique numa marca
+          linha sage = frente com tração (uso real / alavanca) · nó apagado = sem tração ainda<br />arraste o mouse pra orbitar · clique numa marca
         </div>
       </div>
 
       {/* Frentes com tração */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-outline/10 border-t border-outline/10">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-outline/10 border-t border-outline/10">
         {foco.map(m => (
           <button
             key={m.id}
@@ -195,16 +153,16 @@ export default function MapaVivo({ onNavigate }: Props) {
             data-reveal
           >
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="w-2 h-2 shrink-0" style={{ background: `var(${m.colorVar})` }} />
-              <span className="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant">{m.label}</span>
+              <span className="w-2 h-2 shrink-0" style={{ background: m.produto.cor }} />
+              <span className="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant">{m.produto.nome}</span>
             </div>
-            <div className="text-sm text-on-surface">{m.metricas[0].label}: <span className="text-success">{m.metricas[0].valor}</span></div>
+            <div className="text-sm text-on-surface">Maturidade: <span className="text-success tabular-nums">{m.produto.maturidade}%</span>{m.produto.degrau ? <span className="text-muted"> · {DEGRAU_LABEL[m.produto.degrau]}</span> : null}</div>
           </button>
         ))}
       </div>
 
       <div className="px-6 py-3 text-[10px] font-mono text-muted border-t border-outline/10">
-        Telemetria estática v1 (retrato manual 2026-07) · próxima iteração liga aos stores do painel
+        Fonte viva: índice PRODUTOS do Portfólio (mesma verdade do Placar e da Lista Mestra) + fase atual do Roadmap
       </div>
     </div>
   );

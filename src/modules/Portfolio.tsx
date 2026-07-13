@@ -294,6 +294,12 @@ export const DEGRAU_LABEL: Record<number, string> = {
 export type ProdutoInfo = {
   slug: string; nome: string; maturidade: number; estado: Estado; tier: Tier;
   cor: string; mono: string; logo?: string; badge: boolean; degrau?: number;
+  tagline: string; funcao: string; url?: string;
+};
+
+export const TIER_LABEL_CURTO: Record<Tier, string> = {
+  ancora: 'Produto-âncora', alavanca: 'Alavanca crítica', suporte: 'Suporte prioritário',
+  autonomo: 'Autônomo', incubacao: 'Incubação', institucional: 'Institucional', infra: 'Infra interna',
 };
 
 export const PRODUTOS: ProdutoInfo[] = APPS.map(a => ({
@@ -301,6 +307,7 @@ export const PRODUTOS: ProdutoInfo[] = APPS.map(a => ({
   nome: a.nome, maturidade: a.maturidade, estado: a.estado, tier: a.tier,
   cor: a.cor, mono: a.mono, logo: LOGO[a.nome], badge: BADGE.has(a.nome),
   degrau: DEGRAU[a.nome],
+  tagline: a.tagline, funcao: a.funcao, url: a.urls[0]?.url,
 }));
 
 export const PRODUTO_BY_SLUG: Record<string, ProdutoInfo> =
