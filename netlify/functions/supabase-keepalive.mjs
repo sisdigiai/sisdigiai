@@ -9,6 +9,7 @@ const PROJETOS = [
   ['digiai', 'hswyopqvnolqpmprqvzh', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhzd3lvcHF2bm9scXBtcHJxdnpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MzY0NzMsImV4cCI6MjA5MjAxMjQ3M30.ZCtoaMGvko1QHVFs23gC8nDpfTG-xgieaRsIPNAT21s'],
   ['clearix', 'mhgbuplnxtfgipbemchb', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oZ2J1cGxueHRmZ2lwYmVtY2hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwODAwMDQsImV4cCI6MjA1OTY1NjAwNH0.478ltLNyzDefQFZjnMHxuM2Qk8Aw8lsIpIrdb-h7rl0'],
   ['nexus', 'tkbhhbzhlqsgcwljeesg', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRrYmhoYnpobHFzZ2N3bGplZXNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NzMzNjcsImV4cCI6MjA4OTQ0OTM2N30.mzHTjV8ilOtNV6ydZuEWI11pHVuw3G5yLqlHW4bGrX4'],
+  ['polapetit', 'cvqoqnjitqvuopqadfbh', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN2cW9xbmppdHF2dW9wcWFkZmJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMzE1ODEsImV4cCI6MjA5MDkwNzU4MX0.YQxZ-My4ap4QB-KMK8U3MgvDsWXNPPexYx0QfFYptME'],
 ];
 
 export default async () => {

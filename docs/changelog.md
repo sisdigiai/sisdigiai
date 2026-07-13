@@ -4,6 +4,12 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Adicionado (2026-07-13 — sequência pós-auditoria: keep-alive + resgate de trabalho local + fixes)
+- **Keep-alive dos Supabase free** (`netlify/functions/supabase-keepalive.mjs`): scheduled function 2x/semana (seg+qui 9h UTC) pingando o REST de 7 projetos (nipo, qual_foto, easy, digiai, clearix, nexus, polapetit) com as anon keys públicas — mata a classe de incidente "free pausou e derrubou o login". (1ª tentativa via GitHub Actions foi rejeitada: PAT sem escopo `workflow`.)
+- **Trabalho local resgatado**: Easy — redesign dos 3 dashboards + AGENTS.md + docs commitados e pushados (`35c311a`); o site é linkado ao GitHub e o **redesign deployou sozinho** (verificado no bundle). Nipo — fix da migration 030b (campos de token '' em vez de NULL) + AGENTS.md commitados no branch do piloto (`9cf6d6a`). Qual Foto — AGENTS.md + docs/brand commitados (`7ad21e1`). Polapetit landing — causa-raiz do hero quebrado: **todas as fotos de v_photos são URLs assinadas do CDN do Instagram (403 após expirar)**; fix de resiliência commitado (`a9cf341`): filtra cdninstagram, hero degrada pra placeholder de marca, galeria some quando vazia.
+- **Bloqueio novo**: os PATs próprios de niposchool-design, tgjphotos e polapetit estão **expirados** (401) e o token do digiai não alcança essas orgs — os 3 commits estão salvos localmente aguardando renovação dos tokens pra push/deploy.
+- Backlog: "Entrar mudo" do Qual Foto fechado como não-bug (redirect de sessão ativa; código idêntico ao Começar Grátis).
+
 ### Verificado (2026-07-13 — Qual a Foto: análise profunda logada, incluindo painel admin)
 - **Magic link comprovado em uso real**: 3 galerias com seleções feitas por clientes (29 fotos escolhidas; galeria_003 com 62,5% de progresso) — o diferencial central do produto funciona ponta a ponta.
 - **Tração externa esquecida**: 8 fotógrafos externos reais cadastraram e testaram em jan/2026 (lista no admin com últimos acessos) — morreu quando o Supabase pausou. Item comercial P2 no Backlog: reativar como leads de validação.
