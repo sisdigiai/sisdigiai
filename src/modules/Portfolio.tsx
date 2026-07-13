@@ -138,7 +138,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Qual a Foto', mono: 'QF', cor: 'var(--color-eco-qualafoto)', tagline: 'Aprovação de fotos para fotógrafos',
-    tier: 'incubacao', estado: 'no-ar', maturidade: 55, funcao: 'Plataforma no ar e logada: dashboard do fotógrafo, 10 galerias, 82 fotos, análise IA RODADA (81 fotos com score), magic link sem cadastro · dados de teste do dono',
+    tier: 'incubacao', estado: 'no-ar', maturidade: 58, funcao: 'Plataforma no ar e logada: 10 galerias, 82 fotos, análise IA RODADA (81 com score) · magic link COMPROVADO (29 fotos escolhidas por clientes) · 8 fotógrafos externos testaram em jan/26 · admin próprio (stats com bug)',
     stack: 'SvelteKit (web) · Worker Python (RawTherapee) · Supabase · Gemini',
     repos: 'D:\\projetos\\qual_foto (monorepo apps/web + worker)',
     git: '2d4d389 29/mai/2026 · AGENTS.md + docs/brand não commitados',

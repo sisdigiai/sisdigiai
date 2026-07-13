@@ -4,6 +4,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Verificado (2026-07-13 — Qual a Foto: análise profunda logada, incluindo painel admin)
+- **Magic link comprovado em uso real**: 3 galerias com seleções feitas por clientes (29 fotos escolhidas; galeria_003 com 62,5% de progresso) — o diferencial central do produto funciona ponta a ponta.
+- **Tração externa esquecida**: 8 fotógrafos externos reais cadastraram e testaram em jan/2026 (lista no admin com últimos acessos) — morreu quando o Supabase pausou. Item comercial P2 no Backlog: reativar como leads de validação.
+- **Painel /admin (SUPERADMIN, v1.0.0 MVP)**: funcional para usuários/solicitações, mas KPIs zerados (0 galerias/0 fotos vs 10/82 reais — "Atualizar Stats" não resolve), Configurações aponta pra 404 e coluna Ações é "Em breve". Item no Backlog. Card: maturidade 55→58.
+
 ### Corrigido (2026-07-13 — ritual Qual a Foto: Supabase restaurado a 21 dias do prazo final)
 - **Mesma causa-raiz do Nipo**: projeto Supabase `qual_foto?` (org tgjphotos, Free) pausado por inatividade — restaurado via dashboard no Chrome do Junior **faltando 21 dias** pro limite (03/ago; depois, só download dos dados). Verificado logado pós-restore: dashboard do fotógrafo com 10 galerias, 82 fotos e **81 com análise IA rodada** (scores por galeria) — a IA de curadoria funcionou, ao contrário do que card e Spec diziam; o que roda local é o worker de edição pesada (RawTherapee).
 - **Card Qual a Foto**: maturidade 50→55, função real, bloqueios atualizados (free tier pausa + worker local). Achados no Backlog (`qual-a-foto`): keep-alive (P2), botão "Entrar" da landing mudo (P3), pendências não commitadas AGENTS.md/docs-brand (P3); item antigo de validação (abril) fechado como done. Spec atualizada. **Fecha o ritual código→online dos 4 apps de incubação** (Polapetit, Easy, Nipo, Qual Foto).
