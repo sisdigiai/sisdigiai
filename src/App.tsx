@@ -19,6 +19,7 @@ import Financeiro from './modules/Financeiro';
 import Academy from './modules/Academy';
 import Funil from './modules/Funil';
 import Marketing from './modules/Marketing';
+import MarketingEspelho from './modules/MarketingEspelho';
 import MarketingSEO from './modules/MarketingSEO';
 import Marketplace from './modules/Marketplace';
 import ReferenciasDesign from './modules/ReferenciasDesign';
@@ -46,8 +47,7 @@ const PUBLIC_ROUTES = ['/osi/depoimento', '/osi'];
 const MODULES: ModuleId[] = [
   'visao', 'portfolio', 'trilha', 'lista-mestra', 'backlog', 'comercial',
   'cadastro-empresa', 'financeiro', 'academy', 'marketplace', 'clearix', 'cobranca',
-  'marketing', 'marketing-redes', 'marketing-performance', 'marketing-banco',
-  'marketing-prompts', 'marketing-engajamento', 'funil', 'fluxo-osi',
+  'marketing', 'marketing-engajamento', 'funil', 'fluxo-osi',
   'marketing-seo', 'marketing-materiais', 'marketing-afiliados', 'travas-marketing',
   'ecossistemas', 'mapa-vivo', 'decisoes', 'biblioteca', 'brand',
   'referencias-design', 'como-usar', 'mock-estilos', 'guia',
@@ -63,8 +63,7 @@ const MODULE_LABEL: Record<ModuleId, string> = {
   visao: 'Visão', portfolio: 'Portfólio', trilha: 'Roadmap', 'lista-mestra': 'Lista Mestra',
   backlog: 'Backlog Executivo', comercial: 'Comercial', 'cadastro-empresa': 'Cadastro Empresa',
   financeiro: 'Financeiro', academy: 'Academy', funil: 'Funil OSI', 'fluxo-osi': 'Mapa OSI',
-  marketing: 'Calendário', 'marketing-redes': 'Redes', 'marketing-performance': 'Performance',
-  'marketing-banco': 'Banco de Ideias', 'marketing-prompts': 'Prompts IA', 'marketing-engajamento': 'Engajamento',
+  marketing: 'Marketing', 'marketing-engajamento': 'Engajamento',
   'marketing-materiais': 'Materiais', 'marketing-afiliados': 'Afiliados',
   'marketing-seo': 'Marketing & SEO', marketplace: 'Marketplace', clearix: 'Central Clearix', cobranca: 'Cobrança',
   ecossistemas: 'Ecossistemas', 'mapa-vivo': 'Mapa Vivo', decisoes: 'Decisões', biblioteca: 'Biblioteca', brand: 'Brand Guidelines',
@@ -77,8 +76,7 @@ const MODULE_SECTION: Record<ModuleId, string> = {
   visao: 'Operacional', portfolio: 'Operacional', trilha: 'Operacional', 'lista-mestra': 'Operacional',
   backlog: 'Operacional', comercial: 'Operacional', 'cadastro-empresa': 'Operacional', financeiro: 'Operacional',
   academy: 'Operacional', marketplace: 'Operacional', clearix: 'Operacional', cobranca: 'Operacional',
-  marketing: 'Marketing', 'marketing-redes': 'Marketing', 'marketing-performance': 'Marketing',
-  'marketing-banco': 'Marketing', 'marketing-prompts': 'Marketing', 'marketing-engajamento': 'Marketing',
+  marketing: 'Marketing', 'marketing-engajamento': 'Marketing',
   funil: 'Marketing', 'fluxo-osi': 'Marketing', 'marketing-seo': 'Marketing',
   'marketing-materiais': 'Marketing', 'marketing-afiliados': 'Marketing', 'travas-marketing': 'Marketing',
   ecossistemas: 'Ecossistemas', 'mapa-vivo': 'Ecossistemas',
@@ -160,11 +158,7 @@ export default function App() {
       case 'financeiro': return <Financeiro />;
       case 'academy': return <Academy />;
       case 'funil': return <Funil />;
-      case 'marketing': return <Marketing view="calendario" />;
-      case 'marketing-redes': return <Marketing view="redes" />;
-      case 'marketing-performance': return <Marketing view="performance" />;
-      case 'marketing-banco': return <Marketing view="banco" />;
-      case 'marketing-prompts': return <Marketing view="prompts" />;
+      case 'marketing': return <MarketingEspelho />;
       case 'marketing-engajamento': return <Marketing view="engajamento" />;
       case 'marketing-materiais': return <Marketing view="materiais" />;
       case 'marketing-afiliados': return <Marketing view="afiliados" />;

@@ -43,7 +43,7 @@ const MARCAS: Marca[] = [
       { label: 'Redes', valor: '4 ativas' },
       { label: 'Cadência', valor: 'SO editorial' },
     ],
-    modulo: 'marketing-redes',
+    modulo: 'marketing',
   },
   {
     id: 'academy', label: 'Academy', colorVar: '--color-eco-academy', foco: false, tierLabel: 'No ar',

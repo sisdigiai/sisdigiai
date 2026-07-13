@@ -5,7 +5,7 @@ import {
   Compass, Flame, LogOut, Store, Sparkles, Music2, Activity,
   Camera, Wand2, Boxes, Search, ShieldCheck, Workflow, ChevronDown,
   GraduationCap, Languages, Calendar as CalendarIcon, Globe, BarChart3,
-  Lightbulb, Heart, Package, Users, Receipt
+  Lightbulb, Heart, Package, Users, Receipt, Radio,
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
@@ -19,8 +19,7 @@ export type ModuleId =
   | 'clearix' | 'cobranca' | 'referencias-design' | 'como-usar' | 'mock-estilos' | 'marketing'
   | 'marketing-seo' | 'marketplace' | 'ecossistemas' | 'mapa-vivo' | 'travas-marketing'
   | 'fluxo-osi' | 'guia'
-  | 'marketing-redes' | 'marketing-performance' | 'marketing-banco'
-  | 'marketing-prompts' | 'marketing-engajamento' | 'marketing-materiais'
+  | 'marketing-engajamento' | 'marketing-materiais'
   | 'marketing-afiliados';
 
 interface NavItem {
@@ -70,11 +69,7 @@ const operacional: NavItem[] = [
 // Marketing — seção de 1º nível (calendário + redes + engajamento + funil OSI +
 // SEO + afiliados + travas). Sub-abas do antigo módulo Marketing viraram itens.
 const marketing: NavItem[] = [
-  { id: 'marketing',             label: 'Calendário',       icon: <CalendarIcon className="w-4 h-4" /> },
-  { id: 'marketing-redes',       label: 'Redes',            icon: <Globe className="w-4 h-4" /> },
-  { id: 'marketing-performance', label: 'Performance',      icon: <BarChart3 className="w-4 h-4" /> },
-  { id: 'marketing-banco',       label: 'Banco de Ideias',  icon: <Lightbulb className="w-4 h-4" /> },
-  { id: 'marketing-prompts',     label: 'Prompts IA',       icon: <Sparkles className="w-4 h-4" /> },
+  { id: 'marketing',             label: 'Marketing (MKT)',  icon: <Radio className="w-4 h-4" /> },
   { id: 'marketing-engajamento', label: 'Engajamento',      icon: <Heart className="w-4 h-4" /> },
   { id: 'funil',                 label: 'Funil OSI',        icon: <Flame className="w-4 h-4" /> },
   { id: 'fluxo-osi',             label: 'Mapa OSI',         icon: <Workflow className="w-4 h-4" /> },

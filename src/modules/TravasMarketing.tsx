@@ -1,9 +1,13 @@
-import { ShieldCheck, Bot, Lock, Target, Heart, Store, Globe } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ShieldCheck, Bot, Lock, Target, Heart, Store, Globe, Palette } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
+import { supabase } from '../lib/supabase';
 
-// Travas de marketing — derivadas das regras canônicas (R-011, R-013/LGPD,
-// decisões 17/04 Academy-funil, design system). Fonte única para Marketing,
-// Funil e Academy. Ajustar aqui reflete no banner de todos os módulos.
+// Travas de marketing — DUAS camadas, cada uma com sua verdade única:
+// 1. GLOBAIS (abaixo, TRAVAS): espelham as regras canônicas do Cockpit/Harness
+//    (R-011, R-013/LGPD, marketplace-first...). Mudou a regra → atualizar lá e aqui.
+// 2. POR MARCA (v_mkt_travas): a verdade vive em mkt.content_rules, editada SÓ
+//    no app DIGIAI MKT — o digiai lê ao vivo, nunca duplica.
 
 interface Trava {
   icone: typeof Bot;
@@ -23,7 +27,7 @@ export const TRAVAS: Trava[] = [
       'AI nunca posta, envia mensagem, faz deploy ou cobra sozinho.',
       'Conteúdo só vai a "publicado" após revisão humana de aderência setorial.',
     ],
-    onde: 'Calendário Editorial · Planejador · Materiais de afiliados',
+    onde: 'DIGIAI MKT (produção → publicação) · Materiais de afiliados',
   },
   {
     icone: Lock,
@@ -45,7 +49,7 @@ export const TRAVAS: Trava[] = [
       'Distribuição > Produto: Academy/OSI são canais que constroem confiança pro Clearix futuro.',
       'Nenhuma frente editorial deve sobre-vender Clearix no low-ticket.',
     ],
-    onde: 'Banco de Ideias · Calendário · Landing OSI · PromptsIA',
+    onde: 'DIGIAI MKT (ideias/roteiros) · Landing OSI · Funil',
   },
   {
     icone: Store,
@@ -56,7 +60,7 @@ export const TRAVAS: Trava[] = [
       'Toda copy/CTA aponta pro listing do marketplace, não pra landing intermediária.',
       'Preço, capa e oferta no marketplace são fonte da verdade — sincronizar app ↔ marketplace.',
     ],
-    onde: 'Marketplace · Calendário · Materiais de afiliados · Landing OSI',
+    onde: 'Marketplace · DIGIAI MKT · Materiais de afiliados · Landing OSI',
   },
   {
     icone: Globe,
@@ -67,9 +71,9 @@ export const TRAVAS: Trava[] = [
       'Um navegador travado por rede; rede com navegador "a validar" não entra em rotina.',
       'Devlog diário = LinkedIn pessoal; contas DIGIAI = consolidado semanal; OSI nunca nas contas DIGIAI nem no LinkedIn.',
       'Meta (FB+IG) publica via Business Suite, SEMPRE com imagem (T-9/T-10) — conferir o portfólio "Digiai" antes de postar. LinkedIn segue texto livre.',
-      'Toda atualização de rede é registrada em Marketing → Redes (log eterno).',
+      'Toda atualização de rede é registrada no DIGIAI MKT (Marcas & Redes).',
     ],
-    onde: 'Marketing → Redes · Calendário Editorial',
+    onde: 'DIGIAI MKT → Marcas & Redes',
   },
   {
     icone: Heart,
@@ -103,15 +107,84 @@ export function TravasBanner() {
   );
 }
 
+type TravaMarca = {
+  marca: string;
+  marca_code: string;
+  accent_hex: string | null;
+  proibicoes: string[] | null;
+  guardrails: { hard_never?: string[]; hard_always?: string[]; cor_marca?: string; extra?: string } | null;
+  cadencia: { canais?: string[]; horario?: string; qtd_por_dia?: number } | null;
+  updated_at: string;
+};
+
 export default function TravasMarketing() {
+  const [marcas, setMarcas] = useState<TravaMarca[]>([]);
+
+  useEffect(() => {
+    supabase.from('v_mkt_travas').select('*').then(({ data }) => setMarcas((data ?? []) as TravaMarca[]));
+  }, []);
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <PageHeader
         eyebrow="Governança"
         title="Travas de Marketing"
-        subtitle="Regras inegociáveis que regem todo conteúdo de marketing — derivadas das regras canônicas (R-011, R-013, decisões 17/04, design system). Aplicam em Marketing, Funil OSI e Academy."
+        subtitle="Duas camadas: regras globais (Cockpit/Harness — R-011, R-013…) + travas por marca (verdade única em mkt.content_rules, editadas só no DIGIAI MKT)."
       />
       <div className="space-y-6">
+
+      {/* Travas POR MARCA — verdade única do MKT (leitura ao vivo) */}
+      {marcas.length > 0 && (
+        <div className="border border-outline/15 bg-surface-container">
+          <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2">
+            <Palette className="w-3.5 h-3.5 text-secondary" />
+            <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Travas por marca — vivas do DIGIAI MKT ({marcas.length})</span>
+            <a href="https://digiaimkt.netlify.app" target="_blank" rel="noreferrer" className="ml-auto font-mono text-[10px] text-secondary hover:underline">editar no MKT ↗</a>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-outline/10">
+            {marcas.map((m) => (
+              <div key={m.marca_code} className="bg-surface-container p-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 shrink-0" style={{ background: m.accent_hex || 'var(--color-muted)' }} />
+                  <span className="text-sm font-semibold text-on-surface">{m.marca}</span>
+                  <span className="ml-auto font-mono text-[9px] text-muted">atualizada {new Date(m.updated_at).toLocaleDateString('pt-BR')}</span>
+                </div>
+                {m.guardrails?.hard_never && m.guardrails.hard_never.length > 0 && (
+                  <div>
+                    <div className="font-mono text-[9px] uppercase tracking-wider text-danger mb-0.5">nunca</div>
+                    <ul className="space-y-0.5">
+                      {m.guardrails.hard_never.map((r, i) => <li key={i} className="text-[12px] text-on-surface-variant flex gap-1.5"><span className="text-danger/70 shrink-0">✗</span>{r}</li>)}
+                    </ul>
+                  </div>
+                )}
+                {m.guardrails?.hard_always && m.guardrails.hard_always.length > 0 && (
+                  <div>
+                    <div className="font-mono text-[9px] uppercase tracking-wider text-success mb-0.5">sempre</div>
+                    <ul className="space-y-0.5">
+                      {m.guardrails.hard_always.map((r, i) => <li key={i} className="text-[12px] text-on-surface-variant flex gap-1.5"><span className="text-success/70 shrink-0">✓</span>{r}</li>)}
+                    </ul>
+                  </div>
+                )}
+                {m.proibicoes && m.proibicoes.length > 0 && (
+                  <details className="text-[12px] text-on-surface-variant">
+                    <summary className="font-mono text-[9px] uppercase tracking-wider text-muted cursor-pointer">proibições da marca ({m.proibicoes.length})</summary>
+                    <ul className="space-y-0.5 mt-1">
+                      {m.proibicoes.map((r, i) => <li key={i} className="flex gap-1.5"><span className="text-warning/70 shrink-0">▪</span>{r}</li>)}
+                    </ul>
+                  </details>
+                )}
+                {m.cadencia && (
+                  <div className="font-mono text-[10px] text-muted">
+                    cadência: {m.cadencia.qtd_por_dia ?? '—'}/dia · {m.cadencia.horario ?? '—'} · {(m.cadencia.canais ?? []).join(', ')}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="font-mono text-[10px] uppercase tracking-widest text-muted pt-2">Travas globais — regras canônicas (Cockpit/Harness)</div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {TRAVAS.map(t => {
           const Icon = t.icone;
