@@ -4,6 +4,10 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Alterado (2026-07-13 — ritual Polapetit: card do Portfólio com app + landing)
+- **Card Polapetit atualizado após verificação código→online**: agora lista as **duas URLs canônicas** — landing `polapetit.netlify.app` (200, viva) e app `polapetitapp.netlify.app` (200, Portal do Cliente + /admin gated). `funcao` reflete o produto real: ERP do Buffet Taty Mello em produção com 20 módulos admin (CRM, pipeline, propostas, contratos, financeiro, estoque), portal do cliente e simulador 3D. Maturidade 70→72.
+- **Bloqueio registrado**: `polapetit.com.br` não resolve (DNS fora) — Spec dizia "landing ativa em polapetit.com.br", corrigida (`Cockpit/Spec/polapetit.md`, junto com a grafia `polapettiapp`→`polapetitapp`). 3 gaps no Backlog (`product_id='polapetit'`): DNS do domínio, imagem do hero quebrada na landing, decisão binária do experimento Persol.
+
 ### Adicionado (2026-07-13 — leads Clearix visíveis e trabalháveis no Comercial)
 - **Seção "Demonstrações Clearix (site)"** no módulo Comercial: lê `v_marketing_landing_leads` com `product='clearix'` — nome, WhatsApp, e-mail, nº de lojas + mensagem (parse do `notes`), UTM, quando chegou e status. Fecha o gap do briefing (`docs/briefing-leads-clearix-site.md`): lead entrava no banco e não aparecia em módulo nenhum.
 - **Workflow de status** `novo → contactado → comprou | descartado` via select na própria linha. **Migration `fn_update_landing_lead_status`** (SECURITY DEFINER + `is_staff()`, valida vocabulário, ignora anonimizados — LGPD).

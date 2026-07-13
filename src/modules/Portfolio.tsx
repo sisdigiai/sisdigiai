@@ -119,12 +119,16 @@ const APPS: App[] = [
   },
   {
     nome: 'Polapetit', mono: 'PP', cor: 'var(--color-eco-polapetit)', tagline: 'Sistema operacional para festas infantis',
-    tier: 'incubacao', estado: 'no-ar', maturidade: 70, funcao: 'Produção (Buffet Taty Mello + landing)',
-    stack: 'Vite · React 19 (Three.js/R3F) · Supabase · Firebase',
+    tier: 'incubacao', estado: 'no-ar', maturidade: 72, funcao: 'ERP do Buffet Taty Mello em produção — 20 módulos admin (CRM, pipeline, propostas, contratos, financeiro, estoque) + portal do cliente + simulador 3D + landing',
+    stack: 'Vite · React 19 (Three.js/R3F) · Supabase · Firebase | landing: Express · Drizzle · Radix',
     repos: 'polapetit (app) · polapetit_landing (site)',
     git: 'app 766ac5d · landing 8a7f07d (mai/2026)',
-    proximo: 'Validar experimento Persol · configurar domínio polapetit.com.br (DNS fora)',
-    urls: [{ label: 'polapetit.netlify.app', url: 'https://polapetit.netlify.app' }],
+    proximo: 'Validar experimento Persol (decisão binária) · corrigir imagem do hero na landing',
+    bloqueio: 'Domínio polapetit.com.br não resolve (DNS fora) — usar netlify.app na copy',
+    urls: [
+      { label: 'landing · polapetit.netlify.app', url: 'https://polapetit.netlify.app' },
+      { label: 'app · polapetitapp.netlify.app', url: 'https://polapetitapp.netlify.app' },
+    ],
   },
   {
     nome: 'Qual a Foto', mono: 'QF', cor: 'var(--color-eco-qualafoto)', tagline: 'Aprovação de fotos para fotógrafos',
