@@ -4,6 +4,10 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Corrigido (2026-07-13 — ritual Nipo School: login voltou + card com estado real)
+- **Causa-raiz do login quebrado encontrada e resolvida**: o projeto Supabase do deploy (`tqlwkgiytdikumtcnizf`, org niposchool-design, Free) estava **pausado por inatividade** — auth respondia 503 e o app mostrava "Failed to fetch". Restaurado via dashboard (navegador do Nipo); teste ao vivo confirmou auth respondendo 400 pra credencial inválida = circuito funcional. Detalhe: o `.env` local aponta pra um projeto **diferente e deletado** (`eehidnwlwrzqzgytbfsd`, DNS morto) — por isso o diagnóstico local também falhava.
+- **Card Nipo School**: sai de Travado → **No ar** (degrau 2), maturidade 50→55 — plataforma multi-tenant de ensino musical com 66 rotas, gamificação, presença QR, IA pedagógica. Bloqueios reais registrados: free tier volta a pausar, piloto ADNIPO parado, branch do piloto Nipo Wa só local. 3 itens no Backlog (`nipo-school`) + Spec atualizada.
+
 ### Alterado (2026-07-13 — ritual Easy Idiomas: card com estado real)
 - **Card Easy Idiomas atualizado após verificação código→online**: plataforma bem mais completa do que o card dizia — admin (16 páginas) + portais aluno e professor, presença por QR Code, assistente IA Gemini, multi-tenant com RLS e signup por convite (18 migrations com hardening). Site vivo e logado em `easyidioma.netlify.app`. Maturidade 55→58.
 - **Achado crítico**: redesign completo de 3 dashboards (Dashboard, AlunoHome, ProfessorHome, ~560 linhas) + AGENTS.md + docs/ existem **só no working tree local** — marker ausente do HEAD e do bundle deployado. Registrado como bloqueio no card + item P2 no Backlog. Segundo item: validar oferta com escolas reais (dados 100% seed). Spec `easy-idiomas.md` atualizada (entidades, hospedagem, status).

@@ -158,12 +158,12 @@ const APPS: App[] = [
   },
   {
     nome: 'Nipo School', mono: 'NP', cor: 'var(--color-eco-nipo)', tagline: 'Ensino musical comunitário · ADNIPO Suzano',
-    tier: 'incubacao', estado: 'travado', maturidade: 50, funcao: 'Landing no ar · piloto interno travado',
-    stack: 'Next 16 · React 19 · TS · Supabase · OpenAI',
+    tier: 'incubacao', estado: 'no-ar', maturidade: 55, funcao: 'Plataforma multi-tenant de ensino musical no ar: 66 rotas, gamificação, presença QR, portfólio do aluno, IA pedagógica (GPT-4o) · login RESTAURADO 13/jul (Supabase free tinha pausado)',
+    stack: 'Next 16 · React 19 · TS · Supabase (71+ migrations) · OpenAI',
     repos: 'D:\\projetos\\nipo_school',
-    git: '3e4afe4 31/mai/2026 (design system DIGIAI)',
-    proximo: 'Corrigir tabela profiles · fechar checklist go/no-go · piloto ADNIPO',
-    bloqueio: 'Bug de acesso à tabela profiles + checklist de piloto incompleto',
+    git: 'main d46659f · piloto Nipo Wa (3e4afe4) em branch SÓ local',
+    proximo: 'Retomar piloto ADNIPO · pushar branch do piloto Nipo Wa · keep-alive do Supabase free',
+    bloqueio: 'Supabase free pausa por inatividade (causou o 503 do login) · piloto ADNIPO parado · branch do piloto não pushado',
     urls: [{ label: 'niposchool.vercel.app', url: 'https://niposchool.vercel.app' }],
   },
   {
@@ -296,7 +296,7 @@ const SLUG: Record<string, string> = {
 const DEGRAU: Record<string, number> = {
   'Clearix': 3, 'Ótica Sem Improviso': 2, 'Pulso': 3, 'Lumina': 3, 'Nexus': 2,
   'Clearix Calc': 2, 'Polapetit': 3, 'Qual a Foto': 1, 'Easy Idiomas': 2,
-  'Nipo School': 1, 'Mello Eyewear': 2,
+  'Nipo School': 2, 'Mello Eyewear': 2,
 };
 
 export const DEGRAU_LABEL: Record<number, string> = {
