@@ -4,6 +4,12 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Adicionado (2026-07-13 — leads Clearix visíveis e trabalháveis no Comercial)
+- **Seção "Demonstrações Clearix (site)"** no módulo Comercial: lê `v_marketing_landing_leads` com `product='clearix'` — nome, WhatsApp, e-mail, nº de lojas + mensagem (parse do `notes`), UTM, quando chegou e status. Fecha o gap do briefing (`docs/briefing-leads-clearix-site.md`): lead entrava no banco e não aparecia em módulo nenhum.
+- **Workflow de status** `novo → contactado → comprou | descartado` via select na própria linha. **Migration `fn_update_landing_lead_status`** (SECURITY DEFINER + `is_staff()`, valida vocabulário, ignora anonimizados — LGPD).
+- **Alerta no "Ação hoje"**: lead de demo com `status='novo'` aparece no topo do painel — verde nas primeiras 24h, **vermelho "LEAD ESFRIANDO"** depois (o form promete contato em horário comercial).
+- **1º toque pronto**: botão WhatsApp abre `wa.me` com script de agendamento já escrito — o texto muda conforme o nº de lojas (solo / 2-4 multi-lojas / rede com BI). Envio segue manual (R-011).
+
 ### Adicionado (2026-07-13 — lead-capture recebe leads do clearix-site)
 - **Migration 047** (`047_landing_lead_notes.sql`, aplicada via Management API): `fn_capture_landing_lead` ganha `p_notes` (assinatura antiga de 13 args removida — sem overload ambíguo no PostgREST). No upsert, nota nova prevalece; sem nota, preserva a antiga.
 - **Edge fn `lead-capture` v2 deployada**: repassa `notes` (truncado em 2000). O formulário de demonstração do **clearix.app.br/contato** agora POSTa aqui com `product='clearix'` — "lojas" + mensagem livre vão em `notes`; UTM/source_url/consent LGPD registrados. Decisão do dono (2026-07-13): **intenções comerciais moram no banco digiai** (`marketing.landing_leads`), visíveis no app via `v_marketing_landing_leads`. Testado de ponta a ponta (2 leads de teste criados e removidos).

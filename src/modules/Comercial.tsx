@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Plus, Trash2, Briefcase, Pencil, X, Play, FileText, Search, Target, AlertTriangle, Clock } from 'lucide-react';
+import { Plus, Trash2, Briefcase, Pencil, X, Play, FileText, Search, Target, AlertTriangle, Clock, MessageCircle, Monitor } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
+import { supabase } from '../lib/supabase';
 import { commercialStore, type CommercialLead, type LeadStage, type OutreachItem } from '../lib/commercialStore';
 import { playbookStore, type Playbook } from '../lib/playbookStore';
 import { meetingStore, type MeetingSession } from '../lib/meetingStore';
@@ -26,6 +27,56 @@ const COL_CAP = 8; // cards visíveis por coluna antes do "+N mais" (232 leads n
 function diasParado(updatedAt?: string): number | null {
   if (!updatedAt) return null;
   return Math.floor((Date.now() - new Date(updatedAt).getTime()) / 86400000);
+}
+
+// ===== Demonstrações Clearix — leads do form clearix.app.br/contato =====
+// (briefing docs/briefing-leads-clearix-site.md · v_marketing_landing_leads product='clearix')
+type LandingLeadStatus = 'novo' | 'contactado' | 'comprou' | 'descartado';
+
+interface LandingLead {
+  id: string;
+  name: string | null;
+  email: string | null;
+  phone_e164: string | null;
+  notes: string | null;
+  utm_source: string | null;
+  utm_campaign: string | null;
+  status: LandingLeadStatus;
+  created_at: string;
+}
+
+const DEMO_STATUS: Record<LandingLeadStatus, { label: string; cls: string }> = {
+  novo:       { label: 'Novo',       cls: 'text-warning border-warning/40 bg-warning/10' },
+  contactado: { label: 'Contactado', cls: 'text-secondary border-secondary/40 bg-secondary/10' },
+  comprou:    { label: 'Comprou',    cls: 'text-success border-success/40 bg-success/10' },
+  descartado: { label: 'Descartado', cls: 'text-muted border-outline/20' },
+};
+
+// notes chega como "Lojas: <1|2-4|5-15|16+> | <mensagem livre>"
+function parseNotes(notes: string | null): { lojas: string | null; msg: string | null } {
+  if (!notes) return { lojas: null, msg: null };
+  const m = notes.match(/Lojas:\s*([^|]+?)\s*(?:\|\s*([\s\S]*))?$/);
+  if (!m) return { lojas: null, msg: notes };
+  return { lojas: m[1].trim(), msg: m[2]?.trim() || null };
+}
+
+function horasDesde(iso: string): number {
+  return Math.floor((Date.now() - new Date(iso).getTime()) / 3600000);
+}
+
+// 1º toque pronto (envio manual — R-011): script muda conforme o nº de lojas
+function scriptDemo(lead: LandingLead): string {
+  const { lojas } = parseNotes(lead.notes);
+  const nome = (lead.name || '').split(' ')[0];
+  let corpo = 'a demonstração leva uns 20 minutos e já sai com o sistema fazendo sentido pra sua operação';
+  if (lojas === '2-4') corpo = 'com suas lojas, vale eu te mostrar o multi-lojas funcionando de verdade';
+  else if (lojas === '5-15' || lojas === '16+') corpo = 'pra uma rede do seu tamanho, te mostro o painel multi-loja e o BI ao vivo';
+  return `Olá${nome ? ` ${nome}` : ''}! Aqui é o Gilberto, da Clearix. Vi que você pediu uma demonstração pelo nosso site — obrigado pelo interesse! ${corpo}. Qual horário fica bom pra você, em horário comercial?`;
+}
+
+function waLink(lead: LandingLead): string | null {
+  if (!lead.phone_e164) return null;
+  return `https://wa.me/${lead.phone_e164.replace(/\D/g, '')}?text=${encodeURIComponent(scriptDemo(lead))}`;
 }
 
 const PRODUCTS = ['clearix', 'osi', 'academy', 'outro'];
@@ -55,6 +106,7 @@ export default function Comercial() {
   const [expandidas, setExpandidas] = useState<Set<LeadStage>>(new Set());
   const [faseAtual, setFaseAtual] = useState<RoadmapPhase | null>(null);
   const [outreach, setOutreach] = useState<OutreachItem[]>([]);
+  const [demos, setDemos] = useState<LandingLead[]>([]);
 
   const load = () => {
     commercialStore.list().then((rows) => { setLeads(rows); setLoading(false); });
@@ -63,8 +115,20 @@ export default function Comercial() {
     proposalStore.list().then(setProposals);
     commercialStore.listOutreach().then(setOutreach);
     roadmapStore.listPhases().then((ps) => setFaseAtual(ps.find((p) => !p.completed_at && p.started_at) ?? null));
+    supabase.from('v_marketing_landing_leads').select('id,name,email,phone_e164,notes,utm_source,utm_campaign,status,created_at')
+      .eq('product', 'clearix').order('created_at', { ascending: false })
+      .then(({ data }) => setDemos((data ?? []) as LandingLead[]));
   };
   useEffect(load, []);
+
+  const mudarStatusDemo = async (lead: LandingLead, status: LandingLeadStatus) => {
+    setDemos((prev) => prev.map((d) => d.id === lead.id ? { ...d, status } : d));
+    const { error } = await supabase.rpc('fn_update_landing_lead_status', { p_id: lead.id, p_status: status });
+    if (error) {
+      console.error('[demos] status', error);
+      load();
+    }
+  };
 
   const visiveis = useMemo(() => {
     const q = busca.trim().toLowerCase();
@@ -176,8 +240,8 @@ export default function Comercial() {
             </div>
           )}
 
-          {/* Ação hoje — follow-ups vencidos + leads esfriando + esteira de prospecção parada */}
-          {(acao.followupsVencidos.length > 0 || acao.parados.length > 0 || acao.semNextStep > 0 || acao.outreachVencido.length > 0) && (
+          {/* Ação hoje — demos aguardando 1º contato + follow-ups vencidos + leads esfriando + esteira parada */}
+          {(demos.some((d) => d.status === 'novo') || acao.followupsVencidos.length > 0 || acao.parados.length > 0 || acao.semNextStep > 0 || acao.outreachVencido.length > 0) && (
             <div className="border border-warning/30 bg-warning/5 mb-5">
               <div className="px-4 py-2 border-b border-warning/20 flex items-center gap-2">
                 <Clock className="w-3.5 h-3.5 text-warning" />
@@ -185,6 +249,25 @@ export default function Comercial() {
                 {acao.semNextStep > 0 && <span className="ml-auto font-mono text-[10px] text-muted">{acao.semNextStep} trabalhado(s) sem próximo passo</span>}
               </div>
               <div className="divide-y divide-outline/10">
+                {demos.filter((d) => d.status === 'novo').map((d) => {
+                  const h = horasDesde(d.created_at);
+                  const wa = waLink(d);
+                  return (
+                    <div key={d.id} className={`flex items-center gap-3 px-4 py-2 ${h >= 24 ? 'bg-danger/5' : 'bg-success/5'}`}>
+                      <Monitor className={`w-3.5 h-3.5 shrink-0 ${h >= 24 ? 'text-danger' : 'text-success'}`} />
+                      <span className="text-sm text-on-surface flex-1 truncate">
+                        <strong>Demo Clearix aguardando 1º contato:</strong> {d.name || d.email || d.phone_e164}
+                        {parseNotes(d.notes).lojas && ` · ${parseNotes(d.notes).lojas} loja(s)`}
+                      </span>
+                      <span className={`font-mono text-[10px] shrink-0 ${h >= 24 ? 'text-danger' : 'text-muted'}`}>{h >= 24 ? `há ${Math.floor(h / 24)}d — LEAD ESFRIANDO` : `há ${h}h`}</span>
+                      {wa && (
+                        <a href={wa} target="_blank" rel="noreferrer" className="font-mono text-[9px] uppercase text-success hover:underline shrink-0 flex items-center gap-1">
+                          <MessageCircle className="w-3 h-3" /> chamar
+                        </a>
+                      )}
+                    </div>
+                  );
+                })}
                 {acao.outreachVencido.length > 0 && acao.outreachDatas && (
                   <div className="flex items-center gap-3 px-4 py-2 bg-danger/5">
                     <AlertTriangle className="w-3.5 h-3.5 text-danger shrink-0" />
@@ -209,6 +292,64 @@ export default function Comercial() {
                     <button onClick={() => setEditing(lead)} className="font-mono text-[9px] uppercase text-secondary hover:underline shrink-0">retomar</button>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Demonstrações Clearix — leads do form clearix.app.br/contato */}
+          {demos.length > 0 && (
+            <div className="border border-outline/15 bg-surface-container mb-5">
+              <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2">
+                <Monitor className="w-3.5 h-3.5 text-secondary" />
+                <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Demonstrações Clearix (site)</span>
+                <span className="ml-auto font-mono text-[10px] text-muted">{demos.filter((d) => d.status === 'novo').length} novo(s) · fonte: clearix.app.br/contato</span>
+              </div>
+              <div className="divide-y divide-outline/10">
+                {demos.map((d) => {
+                  const { lojas, msg } = parseNotes(d.notes);
+                  const st = DEMO_STATUS[d.status] ?? DEMO_STATUS.novo;
+                  const wa = waLink(d);
+                  return (
+                    <div key={d.id} className="px-4 py-3 flex items-start gap-3 flex-wrap">
+                      <div className="flex-1 min-w-[220px]">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-medium text-on-surface">{d.name || '(sem nome)'}</span>
+                          {lojas && <span className="font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 bg-surface-high text-on-surface-variant">{lojas} loja(s)</span>}
+                          <span className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border ${st.cls}`}>{st.label}</span>
+                        </div>
+                        <div className="font-mono text-[11px] text-muted mt-0.5">
+                          {d.phone_e164 || '—'}{d.email ? ` · ${d.email}` : ''}
+                          {d.utm_source ? ` · via ${d.utm_source}${d.utm_campaign ? `/${d.utm_campaign}` : ''}` : ''}
+                          {' · '}{new Date(d.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                        {msg && <div className="text-[12px] text-on-surface-variant mt-1 leading-snug">"{msg}"</div>}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {wa && (
+                          <a
+                            href={wa}
+                            target="_blank"
+                            rel="noreferrer"
+                            title="Abre o WhatsApp com o 1º toque pronto (script muda pelo nº de lojas) — envio é seu (R-011)"
+                            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs bg-success/10 text-success border border-success/40 hover:bg-success/20 transition-colors"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" /> 1º toque
+                          </a>
+                        )}
+                        <select
+                          value={d.status}
+                          onChange={(e) => mudarStatusDemo(d, e.target.value as LandingLeadStatus)}
+                          className="text-[11px] bg-surface-high border border-outline/15 px-2 py-1.5 text-on-surface-variant"
+                          title="novo → contactado → comprou | descartado"
+                        >
+                          {(Object.keys(DEMO_STATUS) as LandingLeadStatus[]).map((s) => (
+                            <option key={s} value={s}>{DEMO_STATUS[s].label}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
