@@ -39,7 +39,9 @@ Em `docs/digiai/docs/04-comercial/` (fora desta pasta) — método completo de v
 - `pricing-clearix.md` — **atualizado p/ o vigente (R$349/899/1499) em 18/06**
 - `kit-apoio-pitch-clearix-completo.md` — kit de apoio paralelo
 
-> ⚠️ **Pricing/oferta vigente** (travado 18/06): Essencial R$349 · Controle R$899 · Crescimento R$1.499 · teste 90 dias (empresa real) · 30% OFF/3 meses · setup isento no teste · migração orçada.
+> ⚠️ **Pricing/oferta vigente** (atualizado 2026-07): planos Essencial R$349 · Controle R$899 · Crescimento R$1.499 · Completo (sob consulta). Pagamento mensal via **Mercado Pago** — **sem cartão preso**, sem fidelidade; se atrasar, o acesso pausa até regularizar (nada se perde).
+> **Oferta PÚBLICA** (landing/manual, o que o cliente lê): **30 dias grátis · sem cartão · migração guiada · dados preservados**.
+> **Alavanca ASSISTIDA** (o vendedor oferece AO VIVO pra quem vai migrar de verdade): **90 dias com a empresa real + 30% OFF nos 3 primeiros meses + migração guiada (orçada por volume)**. Regra: nunca contradizer o público — na call você dá MAIS, não diferente.
 
 ## ⏱️ Visão rápida do tempo
 | Tempo | Bloco |

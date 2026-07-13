@@ -144,7 +144,7 @@ async function iconUri(Comp,color){
     catAxisLabelColor:"9FB6C9",valAxisLabelColor:"9FB6C9",catAxisLabelFontSize:9,valAxisLabelFontSize:9,
     valGridLine:{color:"1E3A57",size:0.5},catGridLine:{style:"none"},showLegend:false,lineSmooth:true,showTitle:false,
   });
-  s.addText("Grupo Mello — 10 lojas, 6 anos de operação 100% no Clearix.",{x:M,y:4.78,w:9,h:0.35,margin:0,fontFace:FB,fontSize:12,italic:true,color:FAINT});
+  s.addText("Grupo Mello — 10 lojas, 5+ anos de operação 100% no Clearix.",{x:M,y:4.78,w:9,h:0.35,margin:0,fontFace:FB,fontSize:12,italic:true,color:FAINT});
 
   // ===== 6 — CICLO =====
   s=p.addSlide(); s.background={color:BG}; motif(s);
@@ -210,7 +210,7 @@ async function iconUri(Comp,color){
     s.addText([{text:t[1],options:{fontSize:24,bold:true,color:INK}},{text:" /mês",options:{fontSize:12,color:MUTED}}],{x:x+0.28,y:3.24,w:2.4,h:0.55,margin:0,fontFace:FH,valign:"middle"});
     s.addText(t[2],{x:x+0.28,y:3.86,w:2.34,h:0.55,margin:0,fontFace:FB,fontSize:12.5,color:SUB});
   });
-  s.addText("Sem fidelidade. Cancela quando quiser.",{x:M,y:4.66,w:8.9,h:0.4,margin:0,fontFace:FH,fontSize:14,bold:true,color:NAVY,align:"center"});
+  s.addText("Mercado Pago · sem cartão preso · sem fidelidade · Completo (rede/franquia): sob consulta.",{x:M,y:4.66,w:8.9,h:0.4,margin:0,fontFace:FH,fontSize:13,bold:true,color:NAVY,align:"center"});
 
   // ===== 10 — EXPERIMENTE (sandboxes) =====
   s=p.addSlide(); s.background={color:BG}; motif(s);
@@ -235,9 +235,9 @@ async function iconUri(Comp,color){
   logo(s,M,0.45,true,0.4);
   kicker(s,"COMECE SEM RISCO",M,1.08,CYAN_BRIGHT);
   s.addText("A sua ótica, testada de verdade.",{x:M,y:1.32,w:9,h:0.6,margin:0,fontFace:FH,fontSize:30,bold:true,color:"FFFFFF"});
-  const offer=[["bolt","90 dias de teste com a sua empresa","Cadastro real e funcionalidades completas. Você usa de verdade antes de decidir."],
-    ["whats","30% OFF nos 3 primeiros meses","O desconto entra quando você virar cliente."],
-    ["lock","Migração da sua base: opcional","Orçada conforme o volume de dados — você decide se quer."]];
+  const offer=[["bolt","30 dias grátis, sem cartão","Comece hoje, sem compromisso. Depois é mensal via Mercado Pago — sem cartão preso, sem fidelidade."],
+    ["whats","Vai migrar de verdade? 90 dias + 30% OFF","90 dias com a sua empresa real e 30% OFF nos 3 primeiros meses ao virar cliente."],
+    ["lock","Migração guiada","A gente traz seu histórico (orçada por volume). Nada se perde."]];
   offer.forEach((c,i)=>{
     const y=2.25+i*0.72;
     rrect(s,M,y,8.9,0.62,{fill:"2A50B8",line:"3B66D6",noShadow:true,r:0.08});
@@ -250,7 +250,7 @@ async function iconUri(Comp,color){
   s=p.addSlide(); s.background={color:BG}; motif(s);
   kicker(s,"PRÓXIMO PASSO");
   title(s,"Como começa","Implantação em menos de 30 dias, sem parar a operação.",0.78);
-  const go=[["1","Você acessa as 3 lojas-modelo hoje."],["2","Cadastro da sua empresa: 90 dias de teste."],["3","Treinamos a equipe; migração opcional."]];
+  const go=[["1","Você acessa as 3 lojas-modelo hoje."],["2","Começa grátis (30 dias) — e 90 dias com a sua empresa ao decidir."],["3","Treinamos a equipe; migração guiada."]];
   go.forEach((c,i)=>{
     const x=[M,3.72,6.89][i];
     rrect(s,x,2.05,2.86,1.7);

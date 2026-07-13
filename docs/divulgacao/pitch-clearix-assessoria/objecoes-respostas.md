@@ -10,6 +10,9 @@
 **"É caro / não sei se cabe."**
 > "Recriar isso custaria mais de R$ 7,7 milhões. Começa em R$ 349, sem fidelidade. E o WhatsApp automático tira quase uma pessoa do atendimento — costuma se pagar."
 
+**"Preciso deixar cartão / me amarrar num contrato?"**
+> "Não. Você começa com **30 dias grátis, sem cartão** nenhum. Depois é mensal via **Mercado Pago**, sem cartão preso e **sem fidelidade** — cancela quando quiser. Se um mês atrasar, o acesso só pausa até você regularizar; nada se perde."
+
 **"Migrar meus dados dá trabalho / vou perder histórico."**
 > "A migração é nossa, orçada pelo volume. Você não perde histórico — ele entra junto. É o que tira o medo de trocar."
 

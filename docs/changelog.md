@@ -4,6 +4,10 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Alterado (2026-07-13 — Polapetit vira 2 frentes: app Autônomos + site Institucional)
+- **Portfólio agora tem 17 frentes**: o card Polapetit foi dividido. **Polapetit (app)** subiu de Incubação → **Autônomos** e do degrau 2 → **3 (uso real)** — é o ERP que roda a operação real do Buffet Taty Mello, mesma classe de Pulso e Mello Eyewear. **Polapetit Site** (novo card, `polapetit-site`) entrou como **Institucional**, padrão Clearix Site / DIGIAI Site: landing premium em `polapetit.netlify.app`, maturidade 70.
+- Gaps do Backlog realocados: DNS do `.com.br` e hero quebrado → `polapetit-site`; decisão Persol segue em `polapetit`. Lista Mestra, Placar e Mapa Vivo herdam automático (verdade única PRODUTOS).
+
 ### Alterado (2026-07-13 — ritual Polapetit: card do Portfólio com app + landing)
 - **Card Polapetit atualizado após verificação código→online**: agora lista as **duas URLs canônicas** — landing `polapetit.netlify.app` (200, viva) e app `polapetitapp.netlify.app` (200, Portal do Cliente + /admin gated). `funcao` reflete o produto real: ERP do Buffet Taty Mello em produção com 20 módulos admin (CRM, pipeline, propostas, contratos, financeiro, estoque), portal do cliente e simulador 3D. Maturidade 70→72.
 - **Bloqueio registrado**: `polapetit.com.br` não resolve (DNS fora) — Spec dizia "landing ativa em polapetit.com.br", corrigida (`Cockpit/Spec/polapetit.md`, junto com a grafia `polapettiapp`→`polapetitapp`). 3 gaps no Backlog (`product_id='polapetit'`): DNS do domínio, imagem do hero quebrada na landing, decisão binária do experimento Persol.

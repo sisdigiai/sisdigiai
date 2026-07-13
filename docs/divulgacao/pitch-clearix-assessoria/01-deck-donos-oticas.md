@@ -2,7 +2,7 @@
 
 > **Foco desta versão:** dono de ótica direto (cliente final). A versão de parceria/assessoria é separada (fase 2).
 > **Objetivo:** despertar interesse → entrar no teste de uso → converter em assinatura.
-> **Oferta travada:** (1) acesso às 3 lojas-modelo (sandboxes) com 3 perfis cada — Dono, Gerente, Vendedor; (2) teste de **90 dias** com cadastro da **empresa real** e funcionalidades completas; (3) **30% OFF** nos 3 primeiros meses ao virar cliente; (4) migração da base = **opcional, orçada por volume de dados**.
+> **Oferta:** pública = **30 dias grátis · sem cartão · migração guiada · dados preservados** (o que ele vê na landing/manual). Na call você entrega a **alavanca assistida** pra quem vai migrar de verdade: (1) acesso às 3 lojas-modelo (sandboxes) com 3 perfis — Dono, Gerente, Vendedor; (2) **90 dias** com a **empresa real** e funcionalidades completas; (3) **30% OFF** nos 3 primeiros meses ao virar cliente; (4) **migração guiada, orçada por volume**. Pagamento **Mercado Pago**, sem cartão preso, sem fidelidade. *Nunca contradiga o público — dê MAIS.*
 > **Tom:** operacional, direto, com prova real. Lidera com prova, traduz tech em dinheiro/folha.
 
 ---
@@ -41,7 +41,7 @@
   - **R$ 12,2M** faturados no histórico (verificado no banco 2026-06-17) · 20.597 vendas
   - **50 mil** ordens de laboratório processadas
   - **19 mil** pacientes
-  - **4 anos** de histórico · **10 lojas** operando
+  - **5+ anos** de histórico · **10 lojas** operando
 - *Fala:* "Enquanto a maioria te mostra tela bonita, o Clearix já roda uma rede inteira."
 - ⚠️ *Guard-rail: citar Mello como número de prova; NÃO navegar o tenant Mello ao vivo.*
 
@@ -82,7 +82,8 @@
   - 🟢 **Essencial** — R$ 349/mês · ótica solo
   - 🔵 **Controle** — R$ 899/mês · multi-loja com laboratório
   - 🟣 **Crescimento** — R$ 1.499/mês · + BI + IA + escala
-- **Sem fidelidade. Cancela quando quiser.**
+  - ⚫ **Completo** — sob consulta · rede/franquia/cadeia
+- **Pagamento mensal via Mercado Pago. Sem cartão preso. Sem fidelidade — cancela quando quiser.**
 
 ### Slide 12 — Experimente: 3 lojas-modelo × 3 perfis ⭐ (NOVO)
 - **Título:** Não acredite — entre e veja.
@@ -94,16 +95,19 @@
 
 ### Slide 13 — A oferta ⭐
 - **Título:** Comece sem risco.
-- **1. 90 dias de teste com a sua empresa.** Cadastro real, funcionalidades completas. Você usa de verdade antes de decidir.
-- **2. 30% OFF nos 3 primeiros meses** quando virar cliente.
-- **3. Migração da sua base: opcional.** Orçada conforme o volume de dados — você decide se quer.
-- *Fala:* "Você não compra confiando na minha palavra. Você usa, e decide depois."
+- **Base (o que qualquer um tem):** **30 dias grátis, sem cartão** — você começa a usar hoje, sem compromisso. Pagamento depois via Mercado Pago, sem cartão preso e sem fidelidade.
+- **E pra você, que vai trazer a operação inteira, eu libero mais:**
+  - **1. 90 dias com a sua empresa real** — cadastro real, funcionalidades completas. Você usa de verdade antes de decidir.
+  - **2. 30% OFF nos 3 primeiros meses** quando virar cliente.
+  - **3. Migração guiada** — a gente traz seu histórico (orçada por volume). Nada se perde.
+- *Fala:* "Você não compra confiando na minha palavra. Você usa 90 dias com a sua empresa, e decide depois."
 
 ### Slide 14 — Como começa
 - **Implantação em menos de 30 dias**, sem parar a operação.
 - **Passo 1:** você acessa as 3 lojas-modelo hoje.
 - **Passo 2:** cadastro da sua empresa para o teste de 90 dias.
-- **Passo 3:** treinamos a equipe; migração opcional, sob orçamento.
+- **Passo 3:** treinamos a equipe; migração guiada, orçada por volume.
+- **Leva pra casa:** o ecossistema inteiro, tela por tela → **manual-clearix.netlify.app** (o mesmo que roda o Grupo Mello).
 - **CTA:** "Vamos liberar seu acesso de teste agora?"
 
 ### Slide 15 — Fechamento

@@ -9,9 +9,10 @@
 
 ## O que enviar
 1. **PDF do deck** (`Clearix-Pitch-Oticas.pdf`)
-2. **Cartão dos acessos demo** (os 9 logins — se ainda não entregou na call)
-3. **Resumo de 3 linhas** do que foi combinado + a data do próximo passo
-4. (Opcional) link de 1 tela que impressionou (ex.: o BI)
+2. **O manual completo** — o ecossistema tela por tela, o mesmo que roda o Grupo Mello: **manual-clearix.netlify.app** (ótimo pra ele explorar sozinho e mostrar pro sócio/equipe; tem o botão de WhatsApp que cai direto com você).
+3. **Cartão dos acessos demo** (os 9 logins — se ainda não entregou na call)
+4. **Resumo de 3 linhas** do que foi combinado + a data do próximo passo
+5. (Opcional) link de 1 tela que impressionou (ex.: o BI)
 
 ## Template — para o DONO da ótica
 > Oi [nome], obrigado pelo tempo hoje!

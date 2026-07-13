@@ -119,16 +119,22 @@ const APPS: App[] = [
   },
   {
     nome: 'Polapetit', mono: 'PP', cor: 'var(--color-eco-polapetit)', tagline: 'Sistema operacional para festas infantis',
-    tier: 'incubacao', estado: 'no-ar', maturidade: 72, funcao: 'ERP do Buffet Taty Mello em produção — 20 módulos admin (CRM, pipeline, propostas, contratos, financeiro, estoque) + portal do cliente + simulador 3D + landing',
-    stack: 'Vite · React 19 (Three.js/R3F) · Supabase · Firebase | landing: Express · Drizzle · Radix',
-    repos: 'polapetit (app) · polapetit_landing (site)',
-    git: 'app 766ac5d · landing 8a7f07d (mai/2026)',
-    proximo: 'Validar experimento Persol (decisão binária) · corrigir imagem do hero na landing',
+    tier: 'autonomo', estado: 'no-ar', maturidade: 72, funcao: 'ERP do Buffet Taty Mello em produção — 20 módulos admin (CRM, pipeline, propostas, contratos, financeiro, estoque) + portal do cliente + simulador 3D',
+    stack: 'Vite · React 19 (Three.js/R3F) · Supabase · Firebase',
+    repos: 'D:\\projetos\\polapetit',
+    git: '766ac5d 25/mai/2026 (experimento Persol)',
+    proximo: 'Validar experimento Persol (decisão binária) · futuro app.polapetit.com.br',
+    urls: [{ label: 'polapetitapp.netlify.app', url: 'https://polapetitapp.netlify.app' }],
+  },
+  {
+    nome: 'Polapetit Site', mono: 'PS', cor: 'var(--color-eco-polapetit)', tagline: 'Landing institucional do Buffet Taty Mello — festas infantis premium',
+    tier: 'institucional', estado: 'no-ar', maturidade: 70, funcao: 'No ar: posicionamento premium ("12 anos · 1.200 famílias") + simulador de festa + CTA WhatsApp/consultora — capta leads da operação real',
+    stack: 'Express · Drizzle · Radix · AWS S3 (fullstack)',
+    repos: 'D:\\projetos\\polapetit_landing',
+    git: '8a7f07d 29/mai/2026',
+    proximo: 'Corrigir imagem do hero (quebrada na primeira dobra)',
     bloqueio: 'Domínio polapetit.com.br não resolve (DNS fora) — usar netlify.app na copy',
-    urls: [
-      { label: 'landing · polapetit.netlify.app', url: 'https://polapetit.netlify.app' },
-      { label: 'app · polapetitapp.netlify.app', url: 'https://polapetitapp.netlify.app' },
-    ],
+    urls: [{ label: 'polapetit.netlify.app', url: 'https://polapetit.netlify.app' }],
   },
   {
     nome: 'Qual a Foto', mono: 'QF', cor: 'var(--color-eco-qualafoto)', tagline: 'Aprovação de fotos para fotógrafos',
@@ -263,7 +269,8 @@ const HOST: Record<string, string> = {
   'Lumina': 'Netlify · Supabase',
   'Nexus': 'Netlify · Supabase',
   'Clearix Calc': 'Netlify · PWA client-side (sem banco)',
-  'Polapetit': 'Netlify (app + landing)',
+  'Polapetit': 'Netlify · Supabase + Firebase',
+  'Polapetit Site': 'Netlify · fullstack Express (S3)',
   'Qual a Foto': 'Netlify (web) · worker local',
   'Easy Idiomas': 'Netlify · Supabase',
   'Nipo School': 'Vercel · Supabase',
@@ -278,7 +285,7 @@ const HOST: Record<string, string> = {
 const SLUG: Record<string, string> = {
   'Clearix': 'clearix', 'Clearix Site': 'clearix-site', 'Ótica Sem Improviso': 'osi',
   'Pulso': 'pulso', 'Lumina': 'lumina', 'Nexus': 'nexus', 'Clearix Calc': 'clearix-calc',
-  'Polapetit': 'polapetit', 'Qual a Foto': 'qual-a-foto', 'Easy Idiomas': 'easy-idiomas',
+  'Polapetit': 'polapetit', 'Polapetit Site': 'polapetit-site', 'Qual a Foto': 'qual-a-foto', 'Easy Idiomas': 'easy-idiomas',
   'Nipo School': 'nipo-school', 'Mello Eyewear': 'mello-eyewear', 'DIGIAI App': 'digiai-app',
   'DIGIAI Site': 'digiai-site', 'Pulso Hub': 'pulso-hub', 'DIGIAI MKT': 'digiai-mkt',
 };
@@ -287,7 +294,7 @@ const SLUG: Record<string, string> = {
 // Só produtos de mercado; sites/infra não usam a escada (undefined).
 const DEGRAU: Record<string, number> = {
   'Clearix': 3, 'Ótica Sem Improviso': 2, 'Pulso': 3, 'Lumina': 3, 'Nexus': 2,
-  'Clearix Calc': 2, 'Polapetit': 2, 'Qual a Foto': 1, 'Easy Idiomas': 2,
+  'Clearix Calc': 2, 'Polapetit': 3, 'Qual a Foto': 1, 'Easy Idiomas': 2,
   'Nipo School': 1, 'Mello Eyewear': 2,
 };
 
@@ -344,7 +351,7 @@ export default function Portfolio() {
       <PageHeader
         eyebrow="Hierarquia Canônica"
         title="Portfólio de Produtos"
-        subtitle={`${APPS.length} frentes · ${noAr} no ar · ${travados} travadas · estado real 2026-07-10`}
+        subtitle={`${APPS.length} frentes · ${noAr} no ar · ${travados} travadas · estado real 2026-07-13`}
       />
 
       {/* Alternador de visão */}

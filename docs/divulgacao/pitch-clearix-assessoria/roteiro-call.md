@@ -35,7 +35,7 @@
 
 ## 25–29 min · Preço + oferta — *(dono)*
 - Ancoragem: *"Recriar isso custaria R$ 7,7M. Os planos começam em R$ 349."* (slide 9)
-- Oferta: **90 dias de teste com a empresa real + 30% off nos 3 primeiros meses + migração orçada.** Sem fidelidade.
+- Oferta: base pública **30 dias grátis, sem cartão** (Mercado Pago, sem cartão preso, sem fidelidade). Na call, a alavanca pra quem vai migrar de verdade: **90 dias com a empresa real + 30% off nos 3 primeiros meses + migração guiada (orçada por volume).** *Dê MAIS que o público, nunca diferente.*
 
 ## 29–33 min · A parceria — *(assessoria)* ⭐
 - *"Agora, [assessoria], a parte que te interessa."*
