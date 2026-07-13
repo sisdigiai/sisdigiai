@@ -148,11 +148,12 @@ const APPS: App[] = [
   },
   {
     nome: 'Easy Idiomas', mono: 'EI', cor: 'var(--color-muted)', tagline: 'SaaS para escolas de idiomas (Easy Aula+)',
-    tier: 'incubacao', estado: 'no-ar', maturidade: 55, funcao: 'Dashboard no ar e logado (Easy Aula+)',
-    stack: 'React 19 · Vite · TS · Supabase · Gemini',
+    tier: 'incubacao', estado: 'no-ar', maturidade: 58, funcao: 'Plataforma completa no ar: admin (16 páginas) + portais aluno e professor · presença por QR Code · assistente IA (Gemini) · multi-tenant com RLS + signup por convite — dados demo (seed), sem escola real',
+    stack: 'React 19 · Vite 6 · TS · Tailwind 4 · Supabase (18 migrations) · Gemini',
     repos: 'D:\\projetos\\easy-idiomas',
-    git: 'e0538bf 29/mai/2026',
-    proximo: 'Validar oferta com escolas · commitar pendências locais',
+    git: 'e0538bf 29/mai/2026 · redesign de 3 dashboards NÃO commitado',
+    proximo: 'Commitar + deployar redesign local dos dashboards · validar oferta com escolas reais',
+    bloqueio: 'Zero uso real (9 alunos seed) · redesign só na máquina local — risco de perda',
     urls: [{ label: 'easyidioma.netlify.app', url: 'https://easyidioma.netlify.app' }],
   },
   {

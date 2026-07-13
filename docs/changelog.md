@@ -4,6 +4,10 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Alterado (2026-07-13 — ritual Easy Idiomas: card com estado real)
+- **Card Easy Idiomas atualizado após verificação código→online**: plataforma bem mais completa do que o card dizia — admin (16 páginas) + portais aluno e professor, presença por QR Code, assistente IA Gemini, multi-tenant com RLS e signup por convite (18 migrations com hardening). Site vivo e logado em `easyidioma.netlify.app`. Maturidade 55→58.
+- **Achado crítico**: redesign completo de 3 dashboards (Dashboard, AlunoHome, ProfessorHome, ~560 linhas) + AGENTS.md + docs/ existem **só no working tree local** — marker ausente do HEAD e do bundle deployado. Registrado como bloqueio no card + item P2 no Backlog. Segundo item: validar oferta com escolas reais (dados 100% seed). Spec `easy-idiomas.md` atualizada (entidades, hospedagem, status).
+
 ### Alterado (2026-07-13 — Polapetit vira 2 frentes: app Autônomos + site Institucional)
 - **Portfólio agora tem 17 frentes**: o card Polapetit foi dividido. **Polapetit (app)** subiu de Incubação → **Autônomos** e do degrau 2 → **3 (uso real)** — é o ERP que roda a operação real do Buffet Taty Mello, mesma classe de Pulso e Mello Eyewear. **Polapetit Site** (novo card, `polapetit-site`) entrou como **Institucional**, padrão Clearix Site / DIGIAI Site: landing premium em `polapetit.netlify.app`, maturidade 70.
 - Gaps do Backlog realocados: DNS do `.com.br` e hero quebrado → `polapetit-site`; decisão Persol segue em `polapetit`. Lista Mestra, Placar e Mapa Vivo herdam automático (verdade única PRODUTOS).
