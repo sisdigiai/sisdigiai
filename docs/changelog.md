@@ -4,6 +4,10 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Adicionado (2026-07-13 — lead-capture recebe leads do clearix-site)
+- **Migration 047** (`047_landing_lead_notes.sql`, aplicada via Management API): `fn_capture_landing_lead` ganha `p_notes` (assinatura antiga de 13 args removida — sem overload ambíguo no PostgREST). No upsert, nota nova prevalece; sem nota, preserva a antiga.
+- **Edge fn `lead-capture` v2 deployada**: repassa `notes` (truncado em 2000). O formulário de demonstração do **clearix.app.br/contato** agora POSTa aqui com `product='clearix'` — "lojas" + mensagem livre vão em `notes`; UTM/source_url/consent LGPD registrados. Decisão do dono (2026-07-13): **intenções comerciais moram no banco digiai** (`marketing.landing_leads`), visíveis no app via `v_marketing_landing_leads`. Testado de ponta a ponta (2 leads de teste criados e removidos).
+
 ### Adicionado (2026-07-09 — Brand Guidelines ganha abas: aba MKT "Ateliê de Convergência")
 - **`/brand` agora tem 2 abas**: "Holding · DIGIAI House" (conteúdo existente, intacto) e "Produto · MKT — Ateliê de Convergência" (`src/components/BrandMktAtelie.tsx`), registrando o tema visual aprovado pro `digiai_mkt`: planos cubistas facetados (clip-path + plano-sombra), céu de dados generativo (`src/lib/atelieCeu.ts`, campo de fluxo estilo Noite Estrelada, herdeiro do dhMesh), pincelada no lugar de glow (semântica ciano=máquina/magenta=humano/trigo=guia mantida da skin Órbita Cyber-Glass de 2026-07-03), assinatura magenta no gate humano e estados vazios como composições cubistas. Cores do tema escopadas em `.atl-root` (conteúdo de produto — hex ok pela regra 5), sem tocar nos tokens globais. Plano de adoção no mkt em 4 fases documentado na própria aba.
 

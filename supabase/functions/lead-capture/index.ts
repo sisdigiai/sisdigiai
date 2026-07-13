@@ -1,12 +1,13 @@
 /**
  * lead-capture
  *
- * Sink first-party de leads da landing OSI. O form POSTa aqui (sem chave Supabase)
- * e gravamos em marketing.landing_leads via fn_capture_landing_lead (SECURITY DEFINER)
- * usando SERVICE_ROLE — mesmo padrão keyless do events-ingest.
+ * Sink first-party de leads das landings DIGIAI (OSI + clearix-site). O form POSTa
+ * aqui (sem chave Supabase) e gravamos em marketing.landing_leads via
+ * fn_capture_landing_lead (SECURITY DEFINER) usando SERVICE_ROLE — mesmo padrão
+ * keyless do events-ingest.
  *
  * POST / { product?, name, email?, whatsapp?, source_url?, session_id?, utm_*?,
- *          consent_text?, website? (honeypot) }
+ *          consent_text?, notes?, website? (honeypot) }
  *   → { ok, lead_id } | { error }
  *
  * Anti-bot: campo honeypot 'website' (humano não vê; bot preenche → descarta em silêncio).
@@ -62,6 +63,7 @@ Deno.serve(async (req) => {
       p_utm_term:     typeof body?.utm_term === 'string' ? body.utm_term.slice(0, 120) : null,
       p_consent_text: typeof body?.consent_text === 'string' ? body.consent_text.slice(0, 500) : null,
       p_user_agent:   ua,
+      p_notes:        typeof body?.notes === 'string' ? body.notes.slice(0, 2000) : null,
     });
 
     if (error) {
