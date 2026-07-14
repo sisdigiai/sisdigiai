@@ -10,6 +10,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Bloqueio novo**: os PATs próprios de niposchool-design, tgjphotos e polapetit estão **expirados** (401) e o token do digiai não alcança essas orgs — os 3 commits estão salvos localmente aguardando renovação dos tokens pra push/deploy.
 - Backlog: "Entrar mudo" do Qual Foto fechado como não-bug (redirect de sessão ativa; código idêntico ao Começar Grátis).
 
+### Ops (2026-07-13 — sequência pós-auditoria: keep-alive + resgate dos trabalhos locais)
+- **Keep-alive dos Supabase free no ar**: `netlify/functions/supabase-keepalive.mjs` (scheduled function, seg+qui 9h UTC) pinga nipo/qual_foto/easy/digiai/clearix/nexus com anon key — mata a classe de incidente "projeto pausou por inatividade" (2 casos hoje). GitHub Actions foi descartado (PAT sem escopo workflow).
+- **Trabalho local dos 3 repos salvo no GitHub**: Easy `35c311a` (redesign 3 dashboards + AGENTS.md + docs — e o push disparou o deploy: redesign NO AR em easyidioma.netlify.app), Nipo branch `experiment/design-system-pilot` `9cf6d6a` (piloto Nipo Wa + fix migration 030b + docs), Qual Foto `7ad21e1` (AGENTS.md + docs/brand), Polapetit landing `a9cf341` (fix hero: filtra URLs assinadas do CDN do Instagram).
+- **3 PATs renovados via navegador** (niposchool-design, tgjphotos, polapetit — 90 dias, escopo repo, gravados nos .env de cada repo sem transitar na conversa) + credential helpers quebrados (caminho antigo `diferentes/`) removidos do easy e da polapetit_landing. 6 itens do Backlog fechados como done.
+
 ### Verificado (2026-07-13 — Qual a Foto: análise profunda logada, incluindo painel admin)
 - **Magic link comprovado em uso real**: 3 galerias com seleções feitas por clientes (29 fotos escolhidas; galeria_003 com 62,5% de progresso) — o diferencial central do produto funciona ponta a ponta.
 - **Tração externa esquecida**: 8 fotógrafos externos reais cadastraram e testaram em jan/2026 (lista no admin com últimos acessos) — morreu quando o Supabase pausou. Item comercial P2 no Backlog: reativar como leads de validação.
