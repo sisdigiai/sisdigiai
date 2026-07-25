@@ -18,10 +18,10 @@
 | Visbel Óticas | 4 | 4/5 | Crescimento R$1.499 | (11) 4056-5110 |
 | Óticas Redvision | 2 | 3/5 | Essencial R$349 | a confirmar |
 
-## 2. Ligar no mkt (digiai_mkt — esteira de outreach)
-- O CRM lê a esteira por `public.v_marketing_outreach` (→ `marketing.outreach_schedule`). Criar, pra cada lead, uma **cadência de abordagem** (1º toque WhatsApp com a mensagem do `notes`, follow-up D+2 se sem resposta).
-- **Confirmar contato de Mileto e Redvision** (estão "a confirmar") antes de agendar o 1º toque — usar **Google Maps + Apify (IG)** (o furo que a IA teve: Instagram bloqueia bot; o Apify do digiai_mkt resolve).
-- Respeitar cadência e travas de outreach já existentes no mkt (não disparar em massa; venda consultiva 1:1).
+## 2. Ligar no mkt (esteira de outreach) — ✅ 1º toque AGENDADO
+- Já inseri em `marketing.outreach_schedule` um **`primeiro_contato` (status `agendado`)** pra cada um dos 5 leads (não envia nada — a esteira não tem dispatcher automático; vira `enviado` só quando o humano manda). Aparece no CRM via `v_marketing_outreach`.
+- **Pendente (agente/humano):** follow-up D+2 se sem resposta; e **confirmar contato/@Instagram de Óticas Mileto e Redvision** ("a confirmar") via **Google Maps + Apify (IG)** — o furo que a IA teve (Instagram bloqueia bot).
+- Manter as travas de outreach do mkt (venda consultiva 1:1, sem disparo em massa).
 
 ## 3. Enriquecimento pendente (opcional, melhora o lead)
 - **@Instagram** dos 5 (a IA não pegou — IG bloqueia): puxar via Apify.
