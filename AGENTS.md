@@ -7,6 +7,14 @@ D:\projetos\Cockpit\Apps\digiai\README.md
 O app/codigo/filesystem e a verdade factual. O Cockpit e a fonte documental operacional. Se divergirem, o app vence e o Cockpit deve ser atualizado no mesmo turno.
 
 ---
+
+## Ordens ativas (handoffs — ler antes de mexer em Comercial/Marketing/Billing)
+
+1. **Leads de prospeccao (Kimi/SP) — CRM ja populado, falta o MKT.** 5 oticas qualificadas ja inseridas em `ops.commercial_leads` (stage `lead`, source "Prospeccao IA (Kimi)..."), com dor + plano-alvo + mensagem de WhatsApp no `notes`. **Pendente:** ligar na esteira de outreach do mkt (`v_marketing_outreach` / `marketing.outreach_schedule`) + completar contato/@Instagram de Oticas Mileto e Redvision (Google Maps + Apify). Detalhe: [`docs/ordem-agente-leads-prospeccao-kimi.md`](docs/ordem-agente-leads-prospeccao-kimi.md).
+2. **Cobranca + trava por inadimplencia (Mercado Pago).** Spec pronto: [`docs/plano-cobranca-inadimplencia-mercadopago.md`](docs/plano-cobranca-inadimplencia-mercadopago.md). Reusa o tenant lifecycle (suspend/reactivate) — hoje so o Hub respeita.
+3. **Dados comerciais = fonte unica travada (R-036):** planos/oferta/pagamento/prova so mudam em [`../docs/digiai/docs/04-comercial/00-DADOS-COMERCIAIS-CANONICOS.md`](../docs/digiai/docs/04-comercial/00-DADOS-COMERCIAIS-CANONICOS.md), depois propaga. Nenhum material pode divergir.
+
+---
 # AGENTS.md â€” digiai
 
 > **Porta de entrada padronizada** para qualquer agente IA (Claude, Cursor, Cline, Copilot, Aider) entrando neste app. ConvenÃ§Ã£o definida em [ADR-0024](../Cockpit/ADR/ADR-0024-agents-md-por-app-aguardando-design-system.md).

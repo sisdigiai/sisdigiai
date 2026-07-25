@@ -4,11 +4,10 @@
 > Objetivo: os 5 leads qualificados (prospecção IA, SP/Grande SP) entram no **CRM comercial** e na **esteira de outreach do digiai_mkt**, prontos pra abordagem.
 > Regra: dados comerciais seguem [`00-DADOS-COMERCIAIS-CANONICOS.md`] (R-036). Não prometer nada fora da oferta.
 
-## 1. Inserir no CRM (digiai)
-- Rodar o seed **`supabase/seeds/prospeccao_kimi_sp_2026-07.sql`** no projeto digiai (`hswyopqvnolqpmprqvzh`) via MCP.
-- É **idempotente** (só insere se a `company` não existir) → pode rodar sem medo de duplicar.
-- Insere em `ops.commercial_leads` 5 leads (stage=`lead`, product=`clearix`, owner=Gilberto), com a **dor + plano-alvo + mensagem de WhatsApp pronta** no campo `notes`.
-- Conferir depois: `select company, stage, value_brl, next_step from public.v_commercial_leads where source ilike 'Prospecção IA%';`
+## 1. Inserir no CRM (digiai) — ✅ FEITO (2026-07)
+- Seed **`supabase/seeds/prospeccao_kimi_sp_2026-07.sql`** já **executado via Management API** (PAT do `.env`) — os 5 leads estão em `ops.commercial_leads` (stage=`lead`, product=`clearix`, owner=Gilberto, source "Prospecção IA (Kimi)…"), com **dor + plano-alvo + mensagem de WhatsApp** no `notes`. Acentos verificados OK no banco.
+- O seed é **idempotente** (só insere se a `company` não existir) → seguro re-rodar.
+- Conferir: `select company, stage, value_brl, next_step from public.v_commercial_leads where source ilike 'Prospecção IA%';`
 
 **Os 5 leads:**
 | Ótica | Lojas | Fit | Plano-alvo | Contato |
