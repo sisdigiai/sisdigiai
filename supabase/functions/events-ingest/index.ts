@@ -28,7 +28,7 @@ const json = (body: unknown, status = 200) =>
     headers: { ...CORS, 'Content-Type': 'application/json' },
   });
 
-const ALLOWED = new Set(['landing_visit', 'click_checkout', 'checkout_started']);
+const ALLOWED = new Set(['landing_visit', 'click_checkout', 'checkout_started', 'calc_used']);
 const MAX_EVENTS = 20;
 
 Deno.serve(async (req) => {

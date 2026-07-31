@@ -56,6 +56,7 @@ interface FunnelRow {
   n_30d: number;
   n_total: number;
   sort_order: number;
+  last_at?: string | null;
 }
 
 const FUNNEL_LABEL: Record<string, string> = {
@@ -71,6 +72,7 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
   const [fase0, setFase0] = useState<Fase0Item[]>([]);
   const [geo, setGeo] = useState<GeoRow[]>([]);
   const [funnel, setFunnel] = useState<FunnelRow[]>([]);
+  const [calcIsca, setCalcIsca] = useState<FunnelRow | null>(null);
   const [leads, setLeads] = useState<LeadRow[]>([]);
   const [nexus, setNexus] = useState<{ data: OsiOnboardingSummary | null; error: string | null } | null>(null);
 
@@ -255,6 +257,19 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
       } catch { /* silencioso */ }
     })();
 
+    // Isca Clearix Calc — telemetria calc_used (migration 048; ADR-0036/0041)
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('v_analytics_funnel_summary')
+          .select('event_code, funnel_stage, n_7d, n_30d, n_total, sort_order, last_at')
+          .eq('product', 'clearix-calc')
+          .eq('event_code', 'calc_used')
+          .maybeSingle();
+        setCalcIsca((data ?? null) as FunnelRow | null);
+      } catch { /* silencioso */ }
+    })();
+
     // Leads capturados na landing (marketing.landing_leads via view)
     (async () => {
       try {
@@ -416,6 +431,41 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
           </div>
         );
       })()}
+
+      {/* Isca Clearix Calc — uso real das calculadoras (calc_used, first-party) */}
+      {calcIsca && (
+        <div className="border border-outline/10 bg-surface-low p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <Activity className="w-4 h-4 text-secondary" />
+            <span className="text-xs font-mono uppercase tracking-widest text-muted">Isca Clearix Calc · calculadoras usadas</span>
+            <span className="ml-auto text-[11px] text-on-surface-variant font-mono tabular-nums">
+              {calcIsca.last_at ? `último uso ${new Date(calcIsca.last_at).toLocaleDateString('pt-BR')}` : 'sem uso ainda'}
+            </span>
+          </div>
+          <div className="text-xs text-muted">
+            Evento <span className="font-mono">calc_used</span> disparado pela Clearix Calc (topo do funil, awareness) — mesmo sink first-party do funil OSI.
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="bg-surface-lowest border border-outline/15 px-3 py-2">
+              <div className="text-[11px] text-muted">Últimos 7 dias</div>
+              <div className="text-lg font-bold text-on-surface tabular-nums">{calcIsca.n_7d}</div>
+            </div>
+            <div className="bg-surface-lowest border border-outline/15 px-3 py-2">
+              <div className="text-[11px] text-muted">Últimos 30 dias</div>
+              <div className="text-lg font-bold text-on-surface tabular-nums">{calcIsca.n_30d}</div>
+            </div>
+            <div className="bg-surface-lowest border border-outline/15 px-3 py-2">
+              <div className="text-[11px] text-muted">Total</div>
+              <div className="text-lg font-bold text-on-surface tabular-nums">{calcIsca.n_total}</div>
+            </div>
+          </div>
+          {calcIsca.n_total === 0 && (
+            <div className="bg-warning/[0.08] border border-warning/20 px-3 py-2 text-xs text-on-surface-variant">
+              Backend pronto (catálogo + ingest deployados) — popula assim que a Clearix Calc publicar o disparo do evento.
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Leads capturados na landing (form "Movimento 1 grátis") */}
       <div className="border border-outline/10 bg-surface-low p-5 space-y-3">
