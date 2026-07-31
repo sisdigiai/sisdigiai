@@ -4,6 +4,10 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Adicionado (2026-07-31 — FATOS publicáveis: fonte única pra IA do MKT citar)
+- **Migration 050**: `mkt.fatos` (fato pronto + fonte + verificado_em + validade_dias + publico) e `v_mkt_fatos` com flag **`fresco`** — as travas já proibiam "citar número fora dos FATOS"; agora os FATOS existem como dado, com prazo de validade. 7 seeds verificados na fonte (Pulso, YouTube, série Mello, custo de roteiro, Clearix, OSI, portfólio). RPC `fn_mkt_fato_reverificar` (is_staff) pra re-verificação.
+- **Seção "Fatos publicáveis" no espelho Marketing** — o dono vê a lista com badge fresco/vencido; fato vencido = a IA silencia o número. **Despacho R-032 pro agente do MKT** (`digiai_mkt/_DESPACHO_FATOS_DO_DIGIAI_2026-07-31.md`): regra de consumo (só fresco+publico), endpoints vivos de Pulso/Limelight pra número do dia, e a tarefa de plugar o gerador na view.
+
 ### Corrigido (2026-07-31 — Limelight publicando: card atualizado com a verdade verificada)
 - Dono avisou que o Limelight já publica com dados reais; verificação na fonte confirmou a nuance: **série NO AR via gate humano R-011** (12 itens da fila `publicado`, última publicação 28/07, reconciliador promovendo episódios, coleta diária medindo) — mas o `dry_run` das APIs segue `true` nas 4 plataformas. Card: Funciona→No ar, 68→72, bloqueio removido; próximo passo inclui limpar 5 itens em erro na fila.
 

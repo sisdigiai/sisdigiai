@@ -5,6 +5,17 @@ import { TravasBanner } from './TravasMarketing';
 import { supabase } from '../lib/supabase';
 import { espelhoMotores, type EspelhoLimelight, type EspelhoPulso } from '../lib/espelhoMotores';
 
+interface FatoMkt {
+  brand_slug: string | null;
+  chave: string;
+  fato: string;
+  fonte: string;
+  verificado_em: string;
+  valido_ate: string;
+  fresco: boolean;
+  publico: boolean;
+}
+
 // Espelho READ-ONLY do DIGIAI MKT (decisão do dono, 2026-07-12): a produção de
 // conteúdo (ideias → roteiro → arte → agenda → publicação) mora no app MKT
 // (mkt.digiai.app.br, schema mkt). O digiai é o cérebro: vê, não opera.
@@ -47,22 +58,25 @@ export default function MarketingEspelho() {
   const [pubs, setPubs] = useState<Publicacao[]>([]);
   const [limelight, setLimelight] = useState<EspelhoLimelight | null>(null);
   const [pulso, setPulso] = useState<EspelhoPulso | null>(null);
+  const [fatos, setFatos] = useState<FatoMkt[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
     setLoading(true);
-    const [{ data: e }, { data: m }, { data: p }, ll, pu] = await Promise.all([
+    const [{ data: e }, { data: m }, { data: p }, ll, pu, { data: f }] = await Promise.all([
       supabase.from('v_mkt_espelho').select('*').maybeSingle(),
       supabase.from('v_mkt_marcas').select('*'),
       supabase.from('v_mkt_publicacoes_recentes').select('*'),
       espelhoMotores.limelight(),
       espelhoMotores.pulso(),
+      supabase.from('v_mkt_fatos').select('*'),
     ]);
     if (e) setEsp(e as Espelho);
     setMarcas(((m ?? []) as Marca[]).sort((a, b) => b.publicadas_7d - a.publicadas_7d || b.publicacoes - a.publicacoes));
     setPubs((p ?? []) as Publicacao[]);
     setLimelight(ll);
     setPulso(pu);
+    setFatos((f ?? []) as FatoMkt[]);
     setLoading(false);
   };
   useEffect(() => { load(); }, []);
@@ -298,6 +312,34 @@ export default function MarketingEspelho() {
               ) : <div className="text-sm text-muted italic">Espelho indisponível.</div>}
             </div>
           </div>
+        </div>
+
+        {/* FATOS publicáveis — o que a IA do MKT PODE citar (fonte: mkt.fatos, com validade) */}
+        <div className="border border-outline/15 bg-surface-container">
+          <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2">
+            <Target className="w-3.5 h-3.5 text-secondary" />
+            <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Fatos publicáveis · o que a IA pode citar</span>
+            <span className="ml-auto font-mono text-[10px] text-muted">fonte: v_mkt_fatos · vencido = a IA silencia o número</span>
+          </div>
+          {fatos.length === 0 ? (
+            <div className="p-4 text-sm text-muted italic">Nenhum fato cadastrado.</div>
+          ) : (
+            <div className="divide-y divide-outline/10">
+              {fatos.map((f) => (
+                <div key={f.chave} className="px-4 py-2.5 flex items-start gap-3">
+                  <span className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border shrink-0 mt-0.5 ${f.fresco ? 'border-success/40 text-success bg-success/10' : 'border-danger/40 text-danger bg-danger/10'}`}>
+                    {f.fresco ? 'fresco' : 'vencido'}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] text-on-surface leading-snug">{f.fato}</div>
+                    <div className="text-[10px] font-mono text-muted mt-0.5 truncate">
+                      {f.brand_slug ?? 'geral'} · verificado {f.verificado_em} · vale até {f.valido_ate} · {f.fonte}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="border border-outline/15 bg-surface-lowest p-3 flex items-start gap-2.5 text-[12px] text-on-surface-variant">
