@@ -5,6 +5,7 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 ## [Não lançado]
 
 ### Adicionado (2026-07-31 — Vida real do tenant na Central Clearix)
+- **+2 FATOS da vida real** em mkt.fatos (validade 7d): `clearix_uso_vivo` (1,9k transações/30d, cliente sem nome — LGPD) e `digiai_prova_operacao` (build-in-public do grupo). **Adendo no despacho do MKT** com a regra de trava por marca: IA da marca X só usa fatos brand_slug=X ou gerais, nunca cruza marca, nunca enriquece com nome de cliente.
 - **View `v_admin_tenant_vida` criada no banco Clearix** (agregados por tenant, zero PII): transações 30d/7d, pedidos, usuários ativos, último login, ações auditadas. **Seção "Vida real · uso operacional" no tab Tenants** da Central: Grupo Mello Óticas com badge `operando` (1.954 transações/30d, 240/7d, 78 usuários, login hoje) vs 3 sandboxes parados — o contraste É a prova de uso real, e vira insumo de FATO fresco pro MKT.
 - Padrão pros demais bancos: espelho agregado `v_espelho_*` (Pulso e Limelight já têm; Nipo/Easy/Qual Foto/Lumina/Nexus na fila conforme ganharem uso que dirija decisão).
 
