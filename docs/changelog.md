@@ -4,6 +4,10 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Corrigido (2026-07-31 — camada final: o Pulso JÁ É automático; o espelho lia o schema morto)
+- **A investigação fechou o quadro completo**: o registro vivo do Pulso mora em **`pulso_content.metricas_publicacao`** — **475 publicações · 289,5k views** (FB 133k · Kwai 48k · YT 43k · TikTok 32k · IG 31k) — alimentado por **Vercel Crons diários** (`reconciliar-publicacoes` 4×/dia auto-descobre vídeos publicados por fora, `coletar-metricas` 11h via YT/IG APIs, decisor, aprendizado semanal). Prova de integridade: YT no banco 43.474 vs Studio 42.866 (defasagem de 1 coleta ✓). Tudo que eu lia antes (`public.posts`/`metricas_diarias`, cron pg_cron desativado, fila antiga) era o **sistema legado morto desde 16/06**.
+- `v_espelho_pulso` recriada na fonte viva (publicações, views por plataforma, pipeline, última publicação = **hoje**); card do espelho mostra "esteira automática viva ✓" e o card do Portfólio ganhou os números reais (maturidade 85→92, bloqueio removido — não existia). Item P1 do Backlog fechado com a explicação. Ligação digiai↔Pulso agora é automática de ponta a ponta: crons alimentam o banco, o espelho lê ao vivo.
+
 ### Corrigido (2026-07-31 — inverdades do Pulso desfeitas na fonte)
 - **Verificação no YouTube Studio (navegador do Pulso)** derrubou duas inverdades: (1) a "esteira parada" era falsa — o canal PULSO está **VIVO** (42.866 views vitalícias, 223 inscritos +114/28d, 21,7k views/28d, Shorts diários); o que parou foi o **REGISTRO** no pulso_control (posts 16/06, coleta 20/07). (2) o "987k views" do espelho era **inflação de 37×**: `metricas_diarias` guarda snapshot cumulativo por dia e a soma repetia o mesmo total — `v_espelho_pulso` recriada com último-snapshot (real registrado: **26.743**).
 - Card do Portfólio e espelho do Marketing reescritos com os números verificados + rótulo "views reg." (registradas ≠ realidade das plataformas). **Item P1 no Backlog** (`pulso`): religar registro/coleta — a publicação roda por fora do app e o crescimento é invisível pra telemetria.

@@ -21,13 +21,14 @@ export interface EspelhoLimelight {
 }
 
 export interface EspelhoPulso {
-  posts: number;
-  canais: number;
-  ideias: number;
+  publicacoes: number;
   views_total: number;
-  views_7d: number;
-  ultima_metrica: string | null;
-  ultimo_post: string | null;
+  views_por_plataforma: Record<string, number>;
+  ultima_publicacao: string | null;
+  ultima_descoberta: string | null;
+  pipeline: Record<string, number>;
+  ideias: number;
+  canais: number;
 }
 
 async function lerEspelho<T>(base: string, anon: string, view: string): Promise<T | null> {

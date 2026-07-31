@@ -69,7 +69,7 @@ export default function MarketingEspelho() {
 
   const diasDesde = (d: string | null | undefined) =>
     d ? Math.floor((Date.now() - new Date(d + 'T12:00:00').getTime()) / 86400000) : null;
-  const pulsoParadoDias = diasDesde(pulso?.ultimo_post);
+  const pulsoUltimaPubDias = diasDesde(pulso?.ultima_publicacao);
 
   return (
     <div className="max-w-7xl mx-auto p-8">
@@ -280,16 +280,19 @@ export default function MarketingEspelho() {
               {pulso ? (
                 <>
                   <div className="grid grid-cols-4 gap-2 text-center">
-                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{pulso.posts}</div><div className="text-[10px] font-mono uppercase text-muted">posts reg.</div></div>
-                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{(pulso.views_total / 1000).toFixed(1)}k</div><div className="text-[10px] font-mono uppercase text-muted">views reg.</div></div>
-                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{pulso.canais}</div><div className="text-[10px] font-mono uppercase text-muted">canais</div></div>
+                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{pulso.publicacoes}</div><div className="text-[10px] font-mono uppercase text-muted">publicações</div></div>
+                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{(pulso.views_total / 1000).toFixed(0)}k</div><div className="text-[10px] font-mono uppercase text-muted">views</div></div>
+                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{(pulso.pipeline['PRONTO_PUBLICACAO'] ?? 0) + (pulso.pipeline['EM_EDICAO'] ?? 0) + (pulso.pipeline['ROTEIRO_PRONTO'] ?? 0)}</div><div className="text-[10px] font-mono uppercase text-muted">no pipeline</div></div>
                     <div><div className="text-lg font-bold tabular-nums text-on-surface">{pulso.ideias}</div><div className="text-[10px] font-mono uppercase text-muted">ideias</div></div>
                   </div>
                   <div className="text-[11px] text-muted">
-                    {pulsoParadoDias != null && pulsoParadoDias > 14
-                      ? <span className="text-warning">registro no banco parado há {pulsoParadoDias} dias — o canal segue publicando por fora (YT vivo, verificado 31/07)</span>
-                      : <>último post registrado {pulso.ultimo_post ?? '—'}</>}
-                    {' · '}coleta até {pulso.ultima_metrica ?? '—'}
+                    Views: {Object.entries(pulso.views_por_plataforma).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${(v / 1000).toFixed(0)}k`).join(' · ')}
+                  </div>
+                  <div className="text-[11px] text-muted">
+                    {pulsoUltimaPubDias != null && pulsoUltimaPubDias <= 2
+                      ? <span className="text-success">esteira automática viva — última publicação {pulsoUltimaPubDias === 0 ? 'hoje ✓' : `há ${pulsoUltimaPubDias}d`}</span>
+                      : <span className="text-warning">última publicação {pulso.ultima_publicacao ?? '—'}</span>}
+                    {' · '}coleta diária 11h (Vercel Crons)
                   </div>
                 </>
               ) : <div className="text-sm text-muted italic">Espelho indisponível.</div>}

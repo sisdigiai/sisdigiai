@@ -80,12 +80,11 @@ const APPS: App[] = [
   },
   {
     nome: 'Pulso', mono: 'PU', cor: 'var(--color-eco-pulso)', tagline: 'Produção de vídeos curtos faceless — produto autônomo',
-    tier: 'autonomo', estado: 'no-ar', maturidade: 85, funcao: 'Canal PULSO VIVO no YouTube: 42,9k views vitalícias · 223 inscritos (+114 em 28d) · 21,7k views/28d · Shorts diários (verificado no Studio 31/07) — o app registra só 26,7k: coleta parada',
-    stack: 'Next 16 · React 19 · Supabase · pg_cron · OpenAI/Claude · ElevenLabs',
+    tier: 'autonomo', estado: 'no-ar', maturidade: 92, funcao: 'Esteira 100% AUTOMÁTICA e viva: 475 publicações · 289,5k views em 5 plataformas (FB 133k · Kwai 48k · YT 43k · TikTok 32k · IG 31k) · Vercel Crons diários (reconciliar 4×/dia + coleta 11h + decisor + aprendizado) — números vivos no espelho do Marketing',
+    stack: 'Next 16 · React 19 · Supabase (schema pulso_content) · Vercel Crons · YT/IG APIs · OpenAI/Claude · ElevenLabs · Higgsfield',
     repos: 'D:\\projetos\\pulso_control',
     git: 'control 5fac8e3 07/jul/2026',
-    proximo: 'Religar registro/coleta do pulso_control — a publicação roda POR FORA do app desde 16/06 e o canal explodiu depois disso',
-    bloqueio: 'App cego: banco parou em 20/07 (26,7k reg.) enquanto o canal cresce — telemetria descolada da realidade',
+    proximo: 'Crescer o canal YT (223 inscritos, +114/28d) rumo à monetização · manter cadência automática',
     urls: [{ label: 'pulsoprojects.vercel.app', url: 'https://pulsoprojects.vercel.app' }],
   },
   {
