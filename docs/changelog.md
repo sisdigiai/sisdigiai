@@ -4,6 +4,9 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Corrigido (2026-07-31 — Limelight publicando: card atualizado com a verdade verificada)
+- Dono avisou que o Limelight já publica com dados reais; verificação na fonte confirmou a nuance: **série NO AR via gate humano R-011** (12 itens da fila `publicado`, última publicação 28/07, reconciliador promovendo episódios, coleta diária medindo) — mas o `dry_run` das APIs segue `true` nas 4 plataformas. Card: Funciona→No ar, 68→72, bloqueio removido; próximo passo inclui limpar 5 itens em erro na fila.
+
 ### Auditoria de verdade (2026-07-31 — o que o app pode afirmar antes de vender)
 - **Varredura fonte a fonte** classificou as superfícies: 🟢 verdade viva (Comercial 260 leads/toque 25-07, Central Clearix, espelhos MKT/Limelight/Pulso verificados na fonte, analytics first-party, scorecard) · 🟡 viva mas defasada (**Financeiro parado em 12/06** — banner âmbar "dados defasados" adicionado quando passa de 30d; landing leads 0 = form ok sem tráfego; MP 1 evento teste) · 🔴 retrato editorial (cards do Portfólio — texto à mão apodrece, caso Pulso provou).
 - **Fix estrutural**: campo obrigatório `verificado` (YYYY-MM-DD) nos 18 cards do Portfólio + linha "Verificado (Xd atrás)" no drawer — verdade agora tem prazo de validade visível; card novo não compila sem data.

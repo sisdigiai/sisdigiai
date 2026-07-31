@@ -95,12 +95,11 @@ const APPS: App[] = [
   {
     nome: 'Limelight', mono: 'LL', cor: 'var(--color-eco-app)', tagline: 'Fábrica de conteúdo da Mello — série "Transforme Sua Visão" (12 temporadas · 72 eps)',
     verificado: '2026-07-31',
-    tier: 'suporte', estado: 'funciona', maturidade: 68, funcao: '144 episódios estruturados · motores de roteiro/imagem/áudio LIGADOS (T1E01 provado E2E, ~US$0,006/roteiro) · coleta diária 10h · publicação em DRY_RUN (gate humano R-011) — números vivos no espelho do Marketing',
+    tier: 'suporte', estado: 'no-ar', maturidade: 72, funcao: 'Série NO AR publicando com dados reais: 12 itens da fila publicados (último 28/07, gate humano R-011) · motores roteiro/imagem/áudio ligados · coleta diária 10h medindo · engine de API por plataforma ainda em dry_run — números vivos no espelho do Marketing',
     stack: 'Vite · React 19 · TS · Tailwind 4 · Supabase próprio (org Pulso) · Gemini/Claude · ElevenLabs · Veo · FFmpeg local',
     repos: 'D:\\projetos\\limelight_studio',
     git: '769ed9f (reconciliar kanban idempotente)',
-    proximo: 'Kit avatar da Taty (dono) · desligar DRY_RUN quando autorizado · confirmar URL de produção',
-    bloqueio: 'Publicação real travada em DRY_RUN até o dono autorizar · avatar/lip-sync aguardam kit',
+    proximo: 'Desligar dry_run por plataforma quando quiser publicação via API · kit avatar da Taty · limpar 5 itens em erro na fila',
     urls: [],
   },
   {
