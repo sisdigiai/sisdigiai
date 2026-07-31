@@ -1,7 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Search, RefreshCw, ChevronRight, Package } from 'lucide-react';
+import { Search, RefreshCw, ChevronRight, Package, Activity } from 'lucide-react';
 import { listPackages, listTenantCatalog } from './api';
+import { clearixSupabase } from '../../lib/clearixSupabase';
 import type { ClearixPackage, TenantCatalogRow } from '../../lib/clearixSupabase';
+
+// Vida operacional agregada por tenant (v_admin_tenant_vida — só números, zero PII)
+type TenantVida = {
+  tenant_id: string;
+  tenant_name: string;
+  transacoes_30d: number;
+  transacoes_7d: number;
+  ultima_transacao: string | null;
+  pedidos_30d: number;
+  usuarios: number;
+  usuarios_ativos_7d: number;
+  ultimo_login: string | null;
+  acoes_7d: number;
+};
 
 type Props = {
   onSelectTenant: (tenantId: string) => void;
@@ -16,6 +31,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default function TabTenants({ onSelectTenant }: Props) {
   const [rows, setRows] = useState<TenantCatalogRow[]>([]);
+  const [vida, setVida] = useState<TenantVida[]>([]);
   const [packages, setPackages] = useState<ClearixPackage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,9 +43,14 @@ export default function TabTenants({ onSelectTenant }: Props) {
     setLoading(true);
     setError(null);
     try {
-      const [cat, pkgs] = await Promise.all([listTenantCatalog(), listPackages()]);
+      const [cat, pkgs, { data: v }] = await Promise.all([
+        listTenantCatalog(),
+        listPackages(),
+        clearixSupabase.from('v_admin_tenant_vida').select('*').order('transacoes_30d', { ascending: false }),
+      ]);
       setRows(cat);
       setPackages(pkgs);
+      setVida((v ?? []) as TenantVida[]);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -87,6 +108,47 @@ export default function TabTenants({ onSelectTenant }: Props) {
           <RefreshCw size={12} /> Atualizar
         </button>
       </div>
+
+      {/* Vida real por tenant — uso operacional agregado (v_admin_tenant_vida, zero PII) */}
+      {vida.length > 0 && (
+        <div className="border border-outline/10 bg-surface-low">
+          <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2">
+            <Activity size={13} className="text-secondary" />
+            <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Vida real · uso operacional 30d</span>
+            <span className="ml-auto font-mono text-[10px] text-muted">fonte: v_admin_tenant_vida (agregados, zero PII)</span>
+          </div>
+          <div className="divide-y divide-outline/10">
+            {vida.map((v) => {
+              const vivo = v.transacoes_7d > 0;
+              return (
+                <div key={v.tenant_id} className="px-4 py-2.5 grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-4">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className={`w-2 h-2 shrink-0 rounded-none ${vivo ? 'bg-success' : 'bg-surface-highest border border-outline/30'}`} />
+                    <span className="text-sm text-on-surface truncate">{v.tenant_name}</span>
+                    {vivo && <span className="font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border border-success/40 text-success bg-success/10 shrink-0">operando</span>}
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-bold tabular-nums text-on-surface">{v.transacoes_30d.toLocaleString('pt-BR')}</div>
+                    <div className="text-[9px] font-mono uppercase text-muted">transações 30d</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-bold tabular-nums text-on-surface">{v.pedidos_30d}</div>
+                    <div className="text-[9px] font-mono uppercase text-muted">pedidos 30d</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-bold tabular-nums text-on-surface">{v.usuarios_ativos_7d}<span className="text-muted font-normal">/{v.usuarios}</span></div>
+                    <div className="text-[9px] font-mono uppercase text-muted">ativos 7d</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm tabular-nums text-on-surface-variant">{v.ultimo_login ?? '—'}</div>
+                    <div className="text-[9px] font-mono uppercase text-muted">último login</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {packages.map((p) => (

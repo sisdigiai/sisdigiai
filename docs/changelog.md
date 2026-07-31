@@ -4,6 +4,10 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Adicionado (2026-07-31 — Vida real do tenant na Central Clearix)
+- **View `v_admin_tenant_vida` criada no banco Clearix** (agregados por tenant, zero PII): transações 30d/7d, pedidos, usuários ativos, último login, ações auditadas. **Seção "Vida real · uso operacional" no tab Tenants** da Central: Grupo Mello Óticas com badge `operando` (1.954 transações/30d, 240/7d, 78 usuários, login hoje) vs 3 sandboxes parados — o contraste É a prova de uso real, e vira insumo de FATO fresco pro MKT.
+- Padrão pros demais bancos: espelho agregado `v_espelho_*` (Pulso e Limelight já têm; Nipo/Easy/Qual Foto/Lumina/Nexus na fila conforme ganharem uso que dirija decisão).
+
 ### Adicionado (2026-07-31 — FATOS publicáveis: fonte única pra IA do MKT citar)
 - **Migration 050**: `mkt.fatos` (fato pronto + fonte + verificado_em + validade_dias + publico) e `v_mkt_fatos` com flag **`fresco`** — as travas já proibiam "citar número fora dos FATOS"; agora os FATOS existem como dado, com prazo de validade. 7 seeds verificados na fonte (Pulso, YouTube, série Mello, custo de roteiro, Clearix, OSI, portfólio). RPC `fn_mkt_fato_reverificar` (is_staff) pra re-verificação.
 - **Seção "Fatos publicáveis" no espelho Marketing** — o dono vê a lista com badge fresco/vencido; fato vencido = a IA silencia o número. **Despacho R-032 pro agente do MKT** (`digiai_mkt/_DESPACHO_FATOS_DO_DIGIAI_2026-07-31.md`): regra de consumo (só fresco+publico), endpoints vivos de Pulso/Limelight pra número do dia, e a tarefa de plugar o gerador na view.
