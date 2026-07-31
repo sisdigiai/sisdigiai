@@ -5,9 +5,9 @@
 // anon keys são públicas por design (mesma classe do bundle de cada app).
 
 const LIMELIGHT_URL = import.meta.env.VITE_LIMELIGHT_SUPABASE_URL || 'https://gfdpvasbrxwulvpvyfvr.supabase.co';
-const LIMELIGHT_ANON = import.meta.env.VITE_LIMELIGHT_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmZHB2YXNicnh3dWx2cHZ5ZnZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5MjMzMzMsImV4cCI6MjEwMDQ5OTMzM30.9m8gHOWt2zBpFTC0iXH_1J17q1uUvPop8zAqLU4Nrbk';
+const LIMELIGHT_ANON = import.meta.env.VITE_LIMELIGHT_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmZHB2YXNicnh3dWx2cHZ5ZnZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NzMwNzYsImV4cCI6MjEwMDE0OTA3Nn0.Gr8I2e9Ot2d6fOq0eBp43yDWDxAohkzAcoa0dJ9_zOk';
 const PULSO_URL = import.meta.env.VITE_PULSO_SUPABASE_URL || 'https://nlcisbfdiokmipyihtuz.supabase.co';
-const PULSO_ANON = import.meta.env.VITE_PULSO_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sY2lzYmZkaW9rbWlweWlodHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5NzQ4NDcsImV4cCI6MjA2NDU1MDg0N30.0aEhBOSJcOSEEMILtuwZ1frDWpUZmnFRpUvKMhTQCnQ';
+const PULSO_ANON = import.meta.env.VITE_PULSO_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sY2lzYmZkaW9rbWlweWlodHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1ODk0OTksImV4cCI6MjA3OTE2NTQ5OX0.-Cfzv9ebOYB8I93zNLghWTszawJk4G3rXwiTTY9PpOI';
 
 export interface EspelhoLimelight {
   episodios: number;
