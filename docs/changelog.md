@@ -4,6 +4,10 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Corrigido (2026-07-31 — inverdades do Pulso desfeitas na fonte)
+- **Verificação no YouTube Studio (navegador do Pulso)** derrubou duas inverdades: (1) a "esteira parada" era falsa — o canal PULSO está **VIVO** (42.866 views vitalícias, 223 inscritos +114/28d, 21,7k views/28d, Shorts diários); o que parou foi o **REGISTRO** no pulso_control (posts 16/06, coleta 20/07). (2) o "987k views" do espelho era **inflação de 37×**: `metricas_diarias` guarda snapshot cumulativo por dia e a soma repetia o mesmo total — `v_espelho_pulso` recriada com último-snapshot (real registrado: **26.743**).
+- Card do Portfólio e espelho do Marketing reescritos com os números verificados + rótulo "views reg." (registradas ≠ realidade das plataformas). **Item P1 no Backlog** (`pulso`): religar registro/coleta — a publicação roda por fora do app e o crescimento é invisível pra telemetria.
+
 ### Adicionado (2026-07-30 — espelhos vivos do Limelight e do Pulso)
 - **Views `v_espelho_limelight` e `v_espelho_pulso`** criadas nos bancos próprios (org Pulso, via Management API): agregados sem PII — episódios/publicações/fila/custo IA/seguidores por rede (Limelight) e posts/canais/ideias/views totais e 7d/recência (Pulso). Exceção consciente à R-031 (`security_invoker=false` + grant anon) — só números agregados.
 - **Seção "Outros motores de conteúdo" no espelho Marketing** (`src/lib/espelhoMotores.ts`): cards vivos dos 2 motores com staleness honesto — a coleta do Limelight rodou hoje ✓; o Pulso aparece com **"esteira parada há 44 dias"** em âmbar (987k views acumuladas, último post 16/06 — o card do Portfólio dizia "124k views · esteira viva", muito defasado).

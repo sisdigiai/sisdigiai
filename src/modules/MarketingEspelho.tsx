@@ -280,16 +280,16 @@ export default function MarketingEspelho() {
               {pulso ? (
                 <>
                   <div className="grid grid-cols-4 gap-2 text-center">
-                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{pulso.posts}</div><div className="text-[10px] font-mono uppercase text-muted">posts</div></div>
-                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{(pulso.views_total / 1000).toFixed(0)}k</div><div className="text-[10px] font-mono uppercase text-muted">views</div></div>
-                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{pulso.views_7d}</div><div className="text-[10px] font-mono uppercase text-muted">views 7d</div></div>
+                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{pulso.posts}</div><div className="text-[10px] font-mono uppercase text-muted">posts reg.</div></div>
+                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{(pulso.views_total / 1000).toFixed(1)}k</div><div className="text-[10px] font-mono uppercase text-muted">views reg.</div></div>
+                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{pulso.canais}</div><div className="text-[10px] font-mono uppercase text-muted">canais</div></div>
                     <div><div className="text-lg font-bold tabular-nums text-on-surface">{pulso.ideias}</div><div className="text-[10px] font-mono uppercase text-muted">ideias</div></div>
                   </div>
                   <div className="text-[11px] text-muted">
                     {pulsoParadoDias != null && pulsoParadoDias > 14
-                      ? <span className="text-warning">esteira parada há {pulsoParadoDias} dias (último post {pulso.ultimo_post})</span>
-                      : <>último post {pulso.ultimo_post ?? '—'}</>}
-                    {' · '}métricas até {pulso.ultima_metrica ?? '—'}
+                      ? <span className="text-warning">registro no banco parado há {pulsoParadoDias} dias — o canal segue publicando por fora (YT vivo, verificado 31/07)</span>
+                      : <>último post registrado {pulso.ultimo_post ?? '—'}</>}
+                    {' · '}coleta até {pulso.ultima_metrica ?? '—'}
                   </div>
                 </>
               ) : <div className="text-sm text-muted italic">Espelho indisponível.</div>}

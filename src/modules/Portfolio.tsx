@@ -80,12 +80,12 @@ const APPS: App[] = [
   },
   {
     nome: 'Pulso', mono: 'PU', cor: 'var(--color-eco-pulso)', tagline: 'Produção de vídeos curtos faceless — produto autônomo',
-    tier: 'autonomo', estado: 'no-ar', maturidade: 85, funcao: '65 posts publicados · 987k views · 13 canais · 193 ideias — números vivos no espelho do Marketing; esteira PARADA desde 16/06',
+    tier: 'autonomo', estado: 'no-ar', maturidade: 85, funcao: 'Canal PULSO VIVO no YouTube: 42,9k views vitalícias · 223 inscritos (+114 em 28d) · 21,7k views/28d · Shorts diários (verificado no Studio 31/07) — o app registra só 26,7k: coleta parada',
     stack: 'Next 16 · React 19 · Supabase · pg_cron · OpenAI/Claude · ElevenLabs',
     repos: 'D:\\projetos\\pulso_control',
     git: 'control 5fac8e3 07/jul/2026',
-    proximo: 'Religar a esteira (último post 16/06, métricas até 20/07) · decidir foco: canais autônomos vs alimentar DIGIAI',
-    bloqueio: 'Esteira parada há ~6 semanas — o motor existe, falta rodar',
+    proximo: 'Religar registro/coleta do pulso_control — a publicação roda POR FORA do app desde 16/06 e o canal explodiu depois disso',
+    bloqueio: 'App cego: banco parou em 20/07 (26,7k reg.) enquanto o canal cresce — telemetria descolada da realidade',
     urls: [{ label: 'pulsoprojects.vercel.app', url: 'https://pulsoprojects.vercel.app' }],
   },
   {
