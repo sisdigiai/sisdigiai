@@ -139,7 +139,7 @@ export default function TravasMarketing() {
           <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2">
             <Palette className="w-3.5 h-3.5 text-secondary" />
             <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Travas por marca — vivas do DIGIAI MKT ({marcas.length})</span>
-            <a href="https://digiaimkt.netlify.app" target="_blank" rel="noreferrer" className="ml-auto font-mono text-[10px] text-secondary hover:underline">editar no MKT ↗</a>
+            <a href="https://mkt.digiai.app.br" target="_blank" rel="noreferrer" className="ml-auto font-mono text-[10px] text-secondary hover:underline">editar no MKT ↗</a>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-outline/10">
             {marcas.map((m) => (

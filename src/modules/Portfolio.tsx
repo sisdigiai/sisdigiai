@@ -184,7 +184,7 @@ const APPS: App[] = [
     git: 'f11fc2c 11/jul/2026 (revisão do Portfólio)',
     proximo: 'Publicar drafts legais (LGPD/ToS) · alimentar Roadmap com as pendências levantadas dos apps',
     bloqueio: 'CNPJ em transição na RFB · credenciais a rotacionar (ver task de segurança do Nexus)',
-    urls: [{ label: 'sisdigiai.netlify.app', url: 'https://sisdigiai.netlify.app' }],
+    urls: [{ label: 'app.digiai.app.br', url: 'https://app.digiai.app.br' }],
   },
   {
     nome: 'DIGIAI Site', mono: 'DS', cor: 'var(--color-secondary)', tagline: 'Landing institucional da holding',
@@ -212,7 +212,7 @@ const APPS: App[] = [
     git: '0a0437a 09/jul/2026 (skin Ateliê de Convergência)',
     proximo: 'Reconectar 2 tokens TikTok expirados (Mello Óticas + Pessoal) · escoar 49 mídias do acervo · fluxo ideias(digiai)→mkt ainda manual',
     bloqueio: '2 tokens TikTok expirados travam publicação dessas marcas · cota diária da campanha 100 dias ainda 0 hoje',
-    urls: [{ label: 'digiaimkt.netlify.app', url: 'https://digiaimkt.netlify.app' }],
+    urls: [{ label: 'mkt.digiai.app.br', url: 'https://mkt.digiai.app.br' }],
   },
 ];
 

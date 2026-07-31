@@ -98,7 +98,7 @@ export default function Academy() {
           <Info className="w-4 h-4 text-secondary shrink-0 mt-0.5" />
           <span>
             Este módulo é <strong className="text-on-surface">somente leitura</strong>. A produção de conteúdo, as artes e as travas de
-            execução moram no <a href="https://digiaimkt.netlify.app" target="_blank" rel="noreferrer" className="text-secondary hover:underline">DIGIAI MKT</a>;
+            execução moram no <a href="https://mkt.digiai.app.br" target="_blank" rel="noreferrer" className="text-secondary hover:underline">DIGIAI MKT</a>;
             os dados do produto vivem no banco (<span className="font-mono">academy.*</span>) e são atualizados por lá ou por agente.
           </span>
         </div>

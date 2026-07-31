@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase';
 
 // Espelho READ-ONLY do DIGIAI MKT (decisão do dono, 2026-07-12): a produção de
 // conteúdo (ideias → roteiro → arte → agenda → publicação) mora no app MKT
-// (digiaimkt.netlify.app, schema mkt). O digiai é o cérebro: vê, não opera.
+// (mkt.digiai.app.br, schema mkt). O digiai é o cérebro: vê, não opera.
 
 type Espelho = {
   ideias: number; roteiros: number; assets: number; publicacoes: number;
@@ -69,7 +69,7 @@ export default function MarketingEspelho() {
         actions={
           <div className="flex items-center gap-2">
             <a
-              href="https://digiaimkt.netlify.app"
+              href="https://mkt.digiai.app.br"
               target="_blank"
               rel="noreferrer"
               className="px-3 py-2 text-sm bg-secondary-container text-on-secondary-container border border-secondary/40 hover:bg-secondary-container/70 transition-colors flex items-center gap-2"
@@ -235,7 +235,7 @@ export default function MarketingEspelho() {
           <Info className="w-4 h-4 text-secondary shrink-0 mt-0.5" />
           <span>
             Somente leitura — a produção, as marcas, os robôs e as travas por marca moram no{' '}
-            <a href="https://digiaimkt.netlify.app" target="_blank" rel="noreferrer" className="text-secondary hover:underline">DIGIAI MKT</a>.
+            <a href="https://mkt.digiai.app.br" target="_blank" rel="noreferrer" className="text-secondary hover:underline">DIGIAI MKT</a>.
             Histórico da era anterior (schema <span className="font-mono">marketing</span>) permanece arquivado no banco.
           </span>
         </div>

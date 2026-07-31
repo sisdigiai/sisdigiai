@@ -3,7 +3,7 @@
  *
  * NÃO substitui a landing completa em landingoticasemimproviso.netlify.app.
  * Existe pra dar ao app DIGIAI uma rota pública oficial com CTA → Hotmart, garantindo
- * controle institucional do funil no domínio sisdigiai.netlify.app (e futuro digiai.app.br/osi).
+ * controle institucional do funil no domínio app.digiai.app.br (antes sisdigiai.netlify.app).
  *
  * Cross-ref: academy.product_checklist_items 'Publicar landing publica com CTA preparado'
  * (FluxoOSI checklist sales) + Cockpit/sessoes/META_setup_2026-06-02.md (Bloco C).
