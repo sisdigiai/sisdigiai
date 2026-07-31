@@ -5,7 +5,7 @@ import {
   Compass, Flame, LogOut, Store, Sparkles, Music2, Activity,
   Camera, Wand2, Boxes, Search, ShieldCheck, Workflow, ChevronDown,
   GraduationCap, Languages, Calendar as CalendarIcon, Globe, BarChart3,
-  Lightbulb, Heart, Package, Users, Receipt, Radio,
+  Lightbulb, Heart, Package, Users, Receipt, Radio, CalendarCheck,
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
@@ -13,7 +13,7 @@ import { canAccessModule } from '../lib/permissions';
 import EcossistemaLink, { EcossistemaStatus } from './EcossistemaLink';
 
 export type ModuleId =
-  | 'visao' | 'portfolio' | 'trilha' | 'lista-mestra'
+  | 'visao' | 'semana' | 'portfolio' | 'trilha' | 'lista-mestra'
   | 'backlog' | 'comercial' | 'academy' | 'financeiro'
   | 'decisoes' | 'biblioteca' | 'brand' | 'cadastro-empresa'
   | 'clearix' | 'cobranca' | 'marketing'
@@ -52,6 +52,7 @@ const NIPO_URL        = import.meta.env.VITE_NIPO_URL        || 'https://niposch
 
 const operacional: NavItem[] = [
   { id: 'visao',            label: 'Visão',             icon: <Eye className="w-4 h-4" /> },
+  { id: 'semana',           label: 'Semana',            icon: <CalendarCheck className="w-4 h-4" /> },
   { id: 'portfolio',        label: 'Portfólio',         icon: <LayoutGrid className="w-4 h-4" /> },
   { id: 'trilha',           label: 'Roadmap',           icon: <Map className="w-4 h-4" /> },
   { id: 'lista-mestra',     label: 'Lista Mestra',      icon: <List className="w-4 h-4" /> },

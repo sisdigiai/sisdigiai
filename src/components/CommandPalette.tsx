@@ -7,6 +7,7 @@ interface Item { id: ModuleId; label: string; group: string }
 const ITEMS: Item[] = [
   { id: 'visao', label: 'Visão', group: 'Operacional' },
   { id: 'portfolio', label: 'Portfólio', group: 'Operacional' },
+  { id: 'semana', label: 'Semana (scorecard + ritual)', group: 'Operacional' },
   { id: 'trilha', label: 'Roadmap', group: 'Operacional' },
   { id: 'lista-mestra', label: 'Lista Mestra', group: 'Operacional' },
   { id: 'backlog', label: 'Backlog Executivo', group: 'Operacional' },
