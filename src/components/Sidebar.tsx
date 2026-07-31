@@ -10,7 +10,6 @@ import {
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
 import { canAccessModule } from '../lib/permissions';
-import EcossistemaLink, { EcossistemaStatus } from './EcossistemaLink';
 
 export type ModuleId =
   | 'visao' | 'semana' | 'portfolio' | 'trilha' | 'lista-mestra'
@@ -27,28 +26,6 @@ interface NavItem {
   icon: React.ReactNode;
 }
 
-interface Ecossistema {
-  key: string;
-  icone: React.ReactNode;
-  nome: string;
-  url?: string;
-  status: EcossistemaStatus;
-}
-
-import { useEcosystemUrls } from '../hooks/useEcosystemUrls';
-
-// URLs externas dos ecossistemas — fonte única em company.digital_assets (via
-// useEcosystemUrls). As constantes abaixo são FALLBACK (offline/RLS). ADR-0029.
-const ATLAS_URL       = import.meta.env.VITE_ATLAS_URL       || 'https://digiaiatlas.netlify.app';
-const OSI_URL         = import.meta.env.VITE_OSI_URL         || 'https://oticasemimproviso.netlify.app';
-const CLEARIX_HUB_URL = import.meta.env.VITE_CLEARIX_HUB_URL || 'https://clearixhub.netlify.app';
-const NEXUS_URL       = import.meta.env.VITE_NEXUS_URL       || 'https://sisnexus.netlify.app';
-const POLAPETIT_URL   = import.meta.env.VITE_POLAPETIT_URL   || 'https://polapetit.netlify.app';
-const PULSO_URL       = import.meta.env.VITE_PULSO_URL       || 'https://pulsoprojects.vercel.app';
-const QUALFOTO_URL    = import.meta.env.VITE_QUALFOTO_URL    || 'https://qualfoto.netlify.app';
-const LUMINA_URL      = import.meta.env.VITE_LUMINA_URL      || 'https://luminabox.netlify.app';
-const EASY_URL        = import.meta.env.VITE_EASY_URL        || 'https://easyidioma.netlify.app';
-const NIPO_URL        = import.meta.env.VITE_NIPO_URL        || 'https://niposchool.vercel.app';
 
 const operacional: NavItem[] = [
   { id: 'visao',            label: 'Visão',             icon: <Eye className="w-4 h-4" /> },
@@ -73,21 +50,6 @@ const marketing: NavItem[] = [
   { id: 'marketing-engajamento', label: 'Engajamento',      icon: <Heart className="w-4 h-4" /> },
   { id: 'fluxo-osi',             label: 'OSI',              icon: <Workflow className="w-4 h-4" /> },
   { id: 'travas-marketing',      label: 'Travas Marketing', icon: <ShieldCheck className="w-4 h-4" /> },
-];
-
-// Ecossistemas (links externos — ADR-0029)
-// Ordem: ativos primeiro, depois em_construcao, depois em_concepcao
-const ECOSSISTEMA_DEFS: Ecossistema[] = [
-  { key: 'clearix-hub',  icone: <Boxes        className="w-4 h-4" />, nome: 'Clearix Hub',   url: CLEARIX_HUB_URL, status: 'ativo' },
-  { key: 'atlas',        icone: <Compass      className="w-4 h-4" />, nome: 'Clearix Atlas', url: ATLAS_URL,       status: 'ativo' },
-  { key: 'osi',          icone: <Store        className="w-4 h-4" />, nome: 'OSI',           url: OSI_URL,         status: 'ativo' },
-  { key: 'nexus',        icone: <GraduationCap className="w-4 h-4" />, nome: 'Nexus',        url: NEXUS_URL,       status: 'ativo' },
-  { key: 'pulsocontrol', icone: <Activity     className="w-4 h-4" />, nome: 'Pulso Control', url: PULSO_URL,       status: 'ativo' },
-  { key: 'polapetit',    icone: <Sparkles     className="w-4 h-4" />, nome: 'Polapetit',     url: POLAPETIT_URL,   status: 'ativo' },
-  { key: 'lumina',       icone: <Wand2        className="w-4 h-4" />, nome: 'Lumina',        url: LUMINA_URL,      status: 'ativo' },
-  { key: 'qualafoto',    icone: <Camera       className="w-4 h-4" />, nome: 'Qual a Foto',   url: QUALFOTO_URL,    status: 'ativo' },
-  { key: 'easyidiomas',  icone: <Languages    className="w-4 h-4" />, nome: 'Easy Idiomas',  url: EASY_URL,        status: 'ativo' },
-  { key: 'niposchool',   icone: <Music2       className="w-4 h-4" />, nome: 'Nipo School',   url: NIPO_URL,        status: 'ativo' },
 ];
 
 const sistema: NavItem[] = [
@@ -135,8 +97,6 @@ export default function Sidebar({ active, onSelect, mobileOpen = false, onClose 
   const visibleOperacional = operacional.filter(item => canAccessModule(item.id, role));
   const visibleMarketing = marketing.filter(item => canAccessModule(item.id, role));
   const activeSection = sectionOf(active);
-  const ecoUrls = useEcosystemUrls();
-  const ecossistemas = ECOSSISTEMA_DEFS.map(e => ({ ...e, url: ecoUrls[e.key] ?? e.url }));
 
   const toggleSection = (k: SectionKey) => {
     setCollapsed(prev => {
@@ -214,18 +174,9 @@ export default function Sidebar({ active, onSelect, mobileOpen = false, onClose 
               <div className="space-y-0.5">
                 <NavButton item={{ id: 'mapa-vivo', label: 'Mapa Vivo', icon: <Network className="w-4 h-4" /> }} />
                 <NavButton item={{ id: 'ecossistemas', label: 'Painel', icon: <Boxes className="w-4 h-4" /> }} />
-                {ecossistemas.map(e => (
-                  <EcossistemaLink
-                    key={e.key}
-                    icone={e.icone}
-                    nome={e.nome}
-                    url={e.url}
-                    status={e.status}
-                  />
-                ))}
               </div>
               <div className="px-3 mt-2 text-[9px] font-mono text-muted/70 leading-relaxed">
-                Links externos · cada ecossistema tem banco e auth próprios (ADR-0029)
+                Links e status de cada app moram no Painel (fonte: digital_assets · ADR-0029)
               </div>
             </>
           )}

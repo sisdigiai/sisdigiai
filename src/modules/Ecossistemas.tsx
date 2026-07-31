@@ -3,6 +3,7 @@ import { ExternalLink, Globe } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { companyStore } from '../lib/companyStore';
 import type { DigitalAsset } from '../lib/supabase';
+import { PRODUTO_BY_SLUG, type ProdutoInfo } from './Portfolio';
 
 // Rótulo amigável por owner_product (agrupa os apps por ecossistema).
 const OWNER_LABEL: Record<string, string> = {
@@ -17,6 +18,29 @@ const OWNER_LABEL: Record<string, string> = {
   niposchool: 'Nipo School',
   qualfoto: 'Qual a Foto',
 };
+
+// owner_product (digital_assets) → slug do índice PRODUTOS (verdade única do Portfólio)
+const OWNER_TO_SLUG: Record<string, string> = {
+  clearix: 'clearix', digiai: 'digiai-app', osi: 'osi', polapetit: 'polapetit',
+  pulso: 'pulso', nexus: 'nexus', lumina: 'lumina',
+  easyidiomas: 'easy-idiomas', niposchool: 'nipo-school', qualfoto: 'qual-a-foto',
+};
+
+function produtoDoOwner(owner: string): ProdutoInfo | undefined {
+  return PRODUTO_BY_SLUG[OWNER_TO_SLUG[owner] ?? owner];
+}
+
+function LogoTile({ p, size = 'sm' }: { p?: ProdutoInfo; size?: 'sm' | 'md' }) {
+  const box = size === 'md' ? 'w-8 h-8' : 'w-6 h-6';
+  if (!p) return <Globe className="w-3.5 h-3.5 text-muted shrink-0" />;
+  return (
+    <span className={`${box} shrink-0 flex items-center justify-center overflow-hidden`} style={{ background: p.badge ? 'transparent' : p.cor }}>
+      {p.logo
+        ? <img src={p.logo} alt="" className={p.badge ? `${box} object-cover` : 'w-[70%] h-[70%] object-contain'} style={p.badge ? undefined : { filter: 'brightness(0) invert(1)' }} />
+        : <span className="text-[9px] font-mono font-bold text-white">{p.mono}</span>}
+    </span>
+  );
+}
 
 const STATUS_STYLE: Record<string, { label: string; cls: string }> = {
   ativo:              { label: 'Ativo',       cls: 'bg-success/15 text-success border-success/30' },
@@ -62,8 +86,11 @@ export default function Ecossistemas() {
 
       {orderedKeys.map(key => (
         <div key={key} className="space-y-2">
-          <div className="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant px-1">
-            {OWNER_LABEL[key] || key}
+          <div className="flex items-center gap-2 px-1">
+            <LogoTile p={produtoDoOwner(key)} size="md" />
+            <span className="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant">
+              {OWNER_LABEL[key] || key}
+            </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {groups[key].map(s => {
@@ -82,7 +109,7 @@ export default function Ecossistemas() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <div className="font-semibold text-sm flex items-center gap-2">
-                        <Globe className="w-3.5 h-3.5 text-muted shrink-0" /> {s.rotulo}
+                        <LogoTile p={produtoDoOwner(key)} /> {s.rotulo}
                       </div>
                       <div className="text-xs font-mono text-muted truncate mt-1">{s.valor}</div>
                     </div>
