@@ -605,7 +605,7 @@ GRANT SELECT ON public.v_osi_onboarding_summary TO anon, authenticated;`}</pre>
         <Card icon={<Flame className="w-3.5 h-3.5" />} etapa="Captação · Funil OSI" titulo="Isca paga + esteira">
           <Metric label="Ticket médio" value={s.funil ? brl(s.funil.ticket) : '…'} />
           <Metric label="ROAS microteste" value={s.funil ? s.funil.roas.toFixed(2) : '…'} />
-          <button onClick={() => onNavigate?.('funil')} className="text-[11px] text-secondary hover:text-secondary pt-1 transition-colors">Abrir Funil OSI →</button>
+          <span className="text-[11px] text-muted pt-1">Economia completa na aba “Economia do funil” ↑</span>
         </Card>
 
         <Arrow />

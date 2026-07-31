@@ -14,13 +14,12 @@ import EcossistemaLink, { EcossistemaStatus } from './EcossistemaLink';
 
 export type ModuleId =
   | 'visao' | 'portfolio' | 'trilha' | 'lista-mestra'
-  | 'backlog' | 'comercial' | 'academy' | 'funil' | 'financeiro'
+  | 'backlog' | 'comercial' | 'academy' | 'financeiro'
   | 'decisoes' | 'biblioteca' | 'brand' | 'cadastro-empresa'
-  | 'clearix' | 'cobranca' | 'referencias-design' | 'como-usar' | 'mock-estilos' | 'marketing'
-  | 'marketing-seo' | 'marketplace' | 'ecossistemas' | 'mapa-vivo' | 'travas-marketing'
+  | 'clearix' | 'cobranca' | 'marketing'
+  | 'marketplace' | 'ecossistemas' | 'mapa-vivo' | 'travas-marketing'
   | 'fluxo-osi' | 'guia'
-  | 'marketing-engajamento' | 'marketing-materiais'
-  | 'marketing-afiliados';
+  | 'marketing-engajamento';
 
 interface NavItem {
   id: ModuleId;
@@ -66,16 +65,12 @@ const operacional: NavItem[] = [
   { id: 'cobranca',         label: 'Cobrança',          icon: <Receipt className="w-4 h-4" /> },
 ];
 
-// Marketing — seção de 1º nível (calendário + redes + engajamento + funil OSI +
-// SEO + afiliados + travas). Sub-abas do antigo módulo Marketing viraram itens.
+// Marketing — enxuto pós-emagrecimento 2026-07-30: espelho MKT + engajamento +
+// OSI (Mapa/Economia/Materiais/Afiliados em abas) + travas. Produção mora no MKT.
 const marketing: NavItem[] = [
   { id: 'marketing',             label: 'Marketing (MKT)',  icon: <Radio className="w-4 h-4" /> },
   { id: 'marketing-engajamento', label: 'Engajamento',      icon: <Heart className="w-4 h-4" /> },
-  { id: 'funil',                 label: 'Funil OSI',        icon: <Flame className="w-4 h-4" /> },
-  { id: 'fluxo-osi',             label: 'Mapa OSI',         icon: <Workflow className="w-4 h-4" /> },
-  { id: 'marketing-seo',         label: 'Marketing & SEO',  icon: <Search className="w-4 h-4" /> },
-  { id: 'marketing-materiais',   label: 'Materiais',        icon: <Package className="w-4 h-4" /> },
-  { id: 'marketing-afiliados',   label: 'Afiliados',        icon: <Users className="w-4 h-4" /> },
+  { id: 'fluxo-osi',             label: 'OSI',              icon: <Workflow className="w-4 h-4" /> },
   { id: 'travas-marketing',      label: 'Travas Marketing', icon: <ShieldCheck className="w-4 h-4" /> },
 ];
 
@@ -99,9 +94,6 @@ const sistema: NavItem[] = [
   { id: 'decisoes',           label: 'Decisões',            icon: <GitBranch className="w-4 h-4" /> },
   { id: 'biblioteca',         label: 'Biblioteca',          icon: <Library className="w-4 h-4" /> },
   { id: 'brand',              label: 'Brand Guidelines',    icon: <Palette className="w-4 h-4" /> },
-  { id: 'referencias-design', label: 'Referências Design',  icon: <Palette className="w-4 h-4" /> },
-  { id: 'como-usar',          label: 'Como usar o DS',      icon: <BookOpen className="w-4 h-4" /> },
-  { id: 'mock-estilos',       label: 'Mock Vendas',         icon: <Palette className="w-4 h-4" /> },
 ];
 
 interface SidebarProps {

@@ -50,11 +50,9 @@ const FASES: Fase[] = [
     nome: 'Executar',
     objetivo: 'Tocar a operação — aquisição, distribuição e produto-âncora.',
     mods: [
-      { id: 'funil',        label: 'Funil OSI',       nota: 'Aquisição / isca paga',       icon: <Flame className={I} /> },
       { id: 'academy',      label: 'Academy',         nota: 'Produto low-ticket de entrada', icon: <BookOpen className={I} /> },
-      { id: 'fluxo-osi',    label: 'Mapa OSI',        nota: 'Mapa da espinha do ecossistema', icon: <Workflow className={I} /> },
+      { id: 'fluxo-osi',    label: 'OSI',             nota: 'Mapa + economia + materiais + afiliados', icon: <Workflow className={I} /> },
       { id: 'marketing',    label: 'Marketing',       nota: 'Calendário + distribuição',   icon: <Megaphone className={I} /> },
-      { id: 'marketing-seo',label: 'Marketing & SEO', nota: 'Tráfego orgânico',            icon: <Search className={I} /> },
       { id: 'clearix',      label: 'Central Clearix', nota: 'Produto-âncora · tenants',    icon: <Network className={I} /> },
     ],
   },

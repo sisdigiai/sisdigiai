@@ -17,19 +17,14 @@ import Clearix from './modules/Clearix';
 import Decisoes from './modules/Decisoes';
 import Financeiro from './modules/Financeiro';
 import Academy from './modules/Academy';
-import Funil from './modules/Funil';
 import Marketing from './modules/Marketing';
 import MarketingEspelho from './modules/MarketingEspelho';
-import MarketingSEO from './modules/MarketingSEO';
 import Marketplace from './modules/Marketplace';
-import ReferenciasDesign from './modules/ReferenciasDesign';
-import ComoUsarDigiaiHouse from './modules/ComoUsarDigiaiHouse';
-import MockClearixEstilos from './modules/MockClearixEstilos';
 import Ecossistemas from './modules/Ecossistemas';
 import MapaVivo from './modules/MapaVivo';
 import ListaMestra from './modules/ListaMestra';
 import TravasMarketing from './modules/TravasMarketing';
-import FluxoOSI from './modules/FluxoOSI';
+import OsiHub from './modules/OsiHub';
 import Guia from './modules/Guia';
 import Comercial from './modules/Comercial';
 import Billing from './modules/Billing';
@@ -47,10 +42,8 @@ const PUBLIC_ROUTES = ['/osi/depoimento', '/osi'];
 const MODULES: ModuleId[] = [
   'visao', 'portfolio', 'trilha', 'lista-mestra', 'backlog', 'comercial',
   'cadastro-empresa', 'financeiro', 'academy', 'marketplace', 'clearix', 'cobranca',
-  'marketing', 'marketing-engajamento', 'funil', 'fluxo-osi',
-  'marketing-seo', 'marketing-materiais', 'marketing-afiliados', 'travas-marketing',
-  'ecossistemas', 'mapa-vivo', 'decisoes', 'biblioteca', 'brand',
-  'referencias-design', 'como-usar', 'mock-estilos', 'guia',
+  'marketing', 'marketing-engajamento', 'fluxo-osi', 'travas-marketing',
+  'ecossistemas', 'mapa-vivo', 'decisoes', 'biblioteca', 'brand', 'guia',
 ];
 
 function moduleFromHash(): ModuleId {
@@ -62,12 +55,11 @@ function moduleFromHash(): ModuleId {
 const MODULE_LABEL: Record<ModuleId, string> = {
   visao: 'Visão', portfolio: 'Portfólio', trilha: 'Roadmap', 'lista-mestra': 'Lista Mestra',
   backlog: 'Backlog Executivo', comercial: 'Comercial', 'cadastro-empresa': 'Cadastro Empresa',
-  financeiro: 'Financeiro', academy: 'Academy', funil: 'Funil OSI', 'fluxo-osi': 'Mapa OSI',
+  financeiro: 'Financeiro', academy: 'Academy', 'fluxo-osi': 'OSI',
   marketing: 'Marketing', 'marketing-engajamento': 'Engajamento',
-  'marketing-materiais': 'Materiais', 'marketing-afiliados': 'Afiliados',
-  'marketing-seo': 'Marketing & SEO', marketplace: 'Marketplace', clearix: 'Central Clearix', cobranca: 'Cobrança',
+  marketplace: 'Marketplace', clearix: 'Central Clearix', cobranca: 'Cobrança',
   ecossistemas: 'Ecossistemas', 'mapa-vivo': 'Mapa Vivo', decisoes: 'Decisões', biblioteca: 'Biblioteca', brand: 'Brand Guidelines',
-  'travas-marketing': 'Travas Marketing', 'referencias-design': 'Referências Design', 'como-usar': 'Como usar o DS', 'mock-estilos': 'Mock Vendas',
+  'travas-marketing': 'Travas Marketing',
   guia: 'Guia Operacional',
 };
 
@@ -77,11 +69,9 @@ const MODULE_SECTION: Record<ModuleId, string> = {
   backlog: 'Operacional', comercial: 'Operacional', 'cadastro-empresa': 'Operacional', financeiro: 'Operacional',
   academy: 'Operacional', marketplace: 'Operacional', clearix: 'Operacional', cobranca: 'Operacional',
   marketing: 'Marketing', 'marketing-engajamento': 'Marketing',
-  funil: 'Marketing', 'fluxo-osi': 'Marketing', 'marketing-seo': 'Marketing',
-  'marketing-materiais': 'Marketing', 'marketing-afiliados': 'Marketing', 'travas-marketing': 'Marketing',
+  'fluxo-osi': 'Marketing', 'travas-marketing': 'Marketing',
   ecossistemas: 'Ecossistemas', 'mapa-vivo': 'Ecossistemas',
-  decisoes: 'Sistema', biblioteca: 'Sistema', brand: 'Sistema',
-  'referencias-design': 'Sistema', 'como-usar': 'Sistema', 'mock-estilos': 'Sistema', guia: 'Sistema',
+  decisoes: 'Sistema', biblioteca: 'Sistema', brand: 'Sistema', guia: 'Sistema',
 };
 
 export default function App() {
@@ -157,21 +147,14 @@ export default function App() {
       case 'decisoes': return <Decisoes />;
       case 'financeiro': return <Financeiro />;
       case 'academy': return <Academy />;
-      case 'funil': return <Funil />;
       case 'marketing': return <MarketingEspelho />;
       case 'marketing-engajamento': return <Marketing view="engajamento" />;
-      case 'marketing-materiais': return <Marketing view="materiais" />;
-      case 'marketing-afiliados': return <Marketing view="afiliados" />;
-      case 'marketing-seo': return <MarketingSEO />;
       case 'marketplace': return <Marketplace />;
-      case 'referencias-design': return <ReferenciasDesign />;
-      case 'como-usar': return <ComoUsarDigiaiHouse />;
-      case 'mock-estilos': return <MockClearixEstilos />;
       case 'ecossistemas': return <Ecossistemas />;
       case 'mapa-vivo': return <MapaVivo onNavigate={navigate} />;
       case 'lista-mestra': return <ListaMestra />;
       case 'travas-marketing': return <TravasMarketing />;
-      case 'fluxo-osi': return <FluxoOSI onNavigate={navigate} />;
+      case 'fluxo-osi': return <OsiHub onNavigate={navigate} />;
       case 'guia': return <Guia onNavigate={navigate} />;
       case 'comercial': return <Comercial />;
       default: {

@@ -21,7 +21,7 @@ function temTracao(p: ProdutoInfo): boolean {
 // Onde abre dentro do painel (senão, abre o app externo pela URL do Portfólio)
 const MODULO_INTERNO: Partial<Record<string, ModuleId>> = {
   'clearix': 'clearix',
-  'osi': 'funil',
+  'osi': 'fluxo-osi',
   'digiai-mkt': 'marketing',
   'digiai-app': 'visao',
 };

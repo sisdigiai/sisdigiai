@@ -18,19 +18,13 @@ const ITEMS: Item[] = [
   { id: 'clearix', label: 'Central Clearix', group: 'Operacional' },
   { id: 'marketing', label: 'Marketing (espelho MKT)', group: 'Marketing' },
   { id: 'marketing-engajamento', label: 'Engajamento', group: 'Marketing' },
-  { id: 'funil', label: 'Funil OSI', group: 'Marketing' },
-  { id: 'fluxo-osi', label: 'Mapa OSI', group: 'Marketing' },
-  { id: 'marketing-seo', label: 'Marketing & SEO', group: 'Marketing' },
-  { id: 'marketing-materiais', label: 'Materiais (afiliados)', group: 'Marketing' },
-  { id: 'marketing-afiliados', label: 'Afiliados', group: 'Marketing' },
+  { id: 'fluxo-osi', label: 'OSI (mapa · economia · materiais · afiliados)', group: 'Marketing' },
   { id: 'travas-marketing', label: 'Travas Marketing', group: 'Marketing' },
   { id: 'ecossistemas', label: 'Ecossistemas (Painel)', group: 'Ecossistemas' },
   { id: 'guia', label: 'Guia Operacional', group: 'Sistema' },
   { id: 'decisoes', label: 'Decisões', group: 'Sistema' },
   { id: 'biblioteca', label: 'Biblioteca', group: 'Sistema' },
   { id: 'brand', label: 'Brand Guidelines', group: 'Sistema' },
-  { id: 'referencias-design', label: 'Referências Design', group: 'Sistema' },
-  { id: 'mock-estilos', label: 'Mock Vendas', group: 'Sistema' },
 ];
 
 const norm = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
