@@ -3,6 +3,7 @@ import { ExternalLink, RefreshCw, Info, Radio, DollarSign, Send, Target, Calenda
 import PageHeader from '../components/PageHeader';
 import { TravasBanner } from './TravasMarketing';
 import { supabase } from '../lib/supabase';
+import { espelhoMotores, type EspelhoLimelight, type EspelhoPulso } from '../lib/espelhoMotores';
 
 // Espelho READ-ONLY do DIGIAI MKT (decisão do dono, 2026-07-12): a produção de
 // conteúdo (ideias → roteiro → arte → agenda → publicação) mora no app MKT
@@ -44,21 +45,31 @@ export default function MarketingEspelho() {
   const [esp, setEsp] = useState<Espelho | null>(null);
   const [marcas, setMarcas] = useState<Marca[]>([]);
   const [pubs, setPubs] = useState<Publicacao[]>([]);
+  const [limelight, setLimelight] = useState<EspelhoLimelight | null>(null);
+  const [pulso, setPulso] = useState<EspelhoPulso | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
     setLoading(true);
-    const [{ data: e }, { data: m }, { data: p }] = await Promise.all([
+    const [{ data: e }, { data: m }, { data: p }, ll, pu] = await Promise.all([
       supabase.from('v_mkt_espelho').select('*').maybeSingle(),
       supabase.from('v_mkt_marcas').select('*'),
       supabase.from('v_mkt_publicacoes_recentes').select('*'),
+      espelhoMotores.limelight(),
+      espelhoMotores.pulso(),
     ]);
     if (e) setEsp(e as Espelho);
     setMarcas(((m ?? []) as Marca[]).sort((a, b) => b.publicadas_7d - a.publicadas_7d || b.publicacoes - a.publicacoes));
     setPubs((p ?? []) as Publicacao[]);
+    setLimelight(ll);
+    setPulso(pu);
     setLoading(false);
   };
   useEffect(() => { load(); }, []);
+
+  const diasDesde = (d: string | null | undefined) =>
+    d ? Math.floor((Date.now() - new Date(d + 'T12:00:00').getTime()) / 86400000) : null;
+  const pulsoParadoDias = diasDesde(pulso?.ultimo_post);
 
   return (
     <div className="max-w-7xl mx-auto p-8">
@@ -231,11 +242,67 @@ export default function MarketingEspelho() {
           </>
         )}
 
+        {/* Outros motores de conteúdo — espelhos vivos dos bancos próprios (2026-07-30) */}
+        <div className="border border-outline/15 bg-surface-container">
+          <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2">
+            <Radio className="w-3.5 h-3.5 text-secondary" />
+            <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Outros motores de conteúdo</span>
+            <span className="ml-auto font-mono text-[10px] text-muted">fonte: v_espelho_* (bancos Limelight e Pulso)</span>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-outline/10">
+            <div className="bg-surface-container p-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 shrink-0" style={{ background: 'var(--color-eco-app)' }} />
+                <span className="text-sm font-semibold text-on-surface">Limelight Studio · Mello</span>
+                <span className="ml-auto font-mono text-[10px] text-muted">série "Transforme Sua Visão"</span>
+              </div>
+              {limelight ? (
+                <>
+                  <div className="grid grid-cols-4 gap-2 text-center">
+                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{limelight.episodios}</div><div className="text-[10px] font-mono uppercase text-muted">episódios</div></div>
+                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{limelight.publicacoes}</div><div className="text-[10px] font-mono uppercase text-muted">publicações</div></div>
+                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{limelight.fila}</div><div className="text-[10px] font-mono uppercase text-muted">na fila</div></div>
+                    <div><div className="text-lg font-bold tabular-nums text-on-surface">${limelight.custo_ia_usd}</div><div className="text-[10px] font-mono uppercase text-muted">custo IA</div></div>
+                  </div>
+                  <div className="text-[11px] text-muted">
+                    Seguidores: {Object.entries(limelight.seguidores).filter(([, v]) => v > 0).map(([k, v]) => `${k} ${v}`).join(' · ') || '—'}
+                    {' · '}coleta {limelight.ultima_coleta === new Date().toISOString().slice(0, 10) ? <span className="text-success">hoje ✓</span> : limelight.ultima_coleta ?? '—'}
+                  </div>
+                </>
+              ) : <div className="text-sm text-muted italic">Espelho indisponível.</div>}
+            </div>
+            <div className="bg-surface-container p-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 shrink-0" style={{ background: 'var(--color-eco-pulso)' }} />
+                <span className="text-sm font-semibold text-on-surface">Pulso Control · canais faceless</span>
+                <span className="ml-auto font-mono text-[10px] text-muted">{pulso?.canais ?? '—'} canais</span>
+              </div>
+              {pulso ? (
+                <>
+                  <div className="grid grid-cols-4 gap-2 text-center">
+                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{pulso.posts}</div><div className="text-[10px] font-mono uppercase text-muted">posts</div></div>
+                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{(pulso.views_total / 1000).toFixed(0)}k</div><div className="text-[10px] font-mono uppercase text-muted">views</div></div>
+                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{pulso.views_7d}</div><div className="text-[10px] font-mono uppercase text-muted">views 7d</div></div>
+                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{pulso.ideias}</div><div className="text-[10px] font-mono uppercase text-muted">ideias</div></div>
+                  </div>
+                  <div className="text-[11px] text-muted">
+                    {pulsoParadoDias != null && pulsoParadoDias > 14
+                      ? <span className="text-warning">esteira parada há {pulsoParadoDias} dias (último post {pulso.ultimo_post})</span>
+                      : <>último post {pulso.ultimo_post ?? '—'}</>}
+                    {' · '}métricas até {pulso.ultima_metrica ?? '—'}
+                  </div>
+                </>
+              ) : <div className="text-sm text-muted italic">Espelho indisponível.</div>}
+            </div>
+          </div>
+        </div>
+
         <div className="border border-outline/15 bg-surface-lowest p-3 flex items-start gap-2.5 text-[12px] text-on-surface-variant">
           <Info className="w-4 h-4 text-secondary shrink-0 mt-0.5" />
           <span>
             Somente leitura — a produção, as marcas, os robôs e as travas por marca moram no{' '}
-            <a href="https://mkt.digiai.app.br" target="_blank" rel="noreferrer" className="text-secondary hover:underline">DIGIAI MKT</a>.
+            <a href="https://mkt.digiai.app.br" target="_blank" rel="noreferrer" className="text-secondary hover:underline">DIGIAI MKT</a>{' '}
+            (e os motores Limelight/Pulso nos seus próprios apps).
             Histórico da era anterior (schema <span className="font-mono">marketing</span>) permanece arquivado no banco.
           </span>
         </div>

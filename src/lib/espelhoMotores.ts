@@ -1,0 +1,50 @@
+// Espelhos read-only dos motores de conteúdo que vivem FORA do banco digiai:
+// Limelight Studio (fábrica da Mello, projeto gfdpvasbrxwulvpvyfvr) e
+// Pulso Control (canais faceless, projeto nlcisbfdiokmipyihtuz).
+// Views agregadas v_espelho_* criadas em 2026-07-30 — só números, zero PII;
+// anon keys são públicas por design (mesma classe do bundle de cada app).
+
+const LIMELIGHT_URL = import.meta.env.VITE_LIMELIGHT_SUPABASE_URL || 'https://gfdpvasbrxwulvpvyfvr.supabase.co';
+const LIMELIGHT_ANON = import.meta.env.VITE_LIMELIGHT_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmZHB2YXNicnh3dWx2cHZ5ZnZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5MjMzMzMsImV4cCI6MjEwMDQ5OTMzM30.9m8gHOWt2zBpFTC0iXH_1J17q1uUvPop8zAqLU4Nrbk';
+const PULSO_URL = import.meta.env.VITE_PULSO_SUPABASE_URL || 'https://nlcisbfdiokmipyihtuz.supabase.co';
+const PULSO_ANON = import.meta.env.VITE_PULSO_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sY2lzYmZkaW9rbWlweWlodHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5NzQ4NDcsImV4cCI6MjA2NDU1MDg0N30.0aEhBOSJcOSEEMILtuwZ1frDWpUZmnFRpUvKMhTQCnQ';
+
+export interface EspelhoLimelight {
+  episodios: number;
+  episodios_prontos: number;
+  ideias: number;
+  publicacoes: number;
+  fila: number;
+  custo_ia_usd: number;
+  ultima_coleta: string | null;
+  seguidores: Record<string, number>;
+}
+
+export interface EspelhoPulso {
+  posts: number;
+  canais: number;
+  ideias: number;
+  views_total: number;
+  views_7d: number;
+  ultima_metrica: string | null;
+  ultimo_post: string | null;
+}
+
+async function lerEspelho<T>(base: string, anon: string, view: string): Promise<T | null> {
+  try {
+    const r = await fetch(`${base}/rest/v1/${view}?select=*`, {
+      headers: { apikey: anon, Authorization: `Bearer ${anon}` },
+      signal: AbortSignal.timeout(12000),
+    });
+    if (!r.ok) return null;
+    const rows = await r.json();
+    return Array.isArray(rows) && rows.length ? (rows[0] as T) : null;
+  } catch {
+    return null;
+  }
+}
+
+export const espelhoMotores = {
+  limelight: () => lerEspelho<EspelhoLimelight>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight'),
+  pulso: () => lerEspelho<EspelhoPulso>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso'),
+};

@@ -80,12 +80,23 @@ const APPS: App[] = [
   },
   {
     nome: 'Pulso', mono: 'PU', cor: 'var(--color-eco-pulso)', tagline: 'Produção de vídeos curtos faceless — produto autônomo',
-    tier: 'autonomo', estado: 'no-ar', maturidade: 90, funcao: '248 posts · 124k views · 5 redes · esteira viva',
+    tier: 'autonomo', estado: 'no-ar', maturidade: 85, funcao: '65 posts publicados · 987k views · 13 canais · 193 ideias — números vivos no espelho do Marketing; esteira PARADA desde 16/06',
     stack: 'Next 16 · React 19 · Supabase · pg_cron · OpenAI/Claude · ElevenLabs',
     repos: 'D:\\projetos\\pulso_control',
     git: 'control 5fac8e3 07/jul/2026',
-    proximo: 'APIs por rede rodando; teste API vs manual pela entrega; app cobre a diária travada; humano autoriza sempre (R-011)',
+    proximo: 'Religar a esteira (último post 16/06, métricas até 20/07) · decidir foco: canais autônomos vs alimentar DIGIAI',
+    bloqueio: 'Esteira parada há ~6 semanas — o motor existe, falta rodar',
     urls: [{ label: 'pulsoprojects.vercel.app', url: 'https://pulsoprojects.vercel.app' }],
+  },
+  {
+    nome: 'Limelight', mono: 'LL', cor: 'var(--color-eco-app)', tagline: 'Fábrica de conteúdo da Mello — série "Transforme Sua Visão" (12 temporadas · 72 eps)',
+    tier: 'suporte', estado: 'funciona', maturidade: 68, funcao: '144 episódios estruturados · motores de roteiro/imagem/áudio LIGADOS (T1E01 provado E2E, ~US$0,006/roteiro) · coleta diária 10h · publicação em DRY_RUN (gate humano R-011) — números vivos no espelho do Marketing',
+    stack: 'Vite · React 19 · TS · Tailwind 4 · Supabase próprio (org Pulso) · Gemini/Claude · ElevenLabs · Veo · FFmpeg local',
+    repos: 'D:\\projetos\\limelight_studio',
+    git: '769ed9f (reconciliar kanban idempotente)',
+    proximo: 'Kit avatar da Taty (dono) · desligar DRY_RUN quando autorizado · confirmar URL de produção',
+    bloqueio: 'Publicação real travada em DRY_RUN até o dono autorizar · avatar/lip-sync aguardam kit',
+    urls: [],
   },
   {
     nome: 'Lumina', mono: 'LU', cor: 'var(--color-eco-lumina)', tagline: 'Digital signage — plus do ecossistema Clearix',
@@ -271,6 +282,7 @@ const HOST: Record<string, string> = {
   'Nexus': 'Netlify · Supabase',
   'Clearix Calc': 'Netlify · PWA client-side (sem banco)',
   'Polapetit': 'Netlify · Supabase + Firebase',
+  'Limelight': 'Netlify (URL a confirmar) · Supabase próprio',
   'Polapetit Site': 'Netlify · fullstack Express (S3)',
   'Qual a Foto': 'Netlify (web) · worker local',
   'Easy Idiomas': 'Netlify · Supabase',
@@ -286,7 +298,7 @@ const HOST: Record<string, string> = {
 const SLUG: Record<string, string> = {
   'Clearix': 'clearix', 'Clearix Site': 'clearix-site', 'Ótica Sem Improviso': 'osi',
   'Pulso': 'pulso', 'Lumina': 'lumina', 'Nexus': 'nexus', 'Clearix Calc': 'clearix-calc',
-  'Polapetit': 'polapetit', 'Polapetit Site': 'polapetit-site', 'Qual a Foto': 'qual-a-foto', 'Easy Idiomas': 'easy-idiomas',
+  'Polapetit': 'polapetit', 'Polapetit Site': 'polapetit-site', 'Limelight': 'limelight', 'Qual a Foto': 'qual-a-foto', 'Easy Idiomas': 'easy-idiomas',
   'Nipo School': 'nipo-school', 'Mello Eyewear': 'mello-eyewear', 'DIGIAI App': 'digiai-app',
   'DIGIAI Site': 'digiai-site', 'Pulso Hub': 'pulso-hub', 'DIGIAI MKT': 'digiai-mkt',
 };
