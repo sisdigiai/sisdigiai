@@ -4,6 +4,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Adicionado (2026-07-30 — espelhos vivos do Limelight e do Pulso)
+- **Views `v_espelho_limelight` e `v_espelho_pulso`** criadas nos bancos próprios (org Pulso, via Management API): agregados sem PII — episódios/publicações/fila/custo IA/seguidores por rede (Limelight) e posts/canais/ideias/views totais e 7d/recência (Pulso). Exceção consciente à R-031 (`security_invoker=false` + grant anon) — só números agregados.
+- **Seção "Outros motores de conteúdo" no espelho Marketing** (`src/lib/espelhoMotores.ts`): cards vivos dos 2 motores com staleness honesto — a coleta do Limelight rodou hoje ✓; o Pulso aparece com **"esteira parada há 44 dias"** em âmbar (987k views acumuladas, último post 16/06 — o card do Portfólio dizia "124k views · esteira viva", muito defasado).
+- **Portfólio: 18 frentes** — entra o card **Limelight** (suporte, 68%, motores de roteiro/imagem/áudio ligados, publicação em DRY_RUN gate R-011) e o Pulso ganha números reais + bloqueio explícito da esteira parada.
+
 ### Transformação (2026-07-30 — emagrecimento 29→20 módulos + módulo Semana)
 - **Emagrecimento** (benchmark vs Ninety.io/EOS + literatura de feature bloat; critério: módulo que não dirige decisão sai da vista principal): removidos **Mock Vendas** (897 linhas, protótipo cumprido), **Referências Design** e **Como usar o DS** (material de consulta — vive no git history e no Cockpit/design_system), **Marketing & SEO** (sync já quebrado; dados seguem em `marketing.seo_*`). **Funil OSI + Mapa OSI + Materiais + Afiliados fundidos no hub `OSI`** (4 abas, 1 entrada na sidebar). Saldo: −2.079 linhas, sidebar 29→20.
 - **Módulo novo `Semana`** — a peça que faltava vs mercado (padrão EOS/Traction): **scorecard semanal com META e DONO** (6 métricas seed da fase VENDER: prospecção ≥10, demos ≥2, leads <24h 100%, follow-ups ≥5, vendas OSI ≥1, posts ≥5) + **ritual de revisão em 5 passos** com dados vivos (fase/atrasos do Roadmap, P1-P2 do Backlog, demos sem resposta, Decisões). Migration 049: `ops.scorecard_metrics/entries` + `v_ops_scorecard` + `fn_scorecard_set` (SECURITY DEFINER + is_staff). Verificado ao vivo em app.digiai.app.br: leitura, escrita (valor gravado via RPC) e status verde/vermelho funcionando.
