@@ -23,6 +23,7 @@ interface App {
   repos: string;
   git: string;
   proximo: string;
+  verificado: string;   // última verificação código→online (YYYY-MM-DD) — verdade tem prazo de validade
   bloqueio?: string;
   urls: { label: string; url: string }[];
   subApps?: { nome: string; desc: string }[]; // suítes (ex.: Clearix) — detalhe no drawer
@@ -31,6 +32,7 @@ interface App {
 const APPS: App[] = [
   {
     nome: 'Clearix', mono: 'CX', cor: 'var(--color-eco-clearix)', tagline: 'Ecossistema SaaS para varejo óptico — produto-âncora',
+    verificado: '2026-07-30',
     tier: 'ancora', estado: 'no-ar', maturidade: 85, funcao: 'Suíte de 17 apps multi-tenant em produção · 1 cliente real (Mello)',
     stack: 'Polyrepo (17 sub-apps) · Next 16 / SvelteKit · React 19 · Supabase · SSO (AES-256)',
     repos: 'D:\\projetos\\clearix_eco_full (17 sub-apps — ver lista abaixo)',
@@ -60,6 +62,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Clearix Site', mono: 'CS', cor: 'var(--color-eco-clearix)', tagline: 'Landing institucional pública do ecossistema Clearix',
+    verificado: '2026-07-11',
     tier: 'institucional', estado: 'no-ar', maturidade: 82, funcao: 'No ar (marca Clearix): hero de dor + 4 planos canônicos ADR-0022 (349/899/1499/sob consulta) + add-ons + ecossistema · WhatsApp',
     stack: 'Astro 5 (SSG) · Tailwind 3 · TypeScript · Cloudflare · sem banco',
     repos: 'D:\\projetos\\clearix-site',
@@ -70,6 +73,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Ótica Sem Improviso', mono: 'OSI', cor: 'var(--color-eco-osi)', tagline: 'Primeira isca paga — funil pro Clearix',
+    verificado: '2026-07-13',
     tier: 'alavanca', estado: 'no-ar', maturidade: 90, funcao: 'Build 100% (landing + app + checkout) · fase VENDER · 0 vendas',
     stack: 'React 19 · Vite 6 · Tailwind 4 · Hotmart+Kiwify · pixels Meta/TikTok · ebook-v3.pdf',
     repos: 'otica_sem_improviso (landing 20 seções + gerador PDF) · app_oticasemimproviso (leitor 28 págs/5 módulos)',
@@ -80,6 +84,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Pulso', mono: 'PU', cor: 'var(--color-eco-pulso)', tagline: 'Produção de vídeos curtos faceless — produto autônomo',
+    verificado: '2026-07-31',
     tier: 'autonomo', estado: 'no-ar', maturidade: 92, funcao: 'Esteira 100% AUTOMÁTICA e viva: 475 publicações · 289,5k views em 5 plataformas (FB 133k · Kwai 48k · YT 43k · TikTok 32k · IG 31k) · Vercel Crons diários (reconciliar 4×/dia + coleta 11h + decisor + aprendizado) — números vivos no espelho do Marketing',
     stack: 'Next 16 · React 19 · Supabase (schema pulso_content) · Vercel Crons · YT/IG APIs · OpenAI/Claude · ElevenLabs · Higgsfield',
     repos: 'D:\\projetos\\pulso_control',
@@ -89,6 +94,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Limelight', mono: 'LL', cor: 'var(--color-eco-app)', tagline: 'Fábrica de conteúdo da Mello — série "Transforme Sua Visão" (12 temporadas · 72 eps)',
+    verificado: '2026-07-31',
     tier: 'suporte', estado: 'funciona', maturidade: 68, funcao: '144 episódios estruturados · motores de roteiro/imagem/áudio LIGADOS (T1E01 provado E2E, ~US$0,006/roteiro) · coleta diária 10h · publicação em DRY_RUN (gate humano R-011) — números vivos no espelho do Marketing',
     stack: 'Vite · React 19 · TS · Tailwind 4 · Supabase próprio (org Pulso) · Gemini/Claude · ElevenLabs · Veo · FFmpeg local',
     repos: 'D:\\projetos\\limelight_studio',
@@ -99,6 +105,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Lumina', mono: 'LU', cor: 'var(--color-eco-lumina)', tagline: 'Digital signage — plus do ecossistema Clearix',
+    verificado: '2026-07-10',
     tier: 'suporte', estado: 'no-ar', maturidade: 72, funcao: 'Produção real · 4 telas (1 online) · 67 mídias · playlist ativa',
     stack: 'React 19 · Vite · TS · Supabase (Realtime) · player web · Lumina Signage DS v1.0',
     repos: 'D:\\projetos\\lumina_box',
@@ -109,6 +116,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Nexus', mono: 'NX', cor: 'var(--color-eco-nexus)', tagline: 'Plataforma de aprendizado AI-first — abriga a Clearix Academy (Clearix University)',
+    verificado: '2026-07-10',
     tier: 'suporte', estado: 'no-ar', maturidade: 70, funcao: 'Universidade Clearix: 18 módulos · 196 lições · 74 workshops · gamificação + certificados',
     stack: 'Vite · React 19 · Express · Supabase (próprio + Clearix read-only) · Firebase · Gemini (Nex/Doug)',
     repos: 'D:\\projetos\\nexus (Universidade Clearix + Manual OSI · landing vende OSI R$48,50)',
@@ -119,6 +127,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Clearix Calc', mono: 'CC', cor: 'var(--color-eco-clearix)', tagline: 'Calculadora de grau — PWA pública, grátis, sem login (isca do Clearix)',
+    verificado: '2026-07-10',
     tier: 'suporte', estado: 'no-ar', maturidade: 85, funcao: '12 calculadoras ópticas · fórmula + exemplo + enviar no WhatsApp · offline · isca Clearix/OSI',
     stack: 'Next 16 · React 19 · Tailwind 4 · Clearix Lens · PWA (sw.js) · sem banco/auth',
     repos: 'D:\\projetos\\clearix_eco_full\\clearix_calc',
@@ -129,6 +138,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Polapetit', mono: 'PP', cor: 'var(--color-eco-polapetit)', tagline: 'Sistema operacional para festas infantis',
+    verificado: '2026-07-13',
     tier: 'autonomo', estado: 'no-ar', maturidade: 72, funcao: 'ERP do Buffet Taty Mello em produção — 20 módulos admin (CRM, pipeline, propostas, contratos, financeiro, estoque) + portal do cliente + simulador 3D',
     stack: 'Vite · React 19 (Three.js/R3F) · Supabase · Firebase',
     repos: 'D:\\projetos\\polapetit',
@@ -138,6 +148,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Polapetit Site', mono: 'PS', cor: 'var(--color-eco-polapetit)', tagline: 'Landing institucional do Buffet Taty Mello — festas infantis premium',
+    verificado: '2026-07-13',
     tier: 'institucional', estado: 'no-ar', maturidade: 70, funcao: 'No ar: posicionamento premium ("12 anos · 1.200 famílias") + simulador de festa + CTA WhatsApp/consultora — capta leads da operação real',
     stack: 'Express · Drizzle · Radix · AWS S3 (fullstack)',
     repos: 'D:\\projetos\\polapetit_landing',
@@ -148,6 +159,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Qual a Foto', mono: 'QF', cor: 'var(--color-eco-qualafoto)', tagline: 'Aprovação de fotos para fotógrafos',
+    verificado: '2026-07-13',
     tier: 'incubacao', estado: 'no-ar', maturidade: 58, funcao: 'Plataforma no ar e logada: 10 galerias, 82 fotos, análise IA RODADA (81 com score) · magic link COMPROVADO (29 fotos escolhidas por clientes) · 8 fotógrafos externos testaram em jan/26 · admin próprio (stats com bug)',
     stack: 'SvelteKit (web) · Worker Python (RawTherapee) · Supabase · Gemini',
     repos: 'D:\\projetos\\qual_foto (monorepo apps/web + worker)',
@@ -158,6 +170,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Easy Idiomas', mono: 'EI', cor: 'var(--color-muted)', tagline: 'SaaS para escolas de idiomas (Easy Aula+)',
+    verificado: '2026-07-13',
     tier: 'incubacao', estado: 'no-ar', maturidade: 58, funcao: 'Plataforma completa no ar: admin (16 páginas) + portais aluno e professor · presença por QR Code · assistente IA (Gemini) · multi-tenant com RLS + signup por convite — dados demo (seed), sem escola real',
     stack: 'React 19 · Vite 6 · TS · Tailwind 4 · Supabase (18 migrations) · Gemini',
     repos: 'D:\\projetos\\easy-idiomas',
@@ -168,6 +181,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Nipo School', mono: 'NP', cor: 'var(--color-eco-nipo)', tagline: 'Ensino musical comunitário · ADNIPO Suzano',
+    verificado: '2026-07-13',
     tier: 'incubacao', estado: 'no-ar', maturidade: 55, funcao: 'Plataforma multi-tenant de ensino musical no ar: 66 rotas, gamificação, presença QR, portfólio do aluno, IA pedagógica (GPT-4o) · login RESTAURADO 13/jul (Supabase free tinha pausado)',
     stack: 'Next 16 · React 19 · TS · Supabase (71+ migrations) · OpenAI',
     repos: 'D:\\projetos\\nipo_school',
@@ -178,6 +192,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Mello Eyewear', mono: 'ME', cor: 'var(--color-eco-app)', tagline: 'E-commerce de óculos + clube de fidelidade (∞ Club)',
+    verificado: '2026-07-10',
     estado: 'no-ar', tier: 'autonomo', maturidade: 72, funcao: 'Software pronto (catálogo Clearix real 772 armações, carrinho, checkout MP blindado, webhook→ERP, auth, ∞ Club) — falta operacional pré-go-live',
     stack: 'React 19 · Vite · Express · Supabase (estoque Clearix) · Mercado Pago (prod) · Resend · Gemini · 5 functions Netlify',
     repos: 'D:\\projetos\\melloeyewear',
@@ -188,6 +203,7 @@ const APPS: App[] = [
   },
   {
     nome: 'DIGIAI App', mono: 'DA', cor: 'var(--color-secondary)', tagline: 'Painel de comando interno da holding (este app)',
+    verificado: '2026-07-31',
     tier: 'infra', estado: 'no-ar', maturidade: 88, funcao: '33 módulos reais (0 stubs) · RBAC · tema DIGIAI House (claro/escuro) · painel de comando da holding',
     stack: 'React 19 · Vite · TS · Tailwind 4 · Supabase · Chart.js',
     repos: 'D:\\projetos\\digiai',
@@ -198,6 +214,7 @@ const APPS: App[] = [
   },
   {
     nome: 'DIGIAI Site', mono: 'DS', cor: 'var(--color-secondary)', tagline: 'Landing institucional da holding',
+    verificado: '2026-07-13',
     tier: 'institucional', estado: 'no-ar', maturidade: 85, funcao: 'No ar (DIGIAI House): hero + jornada + portfólio + "Operação Real" (20.708 vendas · 19.847 pacientes · 10 lojas, count-up)',
     stack: 'Astro 5 (SSG) · Tailwind 3 · Cloudflare Pages · assets Supabase',
     repos: 'D:\\projetos\\digiai-site',
@@ -207,6 +224,7 @@ const APPS: App[] = [
   },
   {
     nome: 'Pulso Hub', mono: 'PH', cor: 'var(--color-eco-pulso)', tagline: 'Site público do Pulso — catálogo de vídeos e redes',
+    verificado: '2026-07-10',
     tier: 'institucional', estado: 'no-ar', maturidade: 95, funcao: 'Catálogo estilo Netflix: hero Originais + fileiras "Em alta"/"Histórias reais" · pôsteres lazy-load',
     stack: 'Next 16 · Tailwind 4 · Supabase (anon read-only)',
     repos: 'D:\\projetos\\pulso_hub',
@@ -216,6 +234,7 @@ const APPS: App[] = [
   },
   {
     nome: 'DIGIAI MKT', mono: 'MK', cor: 'var(--color-eco-app)', tagline: 'Central de marketing multimarca — ideias → arte → agenda → publicação por IA',
+    verificado: '2026-07-30',
     tier: 'infra', estado: 'no-ar', maturidade: 88, funcao: 'Mission-control vivo (orbita://nucleo): pipeline 198→132→49→81→88 no ar · 5 marcas · custo IA real ($6.79/$40) · 4 robôs cron · campanha 100 dias (dia 6) · TikTok+LinkedIn',
     stack: 'React 19 · Vite 6 · Tailwind 4 · Supabase (schema mkt) · pg_cron · edge functions IA · Ateliê de Convergência',
     repos: 'D:\\projetos\\digiai_mkt',
@@ -561,6 +580,7 @@ export default function Portfolio() {
 
               <Field label="Repositórios" value={sel.repos} mono />
               <Field label="Git" value={sel.git} mono />
+              <Field label="Verificado" value={`${sel.verificado} (${Math.floor((Date.now() - new Date(sel.verificado + 'T12:00:00').getTime()) / 86400000)}d atrás)`} mono />
               <div>
                 <div className="text-[10px] font-mono text-secondary uppercase tracking-widest mb-1">Próximo passo</div>
                 <div className="text-sm text-on-surface flex items-start gap-2"><ArrowRight className="w-4 h-4 text-secondary shrink-0 mt-0.5" />{sel.proximo}</div>

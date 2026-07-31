@@ -4,6 +4,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Auditoria de verdade (2026-07-31 — o que o app pode afirmar antes de vender)
+- **Varredura fonte a fonte** classificou as superfícies: 🟢 verdade viva (Comercial 260 leads/toque 25-07, Central Clearix, espelhos MKT/Limelight/Pulso verificados na fonte, analytics first-party, scorecard) · 🟡 viva mas defasada (**Financeiro parado em 12/06** — banner âmbar "dados defasados" adicionado quando passa de 30d; landing leads 0 = form ok sem tráfego; MP 1 evento teste) · 🔴 retrato editorial (cards do Portfólio — texto à mão apodrece, caso Pulso provou).
+- **Fix estrutural**: campo obrigatório `verificado` (YYYY-MM-DD) nos 18 cards do Portfólio + linha "Verificado (Xd atrás)" no drawer — verdade agora tem prazo de validade visível; card novo não compila sem data.
+- **Gap da tese de vendas exposto**: "postagens diárias massivas" hoje só o Pulso cumpre (automático); MKT publicou 2/7d (meta ≥5) e Limelight aguarda DRY_RUN. 2 itens P2 no Backlog: importar extrato (pré-venda) e destravar cadência do MKT.
+
 ### Corrigido (2026-07-31 — camada final: o Pulso JÁ É automático; o espelho lia o schema morto)
 - **Despacho R-032 emitido pro agente do pulso_control** (`pulso_control/_DESPACHO_DO_DIGIAI_2026-07-31.md`): arqueologia completa, contrato v_espelho_pulso documentado, e as pendências de docs que ficam lá (AGENTS.md ~7 meses desatualizado, Spec, changelog, espelho de migrations, decisão de limpeza do legado com o dono).
 - **A investigação fechou o quadro completo**: o registro vivo do Pulso mora em **`pulso_content.metricas_publicacao`** — **475 publicações · 289,5k views** (FB 133k · Kwai 48k · YT 43k · TikTok 32k · IG 31k) — alimentado por **Vercel Crons diários** (`reconciliar-publicacoes` 4×/dia auto-descobre vídeos publicados por fora, `coletar-metricas` 11h via YT/IG APIs, decisor, aprendizado semanal). Prova de integridade: YT no banco 43.474 vs Studio 42.866 (defasagem de 1 coleta ✓). Tudo que eu lia antes (`public.posts`/`metricas_diarias`, cron pg_cron desativado, fila antiga) era o **sistema legado morto desde 16/06**.

@@ -259,6 +259,19 @@ function DashboardTab() {
         </button>
       </div>
 
+      {/* Frescor dos dados — extrato é a fonte da verdade; sem import recente, tudo aqui é verdade VELHA */}
+      {(() => {
+        const ultimo = expenses.reduce<string | null>((max, e) => (e.created_at && (!max || e.created_at > max) ? e.created_at : max), null);
+        const dias = ultimo ? Math.floor((Date.now() - new Date(ultimo).getTime()) / 86400000) : null;
+        if (dias == null || dias <= 30) return null;
+        return (
+          <div className="border border-warning/40 bg-warning/10 px-4 py-2.5 text-[12px] text-on-surface flex items-center gap-2">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-warning shrink-0">dados defasados</span>
+            <span>Último lançamento há <strong>{dias} dias</strong> — importar o extrato antes de usar estes números em decisão ou venda (extrato = fonte da verdade).</span>
+          </div>
+        );
+      })()}
+
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <KpiCard label={`Total Investido${filterProduct !== 'all' ? '' : ' (geral)'}`} value={brl(total12m)} icon={<DollarSign size={20} />} color="text-secondary" spark={monthlyTotals} />
