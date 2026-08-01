@@ -22,6 +22,8 @@ interface Metrica {
   slug: string; label: string; owner: string; target: number;
   direction: '>=' | '<='; unit: string | null; hint: string | null;
   atual: number | null; anterior: number | null;
+  auto: number | null;      // valor calculado na fonte (v_ops_scorecard_auto)
+  autoFonte: string | null;
 }
 
 // Segunda-feira da semana de `d`, em YYYY-MM-DD (fuso local)
@@ -51,14 +53,23 @@ export default function Semana({ onNavigate }: { onNavigate?: (id: ModuleId) => 
   const [ritual, setRitual] = useState<{ fase: number | null; atrasadas: number; p12: number; demosNovos: number } | null>(null);
 
   const carregar = async () => {
-    const { data } = await supabase.from('v_ops_scorecard').select('*');
+    const [{ data }, { data: autos }] = await Promise.all([
+      supabase.from('v_ops_scorecard').select('*'),
+      supabase.from('v_ops_scorecard_auto').select('*'),
+    ]);
+    const porAuto = new Map<string, { valor: number; fonte: string }>(
+      ((autos ?? []) as { slug: string; valor: string | number; fonte: string }[])
+        .map((a) => [a.slug, { valor: Number(a.valor), fonte: a.fonte }])
+    );
     const rows = (data ?? []) as ScoreRow[];
     const porSlug = new Map<string, Metrica>();
     for (const r of rows) {
       if (!porSlug.has(r.slug)) {
+        const a = porAuto.get(r.slug);
         porSlug.set(r.slug, {
           slug: r.slug, label: r.label, owner: r.owner, target: Number(r.target),
           direction: r.direction, unit: r.unit, hint: r.hint, atual: null, anterior: null,
+          auto: a ? a.valor : null, autoFonte: a ? a.fonte : null,
         });
       }
       const m = porSlug.get(r.slug)!;
@@ -66,6 +77,23 @@ export default function Semana({ onNavigate }: { onNavigate?: (id: ModuleId) => 
       if (r.week_start === semanaAnterior) m.anterior = r.value == null ? null : Number(r.value);
     }
     setMetricas([...porSlug.values()]);
+  };
+
+  // Grava de uma vez todas as métricas que o sistema já mede e que ainda divergem do salvo
+  const aplicarAutomaticas = async () => {
+    const pendentes = metricas.filter((m) => m.auto != null && m.auto !== m.atual);
+    if (!pendentes.length) return;
+    setSalvando('__auto__');
+    try {
+      for (const m of pendentes) {
+        await supabase.rpc('fn_scorecard_set', {
+          p_slug: m.slug, p_week_start: semana, p_value: m.auto, p_note: `auto · ${m.autoFonte}`,
+        });
+      }
+      await carregar();
+    } finally {
+      setSalvando(null);
+    }
   };
 
   useEffect(() => {
@@ -105,6 +133,7 @@ export default function Semana({ onNavigate }: { onNavigate?: (id: ModuleId) => 
 
   const verdes = metricas.filter(m => bateMeta(m) === true).length;
   const preenchidas = metricas.filter(m => m.atual != null).length;
+  const pendentesAuto = metricas.filter(m => m.auto != null && m.auto !== m.atual).length;
   const fmtSemana = new Date(semana + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
 
   const estacoes = ritual ? [
@@ -126,7 +155,18 @@ export default function Semana({ onNavigate }: { onNavigate?: (id: ModuleId) => 
         <div className="flex items-center gap-2 px-5 py-3 border-b border-outline/10">
           <Target className="w-4 h-4 text-secondary" />
           <span className="text-xs font-mono uppercase tracking-widest text-muted">Scorecard da semana · meta × real</span>
-          <span className="ml-auto text-[10px] font-mono text-muted">nº que não bate meta 2 semanas seguidas = conversa séria</span>
+          {pendentesAuto > 0 && (
+            <button
+              onClick={aplicarAutomaticas}
+              disabled={salvando === '__auto__'}
+              className="ml-auto text-[11px] font-mono uppercase px-2.5 py-1 border border-secondary/50 text-secondary hover:bg-secondary/10 disabled:opacity-40 transition-colors"
+            >
+              {salvando === '__auto__' ? 'aplicando…' : `aplicar ${pendentesAuto} automático(s)`}
+            </button>
+          )}
+          {pendentesAuto === 0 && (
+            <span className="ml-auto text-[10px] font-mono text-muted">nº que não bate meta 2 semanas seguidas = conversa séria</span>
+          )}
         </div>
         <div className="divide-y divide-outline/10">
           {metricas.map(m => {
@@ -134,7 +174,21 @@ export default function Semana({ onNavigate }: { onNavigate?: (id: ModuleId) => 
             return (
               <div key={m.slug} className="px-5 py-3 grid grid-cols-[1fr_auto_auto_auto] items-center gap-4">
                 <div>
-                  <div className="text-sm text-on-surface">{m.label}</div>
+                  <div className="text-sm text-on-surface flex items-center gap-2">
+                    {m.label}
+                    {m.auto != null && (
+                      <span
+                        title={m.autoFonte ?? ''}
+                        className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border ${
+                          m.auto === m.atual
+                            ? 'border-success/40 text-success bg-success/10'
+                            : 'border-secondary/40 text-secondary bg-secondary/10'
+                        }`}
+                      >
+                        {m.auto === m.atual ? 'auto ✓' : `sistema: ${m.auto}`}
+                      </span>
+                    )}
+                  </div>
                   <div className="text-[11px] text-muted">{m.hint} · dono: {m.owner} · semana passada: <span className="tabular-nums">{m.anterior ?? '—'}</span></div>
                 </div>
                 <div className="text-right">
@@ -181,7 +235,9 @@ export default function Semana({ onNavigate }: { onNavigate?: (id: ModuleId) => 
         <div className="divide-y divide-outline/10">
           <div className="px-5 py-3 flex items-center gap-3">
             <span className="font-mono text-[11px] text-muted w-5">1.</span>
-            <span className="text-sm text-on-surface flex-1">Preencher o scorecard acima — número real, sem enfeite</span>
+            <span className="text-sm text-on-surface flex-1">
+              Conferir o scorecard — o sistema já preenche o que mede; você digita o que é julgamento (demos, follow-ups)
+            </span>
             <span className="text-[11px] font-mono text-muted tabular-nums">{preenchidas}/{metricas.length}</span>
           </div>
           {estacoes.map((e, i) => (
