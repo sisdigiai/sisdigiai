@@ -27,6 +27,7 @@ const PROJETOS = [
   ['polapetit', 'cvqoqnjitqvuopqadfbh', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN2cW9xbmppdHF2dW9wcWFkZmJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMzE1ODEsImV4cCI6MjA5MDkwNzU4MX0.YQxZ-My4ap4QB-KMK8U3MgvDsWXNPPexYx0QfFYptME'],
   ['limelight', 'gfdpvasbrxwulvpvyfvr', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmZHB2YXNicnh3dWx2cHZ5ZnZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NzMwNzYsImV4cCI6MjEwMDE0OTA3Nn0.Gr8I2e9Ot2d6fOq0eBp43yDWDxAohkzAcoa0dJ9_zOk'],
   ['pulso', 'nlcisbfdiokmipyihtuz', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sY2lzYmZkaW9rbWlweWlodHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1ODk0OTksImV4cCI6MjA3OTE2NTQ5OX0.-Cfzv9ebOYB8I93zNLghWTszawJk4G3rXwiTTY9PpOI'],
+  ['gj-pessoal', 'xfkcqrlovqbcriiksxng', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2NxcmxvdnFiY3JpaWtzeG5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5NzYwODksImV4cCI6MjA5OTU1MjA4OX0.uTAm5HVsYX2M7wJ4NXUtwfPtK5DwPw7oAJ2Hzkwlk2w'],
 ];
 
 async function pingRest([nome, ref, key]) {

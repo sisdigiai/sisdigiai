@@ -21,6 +21,10 @@ for (const f of ['D:/projetos/pulso_control/.env', 'D:/projetos/pulso_control/.e
   if (pulso) break;
 }
 pares.push(['pulso', 'nlcisbfdiokmipyihtuz', pulso]);
+pares.push(['gj-pessoal', 'xfkcqrlovqbcriiksxng', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhma2NxcmxvdnFiY3JpaWtzeG5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5NzYwODksImV4cCI6MjA5OTU1MjA4OX0.uTAm5HVsYX2M7wJ4NXUtwfPtK5DwPw7oAJ2Hzkwlk2w']);
+// lumina_box: pausado e sem anon key acessível (projeto INACTIVE não expõe /api-keys).
+// Fica de fora até ser restaurado — anotado no Backlog.
+
 
 const faltando = pares.filter((p) => !p[2].startsWith('eyJ')).map((p) => p[0]);
 if (faltando.length) {
