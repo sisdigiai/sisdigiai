@@ -4,6 +4,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Corrigido (2026-08-13 — Financeiro para de mostrar assinatura velha como se fosse contrato)
+- **Todas as 12 assinaturas ativas** de `finance.subscriptions` são **auto-derivadas de médias em 06/06/2026** e nunca foram revisadas (68 dias). Elas somam **R$ 1.336,94/mês**, enquanto o extrato real (aporte conta 7.4 no Finance) mostra **~R$ 3,4 mil/mês** em jul/2026 — Anthropic aparece como R$ 339/mês quando teve linha única de R$ 1.100 em julho.
+- O risco não era só exibição: o botão **"Gerar despesas do mês"** grava esses valores em `finance.expenses`, ou seja, número velho viraria lançamento errado no razão.
+- **Aba Subscriptions** ganhou aviso quando há valor auto-derivado sem revisão há 60+ dias (com a data da derivação e o alerta explícito sobre o botão) e **badge `derivado`** por linha. Nenhum valor foi alterado — corrigir os números é decisão do dono, não do agente.
+- Detecção pela marca `Auto-derivado` + data nas `notes` (é o que a view `v_finance_subscriptions_active` expõe — ela não traz `updated_at`).
+
+### Conhecido (2026-08-13 — série de receita não carrega no Financeiro)
+- `financeStore.listRevenue()` chama `supabase.from('revenue')`, mas `revenue` só existe no schema `finance` e **não há view em `public`** → PostgREST devolve **406** e o store engole o erro retornando `[]`. Efeito: gráfico de MRR sempre vazio ("histórico insuficiente"). Correção exige view/migration — **não aplicada** (DDL em `finance.*` pede confirmação do dono).
+
 ### Corrigido (2026-08-13 — lead da Clearix Calc deixou de ser invisível)
 - **Achado de auditoria de funil**: a Clearix Calc captura lead com `product='clearix-calc'` (edge `lead-capture` → `fn_capture_landing_lead` → `marketing.landing_leads`), mas **nenhuma tela mostrava esse lead com o contato**. `Comercial` filtrava `product='clearix'`, `FluxoOSI` `'osi'`, `AfiliadosDashboard` `'osi-afiliado'` — e `Semana` conta `status='novo'` **sem filtro de produto**, então o lead da calc aparecia no contador sem ter onde ser aberto. Lead entrava e ninguém fazia follow-up.
 - **Comercial → Demonstrações Clearix** passa a ler `product IN ('clearix','clearix-calc')` (mesma ordenação `created_at desc`, mesmo fluxo de status novo/contactado/comprou/descartado).

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   BarChart3, PlusCircle, RefreshCw, CreditCard, FileDown,
   Trash2, X, DollarSign, TrendingDown, Repeat, Download,
-  ChevronDown, ChevronUp, XCircle,
+  ChevronDown, ChevronUp, XCircle, AlertTriangle,
 } from 'lucide-react';
 import {
   Chart as ChartJS,
@@ -698,6 +698,12 @@ function LancarTab() {
 // =====================================================================
 // TAB 3 — Subscriptions
 // =====================================================================
+// notes das subs auto-derivadas terminam com a data da derivação ("… 2026-06-06.")
+function derivadoEm(notes?: string): string | null {
+  if (!notes || !/Auto-derivado/i.test(notes)) return null;
+  return notes.match(/(\d{4}-\d{2}-\d{2})/)?.[1] ?? null;
+}
+
 function SubscriptionsTab() {
   const [subs, setSubs] = useState<Subscription[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -772,6 +778,17 @@ function SubscriptionsTab() {
   const inactiveSubs = subs.filter(s => !s.is_active);
   const monthlyTotal = activeSubs.reduce((a, s) => a + Number(s.monthly_amount_brl), 0);
 
+  // Valor auto-derivado é MÉDIA de um retrato antigo, não contrato confirmado. Como
+  // "Gerar despesas do mês" grava esse valor em finance.expenses, número velho vira
+  // lançamento errado no razão — por isso o aviso vive colado no botão.
+  const derivadas = activeSubs.filter(s => derivadoEm(s.notes) !== null);
+  const derivacaoMaisAntiga = derivadas
+    .map(s => derivadoEm(s.notes)!)
+    .sort()[0] ?? null;
+  const diasDesdeDerivacao = derivacaoMaisAntiga
+    ? Math.floor((Date.now() - new Date(derivacaoMaisAntiga).getTime()) / 86400000)
+    : 0;
+
   if (loading) return <div className="text-muted py-8">Carregando...</div>;
 
   return (
@@ -793,6 +810,23 @@ function SubscriptionsTab() {
       </div>
 
       {msg && <div className={`text-sm ${msg.startsWith('Erro') ? 'text-danger' : 'text-success'}`}>{msg}</div>}
+
+      {derivadas.length > 0 && diasDesdeDerivacao >= 60 && (
+        <div className="border border-warning/40 bg-warning/5 p-4 flex items-start gap-3">
+          <AlertTriangle size={16} className="text-warning shrink-0 mt-0.5" />
+          <div className="text-sm text-on-surface-variant leading-relaxed">
+            <span className="font-medium text-on-surface">
+              {derivadas.length} de {activeSubs.length} assinaturas usam valor auto-derivado de {new Date(derivacaoMaisAntiga + 'T00:00:00').toLocaleDateString('pt-BR')}
+            </span>{' '}
+            — média de despesas passadas, não contrato confirmado, e sem revisão há {diasDesdeDerivacao} dias.
+            Serviço usage-based (Supabase, Anthropic, Netlify) varia muito mês a mês.
+            <div className="mt-1 text-muted">
+              <strong>Gerar despesas do mês</strong> grava esses valores em <code className="font-mono text-[11px]">finance.expenses</code>:
+              confira contra a fatura real antes de usar, ou o razão herda o número velho.
+            </div>
+          </div>
+        </div>
+      )}
 
       {showForm && (
         <div className="bg-surface-lowest border border-outline/15 p-6">
@@ -860,7 +894,17 @@ function SubscriptionsTab() {
                   <td className="py-2 text-on-surface">{s.vendor_name}</td>
                   <td className="py-2 text-on-surface-variant">{s.plan_name}</td>
                   <td className="py-2 text-muted">{s.product_name}</td>
-                  <td className="py-2 text-right font-mono text-on-surface">{brl(Number(s.monthly_amount_brl))}</td>
+                  <td className="py-2 text-right font-mono text-on-surface">
+                    {brl(Number(s.monthly_amount_brl))}
+                    {derivadoEm(s.notes) && (
+                      <span
+                        className="ml-2 font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border text-warning border-warning/40 bg-warning/10"
+                        title={`Média auto-derivada em ${derivadoEm(s.notes)} — não é contrato confirmado`}
+                      >
+                        derivado
+                      </span>
+                    )}
+                  </td>
                   <td className="py-2 text-muted">{s.started_on}</td>
                   <td className="py-2 text-right">
                     <button
