@@ -121,6 +121,20 @@ export type FounderTime = {
   notes?: string;
 };
 
+// Espelho do aporte 7.4 do Finance. Valor BRUTO: cashback/reembolso (~0,9%) não
+// abatidos. `parcial` = mês que o extrato de origem ainda não cobre inteiro —
+// nunca usar linha parcial em comparativo mês a mês.
+export type InfraCost = {
+  month: string;
+  service: string;
+  conta_pagadora: string | null;
+  cost_brl: number;
+  lancamentos: number | null;
+  parcial: boolean;
+  extrato_ate: string | null;
+  sincronizado_em: string | null;
+};
+
 export type RevenueRow = {
   month: string;
   product_id: string;
@@ -200,6 +214,19 @@ export const financeStore = {
   },
 
   // --- Founder time (view) ---
+  // --- Custo de infra: espelho do aporte 7.4 vindo do Finance (migrations 053-055) ---
+  async listInfraCosts(): Promise<InfraCost[]> {
+    if (!isSupabaseReady()) return [];
+    const { data, error } = await supabase
+      .from('v_finance_infra_costs')
+      .select('month, service, conta_pagadora, cost_brl, lancamentos, parcial, extrato_ate, sincronizado_em');
+    if (error) {
+      console.error('[finance] listInfraCosts', error);
+      return [];
+    }
+    return (data as InfraCost[]) || [];
+  },
+
   // --- Receita (view) ---
   // Via v_finance_revenue (migration 052): o schema `finance` não está exposto no
   // PostgREST, então `.schema('finance')` respondia 406 e o gráfico de MRR ficava

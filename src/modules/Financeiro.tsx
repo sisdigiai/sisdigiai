@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   BarChart3, PlusCircle, RefreshCw, CreditCard, FileDown,
   Trash2, X, DollarSign, TrendingDown, Repeat, Download,
-  ChevronDown, ChevronUp, XCircle, AlertTriangle,
+  ChevronDown, ChevronUp, XCircle, AlertTriangle, Server,
 } from 'lucide-react';
 import {
   Chart as ChartJS,
@@ -16,17 +16,18 @@ import {
   CATEGORY_LABELS, CATEGORY_COLORS,
   type Product, type Vendor, type Expense, type Subscription,
   type VendorSpend, type MonthlyByCategory, type ExpenseCategory,
-  type RevenueRow, type FounderTime,
+  type RevenueRow, type FounderTime, type InfraCost,
 } from '../lib/financeStore';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-type TabId = 'dashboard' | 'lancar' | 'subscriptions' | 'relatorio';
+type TabId = 'dashboard' | 'lancar' | 'subscriptions' | 'infra' | 'relatorio';
 
 const TABS: Array<{ id: TabId; label: string; icon: typeof BarChart3 }> = [
   { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
   { id: 'lancar', label: 'Lançar Despesa', icon: PlusCircle },
   { id: 'subscriptions', label: 'Subscriptions', icon: CreditCard },
+  { id: 'infra', label: 'Infra (aporte)', icon: Server },
   { id: 'relatorio', label: 'Relatório', icon: FileDown },
 ];
 
@@ -78,6 +79,7 @@ export default function Financeiro() {
         {tab === 'dashboard' && <DashboardTab />}
         {tab === 'lancar' && <LancarTab />}
         {tab === 'subscriptions' && <SubscriptionsTab />}
+        {tab === 'infra' && <InfraTab />}
         {tab === 'relatorio' && <RelatorioTab />}
       </section>
     </div>
@@ -945,7 +947,153 @@ function SubscriptionsTab() {
 }
 
 // =====================================================================
-// TAB 4 — Relatório (genérico com filtro de projeto)
+// TAB 4 — Infra (aporte 7.4, espelho do Finance)
+// =====================================================================
+function InfraTab() {
+  const [linhas, setLinhas] = useState<InfraCost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    financeStore.listInfraCosts().then((r) => { setLinhas(r); setLoading(false); });
+  }, []);
+
+  if (loading) return <div className="text-muted py-8">Carregando...</div>;
+  if (linhas.length === 0) {
+    return <div className="text-muted py-8">Espelho ainda não sincronizado. O cron roda às 04:20.</div>;
+  }
+
+  const total = linhas.reduce((a, l) => a + Number(l.cost_brl), 0);
+  const extratoAte = linhas.map((l) => l.extrato_ate).filter(Boolean).sort().pop() ?? null;
+  const sincronizado = linhas.map((l) => l.sincronizado_em).filter(Boolean).sort().pop() ?? null;
+  const dataExtrato = extratoAte ? new Date(extratoAte + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+
+  // Mês parcial NUNCA entra em comparativo: o extrato de origem ainda não cobre o
+  // mês inteiro, e a queda aparente seria lida como economia.
+  const porMes = new Map<string, { total: number; parcial: boolean }>();
+  for (const l of linhas) {
+    const k = l.month.slice(0, 7);
+    const cur = porMes.get(k) ?? { total: 0, parcial: false };
+    porMes.set(k, { total: cur.total + Number(l.cost_brl), parcial: cur.parcial || l.parcial });
+  }
+  const meses = [...porMes.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+  const fechados = meses.filter(([, v]) => !v.parcial);
+  const ultimoFechado = fechados[0] ?? null;
+  const emAndamento = meses.find(([, v]) => v.parcial) ?? null;
+  const ultimos3 = fechados.slice(0, 3);
+  const mediaFechados3 = ultimos3.reduce((a, [, v]) => a + v.total, 0) / (ultimos3.length || 1);
+  const maiorMes = Math.max(...meses.map(([, v]) => v.total), 1);
+
+  const porFerramenta = new Map<string, { total: number; digiai: number; otica: number }>();
+  for (const l of linhas) {
+    const cur = porFerramenta.get(l.service) ?? { total: 0, digiai: 0, otica: 0 };
+    const v = Number(l.cost_brl);
+    cur.total += v;
+    if ((l.conta_pagadora ?? '').toUpperCase() === 'DIGIAI') cur.digiai += v;
+    else cur.otica += v;
+    porFerramenta.set(l.service, cur);
+  }
+  const ferramentas = [...porFerramenta.entries()].sort((a, b) => b[1].total - a[1].total);
+  const maiorFerramenta = ferramentas[0]?.[1].total ?? 1;
+
+  return (
+    <div className="space-y-6">
+      <div className="border border-outline/15 bg-surface-container px-4 py-2.5 flex items-center gap-2 flex-wrap text-[12px]">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Espelho do Finance · conta 7.4</span>
+        <span className="text-muted">
+          Extrato até <strong className="text-on-surface">{dataExtrato}</strong>
+          {sincronizado && ` · sincronizado ${new Date(sincronizado).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}`}
+        </span>
+        <span
+          className="ml-auto font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border border-warning/40 text-warning bg-warning/10"
+          title="Cashback e reembolso (~0,9%) não estão abatidos"
+        >
+          valor bruto
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <KpiCard label="Aporte acumulado" value={brl(total)} sub="desde ago/2025" icon={<Server size={20} />} color="text-secondary" />
+        <KpiCard label="Último mês fechado" value={brl(ultimoFechado?.[1].total ?? 0)} sub={ultimoFechado ? monthLabel(ultimoFechado[0] + '-01') : '—'} icon={<BarChart3 size={20} />} color="text-secondary" />
+        <KpiCard label="Média (3 fechados)" value={brl(mediaFechados3)} sub="/mês · exclui parciais" icon={<TrendingDown size={20} />} color="text-secondary" />
+        <KpiCard label="Ferramentas" value={String(ferramentas.length)} sub="serviços pagos" icon={<CreditCard size={20} />} color="text-secondary" />
+      </div>
+
+      {emAndamento && (
+        <div className="border border-warning/40 bg-warning/5 p-4 flex items-start gap-3">
+          <AlertTriangle size={16} className="text-warning shrink-0 mt-0.5" />
+          <div className="text-sm text-on-surface-variant leading-relaxed">
+            <span className="font-medium text-on-surface">
+              {monthLabel(emAndamento[0] + '-01')} está em andamento ({brl(emAndamento[1].total)})
+            </span>{' '}
+            — o extrato de origem só vai até {dataExtrato}. Esse número <strong>não</strong> é comparável
+            com o mês anterior: a diferença é extrato faltando, não economia.
+          </div>
+        </div>
+      )}
+
+      <div className="border border-outline/15 bg-surface-lowest p-6">
+        <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Por ferramenta · quem pagou</h3>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-muted text-xs uppercase">
+              <th className="text-left pb-3">Ferramenta</th>
+              <th className="text-right pb-3">Total</th>
+              <th className="text-right pb-3">Conta DIGIAI</th>
+              <th className="text-right pb-3">Conta ótica</th>
+              <th className="pb-3 w-1/4"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {ferramentas.map(([nome, v]) => (
+              <tr key={nome} className="border-t border-outline/10">
+                <td className="py-2 text-on-surface">{nome}</td>
+                <td className="py-2 text-right font-mono text-on-surface">{brl(v.total)}</td>
+                <td className="py-2 text-right font-mono text-secondary">{v.digiai > 0 ? brl(v.digiai) : '—'}</td>
+                <td className="py-2 text-right font-mono text-muted">{v.otica > 0 ? brl(v.otica) : '—'}</td>
+                <td className="py-2 pl-4">
+                  <div className="h-1.5 bg-surface-high">
+                    <div className="h-1.5 bg-secondary" style={{ width: `${(v.total / maiorFerramenta) * 100}%` }} />
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="border border-outline/15 bg-surface-lowest p-6">
+        <h3 className="text-sm font-semibold text-on-surface-variant mb-4">Mês a mês</h3>
+        <div className="space-y-1.5">
+          {meses.map(([mes, v]) => (
+            <div key={mes} className="flex items-center gap-3 text-sm">
+              <span className="font-mono text-muted w-16 shrink-0">{monthLabel(mes + '-01')}</span>
+              <div className="flex-1 h-2 bg-surface-high">
+                <div className={`h-2 ${v.parcial ? 'bg-warning/50' : 'bg-secondary'}`} style={{ width: `${(v.total / maiorMes) * 100}%` }} />
+              </div>
+              <span className="font-mono tabular-nums text-on-surface w-24 text-right shrink-0">{brl(v.total)}</span>
+              {v.parcial && (
+                <span className="font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border border-warning/40 text-warning bg-warning/10 shrink-0">
+                  em andamento
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="border border-outline/15 bg-surface-container p-4 text-[12px] text-muted leading-relaxed">
+        <strong className="text-on-surface">Por que este número difere do Dashboard.</strong>{' '}
+        Aqui é o espelho do Finance (conta contábil 7.4), sincronizado automático e cobrindo até {dataExtrato}.
+        O Dashboard soma <code className="font-mono text-[11px]">finance.expenses</code>, cuja última importação
+        foi em <strong className="text-on-surface">12/06/2026</strong> — as mesmas ferramentas aparecem nas duas
+        fontes, então <strong>não some os dois totais</strong>: seria contar o mesmo dinheiro duas vezes.
+      </div>
+    </div>
+  );
+}
+
+// =====================================================================
+// TAB 5 — Relatório (genérico com filtro de projeto)
 // =====================================================================
 function RelatorioTab() {
   const [allExpenses, setAllExpenses] = useState<Expense[]>([]);
