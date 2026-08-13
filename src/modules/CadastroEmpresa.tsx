@@ -353,6 +353,7 @@ function DocsTab() {
 function IdentidadeTab() {
   const [identity, setIdentity] = useState<CompanyIdentity>({ nome_fantasia: 'DIGIAI' });
   const [saved, setSaved] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
     companyStore.getIdentity().then(setIdentity);
@@ -363,7 +364,13 @@ function IdentidadeTab() {
   };
 
   const save = async () => {
-    await companyStore.saveIdentity(identity);
+    setErro(null);
+    try {
+      await companyStore.saveIdentity(identity);
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : 'Falha ao salvar no servidor.');
+      return;
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -508,6 +515,7 @@ function IdentidadeTab() {
           Salvar
         </button>
         {saved && <span className="text-success text-sm">✓ Salvo</span>}
+        {erro && <span className="text-danger text-sm">⚠ {erro}</span>}
       </div>
     </div>
   );
@@ -1014,11 +1022,18 @@ function LgpdTab() {
     backup_definido: false, treinamento_lgpd_time: false,
   });
   const [saved, setSaved] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => { companyStore.getLegalStatus().then(setLs); }, []);
 
   const save = async () => {
-    await companyStore.saveLegalStatus(ls);
+    setErro(null);
+    try {
+      await companyStore.saveLegalStatus(ls);
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : 'Falha ao salvar no servidor.');
+      return;
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -1098,6 +1113,7 @@ function LgpdTab() {
       <div className="flex items-center gap-4">
         <button onClick={save} className="px-6 py-2.5 bg-secondary hover:bg-secondary/90 text-surface font-medium">Salvar</button>
         {saved && <span className="text-success text-sm">✓ Salvo</span>}
+        {erro && <span className="text-danger text-sm">⚠ {erro}</span>}
       </div>
     </div>
   );

@@ -10,6 +10,14 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Aba Subscriptions** ganhou aviso quando há valor auto-derivado sem revisão há 60+ dias (com a data da derivação e o alerta explícito sobre o botão) e **badge `derivado`** por linha. Nenhum valor foi alterado — corrigir os números é decisão do dono, não do agente.
 - Detecção pela marca `Auto-derivado` + data nas `notes` (é o que a view `v_finance_subscriptions_active` expõe — ela não traz `updated_at`).
 
+### Corrigido (2026-08-13 — Cadastro Empresa parou de dizer "salvo" quando não salvou)
+- **Auditoria** (motivada pelo 406 do MRR) achou a classe de bug mais cara do app: as **12 escritas do `companyStore`** (`saveIdentity`, `upsertContact`, `deleteContact`, `upsertDigitalAsset`, `deleteDigitalAsset`, `upsertTool`, `deleteTool`, `upsertSnapshot`, `saveLegalStatus`) faziam `await supabase.schema('company')...` **sem destructuring, sem `error`, sem `try`**.
+- O fluxo grava no `localStorage` **antes** de tentar o servidor. Recusa do banco (RLS, coluna, schema) era descartada, a tela recarregava do local e o `setSaved(true)` exibia **"✓ Salvo"**. Modo de falha não era tela vazia: era **perda de dado** — CNPJ, contador e snapshot financeiro vivendo só num navegador, descobertos em outra máquina meses depois.
+- Escritas agora checam `error`, logam e **lançam** com mensagem legível ("o dado ficou apenas neste navegador"). `CadastroEmpresa` captura e mostra **⚠ + motivo** no lugar onde o "✓ Salvo" apareceria.
+- Removido ramo morto em `upsertContact` (o `if (c.id)` do servidor era sempre verdadeiro — `c.id` já tinha sido preenchido acima; o `insert` nunca executava).
+- Verificado: typecheck, build e a tela carregando com dado real sem erro espúrio.
+- ⚠ **Ainda aberto**: o mesmo padrão de engolir erro existe em **8 funções do `financeStore`** e em ~20 sítios de gravidade média (`Semana`, `FluxoOSI`, `Marketplace`, `MarketingEspelho`, `dashboardStore`). Essas leem views que **existem**, então não estão quebradas hoje — mas qualquer falha futura vira "R$ 0" com cara de verdade.
+
 ### Corrigido (2026-08-13 — série de receita voltou a carregar: 406 no Financeiro)
 - `financeStore.listRevenue()` chamava `supabase.schema('finance').from('revenue')`, mas **`finance` não está na lista de schemas expostos do PostgREST** (`public, graphql_public, marketing, company, ops, mkt, mello_fabrica, mello_medicao`) → **406**, engolido pelo `if (error) return []`. Efeito: gráfico de MRR sempre vazio, sem distinguir "sem receita" de "query quebrada".
 - **Migration 052** cria `public.v_finance_revenue` (`security_invoker=true`, `GRANT SELECT` só para `authenticated`, `REVOKE` de `anon`) — a RLS de `finance.revenue` (`revenue_staff_all` / `is_staff()`) continua valendo. **Não** expusemos o schema `finance` inteiro: ele carrega `expenses` e snapshots, que são dado sensível (AGENTS.md §6).

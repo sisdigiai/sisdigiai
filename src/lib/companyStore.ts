@@ -68,6 +68,19 @@ function isSupabaseReady(): boolean {
   return !!url && !!key && !url.includes('placeholder');
 }
 
+// Escrita que falha calada é pior que erro na tela: o fluxo grava no localStorage
+// ANTES de tentar o servidor, então recusa do banco (RLS, coluna, schema) deixava
+// a UI dizendo "salvo" com o dado vivo só naquele navegador — e o dono só descobria
+// em outra máquina, meses depois.
+function checar(op: string, error: { message?: string } | null): void {
+  if (!error) return;
+  console.error(`[companyStore] ${op}`, error);
+  throw new Error(
+    `Falha ao salvar ${op} no servidor: ${error.message ?? 'erro desconhecido'}. ` +
+    'O dado ficou apenas neste navegador.'
+  );
+}
+
 export const companyStore = {
   isOnline: isSupabaseReady,
 
@@ -93,10 +106,12 @@ export const companyStore = {
       .maybeSingle();
 
     if (existing?.id) {
-      await supabase.schema('company').from('identity')
+      const { error } = await supabase.schema('company').from('identity')
         .update(identity).eq('id', existing.id);
+      checar('identidade', error);
     } else {
-      await supabase.schema('company').from('identity').insert(identity);
+      const { error } = await supabase.schema('company').from('identity').insert(identity);
+      checar('identidade', error);
     }
   },
 
@@ -125,11 +140,8 @@ export const companyStore = {
     writeLocal(data);
 
     if (!isSupabaseReady()) return;
-    if (c.id) {
-      await supabase.schema('company').from('contacts').upsert(c);
-    } else {
-      await supabase.schema('company').from('contacts').insert(c);
-    }
+    const { error } = await supabase.schema('company').from('contacts').upsert(c);
+    checar('contato', error);
   },
 
   async deleteContact(id: string): Promise<void> {
@@ -138,8 +150,9 @@ export const companyStore = {
     writeLocal(data);
 
     if (!isSupabaseReady()) return;
-    await supabase.schema('company').from('contacts')
+    const { error } = await supabase.schema('company').from('contacts')
       .update({ deleted_at: new Date().toISOString() }).eq('id', id);
+    checar('exclusão de contato', error);
   },
 
   // ========== Digital Assets ==========
@@ -160,7 +173,8 @@ export const companyStore = {
     writeLocal(data);
 
     if (!isSupabaseReady()) return;
-    await supabase.schema('company').from('digital_assets').upsert(a);
+    const { error } = await supabase.schema('company').from('digital_assets').upsert(a);
+    checar('ativo digital', error);
   },
 
   async deleteDigitalAsset(id: string): Promise<void> {
@@ -169,8 +183,9 @@ export const companyStore = {
     writeLocal(data);
 
     if (!isSupabaseReady()) return;
-    await supabase.schema('company').from('digital_assets')
+    const { error } = await supabase.schema('company').from('digital_assets')
       .update({ deleted_at: new Date().toISOString() }).eq('id', id);
+    checar('exclusão de ativo digital', error);
   },
 
   // ========== Tools ==========
@@ -191,7 +206,8 @@ export const companyStore = {
     writeLocal(data);
 
     if (!isSupabaseReady()) return;
-    await supabase.schema('company').from('tools').upsert(t);
+    const { error } = await supabase.schema('company').from('tools').upsert(t);
+    checar('ferramenta', error);
   },
 
   async deleteTool(id: string): Promise<void> {
@@ -200,8 +216,9 @@ export const companyStore = {
     writeLocal(data);
 
     if (!isSupabaseReady()) return;
-    await supabase.schema('company').from('tools')
+    const { error } = await supabase.schema('company').from('tools')
       .update({ deleted_at: new Date().toISOString() }).eq('id', id);
+    checar('exclusão de ferramenta', error);
   },
 
   // ========== Financial snapshots ==========
@@ -223,8 +240,9 @@ export const companyStore = {
     writeLocal(data);
 
     if (!isSupabaseReady()) return;
-    await supabase.schema('company').from('financial_snapshots')
+    const { error } = await supabase.schema('company').from('financial_snapshots')
       .upsert(s, { onConflict: 'month' });
+    checar('snapshot financeiro', error);
   },
 
   // ========== Legal status (singleton) ==========
@@ -243,10 +261,12 @@ export const companyStore = {
     const { data: existing } = await supabase
       .from('v_company_legal_status').select('id').maybeSingle();
     if (existing?.id) {
-      await supabase.schema('company').from('legal_status')
+      const { error } = await supabase.schema('company').from('legal_status')
         .update(ls).eq('id', existing.id);
+      checar('situação legal', error);
     } else {
-      await supabase.schema('company').from('legal_status').insert(ls);
+      const { error } = await supabase.schema('company').from('legal_status').insert(ls);
+      checar('situação legal', error);
     }
   },
 
