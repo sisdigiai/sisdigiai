@@ -10,6 +10,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Aba Subscriptions** ganhou aviso quando há valor auto-derivado sem revisão há 60+ dias (com a data da derivação e o alerta explícito sobre o botão) e **badge `derivado`** por linha. Nenhum valor foi alterado — corrigir os números é decisão do dono, não do agente.
 - Detecção pela marca `Auto-derivado` + data nas `notes` (é o que a view `v_finance_subscriptions_active` expõe — ela não traz `updated_at`).
 
+### Adicionado (2026-08-13 — custo real de infraestrutura entra no digiai por espelho)
+- O custo de infra vive no Finance (`crm_erp`), conta contábil **7.4 "Aporte no ecossistema DIGIAI"**. O digiai **não pode ler aquele banco** em tempo de tela (ADR-0001/R-009; e é o único banco de produção real — R-033). Solução: **espelho servidor-a-servidor**, painel lê tabela local.
+- **Migration 053** — `finance.infra_costs` ganha `conta_pagadora`, `lancamentos`, `parcial`, `extrato_ate`, `sincronizado_em`; chave única passa a incluir `conta_pagadora` (Supabase pago pela conta DIGIAI e pela da ótica no mesmo mês são duas linhas legítimas). View `public.v_finance_infra_costs` (`security_invoker`, só `authenticated`).
+- **Migration 054** — RPC `fn_sync_infra_costs(jsonb)` `SECURITY DEFINER`, só `service_role`. Necessária porque a edge levou `Invalid schema: finance`: o schema não está exposto no PostgREST e **seguirá não estando** (carrega `expenses` e snapshots).
+- **Edge `sync-aporte-digiai`** (v2, `verify_jwt=true`) — lê `ESPELHO_DIGIAI_TOKEN` dos secrets do projeto, chama a edge do Finance e grava pela RPC. O token **nunca** vai ao frontend: variável `VITE_*` entraria no bundle e ficaria visível a qualquer visitante.
+- **Migration 055** — cron `sync-aporte-diario` às 04:20, padrão do `mkt-tick-diario` (Bearer do vault, `net.http_post`). Upsert idempotente.
+- **Primeira sincronização verificada**: 55 linhas · **R$ 19.619,36** · 13 serviços · 2 contas · ago/2025→ago/2026 · `extrato_ate` 12/08 · **4 meses parciais**. Bate com a origem.
+- ⚠ **A UI ainda não existe.** Quando existir, tem duas travas devolvidas pelo Finance: **badge de mês em andamento** via `parcial` (sem isso agosto aparece com queda de 83% no custo) e rótulo **bruto** (cashback/reembolso ~0,9% não abatidos).
+
 ### Corrigido (2026-08-13 — Cadastro Empresa parou de dizer "salvo" quando não salvou)
 - **Auditoria** (motivada pelo 406 do MRR) achou a classe de bug mais cara do app: as **12 escritas do `companyStore`** (`saveIdentity`, `upsertContact`, `deleteContact`, `upsertDigitalAsset`, `deleteDigitalAsset`, `upsertTool`, `deleteTool`, `upsertSnapshot`, `saveLegalStatus`) faziam `await supabase.schema('company')...` **sem destructuring, sem `error`, sem `try`**.
 - O fluxo grava no `localStorage` **antes** de tentar o servidor. Recusa do banco (RLS, coluna, schema) era descartada, a tela recarregava do local e o `setSaved(true)` exibia **"✓ Salvo"**. Modo de falha não era tela vazia: era **perda de dado** — CNPJ, contador e snapshot financeiro vivendo só num navegador, descobertos em outra máquina meses depois.
