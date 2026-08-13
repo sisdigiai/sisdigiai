@@ -4,6 +4,16 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Corrigido (2026-08-13 — lead da Clearix Calc deixou de ser invisível)
+- **Achado de auditoria de funil**: a Clearix Calc captura lead com `product='clearix-calc'` (edge `lead-capture` → `fn_capture_landing_lead` → `marketing.landing_leads`), mas **nenhuma tela mostrava esse lead com o contato**. `Comercial` filtrava `product='clearix'`, `FluxoOSI` `'osi'`, `AfiliadosDashboard` `'osi-afiliado'` — e `Semana` conta `status='novo'` **sem filtro de produto**, então o lead da calc aparecia no contador sem ter onde ser aberto. Lead entrava e ninguém fazia follow-up.
+- **Comercial → Demonstrações Clearix** passa a ler `product IN ('clearix','clearix-calc')` (mesma ordenação `created_at desc`, mesmo fluxo de status novo/contactado/comprou/descartado).
+- **Badge de origem Site/Calc** em cada linha e no bloco "Ação hoje" — a conversa começa diferente: quem veio da Calc é ótica que usou a ferramenta grátis, **não** pediu demonstração.
+- **Script do 1º toque agora ramifica por origem.** O texto antigo abria com *"vi que você pediu uma demonstração pelo nosso site"* — mentira para lead da calc. O da Calc abre pela calculadora e oferece mostrar o ecossistema.
+- **UTM na listagem**: `utm_source / utm_campaign` (a distribuição manda `utm_campaign=distribuicao_*_AAAA_MM`, o boca-a-boca vem como `utm_source=indicacao`). Corrigido bug em que a UTM sumia da linha quando havia `utm_campaign` sem `utm_source`.
+- Nome do lead cai para e-mail/telefone quando ausente — lead da Calc não manda nome (só e-mail + WhatsApp), aparecia como "(sem nome)".
+- **Sem tocar em schema nem na edge function** (R-032): `v_marketing_landing_leads` já expunha `product` e todos os `utm_*`, sem filtro de produto. Verificado em produção.
+- Cobertura fechada: os 4 produtos que chegam em `landing_leads` (`osi`, `osi-afiliado`, `clearix`, `clearix-calc`) têm tela.
+
 ### Adicionado (2026-08-01 — scorecard que se preenche sozinho + verificação de vendas/analytics)
 - **Verificação do circuito de vendas**: os 3 webhooks estão ATIVOS e keyless (hotmart-webhook v22, kiwify-webhook v20, mercadopago-webhook v15 — o 401 a payload vazio é a validação HMAC funcionando). Zero vendas registradas **não é falha técnica: é falta de venda** — o circuito está armado.
 - **Analytics OSI expõe o gargalo real**: 9 visitas na landing em 7d (21 em 30d, última hoje) e **zero cliques no checkout em 30 dias**. Tráfego chega, ninguém compra — problema de oferta/tráfego, não de instrumentação.
