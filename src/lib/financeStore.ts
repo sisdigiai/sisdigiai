@@ -200,15 +200,19 @@ export const financeStore = {
   },
 
   // --- Founder time (view) ---
-  // --- Receita (finance.revenue — sem view pública; leitura direta com fallback) ---
+  // --- Receita (view) ---
+  // Via v_finance_revenue (migration 052): o schema `finance` não está exposto no
+  // PostgREST, então `.schema('finance')` respondia 406 e o gráfico de MRR ficava
+  // sempre vazio sem distinguir "sem receita" de "query quebrada".
   async listRevenue(): Promise<RevenueRow[]> {
     if (!isSupabaseReady()) return [];
     const { data, error } = await supabase
-      .schema('finance')
-      .from('revenue')
-      .select('month, product_id, mrr_brl, one_time_brl, active_subscriptions')
-      .is('deleted_at', null);
-    if (error) return [];
+      .from('v_finance_revenue')
+      .select('month, product_id, mrr_brl, one_time_brl, active_subscriptions');
+    if (error) {
+      console.error('[finance] listRevenue', error);
+      return [];
+    }
     return (data as RevenueRow[]) || [];
   },
 

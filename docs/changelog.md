@@ -10,8 +10,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Aba Subscriptions** ganhou aviso quando há valor auto-derivado sem revisão há 60+ dias (com a data da derivação e o alerta explícito sobre o botão) e **badge `derivado`** por linha. Nenhum valor foi alterado — corrigir os números é decisão do dono, não do agente.
 - Detecção pela marca `Auto-derivado` + data nas `notes` (é o que a view `v_finance_subscriptions_active` expõe — ela não traz `updated_at`).
 
-### Conhecido (2026-08-13 — série de receita não carrega no Financeiro)
-- `financeStore.listRevenue()` chama `supabase.from('revenue')`, mas `revenue` só existe no schema `finance` e **não há view em `public`** → PostgREST devolve **406** e o store engole o erro retornando `[]`. Efeito: gráfico de MRR sempre vazio ("histórico insuficiente"). Correção exige view/migration — **não aplicada** (DDL em `finance.*` pede confirmação do dono).
+### Corrigido (2026-08-13 — série de receita voltou a carregar: 406 no Financeiro)
+- `financeStore.listRevenue()` chamava `supabase.schema('finance').from('revenue')`, mas **`finance` não está na lista de schemas expostos do PostgREST** (`public, graphql_public, marketing, company, ops, mkt, mello_fabrica, mello_medicao`) → **406**, engolido pelo `if (error) return []`. Efeito: gráfico de MRR sempre vazio, sem distinguir "sem receita" de "query quebrada".
+- **Migration 052** cria `public.v_finance_revenue` (`security_invoker=true`, `GRANT SELECT` só para `authenticated`, `REVOKE` de `anon`) — a RLS de `finance.revenue` (`revenue_staff_all` / `is_staff()`) continua valendo. **Não** expusemos o schema `finance` inteiro: ele carrega `expenses` e snapshots, que são dado sensível (AGENTS.md §6).
+- Store passa a ler a view e **loga o erro** em vez de engolir em silêncio.
+- Verificado no navegador: a chamada responde **HTTP 200 com `[]`**. O gráfico segue vazio — mas agora porque **não há receita mesmo** (pré-lançamento), não porque a query quebrou.
 
 ### Corrigido (2026-08-13 — lead da Clearix Calc deixou de ser invisível)
 - **Achado de auditoria de funil**: a Clearix Calc captura lead com `product='clearix-calc'` (edge `lead-capture` → `fn_capture_landing_lead` → `marketing.landing_leads`), mas **nenhuma tela mostrava esse lead com o contato**. `Comercial` filtrava `product='clearix'`, `FluxoOSI` `'osi'`, `AfiliadosDashboard` `'osi-afiliado'` — e `Semana` conta `status='novo'` **sem filtro de produto**, então o lead da calc aparecia no contador sem ter onde ser aberto. Lead entrava e ninguém fazia follow-up.
