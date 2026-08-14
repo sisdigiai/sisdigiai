@@ -6,12 +6,14 @@ import {
   Camera, Wand2, Boxes, Search, ShieldCheck, Workflow, ChevronDown,
   GraduationCap, Languages, Calendar as CalendarIcon, Globe, BarChart3,
   Lightbulb, Heart, Package, Users, Receipt, Radio, CalendarCheck,
+  Sunrise,
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
 import { canAccessModule } from '../lib/permissions';
 
 export type ModuleId =
+  | 'hoje'
   | 'visao' | 'semana' | 'portfolio' | 'trilha' | 'lista-mestra'
   | 'backlog' | 'comercial' | 'academy' | 'financeiro'
   | 'decisoes' | 'biblioteca' | 'brand' | 'cadastro-empresa'
@@ -28,6 +30,7 @@ interface NavItem {
 
 
 const operacional: NavItem[] = [
+  { id: 'hoje',             label: 'Hoje',              icon: <Sunrise className="w-4 h-4" /> },
   { id: 'visao',            label: 'Visão',             icon: <Eye className="w-4 h-4" /> },
   { id: 'semana',           label: 'Semana',            icon: <CalendarCheck className="w-4 h-4" /> },
   { id: 'portfolio',        label: 'Portfólio',         icon: <LayoutGrid className="w-4 h-4" /> },

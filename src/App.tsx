@@ -8,6 +8,7 @@ import Login from './components/Login';
 import TestimonialPublicForm from './components/TestimonialPublicForm';
 import OsiPublicLanding from './components/OsiPublicLanding';
 import Visao from './modules/Visao';
+import Hoje from './modules/Hoje';
 import Portfolio from './modules/Portfolio';
 import Trilha from './modules/Trilha';
 import Backlog from './modules/Backlog';
@@ -41,7 +42,7 @@ const PUBLIC_ROUTES = ['/osi/depoimento', '/osi'];
 
 // Todos os módulos roteáveis — usado pelo deep-link por hash (#/<modulo>).
 const MODULES: ModuleId[] = [
-  'visao', 'semana', 'portfolio', 'trilha', 'lista-mestra', 'backlog', 'comercial',
+  'hoje', 'visao', 'semana', 'portfolio', 'trilha', 'lista-mestra', 'backlog', 'comercial',
   'cadastro-empresa', 'financeiro', 'academy', 'marketplace', 'clearix', 'cobranca',
   'marketing', 'marketing-engajamento', 'fluxo-osi', 'travas-marketing',
   'ecossistemas', 'mapa-vivo', 'decisoes', 'biblioteca', 'brand', 'guia',
@@ -54,7 +55,7 @@ function moduleFromHash(): ModuleId {
 }
 
 const MODULE_LABEL: Record<ModuleId, string> = {
-  visao: 'Visão', semana: 'Semana', portfolio: 'Portfólio', trilha: 'Roadmap', 'lista-mestra': 'Lista Mestra',
+  hoje: 'Hoje', visao: 'Visão', semana: 'Semana', portfolio: 'Portfólio', trilha: 'Roadmap', 'lista-mestra': 'Lista Mestra',
   backlog: 'Backlog Executivo', comercial: 'Comercial', 'cadastro-empresa': 'Cadastro Empresa',
   financeiro: 'Financeiro', academy: 'Academy', 'fluxo-osi': 'OSI',
   marketing: 'Marketing', 'marketing-engajamento': 'Engajamento',
@@ -66,7 +67,7 @@ const MODULE_LABEL: Record<ModuleId, string> = {
 
 // Seção da navegação a que cada módulo pertence — usado como breadcrumb no header.
 const MODULE_SECTION: Record<ModuleId, string> = {
-  visao: 'Operacional', semana: 'Operacional', portfolio: 'Operacional', trilha: 'Operacional', 'lista-mestra': 'Operacional',
+  hoje: 'Operacional', visao: 'Operacional', semana: 'Operacional', portfolio: 'Operacional', trilha: 'Operacional', 'lista-mestra': 'Operacional',
   backlog: 'Operacional', comercial: 'Operacional', 'cadastro-empresa': 'Operacional', financeiro: 'Operacional',
   academy: 'Operacional', marketplace: 'Operacional', clearix: 'Operacional', cobranca: 'Operacional',
   marketing: 'Marketing', 'marketing-engajamento': 'Marketing',
@@ -136,6 +137,7 @@ export default function App() {
       );
     }
     switch (activeModule) {
+      case 'hoje': return <Hoje />;
       case 'visao': return <Visao onNavigate={navigate} />;
       case 'portfolio': return <Portfolio />;
       case 'semana': return <Semana onNavigate={navigate} />;
