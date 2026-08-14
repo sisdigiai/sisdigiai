@@ -71,7 +71,7 @@ O app/codigo/filesystem e a verdade factual. O Cockpit e a fonte documental oper
 
 - **Stack:** **Vite 6.2** + React 19 + TypeScript 5.8 + TailwindCSS 4.1 + Motion + Chart.js + Lucide React (o `@google/genai` foi **removido em 2026-05-28** â€” era dependÃªncia morta; a geraÃ§Ã£o de IA do Marketing Ã© server-side via RPC `marketing_render_prompt`)
 - **Porta dev:** **3000** (host `0.0.0.0` â€” `npm run dev` em `vite --port=3000 --host=0.0.0.0`) â€” **conflita com `clearix_hub`** ao rodar local; mudar uma das duas
-- **URL produÃ§Ã£o:** **https://sisdigiai.netlify.app** (auto-deploy do branch `main`; repo `sisdigiai/sisdigiai`). Verificado logado em 2026-05-28. O `digiaiatlas.netlify.app` Ã© sÃ³ um **link externo** do grupo Ecossistemas (Atlas), nÃ£o o host deste app.
+- **URL produção:** **https://app.digiai.app.br** — **Cloudflare Pages** (projeto `digiai-app`, GitHub-linkado ao repo `sisdigiai/sisdigiai`, build `npm run build` → `dist`). Migração concluída em 2026-07-30 ([ADR-0028]); reconfirmado no ar em 2026-08-13. ⚠ **`sisdigiai.netlify.app` NÃO é mais produção**: segue online como rollback, congelado no commit `5c919f3` (30/07) e com todos os deploys do Git em "Skipped". Não use como referência — foi exatamente o que induziu um agente ao erro em 2026-08-13. O `digiaiatlas.netlify.app` é só link externo do grupo Ecossistemas (Atlas).
 - **Como rodar:**
   ```bash
   npm install
@@ -81,7 +81,7 @@ O app/codigo/filesystem e a verdade factual. O Cockpit e a fonte documental oper
   npm run lint     # tsc --noEmit (typecheck â€” sem ESLint)
   npm run clean    # rm -rf dist
   ```
-- **Hospedagem:** **Netlify** (consome `public/_headers`, que jÃ¡ traz HSTS + X-Frame-Options + CSP). R-025: Cloudflare Ã© o host canÃ´nico â€” migraÃ§Ã£o conforme priorizaÃ§Ã£o do dono.
+- **Hospedagem:** **Cloudflare Pages** — host canônico por R-025, migração feita em 2026-07-30. O `public/_headers` (HSTS + X-Frame-Options + CSP) é consumido pelo Pages. ⚠ Antes de desligar o Netlify de vez: migrar o keep-alive `netlify/functions/supabase-keepalive.mjs` (seg+qui) para um Worker com cron trigger — o Pages não executa scheduled functions.
 - **RepositÃ³rio:** `https://github.com/sisdigiai/sisdigiai.git`
 - **Modo offline/fallback:** âœ… funciona sem `.env` â€” dev local sem chaves usa `localStorage`
 
@@ -196,7 +196,7 @@ Roteamento real em `App.tsx` (`activeModule` por estado, nÃ£o por URL). **~22 
 
 ## 10. PendÃªncias conhecidas (do Spec Â§13 + Â§8)
 
-- [x] ~~Confirmar hospedagem~~ â€” **Netlify** (`sisdigiai.netlify.app`), confirmado 2026-05-28
+- [x] ~~Confirmar hospedagem~~ — **Cloudflare Pages** + domínio `app.digiai.app.br` (ADR-0028), migrado 2026-07-30 e reconfirmado no ar em 2026-08-13. Netlify permanece como rollback congelado.
 - [x] ~~Migrar `iam.users` para R-013~~ â€” **feito 2026-05-28** (mig 025: USUUID + wa_bsuid/username/phone_legacy + campos LGPD)
 - [x] ~~Deploy `health` (R-016)~~ â€” **feito 2026-05-28**, pÃºblico em `/functions/v1/health` (HTTP 200, checa DB)
 - [x] ~~CSP em produÃ§Ã£o~~ â€” **validada 2026-05-28** (app + conexÃ£o Supabase OK sob a CSP)
