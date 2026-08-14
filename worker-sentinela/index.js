@@ -62,6 +62,37 @@ async function avisar(env, texto) {
   return { enviado: r.ok, http: r.status };
 }
 
+/**
+ * Escreve o resultado da vigília de volta no inventário (ops.contas_servicos).
+ * É isto que transforma cadastro em proteção: a tabela deixa de ser documento e
+ * passa a carregar o estado medido — status + quando foi visto pela última vez.
+ */
+async function marcarInventario(env, marcas) {
+  if (!env.DIGIAI_URL || !env.DIGIAI_SERVICE_KEY) return { gravado: 0, motivo: 'sem_credencial' };
+  let ok = 0;
+  for (const m of marcas) {
+    try {
+      const r = await fetch(`${env.DIGIAI_URL}/rest/v1/rpc/fn_conta_marcar`, {
+        method: 'POST',
+        headers: {
+          apikey: env.DIGIAI_SERVICE_KEY,
+          Authorization: `Bearer ${env.DIGIAI_SERVICE_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          p_servico: 'supabase',
+          p_identificador: m.ref,
+          p_status: m.status,
+          p_detalhe: m.detalhe,
+        }),
+        signal: AbortSignal.timeout(12000),
+      });
+      if (r.ok) ok++;
+    } catch { /* uma falha de escrita não pode derrubar a vigília */ }
+  }
+  return { gravado: ok, de: marcas.length };
+}
+
 async function rodar(env, origem) {
   const pings = await Promise.all(PROJETOS.map(pingRest));
   const [orgA, orgB] = await Promise.all([statusOrg(env.SUPABASE_TOKEN), statusOrg(env.SUPABASE_TOKEN_PULSO)]);
@@ -73,6 +104,19 @@ async function rodar(env, origem) {
     if (!p.vivo) problemas.push(`🔴 <b>${p.nome}</b> — sem resposta (HTTP ${p.http}${st ? `, ${st}` : ''})`);
     else if (st && st !== 'ACTIVE_HEALTHY') problemas.push(`🟠 <b>${p.nome}</b> — status ${st}`);
   }
+
+  // devolve ao inventário o que foi medido (status por projeto)
+  const inventario = await marcarInventario(
+    env,
+    pings.map((p) => {
+      const st = porRef[p.ref];
+      return {
+        ref: p.ref,
+        status: !p.vivo ? (st === 'INACTIVE' ? 'pausado' : 'quebrado') : st && st !== 'ACTIVE_HEALTHY' ? 'atencao' : 'ok',
+        detalhe: `HTTP ${p.http}${st ? ` · ${st}` : ''} (sentinela ${origem})`,
+      };
+    })
+  );
 
   const agora = new Date();
   const hoje = agora.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
@@ -92,7 +136,7 @@ async function rodar(env, origem) {
     aviso = await avisar(env, `✅ <b>Sentinela viva</b> — ${hoje}\n${pings.length} projetos OK, nada a reportar.`);
   }
 
-  return { origem, quando: agora.toISOString(), projetos: pings.length, problemas, aviso };
+  return { origem, quando: agora.toISOString(), projetos: pings.length, problemas, aviso, inventario };
 }
 
 export default {

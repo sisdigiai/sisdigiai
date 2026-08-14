@@ -43,6 +43,12 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Sem tocar em schema nem na edge function** (R-032): `v_marketing_landing_leads` já expunha `product` e todos os `utm_*`, sem filtro de produto. Verificado em produção.
 - Cobertura fechada: os 4 produtos que chegam em `landing_leads` (`osi`, `osi-afiliado`, `clearix`, `clearix-calc`) têm tela.
 
+### Adicionado (2026-08-14 — inventário de contas e serviços, vivo pelo Sentinela)
+- **Despacho do MKT executado** (`docs/_DESPACHO_INVENTARIO_CONTAS_DO_MKT_2026-08-14.md`): criada `ops.contas_servicos` — onde está a conta, quem é o dono, quando vence, **em qual navegador abrir** (campo que resolve a dor real do socorro) e `secret_ref` (só o NOME do secret).
+- **A linha vermelha virou regra executável**: o CHECK `contas_servicos_sem_segredo` recusa qualquer valor com cara de credencial (prefixos eyJ/sbp_/ghp_/sk-/AIza e cadeias longas). Testado: o banco rejeita token colado por engano.
+- **21 contas semeadas** com o §4 do despacho + o que só o digiai enxerga (navegador por conta, PATs por org, prazo do qual-foto). Views: `v_ops_contas_servicos` (painel) e `v_mkt_contas` (leitura do MKT — mesmo desenho de v_mkt_fatos, invertido). RPC `fn_conta_marcar` pro alarme escrever.
+- **Cadastro virou proteção**: o Worker `digiai-sentinela` (Cloudflare, cron 9h — fora da infra que cai) agora **lê e escreve o inventário**: mediu 10 projetos e gravou status+carimbo em 9 (o 10º é o lumina, ainda sem chave por estar pausado). Devolutiva de risco ao MKT: não construímos um segundo alarme em GitHub Actions — o Sentinela já existe, roda fora e agora alimenta a tabela.
+
 ### Adicionado (2026-08-01 — scorecard que se preenche sozinho + verificação de vendas/analytics)
 - **Verificação do circuito de vendas**: os 3 webhooks estão ATIVOS e keyless (hotmart-webhook v22, kiwify-webhook v20, mercadopago-webhook v15 — o 401 a payload vazio é a validação HMAC funcionando). Zero vendas registradas **não é falha técnica: é falta de venda** — o circuito está armado.
 - **Analytics OSI expõe o gargalo real**: 9 visitas na landing em 7d (21 em 30d, última hoje) e **zero cliques no checkout em 30 dias**. Tráfego chega, ninguém compra — problema de oferta/tráfego, não de instrumentação.
