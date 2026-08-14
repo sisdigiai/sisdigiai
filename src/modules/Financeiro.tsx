@@ -885,7 +885,7 @@ function SubscriptionsTab() {
                 <th className="text-left pb-3">Vendor</th>
                 <th className="text-left pb-3">Plano</th>
                 <th className="text-left pb-3">Produto</th>
-                <th className="text-right pb-3">R$/mês</th>
+                <th className="text-right pb-3 pr-6">R$/mês</th>
                 <th className="text-left pb-3">Desde</th>
                 <th className="text-right pb-3"></th>
               </tr>
@@ -896,7 +896,7 @@ function SubscriptionsTab() {
                   <td className="py-2 text-on-surface">{s.vendor_name}</td>
                   <td className="py-2 text-on-surface-variant">{s.plan_name}</td>
                   <td className="py-2 text-muted">{s.product_name}</td>
-                  <td className="py-2 text-right font-mono text-on-surface">
+                  <td className="py-2 text-right font-mono text-on-surface pr-6 whitespace-nowrap">
                     {brl(Number(s.monthly_amount_brl))}
                     {derivadoEm(s.notes) && (
                       <span
