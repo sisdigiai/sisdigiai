@@ -43,6 +43,13 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Sem tocar em schema nem na edge function** (R-032): `v_marketing_landing_leads` já expunha `product` e todos os `utm_*`, sem filtro de produto. Verificado em produção.
 - Cobertura fechada: os 4 produtos que chegam em `landing_leads` (`osi`, `osi-afiliado`, `clearix`, `clearix-calc`) têm tela.
 
+### Ampliado (2026-08-14 — de inventário de serviços para COFRE DA EMPRESA)
+- Decisão do dono no meio da varredura: não é inventário de SaaS do marketing — é o **cofre de tudo que a casa tem, por entidade**, incluindo o que já encerrou ("não perder nada") e coisas como **números de WhatsApp de lojas antigas**.
+- **`ops.empresas`** criada (12 entidades: DIGIAI LTDA, as 5 unidades da Mello + guarda-chuva, Lancaster, Polapetit, Pulso, Nipo, pessoal) com tipo (própria/cliente/parceira/pessoal/encerrada) e situação (ativa/dormente/encerrada/vendida). `contas_servicos` ganhou `empresa_slug`, `categoria` (email, rede_social, ads, business_manager, infra, banco, fiscal, domínio, marketplace, ia, telefonia, dev…), `situacao` e `encerrada_em` — **conta encerrada não se apaga, vira histórico**.
+- **Varredura do Chrome "empresa DIGIAI"**: âncora `sisdigiai@gmail.com`; **8 Business Managers no Meta** que ninguém havia mapeado (12 contas de anúncios entre Digiai, Pulso, Lancaster e as 5 unidades da Mello); Google Analytics **inexistente** (conta na tela de provisionamento); Search Console só com clearix.app.br; TikTok Developers com **apenas o app Limelight** — o app órfão `sbawypfqzlshver28s` do MKT **não está nesta conta**; Hotmart e OpenAI **não logados aqui** apesar de gasto real no Financeiro.
+- **21 contas de rede do MKT importadas** pro cofre com marca e navegador. Total: **56 registros em 12 empresas** (17 redes, 4 telefonia). Views `v_ops_cofre` e `v_ops_cofre_resumo`.
+- **Achado ao vivo durante o trabalho**: o PAT do GitHub sisdigiai expirou (401) — um dos 6 incidentes do despacho acontecendo em tempo real; registrado no cofre como `quebrado` com instrução de recuperação.
+
 ### Adicionado (2026-08-14 — inventário de contas e serviços, vivo pelo Sentinela)
 - **Despacho do MKT executado** (`docs/_DESPACHO_INVENTARIO_CONTAS_DO_MKT_2026-08-14.md`): criada `ops.contas_servicos` — onde está a conta, quem é o dono, quando vence, **em qual navegador abrir** (campo que resolve a dor real do socorro) e `secret_ref` (só o NOME do secret).
 - **A linha vermelha virou regra executável**: o CHECK `contas_servicos_sem_segredo` recusa qualquer valor com cara de credencial (prefixos eyJ/sbp_/ghp_/sk-/AIza e cadeias longas). Testado: o banco rejeita token colado por engano.
