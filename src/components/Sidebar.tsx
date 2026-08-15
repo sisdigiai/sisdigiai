@@ -38,14 +38,16 @@ interface NavItem {
 // Reescrever 24 telas em 6 no fim de um dia de construcao seria trocar dispersao
 // por bug. Agrupar e reversivel; reescrever nao.
 
+// Consolidada (Fase F): a secao Hoje tem UM item. Semana, Roadmap, Lista Mestra
+// e Backlog continuam roteaveis — viraram links no rodape da propria tela, e a
+// Visao deixou de existir (KPIs viraram o placar). Menu nao e indice de arquivos:
+// e a lista do que se decide todo dia.
 const hoje: NavItem[] = [
-  { id: 'hoje',             label: 'Ordem do dia',      icon: <Sunrise className="w-4 h-4" /> },
-  { id: 'visao',            label: 'Visão geral',       icon: <Eye className="w-4 h-4" /> },
-  { id: 'semana',           label: 'Semana',            icon: <CalendarCheck className="w-4 h-4" /> },
-  { id: 'trilha',           label: 'Roadmap',           icon: <Map className="w-4 h-4" /> },
-  { id: 'lista-mestra',     label: 'Lista Mestra',      icon: <List className="w-4 h-4" /> },
-  { id: 'backlog',          label: 'Backlog',           icon: <Zap className="w-4 h-4" /> },
+  { id: 'hoje', label: 'Ordem do dia', icon: <Sunrise className="w-4 h-4" /> },
 ];
+
+// Roteaveis sem cadeira no menu — alcancadas pelos links da tela Hoje.
+const SEM_CADEIRA: ModuleId[] = ['visao', 'semana', 'trilha', 'lista-mestra', 'backlog'];
 
 const dinheiro: NavItem[] = [
   { id: 'financeiro',       label: 'Financeiro',        icon: <DollarSign className="w-4 h-4" /> },
@@ -100,6 +102,7 @@ const SECOES: { k: SectionKey; label: string; itens: NavItem[] }[] = [
 ];
 
 function sectionOf(id: ModuleId): SectionKey {
+  if (SEM_CADEIRA.includes(id)) return 'hoje';
   return SECOES.find(s => s.itens.some(i => i.id === id))?.k ?? 'hoje';
 }
 

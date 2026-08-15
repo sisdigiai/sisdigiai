@@ -192,7 +192,15 @@ export default function App() {
               <Menu className="w-5 h-5" />
             </button>
             <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary truncate">
-              {MODULE_SECTION[activeModule] ?? 'Operacional'} <span className="text-muted">/</span> <span className="text-on-surface">{MODULE_LABEL[activeModule] ?? 'Visão'}</span>
+              {/* Sem "Hoje / Hoje": quando o modulo e a propria secao, o nome basta. */}
+              {MODULE_SECTION[activeModule] === MODULE_LABEL[activeModule] ? (
+                <span className="text-on-surface">{MODULE_LABEL[activeModule]}</span>
+              ) : (
+                <>
+                  {MODULE_SECTION[activeModule] ?? 'Operacional'} <span className="text-muted">/</span>{' '}
+                  <span className="text-on-surface">{MODULE_LABEL[activeModule] ?? 'Visão'}</span>
+                </>
+              )}
             </div>
             <div className="hidden lg:flex items-center gap-5 font-mono text-[10px] tracking-[0.08em] text-muted uppercase">
               <span className="flex items-center gap-1.5 text-secondary"><span className="w-1.5 h-1.5 bg-action inline-block animate-pulse" />Sistema nominal</span>
