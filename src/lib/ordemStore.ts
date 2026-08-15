@@ -64,3 +64,37 @@ export const ordemStore = {
     return (data as number) ?? 0;
   },
 };
+
+// Placar da tela Hoje (migration 069). Substitui os 4 cards de KPI da Visão —
+// os mesmos números, sem o bloco decorativo. A série de MRR fica por decisão do
+// dono (15/08), mas como sparkline: uma reta em zero não merece um quarto da tela.
+export type PontoMrr = { mes: string; mrr: number };
+
+export type PlacarHoje = {
+  fase: number;
+  fase_nome: string;
+  metrica: string;
+  elo_titulo: string | null;
+  elo_numero: number | null;
+  elo_total: number | null;
+  elo_prazo: string | null;
+  elo_dias: number | null;
+  caixa: number;
+  custo_mes: number;
+  pagantes: number;
+  gate_ok: boolean;
+  gate_veredito: string;
+  mrr_serie: PontoMrr[];
+};
+
+export const placarStore = {
+  async hoje(): Promise<PlacarHoje | null> {
+    if (!isSupabaseReady()) return null;
+    const { data, error } = await supabase.from('v_ops_placar_hoje').select('*').maybeSingle();
+    if (error) {
+      console.error('[placar] hoje', error);
+      return null;
+    }
+    return (data as PlacarHoje) ?? null;
+  },
+};

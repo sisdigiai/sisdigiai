@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, Target, Bot, RefreshCw, Check, MessageSquareWarning } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
-import { ordemStore, type ItemOrdem, type BlocoOrdem } from '../lib/ordemStore';
+import { ordemStore, placarStore, type ItemOrdem, type BlocoOrdem, type PlacarHoje, type PontoMrr } from '../lib/ordemStore';
 
 const BLOCOS: { id: BlocoOrdem; titulo: string; regra: string; icon: typeof Target; cor: string }[] = [
   { id: 'trava',   titulo: 'Trava',   regra: 'Apaga a empresa se ignorado',  icon: AlertTriangle, cor: 'text-danger border-danger/40' },
@@ -14,6 +14,7 @@ const dataLonga = (iso: string) =>
 
 export default function Hoje() {
   const [itens, setItens] = useState<ItemOrdem[]>([]);
+  const [placar, setPlacar] = useState<PlacarHoje | null>(null);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [justificando, setJustificando] = useState<string | null>(null);
@@ -24,6 +25,7 @@ export default function Hoje() {
   const carregar = useCallback(() => {
     setLoading(true);
     ordemStore.doDia(hoje).then((r) => { setItens(r); setLoading(false); });
+    placarStore.hoje().then(setPlacar);
   }, [hoje]);
 
   useEffect(carregar, [carregar]);
@@ -83,6 +85,48 @@ export default function Hoje() {
           </button>
         </div>
       </PageHeader>
+
+      {placar && (
+        <div className="mb-5 space-y-3">
+          {/* A fase em uma linha: onde estamos e se o gate se sustenta no dado */}
+          <div className="flex items-center gap-2 flex-wrap text-sm text-on-surface-variant">
+            <span>
+              Fase {placar.fase} · {placar.fase_nome} —{' '}
+              <strong className="text-on-surface">elo {placar.elo_numero} de {placar.elo_total}</strong>
+              {placar.elo_dias != null && (placar.elo_dias >= 0
+                ? `, vence em ${placar.elo_dias} dia(s)`
+                : `, passou do prazo`)}
+            </span>
+            {!placar.gate_ok && (
+              <span
+                title={placar.gate_veredito}
+                className="font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border text-warning border-warning/40 bg-warning/10"
+              >
+                gate não sustentado pelo dado
+              </span>
+            )}
+          </div>
+
+          {/* Placar: os 4 KPIs da antiga Visão, sem os cards decorativos */}
+          <div className="grid grid-cols-2 md:grid-cols-4 border border-outline/15 bg-surface-container">
+            {[
+              { rot: 'Caixa', val: brl(placar.caixa), zero: placar.caixa === 0 },
+              { rot: 'Custo / mês', val: brl(placar.custo_mes), zero: false },
+              { rot: 'Clientes pagantes', val: String(placar.pagantes), zero: placar.pagantes === 0 },
+              { rot: 'MRR', val: brl(ultimoMrr(placar.mrr_serie)), zero: ultimoMrr(placar.mrr_serie) === 0,
+                spark: placar.mrr_serie },
+            ].map((k) => (
+              <div key={k.rot} className="p-3 border-r border-outline/10 last:border-r-0">
+                <div className="font-mono text-[9px] uppercase tracking-widest text-muted">{k.rot}</div>
+                <div className={`font-serif text-xl font-semibold tabular-nums mt-0.5 ${k.zero ? 'text-danger' : 'text-on-surface'}`}>
+                  {k.val}
+                </div>
+                {k.spark && <Sparkline serie={k.spark} />}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {erro && (
         <div className="border border-danger/40 bg-danger/5 px-4 py-2.5 mb-5 text-sm text-on-surface">
@@ -203,6 +247,36 @@ export default function Hoje() {
           })}
         </div>
       )}
+      {itens.length > 0 && (
+        <div className="mt-6 pt-4 border-t border-outline/10 flex gap-5 flex-wrap font-mono text-[10px] uppercase tracking-wider">
+          <a href="#/semana" className="text-secondary hover:underline">ver a semana →</a>
+          <a href="#/lista-mestra" className="text-secondary hover:underline">ver a fila completa →</a>
+          <a href="#/trilha" className="text-secondary hover:underline">ver o roadmap →</a>
+        </div>
+      )}
     </div>
+  );
+}
+
+const brl = (v: number) =>
+  Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+
+const ultimoMrr = (serie: PontoMrr[]) =>
+  serie.length ? Number(serie[serie.length - 1].mrr) : 0;
+
+// Sparkline em vez de bloco: a série de MRR fica visível sem ocupar um quarto da
+// tela desenhando uma reta em zero.
+function Sparkline({ serie }: { serie: PontoMrr[] }) {
+  if (serie.length < 2) return null;
+  const vals = serie.map((p) => Number(p.mrr));
+  const max = Math.max(...vals, 1);
+  const pts = vals
+    .map((v, i) => `${(i / (vals.length - 1)) * 100},${20 - (v / max) * 18}`)
+    .join(' ');
+  return (
+    <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="w-full h-4 mt-1.5" aria-hidden="true">
+      <polyline points={pts} fill="none" stroke="currentColor" strokeWidth="1"
+        className="text-secondary/60" vectorEffect="non-scaling-stroke" />
+    </svg>
   );
 }
