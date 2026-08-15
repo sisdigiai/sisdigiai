@@ -29,37 +29,55 @@ interface NavItem {
 }
 
 
-const operacional: NavItem[] = [
-  { id: 'hoje',             label: 'Hoje',              icon: <Sunrise className="w-4 h-4" /> },
-  { id: 'visao',            label: 'Visão',             icon: <Eye className="w-4 h-4" /> },
+// ── Fase F (2026-08-15): 24 modulos viram 6 secoes ──────────────────────────
+// Os modulos nao foram reescritos — eles funcionavam. O que estava errado era a
+// navegacao: 24 itens numa lista plana obrigam a decidir onde clicar antes de
+// saber o que fazer. Cada secao agora agrupa os modulos que respondem a MESMA
+// pergunta, e o primeiro item de cada uma e a entrada natural.
+//
+// Reescrever 24 telas em 6 no fim de um dia de construcao seria trocar dispersao
+// por bug. Agrupar e reversivel; reescrever nao.
+
+const hoje: NavItem[] = [
+  { id: 'hoje',             label: 'Ordem do dia',      icon: <Sunrise className="w-4 h-4" /> },
+  { id: 'visao',            label: 'Visão geral',       icon: <Eye className="w-4 h-4" /> },
   { id: 'semana',           label: 'Semana',            icon: <CalendarCheck className="w-4 h-4" /> },
-  { id: 'portfolio',        label: 'Portfólio',         icon: <LayoutGrid className="w-4 h-4" /> },
   { id: 'trilha',           label: 'Roadmap',           icon: <Map className="w-4 h-4" /> },
   { id: 'lista-mestra',     label: 'Lista Mestra',      icon: <List className="w-4 h-4" /> },
-  { id: 'backlog',          label: 'Backlog Executivo', icon: <Zap className="w-4 h-4" /> },
-  { id: 'cadastro-empresa', label: 'Cadastro Empresa',  icon: <Building2 className="w-4 h-4" /> },
+  { id: 'backlog',          label: 'Backlog',           icon: <Zap className="w-4 h-4" /> },
+];
+
+const dinheiro: NavItem[] = [
   { id: 'financeiro',       label: 'Financeiro',        icon: <DollarSign className="w-4 h-4" /> },
-  { id: 'comercial',        label: 'Comercial',         icon: <TrendingUp className="w-4 h-4" /> },
-  { id: 'academy',          label: 'Academy',           icon: <BookOpen className="w-4 h-4" /> },
-  { id: 'marketplace',      label: 'Marketplace',       icon: <Store className="w-4 h-4" /> },
-  { id: 'clearix',          label: 'Central Clearix',   icon: <Network className="w-4 h-4" /> },
   { id: 'cobranca',         label: 'Cobrança',          icon: <Receipt className="w-4 h-4" /> },
+  { id: 'marketplace',      label: 'Marketplace',       icon: <Store className="w-4 h-4" /> },
 ];
 
-// Marketing — enxuto pós-emagrecimento 2026-07-30: espelho MKT + engajamento +
-// OSI (Mapa/Economia/Materiais/Afiliados em abas) + travas. Produção mora no MKT.
+const mercado: NavItem[] = [
+  { id: 'comercial',        label: 'Pipeline',          icon: <TrendingUp className="w-4 h-4" /> },
+  { id: 'fluxo-osi',        label: 'OSI',               icon: <Workflow className="w-4 h-4" /> },
+  { id: 'marketing-engajamento', label: 'Engajamento',  icon: <Heart className="w-4 h-4" /> },
+];
+
+const produtos: NavItem[] = [
+  { id: 'portfolio',        label: 'Portfólio',         icon: <LayoutGrid className="w-4 h-4" /> },
+  { id: 'ecossistemas',     label: 'Ecossistemas',      icon: <Boxes className="w-4 h-4" /> },
+  { id: 'mapa-vivo',        label: 'Mapa vivo',         icon: <Activity className="w-4 h-4" /> },
+  { id: 'clearix',          label: 'Central Clearix',   icon: <Network className="w-4 h-4" /> },
+  { id: 'academy',          label: 'Academy',           icon: <BookOpen className="w-4 h-4" /> },
+];
+
 const marketing: NavItem[] = [
-  { id: 'marketing',             label: 'Marketing (MKT)',  icon: <Radio className="w-4 h-4" /> },
-  { id: 'marketing-engajamento', label: 'Engajamento',      icon: <Heart className="w-4 h-4" /> },
-  { id: 'fluxo-osi',             label: 'OSI',              icon: <Workflow className="w-4 h-4" /> },
-  { id: 'travas-marketing',      label: 'Travas Marketing', icon: <ShieldCheck className="w-4 h-4" /> },
+  { id: 'marketing',        label: 'Espelho do MKT',    icon: <Radio className="w-4 h-4" /> },
+  { id: 'travas-marketing', label: 'Travas',            icon: <ShieldCheck className="w-4 h-4" /> },
 ];
 
-const sistema: NavItem[] = [
-  { id: 'guia',               label: 'Guia Operacional',    icon: <Compass className="w-4 h-4" /> },
-  { id: 'decisoes',           label: 'Decisões',            icon: <GitBranch className="w-4 h-4" /> },
-  { id: 'biblioteca',         label: 'Biblioteca',          icon: <Library className="w-4 h-4" /> },
-  { id: 'brand',              label: 'Brand Guidelines',    icon: <Palette className="w-4 h-4" /> },
+const empresa: NavItem[] = [
+  { id: 'cadastro-empresa', label: 'Cadastro',          icon: <Building2 className="w-4 h-4" /> },
+  { id: 'decisoes',         label: 'Decisões',          icon: <GitBranch className="w-4 h-4" /> },
+  { id: 'brand',            label: 'Marca',             icon: <Palette className="w-4 h-4" /> },
+  { id: 'biblioteca',       label: 'Biblioteca',        icon: <Library className="w-4 h-4" /> },
+  { id: 'guia',             label: 'Guia',              icon: <Compass className="w-4 h-4" /> },
 ];
 
 interface SidebarProps {
@@ -69,22 +87,30 @@ interface SidebarProps {
   onClose?: () => void;
 }
 
-type SectionKey = 'operacional' | 'marketing' | 'ecossistemas' | 'sistema';
+type SectionKey = 'hoje' | 'dinheiro' | 'mercado' | 'produtos' | 'marketing' | 'empresa';
 
-const SISTEMA_IDS = sistema.map(i => i.id) as ModuleId[];
-const MARKETING_IDS = marketing.map(i => i.id) as ModuleId[];
+// A secao responde a pergunta que o dono tem na cabeca, nao a arquitetura do app.
+const SECOES: { k: SectionKey; label: string; itens: NavItem[] }[] = [
+  { k: 'hoje',      label: 'Hoje',      itens: hoje },
+  { k: 'dinheiro',  label: 'Dinheiro',  itens: dinheiro },
+  { k: 'mercado',   label: 'Mercado',   itens: mercado },
+  { k: 'produtos',  label: 'Produtos',  itens: produtos },
+  { k: 'marketing', label: 'Marketing', itens: marketing },
+  { k: 'empresa',   label: 'Empresa',   itens: empresa },
+];
 
 function sectionOf(id: ModuleId): SectionKey {
-  if (id === 'ecossistemas' || id === 'mapa-vivo') return 'ecossistemas';
-  if (MARKETING_IDS.includes(id)) return 'marketing';
-  if (SISTEMA_IDS.includes(id)) return 'sistema';
-  return 'operacional';
+  return SECOES.find(s => s.itens.some(i => i.id === id))?.k ?? 'hoje';
 }
 
 const COLLAPSE_KEY = 'digiai.sidebar.collapsed.v1';
 
 function loadCollapsed(): Record<SectionKey, boolean> {
-  const fallback = { operacional: false, marketing: false, ecossistemas: true, sistema: false };
+  // So a secao do dia nasce aberta: o resto se abre sozinho quando voce navega
+  // para dentro dele. Seis cabecalhos cabem na tela; 24 itens nao cabiam.
+  const fallback: Record<SectionKey, boolean> = {
+    hoje: false, dinheiro: true, mercado: true, produtos: true, marketing: true, empresa: true,
+  };
   if (typeof window === 'undefined') return fallback;
   try {
     const raw = window.localStorage.getItem(COLLAPSE_KEY);
@@ -97,8 +123,9 @@ function loadCollapsed(): Record<SectionKey, boolean> {
 export default function Sidebar({ active, onSelect, mobileOpen = false, onClose }: SidebarProps) {
   const { user, role, signOut } = useAuth();
   const [collapsed, setCollapsed] = useState<Record<SectionKey, boolean>>(loadCollapsed);
-  const visibleOperacional = operacional.filter(item => canAccessModule(item.id, role));
-  const visibleMarketing = marketing.filter(item => canAccessModule(item.id, role));
+  const secoesVisiveis = SECOES
+    .map(s => ({ ...s, itens: s.itens.filter(item => canAccessModule(item.id, role)) }))
+    .filter(s => s.itens.length > 0);
   const activeSection = sectionOf(active);
 
   const toggleSection = (k: SectionKey) => {
@@ -152,47 +179,16 @@ export default function Sidebar({ active, onSelect, mobileOpen = false, onClose 
       </div>
 
       <nav className="flex-1 overflow-y-auto p-3 space-y-5">
-        <div>
-          <GroupHeader k="operacional" label="Operacional" />
-          {isOpen('operacional') && (
-            <div className="space-y-0.5">
-              {visibleOperacional.map(item => <NavButton key={item.id} item={item} />)}
-            </div>
-          )}
-        </div>
-
-        <div>
-          <GroupHeader k="marketing" label="Marketing" />
-          {isOpen('marketing') && (
-            <div className="space-y-0.5">
-              {visibleMarketing.map(item => <NavButton key={item.id} item={item} />)}
-            </div>
-          )}
-        </div>
-
-        <div>
-          <GroupHeader k="ecossistemas" label="Ecossistemas" />
-          {isOpen('ecossistemas') && (
-            <>
+        {secoesVisiveis.map(sec => (
+          <div key={sec.k}>
+            <GroupHeader k={sec.k} label={sec.label} />
+            {isOpen(sec.k) && (
               <div className="space-y-0.5">
-                <NavButton item={{ id: 'mapa-vivo', label: 'Mapa Vivo', icon: <Network className="w-4 h-4" /> }} />
-                <NavButton item={{ id: 'ecossistemas', label: 'Painel', icon: <Boxes className="w-4 h-4" /> }} />
+                {sec.itens.map(item => <NavButton key={item.id} item={item} />)}
               </div>
-              <div className="px-3 mt-2 text-[9px] font-mono text-muted/70 leading-relaxed">
-                Links e status de cada app moram no Painel (fonte: digital_assets · ADR-0029)
-              </div>
-            </>
-          )}
-        </div>
-
-        <div>
-          <GroupHeader k="sistema" label="Sistema" />
-          {isOpen('sistema') && (
-            <div className="space-y-0.5">
-              {sistema.map(item => <NavButton key={item.id} item={item} />)}
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        ))}
       </nav>
 
       <div className="p-3 border-t border-outline/10 space-y-2">

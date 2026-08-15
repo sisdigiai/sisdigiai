@@ -67,13 +67,12 @@ const MODULE_LABEL: Record<ModuleId, string> = {
 
 // Seção da navegação a que cada módulo pertence — usado como breadcrumb no header.
 const MODULE_SECTION: Record<ModuleId, string> = {
-  hoje: 'Operacional', visao: 'Operacional', semana: 'Operacional', portfolio: 'Operacional', trilha: 'Operacional', 'lista-mestra': 'Operacional',
-  backlog: 'Operacional', comercial: 'Operacional', 'cadastro-empresa': 'Operacional', financeiro: 'Operacional',
-  academy: 'Operacional', marketplace: 'Operacional', clearix: 'Operacional', cobranca: 'Operacional',
-  marketing: 'Marketing', 'marketing-engajamento': 'Marketing',
-  'fluxo-osi': 'Marketing', 'travas-marketing': 'Marketing',
-  ecossistemas: 'Ecossistemas', 'mapa-vivo': 'Ecossistemas',
-  decisoes: 'Sistema', biblioteca: 'Sistema', brand: 'Sistema', guia: 'Sistema',
+  hoje: 'Hoje', visao: 'Hoje', semana: 'Hoje', trilha: 'Hoje', 'lista-mestra': 'Hoje', backlog: 'Hoje',
+  financeiro: 'Dinheiro', cobranca: 'Dinheiro', marketplace: 'Dinheiro',
+  comercial: 'Mercado', 'fluxo-osi': 'Mercado', 'marketing-engajamento': 'Mercado',
+  portfolio: 'Produtos', ecossistemas: 'Produtos', 'mapa-vivo': 'Produtos', clearix: 'Produtos', academy: 'Produtos',
+  marketing: 'Marketing', 'travas-marketing': 'Marketing',
+  'cadastro-empresa': 'Empresa', decisoes: 'Empresa', brand: 'Empresa', biblioteca: 'Empresa', guia: 'Empresa',
 };
 
 export default function App() {
