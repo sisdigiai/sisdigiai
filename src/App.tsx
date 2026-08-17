@@ -32,6 +32,7 @@ import Comercial from './modules/Comercial';
 import Billing from './modules/Billing';
 import Inventario from './modules/Inventario';
 import Seo from './modules/Seo';
+import Vendas from './modules/Vendas';
 import { ModuleStub } from './modules/Stub';
 import { useAuth } from './contexts/AuthContext';
 import { canAccessModule } from './lib/permissions';
@@ -47,7 +48,7 @@ const MODULES: ModuleId[] = [
   'hoje', 'visao', 'semana', 'portfolio', 'trilha', 'lista-mestra', 'backlog', 'comercial',
   'cadastro-empresa', 'financeiro', 'academy', 'marketplace', 'clearix', 'cobranca',
   'marketing', 'marketing-engajamento', 'fluxo-osi', 'travas-marketing',
-  'ecossistemas', 'mapa-vivo', 'decisoes', 'biblioteca', 'brand', 'guia', 'inventario', 'seo',
+  'ecossistemas', 'mapa-vivo', 'decisoes', 'biblioteca', 'brand', 'guia', 'inventario', 'seo', 'vendas',
 ];
 
 function moduleFromHash(): ModuleId {
@@ -67,12 +68,13 @@ const MODULE_LABEL: Record<ModuleId, string> = {
   guia: 'Guia Operacional',
   inventario: 'Inventário',
   seo: 'SEO',
+  vendas: 'Vendas',
 };
 
 // Seção da navegação a que cada módulo pertence — usado como breadcrumb no header.
 const MODULE_SECTION: Record<ModuleId, string> = {
   hoje: 'Hoje', visao: 'Hoje', semana: 'Hoje', trilha: 'Hoje', 'lista-mestra': 'Hoje', backlog: 'Hoje',
-  financeiro: 'Dinheiro', cobranca: 'Dinheiro', marketplace: 'Dinheiro',
+  vendas: 'Dinheiro', financeiro: 'Dinheiro', cobranca: 'Dinheiro', marketplace: 'Dinheiro',
   comercial: 'Mercado', 'fluxo-osi': 'Mercado', 'marketing-engajamento': 'Mercado',
   portfolio: 'Produtos', ecossistemas: 'Produtos', 'mapa-vivo': 'Produtos', clearix: 'Produtos', academy: 'Produtos', seo: 'Produtos',
   marketing: 'Marketing', 'travas-marketing': 'Marketing',
@@ -165,6 +167,7 @@ export default function App() {
       case 'guia': return <Guia onNavigate={navigate} />;
       case 'inventario': return <Inventario />;
       case 'seo': return <Seo />;
+      case 'vendas': return <Vendas />;
       case 'comercial': return <Comercial />;
       default: {
         const stub = STUBS[activeModule];

@@ -20,7 +20,7 @@ export type ModuleId =
   | 'clearix' | 'cobranca' | 'marketing'
   | 'marketplace' | 'ecossistemas' | 'mapa-vivo' | 'travas-marketing'
   | 'fluxo-osi' | 'guia'
-  | 'marketing-engajamento' | 'inventario' | 'seo';
+  | 'marketing-engajamento' | 'inventario' | 'seo' | 'vendas';
 
 interface NavItem {
   id: ModuleId;
@@ -50,6 +50,7 @@ const hoje: NavItem[] = [
 const SEM_CADEIRA: ModuleId[] = ['visao', 'semana', 'trilha', 'lista-mestra', 'backlog'];
 
 const dinheiro: NavItem[] = [
+  { id: 'vendas',           label: 'Vendas',            icon: <TrendingUp className="w-4 h-4" /> },
   { id: 'financeiro',       label: 'Financeiro',        icon: <DollarSign className="w-4 h-4" /> },
   { id: 'cobranca',         label: 'Cobrança',          icon: <Receipt className="w-4 h-4" /> },
   { id: 'marketplace',      label: 'Marketplace',       icon: <Store className="w-4 h-4" /> },
