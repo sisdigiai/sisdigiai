@@ -25,9 +25,16 @@ export interface VendaEvento {
 export interface Canal {
   canal: string;
   cobre: string;
-  pagamentos_reais: number;
+  vendas_reais: number;
+  eventos_recebidos: number;
+  eventos_validos: number;
+  ultimo_evento: string | null;
   assinantes: number | null;
-  estado: 'ativo' | 'ligado sem venda' | 'sem integracao';
+  dias_desde_evento: number | null;
+  /** Cinco estados porque "zero venda" tem causas que pedem ações opostas. */
+  estado: 'ativo' | 'recebendo sem venda' | 'validou uma vez, silencioso desde' | 'so teste manual' | 'nunca chamado';
+  /** O que fazer. Nulo quando o canal já vende. */
+  pendencia: string | null;
 }
 
 export interface Resumo {

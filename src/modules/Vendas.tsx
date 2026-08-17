@@ -14,10 +14,16 @@ import { vendasStore, janelas, porProduto, type VendaEvento, type Canal, type Re
 // perceberia se não houvesse onde aparecer — foi esse silêncio que deixou a fila do MKT
 // 11 dias travada e a coleta de audiência 39 dias parada.
 
+// Cinco estados, não dois. "Zero venda" tem causas que pedem ações opostas: cano por
+// configurar no painel do fornecedor, segredo divergente, ou simplesmente ninguém
+// comprou. Fundir isso num "sem integração" manda construir o que já existe — foi o
+// erro que esta tela cometeu no primeiro dia.
 const ESTADO_CANAL: Record<string, { Icone: typeof CircleCheck; cor: string; texto: string }> = {
-  'ativo':            { Icone: CircleCheck, cor: 'text-success', texto: 'recebendo venda' },
-  'ligado sem venda': { Icone: PlugZap,     cor: 'text-warning', texto: 'integrado, nenhuma venda ainda' },
-  'sem integracao':   { Icone: Unplug,      cor: 'text-danger',  texto: 'sem integração — venda aqui não seria vista' },
+  'ativo':                            { Icone: CircleCheck, cor: 'text-success', texto: 'recebendo venda' },
+  'recebendo sem venda':              { Icone: PlugZap,     cor: 'text-warning', texto: 'cano ativo, ninguém comprou' },
+  'validou uma vez, silencioso desde': { Icone: PlugZap,    cor: 'text-warning', texto: 'autenticou uma vez e calou' },
+  'so teste manual':                  { Icone: Unplug,      cor: 'text-danger',  texto: 'só chamada de teste — fornecedor nunca chamou' },
+  'nunca chamado':                    { Icone: Unplug,      cor: 'text-danger',  texto: 'nunca chamado' },
 };
 
 function brl(v: number): string {
@@ -99,7 +105,7 @@ export default function Vendas() {
             <h2 className="font-mono text-[11px] uppercase tracking-[0.2em] text-secondary mb-3">Canais de venda</h2>
             <div className="border border-outline divide-y divide-outline">
               {canais.map((c) => {
-                const e = ESTADO_CANAL[c.estado] ?? ESTADO_CANAL['sem integracao'];
+                const e = ESTADO_CANAL[c.estado] ?? ESTADO_CANAL['nunca chamado'];
                 return (
                   <div key={c.canal} className="bg-surface-low px-4 py-3 flex items-start gap-3">
                     <e.Icone className={`w-4 h-4 mt-0.5 shrink-0 ${e.cor}`} />
@@ -109,10 +115,16 @@ export default function Vendas() {
                         <span className={`font-mono text-[10px] uppercase tracking-wider ${e.cor}`}>{e.texto}</span>
                       </div>
                       <p className="text-on-surface-variant text-sm mt-0.5">{c.cobre}</p>
+                      {c.pendencia && (
+                        <p className="text-sm text-warning mt-1 leading-snug">{c.pendencia}</p>
+                      )}
                     </div>
-                    <div className="text-right font-mono text-[11px] text-muted shrink-0">
-                      {c.pagamentos_reais} venda(s)
+                    <div className="text-right font-mono text-[11px] text-muted shrink-0 whitespace-nowrap">
+                      {c.vendas_reais} venda(s)
                       {c.assinantes != null && <><br />{c.assinantes} assinante(s)</>}
+                      {c.dias_desde_evento != null && (
+                        <><br />último sinal há {c.dias_desde_evento}d</>
+                      )}
                     </div>
                   </div>
                 );
@@ -131,9 +143,10 @@ export default function Vendas() {
               </p>
               <p className="text-sm text-muted leading-relaxed mt-2">
                 A tela existe antes da primeira venda de propósito — sem ela, ninguém perceberia
-                a primeira acontecer. E o <strong className="text-on-surface-variant">Hotmart está sem
-                integração</strong>: venda do OSI hoje não seria vista por este painel, o que é
-                diferente de não ter vendido.
+                a primeira acontecer. Veja o estado de cada canal acima: código, segredo e tabelas
+                estão prontos nos três, e <strong className="text-on-surface-variant">o que falta é
+                a URL de postback registrada no painel de cada fornecedor</strong>. Enquanto isso não
+                for feito, uma venda real não seria vista aqui — o que é bem diferente de não ter vendido.
               </p>
             </div>
           )}
