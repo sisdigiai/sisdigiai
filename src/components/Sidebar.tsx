@@ -20,7 +20,7 @@ export type ModuleId =
   | 'clearix' | 'cobranca' | 'marketing'
   | 'marketplace' | 'ecossistemas' | 'mapa-vivo' | 'travas-marketing'
   | 'fluxo-osi' | 'guia'
-  | 'marketing-engajamento' | 'inventario';
+  | 'marketing-engajamento' | 'inventario' | 'seo';
 
 interface NavItem {
   id: ModuleId;
@@ -67,6 +67,7 @@ const produtos: NavItem[] = [
   { id: 'mapa-vivo',        label: 'Mapa vivo',         icon: <Activity className="w-4 h-4" /> },
   { id: 'clearix',          label: 'Central Clearix',   icon: <Network className="w-4 h-4" /> },
   { id: 'academy',          label: 'Academy',           icon: <BookOpen className="w-4 h-4" /> },
+  { id: 'seo',              label: 'SEO',               icon: <Globe className="w-4 h-4" /> },
 ];
 
 const marketing: NavItem[] = [

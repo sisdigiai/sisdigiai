@@ -31,6 +31,7 @@ import Guia from './modules/Guia';
 import Comercial from './modules/Comercial';
 import Billing from './modules/Billing';
 import Inventario from './modules/Inventario';
+import Seo from './modules/Seo';
 import { ModuleStub } from './modules/Stub';
 import { useAuth } from './contexts/AuthContext';
 import { canAccessModule } from './lib/permissions';
@@ -46,7 +47,7 @@ const MODULES: ModuleId[] = [
   'hoje', 'visao', 'semana', 'portfolio', 'trilha', 'lista-mestra', 'backlog', 'comercial',
   'cadastro-empresa', 'financeiro', 'academy', 'marketplace', 'clearix', 'cobranca',
   'marketing', 'marketing-engajamento', 'fluxo-osi', 'travas-marketing',
-  'ecossistemas', 'mapa-vivo', 'decisoes', 'biblioteca', 'brand', 'guia', 'inventario',
+  'ecossistemas', 'mapa-vivo', 'decisoes', 'biblioteca', 'brand', 'guia', 'inventario', 'seo',
 ];
 
 function moduleFromHash(): ModuleId {
@@ -65,6 +66,7 @@ const MODULE_LABEL: Record<ModuleId, string> = {
   'travas-marketing': 'Travas Marketing',
   guia: 'Guia Operacional',
   inventario: 'Inventário',
+  seo: 'SEO',
 };
 
 // Seção da navegação a que cada módulo pertence — usado como breadcrumb no header.
@@ -72,7 +74,7 @@ const MODULE_SECTION: Record<ModuleId, string> = {
   hoje: 'Hoje', visao: 'Hoje', semana: 'Hoje', trilha: 'Hoje', 'lista-mestra': 'Hoje', backlog: 'Hoje',
   financeiro: 'Dinheiro', cobranca: 'Dinheiro', marketplace: 'Dinheiro',
   comercial: 'Mercado', 'fluxo-osi': 'Mercado', 'marketing-engajamento': 'Mercado',
-  portfolio: 'Produtos', ecossistemas: 'Produtos', 'mapa-vivo': 'Produtos', clearix: 'Produtos', academy: 'Produtos',
+  portfolio: 'Produtos', ecossistemas: 'Produtos', 'mapa-vivo': 'Produtos', clearix: 'Produtos', academy: 'Produtos', seo: 'Produtos',
   marketing: 'Marketing', 'travas-marketing': 'Marketing',
   inventario: 'Empresa', 'cadastro-empresa': 'Empresa', decisoes: 'Empresa', brand: 'Empresa', biblioteca: 'Empresa', guia: 'Empresa',
 };
@@ -162,6 +164,7 @@ export default function App() {
       case 'fluxo-osi': return <OsiHub onNavigate={navigate} />;
       case 'guia': return <Guia onNavigate={navigate} />;
       case 'inventario': return <Inventario />;
+      case 'seo': return <Seo />;
       case 'comercial': return <Comercial />;
       default: {
         const stub = STUBS[activeModule];
