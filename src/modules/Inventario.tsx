@@ -46,11 +46,13 @@ export default function Inventario() {
       .finally(() => setCarregando(false));
   }, []);
 
+  // O 4º quadro NÃO é custo. `custo_mensal` está vazio em todas as linhas — o custo
+  // de infraestrutura vive em `finance.infra_costs`, e um quadro que nunca preenche
+  // é ruído, não informação. O que importa aqui é o tamanho da lacuna de verificação.
   const placar = useMemo(() => {
     const conferidos = itens.filter(foiConferido).length;
     const problema = itens.filter((i) => i.status === 'quebrado' || i.status === 'pausado').length;
-    const custo = itens.reduce((s, i) => s + (i.custo_mensal ?? 0), 0);
-    return { total: itens.length, conferidos, problema, custo };
+    return { total: itens.length, conferidos, problema, pendentes: itens.length - conferidos };
   }, [itens]);
 
   const visiveis = useMemo(() => {
@@ -106,7 +108,7 @@ export default function Inventario() {
               { rotulo: 'itens', valor: String(placar.total) },
               { rotulo: 'conferidos', valor: `${placar.conferidos}/${placar.total}` },
               { rotulo: 'com problema', valor: String(placar.problema) },
-              { rotulo: 'custo/mês', valor: moeda(placar.custo, 'R$') ?? '—' },
+              { rotulo: 'falta conferir', valor: String(placar.pendentes) },
             ].map((c) => (
               <div key={c.rotulo} className="bg-surface-low p-4">
                 <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted mb-1">{c.rotulo}</div>
