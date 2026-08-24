@@ -43,6 +43,12 @@ type Publicacao = {
 
 const DIAS = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
 
+/** Nulo vira travessao, nao "R$ 0,00" — ausencia de dado e diferente de zero. */
+function brl(v: number | null | undefined): string {
+  if (v == null) return '—';
+  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
 function relativo(iso: string | null): string {
   if (!iso) return 'nunca';
   const h = Math.floor((Date.now() - new Date(iso).getTime()) / 3600000);
@@ -308,6 +314,37 @@ export default function MarketingEspelho() {
                       : <span className="text-warning">última publicação {pulso.ultima_publicacao ?? '—'}</span>}
                     {' · '}coleta diária 11h (Vercel Crons)
                   </div>
+
+                  {/* Financeiro do Pulso. Caixa e consumo aparecem SEPARADOS e nunca
+                      somados: o topup e dinheiro saindo, o consumo e uso do credito ja
+                      comprado. Somar os dois da R$ 9.873 e infla o burn em ~3,8x — o
+                      mesmo erro que este painel ja cometeu com o aporte intelectual. */}
+                  {pulso.custo_caixa_total_brl != null && (
+                    <div className="border-t border-outline pt-2 mt-1 space-y-1">
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <div className="text-sm font-bold tabular-nums text-on-surface">{brl(pulso.custo_caixa_total_brl)}</div>
+                          <div className="text-[10px] font-mono uppercase text-muted leading-tight">custo de caixa<br /><span className="text-[9px]">dinheiro que saiu</span></div>
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold tabular-nums text-on-surface-variant">{brl(pulso.custo_consumo_total_brl)}</div>
+                          <div className="text-[10px] font-mono uppercase text-muted leading-tight">crédito consumido<br /><span className="text-[9px]">gerencial, não é despesa</span></div>
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold tabular-nums text-on-surface">{brl(pulso.custo_caixa_por_video_brl)}</div>
+                          <div className="text-[10px] font-mono uppercase text-muted leading-tight">por vídeo<br /><span className="text-[9px]">caixa ÷ publicações</span></div>
+                        </div>
+                      </div>
+                      <div className="text-[11px] text-muted">
+                        Receita: {brl(pulso.receita_total_brl)} · recebido {brl(pulso.receita_recebida_brl)}
+                        {(pulso.receita_total_brl ?? 0) === 0 && <span className="text-warning"> — nenhum gate de monetização aberto ainda</span>}
+                      </div>
+                      <div className="text-[10px] text-muted leading-snug">
+                        Os dois custos <strong>não se somam</strong>: o crédito consumido é uso do
+                        topup já pago. Somar inflaria o burn em ~3,8×.
+                      </div>
+                    </div>
+                  )}
                 </>
               ) : <div className="text-sm text-muted italic">Espelho indisponível.</div>}
             </div>

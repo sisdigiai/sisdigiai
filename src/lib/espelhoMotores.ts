@@ -29,6 +29,25 @@ export interface EspelhoPulso {
   pipeline: Record<string, number>;
   ideias: number;
   canais: number;
+
+  // Financeiro (o Pulso passou a publicar em 2026-08-24).
+  //
+  // TRAVA: `custo_caixa_*` e `custo_consumo_*` NUNCA se somam. O Pulso compra
+  // credito do Higgsfield (topup, dinheiro saindo) e depois consome esse credito
+  // gerando video (higgsfield, uso do que ja foi pago). Somar da R$ 9.873 e infla
+  // o burn em ~3,8x. E o mesmo erro que o proprio digiai cometeu em junho/2026,
+  // somando aporte intelectual ao caixa e mostrando burn de ~R$ 45k/mes quando o
+  // real era R$ 1-3k -- corrigido pela migration 026 com coluna separada.
+  custo_caixa_total_brl?: number | null;
+  custo_caixa_mes_brl?: number | null;
+  /** Uso de credito ja comprado. Metrica gerencial de eficiencia, NAO despesa. */
+  custo_consumo_total_brl?: number | null;
+  custo_por_servico?: Record<string, number> | null;
+  receita_total_brl?: number | null;
+  receita_mes_brl?: number | null;
+  /** So o que ja caiu na conta. */
+  receita_recebida_brl?: number | null;
+  custo_caixa_por_video_brl?: number | null;
 }
 
 async function lerEspelho<T>(base: string, anon: string, view: string): Promise<T | null> {
