@@ -18,7 +18,7 @@ const ITEMS: Item[] = [
   { id: 'marketplace', label: 'Marketplace', group: 'Operacional' },
   { id: 'clearix', label: 'Central Clearix', group: 'Operacional' },
   { id: 'marketing', label: 'Marketing (espelho MKT)', group: 'Marketing' },
-  { id: 'mkt-crescimento', label: 'Crescimento (redes)', group: 'Marketing' },
+  { id: 'mkt-crescimento', label: 'Radar 360 (analytics social)', group: 'Marketing' },
   { id: 'mkt-calc', label: 'Clearix Calc (isca)', group: 'Marketing' },
   { id: 'marketing-engajamento', label: 'Engajamento', group: 'Marketing' },
   { id: 'fluxo-osi', label: 'OSI (mapa · economia · materiais · afiliados)', group: 'Marketing' },

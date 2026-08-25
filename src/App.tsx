@@ -64,7 +64,7 @@ const MODULE_LABEL: Record<ModuleId, string> = {
   backlog: 'Backlog Executivo', comercial: 'Comercial', 'cadastro-empresa': 'Cadastro Empresa',
   financeiro: 'Financeiro', academy: 'Academy', 'fluxo-osi': 'OSI',
   marketing: 'Marketing', 'marketing-engajamento': 'Engajamento',
-  'mkt-crescimento': 'Crescimento', 'mkt-calc': 'Calc',
+  'mkt-crescimento': 'Radar 360', 'mkt-calc': 'Calc',
   marketplace: 'Marketplace', clearix: 'Central Clearix', cobranca: 'Cobrança',
   ecossistemas: 'Ecossistemas', 'mapa-vivo': 'Mapa Vivo', decisoes: 'Decisões', biblioteca: 'Biblioteca', brand: 'Brand Guidelines',
   'travas-marketing': 'Travas Marketing',

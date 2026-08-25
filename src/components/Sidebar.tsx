@@ -74,7 +74,7 @@ const produtos: NavItem[] = [
 
 const marketing: NavItem[] = [
   { id: 'marketing',        label: 'Espelho do MKT',    icon: <Radio className="w-4 h-4" /> },
-  { id: 'mkt-crescimento',  label: 'Crescimento',       icon: <TrendingUp className="w-4 h-4" /> },
+  { id: 'mkt-crescimento',  label: 'Radar 360',         icon: <TrendingUp className="w-4 h-4" /> },
   { id: 'mkt-calc',         label: 'Calc (isca)',       icon: <Calculator className="w-4 h-4" /> },
   { id: 'travas-marketing', label: 'Travas',            icon: <ShieldCheck className="w-4 h-4" /> },
 ];
