@@ -20,6 +20,8 @@ import Financeiro from './modules/Financeiro';
 import Academy from './modules/Academy';
 import Marketing from './modules/Marketing';
 import MarketingEspelho from './modules/MarketingEspelho';
+import MktCrescimento from './modules/MktCrescimento';
+import MktCalc from './modules/MktCalc';
 import Marketplace from './modules/Marketplace';
 import Ecossistemas from './modules/Ecossistemas';
 import MapaVivo from './modules/MapaVivo';
@@ -47,7 +49,7 @@ const PUBLIC_ROUTES = ['/osi/depoimento', '/osi'];
 const MODULES: ModuleId[] = [
   'hoje', 'visao', 'semana', 'portfolio', 'trilha', 'lista-mestra', 'backlog', 'comercial',
   'cadastro-empresa', 'financeiro', 'academy', 'marketplace', 'clearix', 'cobranca',
-  'marketing', 'marketing-engajamento', 'fluxo-osi', 'travas-marketing',
+  'marketing', 'mkt-crescimento', 'mkt-calc', 'marketing-engajamento', 'fluxo-osi', 'travas-marketing',
   'ecossistemas', 'mapa-vivo', 'decisoes', 'biblioteca', 'brand', 'guia', 'inventario', 'seo', 'vendas',
 ];
 
@@ -62,6 +64,7 @@ const MODULE_LABEL: Record<ModuleId, string> = {
   backlog: 'Backlog Executivo', comercial: 'Comercial', 'cadastro-empresa': 'Cadastro Empresa',
   financeiro: 'Financeiro', academy: 'Academy', 'fluxo-osi': 'OSI',
   marketing: 'Marketing', 'marketing-engajamento': 'Engajamento',
+  'mkt-crescimento': 'Crescimento', 'mkt-calc': 'Calc',
   marketplace: 'Marketplace', clearix: 'Central Clearix', cobranca: 'Cobrança',
   ecossistemas: 'Ecossistemas', 'mapa-vivo': 'Mapa Vivo', decisoes: 'Decisões', biblioteca: 'Biblioteca', brand: 'Brand Guidelines',
   'travas-marketing': 'Travas Marketing',
@@ -78,6 +81,7 @@ const MODULE_SECTION: Record<ModuleId, string> = {
   comercial: 'Mercado', 'fluxo-osi': 'Mercado', 'marketing-engajamento': 'Mercado',
   portfolio: 'Produtos', ecossistemas: 'Produtos', 'mapa-vivo': 'Produtos', clearix: 'Produtos', academy: 'Produtos', seo: 'Produtos',
   marketing: 'Marketing', 'travas-marketing': 'Marketing',
+  'mkt-crescimento': 'Marketing', 'mkt-calc': 'Marketing',
   inventario: 'Empresa', 'cadastro-empresa': 'Empresa', decisoes: 'Empresa', brand: 'Empresa', biblioteca: 'Empresa', guia: 'Empresa',
 };
 
@@ -157,6 +161,8 @@ export default function App() {
       case 'financeiro': return <Financeiro />;
       case 'academy': return <Academy />;
       case 'marketing': return <MarketingEspelho />;
+      case 'mkt-crescimento': return <MktCrescimento />;
+      case 'mkt-calc': return <MktCalc />;
       case 'marketing-engajamento': return <Marketing view="engajamento" />;
       case 'marketplace': return <Marketplace />;
       case 'ecossistemas': return <Ecossistemas />;

@@ -6,7 +6,7 @@ import {
   Camera, Wand2, Boxes, Search, ShieldCheck, Workflow, ChevronDown,
   GraduationCap, Languages, Calendar as CalendarIcon, Globe, BarChart3,
   Lightbulb, Heart, Package, Users, Receipt, Radio, CalendarCheck,
-  Sunrise,
+  Sunrise, Calculator,
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
@@ -20,7 +20,8 @@ export type ModuleId =
   | 'clearix' | 'cobranca' | 'marketing'
   | 'marketplace' | 'ecossistemas' | 'mapa-vivo' | 'travas-marketing'
   | 'fluxo-osi' | 'guia'
-  | 'marketing-engajamento' | 'inventario' | 'seo' | 'vendas';
+  | 'marketing-engajamento' | 'inventario' | 'seo' | 'vendas'
+  | 'mkt-crescimento' | 'mkt-calc';
 
 interface NavItem {
   id: ModuleId;
@@ -73,6 +74,8 @@ const produtos: NavItem[] = [
 
 const marketing: NavItem[] = [
   { id: 'marketing',        label: 'Espelho do MKT',    icon: <Radio className="w-4 h-4" /> },
+  { id: 'mkt-crescimento',  label: 'Crescimento',       icon: <TrendingUp className="w-4 h-4" /> },
+  { id: 'mkt-calc',         label: 'Calc (isca)',       icon: <Calculator className="w-4 h-4" /> },
   { id: 'travas-marketing', label: 'Travas',            icon: <ShieldCheck className="w-4 h-4" /> },
 ];
 

@@ -43,6 +43,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Sem tocar em schema nem na edge function** (R-032): `v_marketing_landing_leads` já expunha `product` e todos os `utm_*`, sem filtro de produto. Verificado em produção.
 - Cobertura fechada: os 4 produtos que chegam em `landing_leads` (`osi`, `osi-afiliado`, `clearix`, `clearix-calc`) têm tela.
 
+### Adicionado (2026-08-25 — Crescimento e Calc mudam de casa: dados no digiai, motor no MKT)
+- **Decisão do dono**: os módulos `/analytics` e `/calc` do app MKT sempre leram o banco do digiai (schema `mkt` + views `v_mkt_calc_*`) — só a UI morava no app errado. Portados completos pro painel: **Crescimento** (`#/mkt-crescimento`: KPIs, sacadas automáticas, evolução por marca, matriz marca×rede, rankings formato/gatilho, janelas de horário, top posts, botão sincronizar invocando a mesma edge `sync-metricas`, e o aviso de coleta parada ≥3 dias — a lição dos 39 dias veio junto) e **Calc** (`#/mkt-calc`: funil da isca — usos, sessões, leads, campanhas UTM, ritmo diário).
+- Nada mudou no banco: mesmas tabelas, mesma RLS (`mkt.pode_ver_brand` segue travando por marca; o dono é admin no mkt e vê tudo). Seção Marketing agora: Espelho → Crescimento → Calc → Travas.
+- **Despacho R-032 ao MKT** (`digiai_mkt/_DESPACHO_EMAGRECER_DO_DIGIAI_2026-08-25.md`): remover as duas telas, apontar links pro painel, MANTER a edge e os crons (coleta é do motor), e listar outras telas de leitura candidatas a migrar. A régua: "como estamos?" mora no digiai; "publicar/produzir" mora no MKT.
+
 ### Repassado (2026-08-20 — ADR-0053 aportes intercompany: 2 despachos + 1 risco devolvido)
 - **Briefing do `clearix_finance` verificado** contra o estado real: o espelho do aporte 7.4 está vivo aqui (`finance.infra_costs` — 55 lançamentos, 13 serviços, R$ 19.619,36, sync 20/08, 4 meses parciais respeitados).
 - **Despachos R-032 emitidos** — Pola Petit (`polapetit/_DESPACHO_APORTES_DO_DIGIAI_2026-08-20.md`: 7.5 aporte recebido + 3.4.7 receita retida na ótica, loja 007, 483+35 itens já carimbados, "não recadastre nada") e GJ (`gj/_DESPACHO_APORTES_DO_DIGIAI_2026-08-20.md`: 5.3.9 retirada 976 itens/R$ 151,7k + 3.4.2 conta-ponte, com alerta de dupla contagem e de que transferência não é fluxo).
