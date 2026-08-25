@@ -431,31 +431,48 @@ export default function MktCrescimento() {
           })()}
 
           {/* ═══ VISÃO ═══ */}
-          {aba === 'visao' && (
+          {aba === 'visao' && (() => {
+            // A Visão se ADAPTA à marca: quem tem motor de vídeo mostra views;
+            // quem só tem redes mostra posts/engajamento — 0 gigante era falha
+            // de desenho (marca sem motor parecia marca morta).
+            const temMotor = viewsRecorte > 0;
+            // share das redes das marcas: engajamento por plataforma (mkt real do recorte)
+            const engPorRede = (() => {
+              const m = new Map<string, number>();
+              for (const l of medidos) m.set(l.p.platform, (m.get(l.p.platform) ?? 0) + (l.m!.engajamento || 0));
+              return [...m.entries()].sort((a, b) => b[1] - a[1]);
+            })();
+            const engRedeTot = Math.max(1, engPorRede.reduce((a, [, v]) => a + v, 0));
+            const share = temMotor ? sharePlats : engPorRede;
+            const shTot = temMotor ? shareTot : engRedeTot;
+            return (
             <>
-              <Decide texto={<><b>O que se decide aqui:</b> o tamanho real do alcance no recorte — e onde ele está concentrado.</>} />
+              <Decide texto={<><b>O que se decide aqui:</b> o tamanho real do alcance e da atenção no recorte — e onde estão concentrados.</>} />
               <div className="grid gap-3 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
                 <div className="border border-outline/15 bg-surface-container p-5" style={{ gridColumn: 'span 2' }}>
-                  <div className={lbl}>views no período (pulso + limelight) · {rotuloRecorte}</div>
-                  <div className="font-mono tabular-nums font-semibold text-on-surface" style={{ fontSize: 'clamp(30px,4.5vw,44px)', lineHeight: 1.1 }}>{nf(viewsRecorte)}</div>
+                  <div className={lbl}>{temMotor ? 'views no período (motores de vídeo)' : 'engajamento nas redes no período'} · {rotuloRecorte}</div>
+                  <div className="font-mono tabular-nums font-semibold text-on-surface" style={{ fontSize: 'clamp(30px,4.5vw,44px)', lineHeight: 1.1 }}>{nf(temMotor ? viewsRecorte : engTotal)}</div>
                   <div className="text-[12px] text-muted mt-1 mb-3">
-                    {mostrarPulso && `Pulso ${nf(pulsoTot.views)}`}{mostrarPulso && mostrarLime && ' · '}{mostrarLime && `Limelight ${nf(limeTot.views)}`} · por data de publicação
+                    {temMotor
+                      ? <>{mostrarPulso && `Pulso ${nf(pulsoTot.views)}`}{mostrarPulso && mostrarLime && ' · '}{mostrarLime && `Limelight ${nf(limeTot.views)}`} · por data de publicação</>
+                      : <>{linhas.length} publicações · {medidos.length} medidas{fMarca ? ' · esta marca não tem motor de vídeo — o dado dela vive nas redes' : ''}</>}
                   </div>
-                  {sharePlats.length > 0 ? (
+                  {share.length > 0 ? (
                     <>
                       <div className="flex h-6 gap-0.5">
-                        {sharePlats.map(([p, v]) => (
-                          <div key={p} title={`${platName(p)} ${nf(v)} (${Math.round(v / shareTot * 100)}%)`}
-                            style={{ width: `${(v / shareTot * 100).toFixed(1)}%`, background: PLAT_COR[p] ?? COR_SEC, minWidth: 2 }} />
+                        {share.map(([p, v]) => (
+                          <div key={p} title={`${platName(p)} ${nf(v)} (${Math.round(v / shTot * 100)}%)`}
+                            style={{ width: `${(v / shTot * 100).toFixed(1)}%`, background: PLAT_COR[p] ?? COR_SEC, minWidth: 2 }} />
                         ))}
                       </div>
                       <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-[12px] text-on-surface-variant">
-                        {sharePlats.map(([p, v]) => (
+                        {share.map(([p, v]) => (
                           <span key={p}><span className="inline-block w-2.5 h-2.5 mr-1.5 align-[-1px]" style={{ background: PLAT_COR[p] ?? COR_SEC }} />{platName(p)} {nf(v)}</span>
                         ))}
                       </div>
+                      <div className={lbl + ' mt-2'}>{temMotor ? 'participação de views por plataforma' : 'participação de engajamento por rede'}</div>
                     </>
-                  ) : <div className="text-sm text-muted py-3">sem views neste recorte.</div>}
+                  ) : <div className="text-sm text-muted py-3">sem publicações medidas neste recorte — se a marca é nova no censo, a curva nasce com os próximos dias.</div>}
                 </div>
                 <div className="border border-outline/15 bg-surface-container p-5">
                   <div className={lbl}>seguidores (censo, fim do período)</div>
@@ -466,13 +483,14 @@ export default function MktCrescimento() {
                 </div>
               </div>
               <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <Kpi icon={<TrendingUp className="w-4 h-4" />} label="pubs no período" value={nf(pubsRecorte)} sub="pulso + limelight" glow={COR_SEC} />
-                <Kpi icon={<Sparkles className="w-4 h-4" />} label="interações" value={nf(engRecorte)} sub="likes + comentários + shares" glow={COR_OK} />
-                <Kpi icon={<Eye className="w-4 h-4" />} label="views/pub" value={pubsRecorte ? nf(Math.round(viewsRecorte / pubsRecorte)) : '—'} sub="eficiência média do recorte" glow={COR_WARN} />
-                <Kpi icon={<Users className="w-4 h-4" />} label="posts MKT 7d" value={cadeia ? String(cadeia.posts_7d) : '—'} sub="redes das marcas" glow={COR_SEC} />
+                <Kpi icon={<Newspaper className="w-4 h-4" />} label="posts nas redes" value={nf(linhas.length)} sub={`no recorte · ${medidos.length} medidos`} glow={COR_SEC} />
+                <Kpi icon={<Sparkles className="w-4 h-4" />} label="engajamento redes" value={nf(engTotal)} sub={`média ${nf(Math.round(engMed))}/post`} glow={COR_OK} />
+                <Kpi icon={<Film className="w-4 h-4" />} label="views motores" value={temMotor ? nf(viewsRecorte) : '—'} sub={temMotor ? `${nf(pubsRecorte)} pubs · ${nf(engRecorte)} interações` : fMarca ? 'sem motor nesta marca' : 'sem views no recorte'} glow={COR_WARN} />
+                <Kpi icon={<Eye className="w-4 h-4" />} label="alcance redes" value={temAlcance ? nf(alcanceTotal) : '🔒'} sub={temAlcance ? (taxaEng != null ? `taxa ${taxaEng.toFixed(1)}%` : '') : 'aguarda permissão Meta'} glow={COR_SEC} />
               </section>
             </>
-          )}
+            );
+          })()}
 
           {/* ═══ AUDIÊNCIA ═══ */}
           {aba === 'audiencia' && (

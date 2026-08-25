@@ -43,6 +43,10 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Sem tocar em schema nem na edge function** (R-032): `v_marketing_landing_leads` já expunha `product` e todos os `utm_*`, sem filtro de produto. Verificado em produção.
 - Cobertura fechada: os 4 produtos que chegam em `landing_leads` (`osi`, `osi-afiliado`, `clearix`, `clearix-calc`) têm tela.
 
+### Corrigido (2026-08-25 — Visão do Radar se adapta à marca; marca sem motor não é marca morta)
+- Achado do dono usando o app: filtrar por DIGIAI/Lancaster/OSI/Pessoal zerava a Visão — o hero só somava views dos motores de vídeo (Pulso→PULSO, Limelight→Mello). **Marca sem motor parecia marca morta**, sendo que tem posts, engajamento, alcance e seguidores reais no recorte.
+- A Visão agora se adapta: com motor no recorte, hero = views + participação por plataforma; sem motor, hero = **engajamento das redes** + participação de engajamento por rede (dados reais de content_performance), com a explicação honesta ("esta marca não tem motor de vídeo — o dado dela vive nas redes"). KPIs reformulados: posts nas redes · engajamento · views motores (— quando não há) · alcance.
+
 ### Adicionado (2026-08-25 — RADAR 360: o mock aprovado vira módulo)
 - Decisão do dono após aprovar o mock v2: "montar tudo e ir ligando o que falta". O módulo Crescimento foi reescrito como **Radar 360** — 6 abas (Visão / Audiência / Conteúdo / Vídeo & motores / Funil / Saúde da coleta), com a regra estrutural: **todas as redes (IG, FB, TikTok, YouTube, Kwai, LinkedIn, X), todos os canais e todas as marcas presentes desde já** — o que não tem coleta aparece como "a ligar", nunca some.
 - **Filtros globais estendidos**: período hoje/7/14/30/60/90d/6m/12m/tudo **+ intervalo personalizado (2 datas)**; rede (7 opções); marca (todas do mkt.brands). O recorte ativo aparece sempre no cabeçalho do filtro.
