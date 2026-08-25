@@ -43,6 +43,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Sem tocar em schema nem na edge function** (R-032): `v_marketing_landing_leads` já expunha `product` e todos os `utm_*`, sem filtro de produto. Verificado em produção.
 - Cobertura fechada: os 4 produtos que chegam em `landing_leads` (`osi`, `osi-afiliado`, `clearix`, `clearix-calc`) têm tela.
 
+### Verificado ao vivo (2026-08-25 — as 6 abas do Radar com dado real + um 403 silencioso de semanas)
+- Prova visual completa no app logado (Chrome Pessoal): Visão (169,9k views no recorte, share por plataforma, 1.518 seg — o +1 do LinkedIn já no censo), Audiência (9 contas, matriz 7 redes, evolução 9 dias), Conteúdo, Vídeo (3 cards de decisão com sacadas reais: Kwai 730 views/pub · TikTok 153 no Limelight), Funil (cadeia com carimbos + Calc 6,7% conversão) e Saúde (fila 462 em vermelho, cobertura conta×coleta).
+- **Bug histórico achado e corrigido**: `mkt.content_performance` era a ÚNICA tabela do schema sem GRANT pra `authenticated` — PostgREST devolvia 403 e o loader engolia o erro. **Engajamento aparecia 0 em silêncio, inclusive no Analytics antigo do MKT.** Grant aplicado (RLS por marca já existia); a aba Conteúdo acordou: 28 posts medidos, formatos e gatilhos com taxa.
+- **Alcance destravou**: 143 de alcance com taxa 9,1% fluindo — a permissão Meta que estava 🔒 chegou. E um item de higiene pro MKT: vocabulário de formato tem "reels" E "reel" duplicados.
+
 ### Renovado (2026-08-25 — fila OAuth zerada, um por um com o dono no navegador)
 - **LinkedIn pessoal**: renovado pelo dono no Chrome Pessoal (fluxo `linkedin-oauth?state=pessoal` consertado horas antes) — válido até **24/10/2026**, token no Vault (`mkt_linkedin_oauth_pessoal`, carimbo do mesmo segundo do callback).
 - **TikTok pessoal**: reautorizado (`digiai.app.br/tiktok/auth?state=pessoal` — passou direto, consentimento prévio) — refresh_token novo de 365 dias; o access de 24h é design do TikTok e o cron `refresh-tokens` rola diariamente.
