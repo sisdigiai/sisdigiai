@@ -43,6 +43,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Sem tocar em schema nem na edge function** (R-032): `v_marketing_landing_leads` já expunha `product` e todos os `utm_*`, sem filtro de produto. Verificado em produção.
 - Cobertura fechada: os 4 produtos que chegam em `landing_leads` (`osi`, `osi-afiliado`, `clearix`, `clearix-calc`) têm tela.
 
+### Destravado (2026-08-25 — os dois fluxos OAuth vivos + mistério do TikTok resolvido)
+- **`linkedin-oauth` respondia 401**: o redeploy em massa de 31/07 (17 funções) ligou `verify_jwt` — e fluxo OAuth TEM que ser público (o LinkedIn chama o callback sem token). Por isso a credencial venceria hoje sem ninguém conseguir renovar. Redeployada v14 com `verify_jwt=false`; testada: START → 302 pro consentimento do LinkedIn. Lição registrada na ordem de serviço do MKT: redeploy em massa reseta a flag.
+- **Worker `tiktok-oauth`: o "deploy pendente" do changelog do MKT já tinha sido feito** — verificado o script no ar: o token só passa pela RPC `fn_cred_set` (Vault). E o teste do fluxo revelou o client_key: **`sbawypfqzlshver28s` — o "app TikTok órfão" do despacho de inventário é o próprio DIGIAI Publicador (sandbox)**, em uso ativo pelo OAuth do grupo. Cofre atualizado: status ok, mistério fechado (falta só apurar em qual conta dev ele vive).
+- Fluxos prontos pro dono renovar no navegador: LinkedIn `functions/v1/linkedin-oauth?state=pessoal` · TikTok `digiai.app.br/tiktok/auth?state=pessoal|mello`.
+
 ### Preparado (2026-08-25 — views das postagens: banco e painel prontos, coleta despachada)
 - Dono, testando o Radar: "as postagens também têm views, correto?" — correto, e o sync-metricas do MKT não coletava plays/views de post (só eng/alcance/saves/shares). Doutrina "montar agora, ligar depois": coluna **`mkt.content_performance.views`** criada (NULL = não coletado, nunca zero falso), Radar já exibe (KPI na Visão com "a coletar", coluna nos top posts, semáforo na Saúde), e **despacho R-032 ao MKT** (`_DESPACHO_VIEWS_DE_POST_DO_DIGIAI_2026-08-25.md`) pedindo a coleta: IG plays (Reels), FB total_video_views, TikTok view_count pós-renovação do OAuth.
 
