@@ -15,6 +15,7 @@ type Pub = { id: string; brand_id: string; platform: string; url: string | null;
 type Perf = {
   publication_id: string; brand_id: string; gatilho: string | null; formato: string | null;
   engajamento: number | null; alcance: number | null; salvamentos: number | null; compartilhamentos: number | null;
+  views: number | null;
 };
 type Aud = { brand_id: string; platform: string; seguidores: number; dia: string };
 type Serie = { id: string; label: string; color: string; logo: string | null; pts: number[]; atual: number };
@@ -99,7 +100,7 @@ export default function MktCrescimento() {
     const [b, p, cp, ad, pd, ld, bd, lp, be, { data: cad }, { data: fs }, { data: ac }, cr, { data: cfu }] = await Promise.all([
       supabase.schema('mkt').from('brands').select('id, code, name, accent_hex, logo_url').order('name'),
       supabase.schema('mkt').from('publications').select('id, brand_id, platform, url, published_at').order('published_at', { ascending: false }).limit(2000),
-      supabase.schema('mkt').from('content_performance').select('publication_id, brand_id, gatilho, formato, engajamento, alcance, salvamentos, compartilhamentos'),
+      supabase.schema('mkt').from('content_performance').select('publication_id, brand_id, gatilho, formato, engajamento, alcance, salvamentos, compartilhamentos, views'),
       supabase.schema('mkt').from('audiencia_diaria').select('brand_id, platform, seguidores, dia').order('dia'),
       espelhoMotores.pulsoDias(),
       espelhoMotores.limelightDias(),
@@ -162,6 +163,8 @@ export default function MktCrescimento() {
   const savesTotal = medidos.reduce((s, l) => s + (l.m!.salvamentos || 0), 0);
   const sharesTotal = medidos.reduce((s, l) => s + (l.m!.compartilhamentos || 0), 0);
   const temAlcance = medidos.some((l) => l.m!.alcance != null);
+  const temViewsPosts = medidos.some((l) => l.m!.views != null);
+  const viewsPosts = medidos.reduce((s2, l) => s2 + (l.m!.views || 0), 0);
   const taxaEng = temAlcance && alcanceTotal > 0 ? (engTotal / alcanceTotal * 100) : null;
   const engMed = medidos.length ? engTotal / medidos.length : 0;
 
@@ -436,6 +439,8 @@ export default function MktCrescimento() {
             // quem só tem redes mostra posts/engajamento — 0 gigante era falha
             // de desenho (marca sem motor parecia marca morta).
             const temMotor = viewsRecorte > 0;
+            const heroPosts = temViewsPosts ? viewsPosts : engTotal;
+            const heroPostsRotulo = temViewsPosts ? 'views das postagens no período' : 'engajamento nas redes no período';
             // share das redes das marcas: engajamento por plataforma (mkt real do recorte)
             const engPorRede = (() => {
               const m = new Map<string, number>();
@@ -450,8 +455,8 @@ export default function MktCrescimento() {
               <Decide texto={<><b>O que se decide aqui:</b> o tamanho real do alcance e da atenção no recorte — e onde estão concentrados.</>} />
               <div className="grid gap-3 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
                 <div className="border border-outline/15 bg-surface-container p-5" style={{ gridColumn: 'span 2' }}>
-                  <div className={lbl}>{temMotor ? 'views no período (motores de vídeo)' : 'engajamento nas redes no período'} · {rotuloRecorte}</div>
-                  <div className="font-mono tabular-nums font-semibold text-on-surface" style={{ fontSize: 'clamp(30px,4.5vw,44px)', lineHeight: 1.1 }}>{nf(temMotor ? viewsRecorte : engTotal)}</div>
+                  <div className={lbl}>{temMotor ? 'views no período (motores de vídeo)' : heroPostsRotulo} · {rotuloRecorte}</div>
+                  <div className="font-mono tabular-nums font-semibold text-on-surface" style={{ fontSize: 'clamp(30px,4.5vw,44px)', lineHeight: 1.1 }}>{nf(temMotor ? viewsRecorte : heroPosts)}</div>
                   <div className="text-[12px] text-muted mt-1 mb-3">
                     {temMotor
                       ? <>{mostrarPulso && `Pulso ${nf(pulsoTot.views)}`}{mostrarPulso && mostrarLime && ' · '}{mostrarLime && `Limelight ${nf(limeTot.views)}`} · por data de publicação</>
@@ -486,7 +491,7 @@ export default function MktCrescimento() {
                 <Kpi icon={<Newspaper className="w-4 h-4" />} label="posts nas redes" value={nf(linhas.length)} sub={`no recorte · ${medidos.length} medidos`} glow={COR_SEC} />
                 <Kpi icon={<Sparkles className="w-4 h-4" />} label="engajamento redes" value={nf(engTotal)} sub={`média ${nf(Math.round(engMed))}/post`} glow={COR_OK} />
                 <Kpi icon={<Film className="w-4 h-4" />} label="views motores" value={temMotor ? nf(viewsRecorte) : '—'} sub={temMotor ? `${nf(pubsRecorte)} pubs · ${nf(engRecorte)} interações` : fMarca ? 'sem motor nesta marca' : 'sem views no recorte'} glow={COR_WARN} />
-                <Kpi icon={<Eye className="w-4 h-4" />} label="alcance redes" value={temAlcance ? nf(alcanceTotal) : '🔒'} sub={temAlcance ? (taxaEng != null ? `taxa ${taxaEng.toFixed(1)}%` : '') : 'aguarda permissão Meta'} glow={COR_SEC} />
+                <Kpi icon={<Eye className="w-4 h-4" />} label="views das postagens" value={temViewsPosts ? nf(viewsPosts) : '—'} sub={temViewsPosts ? `${medidos.filter((l) => l.m!.views != null).length} posts com views` : 'a coletar — despacho no MKT (sync-metricas)'} glow={COR_SEC} />
               </section>
             </>
             );
@@ -620,15 +625,15 @@ export default function MktCrescimento() {
               <div className="flex items-baseline justify-between mb-2.5"><h2 className="text-sm text-on-surface-variant">o que o público premiou</h2><span className={lbl}>{linhas.length} publicações no recorte</span></div>
               <section className="border border-outline/15 bg-surface-container overflow-hidden">
                 <div className={'hidden sm:grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-x-3 px-4 py-2 border-b border-outline/15 ' + lbl}>
-                  <span>rede</span><span>marca · quando</span><span className="text-right">eng</span><span className="text-right">alcance</span><span className="text-right">saves</span><span></span>
+                  <span>rede</span><span>marca · quando</span><span className="text-right">eng</span><span className="text-right">views</span><span className="text-right">alcance</span><span></span>
                 </div>
                 {linhas.slice().sort((a, b2) => (b2.m?.engajamento ?? -1) - (a.m?.engajamento ?? -1)).slice(0, 12).map(({ p, m }) => (
                   <div key={p.id} className="grid grid-cols-[auto_1fr_auto_auto] sm:grid-cols-[auto_1fr_auto_auto_auto_auto] gap-x-3 items-center px-4 py-2.5 border-b border-outline/10 hover:bg-surface-highest/50 text-sm">
                     <span className="w-6 h-6 flex items-center justify-center font-mono text-[9px] uppercase" style={{ background: `color-mix(in srgb, ${accent(p.brand_id)} 13%, transparent)`, color: accent(p.brand_id) }}>{platName(p.platform).slice(0, 2)}</span>
                     <span className="min-w-0 truncate text-on-surface">{brandOf(p.brand_id)?.name ?? '—'} <span className="text-muted text-xs">· {fmtDM(p.published_at)} · {platName(p.platform)}{m?.gatilho ? ' · ' + m.gatilho.slice(0, 22) : ''}</span></span>
                     <span className="text-right font-mono tabular-nums" style={{ color: COR_OK }}>{m ? m.engajamento : '—'}</span>
+                    <span className="hidden sm:block text-right font-mono tabular-nums text-on-surface-variant">{m?.views ?? '—'}</span>
                     <span className="hidden sm:block text-right font-mono tabular-nums text-on-surface-variant">{m?.alcance ?? '—'}</span>
-                    <span className="hidden sm:block text-right font-mono tabular-nums text-on-surface-variant">{m?.salvamentos ?? '—'}</span>
                     {p.url ? <a href={p.url} target="_blank" rel="noreferrer" className="text-muted hover:text-secondary"><ExternalLink className="w-3.5 h-3.5" /></a> : <span />}
                   </div>
                 ))}
@@ -744,6 +749,7 @@ export default function MktCrescimento() {
                 <Health cor={COR_OK} titulo="Limelight" sub="coleta própria da fábrica" />
                 <Health cor={COR_OK} titulo="Blogs" sub={blogsEsp ? `últ. leitura ${blogsEsp.ultima_leitura ? fmtDM(blogsEsp.ultima_leitura) : '—'}` : 'espelho indisponível'} />
                 {fila && <Health cor={fila.atrasados > 50 || fila.com_erro > 0 ? COR_DANGER : COR_OK} titulo="Fila do motor MKT" sub={`${fila.atrasados} atrasados · ${fila.com_erro} com erro`} />}
+                <Health cor={temViewsPosts ? COR_OK : COR_WARN} titulo="Views das postagens" sub={temViewsPosts ? `${medidos.filter((l) => l.m!.views != null).length} posts com views` : 'coluna pronta · coleta a ligar (MKT)'} />
                 {credsVencendo.map((c) => (
                   <Health key={c.platform + (c.account_ref ?? '')} cor={c.dias <= 3 ? COR_WARN : COR_OK} titulo={`OAuth ${platName(c.platform)}`} sub={c.dias < 0 ? `venceu há ${-c.dias}d` : c.dias === 0 ? 'vence HOJE' : `vence em ${c.dias}d`} />
                 ))}

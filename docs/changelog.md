@@ -43,6 +43,9 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Sem tocar em schema nem na edge function** (R-032): `v_marketing_landing_leads` já expunha `product` e todos os `utm_*`, sem filtro de produto. Verificado em produção.
 - Cobertura fechada: os 4 produtos que chegam em `landing_leads` (`osi`, `osi-afiliado`, `clearix`, `clearix-calc`) têm tela.
 
+### Preparado (2026-08-25 — views das postagens: banco e painel prontos, coleta despachada)
+- Dono, testando o Radar: "as postagens também têm views, correto?" — correto, e o sync-metricas do MKT não coletava plays/views de post (só eng/alcance/saves/shares). Doutrina "montar agora, ligar depois": coluna **`mkt.content_performance.views`** criada (NULL = não coletado, nunca zero falso), Radar já exibe (KPI na Visão com "a coletar", coluna nos top posts, semáforo na Saúde), e **despacho R-032 ao MKT** (`_DESPACHO_VIEWS_DE_POST_DO_DIGIAI_2026-08-25.md`) pedindo a coleta: IG plays (Reels), FB total_video_views, TikTok view_count pós-renovação do OAuth.
+
 ### Corrigido (2026-08-25 — Visão do Radar se adapta à marca; marca sem motor não é marca morta)
 - Achado do dono usando o app: filtrar por DIGIAI/Lancaster/OSI/Pessoal zerava a Visão — o hero só somava views dos motores de vídeo (Pulso→PULSO, Limelight→Mello). **Marca sem motor parecia marca morta**, sendo que tem posts, engajamento, alcance e seguidores reais no recorte.
 - A Visão agora se adapta: com motor no recorte, hero = views + participação por plataforma; sem motor, hero = **engajamento das redes** + participação de engajamento por rede (dados reais de content_performance), com a explicação honesta ("esta marca não tem motor de vídeo — o dado dela vive nas redes"). KPIs reformulados: posts nas redes · engajamento · views motores (— quando não há) · alcance.
