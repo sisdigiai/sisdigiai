@@ -71,7 +71,8 @@ export interface EspelhoPulso {
 
 // Series diarias dos motores externos (2026-08-25) — pro Crescimento aplicar
 // periodo/rede/marca sobre TODAS as fontes, nao so as redes Meta do schema mkt.
-export interface PulsoDia { dia: string; plataforma: string; publicacoes: number; views: number }
+export interface PulsoDia { dia: string; plataforma: string; publicacoes: number; views: number; likes: number; comentarios: number; shares: number; saves: number }
+export interface LimePubDia { dia: string; plataforma: string; publicacoes: number; views: number; likes: number; comentarios: number; shares: number }
 export interface LimelightDia { dia: string; plataforma: string; seguidores: number | null; alcance: number | null }
 export interface BlogDia { dia: string; blog_slug: string; leituras: number; sessoes: number }
 
@@ -111,5 +112,6 @@ export const espelhoMotores = {
   blogs: () => lerEspelho<EspelhoBlogs>(BLOGS_URL, BLOGS_ANON, 'v_espelho_blogs'),
   pulsoDias: () => lerLinhas<PulsoDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_dias'),
   limelightDias: () => lerLinhas<LimelightDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_dias'),
+  limelightPubDias: () => lerLinhas<LimePubDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_pub_dias'),
   blogsDias: () => lerLinhas<BlogDia>(BLOGS_URL, BLOGS_ANON, 'v_espelho_blogs_dias'),
 };

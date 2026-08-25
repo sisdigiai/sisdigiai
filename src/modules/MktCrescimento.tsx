@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { BarChart3, TrendingUp, Users, Eye, Bookmark, Share2, RefreshCw, Loader2, ExternalLink, Sparkles } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { espelhoMotores, type PulsoDia, type LimelightDia, type BlogDia } from '../lib/espelhoMotores';
+import { espelhoMotores, type PulsoDia, type LimelightDia, type LimePubDia, type BlogDia } from '../lib/espelhoMotores';
 
 // Crescimento (analytics de redes) — MOVIDO do app MKT em 2026-08-25.
 // A tela sempre leu o banco do digiai (schema mkt); só a UI morava no app errado.
@@ -48,6 +48,7 @@ export default function MktCrescimento() {
   const [aud, setAud] = useState<Aud[]>([]);
   const [pulsoDias, setPulsoDias] = useState<PulsoDia[]>([]);
   const [limeDias, setLimeDias] = useState<LimelightDia[]>([]);
+  const [limePub, setLimePub] = useState<LimePubDia[]>([]);
   const [blogDias, setBlogDias] = useState<BlogDia[]>([]);
   const [loading, setLoading] = useState(true);
   const [sincronizando, setSincronizando] = useState(false);
@@ -60,7 +61,7 @@ export default function MktCrescimento() {
   async function load() {
     setLoading(true);
     const corte = new Date(Date.now() - 90 * 864e5).toISOString();
-    const [b, p, cp, ad, pd, ld, bd] = await Promise.all([
+    const [b, p, cp, ad, pd, ld, bd, lp] = await Promise.all([
       supabase.schema('mkt').from('brands').select('id, code, name, accent_hex, logo_url').order('name'),
       supabase.schema('mkt').from('publications').select('id, brand_id, platform, url, published_at').gte('published_at', corte).order('published_at', { ascending: false }).limit(1000),
       supabase.schema('mkt').from('content_performance').select('publication_id, brand_id, gatilho, formato, engajamento, alcance, salvamentos, compartilhamentos'),
@@ -68,6 +69,7 @@ export default function MktCrescimento() {
       espelhoMotores.pulsoDias(),
       espelhoMotores.limelightDias(),
       espelhoMotores.blogsDias(),
+      espelhoMotores.limelightPubDias(),
     ]);
     setBrands((b.data ?? []) as Brand[]);
     setPubs((p.data ?? []) as Pub[]);
@@ -76,6 +78,7 @@ export default function MktCrescimento() {
     setPulsoDias(pd);
     setLimeDias(ld);
     setBlogDias(bd);
+    setLimePub(lp);
     setLoading(false);
   }
   useEffect(() => { load(); }, []);
@@ -236,7 +239,36 @@ export default function MktCrescimento() {
   const pulsoTot = useMemo(() => ({
     views: pulsoF.reduce((a, d) => a + (d.views || 0), 0),
     pubs: pulsoF.reduce((a, d) => a + (d.publicacoes || 0), 0),
+    eng: pulsoF.reduce((a, d) => a + (d.likes || 0) + (d.comentarios || 0) + (d.shares || 0) + (d.saves || 0), 0),
   }), [pulsoF]);
+  // Detalhe por plataforma — o nivel de decisao: views/pub diz onde dobrar a aposta.
+  const porPlataforma = (rows: { plataforma: string; publicacoes: number; views: number; likes: number; comentarios: number; shares: number }[]) => {
+    const m = new Map<string, { pubs: number; views: number; eng: number }>();
+    for (const r of rows) {
+      const c = m.get(r.plataforma) ?? { pubs: 0, views: 0, eng: 0 };
+      c.pubs += r.publicacoes || 0; c.views += r.views || 0;
+      c.eng += (r.likes || 0) + (r.comentarios || 0) + (r.shares || 0);
+      m.set(r.plataforma, c);
+    }
+    return [...m.entries()].map(([plat, c]) => ({ plat, ...c, vpp: c.pubs > 0 ? c.views / c.pubs : 0 }))
+      .sort((a, b) => b.views - a.views);
+  };
+  const pulsoPlats = useMemo(() => porPlataforma(pulsoF), [pulsoF]); // eslint-disable-line react-hooks/exhaustive-deps
+  const limePubF = useMemo(() => limePub.filter((d) => d.dia >= corteDia && (!fRede || d.plataforma === fRede)), [limePub, corteDia, fRede]);
+  const limePlats = useMemo(() => porPlataforma(limePubF), [limePubF]); // eslint-disable-line react-hooks/exhaustive-deps
+  const limeTot = useMemo(() => ({
+    views: limePubF.reduce((a, d) => a + (d.views || 0), 0),
+    pubs: limePubF.reduce((a, d) => a + (d.publicacoes || 0), 0),
+  }), [limePubF]);
+  const blogPorSlug = useMemo(() => {
+    const m = new Map<string, { leituras: number; sessoes: number }>();
+    for (const d of blogF) {
+      const c = m.get(d.blog_slug) ?? { leituras: 0, sessoes: 0 };
+      c.leituras += d.leituras || 0; c.sessoes += d.sessoes || 0;
+      m.set(d.blog_slug, c);
+    }
+    return [...m.entries()].map(([slug, c]) => ({ slug, ...c })).sort((a, b) => b.leituras - a.leituras);
+  }, [blogF]);
   const limeSegAtual = useMemo(() => {
     const porPlat = new Map<string, LimelightDia>();
     for (const d of limeDias.filter((x) => !fRede || x.plataforma === fRede)) {
@@ -472,18 +504,24 @@ export default function MktCrescimento() {
               <section className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-8">
                 {mostrarPulso && (
                   <MotorCard titulo="Pulso · canais faceless" cor={COR_SEC}
-                    headline={`${nf(pulsoTot.views)} views`} sub={`${pulsoTot.pubs} publicações no período · por data de publicação`}
-                    serie={pulsoSerie} rotuloSerie="views/dia de publicação" />
+                    headline={`${nf(pulsoTot.views)} views`} sub={`${pulsoTot.pubs} publicações · ${nf(pulsoTot.eng)} interações no período`}
+                    serie={pulsoSerie} rotuloSerie="views/dia de publicação"
+                    plats={pulsoPlats}
+                    sacada={pulsoPlats.length >= 2 && pulsoPlats[0].pubs >= 2 ? (() => { const top = [...pulsoPlats].sort((a, b) => b.vpp - a.vpp)[0]; return `melhor eficiência: ${platName(top.plat)} (${nf(Math.round(top.vpp))} views/pub)`; })() : undefined} />
                 )}
                 {mostrarLime && (
                   <MotorCard titulo="Limelight · fábrica Mello" cor={COR_OK}
-                    headline={`${nf(limeSegAtual)} seguidores`} sub={`censo diário próprio${fRede ? ` · ${platName(fRede)}` : ' · todas as redes da fábrica'}`}
-                    serie={serieDe(limeF.filter((d) => d.seguidores != null).map((d) => ({ dia: d.dia, v: d.seguidores ?? 0 })))} rotuloSerie="seguidores somados/dia" />
+                    headline={`${nf(limeTot.views)} views`} sub={`${limeTot.pubs} publicações no período · ${nf(limeSegAtual)} seguidores no censo próprio`}
+                    serie={serieDe(limePubF.map((d) => ({ dia: d.dia, v: d.views || 0 })))} rotuloSerie="views/dia de publicação"
+                    plats={limePlats}
+                    sacada={limePlats.length >= 2 && limePlats[0].pubs >= 2 ? (() => { const top = [...limePlats].sort((a, b) => b.vpp - a.vpp)[0]; return `melhor eficiência: ${platName(top.plat)} (${nf(Math.round(top.vpp))} views/pub)`; })() : undefined} />
                 )}
                 {mostrarBlogs && (
                   <MotorCard titulo="Blogs regionais · 5 sites" cor={COR_WARN}
                     headline={`${nf(blogTot)} leituras`} sub="first-party, zero PII · medição desde 20/08"
-                    serie={blogSerie} rotuloSerie="leituras/dia" />
+                    serie={blogSerie} rotuloSerie="leituras/dia"
+                    blogsDetalhe={blogPorSlug}
+                    sacada={blogPorSlug.length >= 2 && blogPorSlug[0].leituras > 0 ? `${blogPorSlug[0].slug} puxa a rede (${blogPorSlug[0].leituras} leituras)` : undefined} />
                 )}
               </section>
             </>
@@ -645,9 +683,12 @@ function Spark({ serie, color }: { serie: number[]; color: string }) {
   );
 }
 
-function MotorCard({ titulo, cor, headline, sub, serie, rotuloSerie }: {
+function MotorCard({ titulo, cor, headline, sub, serie, rotuloSerie, plats, blogsDetalhe, sacada }: {
   titulo: string; cor: string; headline: string; sub: string;
   serie: [string, number][]; rotuloSerie: string;
+  plats?: { plat: string; pubs: number; views: number; eng: number; vpp: number }[];
+  blogsDetalhe?: { slug: string; leituras: number; sessoes: number }[];
+  sacada?: string;
 }) {
   const max = Math.max(1, ...serie.map(([, v]) => v));
   return (
@@ -669,6 +710,55 @@ function MotorCard({ titulo, cor, headline, sub, serie, rotuloSerie }: {
         <div className="h-12 flex items-center justify-center text-[10px] text-muted border border-outline/15">série curta — cresce com os dias</div>
       )}
       <div className="font-mono text-[9px] uppercase tracking-wider text-muted mt-1">{rotuloSerie}</div>
+      {plats && plats.length > 0 && (
+        <table className="w-full mt-2.5 text-[11px]">
+          <thead>
+            <tr className="text-muted border-b border-outline/15 font-mono text-[9px] uppercase tracking-wider">
+              <th className="text-left font-normal py-1">plataforma</th>
+              <th className="text-right font-normal py-1">pubs</th>
+              <th className="text-right font-normal py-1">views</th>
+              <th className="text-right font-normal py-1">views/pub</th>
+              <th className="text-right font-normal py-1">interações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {plats.map((r) => (
+              <tr key={r.plat} className="border-b border-outline/10 last:border-0">
+                <td className="py-1 text-on-surface">{platName(r.plat)}</td>
+                <td className="py-1 text-right font-mono tabular-nums text-on-surface-variant">{r.pubs}</td>
+                <td className="py-1 text-right font-mono tabular-nums text-on-surface-variant">{nf(r.views)}</td>
+                <td className="py-1 text-right font-mono tabular-nums" style={{ color: cor }}>{nf(Math.round(r.vpp))}</td>
+                <td className="py-1 text-right font-mono tabular-nums text-on-surface-variant">{nf(r.eng)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {blogsDetalhe && blogsDetalhe.length > 0 && (
+        <table className="w-full mt-2.5 text-[11px]">
+          <thead>
+            <tr className="text-muted border-b border-outline/15 font-mono text-[9px] uppercase tracking-wider">
+              <th className="text-left font-normal py-1">blog</th>
+              <th className="text-right font-normal py-1">leituras</th>
+              <th className="text-right font-normal py-1">sessões</th>
+            </tr>
+          </thead>
+          <tbody>
+            {blogsDetalhe.map((r) => (
+              <tr key={r.slug} className="border-b border-outline/10 last:border-0">
+                <td className="py-1 text-on-surface">{r.slug}</td>
+                <td className="py-1 text-right font-mono tabular-nums" style={{ color: cor }}>{r.leituras}</td>
+                <td className="py-1 text-right font-mono tabular-nums text-on-surface-variant">{r.sessoes}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {sacada && (
+        <div className="mt-2 text-[11px] flex items-center gap-1.5" style={{ color: cor }}>
+          <span>▲</span><span className="text-on-surface-variant">{sacada}</span>
+        </div>
+      )}
     </div>
   );
 }

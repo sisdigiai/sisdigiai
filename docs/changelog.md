@@ -43,6 +43,10 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Sem tocar em schema nem na edge function** (R-032): `v_marketing_landing_leads` já expunha `product` e todos os `utm_*`, sem filtro de produto. Verificado em produção.
 - Cobertura fechada: os 4 produtos que chegam em `landing_leads` (`osi`, `osi-afiliado`, `clearix`, `clearix-calc`) têm tela.
 
+### Refinado (2026-08-25 — minucioso ao ponto de decisão)
+- Ordem do dono: "tudo separado e minucioso, ao ponto de decisões". Os cards dos motores externos no Crescimento viraram **cards de decisão**: tabela por plataforma (pubs · views · **views/pub** · interações) + sacada automática de eficiência ("melhor eficiência: Kwai, N views/pub"). Views/pub é o número que diz onde dobrar a aposta.
+- Séries ampliadas nas fontes: `v_espelho_pulso_dias` ganhou likes/comentários/shares/saves; criada `v_espelho_limelight_pub_dias` (views e engajamento POR DATA DE PUBLICAÇÃO, mesma semântica honesta do Pulso). O card do Limelight agora abre por plataforma; o de blogs abre por blog (leituras · sessões) com a sacada de qual blog puxa a rede.
+
 ### Adicionado (2026-08-25 — Crescimento vira o analytics de TUDO: motores externos sob os mesmos filtros)
 - Pedido do dono olhando as telas no ar: o Crescimento tinha os filtros certos (período/rede/marca/tipo) mas só via as redes Meta; o Espelho via tudo mas sem recorte. Resolvido no lugar certo: **séries diárias dos motores externos criadas nos bancos de origem** — `v_espelho_pulso_dias` (views/pubs POR DATA DE PUBLICAÇÃO — rotulado assim de propósito, não é snapshot; a lição das metricas_diarias cumulativas que inflavam 37× está gravada no comment da view), `v_espelho_limelight_dias` (censo diário da fábrica) e `v_espelho_blogs_dias` (leituras/dia).
 - **Seção "Motores externos no recorte" no Crescimento**: Pulso, Limelight (Mello) e Blogs com headline + gráfico de barras/dia, obedecendo os MESMOS filtros — período corta a série, rede filtra plataforma (Pulso tem kwai/youtube!), marca mapeia (Pulso→PULSO, Limelight→Mello, Blogs→DIGIAI).
