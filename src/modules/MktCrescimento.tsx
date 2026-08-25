@@ -478,20 +478,26 @@ export default function MktCrescimento() {
               const serie = (seriePorMarca.get(b.id) ?? []).filter((v) => v > 0);
               const atual = serie.length ? serie[serie.length - 1] : 0;
               const delta = serie.length >= 2 ? atual - serie[0] : null;
-              if (atual === 0 && fMarca !== b.code) return null;
+              // Toda marca aparece, mesmo sem censo — marca invisível é marca esquecida.
+              if (fMarca && fMarca !== b.code) return null;
+              const semCenso = atual === 0;
               const c = b.accent_hex || COR_SEC;
               return (
-                <div key={b.id} className="border border-outline/15 bg-surface-container px-4 py-3.5">
+                <div key={b.id} className="border border-outline/15 bg-surface-container px-4 py-3.5" style={semCenso ? { opacity: 0.75 } : undefined}>
                   <div className="flex items-center gap-2 mb-2">
                     {b.logo_url ? <img src={b.logo_url} alt="" className="w-6 h-6 object-cover" /> : <span className="w-6 h-6 flex items-center justify-center text-[10px]" style={{ background: `color-mix(in srgb, ${c} 13%, transparent)`, color: c }}>{b.name[0]}</span>}
                     <span className="text-sm flex-1 truncate text-on-surface">{b.name}</span>
                     {delta != null && <span className="text-[11px] font-mono tabular-nums" style={{ color: delta >= 0 ? COR_OK : COR_DANGER }}>{delta >= 0 ? '+' : ''}{delta}</span>}
                   </div>
                   <div className="flex items-end justify-between gap-3">
-                    <div className="text-2xl font-semibold font-mono tabular-nums" style={{ color: c }}>{nf(atual)}</div>
-                    <Spark serie={serie} color={c} />
+                    <div className="text-2xl font-semibold font-mono tabular-nums" style={{ color: semCenso ? undefined : c }}>{semCenso ? '—' : nf(atual)}</div>
+                    {!semCenso && <Spark serie={serie} color={c} />}
                   </div>
-                  <div className="text-[10px] text-muted mt-1">{serie.length <= 1 ? 'baseline de hoje — a curva nasce amanhã' : `${serie.length} dias de série`}</div>
+                  <div className="text-[10px] mt-1" style={{ color: semCenso ? COR_WARN : undefined }}>
+                    {semCenso
+                      ? 'fora do censo — conta não coletada nesta rede (ver Backlog: coleta por conta)'
+                      : <span className="text-muted">{serie.length <= 1 ? 'baseline de hoje — a curva nasce amanhã' : `${serie.length} dias de série`}</span>}
+                  </div>
                 </div>
               );
             })}
