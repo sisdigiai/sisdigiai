@@ -43,6 +43,13 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Sem tocar em schema nem na edge function** (R-032): `v_marketing_landing_leads` já expunha `product` e todos os `utm_*`, sem filtro de produto. Verificado em produção.
 - Cobertura fechada: os 4 produtos que chegam em `landing_leads` (`osi`, `osi-afiliado`, `clearix`, `clearix-calc`) têm tela.
 
+### Auditado (2026-08-25 — rede por rede, dado real contra a fonte)
+- **Instagram: 100% exato.** Verificação manual nos 4 perfis públicos vs censo do banco: Lancaster 1.160=1.160, Mello 75=75, OSI 15=15, DIGIAI 4=4. O que a coleta cobre, ela cobre CERTO.
+- **O problema não é precisão, é cobertura**: fora do censo estão DIGIAI LinkedIn (1 seguidor — verificado na página e inserido como censo manual de hoje), Mello TikTok, OSI TikTok e Pulso IG (a_configurar). E os 5 IGs das unidades Mello colapsam numa linha só porque `audiencia_diaria` agrega por marca×rede, não por conta — pedido de granularidade vai ao MKT (Backlog P2).
+- **Credenciais no fio**: OAuth LinkedIn expira HOJE, TikTok Mello+pessoal amanhã 26/08 — sem renovar, as contas saem do censo em silêncio. Cofre atualizado (renova_em) + Backlog P1 pro dono.
+- **Fatos reverificados com número de hoje: 9/10 frescos.** Clearix uso vivo **1.954 → 3.392 tx/30d (quase dobrou)**; Pulso 289,5k → **436 mil views / 739 pubs**; cadência 22 → 18 posts/7d. Único vencido: inscritos do YouTube Pulso (sem fonte fresca hoje — vencido honesto). O MKT volta a poder citar os números.
+- TikTok público levantou CAPTCHA (não resolvemos) — verificação de TikTok só pela API oficial, o que reforça a urgência da renovação OAuth.
+
 ### Adicionado (2026-08-25 — Cadeia de resultados: o funil inteiro em um lugar)
 - **`v_marketing_cadeia`** (1 linha, zero PII) + seção no topo do Espelho: **produzir → alcançar → captar → prospectar → vender → provar**, cada elo com número e carimbo de frescor ("elo sem data fresca é elo quebrado"). Compõe as três fontes: banco digiai (MKT/leads/OSI/Hotmart), espelhos client-side (Pulso 739 pubs/436k views, Limelight 180 pubs) e uso vivo do Clearix (`v_admin_tenant_vida`, agregado).
 - A cadeia já denuncia onde quebra hoje: 18 posts/7d e censo de hoje, mas **1 lead/30d, prospecção parada desde 05/08 e 0 vendas** — o gargalo é captar→vender, não produzir.
