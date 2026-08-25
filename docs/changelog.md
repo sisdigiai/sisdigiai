@@ -43,6 +43,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Sem tocar em schema nem na edge function** (R-032): `v_marketing_landing_leads` já expunha `product` e todos os `utm_*`, sem filtro de produto. Verificado em produção.
 - Cobertura fechada: os 4 produtos que chegam em `landing_leads` (`osi`, `osi-afiliado`, `clearix`, `clearix-calc`) têm tela.
 
+### Adicionado (2026-08-25 — Cadeia de resultados: o funil inteiro em um lugar)
+- **`v_marketing_cadeia`** (1 linha, zero PII) + seção no topo do Espelho: **produzir → alcançar → captar → prospectar → vender → provar**, cada elo com número e carimbo de frescor ("elo sem data fresca é elo quebrado"). Compõe as três fontes: banco digiai (MKT/leads/OSI/Hotmart), espelhos client-side (Pulso 739 pubs/436k views, Limelight 180 pubs) e uso vivo do Clearix (`v_admin_tenant_vida`, agregado).
+- A cadeia já denuncia onde quebra hoje: 18 posts/7d e censo de hoje, mas **1 lead/30d, prospecção parada desde 05/08 e 0 vendas** — o gargalo é captar→vender, não produzir.
+- **Regra Clearix explícita no rodapé da cadeia**: dado operacional do tenant é prova INTERNA; pra fora vai só o agregado dos fatos com trava por marca (nunca nomear cliente).
+
 ### Adicionado (2026-08-25 — Crescimento e Calc mudam de casa: dados no digiai, motor no MKT)
 - **Decisão do dono**: os módulos `/analytics` e `/calc` do app MKT sempre leram o banco do digiai (schema `mkt` + views `v_mkt_calc_*`) — só a UI morava no app errado. Portados completos pro painel: **Crescimento** (`#/mkt-crescimento`: KPIs, sacadas automáticas, evolução por marca, matriz marca×rede, rankings formato/gatilho, janelas de horário, top posts, botão sincronizar invocando a mesma edge `sync-metricas`, e o aviso de coleta parada ≥3 dias — a lição dos 39 dias veio junto) e **Calc** (`#/mkt-calc`: funil da isca — usos, sessões, leads, campanhas UTM, ritmo diário).
 - Nada mudou no banco: mesmas tabelas, mesma RLS (`mkt.pode_ver_brand` segue travando por marca; o dono é admin no mkt e vê tudo). Seção Marketing agora: Espelho → Crescimento → Calc → Travas.

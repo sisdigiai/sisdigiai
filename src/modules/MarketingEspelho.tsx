@@ -3,7 +3,19 @@ import { ExternalLink, RefreshCw, Info, Radio, DollarSign, Send, Target, Calenda
 import PageHeader from '../components/PageHeader';
 import { TravasBanner } from './TravasMarketing';
 import { supabase } from '../lib/supabase';
+import { clearixSupabase } from '../lib/clearixSupabase';
 import { espelhoMotores, type EspelhoLimelight, type EspelhoPulso } from '../lib/espelhoMotores';
+
+// Cadeia de resultados (v_marketing_cadeia + espelhos + uso vivo Clearix).
+// Decisão do dono 2026-08-25: tudo que fazemos tem que aparecer LIGADO — produzir →
+// alcançar → captar → prospectar → vender → provar. Elo sem data fresca é elo quebrado.
+type Cadeia = {
+  posts_7d: number; ultima_publicacao: string | null;
+  seguidores: number; ultimo_censo: string | null;
+  leads_30d: number; ultimo_lead: string | null;
+  disparos_30d: number; ultimo_disparo: string | null;
+  vendas_30d: number; receita_30d_brl: number; ultima_venda: string | null;
+};
 
 interface FatoMkt {
   brand_slug: string | null;
@@ -65,18 +77,25 @@ export default function MarketingEspelho() {
   const [limelight, setLimelight] = useState<EspelhoLimelight | null>(null);
   const [pulso, setPulso] = useState<EspelhoPulso | null>(null);
   const [fatos, setFatos] = useState<FatoMkt[]>([]);
+  const [cadeia, setCadeia] = useState<Cadeia | null>(null);
+  const [usoVivoTx, setUsoVivoTx] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
     setLoading(true);
-    const [{ data: e }, { data: m }, { data: p }, ll, pu, { data: f }] = await Promise.all([
+    const [{ data: e }, { data: m }, { data: p }, ll, pu, { data: f }, { data: cad }, vida] = await Promise.all([
       supabase.from('v_mkt_espelho').select('*').maybeSingle(),
       supabase.from('v_mkt_marcas').select('*'),
       supabase.from('v_mkt_publicacoes_recentes').select('*'),
       espelhoMotores.limelight(),
       espelhoMotores.pulso(),
       supabase.from('v_mkt_fatos').select('*'),
+      supabase.from('v_marketing_cadeia').select('*').maybeSingle(),
+      clearixSupabase.from('v_admin_tenant_vida').select('transacoes_30d').then((r) => r, () => ({ data: null })),
     ]);
+    setCadeia((cad ?? null) as Cadeia | null);
+    const rows = (vida as { data: { transacoes_30d: number }[] | null }).data;
+    setUsoVivoTx(rows ? rows.reduce((s, t) => s + (t.transacoes_30d || 0), 0) : null);
     if (e) setEsp(e as Espelho);
     setMarcas(((m ?? []) as Marca[]).sort((a, b) => b.publicadas_7d - a.publicadas_7d || b.publicacoes - a.publicacoes));
     setPubs((p ?? []) as Publicacao[]);
@@ -121,6 +140,48 @@ export default function MarketingEspelho() {
           <div className="text-sm text-muted py-6">Carregando espelho…</div>
         ) : (
           <>
+            {/* Cadeia de resultados — o funil real, cada elo com carimbo de frescor */}
+            {cadeia && (() => {
+              const diasDe = (iso: string | null) => iso ? Math.floor((Date.now() - new Date(iso).getTime()) / 86400000) : null;
+              const carimbo = (iso: string | null, limite: number) => {
+                const d = diasDe(iso);
+                if (d === null) return { txt: 'nunca', ruim: true };
+                return { txt: d === 0 ? 'hoje' : `há ${d}d`, ruim: d > limite };
+              };
+              const elos: { rotulo: string; valor: string; sub: string; stamp: { txt: string; ruim: boolean }; zero?: boolean }[] = [
+                { rotulo: 'produzir', valor: String(cadeia.posts_7d), sub: 'posts 7d (MKT)', stamp: carimbo(cadeia.ultima_publicacao, 2) },
+                { rotulo: 'alcançar', valor: (cadeia.seguidores + (pulso?.views_total ?? 0)).toLocaleString('pt-BR'), sub: `${cadeia.seguidores.toLocaleString('pt-BR')} seg + ${(pulso?.views_total ?? 0).toLocaleString('pt-BR')} views Pulso`, stamp: carimbo(cadeia.ultimo_censo ? cadeia.ultimo_censo + 'T12:00:00' : null, 2) },
+                { rotulo: 'captar', valor: String(cadeia.leads_30d), sub: 'leads 30d', stamp: carimbo(cadeia.ultimo_lead, 14), zero: cadeia.leads_30d === 0 },
+                { rotulo: 'prospectar', valor: String(cadeia.disparos_30d), sub: 'disparos OSI 30d', stamp: carimbo(cadeia.ultimo_disparo, 7), zero: cadeia.disparos_30d === 0 },
+                { rotulo: 'vender', valor: cadeia.vendas_30d > 0 ? `${cadeia.vendas_30d} · ${brl(cadeia.receita_30d_brl)}` : '0', sub: 'vendas 30d', stamp: carimbo(cadeia.ultima_venda, 30), zero: cadeia.vendas_30d === 0 },
+                { rotulo: 'provar', valor: usoVivoTx != null ? usoVivoTx.toLocaleString('pt-BR') : '—', sub: 'transações 30d no Clearix · só nosso', stamp: usoVivoTx != null ? { txt: 'vivo', ruim: false } : { txt: 'sem leitura', ruim: true } },
+              ];
+              return (
+                <div className="border border-outline/15 bg-surface-container">
+                  <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2 flex-wrap">
+                    <Target className="w-3.5 h-3.5 text-secondary" />
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Cadeia de resultados</span>
+                    <span className="ml-auto font-mono text-[10px] text-muted">elo sem data fresca é elo quebrado</span>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-outline/10">
+                    {elos.map((e2, i) => (
+                      <div key={e2.rotulo} className="p-4 relative">
+                        {i > 0 && <span className="hidden lg:block absolute -left-1.5 top-1/2 -translate-y-1/2 text-muted text-xs">→</span>}
+                        <div className="font-mono text-[9px] uppercase tracking-widest text-muted mb-1">{e2.rotulo}</div>
+                        <div className={'text-xl font-semibold font-mono tabular-nums ' + (e2.zero ? 'text-danger' : 'text-on-surface')}>{e2.valor}</div>
+                        <div className="text-[10px] text-muted mt-0.5">{e2.sub}</div>
+                        <div className={'font-mono text-[9px] uppercase tracking-wider mt-1 ' + (e2.stamp.ruim ? 'text-danger' : 'text-secondary')}>{e2.stamp.txt}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="px-4 py-2 border-t border-outline/10 font-mono text-[10px] text-muted flex flex-wrap gap-x-4 gap-y-1">
+                    <span>motores: MKT{limelight ? ` · Limelight (${limelight.publicacoes} pubs)` : ''}{pulso ? ` · Pulso (${pulso.publicacoes} pubs)` : ''}</span>
+                    <span className="ml-auto">Clearix = prova interna; pra fora, só o agregado dos fatos (trava por marca)</span>
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Placar do motor */}
             {esp && (
               <div className="border border-outline/15 bg-surface-container">
