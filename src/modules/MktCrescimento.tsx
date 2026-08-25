@@ -28,7 +28,7 @@ type Cadeia = {
 };
 type Fila = { atrasados: number; com_erro: number; ultima_publicacao: string | null; ultima_audiencia: string | null };
 type Conta = { brand_name: string | null; platform: string; handle: string | null; status: string | null };
-type Cred = { platform: string; account_ref: string | null; status: string | null; expires_at: string | null };
+type Cred = { platform: string; marca: string | null; status: string | null; expires_at: string | null };
 type CalcFunil = { dia: string; usos: number; sessoes: number; leads: number };
 
 const ABAS = [
@@ -110,7 +110,7 @@ export default function MktCrescimento() {
       supabase.from('v_marketing_cadeia').select('*').maybeSingle(),
       supabase.from('v_mkt_fila_saude').select('atrasados, com_erro, ultima_publicacao, ultima_audiencia').maybeSingle(),
       supabase.from('v_mkt_accounts').select('brand_name, platform, handle, status'),
-      supabase.schema('mkt').from('credentials').select('platform, account_ref, status, expires_at').then((r) => r, () => ({ data: [] as Cred[] })),
+      supabase.from('v_mkt_credenciais_saude').select('platform, marca, status, expires_at'),
       supabase.from('v_mkt_calc_funil').select('dia, usos, sessoes, leads').limit(400),
     ]);
     setBrands((b.data ?? []) as Brand[]);
@@ -121,7 +121,7 @@ export default function MktCrescimento() {
     setCadeia((cad ?? null) as Cadeia | null);
     setFila((fs ?? null) as Fila | null);
     setContas((ac ?? []) as Conta[]);
-    setCreds(((cr as { data: Cred[] | null }).data ?? []) as Cred[]);
+    setCreds(((cr.data ?? []) as Cred[]));
     setCalcDias((cfu ?? []) as CalcFunil[]);
     setLoading(false);
   }
@@ -751,7 +751,9 @@ export default function MktCrescimento() {
                 {fila && <Health cor={fila.atrasados > 50 || fila.com_erro > 0 ? COR_DANGER : COR_OK} titulo="Fila do motor MKT" sub={`${fila.atrasados} atrasados · ${fila.com_erro} com erro`} />}
                 <Health cor={temViewsPosts ? COR_OK : COR_WARN} titulo="Views das postagens" sub={temViewsPosts ? `${medidos.filter((l) => l.m!.views != null).length} posts com views` : 'coluna pronta · coleta a ligar (MKT)'} />
                 {credsVencendo.map((c) => (
-                  <Health key={c.platform + (c.account_ref ?? '')} cor={c.dias <= 3 ? COR_WARN : COR_OK} titulo={`OAuth ${platName(c.platform)}`} sub={c.dias < 0 ? `venceu há ${-c.dias}d` : c.dias === 0 ? 'vence HOJE' : `vence em ${c.dias}d`} />
+                  <Health key={c.platform + (c.marca ?? '')} cor={c.dias <= 0 ? COR_DANGER : c.dias <= 3 && c.platform !== 'tiktok' ? COR_WARN : COR_OK}
+                    titulo={`OAuth ${platName(c.platform)} · ${c.marca ?? '?'}`}
+                    sub={c.dias < 0 ? `venceu há ${-c.dias}d` : c.dias === 0 ? 'vence HOJE' : c.platform === 'tiktok' ? `ciclo de 24h · cron renova (vence em ${c.dias}d)` : `vence em ${c.dias}d`} />
                 ))}
               </section>
               <div className="flex items-baseline justify-between mb-2.5"><h2 className="text-sm text-on-surface-variant">cobertura — toda conta cadastrada × coleta</h2><span className={lbl}>fora do censo = número congelado sem aviso</span></div>
