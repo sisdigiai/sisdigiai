@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { BarChart3, TrendingUp, Users, Eye, Bookmark, Share2, RefreshCw, Loader2, ExternalLink, Sparkles } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { espelhoMotores, type PulsoDia, type LimelightDia, type BlogDia } from '../lib/espelhoMotores';
 
 // Crescimento (analytics de redes) — MOVIDO do app MKT em 2026-08-25.
 // A tela sempre leu o banco do digiai (schema mkt); só a UI morava no app errado.
@@ -45,6 +46,9 @@ export default function MktCrescimento() {
   const [pubs, setPubs] = useState<Pub[]>([]);
   const [perf, setPerf] = useState<Perf[]>([]);
   const [aud, setAud] = useState<Aud[]>([]);
+  const [pulsoDias, setPulsoDias] = useState<PulsoDia[]>([]);
+  const [limeDias, setLimeDias] = useState<LimelightDia[]>([]);
+  const [blogDias, setBlogDias] = useState<BlogDia[]>([]);
   const [loading, setLoading] = useState(true);
   const [sincronizando, setSincronizando] = useState(false);
   const [fMarca, setFMarca] = useState('');
@@ -56,16 +60,22 @@ export default function MktCrescimento() {
   async function load() {
     setLoading(true);
     const corte = new Date(Date.now() - 90 * 864e5).toISOString();
-    const [b, p, cp, ad] = await Promise.all([
+    const [b, p, cp, ad, pd, ld, bd] = await Promise.all([
       supabase.schema('mkt').from('brands').select('id, code, name, accent_hex, logo_url').order('name'),
       supabase.schema('mkt').from('publications').select('id, brand_id, platform, url, published_at').gte('published_at', corte).order('published_at', { ascending: false }).limit(1000),
       supabase.schema('mkt').from('content_performance').select('publication_id, brand_id, gatilho, formato, engajamento, alcance, salvamentos, compartilhamentos'),
       supabase.schema('mkt').from('audiencia_diaria').select('brand_id, platform, seguidores, dia').order('dia'),
+      espelhoMotores.pulsoDias(),
+      espelhoMotores.limelightDias(),
+      espelhoMotores.blogsDias(),
     ]);
     setBrands((b.data ?? []) as Brand[]);
     setPubs((p.data ?? []) as Pub[]);
     setPerf((cp.data ?? []) as Perf[]);
     setAud((ad.data ?? []) as Aud[]);
+    setPulsoDias(pd);
+    setLimeDias(ld);
+    setBlogDias(bd);
     setLoading(false);
   }
   useEffect(() => { load(); }, []);
@@ -214,6 +224,38 @@ export default function MktCrescimento() {
     const list = buck.filter((b) => b.n >= 2).map((b) => ({ faixa: b.k, n: b.n, engMed: b.eng / b.n })).sort((a, b) => b.engMed - a.engMed);
     return { list, best: list[0] || null };
   }, [linhas]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Motores externos (Pulso/Limelight/Blogs) sob os MESMOS filtros de periodo/rede/marca.
+  // Mapeamento de marca: Pulso -> marca PULSO, Limelight -> Mello, Blogs -> DIGIAI.
+  const codePulso = useMemo(() => brands.find((b) => /pulso/i.test(b.name))?.code ?? '__pulso', [brands]);
+  const codeMello = useMemo(() => brands.find((b) => /mello/i.test(b.name))?.code ?? '__mello', [brands]);
+  const codeDigiai = useMemo(() => brands.find((b) => /^digiai$/i.test(b.name))?.code ?? '__digiai', [brands]);
+  const pulsoF = useMemo(() => pulsoDias.filter((d) => d.dia >= corteDia && (!fRede || d.plataforma === fRede)), [pulsoDias, corteDia, fRede]);
+  const limeF = useMemo(() => limeDias.filter((d) => d.dia >= corteDia && (!fRede || d.plataforma === fRede)), [limeDias, corteDia, fRede]);
+  const blogF = useMemo(() => blogDias.filter((d) => d.dia >= corteDia), [blogDias, corteDia]);
+  const pulsoTot = useMemo(() => ({
+    views: pulsoF.reduce((a, d) => a + (d.views || 0), 0),
+    pubs: pulsoF.reduce((a, d) => a + (d.publicacoes || 0), 0),
+  }), [pulsoF]);
+  const limeSegAtual = useMemo(() => {
+    const porPlat = new Map<string, LimelightDia>();
+    for (const d of limeDias.filter((x) => !fRede || x.plataforma === fRede)) {
+      const cur = porPlat.get(d.plataforma);
+      if (!cur || d.dia > cur.dia || (d.dia === cur.dia && (d.seguidores ?? 0) > (cur.seguidores ?? 0))) porPlat.set(d.plataforma, d);
+    }
+    return [...porPlat.values()].reduce((a, d) => a + (d.seguidores ?? 0), 0);
+  }, [limeDias, fRede]);
+  const blogTot = useMemo(() => blogF.reduce((a, d) => a + (d.leituras || 0), 0), [blogF]);
+  const serieDe = (rows: { dia: string; v: number }[]) => {
+    const m = new Map<string, number>();
+    for (const r of rows) m.set(r.dia, (m.get(r.dia) ?? 0) + r.v);
+    return [...m.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+  };
+  const pulsoSerie = useMemo(() => serieDe(pulsoF.map((d) => ({ dia: d.dia, v: d.views || 0 }))), [pulsoF]); // eslint-disable-line react-hooks/exhaustive-deps
+  const blogSerie = useMemo(() => serieDe(blogF.map((d) => ({ dia: d.dia, v: d.leituras || 0 }))), [blogF]); // eslint-disable-line react-hooks/exhaustive-deps
+  const mostrarPulso = (!fMarca || fMarca === codePulso) && pulsoDias.length > 0;
+  const mostrarLime = (!fMarca || fMarca === codeMello) && limeDias.length > 0;
+  const mostrarBlogs = (!fMarca || fMarca === codeDigiai) && !fRede && blogDias.length > 0;
 
   // sacadas (insights automáticos)
   const sacadas = useMemo(() => {
@@ -423,6 +465,30 @@ export default function MktCrescimento() {
             })}
           </section>
 
+          {/* ── motores externos (mesmos filtros) ── */}
+          {(mostrarPulso || mostrarLime || mostrarBlogs) && (
+            <>
+              <div className="flex items-center gap-2 mb-2.5"><h2 className="text-sm text-on-surface-variant">motores externos no recorte</h2><span className="font-mono text-[10px] uppercase tracking-widest text-muted">Pulso · Limelight (Mello) · Blogs — mesmos filtros</span></div>
+              <section className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-8">
+                {mostrarPulso && (
+                  <MotorCard titulo="Pulso · canais faceless" cor={COR_SEC}
+                    headline={`${nf(pulsoTot.views)} views`} sub={`${pulsoTot.pubs} publicações no período · por data de publicação`}
+                    serie={pulsoSerie} rotuloSerie="views/dia de publicação" />
+                )}
+                {mostrarLime && (
+                  <MotorCard titulo="Limelight · fábrica Mello" cor={COR_OK}
+                    headline={`${nf(limeSegAtual)} seguidores`} sub={`censo diário próprio${fRede ? ` · ${platName(fRede)}` : ' · todas as redes da fábrica'}`}
+                    serie={serieDe(limeF.filter((d) => d.seguidores != null).map((d) => ({ dia: d.dia, v: d.seguidores ?? 0 })))} rotuloSerie="seguidores somados/dia" />
+                )}
+                {mostrarBlogs && (
+                  <MotorCard titulo="Blogs regionais · 5 sites" cor={COR_WARN}
+                    headline={`${nf(blogTot)} leituras`} sub="first-party, zero PII · medição desde 20/08"
+                    serie={blogSerie} rotuloSerie="leituras/dia" />
+                )}
+              </section>
+            </>
+          )}
+
           {/* ── ranking de conteúdo ── */}
           <div className="flex items-center gap-2 mb-2.5"><h2 className="text-sm text-on-surface-variant">o que rende por tipo de conteúdo</h2><span className="font-mono text-[10px] uppercase tracking-widest text-muted">eng médio · taxa quando há alcance</span></div>
           <section className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4">
@@ -576,5 +642,33 @@ function Spark({ serie, color }: { serie: number[]; color: string }) {
     <svg width={w} height={h} className="shrink-0">
       <polyline points={pts} fill="none" strokeWidth="2" strokeLinecap="round" style={{ stroke: color }} />
     </svg>
+  );
+}
+
+function MotorCard({ titulo, cor, headline, sub, serie, rotuloSerie }: {
+  titulo: string; cor: string; headline: string; sub: string;
+  serie: [string, number][]; rotuloSerie: string;
+}) {
+  const max = Math.max(1, ...serie.map(([, v]) => v));
+  return (
+    <div className="border border-outline/15 bg-surface-container px-4 py-3.5">
+      <div className="flex items-center gap-2 mb-1.5">
+        <span className="w-2 h-2 rounded-full shrink-0" style={{ background: cor }} />
+        <span className="text-sm text-on-surface truncate">{titulo}</span>
+      </div>
+      <div className="text-2xl font-semibold font-mono tabular-nums" style={{ color: cor }}>{headline}</div>
+      <div className="text-[10px] text-muted mt-0.5 mb-2">{sub}</div>
+      {serie.length >= 2 ? (
+        <div className="flex items-end gap-[2px] h-12">
+          {serie.slice(-45).map(([dia, v]) => (
+            <div key={dia} title={`${fmtDM(dia)}: ${nf(v)}`} className="flex-1 min-h-[2px]"
+              style={{ height: `${Math.max(3, (v / max) * 100)}%`, background: cor, opacity: v === 0 ? 0.15 : 0.85 }} />
+          ))}
+        </div>
+      ) : (
+        <div className="h-12 flex items-center justify-center text-[10px] text-muted border border-outline/15">série curta — cresce com os dias</div>
+      )}
+      <div className="font-mono text-[9px] uppercase tracking-wider text-muted mt-1">{rotuloSerie}</div>
+    </div>
   );
 }

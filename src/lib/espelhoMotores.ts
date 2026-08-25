@@ -69,6 +69,26 @@ export interface EspelhoPulso {
   custo_caixa_por_video_brl?: number | null;
 }
 
+// Series diarias dos motores externos (2026-08-25) — pro Crescimento aplicar
+// periodo/rede/marca sobre TODAS as fontes, nao so as redes Meta do schema mkt.
+export interface PulsoDia { dia: string; plataforma: string; publicacoes: number; views: number }
+export interface LimelightDia { dia: string; plataforma: string; seguidores: number | null; alcance: number | null }
+export interface BlogDia { dia: string; blog_slug: string; leituras: number; sessoes: number }
+
+async function lerLinhas<T>(base: string, anon: string, view: string): Promise<T[]> {
+  try {
+    const r = await fetch(`${base}/rest/v1/${view}?select=*&order=dia.asc`, {
+      headers: { apikey: anon, Authorization: `Bearer ${anon}` },
+      signal: AbortSignal.timeout(12000),
+    });
+    if (!r.ok) return [];
+    const rows = await r.json();
+    return Array.isArray(rows) ? (rows as T[]) : [];
+  } catch {
+    return [];
+  }
+}
+
 async function lerEspelho<T>(base: string, anon: string, view: string): Promise<T | null> {
   try {
     const r = await fetch(`${base}/rest/v1/${view}?select=*`, {
@@ -89,4 +109,7 @@ export const espelhoMotores = {
   limelight: () => lerEspelho<EspelhoLimelight>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight'),
   pulso: () => lerEspelho<EspelhoPulso>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso'),
   blogs: () => lerEspelho<EspelhoBlogs>(BLOGS_URL, BLOGS_ANON, 'v_espelho_blogs'),
+  pulsoDias: () => lerLinhas<PulsoDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_dias'),
+  limelightDias: () => lerLinhas<LimelightDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_dias'),
+  blogsDias: () => lerLinhas<BlogDia>(BLOGS_URL, BLOGS_ANON, 'v_espelho_blogs_dias'),
 };
