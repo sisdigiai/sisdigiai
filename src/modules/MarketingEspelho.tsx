@@ -4,7 +4,7 @@ import PageHeader from '../components/PageHeader';
 import { TravasBanner } from './TravasMarketing';
 import { supabase } from '../lib/supabase';
 import { clearixSupabase } from '../lib/clearixSupabase';
-import { espelhoMotores, type EspelhoLimelight, type EspelhoPulso } from '../lib/espelhoMotores';
+import { espelhoMotores, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
 
 // Cadeia de resultados (v_marketing_cadeia + espelhos + uso vivo Clearix).
 // Decisão do dono 2026-08-25: tudo que fazemos tem que aparecer LIGADO — produzir →
@@ -76,31 +76,46 @@ export default function MarketingEspelho() {
   const [pubs, setPubs] = useState<Publicacao[]>([]);
   const [limelight, setLimelight] = useState<EspelhoLimelight | null>(null);
   const [pulso, setPulso] = useState<EspelhoPulso | null>(null);
+  const [blogs, setBlogs] = useState<EspelhoBlogs | null>(null);
   const [fatos, setFatos] = useState<FatoMkt[]>([]);
   const [cadeia, setCadeia] = useState<Cadeia | null>(null);
   const [usoVivoTx, setUsoVivoTx] = useState<number | null>(null);
+  const [fila, setFila] = useState<{ atrasados: number; com_erro: number; ultima_publicacao: string | null } | null>(null);
+  const [seo, setSeo] = useState<{ cliques: number; impressoes: number; sites: number; medido_em: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
     setLoading(true);
-    const [{ data: e }, { data: m }, { data: p }, ll, pu, { data: f }, { data: cad }, vida] = await Promise.all([
+    const [{ data: e }, { data: m }, { data: p }, ll, pu, bl, { data: f }, { data: cad }, vida, { data: fs }, { data: se }] = await Promise.all([
       supabase.from('v_mkt_espelho').select('*').maybeSingle(),
       supabase.from('v_mkt_marcas').select('*'),
       supabase.from('v_mkt_publicacoes_recentes').select('*'),
       espelhoMotores.limelight(),
       espelhoMotores.pulso(),
+      espelhoMotores.blogs(),
       supabase.from('v_mkt_fatos').select('*'),
       supabase.from('v_marketing_cadeia').select('*').maybeSingle(),
       clearixSupabase.from('v_admin_tenant_vida').select('transacoes_30d').then((r) => r, () => ({ data: null })),
+      supabase.from('v_mkt_fila_saude').select('atrasados, com_erro, ultima_publicacao').maybeSingle(),
+      supabase.from('v_seo_estado').select('cliques, impressoes, medido_em'),
     ]);
     setCadeia((cad ?? null) as Cadeia | null);
     const rows = (vida as { data: { transacoes_30d: number }[] | null }).data;
     setUsoVivoTx(rows ? rows.reduce((s, t) => s + (t.transacoes_30d || 0), 0) : null);
+    setFila((fs ?? null) as { atrasados: number; com_erro: number; ultima_publicacao: string | null } | null);
+    const seoRows = (se ?? []) as { cliques: number | null; impressoes: number | null; medido_em: string | null }[];
+    setSeo(seoRows.length ? {
+      cliques: seoRows.reduce((a, r) => a + (r.cliques ?? 0), 0),
+      impressoes: seoRows.reduce((a, r) => a + (r.impressoes ?? 0), 0),
+      sites: seoRows.length,
+      medido_em: seoRows.reduce<string | null>((a, r) => (a == null || (r.medido_em ?? '') > a ? r.medido_em : a), null),
+    } : null);
     if (e) setEsp(e as Espelho);
     setMarcas(((m ?? []) as Marca[]).sort((a, b) => b.publicadas_7d - a.publicadas_7d || b.publicacoes - a.publicacoes));
     setPubs((p ?? []) as Publicacao[]);
     setLimelight(ll);
     setPulso(pu);
+    setBlogs(bl);
     setFatos((f ?? []) as FatoMkt[]);
     setLoading(false);
   };
@@ -150,7 +165,7 @@ export default function MarketingEspelho() {
               };
               const elos: { rotulo: string; valor: string; sub: string; stamp: { txt: string; ruim: boolean }; zero?: boolean }[] = [
                 { rotulo: 'produzir', valor: String(cadeia.posts_7d), sub: 'posts 7d (MKT)', stamp: carimbo(cadeia.ultima_publicacao, 2) },
-                { rotulo: 'alcançar', valor: (cadeia.seguidores + (pulso?.views_total ?? 0)).toLocaleString('pt-BR'), sub: `${cadeia.seguidores.toLocaleString('pt-BR')} seg + ${(pulso?.views_total ?? 0).toLocaleString('pt-BR')} views Pulso`, stamp: carimbo(cadeia.ultimo_censo ? cadeia.ultimo_censo + 'T12:00:00' : null, 2) },
+                { rotulo: 'alcançar', valor: (cadeia.seguidores + (pulso?.views_total ?? 0) + (limelight?.views_total ?? 0) + (blogs?.leituras_total ?? 0)).toLocaleString('pt-BR'), sub: `${cadeia.seguidores.toLocaleString('pt-BR')} seg · views: Pulso ${Math.round((pulso?.views_total ?? 0) / 1000)}k + Limelight ${Math.round((limelight?.views_total ?? 0) / 1000)}k · blogs ${blogs?.leituras_total ?? 0}`, stamp: carimbo(cadeia.ultimo_censo ? cadeia.ultimo_censo + 'T12:00:00' : null, 2) },
                 { rotulo: 'captar', valor: String(cadeia.leads_30d), sub: 'leads 30d', stamp: carimbo(cadeia.ultimo_lead, 14), zero: cadeia.leads_30d === 0 },
                 { rotulo: 'prospectar', valor: String(cadeia.disparos_30d), sub: 'disparos OSI 30d', stamp: carimbo(cadeia.ultimo_disparo, 7), zero: cadeia.disparos_30d === 0 },
                 { rotulo: 'vender', valor: cadeia.vendas_30d > 0 ? `${cadeia.vendas_30d} · ${brl(cadeia.receita_30d_brl)}` : '0', sub: 'vendas 30d', stamp: carimbo(cadeia.ultima_venda, 30), zero: cadeia.vendas_30d === 0 },
@@ -175,7 +190,7 @@ export default function MarketingEspelho() {
                     ))}
                   </div>
                   <div className="px-4 py-2 border-t border-outline/10 font-mono text-[10px] text-muted flex flex-wrap gap-x-4 gap-y-1">
-                    <span>motores: MKT{limelight ? ` · Limelight (${limelight.publicacoes} pubs)` : ''}{pulso ? ` · Pulso (${pulso.publicacoes} pubs)` : ''}</span>
+                    <span>motores: MKT{limelight ? ` · Limelight (${limelight.publicacoes} pubs)` : ''}{pulso ? ` · Pulso (${pulso.publicacoes} pubs)` : ''}{blogs ? ` · Blogs (${blogs.posts_no_ar} posts)` : ''}</span>
                     <span className="ml-auto">Clearix = prova interna; pra fora, só o agregado dos fatos (trava por marca)</span>
                   </div>
                 </div>
@@ -342,8 +357,12 @@ export default function MarketingEspelho() {
                   <div className="grid grid-cols-4 gap-2 text-center">
                     <div><div className="text-lg font-bold tabular-nums text-on-surface">{limelight.episodios}</div><div className="text-[10px] font-mono uppercase text-muted">episódios</div></div>
                     <div><div className="text-lg font-bold tabular-nums text-on-surface">{limelight.publicacoes}</div><div className="text-[10px] font-mono uppercase text-muted">publicações</div></div>
+                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{((limelight.views_total ?? 0) / 1000).toFixed(1)}k</div><div className="text-[10px] font-mono uppercase text-muted">views</div></div>
                     <div><div className="text-lg font-bold tabular-nums text-on-surface">{limelight.fila}</div><div className="text-[10px] font-mono uppercase text-muted">na fila</div></div>
-                    <div><div className="text-lg font-bold tabular-nums text-on-surface">${limelight.custo_ia_usd}</div><div className="text-[10px] font-mono uppercase text-muted">custo IA</div></div>
+                  </div>
+                  <div className="text-[11px] text-muted">
+                    Views: {limelight.views_por_plataforma ? Object.entries(limelight.views_por_plataforma).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v >= 1000 ? (v / 1000).toFixed(1) + 'k' : v}`).join(' · ') : '—'}
+                    {' · '}custo IA ${limelight.custo_ia_usd}
                   </div>
                   <div className="text-[11px] text-muted">
                     Seguidores: {Object.entries(limelight.seguidores).filter(([, v]) => v > 0).map(([k, v]) => `${k} ${v}`).join(' · ') || '—'}
@@ -413,6 +432,50 @@ export default function MarketingEspelho() {
         </div>
 
         {/* FATOS publicáveis — o que a IA do MKT PODE citar (fonte: mkt.fatos, com validade) */}
+        {/* Central de fontes — o indice de comando: toda fonte de marketing da casa,
+            numero-chave + frescor + onde aprofundar. Pedido do dono 25/08:
+            "este espelho tem que trazer tudo que temos de opções". */}
+        {!loading && (
+          <div className="border border-outline/15 bg-surface-container">
+            <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2 flex-wrap">
+              <Info className="w-3.5 h-3.5 text-secondary" />
+              <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Central de fontes · tudo ligado</span>
+              <span className="ml-auto font-mono text-[10px] text-muted">cada fonte com numero-chave, frescor e onde aprofundar</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-outline/10">
+              {([
+                { nome: 'Redes sociais (censo diario)', chave: cadeia ? `${cadeia.seguidores.toLocaleString('pt-BR')} seguidores` : '—', quando: cadeia?.ultimo_censo ?? null, href: '#/mkt-crescimento', destino: 'Crescimento' },
+                { nome: 'Fila do motor MKT', chave: fila ? `${fila.atrasados} atrasados · ${fila.com_erro} com erro` : '—', quando: fila?.ultima_publicacao?.slice(0, 10) ?? null, href: 'https://mkt.digiai.app.br', destino: 'DIGIAI MKT ↗', alerta: (fila?.atrasados ?? 0) > 50 || (fila?.com_erro ?? 0) > 0 },
+                { nome: 'Clearix Calc (isca)', chave: 'usos, sessoes e leads', quando: null, href: '#/mkt-calc', destino: 'Calc' },
+                { nome: 'SEO (Search Console)', chave: seo ? `${seo.cliques} cliques · ${seo.impressoes.toLocaleString('pt-BR')} impressoes · ${seo.sites} sites` : '—', quando: seo?.medido_em ?? null, href: '#/seo', destino: 'SEO' },
+                { nome: 'Pulso (canais faceless)', chave: pulso ? `${Math.round(pulso.views_total / 1000)}k views · ${pulso.publicacoes} pubs` : '—', quando: pulso?.ultima_publicacao ?? null, href: '#/marketing', destino: 'acima' },
+                { nome: 'Limelight (fabrica Mello)', chave: limelight ? `${((limelight.views_total ?? 0) / 1000).toFixed(1)}k views · ${limelight.publicacoes} pubs` : '—', quando: limelight?.ultima_leitura ?? null, href: '#/marketing', destino: 'acima' },
+                { nome: 'Blogs regionais (5 sites)', chave: blogs ? `${blogs.posts_no_ar} posts · ${blogs.leituras_total} leituras` : '—', quando: blogs?.ultima_leitura ?? null, href: '#/marketing', destino: 'acima' },
+                { nome: 'Vendas (canais Hotmart/Kiwify/MP)', chave: cadeia ? `${cadeia.vendas_30d} vendas 30d` : '—', quando: cadeia?.ultima_venda?.slice(0, 10) ?? null, href: '#/vendas', destino: 'Vendas', alerta: (cadeia?.vendas_30d ?? 0) === 0 },
+                { nome: 'OSI (funil + prospeccao)', chave: cadeia ? `${cadeia.disparos_30d} disparos 30d` : '—', quando: cadeia?.ultimo_disparo?.slice(0, 10) ?? null, href: '#/fluxo-osi', destino: 'OSI', alerta: cadeia ? (Date.now() - new Date(cadeia.ultimo_disparo ?? 0).getTime()) / 864e5 > 7 : false },
+                { nome: 'Uso vivo Clearix (prova interna)', chave: usoVivoTx != null ? `${usoVivoTx.toLocaleString('pt-BR')} transacoes 30d` : '—', quando: null, href: '#/clearix', destino: 'Central Clearix' },
+                { nome: 'Fatos publicaveis (trava por marca)', chave: `${fatos.filter((x) => x.fresco).length}/${fatos.length} frescos`, quando: null, href: '#/marketing', destino: 'abaixo' },
+                { nome: 'Scorecard da semana', chave: 'metas + preenchimento automatico', quando: null, href: '#/semana', destino: 'Semana' },
+              ] as { nome: string; chave: string; quando: string | null; href: string; destino: string; alerta?: boolean }[]).map((fonte) => {
+                const dias = fonte.quando ? Math.floor((Date.now() - new Date(fonte.quando + 'T12:00:00').getTime()) / 864e5) : null;
+                return (
+                  <a key={fonte.nome} href={fonte.href} target={fonte.href.startsWith('http') ? '_blank' : undefined} rel="noreferrer"
+                     className="bg-surface-container p-3.5 hover:bg-surface-highest/60 transition-colors block">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-[12px] text-on-surface leading-snug">{fonte.nome}</span>
+                      <span className="font-mono text-[9px] uppercase tracking-wider text-muted shrink-0">{fonte.destino}</span>
+                    </div>
+                    <div className={'text-[13px] font-mono tabular-nums mt-1 ' + (fonte.alerta ? 'text-danger' : 'text-on-surface-variant')}>{fonte.chave}</div>
+                    {dias != null && (
+                      <div className={'font-mono text-[9px] uppercase tracking-wider mt-0.5 ' + (dias > 3 ? 'text-warning' : 'text-secondary')}>{dias === 0 ? 'hoje' : `ha ${dias}d`}</div>
+                    )}
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <div className="border border-outline/15 bg-surface-container">
           <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2">
             <Target className="w-3.5 h-3.5 text-secondary" />

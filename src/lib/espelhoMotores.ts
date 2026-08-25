@@ -7,6 +7,7 @@
 const LIMELIGHT_URL = import.meta.env.VITE_LIMELIGHT_SUPABASE_URL || 'https://gfdpvasbrxwulvpvyfvr.supabase.co';
 const LIMELIGHT_ANON = import.meta.env.VITE_LIMELIGHT_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmZHB2YXNicnh3dWx2cHZ5ZnZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NzMwNzYsImV4cCI6MjEwMDE0OTA3Nn0.Gr8I2e9Ot2d6fOq0eBp43yDWDxAohkzAcoa0dJ9_zOk';
 const PULSO_URL = import.meta.env.VITE_PULSO_SUPABASE_URL || 'https://nlcisbfdiokmipyihtuz.supabase.co';
+const BLOGS_URL = 'https://zgojkioieztikqhwcoae.supabase.co';
 const PULSO_ANON = import.meta.env.VITE_PULSO_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sY2lzYmZkaW9rbWlweWlodHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1ODk0OTksImV4cCI6MjA3OTE2NTQ5OX0.-Cfzv9ebOYB8I93zNLghWTszawJk4G3rXwiTTY9PpOI';
 
 export interface EspelhoLimelight {
@@ -18,6 +19,24 @@ export interface EspelhoLimelight {
   custo_ia_usd: number;
   ultima_coleta: string | null;
   seguidores: Record<string, number>;
+  // Views adicionadas em 2026-08-25: existiam em limelight_medicao.leituras mas o
+  // espelho nao expunha — 23 mil views da fabrica Mello invisiveis no painel.
+  views_total?: number | null;
+  views_por_plataforma?: Record<string, number> | null;
+  ultima_leitura?: string | null;
+}
+
+// Rede de 5 blogs regionais (projeto blogs/ — AI Visibility Lab). Audiencia
+// first-party ADR-0036, zero PII. Numeros pequenos e REAIS: medicao desde 20/08.
+export interface EspelhoBlogs {
+  posts_publicados: number;
+  posts_no_ar: number;
+  ultima_publicacao: string | null;
+  leituras_total: number;
+  leituras_30d: number;
+  sessoes_total: number;
+  ultima_leitura: string | null;
+  leituras_por_blog: Record<string, number>;
 }
 
 export interface EspelhoPulso {
@@ -64,7 +83,10 @@ async function lerEspelho<T>(base: string, anon: string, view: string): Promise<
   }
 }
 
+const BLOGS_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpnb2praW9pZXp0aWtxaHdjb2FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNzk0NjYsImV4cCI6MjEwMjc1NTQ2Nn0.yV530Q6ZBTeGdega3rphtJFNKgShu1fR_ZV9mMZFHzY';
+
 export const espelhoMotores = {
   limelight: () => lerEspelho<EspelhoLimelight>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight'),
   pulso: () => lerEspelho<EspelhoPulso>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso'),
+  blogs: () => lerEspelho<EspelhoBlogs>(BLOGS_URL, BLOGS_ANON, 'v_espelho_blogs'),
 };

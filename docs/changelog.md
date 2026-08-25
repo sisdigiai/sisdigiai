@@ -43,6 +43,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Sem tocar em schema nem na edge function** (R-032): `v_marketing_landing_leads` já expunha `product` e todos os `utm_*`, sem filtro de produto. Verificado em produção.
 - Cobertura fechada: os 4 produtos que chegam em `landing_leads` (`osi`, `osi-afiliado`, `clearix`, `clearix-calc`) têm tela.
 
+### Adicionado (2026-08-25 — nada mais some: views do Limelight, blogs e a Central de fontes)
+- **Caça aos números sumidos** (ordem do dono: "temos números que não aparecem"): o espelho do Limelight NÃO expunha views — `limelight_medicao.leituras` guardava **22.985 views** (TikTok 14,6k · IG 3,9k · YT 2,6k · FB 1,8k) invisíveis no painel. View `v_espelho_limelight` recriada com `views_total`/`views_por_plataforma`/`ultima_leitura`; card no Espelho agora mostra. O "quase 500k do Pulso" é o ecossistema somado: Pulso 436,3k (por plataforma bate exato) + Limelight 23k = 459k — e é assim que o elo "alcançar" da cadeia passa a somar.
+- **Blogs entraram no circuito**: criada `v_espelho_blogs` no banco da rede (zgojkioieztikqhwcoae) — 20 posts no ar, **12 leituras reais** (first-party ADR-0036, zero PII; medição existe desde 20/08 — número pequeno e honesto, não atraso de contagem). Client `espelhoMotores.blogs()`.
+- **Central de fontes** no Espelho — o índice de comando pedido ("tudo que temos de opções"): 12 fontes, cada uma com número-chave, carimbo de frescor e link pro módulo (Crescimento, Calc, SEO, Vendas, OSI, Clearix, Semana, motor MKT). A análise profunda revelou o que estava invisível: **fila do motor MKT com 461 atrasados e 21 com erro** (agora em vermelho na central) e SEO com 281 impressões/CTR 0,7%.
+
 ### Auditado (2026-08-25 — rede por rede, dado real contra a fonte)
 - **Instagram: 100% exato.** Verificação manual nos 4 perfis públicos vs censo do banco: Lancaster 1.160=1.160, Mello 75=75, OSI 15=15, DIGIAI 4=4. O que a coleta cobre, ela cobre CERTO.
 - **O problema não é precisão, é cobertura**: fora do censo estão DIGIAI LinkedIn (1 seguidor — verificado na página e inserido como censo manual de hoje), Mello TikTok, OSI TikTok e Pulso IG (a_configurar). E os 5 IGs das unidades Mello colapsam numa linha só porque `audiencia_diaria` agrega por marca×rede, não por conta — pedido de granularidade vai ao MKT (Backlog P2).
