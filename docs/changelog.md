@@ -43,6 +43,12 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Sem tocar em schema nem na edge function** (R-032): `v_marketing_landing_leads` já expunha `product` e todos os `utm_*`, sem filtro de produto. Verificado em produção.
 - Cobertura fechada: os 4 produtos que chegam em `landing_leads` (`osi`, `osi-afiliado`, `clearix`, `clearix-calc`) têm tela.
 
+### Orquestrado (2026-08-26 — autorização geral do dono: "resolver tudo em todos os motores")
+- **OSI fechada (4/4 business)**: convertida no Chrome DIGIAI, nome "Ótica Sem Improviso", bio do método, site da landing, IG reivindicado + auto-publish ativo, e-mail próprio (oticasemimproviso@gmail.com) no cofre.
+- **Decisões delegadas e tomadas**: (a) `mkt.metricas_diarias` genérica — série por publicação/dia pra TODAS as redes (fim da cegueira de crescimento no tempo; spec do limelight com save sagrado); Pulso = coleta sim/publicação não (papel coleta_derivada — mata a contradição do inventário); convenções do espelho na view.
+- **Ordens novas aos 3 motores**: MKT — raiz da fila (planejador criar ≤ teto aprovável; 301 posts morreram no gate), normalizar reels/reel, censo LinkedIn/TikTok; Limelight e Pulso — listas priorizadas de problemas abertos pra rodada geral de conserto.
+- Entregas do MKT reconhecidas: fila 461→144 (301 cancelados com motivo), views de post gravando (42 posts/453 views), censo por conta rodando, worker+coletor Pinterest prontos (gated).
+
 ### Criado (2026-08-26 — app de desenvolvedor Pinterest: a porta da coleta)
 - Dono + digiai no Chrome do Pulso: conta Pulso convertida pra business (e-mail projectspulso@gmail.com capturado pro cofre) e **app "Pulso Radar" criado (ID 1604974)** — trial access inclui Basic Analytics. Form preenchido pelo digiai (site digiai.app.br, privacidade /lgpd, propósito leitura de contas próprias); CAPTCHA e envio foram do dono, como manda a regra.
 - **Estado: TRIAL PENDENTE** — até o Pinterest aprovar, nem a chave secreta sai nem o token de teste funciona (401 consumer-type, testado). Roteiro pós-aprovação registrado no cofre: secret→Vault, redirect digiai.app.br/pinterest/callback, worker pinterest-oauth (molde tiktok), coletor no MKT.
