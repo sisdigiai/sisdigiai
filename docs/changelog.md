@@ -43,6 +43,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Sem tocar em schema nem na edge function** (R-032): `v_marketing_landing_leads` já expunha `product` e todos os `utm_*`, sem filtro de produto. Verificado em produção.
 - Cobertura fechada: os 4 produtos que chegam em `landing_leads` (`osi`, `osi-afiliado`, `clearix`, `clearix-calc`) têm tela.
 
+### Submetido (2026-08-26 ~03h — auditoria TikTok: o app do grupo entrou em review)
+- Estrutura-alvo aprovada pelo dono (1 conta dev · 1 app · N contas) e executada na madrugada: o rascunho de Production do **Limelight Studio** (que havia RESETADO — 7 erros, tudo vazio) foi remontado inteiro pelo digiai: ícone, categoria, descrição, ToS/Privacidade/site com **URL verificada** (arquivo de assinatura no ar), justificativa nova (952/1000, cada escopo amarrado ao uso), demo 30s, Login Kit com **redirect do worker do grupo** (digiai.app.br/tiktok/callback — a consolidação), Direct Post ON, escopos completos com user.info.stats + video.list.
+- **Dono clicou Submit for review → status "In review"**. Pós-aprovação: métricas completas do TikTok pro Radar, OAuth de todas as contas neste app, sandbox DIGIAI Publicador aposentado.
+- Percalços honestos da madrugada: o formulário do TikTok resetou 2× (um logout acidental meu incluso) e a 3ª passada foi em rajada com Save imediato — lição: portais com rascunho volátil pedem salvamento a cada seção.
+
 ### Orquestrado (2026-08-26 — autorização geral do dono: "resolver tudo em todos os motores")
 - **OSI fechada (4/4 business)**: convertida no Chrome DIGIAI, nome "Ótica Sem Improviso", bio do método, site da landing, IG reivindicado + auto-publish ativo, e-mail próprio (oticasemimproviso@gmail.com) no cofre.
 - **Decisões delegadas e tomadas**: (a) `mkt.metricas_diarias` genérica — série por publicação/dia pra TODAS as redes (fim da cegueira de crescimento no tempo; spec do limelight com save sagrado); Pulso = coleta sim/publicação não (papel coleta_derivada — mata a contradição do inventário); convenções do espelho na view.
