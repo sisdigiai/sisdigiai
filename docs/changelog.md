@@ -43,6 +43,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Sem tocar em schema nem na edge function** (R-032): `v_marketing_landing_leads` já expunha `product` e todos os `utm_*`, sem filtro de produto. Verificado em produção.
 - Cobertura fechada: os 4 produtos que chegam em `landing_leads` (`osi`, `osi-afiliado`, `clearix`, `clearix-calc`) têm tela.
 
+### Criado (2026-08-26 — app de desenvolvedor Pinterest: a porta da coleta)
+- Dono + digiai no Chrome do Pulso: conta Pulso convertida pra business (e-mail projectspulso@gmail.com capturado pro cofre) e **app "Pulso Radar" criado (ID 1604974)** — trial access inclui Basic Analytics. Form preenchido pelo digiai (site digiai.app.br, privacidade /lgpd, propósito leitura de contas próprias); CAPTCHA e envio foram do dono, como manda a regra.
+- **Estado: TRIAL PENDENTE** — até o Pinterest aprovar, nem a chave secreta sai nem o token de teste funciona (401 consumer-type, testado). Roteiro pós-aprovação registrado no cofre: secret→Vault, redirect digiai.app.br/pinterest/callback, worker pinterest-oauth (molde tiktok), coletor no MKT.
+- **Spec do coletor enriquecida por troca entre agentes** (limelight↔digiai): match pin↔episódio é determinístico via carimbo `#T\d{2}E\d{2}` que a fábrica já põe na legenda do IG (que vira a descrição do pin); e o pin com roteiro vazado NÃO veio do banco do limelight — auditar lado mkt/canal_v1 na coleta.
+
 ### Executado (2026-08-25/26 — operação Pinterest completa: 4 marcas ligadas na distribuição gratuita)
 - Dono executou no celular + digiai nos navegadores: **Mello** (@mellooticas, rodava há 1 ano), **DIGIAI** (@sisdigiai — conta virgem do e-mail da empresa convertida, perfil completado pelo digiai, IG _digiai reivindicado, **24 pins importados em 3 minutos**), **OSI** (@oticasemimproviso — ligada; branding pendente, perfil está "Taty Mello") e **Pulso** (@projectspulso — confirmado no Chrome pulso: IG @pulsoprojects reivindicado e conectado; cadeia 100% automática motor → IG → Pinterest).
 - Cofre: as 4 contas registradas com estado real. Ordem de serviço do MKT fechada com os itens estruturais: cadastrar em mkt.accounts, coleta de métricas via API Pinterest (impressões/salvos/cliques → Radar), regra de legenda, branding OSI.
