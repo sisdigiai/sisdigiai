@@ -49,16 +49,16 @@ const RANGES = [
 const REDES = [
   { k: '', label: 'todas' }, { k: 'instagram', label: 'Instagram' }, { k: 'facebook', label: 'Facebook' },
   { k: 'tiktok', label: 'TikTok' }, { k: 'youtube', label: 'YouTube' }, { k: 'kwai', label: 'Kwai' },
-  { k: 'linkedin', label: 'LinkedIn' }, { k: 'x', label: 'X' },
+  { k: 'linkedin', label: 'LinkedIn' }, { k: 'x', label: 'X' }, { k: 'pinterest', label: 'Pinterest' },
 ];
-const ALL_NETS = ['instagram', 'facebook', 'tiktok', 'youtube', 'kwai', 'linkedin', 'x'];
+const ALL_NETS = ['instagram', 'facebook', 'tiktok', 'youtube', 'kwai', 'linkedin', 'x', 'pinterest'];
 const METRICAS = [
   { k: 'seguidores', label: 'seguidores' }, { k: 'engajamento', label: 'engajamento' }, { k: 'alcance', label: 'alcance' },
 ] as const;
 type MetricaK = typeof METRICAS[number]['k'];
 
 const nf = (n: number) => n.toLocaleString('pt-BR');
-const platName = (p: string) => ({ instagram: 'Instagram', facebook: 'Facebook', linkedin: 'LinkedIn', tiktok: 'TikTok', youtube: 'YouTube', kwai: 'Kwai', x: 'X' }[p] ?? p);
+const platName = (p: string) => ({ instagram: 'Instagram', facebook: 'Facebook', linkedin: 'LinkedIn', tiktok: 'TikTok', youtube: 'YouTube', kwai: 'Kwai', x: 'X', pinterest: 'Pinterest' }[p] ?? p);
 const fmtDM = (iso: string) => {
   const d = new Date(iso.length === 10 ? iso + 'T12:00:00' : iso);
   return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
