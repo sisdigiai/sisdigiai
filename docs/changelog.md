@@ -44,7 +44,7 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - Cobertura fechada: os 4 produtos que chegam em `landing_leads` (`osi`, `osi-afiliado`, `clearix`, `clearix-calc`) têm tela.
 
 ### Executado (2026-08-25/26 — operação Pinterest completa: 4 marcas ligadas na distribuição gratuita)
-- Dono executou no celular + digiai nos navegadores: **Mello** (@mellooticas, rodava há 1 ano), **DIGIAI** (@sisdigiai — conta virgem do e-mail da empresa convertida, perfil completado pelo digiai, IG _digiai reivindicado, **24 pins importados em 3 minutos**), **OSI** (@oticasemimproviso — ligada; branding pendente, perfil está "Taty Mello") e **Pulso** (cadeia 100% automática: motor → IG via Meta API → Pinterest; handle Pinterest a confirmar).
+- Dono executou no celular + digiai nos navegadores: **Mello** (@mellooticas, rodava há 1 ano), **DIGIAI** (@sisdigiai — conta virgem do e-mail da empresa convertida, perfil completado pelo digiai, IG _digiai reivindicado, **24 pins importados em 3 minutos**), **OSI** (@oticasemimproviso — ligada; branding pendente, perfil está "Taty Mello") e **Pulso** (@projectspulso — confirmado no Chrome pulso: IG @pulsoprojects reivindicado e conectado; cadeia 100% automática motor → IG → Pinterest).
 - Cofre: as 4 contas registradas com estado real. Ordem de serviço do MKT fechada com os itens estruturais: cadastrar em mkt.accounts, coleta de métricas via API Pinterest (impressões/salvos/cliques → Radar), regra de legenda, branding OSI.
 - Resposta à dúvida do dono registrada: o auto-publish duplica **só as próximas publicações** (histórico é curadoria manual — e melhor assim).
 
