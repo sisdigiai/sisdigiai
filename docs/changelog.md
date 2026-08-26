@@ -43,6 +43,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Sem tocar em schema nem na edge function** (R-032): `v_marketing_landing_leads` já expunha `product` e todos os `utm_*`, sem filtro de produto. Verificado em produção.
 - Cobertura fechada: os 4 produtos que chegam em `landing_leads` (`osi`, `osi-afiliado`, `clearix`, `clearix-calc`) têm tela.
 
+### Executado (2026-08-25/26 — operação Pinterest completa: 4 marcas ligadas na distribuição gratuita)
+- Dono executou no celular + digiai nos navegadores: **Mello** (@mellooticas, rodava há 1 ano), **DIGIAI** (@sisdigiai — conta virgem do e-mail da empresa convertida, perfil completado pelo digiai, IG _digiai reivindicado, **24 pins importados em 3 minutos**), **OSI** (@oticasemimproviso — ligada; branding pendente, perfil está "Taty Mello") e **Pulso** (cadeia 100% automática: motor → IG via Meta API → Pinterest; handle Pinterest a confirmar).
+- Cofre: as 4 contas registradas com estado real. Ordem de serviço do MKT fechada com os itens estruturais: cadastrar em mkt.accounts, coleta de métricas via API Pinterest (impressões/salvos/cliques → Radar), regra de legenda, branding OSI.
+- Resposta à dúvida do dono registrada: o auto-publish duplica **só as próximas publicações** (histórico é curadoria manual — e melhor assim).
+
 ### Descoberto (2026-08-25 — Pinterest: distribuição gratuita já rodava sem ninguém saber)
 - Investigação a quatro mãos (dono no app + digiai nas fontes): TODO o conteúdo que o Limelight publica no IG da Mello é **duplicado automaticamente no Pinterest** via recurso nativo (Instagram reivindicado + publicação automática) na conta @mellooticas (contato@mellooticas.com.br) — **2,2 mil visualizações/mês de graça**, 65+ pins em 1 ano, e nenhum motor nosso publica lá. Descartadas as hipóteses de motor duplicando e de operador humano.
 - **Decisão do dono**: replicar o modelo pra todas as marcas com IG (DIGIAI, OSI, Pulso; Lancaster fora — automação desligada 01/08). Plano na ordem de serviço do MKT: conta Business com e-mail da marca + reivindicar IG e site + auto-publish + regra de fábrica nova ("a legenda do IG agora É a descrição do pin" — achamos pin com roteiro de narração vazado de legenda antiga).
