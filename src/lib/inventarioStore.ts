@@ -31,10 +31,15 @@ export interface ContaServico {
 
 // Agrupa os `servico` técnicos em famílias que fazem sentido para quem decide.
 // Um serviço não mapeado cai em "Outros" em vez de sumir da tela.
+//
+// A lista de verdade vive em `ops.servicos` desde a migration 087, com chave
+// estrangeira em `contas_servicos.servico` — o banco recusa nome fora dela. Este mapa
+// é só a apresentação: qual família cada serviço ocupa na tela. Se divergir, o banco
+// manda, e serviço novo aparece em "Outros" até alguém decidir onde ele mora.
 const FAMILIAS: { chave: string; label: string; servicos: string[] }[] = [
   { chave: 'meta',        label: 'Meta',              servicos: ['meta_bm', 'meta_pixel'] },
-  { chave: 'redes',       label: 'Redes sociais',     servicos: ['rede_facebook', 'rede_instagram', 'rede_linkedin', 'rede_tiktok', 'rede_whatsapp', 'rede_x', 'rede_pinterest'] },
-  { chave: 'google',      label: 'Google',            servicos: ['google_search_console', 'google_analytics', 'google_workspace', 'google_business_profile'] },
+  { chave: 'redes',       label: 'Redes sociais',     servicos: ['rede_facebook', 'rede_instagram', 'rede_linkedin', 'rede_tiktok', 'rede_whatsapp', 'rede_x', 'rede_pinterest', 'rede_google_business', 'rede_youtube'] },
+  { chave: 'google',      label: 'Google',            servicos: ['google_search_console', 'google_analytics', 'google_workspace'] },
   { chave: 'infra',       label: 'Infraestrutura',    servicos: ['supabase', 'cloudflare', 'netlify', 'github'] },
   { chave: 'dev',         label: 'Apps de dev',       servicos: ['tiktok_dev', 'tiktok_pixel', 'linkedin_dev', 'pinterest_dev'] },
   { chave: 'plataformas', label: 'Plataformas e IA',  servicos: ['hotmart', 'openai', 'telegram_bot'] },
