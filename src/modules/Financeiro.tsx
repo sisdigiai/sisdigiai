@@ -192,9 +192,28 @@ function DashboardTab() {
   const last12Months = monthSet.slice(-12);
   const categories = [...new Set(expenses.map(e => e.category))] as ExpenseCategory[];
 
-  // Série mensal de gasto total (real) — sparkline + delta mês vs mês nos KPIs
+  // Série mensal de gasto total (real) — sparkline nos KPIs.
   const monthlyTotals = last12Months.map(m => Object.values(expByMonthCat[m] || {}).reduce((a, b) => a + b, 0));
-  const gastoDelta = deltaPct(monthlyTotals);
+
+  // Delta do BURN: série própria, por dois motivos que já produziram um número falso.
+  //
+  // 1. SÓ CAIXA. `monthlyTotals` inclui aporte intelectual, que é não-caixa. Usá-lo no
+  //    selo do card "Burn de Caixa · só caixa" fazia rótulo e selo medirem coisas
+  //    diferentes: maio somava R$ 27.247 COM aporte contra R$ 3.214 sem.
+  // 2. NUNCA CONTRA MÊS NÃO FECHADO. O mês mais recente do razão é sempre suspeito —
+  //    ou é o mês corrente (parcial por natureza), ou o razão parou no meio dele, que é
+  //    o caso hoje: último lançamento em 12/06. Comparar contra ele mostrava
+  //    "▼ 94,0% vs mês anterior", lido como economia quando era extrato faltando.
+  //    Mesma trava que o `parcial` já faz em finance.infra_costs.
+  const caixaByMonth: Record<string, number> = {};
+  for (const e of expenses) {
+    if (e.kind === 'aporte_intelectual') continue;
+    caixaByMonth[e.month] = (caixaByMonth[e.month] || 0) + Number(e.amount_brl);
+  }
+  const mesesCaixa = Object.keys(caixaByMonth).sort();
+  const mesesFechados = mesesCaixa.slice(0, -1);
+  const burnDelta = deltaPct(mesesFechados.map(m => caixaByMonth[m]));
+  const burnComparados = mesesFechados.slice(-2);
 
   const chartData = {
     labels: last12Months.map(monthLabel),
@@ -278,7 +297,7 @@ function DashboardTab() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <KpiCard label={`Total Investido${filterProduct !== 'all' ? '' : ' (geral)'}`} value={brl(total12m)} icon={<DollarSign size={20} />} color="text-secondary" spark={monthlyTotals} />
         <KpiCard label="Lançamentos" value={String(expenses.length)} sub="despesas registradas" icon={<TrendingDown size={20} />} color="text-secondary" />
-        <KpiCard label="Burn de Caixa (média)" value={brl(burnRate3m)} sub="/mês · só caixa" icon={<BarChart3 size={20} />} color="text-secondary" delta={gastoDelta} invert />
+        <KpiCard label="Burn de Caixa (média)" value={brl(burnRate3m)} sub={burnComparados.length === 2 ? `/mês · só caixa · ${monthLabel(burnComparados[0] )} → ${monthLabel(burnComparados[1])}` : '/mês · só caixa'} icon={<BarChart3 size={20} />} color="text-secondary" delta={burnDelta} invert />
         <KpiCard label="Subscriptions ativas" value={brl(monthlySubsTotal)} sub={`${activeSubs.length} serviços`} icon={<Repeat size={20} />} color="text-secondary" />
       </div>
 
