@@ -2,10 +2,11 @@ import { supabase } from './supabase';
 
 // Inventário de contas e serviços da empresa.
 //
-// A verdade vive em `ops.contas_servicos`, tabela do agente do digiai_mkt (R-032).
-// Aqui é SÓ LEITURA, pela view `public.v_ops_contas_servicos`, que já filtra
-// inativos, calcula dias para renovar e marca verificação velha. O digiai não
-// escreve nada nesta tabela — quando falta ativo, vai despacho para o dono dela.
+// A verdade vive em `ops.contas_servicos`. Desde a ORDEM 2 (17/08/2026) o `ops.*` é
+// ESCRITO pelo digiai e lido pelo digiai_mkt por view — inventário é ativo de empresa,
+// e antes disso ficava sem dono claro. A tela em si continua só lendo, pela
+// `public.v_ops_contas_servicos`, que filtra inativos, calcula dias para renovar e
+// marca verificação velha.
 
 export interface ContaServico {
   id: string;
@@ -23,17 +24,20 @@ export interface ContaServico {
   obs: string | null;
   dias_para_renovar: number | null;
   verificacao_velha: boolean | null;
+  empresa_slug: string | null;
+  categoria: string | null;
+  situacao: string | null;
 }
 
 // Agrupa os `servico` técnicos em famílias que fazem sentido para quem decide.
 // Um serviço não mapeado cai em "Outros" em vez de sumir da tela.
 const FAMILIAS: { chave: string; label: string; servicos: string[] }[] = [
-  { chave: 'meta', label: 'Meta', servicos: ['meta_bm', 'meta_pixel'] },
-  { chave: 'redes', label: 'Redes sociais', servicos: ['rede_facebook', 'rede_instagram', 'rede_linkedin', 'rede_tiktok', 'rede_whatsapp', 'rede_x'] },
-  { chave: 'infra', label: 'Infraestrutura', servicos: ['supabase', 'cloudflare', 'netlify', 'github'] },
-  { chave: 'google', label: 'Google', servicos: ['google_search_console', 'google_analytics', 'google_workspace'] },
-  { chave: 'tiktok', label: 'TikTok (dev)', servicos: ['tiktok_dev', 'tiktok_pixel'] },
-  { chave: 'plataformas', label: 'Plataformas e IA', servicos: ['hotmart', 'openai', 'telegram_bot'] },
+  { chave: 'meta',        label: 'Meta',              servicos: ['meta_bm', 'meta_pixel'] },
+  { chave: 'redes',       label: 'Redes sociais',     servicos: ['rede_facebook', 'rede_instagram', 'rede_linkedin', 'rede_tiktok', 'rede_whatsapp', 'rede_x', 'rede_pinterest'] },
+  { chave: 'google',      label: 'Google',            servicos: ['google_search_console', 'google_analytics', 'google_workspace', 'google_business_profile'] },
+  { chave: 'infra',       label: 'Infraestrutura',    servicos: ['supabase', 'cloudflare', 'netlify', 'github'] },
+  { chave: 'dev',         label: 'Apps de dev',       servicos: ['tiktok_dev', 'tiktok_pixel', 'linkedin_dev', 'pinterest_dev'] },
+  { chave: 'plataformas', label: 'Plataformas e IA',  servicos: ['hotmart', 'openai', 'telegram_bot'] },
 ];
 
 export function familiaDe(servico: string): { chave: string; label: string } {

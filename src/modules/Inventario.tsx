@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ChevronDown, ExternalLink, ShieldAlert, CircleCheck, CircleSlash, CircleHelp, Search } from 'lucide-react';
+import { ChevronDown, ExternalLink, ShieldAlert, CircleCheck, CircleSlash, CircleHelp, Search, TriangleAlert } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import {
   inventarioStore, familiaDe, FAMILIAS_ORDEM, foiConferido, blocosDe, notaOriginal,
@@ -13,10 +13,14 @@ import {
 // banco. Inventário sem tela vira foto velha: foi assim que o inventário
 // anterior passou a contar 12 contas de anúncio onde existem 5.
 //
-// Leitura pura de `public.v_ops_contas_servicos` (R-032 — a tabela é do MKT).
+// Le `public.v_ops_contas_servicos`. Desde a ORDEM 2 (17/08/2026) quem ESCREVE em
+// `ops.*` e o digiai; o MKT le por view. A tela em si nao escreve.
 
+// 'atencao' faz parte do CHECK da tabela e a tela nao o conhecia: caia em
+// 'desconhecido', que e cinza — um item que pede atencao aparecia apagado.
 const ICONE_STATUS: Record<string, { Icone: typeof CircleCheck; cor: string; rotulo: string }> = {
   ok:           { Icone: CircleCheck, cor: 'text-success', rotulo: 'ok' },
+  atencao:      { Icone: TriangleAlert, cor: 'text-warning', rotulo: 'atenção' },
   pausado:      { Icone: CircleSlash, cor: 'text-warning', rotulo: 'pausado' },
   quebrado:     { Icone: ShieldAlert, cor: 'text-danger',  rotulo: 'quebrado' },
   desconhecido: { Icone: CircleHelp,  cor: 'text-muted',   rotulo: 'desconhecido' },
@@ -51,7 +55,9 @@ export default function Inventario() {
   // é ruído, não informação. O que importa aqui é o tamanho da lacuna de verificação.
   const placar = useMemo(() => {
     const conferidos = itens.filter(foiConferido).length;
-    const problema = itens.filter((i) => i.status === 'quebrado' || i.status === 'pausado').length;
+    // 'atencao' entra na conta: era o status dos 3 ativos da Polá Petit que pedem acao
+    // do dono, e sem ele o placar dizia "0 com problema" com pendencia real na lista.
+    const problema = itens.filter((i) => i.status === 'quebrado' || i.status === 'pausado' || i.status === 'atencao').length;
     return { total: itens.length, conferidos, problema, pendentes: itens.length - conferidos };
   }, [itens]);
 
@@ -60,7 +66,7 @@ export default function Inventario() {
     return itens.filter((i) => {
       if (familia !== 'todas' && familiaDe(i.servico).chave !== familia) return false;
       if (!q) return true;
-      return `${i.identificador} ${i.servico} ${i.conta_dona ?? ''} ${i.ultimo_detalhe ?? ''}`.toLowerCase().includes(q);
+      return `${i.identificador} ${i.servico} ${i.empresa_slug ?? ''} ${i.conta_dona ?? ''} ${i.ultimo_detalhe ?? ''}`.toLowerCase().includes(q);
     });
   }, [itens, familia, busca]);
 
@@ -170,6 +176,9 @@ export default function Inventario() {
                             <div className="flex items-baseline gap-2 flex-wrap">
                               <span className="text-on-surface text-sm font-medium break-all">{i.identificador}</span>
                               <span className="font-mono text-[10px] uppercase tracking-wider text-muted">{i.servico}</span>
+                              {i.empresa_slug && (
+                                <span className="font-mono text-[10px] uppercase tracking-wider text-secondary">{i.empresa_slug}</span>
+                              )}
                               {!foiConferido(i) && (
                                 <span className="font-mono text-[10px] uppercase tracking-wider text-warning border border-warning/50 px-1.5 py-0.5">
                                   não conferido
