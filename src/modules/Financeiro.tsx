@@ -520,31 +520,93 @@ function LancarTab() {
     }
   }
 
+  /**
+   * Divide uma linha de CSV respeitando aspas. `split(',')` cru desloca todas as
+   * colunas quando a descricao tem virgula — e descricao de extrato bancario tem
+   * virgula o tempo todo ("PAGAMENTO FORNECEDOR, LTDA"). O resultado seria valor
+   * gravado no campo errado, sem erro nenhum.
+   */
+  function dividirCsv(linha: string): string[] {
+    const cols: string[] = [];
+    let atual = '';
+    let dentroDeAspas = false;
+    for (let i = 0; i < linha.length; i++) {
+      const c = linha[i];
+      if (c === '"') {
+        if (dentroDeAspas && linha[i + 1] === '"') { atual += '"'; i++; }
+        else dentroDeAspas = !dentroDeAspas;
+      } else if (c === ',' && !dentroDeAspas) {
+        cols.push(atual.trim()); atual = '';
+      } else {
+        atual += c;
+      }
+    }
+    cols.push(atual.trim());
+    return cols;
+  }
+
   async function handleCsvImport() {
     if (!csvText.trim()) return;
     setSaving(true);
     setMsg('');
-    const lines = csvText.trim().split('\n').slice(1); // skip header
+    const lines = csvText.trim().split('\n').slice(1); // pula o cabecalho
     let count = 0;
-    for (const line of lines) {
-      const cols = line.split(',').map(c => c.trim());
-      if (cols.length < 6) continue;
+    // Linha pulada NUNCA some em silencio. O codigo anterior tinha
+    // `catch { skip bad rows }` e anunciava so o total importado: 40 de 60 linhas
+    // podiam falhar e a mensagem dizia "20 despesas importadas", que se le como
+    // sucesso. Em razao financeiro, importacao parcial silenciosa e pior que
+    // importacao que falha inteira.
+    const puladas: string[] = [];
+    const mesesTocados = new Set<string>();
+
+    for (const [idx, line] of lines.entries()) {
+      const nLinha = idx + 2; // +1 do cabecalho, +1 para numerar a partir de 1
+      if (!line.trim()) continue;
+      const cols = dividirCsv(line);
+      // Recusa numero de colunas diferente de 6 em vez de pegar as 6 primeiras.
+      // O caso que motiva: valor em formato brasileiro sem aspas ("1.234,56") vira
+      // duas colunas, e aceitar as 6 primeiras importaria 1.234 no lugar de 1.234,56 —
+      // corrupcao silenciosa em razao financeiro. Melhor recusar e dizer por que.
+      if (cols.length !== 6) {
+        puladas.push(`linha ${nLinha}: ${cols.length} colunas, precisa de 6`
+          + (cols.length > 6 ? ' — se a descricao ou o valor tem virgula, coloque o campo entre aspas' : ''));
+        continue;
+      }
       const [product_id, category, kind, description, month, amount_brl_str] = cols;
-      const amount_brl = parseFloat(amount_brl_str);
-      if (isNaN(amount_brl)) continue;
+      const amount_brl = parseFloat(amount_brl_str.replace(/[R$\s]/g, '').replace(/\.(?=\d{3}\b)/g, '').replace(',', '.'));
+      if (isNaN(amount_brl)) { puladas.push(`linha ${nLinha}: valor "${amount_brl_str}" nao e numero`); continue; }
+      const mesNormalizado = month.length === 7 ? month + '-01' : month;
       try {
         await financeStore.addExpense({
           product_id,
           category: category as ExpenseCategory,
           kind: kind as 'subscription' | 'one_time' | 'aporte_intelectual',
           description,
-          month: month.length === 7 ? month + '-01' : month,
+          month: mesNormalizado,
           amount_brl,
         });
         count++;
-      } catch { /* skip bad rows */ }
+        mesesTocados.add(mesNormalizado);
+      } catch (err) {
+        puladas.push(`linha ${nLinha}: ${err instanceof Error ? err.message : 'erro ao gravar'}`);
+      }
     }
-    setMsg(`${count} despesas importadas.`);
+
+    // Alerta de duplicata: nao ha chave que impeca importar o mesmo extrato duas
+    // vezes, e junho ja esta parcialmente carregado (o razao para em 12/06).
+    // Importar junho inteiro por cima duplicaria o que ja existe.
+    const jaExistiam = [...mesesTocados].filter(m => expenses.some(e => e.month === m));
+
+    let aviso = `${count} despesa(s) importada(s).`;
+    if (puladas.length) {
+      aviso += ` ${puladas.length} pulada(s): ` + puladas.slice(0, 5).join(' · ')
+             + (puladas.length > 5 ? ` · e mais ${puladas.length - 5}` : '');
+    }
+    if (jaExistiam.length) {
+      aviso += ` ATENCAO: ${jaExistiam.join(', ')} ja tinha(m) lancamento antes desta importacao`
+             + ' — confira duplicatas em Relatorio antes de usar os numeros.';
+    }
+    setMsg(aviso);
     setCsvText('');
     setShowCsv(false);
     const e = await financeStore.listExpenses(50);
