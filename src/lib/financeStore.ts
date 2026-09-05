@@ -135,6 +135,19 @@ export type InfraCost = {
   sincronizado_em: string | null;
 };
 
+// Aporte de CAIXA (finance.aportes, migration 082): dinheiro que entrou de verdade.
+// NUNCA somar com aporte intelectual (kind=aporte_intelectual / founder_time), que e nao-caixa.
+// natureza: investimento (nao volta) | emprestimo (passivo que volta) | devolucao (saiu no sentido inverso)
+export type Aporte = {
+  id: string;
+  data: string;
+  origem: string;
+  valor_brl: number;
+  natureza: 'investimento' | 'emprestimo' | 'devolucao';
+  observacao?: string | null;
+  created_at: string;
+};
+
 export type RevenueRow = {
   month: string;
   product_id: string;
@@ -241,6 +254,19 @@ export const financeStore = {
       return [];
     }
     return (data as RevenueRow[]) || [];
+  },
+
+  // --- Aportes de caixa (view v_finance_aportes, migration 088; RLS super_admin) ---
+  async listAportes(): Promise<Aporte[]> {
+    if (!isSupabaseReady()) return [];
+    const { data, error } = await supabase
+      .from('v_finance_aportes')
+      .select('id, data, origem, valor_brl, natureza, observacao, created_at');
+    if (error) {
+      console.error('[finance] listAportes', error);
+      return [];
+    }
+    return (data as Aporte[]) || [];
   },
 
   async listFounderTime(): Promise<FounderTime[]> {

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   BarChart3, PlusCircle, RefreshCw, CreditCard, FileDown,
   Trash2, X, DollarSign, TrendingDown, Repeat, Download,
-  ChevronDown, ChevronUp, XCircle, AlertTriangle, Server,
+  ChevronDown, ChevronUp, XCircle, AlertTriangle, Server, Landmark,
 } from 'lucide-react';
 import {
   Chart as ChartJS,
@@ -16,7 +16,7 @@ import {
   CATEGORY_LABELS, CATEGORY_COLORS,
   type Product, type Vendor, type Expense, type Subscription,
   type VendorSpend, type MonthlyByCategory, type ExpenseCategory,
-  type RevenueRow, type FounderTime, type InfraCost,
+  type RevenueRow, type FounderTime, type InfraCost, type Aporte,
 } from '../lib/financeStore';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
@@ -113,10 +113,11 @@ function DashboardTab() {
 
   const [revenue, setRevenue] = useState<RevenueRow[]>([]);
   const [founder, setFounder] = useState<FounderTime[]>([]);
+  const [aportes, setAportes] = useState<Aporte[]>([]);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [e, m, v, s, p, r, f] = await Promise.all([
+    const [e, m, v, s, p, r, f, a] = await Promise.all([
       financeStore.listExpenses(5000),
       financeStore.listMonthlyByCategory(),
       financeStore.listVendorSpend(),
@@ -124,6 +125,7 @@ function DashboardTab() {
       financeStore.listProducts(),
       financeStore.listRevenue(),
       financeStore.listFounderTime(),
+      financeStore.listAportes(),
     ]);
     setAllExpenses(e);
     setMonthlyByCat(m);
@@ -132,6 +134,7 @@ function DashboardTab() {
     setProducts(p);
     setRevenue(r);
     setFounder(f);
+    setAportes(a);
     setLoading(false);
   }, []);
 
@@ -181,6 +184,16 @@ function DashboardTab() {
   const founderHoras = founder.reduce((a, f) => a + Number(f.hours_worked || 0), 0);
   const founderValor = founder.reduce((a, f) => a + Number(f.valued_amount_brl || 0), 0);
   const preReceita = receitaTotal === 0;
+
+  // Aportes de CAIXA (finance.aportes): quem financiou o buraco. Não passa pelo filtro de
+  // projeto — aporte entra na empresa, não num produto. NUNCA somar com o aporte intelectual.
+  const somaAporte = (n: Aporte['natureza']) => aportes.filter(a => a.natureza === n).reduce((s, a) => s + Number(a.valor_brl), 0);
+  const aporteInvestimento = somaAporte('investimento');
+  const aporteEmprestimo = somaAporte('emprestimo');
+  const aporteDevolucao = somaAporte('devolucao');
+  const aporteCaixaLiquido = aporteInvestimento + aporteEmprestimo - aporteDevolucao;
+  const NATUREZA_LABEL: Record<Aporte['natureza'], string> = { investimento: 'Investimento', emprestimo: 'Empréstimo', devolucao: 'Devolução' };
+  const dataBr = (iso: string) => new Date(`${iso}T00:00:00`).toLocaleDateString('pt-BR');
 
   // Chart data — recompute from filtered expenses (not from monthlyByCat view which has no product filter)
   const expByMonthCat: Record<string, Record<string, number>> = {};
@@ -280,15 +293,26 @@ function DashboardTab() {
         </button>
       </div>
 
-      {/* Frescor dos dados — extrato é a fonte da verdade; sem import recente, tudo aqui é verdade VELHA */}
+      {/* Frescor dos dados — extrato é a fonte da verdade; sem import recente, tudo aqui é verdade VELHA.
+          O selo mede a DATA DO LANÇAMENTO (created_at), não o mês coberto: um import feito hoje de
+          extratos velhos zera o contador. Por isso a legenda ao lado diz até que mês o razão vai. */}
       {(() => {
         const ultimo = expenses.reduce<string | null>((max, e) => (e.created_at && (!max || e.created_at > max) ? e.created_at : max), null);
         const dias = ultimo ? Math.floor((Date.now() - new Date(ultimo).getTime()) / 86400000) : null;
-        if (dias == null || dias <= 30) return null;
+        const ultimoMesRazao = mesesCaixa[mesesCaixa.length - 1];
         return (
-          <div className="border border-warning/40 bg-warning/10 px-4 py-2.5 text-[12px] text-on-surface flex items-center gap-2">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-warning shrink-0">dados defasados</span>
-            <span>Último lançamento há <strong>{dias} dias</strong> — importar o extrato antes de usar estes números em decisão ou venda (extrato = fonte da verdade).</span>
+          <div className="space-y-2">
+            {ultimo && (
+              <div className="font-mono text-[10px] uppercase tracking-wider text-muted">
+                razão de caixa até {ultimoMesRazao ? monthLabel(ultimoMesRazao) : '—'} · último lançamento em {new Date(ultimo).toLocaleDateString('pt-BR')}
+              </div>
+            )}
+            {dias != null && dias > 30 && (
+              <div className="border border-warning/40 bg-warning/10 px-4 py-2.5 text-[12px] text-on-surface flex items-center gap-2">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-warning shrink-0">dados defasados</span>
+                <span>Último lançamento há <strong>{dias} dias</strong> — importar o extrato antes de usar estes números em decisão ou venda (extrato = fonte da verdade).</span>
+              </div>
+            )}
           </div>
         );
       })()}
@@ -324,6 +348,9 @@ function DashboardTab() {
             <div className="font-mono text-[10px] uppercase tracking-widest text-muted">Resultado de caixa</div>
             <div className={`font-serif text-2xl font-semibold tabular-nums mt-1 ${resultadoCaixa >= 0 ? 'text-success' : 'text-danger'}`}>{brl(resultadoCaixa)}</div>
             <div className="text-[10px] text-muted mt-0.5">receita − caixa investido ({brl(caixaTotal)})</div>
+            {aportes.length > 0 && (
+              <div className="text-[10px] text-muted mt-0.5">bancado por aportes de caixa: {brl(aporteCaixaLiquido)} líquidos ↓</div>
+            )}
           </div>
           <div className="p-4">
             <div className="font-mono text-[10px] uppercase tracking-widest text-muted">Fundador (sweat equity)</div>
@@ -331,6 +358,78 @@ function DashboardTab() {
             <div className="text-[10px] text-muted mt-0.5">{brl(founderValor)} valorados (não-caixa)</div>
           </div>
         </div>
+      </div>
+
+      {/* Aportes de CAIXA — quem financiou o buraco. Bloco próprio, nunca somado ao aporte intelectual. */}
+      <div className="border border-outline/15 bg-surface-container">
+        <div className="px-5 py-3 border-b border-outline/10 flex items-center justify-between flex-wrap gap-2">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-secondary flex items-center gap-2">
+            <Landmark size={12} /> Aportes de caixa — quem financiou o gasto
+          </span>
+          <span className="font-mono text-[10px] uppercase tracking-wider text-muted">
+            dinheiro que entrou · separado do aporte intelectual (não-caixa) · não filtra por projeto
+          </span>
+        </div>
+        {aportes.length === 0 ? (
+          <div className="p-4 text-xs text-muted">
+            Nenhum aporte de caixa visível — ou não há registro em <code className="font-mono">finance.aportes</code>, ou este login não é super_admin (a RLS só libera leitura ao dono).
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-outline/10">
+              <div className="p-4">
+                <div className="font-mono text-[10px] uppercase tracking-widest text-muted">Investimento</div>
+                <div className="font-serif text-2xl font-semibold tabular-nums mt-1 text-success">{brl(aporteInvestimento)}</div>
+                <div className="text-[10px] text-muted mt-0.5">capital · não volta</div>
+              </div>
+              <div className="p-4">
+                <div className="font-mono text-[10px] uppercase tracking-widest text-muted">Empréstimos</div>
+                <div className="font-serif text-2xl font-semibold tabular-nums mt-1 text-on-surface">{brl(aporteEmprestimo)}</div>
+                <div className="text-[10px] text-muted mt-0.5">passivo · volta</div>
+              </div>
+              <div className="p-4">
+                <div className="font-mono text-[10px] uppercase tracking-widest text-muted">Devoluções</div>
+                <div className="font-serif text-2xl font-semibold tabular-nums mt-1 text-danger">−{brl(aporteDevolucao)}</div>
+                <div className="text-[10px] text-muted mt-0.5">saiu no sentido inverso</div>
+              </div>
+              <div className="p-4">
+                <div className="font-mono text-[10px] uppercase tracking-widest text-muted">Líquido em caixa</div>
+                <div className={`font-serif text-2xl font-semibold tabular-nums mt-1 ${aporteCaixaLiquido >= 0 ? 'text-success' : 'text-danger'}`}>{brl(aporteCaixaLiquido)}</div>
+                <div className="text-[10px] text-muted mt-0.5">investimento + empréstimos − devoluções</div>
+              </div>
+            </div>
+            <div className="px-5 py-3 border-t border-outline/10 overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-muted text-xs uppercase">
+                    <th className="text-left pb-2">Data</th>
+                    <th className="text-left pb-2">Origem</th>
+                    <th className="text-left pb-2">Natureza</th>
+                    <th className="text-right pb-2">Valor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {aportes.map((a) => (
+                    <tr key={a.id} className="border-t border-outline/10" title={a.observacao || undefined}>
+                      <td className="py-2 text-muted whitespace-nowrap">{dataBr(a.data)}</td>
+                      <td className="py-2 text-on-surface">{a.origem}</td>
+                      <td className="py-2">
+                        <span className={`px-2 py-0.5 text-xs border ${
+                          a.natureza === 'devolucao' ? 'border-danger/40 text-danger bg-danger/10'
+                          : a.natureza === 'emprestimo' ? 'border-warning/40 text-warning bg-warning/10'
+                          : 'border-success/40 text-success bg-success/10'
+                        }`}>{NATUREZA_LABEL[a.natureza]}</span>
+                      </td>
+                      <td className={`py-2 text-right font-mono ${a.natureza === 'devolucao' ? 'text-danger' : 'text-on-surface'}`}>
+                        {a.natureza === 'devolucao' ? '−' : ''}{brl(Number(a.valor_brl))}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Stacked bar chart */}
