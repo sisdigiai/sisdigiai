@@ -4,6 +4,12 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Adicionado (2026-09-05 — Comercial: plano dos 259 prospects)
+- **`docs/comercial/plano-259-2026-09-05.md`** — plano de 30 dias para o primeiro piloto pago, escrito pelo agente comercial na ordem noturna. Diagnóstico por agregação no banco (sem PII): 259 prospects, 237 captados · 18 contatados · 4 "conversa" (que são **auto-replies**, não troca humana), 5 com dono, zero e-mail. **Achado que muda o plano:** `wa_status` mostra **110 telefones fixos** (42%) — só ligação alcança; o pool de WhatsApp é 127.
+- Defaults reversíveis documentados: dono padrão "Gilberto (Junior)", SLA 48 h primeiro toque / 7 d segundo. Ordem de ataque em ondas (4 auto-reply → 18 contatados → 42 Suzano-região celular não-franquia por faixa de avaliações → 41 fixos por ligação → SP capital). Três variações de mensagem em primeira pessoa do dono, com link do kit UTM e `utm_content` por variação; roteiro de ligação de 30 s; segundo toque.
+- Confirmado no banco que a migration do vocabulário de 8 estágios (MKT, 31/08) **está aplicada** (`commercial_leads_stage_vocabulario` + `perdido` exige motivo). Plano usa só o vocabulário novo.
+- Divergência registrada para o dono: canônico R-036 ainda oferece "30 dias grátis" (13/07), contradiz D5 (31/08). Plano segue D5 e não oferece teste grátis. Nada foi enviado a lead.
+
 ### Corrigido (2026-08-13 — Financeiro para de mostrar assinatura velha como se fosse contrato)
 - **Todas as 12 assinaturas ativas** de `finance.subscriptions` são **auto-derivadas de médias em 06/06/2026** e nunca foram revisadas (68 dias). Elas somam **R$ 1.336,94/mês**, enquanto o extrato real (aporte conta 7.4 no Finance) mostra **~R$ 3,4 mil/mês** em jul/2026 — Anthropic aparece como R$ 339/mês quando teve linha única de R$ 1.100 em julho.
 - O risco não era só exibição: o botão **"Gerar despesas do mês"** grava esses valores em `finance.expenses`, ou seja, número velho viraria lançamento errado no razão.
@@ -378,3 +384,24 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 ## [Histórico]
 
 - 2026-05-22 — Pasta `docs/` criada como parte da padronização do workspace DIGIAI.
+
+## 2026-09-05 — ordem noturna (orquestrador, autorização textual do dono)
+
+- **Migration 082 — extratos InfinitePay jun–ago/2026 lançados** (21 linhas,
+  R$ 7.847,53, IOF somado, recorte a partir de 13/06). O razão de `finance.expenses`
+  estava parado em 12/06; agora vai até ago/2026. Vendors novos: fal.ai, JusBrasil.
+  **`finance.aportes` criada** (aporte de CAIXA — investimento/empréstimo/devolução),
+  distinta do aporte intelectual: o painel mostrava o buraco de caixa sem mostrar
+  quem o financiou. Lançados R$ 5.710 (investimento da ótica) e R$ 1.000 (devolução):
+  líquido R$ 4.710.
+- **Migration 083 — `ops.comercial_config`** (owner_padrao, sla_primeiro_toque_horas=48,
+  sla_segundo_toque_dias=7) e **254 prospects sem dono receberam o dono padrão
+  "Gilberto (Junior)"** (0 sem dono; reversível — decisão por delegação, registrada
+  na ordem do dia).
+- **Migration 084 — funções de escrita fechadas para anon/PUBLIC** (método do
+  runbook: chamada viva antes → revoke de anon E PUBLIC + grant explícito → chamada
+  viva depois). Prova: `marketing_get_post_promotion` e `fn_mark_sync` como anon
+  passaram de HTTP 200 para 42501; helpers de RLS (`current_role_code`, `is_*`)
+  continuam. Só service_role: credenciais, seeds, ingestão de webhook, sync.
+  Três funções possivelmente públicas por formulário ficaram abertas para o dono
+  decidir (submit_testimonial, add_challenge_participation, track_material_download).
