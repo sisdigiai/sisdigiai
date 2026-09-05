@@ -1,5 +1,5 @@
 -- ============================================================
--- 086 — Esteira de outreach: o lote de junho/julho vira 'pulado' (dado, reversivel)
+-- 089 — Esteira de outreach: o lote de junho/julho vira 'pulado' (dado, reversivel)
 -- ============================================================
 -- Diagnostico (orquestrador, 05/09, ordem noturna): marketing.outreach_schedule
 -- NUNCA teve motor — sem cron, sem edge function; o app so le a view e mostra o
