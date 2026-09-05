@@ -405,3 +405,7 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
   continuam. Só service_role: credenciais, seeds, ingestão de webhook, sync.
   Três funções possivelmente públicas por formulário ficaram abertas para o dono
   decidir (submit_testimonial, add_challenge_participation, track_material_download).
+- **Migration 086 — esteira de outreach: lote de jun/jul vira `pulado`** (114
+  agendados vencidos). Diagnóstico do portão 3: a esteira nunca teve motor (sem
+  cron, sem edge function; o app só lê a view). Parou porque o humano parou. O
+  plano dos 259 substitui o lote; reversível por `notes like '%[05/09 pulado]%'`.
