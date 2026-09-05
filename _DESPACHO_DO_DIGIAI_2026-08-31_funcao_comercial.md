@@ -75,3 +75,14 @@ ele com opções concretas, não como pergunta aberta.
 - Dado comercial: fonte única é o canônico R-036. Não inventar número.
 - Reporta ao orquestrador geral (sessão `digiai-*` viva; se nenhuma, escreve em
   arquivo neste repo).
+
+---
+
+## ADENDO 02/09 - O QUE PODE (o par das proibicoes)
+
+As proibicoes acima ganharam a alternativa: docs/comercial/o-que-pode-prometer-2026-09-02.md
+- capacidade por capacidade com prova de codigo, numeros vivos do tenant real
+(sem PII), dor de otica que cada uma resolve, roteiro de demo de 20 minutos e a
+lista do que NAO mostrar. Levantado pelo subagente vendedor (so codigo, nunca
+Spec) e conferido pelo orquestrador. Proibicao sem alternativa se contorna na
+conversa dificil; agora tens as duas.
