@@ -9,13 +9,13 @@ banco está na tabela abaixo — é ela que vale para rebuild, não o prefixo.
 
 | Arquivo | Autor | Aplicada em |
 |---|---|---|
-| 081_polapetit_e_normalizacao_inventario.sql | agente do app | ver git log |
+| 081_polapetit_e_normalizacao_inventario.sql | agente do app | 28/08 10:17 |
 | 081_telao_views_e_espelhos.sql | orquestrador (Telão) | 27/08 |
-| 082_inventario_com_empresa.sql | agente do app | ver git log |
+| 082_inventario_com_empresa.sql | agente do app | 28/08 10:17 |
 | 082_infinitepay_jun_ago_2026_e_aportes.sql | orquestrador (ordem noturna) | 05/09 ~01h |
-| 083_gbp_api_verificado.sql | agente do app | ver git log |
+| 083_gbp_api_verificado.sql | agente do app | 28/08 10:18 |
 | 083_comercial_config_dono_padrao_sla.sql | orquestrador (ordem noturna) | 05/09 ~01h |
-| 084_fix_view_inventario_permissao.sql | agente do app | ver git log |
+| 084_fix_view_inventario_permissao.sql | agente do app | 28/08 10:21 |
 | 084_revoke_anon_public_em_funcoes_de_escrita.sql | orquestrador (ordem noturna) | 05/09 ~01h |
 
 Independência conferida: nenhum par escreve no mesmo objeto; a ordem relativa dentro
