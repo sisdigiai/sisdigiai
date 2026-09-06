@@ -193,3 +193,88 @@ Duas saídas: **hospedar as fontes** (não afrouxa CSP, tira o terceiro do camin
 flash de fonte) ou **liberar os dois hosts do Google** em `style-src`/`font-src` (uma linha, não
 toca `script-src`). **Prefiro hospedar.** É front, é meu, e faço no próximo passe — não emendei
 agora porque é assunto separado e eu não conseguiria conferir em tela antes do deploy.
+
+---
+
+## 8. Correção do §1 — eu contei a tabela errada
+
+No §1 escrevi, como prova de que fechar o portão não trancava ninguém:
+
+> *"`iam.users` tem **um único usuário**"*
+
+**Verdadeiro e insuficiente.** `iam.users` é a tabela que dá papel; **`auth.users` é a que dá
+conta.** Conferi as duas depois do aviso do Orquestrador Geral:
+
+| conta em `auth.users` | linha em `iam.users` | último login |
+|---|---|---|
+| `junior@oticastatymello.com.br` | **sim** — `super_admin`, `active` | 06/09/2026 |
+| `iamyasminchristinaa009@gmail.com` | **não** | **31/07/2026** |
+| `vendas@digiai.app.br` | **não** | nunca entrou |
+
+**São três contas, não uma.** A conclusão do §1 continua de pé — o dono não é trancado — mas eu
+a tirei olhando só a tabela que me convinha, e não é assim que se prova.
+
+### O que isso revela sobre o fail-open, e é pior do que a auditoria dizia
+
+`current_role_code()` devolve `NULL` para quem **não tem linha em `iam.users`** — exatamente o
+mesmo `NULL` do erro de RPC. Com o portão aberto no `NULL`:
+
+> **A segunda conta entrava em Financeiro, Cadastro Empresa, Clearix e Cobrança.** Não por falha
+> de RPC, não em teoria: por não ter papel nenhum, que era o caso normal dela. E entrou no app
+> pela última vez em **31/07**.
+
+O relatório tratava o fail-open como risco condicional ("se a RPC falhar"). **Não era condicional.**
+Era o comportamento padrão para toda conta sem papel — e existia uma, de uma pessoa real.
+
+**Isto reforça o conserto e cria uma decisão para o dono, que não é minha:** dar papel a essa
+conta ou removê-la. Enquanto ela existir sem papel, o app (já corrigido) vai negar os módulos
+restritos a ela — que é o certo, mas alguém precisa saber antes de a pessoa perceber.
+E `vendas@digiai.app.br` nunca entrou: conta aberta sem uso é superfície sem dono.
+
+## 9. Portão 28 — confirmado, e são seis tabelas, não uma
+
+O Orquestrador Geral reportou `ops.contas_servicos` com RLS ligada e **zero policies**. Confirmo,
+e o padrão não para nela:
+
+| tabela de `ops` | RLS | policies | quem tem grant além do dono |
+|---|---|---|---|
+| `contas_servicos` | ligada | **0** | só `service_role` |
+| `empresas` | ligada | **0** | só `service_role` |
+| `scorecard_entries` | ligada | **0** | só `service_role` |
+| `scorecard_metrics` | ligada | **0** | só `service_role` |
+| `plataformas` | **desligada** | 0 | só `service_role` |
+| `servicos` | **desligada** | 0 | só `service_role` |
+
+As quatro primeiras estão **fechadas por acidente**: RLS ligada sem policy nega tudo, e como
+ninguém além do `service_role` tem grant, o efeito hoje é o mesmo. **Mas são dois cadeados
+independentes, e nenhum deles foi escolhido** — o primeiro `GRANT` futuro (o mesmo tipo de
+`GRANT ALL ON ALL TABLES` que produziu as 145 views) abre as quatro de uma vez.
+
+As duas últimas são as minhas tabelas de vocabulário da migration 087, e estão **um degrau
+pior**: nem RLS têm. Só o grant as segura.
+
+**O conserto certo não é ligar policy em tudo** — é dizer o que se quis. Onde o acesso é só por
+view definer e `service_role`, uma policy explícita `false` ou um `comment on table` registrando
+a intenção vale mais que o silêncio, porque **o silêncio não sobrevive ao próximo grant**.
+
+**Ressalva de fronteira:** o handoff de 02/09 pôs a escrita de `ops.*` com o orquestrador, e o app
+lê por view. Este portão é escrita em `ops.*` — pelo combinado é dele, não meu. Se o dono quiser
+que eu execute, executo; **não assumo por mensagem de par.** E é escrita em produção de qualquer
+forma: vai ao dono.
+
+## 10. A armadilha do `set role` — confirmada, com um recorte que importa
+
+O aviso: RLS não se prova pela Management API com `set role`. **Confirmei, e medi onde a linha cai:**
+
+```
+set local role authenticated;  →  session_user = postgres, current_user = authenticated
+select ... from ops.contas_servicos  →  ERRO 42501 permission denied for table
+```
+
+- **Grant é provável assim** — a checagem de grant dispara sob `set role` e devolveu 42501. É o
+  que usei no §6 para as 13 views, e a alegação que fiz lá era de grant. **Continua válida.**
+- **RLS não é** — `auth.uid()` lê claim de JWT, e não há JWT numa consulta da Management API:
+  toda policy que dependa dele avalia contra nulo. `is_admin()` e parentes **mentem**, como ele disse.
+
+Fica anotado como limite do meu instrumento: **eu provo grant por aqui; RLS só por chamada real
+com token do papel.** Duas coisas diferentes que dão a mesma cara de "passou".
