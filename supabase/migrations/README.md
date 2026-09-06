@@ -1,58 +1,35 @@
-# Estado real das migrations — DIGIAI App
+# Migrations do digiai — numeração e ordem real de aplicação
 
-> Atualizado 2026-05-28. Este README existe porque o histórico de migrations
-> **divergiu** do que está aplicado no banco `hswyopqvnolqpmprqvzh`. Leia antes
-> de rodar `supabase db push` ou reconstruir o banco do zero.
+## Colisão registrada (decisão do orquestrador geral, 06/09/2026): NÃO renumerar
+Duas sessões numeraram em paralelo e colidiram em **081, 082, 083 e 084** — cada
+número tem DOIS arquivos. Renumerar migration já aplicada é reescrever histórico de
+banco; a decisão foi **registrar o fato e travar daqui para a frente** (mesma lógica
+do handoff riscado em vez de apagado). A ordem em que foram de fato aplicadas no
+banco está na tabela abaixo — é ela que vale para rebuild, não o prefixo.
 
-## 1. Migrations numeradas (`migrations/NNN_*.sql`)
-
-`001` → `025`. São a fonte versionada do schema base (`company`, `finance`,
-`iam`, `ops`, `academy`) + Marketing & SEO (`019`–`024`) + R-013 (`025`).
-
-⚠️ **Divergência com `supabase_migrations.schema_migrations`:** a tabela de
-ledger do banco só registra parte delas (os `finance_*` de 2026-04-22 e
-`019`–`024`). As `001`–`018` foram aplicadas cedo via Dashboard/SQL Editor e
-**não** estão no ledger. Por isso `supabase db push` num clone tentaria
-reaplicar `001`–`018`. Hoje o deploy de schema é feito via **Management API /
-SQL Editor**, não via `supabase db push`.
-
-- `025_r013_iam_users_identity.sql` foi aplicada em **2026-05-28 via Management
-  API** (aditiva e idempotente — `ADD COLUMN IF NOT EXISTS`). Não está no ledger;
-  reaplicar é seguro.
-
-## 2. SQL solto em `supabase/*.sql` (FORA da sequência numerada)
-
-Todo o módulo **Marketing** (schema `marketing`, 16 tabelas) foi aplicado via
-estes arquivos ad-hoc — **não estão em `migrations/` nem no ledger**, mas já
-estão **vivos em produção**:
-
-| Arquivo | Cria / faz | Reaplicar é seguro? |
+| Arquivo | Autor | Aplicada em |
 |---|---|---|
-| `marketing-fase-2-completa.sql` | Schema núcleo: pilares, ideias, calendário, copy, brief, artes, platforms, materiais/afiliados, RPCs | Parcial (usa `IF NOT EXISTS` em parte) — revisar |
-| `rpc-marketing.sql` | RPCs `marketing_*` (`CREATE OR REPLACE`) | ✅ Sim (idempotente) |
-| `marketing-ai-prompts.sql` | `ai_prompt_templates` + RPCs de prompt | revisar |
-| `marketing-promote-post.sql` | RPC promover post → material | ✅ provável |
-| `marketing-hotmart-tracking.sql` | `hotmart_events_raw`, `hotmart_sales` + ingest | revisar |
-| `marketing-testimonials.sql` | `testimonials` + RPCs | revisar |
-| `marketing-bulk-schedule.sql` | RPC agendamento em lote | ✅ provável |
-| `marketing-platforms-tune.sql` | ajustes em `platforms` | revisar |
-| `marketing-community.sql` | `community_members` | revisar |
-| `marketing-challenges.sql` | `challenges`, `challenge_participations` | revisar |
-| `marketing-post-outputs.sql` | `post_ai_outputs` | revisar |
-| `marketing-affiliates-active.sql` | afiliados ativos, comissão, payouts | revisar |
-| `company-seed-extras.sql` | **SEED** de 6 ativos digitais | ❌ **NÃO reaplicar** (duplica/seed) |
-| `fix-marketing-encoding.sql` | **DATA-FIX**: `DELETE FROM content_ideas/pillars` + reinsere | ❌ **NUNCA reaplicar** — apaga as ideias reais |
+| 081_polapetit_e_normalizacao_inventario.sql | agente do app | ver git log |
+| 081_telao_views_e_espelhos.sql | orquestrador (Telão) | 27/08 |
+| 082_inventario_com_empresa.sql | agente do app | ver git log |
+| 082_infinitepay_jun_ago_2026_e_aportes.sql | orquestrador (ordem noturna) | 05/09 ~01h |
+| 083_gbp_api_verificado.sql | agente do app | ver git log |
+| 083_comercial_config_dono_padrao_sla.sql | orquestrador (ordem noturna) | 05/09 ~01h |
+| 084_fix_view_inventario_permissao.sql | agente do app | ver git log |
+| 084_revoke_anon_public_em_funcoes_de_escrita.sql | orquestrador (ordem noturna) | 05/09 ~01h |
 
-## 3. Regras
+Independência conferida: nenhum par escreve no mesmo objeto; a ordem relativa dentro
+de cada par não altera o resultado (o 084 do app mexe numa VIEW de inventário; o 084
+do orquestrador em GRANTS de FUNÇÕES). Mesmo assim, a regra abaixo existe para que
+isso nunca precise ser conferido de novo.
 
-- **No banco vivo:** nunca rode `company-seed-extras.sql` nem
-  `fix-marketing-encoding.sql` de novo — eles apagam/duplicam dados reais
-  (hoje há 99 `content_ideas` e 61 posts no calendário).
-- **Rebuild do zero (staging):** ordem = numeradas `001`→`025` →
-  schema do Marketing (`marketing-fase-2-completa` → `*-tracking` →
-  `*-ai-prompts` → demais RPCs/tabelas) → seeds (`company-seed-extras`,
-  `fix-marketing-encoding`) por último.
-- **Pendência (follow-up):** consolidar o SQL solto em migrations numeradas
-  `026+` idempotentes **exige revisão de idempotência arquivo a arquivo** e um
-  drill de rebuild em staging (R-017) antes de virar fonte de verdade. Não foi
-  feito automaticamente para não arriscar reaplicar os data-fixes destrutivos.
+## Regra daqui para a frente (vale para todos os agentes do app)
+1. **Número novo = maior número existente no diretório + 1**, lido do disco na hora
+   (`ls supabase/migrations | sort | tail -1`), nunca "o próximo que eu lembro".
+2. Quem aplica, espelha no mesmo commit em `docs/migrations/migrations/` (o padrão do
+   app — não flat em `docs/migrations/`), e regenera `schema.sql` quando cria objeto.
+3. Antes de aplicar, `git pull`: se outro agente criou número igual entre o teu
+   rascunho e o teu apply, renumera o TEU (ainda não aplicado) — nunca o dele.
+4. Duas sessões no mesmo repo na mesma rodada = um executor por repo (lição 05/09).
+
+Próximo número livre em 06/09/2026: **090**.
