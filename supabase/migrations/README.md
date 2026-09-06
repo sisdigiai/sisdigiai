@@ -32,4 +32,4 @@ isso nunca precise ser conferido de novo.
    rascunho e o teu apply, renumera o TEU (ainda não aplicado) — nunca o dele.
 4. Duas sessões no mesmo repo na mesma rodada = um executor por repo (lição 05/09).
 
-Próximo número livre em 06/09/2026: **090**.
+Próximo número livre em 06/09/2026 (noite): **092** — 090 = revoke anon/PUBLIC em 13 views; 091 = RLS ligada + comentários de intenção em 6 tabelas de ops (portão 28); ambas do orquestrador geral, aplicadas e espelhadas.
