@@ -86,7 +86,7 @@ const MODULE_SECTION: Record<ModuleId, string> = {
 };
 
 export default function App() {
-  const { session, role, loading } = useAuth();
+  const { session, role, papelCarregando, loading } = useAuth();
   const { theme, toggle: toggleTheme } = useTheme();
   const [activeModule, setActiveModule] = useState<ModuleId>(moduleFromHash);
   const [navOpen, setNavOpen] = useState(false);
@@ -135,6 +135,15 @@ export default function App() {
   }
 
   const renderContent = () => {
+    // Enquanto a RPC de papel não responde, ninguém decide. Sem isto o portão
+    // fail-closed mostraria "acesso restrito" a cada carga, antes de saber.
+    if (papelCarregando) {
+      return (
+        <div className="h-full flex items-center justify-center p-8">
+          <div className="text-sm font-mono uppercase tracking-widest text-muted">Verificando acesso…</div>
+        </div>
+      );
+    }
     if (!canAccessModule(activeModule, role)) {
       return (
         <div className="h-full flex items-center justify-center p-8">

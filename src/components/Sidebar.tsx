@@ -130,10 +130,12 @@ function loadCollapsed(): Record<SectionKey, boolean> {
 }
 
 export default function Sidebar({ active, onSelect, mobileOpen = false, onClose }: SidebarProps) {
-  const { user, role, signOut } = useAuth();
+  const { user, role, papelCarregando, signOut } = useAuth();
   const [collapsed, setCollapsed] = useState<Record<SectionKey, boolean>>(loadCollapsed);
   const secoesVisiveis = SECOES
-    .map(s => ({ ...s, itens: s.itens.filter(item => canAccessModule(item.id, role)) }))
+    // Enquanto o papel carrega, o menu não esconde nada — esconder e reaparecer
+    // é pior que esperar. O portão de verdade está no App, não aqui.
+    .map(s => ({ ...s, itens: s.itens.filter(item => papelCarregando || canAccessModule(item.id, role)) }))
     .filter(s => s.itens.length > 0);
   const activeSection = sectionOf(active);
 

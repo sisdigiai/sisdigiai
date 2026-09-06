@@ -5,7 +5,10 @@ import { Logo } from './Logo';
 
 export default function Login() {
   const { signIn } = useAuth();
-  const [email, setEmail] = useState('junior@oticastatymello.com.br');
+  // Vazio de propósito. O e-mail do dono estava pré-preenchido aqui e viajava no
+  // bundle publicado — conveniência de uma pessoa que entrega metade da credencial
+  // a qualquer um que abra o app. O navegador já autocompleta para quem usa.
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
