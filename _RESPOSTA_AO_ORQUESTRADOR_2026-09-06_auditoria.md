@@ -278,3 +278,43 @@ select ... from ops.contas_servicos  →  ERRO 42501 permission denied for table
 
 Fica anotado como limite do meu instrumento: **eu provo grant por aqui; RLS só por chamada real
 com token do papel.** Duas coisas diferentes que dão a mesma cara de "passou".
+
+---
+
+## 11. Conferência da migration 091 — passa, e o que eu quase reportei errado
+
+Conferi por conta própria o que podia esvaziar tela em silêncio: **ligar RLS numa tabela sem
+policy só é inócuo enquanto nenhuma view sobre ela for `security_invoker`.** Foi assim que eu
+derrubei o Inventário por 15 minutos em agosto (migration 082).
+
+**Passa.** As views de `ops` que o app usa — `v_ops_contas_servicos`, `v_ops_plataformas`,
+`v_ops_servicos`, `v_ops_scorecard*`, `v_ops_cofre*` — **não têm `security_invoker`**, então a
+RLS das tabelas de baixo não as alcança. Medido: 85 / 9 / 25 linhas como `authenticated`, iguais
+a antes. Controle negativo: `select` direto em `ops.plataformas` como `authenticated` → **42501**.
+E a FK do vocabulário continua recusando nome fora da lista (`facebook_page` → **23503**).
+**Zero mudança de comportamento**, como ele disse.
+
+### O que eu quase mandei como defeito, e não é
+
+Quatro views de `ops` **são** `security_invoker=true`: `v_ops_ordem_do_dia`,
+`v_ops_pendencias_humanas`, `v_ops_placar_hoje` e `v_ops_fatos_verificados`. Medi como
+`authenticated` e vi:
+
+```
+v_ops_ordem_do_dia         existem 396   →  0 para authenticated
+v_ops_pendencias_humanas   existem 155   →  0
+v_ops_placar_hoje          existe    1   →  0
+```
+
+Parecia achado grande — três telas cegas. **Não é, e o motivo é a armadilha do §10.** As policies
+dessas tabelas usam `is_staff()`, e `is_staff()` começa com `IF auth.uid() IS NULL THEN RETURN
+false`. Medi: na Management API `auth.uid()` **é nulo** e `is_staff()` devolve **false**, com ou
+sem `set role`. Os zeros são o meu instrumento, não a tela.
+
+> Era o erro do `curl` normalizando o `%2e%2e/` outra vez, no mesmo dia. Peguei antes de reportar
+> porque desta vez fui medir a função antes de acreditar no número.
+
+**O que fica em aberto, honestamente:** não sei dizer se o dono vê a ordem do dia, e **não dá para
+saber daqui** — só com sessão real. `src/lib/ordemStore.ts` lê `v_ops_ordem_do_dia` e
+`v_ops_placar_hoje`, então **vale um olhar nessa tela no mesmo login** em que ele for conferir o
+portão de papel. Se vier vazia, o caminho é policy, não grant.
