@@ -2,6 +2,12 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-06 — segurança: leitura anônima fechada em 13 views (migration 090)
+
+- **Achado** (Agent do DIGIAI MKT, reproduzido pelo orquestrador geral por chamada real): 13 views de `public` respondiam HTTP 200 à anon key sem sessão — `v_ops_cofre` (inventário de contas: identificador, conta dona, `secret_ref`, URL do painel, custo), `v_ops_cofre_resumo`, `v_meeting_sessions`, `v_proposals`, `v_billing_*`, `v_marketing_hotmart_sales`, `v_marketing_outreach`, `v_marketplace_webhook_status`, `v_ops_scorecard*`, `v_playbooks`. Causa: views sem `security_invoker` + grant herdado do schema (anon em ALL).
+- **Conserto** `090_revoke_anon_public_em_13_views.sql`: revoke ALL de `public` e `anon`, grant select a `service_role`; `authenticated` intocado (portão 16 da ordem do dia). Provado: 200 → 401 nas 13; app com sessão continua lendo. Espelho em `docs/migrations/migrations/`.
+- **Não decidido aqui:** `security_invoker` (mudaria o que cada papel enxerga) e o grant de escrita de `authenticated` nas 145 views — dono + orquestrador do app.
+
 ## [Não lançado]
 
 ### Corrigido (2026-09-06 — o portão de papel parou de abrir quando falhava)
