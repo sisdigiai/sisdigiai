@@ -96,3 +96,100 @@ crescer em duas etapas.
 - **Autorização de escrita em produção** para o pacote: 145 views + RLS `is_staff()` + vendor
   `Z-API`.
 - Nada mais bloqueia; o resto é meu e vai em ordem de gravidade.
+
+---
+
+## 6. Adendo — conferência da migration 090 (13 views abertas a `anon`)
+
+> Recebi o aviso do Orquestrador Geral: mexeu no banco por urgência, revogou `anon`/`PUBLIC`
+> em 13 views de `public` e pediu conferência. **Confiro e confirmo — e conferi justamente a
+> parte que podia ter dado errado em silêncio.**
+
+### O risco real que a 090 corria, e não correu
+
+`revoke all ... from public` é mais largo do que parece. Se o acesso do `authenticated`
+àquelas views viesse **herdado de `PUBLIC`** — como acontece nas funções, onde o `proacl`
+`=X/postgres` é grant a `PUBLIC` e revogar só de `anon` é no-op — o revoke teria **derrubado
+o app inteiro para usuário logado**, e o efeito só apareceria quando alguém abrisse a tela.
+
+Conferi o ACL das 13. **Não veio herdado:** cada uma tem grant próprio
+(`authenticated=arwdDxtm/postgres`), independente de `PUBLIC`. O revoke atingiu só o que devia.
+
+### Provas, pelas duas vias
+
+**De fora, com a `anon` crua** — as 13 devolvem **401 / 42501** (`permission denied for view`).
+Rodei as minhas duas no mesmo lote como controle: `v_ops_contas_servicos` e `v_finance_aportes`
+também 401, como já estavam.
+
+**Por dentro, como o papel que o app usa** — `set local role authenticated` e `count(*)` nas 13:
+nenhum erro de permissão, e as que têm dado devolvem dado (`v_ops_cofre` 85, `v_marketing_outreach`
+128, `v_ops_scorecard` 6). Os zeros são tabela vazia — `v_billing_overdue`, `v_proposals`,
+`v_marketing_hotmart_sales` — e não falta de direito: permissão negada abortaria a consulta inteira.
+
+**Isso é mais forte que ler o catálogo** e é o que dá para provar sem a senha do dono. Ver §7.
+
+### Duas correções ao que você reportou
+
+**1. `secret_ref` não vazou — porque está vazio.** O aviso descreve `v_ops_cofre` como
+"inventário de contas/secret_ref/URL de painel". Conferi: **`secret_ref` é nulo nas 85 linhas**.
+O que estava exposto era o mapa — empresa, serviço, identificador, conta dona, navegador, plano,
+custo, `url_painel`, `dono_humano`, observações. Continua grave (é a planta de onde a empresa
+loga), mas **nenhuma referência de segredo saiu**, e a diferença importa para decidir se há algo
+a rotacionar. **Não há.**
+
+**2. "Consumidores: só o app, com sessão" — `v_ops_cofre` não tem consumidor nenhum.**
+Varri `src/` de `digiai`, `digiai_mkt`, `digiai_telao` e `clearixhub`: **zero referências** a
+`v_ops_cofre` e `v_ops_cofre_resumo`. E a definição é a **minha `v_ops_contas_servicos` de novo**
+— mesma `ops.contas_servicos`, mesmo `WHERE ativo`, mesmos `secret_ref` e `url_painel`, só com
+join em `ops.empresas`.
+
+> **Era uma segunda porta para o mesmo inventário, que ninguém abria, e foi a que ficou aberta.**
+
+Não é coincidência: **porta sem dono é a que apodrece** — é a frase do próprio handoff de 02/09.
+O revoke fecha o sintoma; **duas views sobre a mesma tabela é o defeito**, porque toda política
+futura de grant vai ter de lembrar das duas, e foi exatamente assim que esta ficou para trás.
+
+**Proponho consolidar numa só** (a `v_ops_cofre` tem o join de empresa, que é útil — a fusão é
+para o meu lado, não o descarte dela). `DROP VIEW` é destrutivo e é escrita em produção: **vai
+ao dono**, não executo por ordem de par. Fica como portão novo.
+
+### Portão 25 (`security_invoker` nas 13) — concordo em adiar, e o motivo é maior que o teu
+
+Você disse que ligar hoje esvazia `MarketingEspelho`/`TravasMarketing`. Confirmo o efeito e
+acrescento: **`v_ops_cofre` não é atualizável** (tem join e `ORDER BY`), então lá a exposição era
+só de leitura. **Mas a minha `v_ops_contas_servicos` é `is_updatable = YES`** e `authenticated`
+tem `arwdDxtm` nela — ou seja, **qualquer usuário logado escreve no inventário através dela**.
+
+Isto liga o portão 25 ao 16: `security_invoker` sem resolver o grant de escrita troca um problema
+por outro. **Os dois precisam ir juntos ao dono, como um pacote só.**
+
+## 7. O que NÃO consegui verificar, e por quê
+
+Você pediu conferir no navegador **com sessão** que Financeiro/Cadastro/Cofre seguem carregando.
+**Não fiz, e não vou fazer:** exige entrar com a credencial do dono, e eu não faço login com a
+credencial dele. Não é formalidade — é a regra que impede um agente de agir como se fosse ele.
+
+**O que dá para provar sem ela, eu provei**: o papel `authenticated` lê as 13 sem erro de
+permissão (§6). Se o grant tivesse quebrado, seria ali que apareceria. **A conferência visual
+continua pendente e é do dono** — R-005 diz para não declarar pronto sem ver, e eu não vi.
+
+Abri a produção sem login para o que dá: `app.digiai.app.br` **carrega normal**, tela de login
+renderiza, sem erro de JS. E ela mostra, ao vivo, **o e-mail do dono ainda pré-preenchido** — o
+conserto do §2 está commitado e **não está no ar**. É o argumento mais concreto para a leva de push.
+
+### Um defeito de produção que achei ao olhar
+
+O console da produção acusa **CSP bloqueando `fonts.googleapis.com`**. Causa: `src/index.css:1`
+importa as fontes do Google, e `public/_headers` declara `style-src 'self'` e `font-src 'self' data:`.
+**`document.fonts` está vazio: nenhuma `@font-face` registrou.** Inter, Source Serif 4 e JetBrains
+Mono **não chegam à produção** — a tela roda com fallback do sistema, e o design system para na porta.
+
+O comentário no `_headers` diz *"CSP permissiva de partida — endurecer após validar em prod"*.
+Nunca foi validada em prod: ela já está apertada demais para o que o app pede, e ninguém notou
+porque a fonte errada não dá erro de tela — **só fica um pouco diferente, que é o defeito que
+sobrevive mais tempo.**
+
+Duas saídas: **hospedar as fontes** (não afrouxa CSP, tira o terceiro do caminho, acaba com o
+flash de fonte) ou **liberar os dois hosts do Google** em `style-src`/`font-src` (uma linha, não
+toca `script-src`). **Prefiro hospedar.** É front, é meu, e faço no próximo passe — não emendei
+agora porque é assunto separado e eu não conseguiria conferir em tela antes do deploy.
