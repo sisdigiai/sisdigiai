@@ -4,6 +4,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Corrigido (2026-09-06 — o portão de papel parou de abrir quando falhava)
+- **Achado da auditoria do orquestrador** (`Cockpit/auditoria-regras-apps-2026-09-06/digiai.md`, CRÍTICO): `permissions.ts` fazia `if (!role) return true`, e o `AuthContext` punha `role = null` quando a RPC `current_role_code()` dava erro. Efeito real: **erro de RPC abria Financeiro, Cadastro Empresa, Clearix e Cobrança**. Portão que abre no erro não é portão (**R-037**).
+- O conserto óbvio (`!role → false`) quebraria a tela, porque `role = null` significava **três coisas ao mesmo tempo** — ainda carregando, RPC falhou, usuário sem papel — e a primeira acontece em **toda carga**. Provavelmente foi assim que o fail-open nasceu: alguém viu a tela piscar "acesso restrito" e abriu o portão em vez de separar os estados.
+- **`papelCarregando` virou estado próprio no `AuthContext`:** enquanto for `true` ninguém decide — o App mostra "Verificando acesso…" e o menu não esconde nada (esconder e reaparecer é pior que esperar). Quando a RPC responde, `null` passa a significar **sem acesso**, inclusive quando a resposta foi erro — que agora vai ao console em vez de sumir.
+- **Fechar não tranca o dono**, conferido no banco antes de mudar: `iam.users` tem **um único usuário**, `super_admin`, `status = active`, com `auth_id` ligado, e a RPC o resolve.
+- **`Login.tsx`** pré-preenchia o e-mail do dono — não era conveniência de UI, era **o e-mail viajando no bundle publicado**. Trocado por vazio e **verificado no artefato**, não no código: `grep` em `dist/assets/*.js` devolve **0**.
+- `tsc` limpo, build limpo. ⚠ **Verificação em navegador pendente** (R-005): depende de deploy, e o push é por leva do dono. Corrigido e não conferido em tela.
+- **Não executado, por ser escrita em produção:** RLS de `finance.*`/`company.*` com `is_staff()` onde o front exige admin+, e a política de grants das 145 views. Vai ao dono no mesmo pacote — ordem de par não autoriza escrita. Resposta em `_RESPOSTA_AO_ORQUESTRADOR_2026-09-06_auditoria.md`.
+
 ### Adicionado (2026-09-05 — Financeiro mostra quem financiou o caixa: bloco "Aportes de caixa")
 - **Problema** (DESPACHO InfinitePay §6): a tela mostrava "Resultado de caixa −R$ 17 mil" sem dizer de onde veio o dinheiro que bancou o gasto — "o painel mostra o buraco e esconde quem o financiou". A migration 082 (orquestrador, mesma noite) criou `finance.aportes` (caixa: investimento / empréstimo / devolução), mas o app não lia.
 - **Migration 088** — `public.v_finance_aportes` (padrão das 052/053: schema `finance` segue não exposto; `security_invoker = true` **conferido antes de aplicar** — a tabela já dá SELECT a `authenticated` e tem RLS `is_super_admin()`, então a view executa como quem chama e a RLS vale). Nasce só com `SELECT` para `authenticated`: os default privileges do `public` davam ALL, e foi revogado explicitamente. **Prova pela via externa:** chave `anon` crua → **401 / 42501** (mesmo que `v_finance_revenue`). Espelho em `docs/migrations/migrations/`.
