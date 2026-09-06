@@ -10,6 +10,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Corrigido (2026-09-06 — as fontes do design system nunca chegaram à produção)
+- **Achado olhando o console da produção** durante a conferência da migration 090: o CSP de `public/_headers` (`style-src 'self'`, `font-src 'self' data:`) **bloqueava** o `@import` de `fonts.googleapis.com` em `src/index.css:1` e os arquivos do `fonts.gstatic.com`. Em `app.digiai.app.br` o `document.fonts` estava **vazio: nenhuma `@font-face` registrada**. Inter, Source Serif 4 e JetBrains Mono nunca chegaram — a tela rodava com fonte de fallback do sistema.
+- **Passou despercebido porque fonte errada não dá erro de tela**, só fica um pouco diferente. O comentário no `_headers` diz *"CSP permissiva de partida — endurecer após validar em prod"*: nunca foi validada, e já estava apertada demais para o que o app pedia.
+- **Conserto: hospedar, não afrouxar.** Fontes self-hosted via `@fontsource` — o CSP fica intacto (não se mexe em `script-src` para resolver problema de fonte) e some o request a terceiro. **Mesmo padrão que `digiai_mkt` e `limelight_studio` já usavam**; o `digiai` é que tinha ficado para trás.
+- **Só o subset `latin`**: com os arquivos completos o build emitia **121 arquivos / 1,9 MB** de fonte, incluindo cirílico, grego e vietnamita. Com `latin-*`, **20 arquivos / 540 KB** — e nada que alguém leia aqui se perde.
+- **Verificado sob o CSP real, não no dev server** (R-005): servi o `dist/` local com os headers exatos do `public/_headers` e abri no navegador. **10 `@font-face` registradas** (eram 0 em produção), 5 já carregadas na tela de login, `document.fonts.check('600 16px Inter')` = `true`, e **zero erro de console** — a produção acusa dois `Content Security Policy` no mesmo ponto.
+- Na mesma tela conferi o conserto do `Login.tsx`: campo de e-mail **vazio**. Em produção ele ainda mostra o e-mail do dono, porque o commit não subiu.
+- Não tocado, porque é de outro dono (**R-032**): `nexus/src/index.css` e `polapetit/src/index.css` importam as fontes do mesmo jeito. Se algum dos dois publicar com CSP equivalente, tem o mesmo defeito calado. Fica o aviso para os agentes deles.
+
 ### Corrigido (2026-09-06 — o portão de papel parou de abrir quando falhava)
 - **Achado da auditoria do orquestrador** (`Cockpit/auditoria-regras-apps-2026-09-06/digiai.md`, CRÍTICO): `permissions.ts` fazia `if (!role) return true`, e o `AuthContext` punha `role = null` quando a RPC `current_role_code()` dava erro. Efeito real: **erro de RPC abria Financeiro, Cadastro Empresa, Clearix e Cobrança**. Portão que abre no erro não é portão (**R-037**).
 - O conserto óbvio (`!role → false`) quebraria a tela, porque `role = null` significava **três coisas ao mesmo tempo** — ainda carregando, RPC falhou, usuário sem papel — e a primeira acontece em **toda carga**. Provavelmente foi assim que o fail-open nasceu: alguém viu a tela piscar "acesso restrito" e abriu o portão em vez de separar os estados.
