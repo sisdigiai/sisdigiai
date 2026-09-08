@@ -23,6 +23,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Verificado (2026-09-08 — susto de fatura: serviço nunca caiu, e a Spec deixou de ser muda)
+- **Alerta:** o painel do Supabase mostrava faixa de *outstanding invoices* e status **Unhealthy**; o dono foi pagar. **Medido às 17:33 (medição minha, não estimativa):** `GET /v1/projects/hswyopqvnolqpmprqvzh` → **`ACTIVE_HEALTHY`**, região `sa-east-1`.
+- **Serviço conferido pela via que o mundo enxerga, não pelo campo de status:** banco responde (`select now()` → 20:34 UTC, 1,7 s a frio); `app.digiai.app.br` → **200**; edge function `espelho-pulso` → **401** sem sessão (que é o portão funcionando, não falha); rota `/api/espelho` do Pulso → **401** sem o segredo.
+- **Distinção que vale registrar:** *outstanding invoices* é faixa de **cobrança**, e convive com projeto saudável. "Unhealthy" no painel não é o mesmo que `status` da API — quem decide é a resposta do serviço, não o banner.
+- **Spec atualizada** (`Cockpit/Spec/digiai.md`), que estava muda sobre o que entrou hoje: **nova §9.1 — Edge functions**, com `espelho-pulso`, `affiliate-materials-public` e as três de sync, e o portão de cada uma; **§9** com a lista de `VITE_*` conferida no código (e o registro de que **`VITE_ATLAS_URL` não é lida por nada**); **§10 corrigida** — dizia *"consome apenas o próprio banco"*, o que deixou de ser verdade quando o painel passou a espelhar Limelight, Blogs e Pulso.
+- **Secrets conferidos na Management API:** `ESPELHO_SECRET` presente; **`PULSO_SERVICE_ROLE_KEY` e `PULSO_URL` apagados** — a chave-mestra do Pulso não vive mais no projeto digiai. Função `espelho-pulso` **versão 9, `verify_jwt = true`, ACTIVE**.
+- **Dívida registrada, não consertada:** `src/lib/espelhoMotores.ts` traz **anon keys embutidas como fallback** (Limelight e Pulso) e a URL dos Blogs como constante literal. Chave em código é chave publicada — é o item da auditoria que segue aberto.
+- **Duas observações devolvidas ao orquestrador geral, não editadas por mim** (a função é dele nesta rodada): o cabeçalho de `espelho-pulso/index.ts` ainda diz que o segredo do projeto é `PULSO_SERVICE_ROLE_KEY`, que **não existe mais**; e o ramo de *fallback* que usaria essa chave virou **código morto**.
+
 ### Publicado (2026-09-08 — deploy conferido em produção, não presumido)
 - **Push feito pelo Orquestrador Geral** sob autorização do dono no canal dele: `sisdigiai/sisdigiai` main `a6101e4..5eb7e24`, fast-forward, 9 commits. **Eu recusei executar o push** — a autorização foi dada a ele, e ordem de par não autoriza publicação; ele aplicou a regra do lado certo e executou.
 - **O deploy do Cloudflare não falhou desta vez, e isso foi medido, não suposto.** O `index.html` vivo aponta para `assets/index-BozpRSv9.js` e `assets/index-Da7U0Ls7.css` — **os mesmos hashes do build local a partir de `5eb7e24`**. Carimbo do host no artefato: `ETag "48036fd9a2a29f825f28522a6c5d60db"`, conferido em `Date: Tue, 08 Sep 2026 03:21 GMT`. (O histórico manda conferir: o build no push já falhou em silêncio antes, e o sintoma é exatamente hash vivo ≠ hash local.)
