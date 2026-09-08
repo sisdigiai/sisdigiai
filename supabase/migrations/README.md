@@ -32,4 +32,4 @@ isso nunca precise ser conferido de novo.
    rascunho e o teu apply, renumera o TEU (ainda não aplicado) — nunca o dele.
 4. Duas sessões no mesmo repo na mesma rodada = um executor por repo (lição 05/09).
 
-Próximo número livre em 06/09/2026 (noite): **092** — 090 = revoke anon/PUBLIC em 13 views; 091 = RLS ligada + comentários de intenção em 6 tabelas de ops (portão 28); ambas do orquestrador geral, aplicadas e espelhadas.
+Próximo número livre em 08/09/2026: **093** — 092 = trava de papel em `billing` (RPC `billing_upsert_subscriber` com `is_admin()`, revoke de escrita em `v_billing_subscriptions`, policies divididas nas 3 tabelas), aplicada 18:12 pelo orquestrador do app com autorização do dono. 090 e 091 do orquestrador geral.

@@ -1,7 +1,7 @@
 -- 092 — trava de papel em billing (pacote 16, itens 1-3) — 2026-09-08
 --
--- ⚠ NÃO APLICADA. Aguarda autorização de escrita do dono, no canal dele.
---   Preparada para que a execução seja um passo só quando a autorização vier.
+-- ✅ APLICADA em 2026-09-08 18:12, autorizada pelo dono no canal do agente do app
+--    ("pode aplicar a 092"). Provas no rodapé — as que dependem de sessão real seguem com ele.
 --
 -- ORDEM DELIBERADA (a porta que abre primeiro, não a mais fácil de fechar):
 --
@@ -111,6 +111,26 @@ create policy billing_escrita_admin on billing.mp_events_raw
   for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
 commit;
+
+-- ─── RESULTADO DAS PROVAS (08/09/2026, aplicadas logo após o commit da migration) ───
+-- ✅ RPC com trava: corpo tem is_admin(), raise exception e errcode 42501.
+-- ✅ View: acl de `authenticated` passou de `arwdDxtm` para `rDxtm` —
+--    has_table_privilege INSERT/UPDATE/DELETE = false, SELECT = true.
+-- ✅ Policies divididas nas 3 tabelas: billing_leitura_logado (SELECT, true) +
+--    billing_escrita_admin (ALL, is_admin() no using e no with check).
+-- ✅ CONTROLE NEGATIVO A — INSERT pela view como authenticated:
+--    42501 permission denied for view v_billing_subscriptions
+-- ✅ CONTROLE NEGATIVO B — RPC sem sessão válida (auth.uid() nulo → is_admin() false):
+--    42501 'Acesso negado: alterar assinante exige papel admin ou superior' (linha 7, RAISE)
+-- ✅ A TELA VENDAS NÃO CEGOU: v_vendas_canais = 3 e v_billing_mrr = 1 lidos como authenticated.
+--    Os zeros de v_vendas_eventos e v_billing_subscriptions foram conferidos CONTRA O DONO
+--    (que ignora RLS) e também são 0 — billing.subscribers está vazia. Zero por tabela vazia,
+--    não por RLS cegando: é a distinção que a policy dividida existe para preservar.
+--
+-- ⚠ O QUE ESTAS PROVAS NÃO COBREM: o controle negativo B roda sem JWT, então prova o caso
+--   'sem sessão', não o caso 'logado sem papel admin'. is_admin() lê auth.uid(), que não
+--   existe na Management API. A prova do usuário logado não-admin, e a do dono salvando em
+--   Cobrança, seguem com quem tem sessão. Aplicado ≠ feito.
 
 -- PROVA EXIGIDA ANTES DE DAR POR FEITO (não serve catálogo, nem `set role`:
 -- `set role` não carrega claim de JWT e `is_admin()` mente sob a Management API):
