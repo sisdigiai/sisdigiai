@@ -404,3 +404,31 @@ o passo 4 **exige JWT de papel real**, que eu não tenho — `set role` não car
 `is_admin()` mente sob a Management API. **A prova final é de quem tiver sessão.**
 
 **Escrita em produção: não executo.** Vai ao dono, no pacote 16.
+
+---
+
+## 12. Desfecho do §8 (08/09 18:14) — as duas contas foram apagadas
+
+O dono decidiu: *"não vamos usar mais, vamos apagar"*. As duas contas sem papel foram
+removidas por soft delete (reversível; login impossível). **Conferi:** `auth.users` devolve
+**uma linha** — só o dono —, e `iam.users` tem **um** ativo.
+
+**Não reescrevi o §8.** Ele registra o que era verdade em 06/09 e é o motivo pelo qual este
+portão existiu: havia uma pessoa real, logada em 31/07, entrando em Financeiro e Cobrança
+por não ter papel nenhum. Apagar a linha do relatório apagaria a razão do conserto.
+
+### Uma consequência que ninguém pediu e vale registrar
+
+A prova que faltava para a **092** era *"conta logada sem papel admin leva `42501`"*.
+**Essa conta não existe mais.** Com um único usuário, e ele `super_admin`, **não há sujeito
+para esse teste** — só criando conta de teste, o que é decisão do dono e mais superfície.
+
+Ou seja: o conserto do portão 29 **fechou o buraco e levou junto a testemunha**. Não é
+defeito de ninguém — é a ordem em que as coisas aconteceram. Mas muda o que dá para afirmar:
+a trava da 092 fica **provada para "sem sessão"** (medido) e **correta por construção para
+"logado sem papel"** (`is_admin()` devolve `false` quando não há linha ativa em `iam.users`,
+que é o mesmo caminho de código). **Não escrevo "provado" onde é "por construção".**
+
+Se o dono quiser a prova de verdade um dia, o caminho é uma conta de teste com papel `viewer`,
+usada uma vez e removida. **Não faço por conta própria:** criar conta é escrita em produção e
+aumenta superfície — vai para a lista dele.

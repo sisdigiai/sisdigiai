@@ -23,6 +23,12 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Alterado (2026-09-08 — portão 29 fechado pelo dono: as duas contas sem papel foram apagadas)
+- Decisão do dono (*"não vamos usar mais, vamos apagar"*), executada pelo orquestrador geral às 18:14 por soft delete (reversível; login impossível). **Conferido:** `auth.users` = **1 linha** (só o dono), `iam.users` = **1 ativo**.
+- Era a conta que, até o conserto do fail-open, abria Financeiro, Cadastro Empresa, Clearix e Cobrança **por não ter papel nenhum** — e tinha login em 31/07. O buraco não era condicional: era o padrão para conta sem papel.
+- ⚠ **Efeito colateral no que dá para provar:** a prova pendente da migration 092 era *"conta logada sem papel leva 42501"*. **Essa conta não existe mais.** Com um único usuário, e ele `super_admin`, não há sujeito para o teste. A trava fica **provada para "sem sessão"** e **correta por construção para "logado sem papel"** — `is_admin()` devolve `false` pelo mesmo caminho quando não há linha ativa em `iam.users`. O conserto fechou o buraco e levou junto a testemunha.
+- Nenhuma tela do app lista usuários (`grep` em `src/`), então não há texto a ajustar. Continua pendente do dono a outra prova da 092: **salvar um assinante em Cobrança com a sessão dele**.
+
 ### Corrigido (2026-09-08 — `billing` deixa de aceitar escrita de qualquer logado — migration 092)
 - **Autorizado pelo dono** no canal do agente do app (*"pode aplicar a 092"*) e **aplicado às 18:12**.
 - **O buraco:** `public.billing_upsert_subscriber` é `SECURITY DEFINER`, executável por **qualquer `authenticated`**, e o corpo **não tinha trava nenhuma**. Qualquer conta logada inseria ou alterava qualquer assinante — nome, e-mail, **`doc` (CPF/CNPJ)**, telefone, valor do plano, status, vencimento. Em paralelo, `public.v_billing_subscriptions` era **view definer e auto-atualizável** com `arwd` para `authenticated`: escrevia como o dono e a RLS da tabela **nem era consultada**.
