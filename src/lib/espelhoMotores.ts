@@ -3,6 +3,7 @@
 // Pulso Control (canais faceless, projeto nlcisbfdiokmipyihtuz).
 // Views agregadas v_espelho_* criadas em 2026-07-30 — só números, zero PII;
 // anon keys são públicas por design (mesma classe do bundle de cada app).
+import { supabase } from './supabase';
 
 const LIMELIGHT_URL = import.meta.env.VITE_LIMELIGHT_SUPABASE_URL || 'https://gfdpvasbrxwulvpvyfvr.supabase.co';
 const LIMELIGHT_ANON = import.meta.env.VITE_LIMELIGHT_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmZHB2YXNicnh3dWx2cHZ5ZnZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NzMwNzYsImV4cCI6MjEwMDE0OTA3Nn0.Gr8I2e9Ot2d6fOq0eBp43yDWDxAohkzAcoa0dJ9_zOk';
@@ -106,9 +107,33 @@ async function lerEspelho<T>(base: string, anon: string, view: string): Promise<
 
 const BLOGS_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpnb2praW9pZXp0aWtxaHdjb2FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNzk0NjYsImV4cCI6MjEwMjc1NTQ2Nn0.yV530Q6ZBTeGdega3rphtJFNKgShu1fR_ZV9mMZFHzY';
 
+// 2026-09-08: v_espelho_pulso (agregado COM custo/receita do Pulso) deixou de ser lida com a
+// anon key do Pulso — era legível por qualquer portador da chave do bundle. Agora vem pela edge
+// function `espelho-pulso` do PRÓPRIO digiai, gateada pela sessão do usuário (auth.getUser no
+// servidor), que lê o Pulso com credencial de servidor. Sem sessão = null, nunca dado.
+// v_espelho_pulso_dias (só engajamento por dia) segue anon por desenho.
+const DIGIAI_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const DIGIAI_ANON = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+async function lerPulsoGateado(): Promise<EspelhoPulso | null> {
+  try {
+    const { data } = await supabase.auth.getSession();
+    const jwt = data.session?.access_token;
+    if (!jwt || !DIGIAI_URL) return null;
+    const r = await fetch(`${DIGIAI_URL}/functions/v1/espelho-pulso`, {
+      headers: { apikey: DIGIAI_ANON, Authorization: `Bearer ${jwt}` },
+      signal: AbortSignal.timeout(12000),
+    });
+    if (!r.ok) return null;
+    const row = await r.json();
+    return row && typeof row === 'object' ? (row as EspelhoPulso) : null;
+  } catch {
+    return null;
+  }
+}
+
 export const espelhoMotores = {
   limelight: () => lerEspelho<EspelhoLimelight>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight'),
-  pulso: () => lerEspelho<EspelhoPulso>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso'),
+  pulso: () => lerPulsoGateado(),
   blogs: () => lerEspelho<EspelhoBlogs>(BLOGS_URL, BLOGS_ANON, 'v_espelho_blogs'),
   pulsoDias: () => lerLinhas<PulsoDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_dias'),
   limelightDias: () => lerLinhas<LimelightDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_dias'),

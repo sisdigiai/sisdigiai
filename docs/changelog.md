@@ -2,6 +2,12 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-08 — espelho do Pulso passa a vir por função gateada (custo/receita não é anon)
+
+- **Por quê:** `public.v_espelho_pulso` (agregado do Pulso COM custo_caixa/consumo/receita) era lida com a anon key do Pulso — legível por qualquer portador da chave do bundle. O Pulso revogou o anon (certo) e a tela MarketingEspelho ficou vazia.
+- **Conserto:** edge function `espelho-pulso` no projeto digiai (verify_jwt + `auth.getUser` no servidor; service_role do digiai também passa pelo claim `role`), lê o Pulso com `PULSO_SERVICE_ROLE_KEY` (secret do projeto) e devolve só o JSON. `src/lib/espelhoMotores.ts` → `pulso()` chama a função com a sessão do usuário. `v_espelho_pulso_dias` (engajamento) segue anon por desenho.
+- **Prova (08/09 15:5x):** anon key → 401; anon key do Pulso → 401; service_role do digiai → 200 com os 16 campos. Tela com sessão: conferir no navegador (dono/orquestrador do app).
+
 ## 2026-09-06 — ops.*: dizer o que se quis (migration 091, portão 28)
 
 - 4 tabelas de `ops` com RLS ligada e zero policies e 2 sem RLS (`plataformas`, `servicos`), todas sem grant a anon/authenticated/PUBLIC: fechadas por acidente. `091`: RLS ligada nas 2 + `comment on table` nas 6 declarando "zero policy é a política; leitura só por view definer, escrita só por service_role; não conceder GRANT direto". Zero mudança de comportamento (views definer seguem lendo: 9/25/85/6 como authenticated; leitura direta = 42501). Achado do orquestrador do app; executor = orquestrador geral (escrita em ops.* pelo handoff de 02/09).
