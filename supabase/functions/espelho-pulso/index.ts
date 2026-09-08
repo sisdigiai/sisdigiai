@@ -67,16 +67,18 @@ Deno.serve(async (req) => {
   // nenhum claim é lido localmente. service_role só passa se o servidor de Auth aceitar o JWT
   // num endpoint admin (assinatura verificada lá); usuário só passa por auth.getUser.
   // Prova de 08/09 (orquestrador do app): JWT forjado com role=service_role → 401.
+  // Ordem = caminho comum primeiro (usuário: UMA ida ao Auth); service_role no else (raro).
+  // Um JWT de service_role não vira usuário no getUser e cai no else naturalmente.
+  // (v4, 08/09 — o orquestrador do app mediu a v3 pagando duas idas ao Auth por usuário.)
   let liberado = false;
   if (jwt === SERVICE) {
     liberado = true; // máquina-a-máquina do próprio digiai (igualdade exata com o env)
-  } else if (await ehServiceRoleValido(SUPABASE_URL, ANON, jwt)) {
-    liberado = true;
   } else {
     // Valida a sessão no Auth do digiai (não decode local). Anon key não é usuário → falha.
     const cli = createClient(SUPABASE_URL, ANON, { global: { headers: { Authorization: `Bearer ${jwt}` } } });
     const { data, error } = await cli.auth.getUser(jwt);
     liberado = !error && !!data?.user?.id;
+    if (!liberado) liberado = await ehServiceRoleValido(SUPABASE_URL, ANON, jwt);
   }
   if (!liberado) return json(req, 401, { error: 'sem_sessao' });
 
