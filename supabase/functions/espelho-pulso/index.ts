@@ -7,8 +7,10 @@
 // auth.getUser, não decode local — ou (b) o service_role do digiai (uso máquina-a-máquina).
 // A anon key do bundle NÃO passa: getUser falha para ela. Erro = fechado (401), nunca aberto.
 //
-// Segredos (projeto digiai): PULSO_SERVICE_ROLE_KEY (lê a view no projeto do Pulso). Nunca
-// chega ao navegador: a função devolve só o JSON da view.
+// Segredos (projeto digiai): ESPELHO_SECRET — segredo de escopo "uma leitura", verificado só pela
+// rota `GET /api/espelho` do Pulso (portão 38, 08/09). A service key do Pulso viveu aqui por
+// algumas horas e foi APAGADA no mesmo dia: a chave-mestra do Pulso não vive fora do Pulso.
+// Nada chega ao navegador: a função devolve só o JSON do agregado.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const PULSO_URL = Deno.env.get('PULSO_URL') ?? 'https://nlcisbfdiokmipyihtuz.supabase.co';
@@ -82,31 +84,20 @@ Deno.serve(async (req) => {
   }
   if (!liberado) return json(req, 401, { error: 'sem_sessao' });
 
-  // Fonte, por ordem: (1) rota do próprio Pulso `GET /api/espelho` com segredo de escopo "uma
-  // leitura" (ESPELHO_SECRET — portão 38, 08/09); (2) enquanto o segredo não existir, a view
-  // direto com a service key do Pulso (chave-mestra; some no mesmo dia em que (1) entrar).
+  // Fonte única: rota do próprio Pulso `GET /api/espelho` com ESPELHO_SECRET. O fallback pela
+  // service key do Pulso existiu na v5–v9 e foi removido em 08/09 (secret apagado = código morto).
   const ESPELHO_SECRET = Deno.env.get('ESPELHO_SECRET');
   const ROTA = Deno.env.get('PULSO_ESPELHO_ROTA') ?? 'https://pulsoprojects.vercel.app/api/espelho';
-  const PULSO_KEY = Deno.env.get('PULSO_SERVICE_ROLE_KEY');
-  if (!ESPELHO_SECRET && !PULSO_KEY) return json(req, 503, { error: 'sem_credencial_pulso' }); // fecha, não abre
+  if (!ESPELHO_SECRET) return json(req, 503, { error: 'sem_credencial_pulso' }); // fecha, não abre
 
   try {
-    if (ESPELHO_SECRET) {
-      const r = await fetch(ROTA, {
-        headers: { 'x-espelho-secret': ESPELHO_SECRET, Accept: 'application/json' },
-        signal: AbortSignal.timeout(12000),
-      });
-      if (!r.ok) return json(req, 502, { error: 'pulso_rota_http_' + r.status });
-      const obj = await r.json();
-      return json(req, 200, obj && typeof obj === 'object' && !Array.isArray(obj) ? obj : (Array.isArray(obj) ? obj[0] ?? null : null));
-    }
-    const r = await fetch(`${PULSO_URL}/rest/v1/v_espelho_pulso?select=*`, {
-      headers: { apikey: PULSO_KEY!, Authorization: `Bearer ${PULSO_KEY}` },
+    const r = await fetch(ROTA, {
+      headers: { 'x-espelho-secret': ESPELHO_SECRET, Accept: 'application/json' },
       signal: AbortSignal.timeout(12000),
     });
-    if (!r.ok) return json(req, 502, { error: 'pulso_http_' + r.status });
-    const rows = await r.json();
-    return json(req, 200, Array.isArray(rows) && rows.length ? rows[0] : null);
+    if (!r.ok) return json(req, 502, { error: 'pulso_rota_http_' + r.status });
+    const obj = await r.json();
+    return json(req, 200, obj && typeof obj === 'object' && !Array.isArray(obj) ? obj : (Array.isArray(obj) ? obj[0] ?? null : null));
   } catch (e) {
     return json(req, 502, { error: 'pulso_inacessivel', detalhe: e instanceof Error ? e.name : 'erro' });
   }
