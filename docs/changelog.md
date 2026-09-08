@@ -6,7 +6,7 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 - **Por quê:** `public.v_espelho_pulso` (agregado do Pulso COM custo_caixa/consumo/receita) era lida com a anon key do Pulso — legível por qualquer portador da chave do bundle. O Pulso revogou o anon (certo) e a tela MarketingEspelho ficou vazia.
 - **Conserto:** edge function `espelho-pulso` no projeto digiai (verify_jwt + `auth.getUser` no servidor; service_role do digiai também passa pelo claim `role`), lê o Pulso com `PULSO_SERVICE_ROLE_KEY` (secret do projeto) e devolve só o JSON. `src/lib/espelhoMotores.ts` → `pulso()` chama a função com a sessão do usuário. `v_espelho_pulso_dias` (engajamento) segue anon por desenho.
-- **Prova (08/09 15:5x):** anon key → 401; anon key do Pulso → 401; service_role do digiai → 200 com os 16 campos. Tela com sessão: conferir no navegador (dono/orquestrador do app).
+- **Prova (08/09 15:0x):** anon key → 401; anon key do Pulso → 401; service_role do digiai → 200 com os 16 campos. Tela com sessão: conferir no navegador (dono/orquestrador do app).
 
 ## 2026-09-06 — ops.*: dizer o que se quis (migration 091, portão 28)
 
