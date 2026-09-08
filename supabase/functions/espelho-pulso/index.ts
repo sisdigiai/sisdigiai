@@ -82,12 +82,26 @@ Deno.serve(async (req) => {
   }
   if (!liberado) return json(req, 401, { error: 'sem_sessao' });
 
+  // Fonte, por ordem: (1) rota do próprio Pulso `GET /api/espelho` com segredo de escopo "uma
+  // leitura" (ESPELHO_SECRET — portão 38, 08/09); (2) enquanto o segredo não existir, a view
+  // direto com a service key do Pulso (chave-mestra; some no mesmo dia em que (1) entrar).
+  const ESPELHO_SECRET = Deno.env.get('ESPELHO_SECRET');
+  const ROTA = Deno.env.get('PULSO_ESPELHO_ROTA') ?? 'https://pulsoprojects.vercel.app/api/espelho';
   const PULSO_KEY = Deno.env.get('PULSO_SERVICE_ROLE_KEY');
-  if (!PULSO_KEY) return json(req, 503, { error: 'sem_credencial_pulso' }); // fecha, não abre
+  if (!ESPELHO_SECRET && !PULSO_KEY) return json(req, 503, { error: 'sem_credencial_pulso' }); // fecha, não abre
 
   try {
+    if (ESPELHO_SECRET) {
+      const r = await fetch(ROTA, {
+        headers: { 'x-espelho-secret': ESPELHO_SECRET, Accept: 'application/json' },
+        signal: AbortSignal.timeout(12000),
+      });
+      if (!r.ok) return json(req, 502, { error: 'pulso_rota_http_' + r.status });
+      const obj = await r.json();
+      return json(req, 200, obj && typeof obj === 'object' && !Array.isArray(obj) ? obj : (Array.isArray(obj) ? obj[0] ?? null : null));
+    }
     const r = await fetch(`${PULSO_URL}/rest/v1/v_espelho_pulso?select=*`, {
-      headers: { apikey: PULSO_KEY, Authorization: `Bearer ${PULSO_KEY}` },
+      headers: { apikey: PULSO_KEY!, Authorization: `Bearer ${PULSO_KEY}` },
       signal: AbortSignal.timeout(12000),
     });
     if (!r.ok) return json(req, 502, { error: 'pulso_http_' + r.status });
