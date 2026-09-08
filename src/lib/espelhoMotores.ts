@@ -77,16 +77,21 @@ export interface LimePubDia { dia: string; plataforma: string; publicacoes: numb
 export interface LimelightDia { dia: string; plataforma: string; seguidores: number | null; alcance: number | null }
 export interface BlogDia { dia: string; blog_slug: string; leituras: number; sessoes: number }
 
+// Os tres leitores abaixo devolvem vazio quando falham — e isso e proposital: espelho de outro
+// produto fora do ar nao pode derrubar a tela do digiai. Mas ficar em silencio TAMBEM nao serve:
+// era assim que 'motor rodando, painel cego' passava por normalidade. Falha agora vai ao console
+// com a view e o status; a tela continua degradando sem quebrar. (08/09/2026)
 async function lerLinhas<T>(base: string, anon: string, view: string): Promise<T[]> {
   try {
     const r = await fetch(`${base}/rest/v1/${view}?select=*&order=dia.asc`, {
       headers: { apikey: anon, Authorization: `Bearer ${anon}` },
       signal: AbortSignal.timeout(12000),
     });
-    if (!r.ok) return [];
+    if (!r.ok) { console.error('[espelho] %s: HTTP %s', view, r.status); return []; }
     const rows = await r.json();
     return Array.isArray(rows) ? (rows as T[]) : [];
-  } catch {
+  } catch (e) {
+    console.error('[espelho] %s inacessivel', view, e);
     return [];
   }
 }
@@ -97,10 +102,11 @@ async function lerEspelho<T>(base: string, anon: string, view: string): Promise<
       headers: { apikey: anon, Authorization: `Bearer ${anon}` },
       signal: AbortSignal.timeout(12000),
     });
-    if (!r.ok) return null;
+    if (!r.ok) { console.error('[espelho] %s: HTTP %s', view, r.status); return null; }
     const rows = await r.json();
     return Array.isArray(rows) && rows.length ? (rows[0] as T) : null;
-  } catch {
+  } catch (e) {
+    console.error('[espelho] %s inacessivel', view, e);
     return null;
   }
 }
@@ -118,15 +124,16 @@ async function lerPulsoGateado(): Promise<EspelhoPulso | null> {
   try {
     const { data } = await supabase.auth.getSession();
     const jwt = data.session?.access_token;
-    if (!jwt || !DIGIAI_URL) return null;
+    if (!jwt || !DIGIAI_URL) return null; // sem sessao e estado normal, nao erro
     const r = await fetch(`${DIGIAI_URL}/functions/v1/espelho-pulso`, {
       headers: { apikey: DIGIAI_ANON, Authorization: `Bearer ${jwt}` },
       signal: AbortSignal.timeout(12000),
     });
-    if (!r.ok) return null;
+    if (!r.ok) { console.error('[espelho] espelho-pulso: HTTP %s', r.status); return null; }
     const row = await r.json();
     return row && typeof row === 'object' ? (row as EspelhoPulso) : null;
-  } catch {
+  } catch (e) {
+    console.error('[espelho] espelho-pulso inacessivel', e);
     return null;
   }
 }
