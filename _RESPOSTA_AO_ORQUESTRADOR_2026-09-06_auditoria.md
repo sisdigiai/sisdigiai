@@ -318,3 +318,89 @@ sem `set role`. Os zeros são o meu instrumento, não a tela.
 saber daqui** — só com sessão real. `src/lib/ordemStore.ts` lê `v_ops_ordem_do_dia` e
 `v_ops_placar_hoje`, então **vale um olhar nessa tela no mesmo login** em que ele for conferir o
 portão de papel. Se vier vazia, o caminho é policy, não grant.
+
+---
+
+## 11. `billing.*` (08/09) — o achado é real, a porta é outra, e a pior nem foi citada
+
+Recebi da varredura de policies `using (true)`: `billing.payments`, `billing.subscribers` e
+`billing.mp_events_raw` com policy `ALL true` para `authenticated`, RLS ligada e grant de
+escrita — *"qualquer usuário logado escreve/apaga pagamentos direto pela API"*.
+
+**Confirmo o catálogo, contesto a rota, e encontrei uma porta pior.**
+
+### O que confirmei
+
+As três têm `polcmd = '*'`, `using = true`, `with check = true`, papel `authenticated`, e
+`acl` com `arwd` para `authenticated`. Exatamente como reportado.
+
+### O que contesto — `billing` não é schema exposto
+
+Testei pela via que o mundo enxerga, com a chave `anon` e `Accept-Profile: billing`:
+
+```
+billing.payments      → 406  PGRST106  "Invalid schema: billing"
+billing.subscribers   → 406  PGRST106  "Invalid schema: billing"
+```
+
+**Nenhum cliente alcança `billing.*` direto — logado ou não.** O PostgREST recusa o schema
+antes de olhar permissão. Então "direto pela API" não acontece, e **a policy `using(true)`
+não é o buraco operante**. Consertar só ela dá sensação de resolvido sem fechar nada.
+
+### A porta real, e por que a policy é irrelevante nela
+
+```
+public.v_billing_subscriptions   definer (sem security_invoker)
+                                 is_updatable = YES   is_insertable_into = YES
+                                 authenticated = arwdDxtm
+```
+
+É **view atualizável, com grant de escrita, e definer** — logo **escreve como o dono, e a RLS
+da tabela de baixo nem é consultada.** A policy `using(true)` podia ser `false` que a escrita
+passaria igual. **É a view que abre, não a policy.**
+
+E ela já estava no meu portão 16: `v_billing_subscriptions` é uma das 54 atualizáveis que
+nomeei em 06/09. O achado novo não é família nova — é a confirmação de que aquela lista tinha
+razão de existir.
+
+**Revogar escrita nessa view é seguro:** li o `src/lib/billingStore.ts` — o app **lê** por ela
+(`select`) e **escreve só por RPC**. Nenhum `insert/update/delete` do app passa pela view.
+
+### A pior, que não foi citada por ninguém
+
+```sql
+CREATE FUNCTION public.billing_upsert_subscriber(p_patch jsonb)
+  RETURNS billing.subscribers
+  SECURITY DEFINER          -- roda como dono
+  -- acl: authenticated = X   → qualquer usuário logado executa
+  -- corpo: sem is_super_admin(), sem is_admin(), sem raise. NENHUMA trava.
+```
+
+**Qualquer conta logada pode inserir ou alterar qualquer assinante** — `name`, `email`, `doc`
+(CPF/CNPJ), `phone`, `plan_amount_brl`, `status`, `next_due_on`, `notes`. Sem papel, sem dono,
+sem verificação de nada.
+
+E esta é a porta que **o app realmente usa** (`billingStore.upsert`), então **não se resolve
+revogando** — precisa de trava no corpo.
+
+> **O conserto proposto fecharia a view e deixaria a RPC aberta.** É o mesmo formato do erro
+> das "duas views" que viraram 145: fechar o que foi nomeado e chamar de resolvido.
+
+Agravante de LGPD: o `doc` é CPF/CNPJ. Escrita livre de PII por qualquer logado não é só
+integridade de cobrança.
+
+### Conserto certo, na ordem
+
+1. **Trava de papel dentro de `billing_upsert_subscriber`** (`is_admin()`/`is_super_admin()`,
+   com `raise` explícito). É a única porta viva hoje e a que o app usa.
+2. **`REVOKE INSERT, UPDATE, DELETE ON public.v_billing_subscriptions FROM authenticated`** —
+   provado seguro pela leitura do store.
+3. **Policy por papel** nas três tabelas, no lugar de `using(true)`. **Por último**, porque com
+   as views definer ela é defesa em profundidade, não a fechadura.
+4. **Controle negativo obrigatório:** conta sem papel → `42501` na RPC. Sem isso, não está provado.
+
+⚠ **Limite do meu instrumento:** os passos 1–3 eu provo por catálogo e por leitura de código;
+o passo 4 **exige JWT de papel real**, que eu não tenho — `set role` não carrega claim e
+`is_admin()` mente sob a Management API. **A prova final é de quem tiver sessão.**
+
+**Escrita em produção: não executo.** Vai ao dono, no pacote 16.
