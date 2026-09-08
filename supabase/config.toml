@@ -1,0 +1,10 @@
+# Configuração versionada das edge functions do projeto digiai (hswyopqvnolqpmprqvzh).
+# Nasceu em 08/09/2026: o portão da função `espelho-pulso` dependia do flag verify_jwt do
+# gateway, que vivia só no painel — e a casa já viu redeploy religar o gateway sem o flag.
+# Regra: toda função que exige sessão declara verify_jwt = true AQUI; as que recebem webhook
+# de terceiro (assinatura própria) declaram false explicitamente, nunca por omissão.
+# Deploy pela Management API não lê este arquivo — o metadata do deploy repete o flag; a CLI lê.
+project_id = "hswyopqvnolqpmprqvzh"
+
+[functions.espelho-pulso]
+verify_jwt = true

@@ -37,6 +37,20 @@ function json(req: Request, status: number, body: unknown): Response {
   });
 }
 
+// Só um service_role autêntico responde 200 em /auth/v1/admin/users; anon, usuário e JWT
+// forjado recebem 401/403. Verificação no servidor, nunca por decode local.
+async function ehServiceRoleValido(url: string, anon: string, jwt: string): Promise<boolean> {
+  try {
+    const r = await fetch(`${url}/auth/v1/admin/users?per_page=1`, {
+      headers: { apikey: anon, Authorization: `Bearer ${jwt}` },
+      signal: AbortSignal.timeout(6000),
+    });
+    return r.status === 200;
+  } catch {
+    return false;
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors(req) });
   if (req.method !== 'GET') return json(req, 405, { error: 'metodo' });
@@ -49,17 +63,15 @@ Deno.serve(async (req) => {
   const SERVICE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const ANON = Deno.env.get('SUPABASE_ANON_KEY')!;
 
-  // service_role: o gateway (verify_jwt=true) já validou a assinatura deste JWT; aqui só se
-  // lê o claim `role`. O env SUPABASE_SERVICE_ROLE_KEY do runtime não é comparável por string
-  // (chaves legadas × novas), por isso o claim, e não a igualdade.
+  // Portão que NÃO depende do verify_jwt do gateway (flag fora do repo; já caiu uma vez na casa):
+  // nenhum claim é lido localmente. service_role só passa se o servidor de Auth aceitar o JWT
+  // num endpoint admin (assinatura verificada lá); usuário só passa por auth.getUser.
+  // Prova de 08/09 (orquestrador do app): JWT forjado com role=service_role → 401.
   let liberado = false;
-  let roleClaim = '';
-  try {
-    const p = JSON.parse(atob(jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
-    roleClaim = String(p.role ?? '');
-  } catch { roleClaim = ''; }
-  if (jwt === SERVICE || roleClaim === 'service_role') {
-    liberado = true; // máquina-a-máquina do próprio digiai
+  if (jwt === SERVICE) {
+    liberado = true; // máquina-a-máquina do próprio digiai (igualdade exata com o env)
+  } else if (await ehServiceRoleValido(SUPABASE_URL, ANON, jwt)) {
+    liberado = true;
   } else {
     // Valida a sessão no Auth do digiai (não decode local). Anon key não é usuário → falha.
     const cli = createClient(SUPABASE_URL, ANON, { global: { headers: { Authorization: `Bearer ${jwt}` } } });
