@@ -5,11 +5,23 @@
 // anon keys são públicas por design (mesma classe do bundle de cada app).
 import { supabase } from './supabase';
 
-const LIMELIGHT_URL = import.meta.env.VITE_LIMELIGHT_SUPABASE_URL || 'https://gfdpvasbrxwulvpvyfvr.supabase.co';
-const LIMELIGHT_ANON = import.meta.env.VITE_LIMELIGHT_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmZHB2YXNicnh3dWx2cHZ5ZnZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NzMwNzYsImV4cCI6MjEwMDE0OTA3Nn0.Gr8I2e9Ot2d6fOq0eBp43yDWDxAohkzAcoa0dJ9_zOk';
-const PULSO_URL = import.meta.env.VITE_PULSO_SUPABASE_URL || 'https://nlcisbfdiokmipyihtuz.supabase.co';
+// Chaves e URLs vêm SÓ do ambiente, sem literal de reserva (09/09/2026).
+//
+// Antes era `import.meta.env.X || 'eyJ...'`. Parecia reserva e não era: conferido
+// pelo bundle publicado em 08/09, as variáveis não existiam em lugar nenhum, então
+// o literal era a ÚNICA fonte — em produção. Chave fixa em código é chave que
+// ninguém troca, e R-021 manda rotacionar a cada 90 dias; esse é o motivo, não
+// sigilo (anon key é pública por desenho).
+//
+// Sem a variável, o espelho DESLIGA e diz por quê — não cai num valor escondido.
+const LIMELIGHT_URL = import.meta.env.VITE_LIMELIGHT_SUPABASE_URL;
+const LIMELIGHT_ANON = import.meta.env.VITE_LIMELIGHT_SUPABASE_ANON_KEY;
+const PULSO_URL = import.meta.env.VITE_PULSO_SUPABASE_URL;
+const PULSO_ANON = import.meta.env.VITE_PULSO_SUPABASE_ANON_KEY;
+// ⚠ Blogs continua com literal: VITE_BLOGS_* ainda não existe no Pages. Tirar
+// daqui antes de a variável existir apagaria o espelho dos Blogs. Ordem: painel
+// primeiro, código depois — a mesma que o resto deste bloco acabou de seguir.
 const BLOGS_URL = 'https://zgojkioieztikqhwcoae.supabase.co';
-const PULSO_ANON = import.meta.env.VITE_PULSO_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sY2lzYmZkaW9rbWlweWlodHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1ODk0OTksImV4cCI6MjA3OTE2NTQ5OX0.-Cfzv9ebOYB8I93zNLghWTszawJk4G3rXwiTTY9PpOI';
 
 export interface EspelhoLimelight {
   episodios: number;
@@ -81,7 +93,8 @@ export interface BlogDia { dia: string; blog_slug: string; leituras: number; ses
 // produto fora do ar nao pode derrubar a tela do digiai. Mas ficar em silencio TAMBEM nao serve:
 // era assim que 'motor rodando, painel cego' passava por normalidade. Falha agora vai ao console
 // com a view e o status; a tela continua degradando sem quebrar. (08/09/2026)
-async function lerLinhas<T>(base: string, anon: string, view: string): Promise<T[]> {
+async function lerLinhas<T>(base: string | undefined, anon: string | undefined, view: string): Promise<T[]> {
+  if (!base || !anon) { console.error('[espelho] %s: variavel de ambiente ausente — espelho desligado', view); return []; }
   try {
     const r = await fetch(`${base}/rest/v1/${view}?select=*&order=dia.asc`, {
       headers: { apikey: anon, Authorization: `Bearer ${anon}` },
@@ -96,7 +109,8 @@ async function lerLinhas<T>(base: string, anon: string, view: string): Promise<T
   }
 }
 
-async function lerEspelho<T>(base: string, anon: string, view: string): Promise<T | null> {
+async function lerEspelho<T>(base: string | undefined, anon: string | undefined, view: string): Promise<T | null> {
+  if (!base || !anon) { console.error('[espelho] %s: variavel de ambiente ausente — espelho desligado', view); return null; }
   try {
     const r = await fetch(`${base}/rest/v1/${view}?select=*`, {
       headers: { apikey: anon, Authorization: `Bearer ${anon}` },

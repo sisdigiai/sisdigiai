@@ -23,6 +23,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Corrigido (2026-09-09 — anon keys saem do código; espelho sem variável agora desliga e avisa)
+- **Portão 46 feito pelo dono/orquestrador (00:23):** `VITE_LIMELIGHT_*` e `VITE_PULSO_*` definidas no Pages `digiai-app` (production + preview). **Só então** removi os literais de reserva de `src/lib/espelhoMotores.ts` — painel primeiro, código depois.
+- **Por que essa ordem:** em 08/09 o bundle publicado provou que as variáveis **não existiam em lugar nenhum**; o `|| 'eyJ...'` **não era reserva, era a única fonte**. Remover antes teria cegado os espelhos de Limelight e Pulso em produção **sem erro de tela**.
+- **O motivo não é sigilo** — anon key é pública por desenho. É **rotação**: chave fixa em código é chave que ninguém troca, e R-021 manda rotacionar a cada 90 dias. Registrado assim para o conserto não ser desfeito por quem, com razão, notar que a chave não é secreta.
+- **Comportamento novo:** sem a variável, `lerEspelho`/`lerLinhas` **desligam o espelho e dizem por quê** no console (`variavel de ambiente ausente`), em vez de cair num valor escondido.
+- **Prova local (controle):** meu `.env` **não** tem essas variáveis, e o build local agora sai **sem as duas chaves** (`grep` = 0 para Limelight e Pulso). Isso prova que o literal saiu do código — um build sem a variável não produz chave nenhuma.
+- ⚠ **A prova de produção é o inverso, e depende do deploy:** com as variáveis definidas no Pages, as chaves devem **VOLTAR a aparecer** no bundle publicado — presença ali passa a significar "a variável está injetada". *"Literal ausente no bundle" não serve como prova*, porque o valor da variável é igual ao literal antigo. Falta ainda: espelhos de Limelight e Pulso respondendo na tela.
+- **Blogs continua com literal** (URL e chave): `VITE_BLOGS_*` não existe no Pages. Mesma dívida, mesma ordem — criar as variáveis antes de tocar no código. Pedido registrado ao orquestrador geral.
+
 ### Alterado (2026-09-08 — portão 29 fechado pelo dono: as duas contas sem papel foram apagadas)
 - Decisão do dono (*"não vamos usar mais, vamos apagar"*), executada pelo orquestrador geral às 18:14 por soft delete (reversível; login impossível). **Conferido:** `auth.users` = **1 linha** (só o dono), `iam.users` = **1 ativo**.
 - Era a conta que, até o conserto do fail-open, abria Financeiro, Cadastro Empresa, Clearix e Cobrança **por não ter papel nenhum** — e tinha login em 31/07. O buraco não era condicional: era o padrão para conta sem papel.
