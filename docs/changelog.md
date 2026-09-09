@@ -23,6 +23,14 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Descoberto (2026-09-09 — um terceiro estado do deploy: nem fila, nem falha — INDISTINGUÍVEL)
+- Fui provar que o build da remoção dos literais dos Blogs subiu, e o bundle vivo continuava `index-BshhoQg0.js`. Pela regra da casa isso seria *fila* (até ~5 min) ou *suspeita* (a partir de ~15). **Não é nenhum dos dois.**
+- **Reconstruí o commit `eb23c1a` localmente com as variáveis de ambiente definidas** (`.env.local` temporário, `.env*` é gitignored, apagado em seguida) e o resultado foi **`index-BshhoQg0.js` — exatamente o hash que está em produção.**
+- **Por quê:** trocar `'literal'` por `import.meta.env.X` quando o valor da variável **é igual ao literal** produz **bundle byte a byte idêntico**. O Vite substitui a variável em tempo de build; a saída não muda; **o hash de conteúdo não muda**.
+- **Consequência prática:** o bundle vivo é compatível **ao mesmo tempo** com "código antigo com literal" e com "código novo lendo do painel". Não dá para distinguir pelo artefato — **o deploy pode já ter acontecido**. Esperar não resolve, e re-disparar build resolveria menos ainda.
+- **A regra do hash ganha um terceiro estado:** hash igual pode ser **fila**, **falha silenciosa** ou **saída idêntica**. Antes de tratar como as duas primeiras, perguntar se a mudança **poderia** alterar a saída. Se não poderia, o hash nunca vai mudar e a conferência precisa de outra coisa.
+- **Essa outra coisa é o `__BUILD_REF__`** do commit anterior, e este episódio é a justificativa dele deixando de ser hipotética: **a dívida dos Blogs só será verificável no primeiro build que carregar o identificador.** Até lá fica "correto por construção" — o código é idêntico em forma ao de Limelight e Pulso, que estão provados pelos três lados.
+
 ### Adicionado (2026-09-09 — o bundle passa a dizer de qual commit ele é)
 - **Problema real, encontrado três vezes em 08–09/09:** *"qual commit está no ar?"* vinha sendo respondido por **marcador improvisado** — uma string que só existisse no commit novo. Funciona até o commit **não acrescentar string nenhuma**: o `eb23c1a` só **remove** literais dos Blogs, então não deixa marcador, e a conferência trava.
 - **`vite.config.ts`** injeta `__BUILD_REF__` (`git rev-parse --short HEAD`, com sufixo `+local` se a árvore estiver suja) e o `main.tsx` publica em `document.documentElement.dataset.build`. Efeito prático: **o hash do commit vira string dentro do `.js` publicado**, greppável, e fica visível no `<html data-build>`.
