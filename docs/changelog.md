@@ -23,6 +23,13 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Adicionado (2026-09-09 — o bundle passa a dizer de qual commit ele é)
+- **Problema real, encontrado três vezes em 08–09/09:** *"qual commit está no ar?"* vinha sendo respondido por **marcador improvisado** — uma string que só existisse no commit novo. Funciona até o commit **não acrescentar string nenhuma**: o `eb23c1a` só **remove** literais dos Blogs, então não deixa marcador, e a conferência trava.
+- **`vite.config.ts`** injeta `__BUILD_REF__` (`git rev-parse --short HEAD`, com sufixo `+local` se a árvore estiver suja) e o `main.tsx` publica em `document.documentElement.dataset.build`. Efeito prático: **o hash do commit vira string dentro do `.js` publicado**, greppável, e fica visível no `<html data-build>`.
+- Isso troca um método frágil (achar uma string que por acaso seja nova) por um determinístico: **todo build carrega a sua própria identidade**, inclusive os que só apagam código.
+- Fallback `desconhecido` se o `git` não estiver disponível no ambiente de build — identificação é diagnóstico, não pode derrubar o build.
+- Conferido no build local: bundle contém `7d4225a+local` (o `+local` porque a árvore tinha a própria mudança ainda não commitada — o que também prova que o sufixo funciona).
+
 ### Verificado (2026-09-09 — portão 46 provado pelos três lados, não por dedução)
 - **Bundle novo no ar:** `index-BshhoQg0.js`, com o marcador `espelho desligado` **presente** — é o build do commit da remoção, não o anterior. **Este é o passo que faltava na regra:** sem confirmar de qual bundle se fala, o sinal invertido mente com cara de prova.
 - **Chaves presentes = injetadas pelo painel:** Limelight e Pulso aparecem no bundle **mesmo com o literal fora do código** — só podem ter vindo das variáveis do Pages.
