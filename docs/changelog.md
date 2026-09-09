@@ -23,6 +23,24 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Removido (2026-09-09 — portão 70: o espelho de copies no servidor, que nunca existiu)
+- Decisão do dono, relatada pelo Orquestrador Geral. Saíram três caminhos de `src/lib/copyStore.ts`: `syncAssetImagesToRemote`, o espelho de status em `updateStatus` e o `syncToRemote`.
+- **Medido antes de remover:** `ops.copy_assets` tem **zero linhas desde sempre**; **ninguém lê** a view (as três únicas referências no workspace eram estas três escritas); e o store lê **só do `localStorage`**. A escrita falhava (`authenticated` não tem UPDATE na base), avisava em `console.warn` e **devolvia sucesso à tela**.
+- **Não foi "consertado" para RPC de propósito:** guardar copy no servidor é **funcionalidade a decidir** (quem leria? para quê?) e nasceria com leitura — que é o que nunca existiu. Consertar teria criado um espelho que ninguém consulta, com mais código para manter.
+- ⚠ **O que NÃO saiu:** as imagens continuam indo para o **Storage**, que sempre funcionou. Só o espelho de **metadado** na tabela foi removido. Nenhum texto ou imagem se perde — o workspace era, e continua, local.
+- `tsc` limpo, build limpo, nenhum chamador órfão.
+
+### Corrigido (2026-09-09 — 098 v3: declarar o que fica, em vez de enumerar o que sai)
+- A 098 foi aplicada pelo Orquestrador Geral e **a trava disparou, com rollback** — dois defeitos reais e diferentes, os dois meus:
+- **(1) trava textual dava falso positivo.** `v_depois like '%authenticated=%w%'` casava com o `w` do **`service_role`**, que vem depois na mesma string. A migration abortaria dizendo *"não pegou"* **justamente quando pegou**. Já corrigida para `has_table_privilege` — pergunta ao sistema em vez de interpretar texto.
+- **(2) o revoke era incompleto.** `revoke insert, update, delete` deixou `authenticated=rDxtm` — o **`D` é TRUNCATE**, que é escrita. Achado do orquestrador lendo o ACL do rollback.
+- **Conserto de fundo:** parei de enumerar o que sai e passei a declarar **o que fica** — `revoke all` + `grant select` (tabelas), `revoke all` + `grant execute` (funções). Enumerar exige lembrar de todos os privilégios, hoje e nas versões futuras do Postgres; declarar o que fica é **fechado por construção**.
+- A trava passou a testar TRUNCATE também, e ganhou **controle positivo** (o que devia ficar, ficou) — sem ele, um revoke largo demais passaria como sucesso.
+
+### Aplicado por terceiro (2026-09-09 — 100 e `espelho-content-rules`)
+- **100 aplicada e provada por execução** pelo Orquestrador Geral (autorização dele, não minha): patch `{id, stage}` manteve name/company/contact/notes; `{id, notes:null}` limpou notes; anon → 42501; 260 leads intactos. É a prova que o catálogo não daria.
+- **`espelho-content-rules` publicada v1**, `verify_jwt=false`, devolvendo **503 sem segredo e com segredo errado** — inerte até o dono digitar o segredo nos dois projetos.
+
 ### Corrigido (2026-09-09 — 097: a 095 nasceu com escrita para `anon`, e a causa não é minha distração)
 - **Achado do Orquestrador Geral:** `v_telao_afericao` era a **única view do banco com INSERT/UPDATE/DELETE para `anon`**. Aplicada por mim hoje.
 - **A minha falha:** a 095 terminava com `revoke all … from public`. Isso mira o **papel `PUBLIC`**, que não tinha nada. Quem tinha era `anon` e `authenticated`. **É o mesmo erro que eu diagnostiquei em outros duas vezes hoje** — confundir o papel `PUBLIC` com os concessionários reais.

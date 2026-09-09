@@ -131,14 +131,21 @@ function createEmpty(): CopyWorkspace {
   return { version: 1, updated_at: now(), assets: [], seeded: false };
 }
 
-async function syncAssetImagesToRemote(asset: CopyAsset): Promise<void> {
-  if (!isSupabaseReady()) return;
-  const { error } = await supabase
-    .from('v_copy_assets')
-    .update({ images: asset.images, updated_at: asset.updated_at })
-    .eq('source_id', asset.id);
-  if (error) console.warn('[copyStore] sync images failed:', error.message);
-}
+// REMOVIDO em 09/09/2026 (portão 70): `syncAssetImagesToRemote`, o espelho de
+// status e o `syncToRemote`. Os três escreviam em `v_copy_assets`, e a escrita
+// NUNCA funcionou — `ops.copy_assets` não concede UPDATE a `authenticated`.
+// Medido antes de remover: a tabela tem ZERO linhas desde sempre, NINGUÉM a lê
+// (as três únicas referências no workspace eram estas três escritas), e este
+// store lê SÓ do localStorage. Ou seja: escrita que falhava, para um destino que
+// ninguém consultava, avisando em `console.warn` e devolvendo sucesso à tela.
+//
+// Não foi "consertado" para RPC de propósito: guardar copy no servidor seria
+// FUNCIONALIDADE a decidir (quem leria? para quê?), e nasceria com leitura — que
+// é o que nunca existiu. Enquanto isso, o workspace é local e honesto.
+//
+// ⚠ O QUE NÃO SAIU, e é importante: as imagens continuam indo para o Storage
+// (`supabase.storage`), que sempre funcionou. Só o espelho de METADADO na tabela
+// foi removido.
 
 /* ─── Store ─── */
 
@@ -171,16 +178,6 @@ export const copyStore = {
     asset.updated_at = now();
     ws.updated_at = now();
     writeLocal(ws);
-
-    if (isSupabaseReady()) {
-      await supabase
-        .from('v_copy_assets')
-        .update({ status, updated_at: asset.updated_at })
-        .eq('source_id', assetId)
-        .then(({ error }) => {
-          if (error) console.warn('[copyStore] sync status failed:', error.message);
-        });
-    }
 
     return ws;
   },
@@ -229,8 +226,6 @@ export const copyStore = {
     ws.updated_at = now();
     writeLocal(ws);
 
-    await syncAssetImagesToRemote(asset);
-
     return ws;
   },
 
@@ -251,8 +246,6 @@ export const copyStore = {
     asset.updated_at = now();
     ws.updated_at = now();
     writeLocal(ws);
-
-    await syncAssetImagesToRemote(asset);
 
     return ws;
   },
@@ -276,38 +269,6 @@ export const copyStore = {
     asset.updated_at = now();
     ws.updated_at = now();
     writeLocal(ws);
-
-    await syncAssetImagesToRemote(asset);
-
-    return ws;
-  },
-
-  async syncToRemote(): Promise<CopyWorkspace> {
-    const ws = readLocal();
-    if (!isSupabaseReady()) return ws;
-
-    for (const asset of ws.assets) {
-      await supabase
-        .from('v_copy_assets')
-        .upsert(
-          {
-            source_id: asset.id,
-            category: asset.category,
-            title: asset.title,
-            format: asset.format,
-            angulo: asset.angulo || null,
-            content: asset.content,
-            status: asset.status,
-            images: asset.images,
-            source_file: asset.source_file,
-            sort_order: asset.sort_order,
-          },
-          { onConflict: 'source_id' },
-        )
-        .then(({ error }) => {
-          if (error) console.warn('[copyStore] sync failed for', asset.id, error.message);
-        });
-    }
 
     return ws;
   },
