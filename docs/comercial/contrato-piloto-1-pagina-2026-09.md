@@ -60,6 +60,11 @@ abandonada, não é migração.
 - **Migração dos dados antigos não está incluída.** O importador atual grava
   colunas que não existem no banco e não tem trava contra duplicar. Se o cliente
   quiser, vira **serviço à parte, orçado, com escopo escrito**.
+  > ⚠ **E agora há caso concreto, não só risco teórico:** a importação da própria
+  > Mello para o Clearix **subiu dado com erro e valores errados** (dono, 09/09).
+  > É a razão de a conferência **por contagem** estar entre as provas de 30 dias,
+  > e de as travas de importação virarem item próprio. Não é cláusula defensiva:
+  > é o que já aconteceu com a nossa própria loja.
 - **Nada de "o sistema avisa o cliente sozinho no WhatsApp".** O que existe e se
   mostra é o botão com mensagem pronta.
 - **Não se fala em "pacote de 7 aplicativos"** (D3). Fala-se em módulos: venda,

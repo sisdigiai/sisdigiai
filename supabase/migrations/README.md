@@ -39,4 +39,4 @@ isso nunca precise ser conferido de novo.
    `grant select on … to authenticated;` + `comment on … is 'Consumidor: … Grant: … porque …'`.
    Grant a `anon` só como exceção documentada, com o motivo no comment.
 
-Próximo número livre em 09/09/2026: **102** — aplicadas: 093, 095, 096, 097, 098, 100. **Escritas e NÃO aplicadas:** 099 (`company.*` por RPC — exige front no mesmo passe e conferência de colunas) e 101 (motivo aposentado deixa de aceitar registro novo). 094 é do agente do MKT.
+Próximo número livre em 09/09/2026: **103** — aplicadas: 093, 095, 096, 097, 098, 100, 101. **Escritas e NÃO aplicadas:** 099 (`company.*` por RPC) e 102 (corrige a lista de motivos de 5 para 3, correção do dono). 094 é do agente do MKT.
