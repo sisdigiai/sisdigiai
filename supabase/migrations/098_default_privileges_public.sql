@@ -61,10 +61,31 @@ alter default privileges for role postgres in schema public
 alter default privileges for role postgres in schema public
   revoke all on sequences from anon;
 
+-- ⚠ FUNÇÕES PRECISAM DE UMA ENTRADA GLOBAL, e isto custou duas tentativas.
+-- O Postgres tem um built-in "EXECUTE a PUBLIC" para toda função nova. Ele é
+-- MESCLADO quando não existe entrada GLOBAL (sem `in schema`) para o role — então
+-- revogar só no schema deixa a função nascer com `=X/postgres` e `anon` HERDA de
+-- PUBLIC. Medido pelo orquestrador geral em transações com rollback: depois do
+-- revoke só-no-schema, `has_function_privilege('anon', …, 'EXECUTE')` continuava
+-- TRUE, e a entrada do schema já não mostrava PUBLIC — o ACL da função mostrava.
+--
+-- É por isso que a trava desta migration testa PRIVILÉGIO e não a entrada de
+-- `pg_default_acl`: a entrada dizia que estava fechado e a função nascia aberta.
+-- Se a prova olhasse a configuração em vez do efeito, teria passado.
+alter default privileges for role postgres
+  revoke execute on functions from public, anon;
 alter default privileges for role postgres in schema public
   revoke all on functions from anon, public;
 alter default privileges for role postgres in schema public
   grant execute on functions to authenticated;
+
+-- NÃO acrescento a linha global para TABELAS e SEQUÊNCIAS "por simetria".
+-- Medido: o built-in delas não concede nada a PUBLIC, então a linha global seria
+-- NO-OP — e criaria em `pg_default_acl` uma entrada que parece uma regra e não
+-- faz nada. É a mesma armadilha das três variáveis mortas do `.env.example`:
+-- documentar um controle que não existe é pior que não documentar, porque o
+-- próximo a ler acredita nele. Uma linha que funciona vale mais que três em que
+-- duas são decoração.
 
 -- ─── PROVA, PARTE 2: como nasce um objeto DEPOIS ────────────────────────────
 create view public._prova_098_depois as select 1 as x;
