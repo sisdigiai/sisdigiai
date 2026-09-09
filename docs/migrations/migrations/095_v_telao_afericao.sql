@@ -1,6 +1,8 @@
 -- 095 — v_telao_afericao: o Telão passa a saber se está cego, sem sessão e sem ver valor
 --
--- ⚠ NÃO APLICADA. Aguarda o "pode" do dono. Portão 52.
+-- ✅ APLICADA em 2026-09-09 15:26, autorizada pelo dono ("1 pode"). Portão 52.
+--    A 1ª aplicação devolveu a fonte v_telao_financeiro DUAS vezes (group by errado);
+--    corrigido para bool_or e reaplicado. A migration disse OK e a saída estava errada.
 --    Pedido original: digiai_telao/_PEDIDO_AO_ORQUESTRADOR_2026-09-08_cegueira.md
 --
 -- ═══════════════════════════════════════════════════════════════════════════
@@ -52,11 +54,14 @@ select 'v_telao_cobranca'::text as fonte,
        gerado_em as atualizado_em
   from public.v_telao_cobranca
 union all
+-- bool_or e NÃO `group by 1,2`: o financeiro tem uma linha POR MÊS, e agrupar
+-- por (fonte, tem_dado) devolvia a fonte DUAS vezes — true para os meses com
+-- valor, false para os sem. Pego na primeira aplicação, olhando o resultado:
+-- a migration disse OK e a saída estava errada. Agora é agregado do conjunto.
 select 'v_telao_financeiro',
-       (coalesce(despesas_brl,0) > 0 or coalesce(mrr_brl,0) > 0 or coalesce(receita_avulsa_brl,0) > 0),
+       bool_or(coalesce(despesas_brl,0) > 0 or coalesce(mrr_brl,0) > 0 or coalesce(receita_avulsa_brl,0) > 0),
        max(gerado_em)
   from public.v_telao_financeiro
- group by 1, 2
 union all
 -- Multi-linha: "tem dado" = existe linha. Aqui o esvaziamento é observável.
 select 'v_telao_pendencias', exists (select 1 from public.v_telao_pendencias), (select max(gerado_em) from public.v_telao_pendencias)

@@ -23,6 +23,16 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Aplicado (2026-09-09 — 093 e 095 em produção, autorizadas pelo dono)
+- **Cadastro público:** encontrei **já fechado** (`disable_signup: true`, confirmado pela via pública `/auth/v1/settings`). **Não fui eu** — estava aberto na medição de 14h e fechado às 15:22; alguém agiu no intervalo. Registro para o crédito não ficar errado.
+- **093 — a trava recusou a primeira aplicação, e foi a coisa mais valiosa do dia.** Mensagem: *"Backfill mudaria a agenda de 0 para 18"*. Causa: `ops.commercial_leads` tem trigger `set_updated_at` **BEFORE UPDATE sem condição** (`NEW.updated_at = now()`). O backfill é um UPDATE — carimbaria `updated_at = agora` nos 18 leads, **destruindo o único registro de quando cada um foi contatado**, que é justamente o que a agenda lê. A agenda iria a **0** no mesmo instante, e zero lê-se como "nada pendente".
+- **E não seria recuperável:** depois do UPDATE não há de onde tirar o valor antigo. Um backfill que apaga o dado que está a copiar.
+- **Conserto:** `disable trigger` em volta do backfill + gravar `last_touch_at = updated_at` no mesmo passe, aproveitando para capturar o último toque real antes que ele se perdesse — que é exatamente para isso que a coluna nasceu.
+- **Provado depois de aplicar:** agenda **18 → 18**; `max(updated_at)` idêntico ao segundo (`2026-09-05 04:02:20.771974+00`); 8 colunas novas; `vendas` no CHECK de `iam.users`; **`is_staff()` intocada** (sem escalada); duas policies divididas; as duas RPCs com `pode_tocar_lead()`; trigger religado; backfill 18/18; **controle negativo** → `42501 Acesso negado: escrever lead exige papel staff ou vendas`.
+- **095 — aplicada, errada, corrigida.** A 1ª versão devolveu `v_telao_financeiro` **duas vezes** (true e false): a view tem uma linha por mês e o `group by 1,2` agrupava por fonte **e** por resultado. **A migration disse OK e a saída estava errada** — só apareceu porque olhei o retorno em vez de confiar no "OK". Trocado por `bool_or`, reaplicada: 7 linhas, uma por fonte.
+- **Provas da 095 pela chave anon crua:** `v_telao_afericao` → **200 com 7 linhas**; colunas devolvidas = exatamente `fonte, tem_dado, atualizado_em`, **nenhuma de valor**; e as fontes em si (`v_telao_cobranca`, `_financeiro`, `_pipeline`, `espelho_telao_bi`) continuam **401** para anon. **Abrimos o metadado sem abrir o dado.**
+- `v_telao_cobranca` reporta `tem_dado = false` — correto: a empresa não tem assinante. É verdade, não alarme.
+
 ### Corrigido (2026-09-09 — front e o papel `vendas`: a resposta era tirar código, não acrescentar)
 - **Pedido:** fazer o front conhecer `vendas`, mexendo em `ROLE_HIERARCHY` (`src/lib/supabase.ts`) e em `permissions.ts`, senão a sessão de vendas cairia em "sem acesso".
 - **Medi antes:** `canAccessModule()` **já trata `vendas` corretamente** — papel não-privilegiado entra nos módulos abertos (Comercial entre eles) e é negado nos restritos. **Nenhuma mudança era necessária para funcionar.**

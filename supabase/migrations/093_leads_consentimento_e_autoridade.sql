@@ -1,6 +1,7 @@
 -- 093 — leads: consentimento (R-013), papel `vendas` sem escalada, e o toque no LEAD
 --
--- ⚠ NÃO APLICADA. Escrita em produção — aguarda o "pode" do dono.
+-- ✅ APLICADA em 2026-09-09 15:25, autorizada pelo dono ("1 pode"). A primeira
+--    tentativa (15:23) foi RECUSADA pela própria trava — ver §2, e foi bom.
 --    Pedida pelo Orquestrador Geral (09/09) para o módulo de vendas por WhatsApp do MKT.
 --    Esta é a 2ª versão: a 1ª foi devolvida com 4 ressalvas, todas aceitas por ele.
 --
@@ -102,13 +103,30 @@ comment on column ops.commercial_leads.next_step is
 --
 -- Deriva do SLA em ops.comercial_config (48h), não de 48 escrito à mão — o dia em
 -- que o dono mudar o SLA, o backfill de um eventual re-run acompanha.
+-- ⚠ O TRIGGER TEM DE SAIR DO CAMINHO, e isto foi descoberto pela trava abaixo
+-- na primeira tentativa de aplicar (09/09 15:23). `set_updated_at` é BEFORE
+-- UPDATE e faz `NEW.updated_at = now()` SEM CONDIÇÃO. Como o backfill é um
+-- UPDATE, ele carimbaria `updated_at = agora` nos 18 leads — destruindo o ÚNICO
+-- registro de quando cada um foi contatado, que é justamente o que a agenda velha
+-- lê. Efeito medido na tentativa: a agenda ia de 18 para 0 no mesmo instante.
+--
+-- Não é perda recuperável: depois do UPDATE não há de onde tirar o valor antigo.
+-- Um backfill que apaga o dado que está a copiar.
+alter table ops.commercial_leads disable trigger set_updated_at;
+
 update ops.commercial_leads l
    set next_touch_at = l.updated_at
-     + make_interval(hours => coalesce(
-         (select (valor #>> '{}')::int from ops.comercial_config where chave = 'sla_primeiro_toque_horas'), 48))
+         + make_interval(hours => coalesce(
+             (select (valor #>> '{}')::int from ops.comercial_config where chave = 'sla_primeiro_toque_horas'), 48)),
+       -- Aproveita para gravar o último toque REAL antes que ele se perca: hoje
+       -- `updated_at` é o único vestígio disso, e é exatamente por essa confusão
+       -- entre "modificado" e "tocado" que `last_touch_at` passa a existir.
+       last_touch_at = coalesce(l.last_touch_at, l.updated_at)
  where l.deleted_at is null
    and l.stage = 'contatado'
    and l.next_touch_at is null;
+
+alter table ops.commercial_leads enable trigger set_updated_at;
 
 -- TRAVA: a migration RECUSA aplicar se a agenda mudar de tamanho. Compara o que a
 -- view velha mostra hoje com o que a regra nova mostraria — se divergir, alguém
