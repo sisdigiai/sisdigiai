@@ -95,6 +95,47 @@ comment on column ops.commercial_leads.last_touch_at is
 comment on column ops.commercial_leads.next_step is
   'DESCRIÇÃO do próximo passo, em texto. O QUANDO é next_touch_at — não derivar agenda daqui.';
 
+-- BACKFILL — sem isto a coluna nasce nula nos 260 leads e a agenda nova cairia
+-- de 18 para ZERO no primeiro dia. Zero na agenda parece "nada pendente", não
+-- parece defeito: é o formato exato do erro que passamos a semana caçando.
+-- Achado pelo agente do MKT ao ler esta migration; entrou aqui porque a tabela é minha.
+--
+-- Deriva do SLA em ops.comercial_config (48h), não de 48 escrito à mão — o dia em
+-- que o dono mudar o SLA, o backfill de um eventual re-run acompanha.
+update ops.commercial_leads l
+   set next_touch_at = l.updated_at
+     + make_interval(hours => coalesce(
+         (select (valor #>> '{}')::int from ops.comercial_config where chave = 'sla_primeiro_toque_horas'), 48))
+ where l.deleted_at is null
+   and l.stage = 'contatado'
+   and l.next_touch_at is null;
+
+-- TRAVA: a migration RECUSA aplicar se a agenda mudar de tamanho. Compara o que a
+-- view velha mostra hoje com o que a regra nova mostraria — se divergir, alguém
+-- precisa decidir, e não em silêncio.
+do $$
+declare v_antes int; v_depois int;
+begin
+  select count(*) into v_antes  from marketing.v_whatsapp_followups_hoje;
+  select count(*) into v_depois from ops.commercial_leads
+   where deleted_at is null and wa_opt_out_em is null and next_touch_at <= now();
+  if v_depois <> v_antes then
+    raise exception 'Backfill mudaria a agenda de % para % — decidir antes de aplicar (093)', v_antes, v_depois;
+  end if;
+end $$;
+
+-- ⚠ MEDIÇÃO QUE MUDA O QUE ISTO SIGNIFICA (09/09): hoje os cinco recortes dão 18 —
+-- total de `contatado`, com corte de 48h, com janela de 7 dias, e com o filtro de
+-- `notes`. Ou seja, o backfill "reproduz os 18" porque HOJE NÃO HÁ DADO QUE
+-- EXERCITE A DIFERENÇA, não porque as regras sejam equivalentes.
+-- A view velha derrubava da agenda quem passasse de 7 dias — o lead esfriava e
+-- SUMIA, sem ninguém decidir. `sla_segundo_toque_dias = 7` sugere que a intenção
+-- era "segundo toque aos 7 dias", e virou "desaparece aos 7 dias". A regra nova
+-- (só `next_touch_at <= now()`) mantém o lead frio na agenda.
+-- Isso é MUDANÇA DE COMPORTAMENTO escondida por um número igual, e a decisão é da
+-- 094 (view do MKT): manter o lead frio ou dar-lhe outro destino. Fica dito aqui
+-- para não ser descoberta daqui a duas semanas como "a agenda cresceu sozinha".
+
 create index if not exists commercial_leads_agenda_idx
   on ops.commercial_leads (next_touch_at)
   where deleted_at is null and wa_opt_out_em is null;
