@@ -23,6 +23,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Corrigido (2026-09-09 — `mp-sync` adotada do deploy E consertada no mesmo passe, v13)
+- **O estado que encontrei:** função **em produção (v12, ACTIVE) sem fonte em repositório nenhum** — ninguém podia revisar nem reconstruir. Corpo recuperado pela Management API (`/functions/mp-sync/body`) e versionado em `supabase/functions/mp-sync/index.ts`. O original intacto ficou ao lado, em `_original_deploy_v12.ts`, para o diff mostrar que a **única** diferença é a trava.
+- **O furo:** ela escreve em `billing` com **service_role** (via `billing_ingest_mp_event`) e o único portão era `verify_jwt = true` — que prova **sessão**, não **papel**. Qualquer conta autenticada disparava a ingestão, **furando a trava que a 092 pôs em billing no dia anterior**.
+- **Por que adoção e conserto no mesmo commit:** versionar primeiro e consertar depois deixaria no repositório, assinado, um código que já se sabia furado — e alguém poderia aplicar metade.
+- **A trava:** pergunta `is_admin()` ao banco com o JWT de quem chama, **a mesma função que governa o módulo Cobrança no front** (trava mais apertada que a tela recriaria o desalinhamento que originou a auditoria). Erro na checagem **nega** — portão que abre no erro não é portão.
+- **Provado pela via externa, na v13:** sem `Authorization` → **401** (gateway); **chave anon no GET → 403**; **chave anon no POST, que é a ingestão → 403** (`Acesso negado: sincronizar cobrança exige papel admin ou superior`). E o corpo publicado contém a trava, a mensagem e o marcador de adoção.
+- **Aprendido de passagem:** o deploy por API é `POST /v1/projects/{ref}/functions/deploy?slug=…` com multipart (`metadata` + `file`). O `PATCH /functions/{slug}` devolve 500. Vale para o runbook — dá para publicar edge function sem a CLI.
+- ⚠ **Falta a prova com sessão do dono:** que a tela Cobrança continua sincronizando. A trava usa `is_admin()`, e o dono é `super_admin`, então deve passar — mas *deve passar* não é *passou*.
+
 ### Aplicado (2026-09-09 — 093 e 095 em produção, autorizadas pelo dono)
 - **Cadastro público:** encontrei **já fechado** (`disable_signup: true`, confirmado pela via pública `/auth/v1/settings`). **Não fui eu** — estava aberto na medição de 14h e fechado às 15:22; alguém agiu no intervalo. Registro para o crédito não ficar errado.
 - **093 — a trava recusou a primeira aplicação, e foi a coisa mais valiosa do dia.** Mensagem: *"Backfill mudaria a agenda de 0 para 18"*. Causa: `ops.commercial_leads` tem trigger `set_updated_at` **BEFORE UPDATE sem condição** (`NEW.updated_at = now()`). O backfill é um UPDATE — carimbaria `updated_at = agora` nos 18 leads, **destruindo o único registro de quando cada um foi contatado**, que é justamente o que a agenda lê. A agenda iria a **0** no mesmo instante, e zero lê-se como "nada pendente".
