@@ -169,7 +169,7 @@ end;
 $function$;
 
 comment on function public.pode_tocar_lead() is
-  'Quem pode ler e escrever lead comercial: staff da casa + papel vendas. Fonte única = iam.users. NÃO usa mkt.app_users — leads são ativo da empresa. Existe separada de is_staff() porque aquela abre finance/company/iam/storage.';
+  'Quem pode ler e escrever lead comercial: staff da casa + papel vendas. Fonte única = iam.users. NÃO usa mkt.app_users — leads são ativo da empresa. Existe separada de is_staff() porque aquela abre finance/company/iam/storage. ⚠ TEM CONSUMIDOR FORA DO DIGIAI: mkt.is_admin_ou_vendas() delega a esta função (decisão do agente do MKT, 09/09/2026), então mexer aqui muda o app de marketing também — avisar antes.';
 
 grant execute on function public.pode_tocar_lead() to authenticated;
 
