@@ -24,7 +24,22 @@ function refDoBuild(): string {
 export default defineConfig(() => {
   return {
     define: { __BUILD_REF__: JSON.stringify(refDoBuild()) },
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react(),
+      tailwindcss(),
+      // O ref também vai para o <head> do index.html, em tempo de build.
+      // Motivo: o `data-build` do <html> é posto em RUNTIME pelo main.tsx, então
+      // `curl` no index.html não o enxerga — quem quisesse conferir teria de baixar
+      // e grepar o bundle inteiro. Com a meta, conferir qual commit está no ar é
+      // uma requisição pequena: `curl -s <site> | grep 'name="build"'`.
+      {
+        name: 'ref-do-build-no-html',
+        transformIndexHtml(html: string) {
+          return html.replace('</head>', `  <meta name="build" content="${refDoBuild()}">
+  </head>`);
+        },
+      },
+    ],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

@@ -23,6 +23,18 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Adicionado (2026-09-09 — o ref do build também no `<head>`: conferir passa a custar uma requisição pequena)
+- **Limitação apontada pelo orquestrador geral:** o `data-build` do `<html>` é posto em **runtime** pelo `main.tsx`, então `curl` no `index.html` não o enxerga. Quem quisesse saber qual commit está no ar tinha de **baixar e grepar o bundle inteiro** (~1,6 MB).
+- Agora um plugin de `transformIndexHtml` grava `<meta name="build" content="<hash>">` no `index.html` **em tempo de build**. Conferir vira:
+
+  ```bash
+  curl -s https://app.digiai.app.br/ | grep 'name="build"'
+  ```
+
+- **As duas vias coexistem de propósito:** a `meta` é barata e serve para a conferência de rotina; o hash dentro do `.js` continua sendo a prova de que **o bundle** — e não só o HTML — é daquele commit. `index.html` e bundle são artefatos servidos separadamente, e já vimos hoje um deles trocar sem o outro.
+- Conferido no build local: `<meta name="build" content="fe7c706+local">` no `dist/index.html` **e** o mesmo hash presente no `.js`.
+- Feito agora porque o mecanismo virou item para os outros agentes de front replicarem (Telão, MKT, sites, Polá, Limelight) — melhor entregar a versão que não obriga a baixar bundle para responder "o que está no ar?".
+
 ### Descoberto (2026-09-09 — um terceiro estado do deploy: nem fila, nem falha — INDISTINGUÍVEL)
 - Fui provar que o build da remoção dos literais dos Blogs subiu, e o bundle vivo continuava `index-BshhoQg0.js`. Pela regra da casa isso seria *fila* (até ~5 min) ou *suspeita* (a partir de ~15). **Não é nenhum dos dois.**
 - **Reconstruí o commit `eb23c1a` localmente com as variáveis de ambiente definidas** (`.env.local` temporário, `.env*` é gitignored, apagado em seguida) e o resultado foi **`index-BshhoQg0.js` — exatamente o hash que está em produção.**
