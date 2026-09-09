@@ -23,6 +23,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Escrito, não aplicado (2026-09-09 — migration 093: leads, consentimento e o papel `vendas`)
+- Pedida pelo Orquestrador Geral para o módulo de vendas por WhatsApp do MKT. **2ª versão** — a 1ª voltou com 4 ressalvas, todas aceitas.
+- **A correção que fiz à decisão, e é a mais séria:** a instrução era pôr `vendas` dentro de `is_staff()`. Medi o que `is_staff()` abre hoje — **66 policies em 8 schemas e 57 funções**, incluindo `finance.*` (7), `company.*` (9), **`iam.users` e `iam.audit_logs`** e `storage.objects`. Fazer ao pé da letra daria a **cada vendedor o financeiro, o jurídico, a tabela de usuários e o storage** — sem que nada na migration parecesse falar sobre isso.
+- **Em vez disso:** `vendas` entra no CHECK de `iam.users.role` (autoridade única cumprida), **`is_staff()` fica intocada**, e nasce `public.pode_tocar_lead()` — `is_staff()` OU papel `vendas` — que trava as RPCs **e** as policies. `mkt.is_admin_ou_vendas()` não aparece: lead é ativo da empresa, não consulta a tabela de usuários do app de marketing.
+- **O "próximo toque" passa a morar no lead** (`next_touch_at`, `last_touch_at`). Havia **três** fontes concorrentes: `marketing.outreach_schedule` (128 linhas), a agenda derivada (18) e `next_step` em texto (258) — e a agenda **não lia o agendador**: decidia quem já fora tocado procurando `%follow-up%` **no campo de observações**.
+- **Consentimento conforme R-013 §5.1:** além de opt-out e data, entram `categoria` (CHECK fechado), `texto exato apresentado` e `IP` — porque sob LGPD quem prova é a empresa, e "origem = landing" não prova a quê a pessoa consentiu. Limite declarado: coluna guarda **estado, não histórico**.
+- **Fica para a 094, e não é minha (R-032):** reescrever `marketing.v_whatsapp_followups_hoje` para derivar de `next_touch_at` + opt-out. Sem ela, o que está na 093 fica correto e **inerte** — ⚠ **opt-out que a agenda ignora é pior que não ter opt-out: parece que alguém cuidou.**
+- Espelho em `docs/migrations/migrations/`. Próximo número livre: **095**.
+
 ### Adicionado (2026-09-09 — o ref do build também no `<head>`: conferir passa a custar uma requisição pequena)
 - **Limitação apontada pelo orquestrador geral:** o `data-build` do `<html>` é posto em **runtime** pelo `main.tsx`, então `curl` no `index.html` não o enxerga. Quem quisesse saber qual commit está no ar tinha de **baixar e grepar o bundle inteiro** (~1,6 MB).
 - Agora um plugin de `transformIndexHtml` grava `<meta name="build" content="<hash>">` no `index.html` **em tempo de build**. Conferir vira:

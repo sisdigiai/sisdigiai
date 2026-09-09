@@ -1,67 +1,38 @@
--- 093 — consentimento/opt-out em ops.commercial_leads + dizer o que se quis na policy
+-- 093 — leads: consentimento (R-013), papel `vendas` sem escalada, e o toque no LEAD
 --
 -- ⚠ NÃO APLICADA. Escrita em produção — aguarda o "pode" do dono.
 --    Pedida pelo Orquestrador Geral (09/09) para o módulo de vendas por WhatsApp do MKT.
---
--- ⚠⚠ ESTA MIGRATION SOZINHA NÃO FAZ O MÓDULO FUNCIONAR. Ver §0. Aplicá-la e dar
---     por feito entrega um módulo que não escreve. A parte que falta é decisão, não código.
+--    Esta é a 2ª versão: a 1ª foi devolvida com 4 ressalvas, todas aceitas por ele.
 --
 -- ═══════════════════════════════════════════════════════════════════════════
--- §0 — O QUE MEDI ANTES DE ESCREVER, E POR QUE MUDA O PEDIDO
+-- §0 — UMA CORREÇÃO À DECISÃO, MEDIDA ANTES DE ESCREVER
 -- ═══════════════════════════════════════════════════════════════════════════
 --
--- (1) A POLICY NÃO É A FECHADURA — de novo, como em billing (092).
---     `ops.commercial_leads` dá a `authenticated` apenas `r` (SELECT). Nenhuma
---     escrita direta passa: nem por tabela, nem pela view. `v_commercial_leads`
---     é `security_invoker` e auto-atualizável, mas escrever por ela executa com
---     o direito de quem chama — e quem chama só tem SELECT. Fecha no grant.
+-- A decisão foi: "`vendas` vira papel em iam.users (nível staff para leads)" e
+-- a policy espelha `is_staff()`. **Fazer isso literalmente seria escalada de
+-- privilégio.** `is_staff()` NÃO é o portão dos leads — é o portão da empresa.
+-- Medido:
 --
---     O app escreve por RPC: `fn_upsert_commercial_lead` e
---     `fn_delete_commercial_lead` (`src/lib/commercialStore.ts`), ambas
---     SECURITY DEFINER, com `EXECUTE` para `authenticated`. Elas IGNORAM RLS.
+--     is_staff() governa 66 policies em 8 schemas e 57 funções, incluindo
+--       finance.*  (7)  expenses, revenue, subscriptions, vendors, founder_time…
+--       company.*  (9)  contacts, financial_snapshots, legal_status, partners…
+--       iam.*      (2)  users e audit_logs
+--       storage.*  (3)  objects
+--       academy.*, analytics.*, marketing.* (24), ops.* (13)
 --
---     > Conclusão: mexer só na policy é defesa em profundidade, não conserto.
---     > O portão vivo é o corpo da RPC, e hoje ele diz:
---     >     if not public.is_staff() then raise exception 'not_staff'; end if;
+-- Ou seja: pôr `vendas` dentro de `is_staff()` daria a cada vendedor o
+-- financeiro, o jurídico, a tabela de usuários e o storage da empresa — sem que
+-- nada na migration parecesse falar sobre isso. É a mesma família do fail-open:
+-- uma linha que abre muito mais do que o nome dela sugere.
 --
--- (2) POR ISSO O MÓDULO DE VENDAS NÃO VAI ESCREVER, mesmo com a policy nova.
---     Uma pessoa `vendas` que não seja staff em `iam.users` continua levando
---     `not_staff` da RPC. A policy nem chega a ser consultada.
---
--- (3) A EXPRESSÃO PEDIDA CONTRADIZ O PRÓPRIO OBJETIVO.
---     O pedido diz "UMA autoridade (iam) para leads" e propõe
---     `is_admin() OR mkt.is_admin_ou_vendas()`. São DUAS autoridades:
---       public.is_admin()          → lê iam.users
---       mkt.is_admin_ou_vendas()   → lê mkt.app_users
---     Hoje elas concordam (medido: 1 admin no mkt, 0 pessoas em mkt.app_users
---     sem linha ativa correspondente em iam.users). Mas a estrutura permite
---     divergir — e, divergindo, o app de marketing passa a conceder escrita
---     nos leads da empresa sem passar por `iam`. Isso é governança, não sintaxe.
---
---     Duas saídas, e a escolha é do dono:
---       (A) UMA autoridade de verdade: criar o papel `vendas` em `iam.users`
---           (o CHECK hoje aceita super_admin/admin/founder/staff/viewer) e
---           incluí-lo em `is_staff()`. O MKT lê a mesma fonte. Mais trabalho,
---           cumpre o que o pedido diz querer.
---       (B) Aceitar as duas fontes, com o OR — e então PARAR de chamar isso
---           de "uma autoridade" na documentação, para ninguém se enganar depois.
---
---     Não escolhi por conta própria: escolher aqui seria decidir quem manda
---     nos leads da empresa. §3 fica escrito e COMENTADO até a decisão.
---
--- (4) CONSENTIMENTO: 3 COLUNAS NÃO CUMPREM O R-013.
---     O padrão da casa (`Cockpit/Harness/padroes-identidade-cadastros.md` §5.1)
---     exige registrar, antes de qualquer mensagem ativa: pessoa, canal,
---     **tipo de comunicação consentido**, data/hora **+ IP/dispositivo**, e o
---     **texto exato apresentado**. As três colunas pedidas cobrem data e uma
---     origem genérica — não provam A QUÊ a pessoa consentiu.
---     Sob LGPD, quem tem de provar o consentimento é a empresa; "origem =
---     landing" não é prova. §1 acrescenta o que falta, ainda como atributo da
---     pessoa (sem tabela nova, como pedido).
---
---     ⚠ Limite honesto: coluna guarda ESTADO, não histórico. Consentir, revogar
---     e consentir de novo sobrescreve. Se a operação passar a exigir a trilha,
---     o lugar é um log de eventos — decisão para depois, registrada aqui.
+-- O QUE FAÇO EM VEZ DISSO — mantém o objetivo (UMA autoridade: iam) e não alarga:
+--   1. `vendas` entra no CHECK de `iam.users.role`  → autoridade única, cumprida.
+--   2. `is_staff()` NÃO é tocada                    → nada de financeiro/jurídico.
+--   3. nasce `public.pode_tocar_lead()` = is_staff() OR papel `vendas`, e é ELA
+--      que trava as RPCs e as policies de lead.
+-- `mkt.is_admin_ou_vendas()` não aparece: leads da empresa não consultam a
+-- tabela de usuários do app de marketing. A doc pode dizer "uma autoridade"
+-- porque passa a ser verdade.
 
 begin;
 
@@ -76,8 +47,6 @@ alter table ops.commercial_leads
   add column if not exists wa_consentimento_texto     text,
   add column if not exists wa_consentimento_ip        inet;
 
--- Categoria fechada: é o que o Meta cobra por template e o que a LGPD exige
--- que se saiba. Texto livre aqui vira "marketing" escrito de cinco jeitos.
 alter table ops.commercial_leads
   drop constraint if exists commercial_leads_wa_consentimento_categoria_check;
 alter table ops.commercial_leads
@@ -85,7 +54,6 @@ alter table ops.commercial_leads
   check (wa_consentimento_categoria is null
          or wa_consentimento_categoria in ('marketing','utility','authentication','service'));
 
--- Consentimento sem data não é consentimento; e o texto apresentado é a prova.
 alter table ops.commercial_leads
   drop constraint if exists commercial_leads_consentimento_coerente;
 alter table ops.commercial_leads
@@ -94,7 +62,7 @@ alter table ops.commercial_leads
          or (wa_consentimento_categoria is not null and wa_consentimento_texto is not null));
 
 comment on column ops.commercial_leads.wa_opt_out_em is
-  'Quando a pessoa pediu para não receber. Preenchido = NÃO ENVIAR, qualquer categoria. Opt-out vence consentimento anterior.';
+  'Quando a pessoa pediu para não receber. Preenchido = NÃO ENVIAR, qualquer categoria. Vence consentimento anterior.';
 comment on column ops.commercial_leads.wa_consentimento_em is
   'Quando consentiu. Sem isto, mensagem ativa é proibida por LGPD e pelo Meta (R-013 §5.1).';
 comment on column ops.commercial_leads.wa_consentimento_origem is
@@ -102,63 +70,162 @@ comment on column ops.commercial_leads.wa_consentimento_origem is
 comment on column ops.commercial_leads.wa_consentimento_categoria is
   'A QUE consentiu — marketing | utility | authentication | service. Consentir para "service" não autoriza marketing.';
 comment on column ops.commercial_leads.wa_consentimento_texto is
-  'Texto EXATO mostrado no momento do opt-in. É a prova, e é a razão de a coluna existir (R-013 §5.1).';
+  'Texto EXATO mostrado no opt-in. É a prova, e é a razão de a coluna existir (R-013 §5.1). Estado, não histórico.';
 comment on column ops.commercial_leads.wa_consentimento_ip is
-  'IP de onde veio o consentimento. Guarda ESTADO, não histórico — ver §0(4).';
-
--- Quem a agenda do dia precisa varrer: quem não pediu para sair.
-create index if not exists commercial_leads_wa_contatavel_idx
-  on ops.commercial_leads (wa_status)
-  where wa_opt_out_em is null and deleted_at is null;
+  'IP de onde veio o consentimento.';
 
 -- ═══════════════════════════════════════════════════════════════════════════
--- §2 — Dizer o que se quis na policy (defesa em profundidade, NÃO a fechadura)
+-- §2 — O "próximo toque" mora no LEAD (correção do agendador)
 -- ═══════════════════════════════════════════════════════════════════════════
--- Mantém `to public` (o escopo de hoje) de propósito: trocar para
--- `to authenticated` mudaria quem a policy alcança, e isso não foi pedido.
+-- Havia TRÊS fontes concorrentes, medidas em 09/09:
+--     marketing.outreach_schedule ......... 128 linhas
+--     v_whatsapp_followups_hoje (derivada)   18 linhas
+--     ops.commercial_leads.next_step ...... 258 linhas
+-- E a agenda da tela NÃO lia o `outreach_schedule`: derivava de `updated_at`
+-- mais `notes NOT ILIKE '%follow-up%'` — decidia se alguém já fora tocado
+-- procurando texto livre no campo de observações.
+alter table ops.commercial_leads
+  add column if not exists next_touch_at timestamptz,
+  add column if not exists last_touch_at timestamptz;
+
+comment on column ops.commercial_leads.next_touch_at is
+  'QUANDO tocar de novo. Fonte única da agenda desde 09/09/2026 — substitui a heurística de procurar "follow-up" em notes.';
+comment on column ops.commercial_leads.last_touch_at is
+  'Quando foi tocado de verdade. Diferente de updated_at, que muda por qualquer edição.';
+comment on column ops.commercial_leads.next_step is
+  'DESCRIÇÃO do próximo passo, em texto. O QUANDO é next_touch_at — não derivar agenda daqui.';
+
+create index if not exists commercial_leads_agenda_idx
+  on ops.commercial_leads (next_touch_at)
+  where deleted_at is null and wa_opt_out_em is null;
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- §3 — Autoridade única (iam), sem alargar is_staff()
+-- ═══════════════════════════════════════════════════════════════════════════
+alter table iam.users drop constraint if exists users_role_check;
+alter table iam.users add constraint users_role_check
+  check (role in ('super_admin','admin','founder','staff','vendas','viewer'));
+
+-- Portão DE LEAD. Existe separado de is_staff() de propósito: is_staff() abre
+-- finance, company, iam e storage (66 policies), e vendedor não precisa disso.
+create or replace function public.pode_tocar_lead()
+returns boolean
+language plpgsql
+stable
+security definer
+set search_path to 'public','iam'
+as $function$
+begin
+  if auth.uid() is null then return false; end if;
+  return exists (
+    select 1 from iam.users
+    where auth_id = auth.uid()
+      and role in ('super_admin','admin','founder','staff','vendas')
+      and status = 'active'
+      and deleted_at is null
+  );
+end;
+$function$;
+
+comment on function public.pode_tocar_lead() is
+  'Quem pode ler e escrever lead comercial: staff da casa + papel vendas. Fonte única = iam.users. NÃO usa mkt.app_users — leads são ativo da empresa. Existe separada de is_staff() porque aquela abre finance/company/iam/storage.';
+
+grant execute on function public.pode_tocar_lead() to authenticated;
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- §4 — Policies espelham a MESMA função que trava a RPC
+-- ═══════════════════════════════════════════════════════════════════════════
+-- Defesa em profundidade: authenticated só tem SELECT nesta tabela, então a
+-- escrita direta já parava no grant. Isto é para o dia em que alguém conceder.
 drop policy if exists commercial_staff_all on ops.commercial_leads;
 
-create policy commercial_leitura_staff on ops.commercial_leads
-  for select using (public.is_staff());
+create policy commercial_leitura_lead on ops.commercial_leads
+  for select using (public.pode_tocar_lead());
 
-create policy commercial_escrita_admin on ops.commercial_leads
-  for all using (public.is_admin()) with check (public.is_admin());
+create policy commercial_escrita_lead on ops.commercial_leads
+  for all using (public.pode_tocar_lead()) with check (public.pode_tocar_lead());
 
 comment on table ops.commercial_leads is
-  'Leads comerciais. ESCRITA REAL ACONTECE NAS RPCs fn_upsert_commercial_lead / fn_delete_commercial_lead (SECURITY DEFINER, ignoram RLS) — a autorização mora no corpo delas. authenticated tem apenas SELECT nesta tabela; as policies abaixo são defesa em profundidade para o dia em que alguém conceder escrita direta. Não conceder sem rever as RPCs.';
+  'Leads comerciais (ativo da empresa). A ESCRITA REAL passa por fn_upsert_commercial_lead / fn_delete_commercial_lead (SECURITY DEFINER, ignoram RLS): a autorização mora no corpo delas, e é a mesma pode_tocar_lead() das policies abaixo. authenticated tem apenas SELECT aqui.';
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- §5 — As RPCs: trava nova + gravam o toque
+-- ═══════════════════════════════════════════════════════════════════════════
+create or replace function public.fn_upsert_commercial_lead(p_lead jsonb)
+returns uuid
+language plpgsql
+security definer
+set search_path to 'public', 'ops'
+as $function$
+declare v_id uuid;
+begin
+  -- Era `is_staff()`, que não deixava vendas escrever. Agora pode_tocar_lead(),
+  -- e com mensagem legível: 'not_staff' não dizia nada a quem lia na tela.
+  if not public.pode_tocar_lead() then
+    raise exception 'Acesso negado: escrever lead exige papel staff ou vendas'
+      using errcode = '42501';
+  end if;
+  v_id := nullif(p_lead->>'id','')::uuid;
+  if v_id is null then
+    insert into ops.commercial_leads (name, company, product, stage, source, contact, value_brl, owner, next_step, notes, next_touch_at, last_touch_at)
+    values (p_lead->>'name', p_lead->>'company', p_lead->>'product',
+            coalesce(nullif(p_lead->>'stage',''),'lead'), p_lead->>'source', p_lead->>'contact',
+            nullif(p_lead->>'value_brl','')::numeric, p_lead->>'owner', p_lead->>'next_step', p_lead->>'notes',
+            nullif(p_lead->>'next_touch_at','')::timestamptz, nullif(p_lead->>'last_touch_at','')::timestamptz)
+    returning id into v_id;
+  else
+    update ops.commercial_leads set
+      name = p_lead->>'name', company = p_lead->>'company', product = p_lead->>'product',
+      stage = coalesce(nullif(p_lead->>'stage',''),'lead'), source = p_lead->>'source',
+      contact = p_lead->>'contact', value_brl = nullif(p_lead->>'value_brl','')::numeric,
+      owner = p_lead->>'owner', next_step = p_lead->>'next_step', notes = p_lead->>'notes',
+      -- coalesce: quem não manda o campo não apaga o que já estava agendado.
+      next_touch_at = coalesce(nullif(p_lead->>'next_touch_at','')::timestamptz, next_touch_at),
+      last_touch_at = coalesce(nullif(p_lead->>'last_touch_at','')::timestamptz, last_touch_at)
+    where id = v_id;
+  end if;
+  return v_id;
+end;
+$function$;
+
+create or replace function public.fn_delete_commercial_lead(p_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path to 'public', 'ops'
+as $function$
+begin
+  if not public.pode_tocar_lead() then
+    raise exception 'Acesso negado: remover lead exige papel staff ou vendas'
+      using errcode = '42501';
+  end if;
+  update ops.commercial_leads set deleted_at = now() where id = p_id;
+end;
+$function$;
 
 commit;
 
 -- ═══════════════════════════════════════════════════════════════════════════
--- §3 — BLOQUEADO: quem pode escrever lead. NÃO APLICAR SEM DECISÃO DO DONO.
+-- FICA PARA A 094 (schema `marketing`, e não é meu — R-032)
 -- ═══════════════════════════════════════════════════════════════════════════
--- Sem este bloco, o módulo de vendas do MKT NÃO ESCREVE: a RPC exige is_staff()
--- e uma pessoa `vendas` não é staff em iam.users. Com ele, a escolha entre (A)
--- e (B) do §0(3) fica feita — e é decisão de governança, não de código.
+-- `marketing.v_whatsapp_followups_hoje` precisa ser reescrita para derivar de
+-- `next_touch_at` + stage + `wa_opt_out_em is null`, e `marketing.outreach_schedule`
+-- precisa do comentário de legado. As duas vivem no schema do MKT: passam pelo
+-- agente dele, não por mim. Sem essa parte, o §1 e o §2 daqui ficam corretos e
+-- INERTES — a agenda continua na heurística de `notes` e o opt-out não filtra nada.
 --
--- OPÇÃO A — uma autoridade de verdade (iam manda; recomendada):
---   alter table iam.users drop constraint users_role_check;
---   alter table iam.users add constraint users_role_check
---     check (role in ('super_admin','admin','founder','staff','vendas','viewer'));
---   create or replace function public.is_staff() ... role in (...,'vendas') ...
---   -- e o MKT passa a ler is_staff()/is_admin(), abandonando mkt.app_users para leads.
---
--- OPÇÃO B — duas fontes, assumidas como duas:
---   create or replace function public.fn_upsert_commercial_lead(...) ...
---     if not (public.is_staff() or mkt.is_admin_ou_vendas()) then
---       raise exception 'Acesso negado: escrever lead exige staff (iam) ou vendas (mkt)'
---         using errcode = '42501';
---     end if;
---   -- idem em fn_delete_commercial_lead. E a doc PARA de dizer "uma autoridade".
+-- ⚠ Opt-out que a agenda ignora é PIOR que não ter opt-out: parece que alguém cuidou.
+--   Se a 094 não vier junto, dizer isso ao dono em vez de dar o pacote por fechado.
 --
 -- ═══════════════════════════════════════════════════════════════════════════
 -- PROVAS EXIGIDAS DEPOIS DE APLICAR (catálogo não serve; `set role` não carrega
--- JWT e is_staff()/is_admin() mentem sob a Management API):
---   a) sessão staff  → LÊ leads na tela Comercial (positivo);
---   b) sessão staff  → escreve lead pela tela (a RPC é o caminho) e funciona;
---   c) sessão sem papel → 42501 na RPC (controle negativo);
---   d) depois do §3: sessão `vendas` → escreve; sessão `viewer` → 42501;
---   e) lead com wa_opt_out_em preenchido NÃO aparece na agenda do dia
---      (`marketing.v_whatsapp_followups_hoje`) — senão o opt-out é decorativo.
--- A (e) é a que importa para a LGPD: coluna de opt-out que a agenda ignora é
--- pior que não ter coluna, porque parece que alguém cuidou.
+-- JWT, e pode_tocar_lead()/is_staff() mentem sob a Management API):
+--   a) sessão staff  → lê e escreve lead pela tela Comercial (positivo);
+--   b) sessão `vendas` → escreve lead (o objetivo do módulo) e NÃO enxerga
+--      Financeiro nem Cadastro Empresa — prova de que não houve escalada;
+--   c) sessão `viewer` → 42501 'Acesso negado' na RPC (controle negativo);
+--   d) depois da 094: lead com `wa_opt_out_em` preenchido NÃO aparece na agenda;
+--   e) lead com `next_touch_at` no passado APARECE na agenda, e um com `notes`
+--      contendo "follow-up" também — provando que a heurística velha morreu.
+-- A (b) é a que eu mais quero ver: é onde a escalada apareceria se eu tivesse
+-- seguido a decisão ao pé da letra.
