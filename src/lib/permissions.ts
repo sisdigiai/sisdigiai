@@ -20,6 +20,15 @@ import type { ModuleId } from '../components/Sidebar';
 // do AuthContext e não decida enquanto for true. Aqui, `null` = sem acesso.
 export const RESTRICTED_MODULES: ModuleId[] = ['financeiro', 'cadastro-empresa', 'clearix', 'cobranca'];
 
+// Papéis do banco hoje (CHECK de iam.users.role): super_admin, admin, founder,
+// staff, vendas, viewer. Só os três abaixo abrem os módulos restritos.
+//
+// `vendas` (criado com a migration 093, para o módulo de WhatsApp do MKT) é
+// NÃO-privilegiado DE PROPÓSITO: escreve lead — pela RPC, que tem trava própria
+// (`pode_tocar_lead()`) — e não enxerga Financeiro, Cobrança, Clearix nem
+// Cadastro Empresa. Não acrescentar `vendas` aqui achando que é esquecimento:
+// no banco, `is_staff()` governa finance, company, iam e storage, e foi por isso
+// que o papel ganhou função própria em vez de entrar naquela.
 const PRIVILEGED_ROLES = ['super_admin', 'founder', 'admin'];
 
 export function canAccessModule(id: ModuleId, role: string | null): boolean {

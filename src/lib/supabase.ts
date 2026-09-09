@@ -1,19 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
 
-export type UserRole = 'super_admin' | 'admin' | 'founder' | 'staff' | 'viewer';
-
-export const ROLE_HIERARCHY: Record<UserRole, number> = {
-  super_admin: 100,
-  founder: 100,
-  admin: 80,
-  staff: 50,
-  viewer: 10,
-};
-
-export function hasRole(userRole: UserRole | null, minRole: UserRole): boolean {
-  if (!userRole) return false;
-  return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[minRole];
-}
+// Aqui existiam `UserRole`, `ROLE_HIERARCHY` e `hasRole()` — removidos em 09/09/2026.
+//
+// Motivo: ZERO consumidores no repositório inteiro (conferido por grep), e a lista
+// já estava desatualizada em relação ao banco no dia em que `vendas` nasceu. Uma
+// segunda fonte de verdade sobre papéis, que ninguém lê e que envelhece sozinha, é
+// pior que nenhuma: o próximo a chamar `hasRole('vendas', 'staff')` receberia
+// `undefined >= 50` → `false`, sem erro, sem aviso.
+//
+// Autorização vem do banco (R-037). Quem decide acesso a módulo é
+// `canAccessModule()` em `./permissions`, contra o papel que a RPC
+// `current_role_code()` devolve. Se um dia fizer falta uma hierarquia, ela nasce
+// da matriz do banco — não de um objeto literal aqui.
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;

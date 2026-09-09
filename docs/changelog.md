@@ -23,6 +23,14 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Corrigido (2026-09-09 — front e o papel `vendas`: a resposta era tirar código, não acrescentar)
+- **Pedido:** fazer o front conhecer `vendas`, mexendo em `ROLE_HIERARCHY` (`src/lib/supabase.ts`) e em `permissions.ts`, senão a sessão de vendas cairia em "sem acesso".
+- **Medi antes:** `canAccessModule()` **já trata `vendas` corretamente** — papel não-privilegiado entra nos módulos abertos (Comercial entre eles) e é negado nos restritos. **Nenhuma mudança era necessária para funcionar.**
+- **E `ROLE_HIERARCHY`, `hasRole()` e o type `UserRole` tinham ZERO consumidores** no repositório inteiro (grep em `.ts/.tsx/.js/.mjs`, fora `node_modules` e `dist`). Eram uma **segunda fonte de verdade sobre papéis**, já desatualizada no dia em que `vendas` nasceu.
+- **Removidos.** O próximo a chamar `hasRole('vendas','staff')` receberia `undefined >= 50` → `false`, **sem erro e sem aviso** — mais uma da família "o defeito que não reclama". Autorização vem do banco (R-037); se um dia fizer falta uma hierarquia, ela nasce da matriz do banco, não de um objeto literal no front.
+- **`permissions.ts` ganhou o porquê, não a exceção:** comentário registrando que `vendas` é não-privilegiado **de propósito** — escreve lead pela RPC (que tem trava própria) e não vê Financeiro/Cobrança/Clearix/Cadastro. Com o aviso explícito de **não** acrescentar `vendas` aos privilegiados achando que é esquecimento, já que no banco `is_staff()` governa finance, company, iam e storage.
+- `tsc` limpo, build limpo. Front do pacote 093 fechado: **uma remoção e um comentário.**
+
 ### Escrito, não aplicado (2026-09-09 — migration 093: leads, consentimento e o papel `vendas`)
 - Pedida pelo Orquestrador Geral para o módulo de vendas por WhatsApp do MKT. **2ª versão** — a 1ª voltou com 4 ressalvas, todas aceitas.
 - **A correção que fiz à decisão, e é a mais séria:** a instrução era pôr `vendas` dentro de `is_staff()`. Medi o que `is_staff()` abre hoje — **66 policies em 8 schemas e 57 funções**, incluindo `finance.*` (7), `company.*` (9), **`iam.users` e `iam.audit_logs`** e `storage.objects`. Fazer ao pé da letra daria a **cada vendedor o financeiro, o jurídico, a tabela de usuários e o storage** — sem que nada na migration parecesse falar sobre isso.
