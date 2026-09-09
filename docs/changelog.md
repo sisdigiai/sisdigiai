@@ -23,6 +23,13 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Verificado (2026-09-09 — portão 46 provado pelos três lados, não por dedução)
+- **Bundle novo no ar:** `index-BshhoQg0.js`, com o marcador `espelho desligado` **presente** — é o build do commit da remoção, não o anterior. **Este é o passo que faltava na regra:** sem confirmar de qual bundle se fala, o sinal invertido mente com cara de prova.
+- **Chaves presentes = injetadas pelo painel:** Limelight e Pulso aparecem no bundle **mesmo com o literal fora do código** — só podem ter vindo das variáveis do Pages.
+- **E o terceiro lado, que é o que realmente importa:** peguei as chaves **de dentro do bundle publicado** e chamei cada espelho. Todos **200 com dado real** — Limelight `episodios: 158`, Pulso engajamento por dia, Blogs `posts_publicados: 26`. Chave presente prova injeção; **chave que responde prova que funciona**, e são coisas diferentes.
+- **Blogs ainda não conta como prova:** a chave aparece no bundle vivo, mas vem do **literal antigo** — o commit que a remove ainda não subiu. Presença só vale como prova depois que o marcador disser que o bundle é o novo.
+- **Fato registrado de passagem:** o bundle publica anon key de **6 projetos** (digiai, Limelight, Pulso, Blogs, Clearix, nexus). São públicas por desenho e agora todas vêm de variável — mas é a superfície real do app, e vale saber o tamanho dela.
+
 ### Corrigido (2026-09-09 — Blogs também sai do literal: zero anon key embutida em `espelhoMotores.ts`)
 - `VITE_BLOGS_SUPABASE_URL` e `VITE_BLOGS_SUPABASE_ANON_KEY` criadas no Pages (production + preview), **e só depois** os literais saíram do código — a mesma ordem das outras quatro.
 - **Controle local:** com um `.env` que não tem nenhuma das seis variáveis, o build agora sai **sem as três chaves** (Limelight, Pulso e Blogs = `grep` 0). Antes deste passe, Blogs ainda dava 1.
