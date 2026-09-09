@@ -6,25 +6,29 @@
 
 ---
 
-## ⚠ ANTES DE LER O RESTO: quatro termos que eu NÃO consegui conferir
+## Procedência de cada termo — o que é fato e o que é decisão
 
-Estes vieram da **decisão 60 do fórum**, relatada pelo Orquestrador Geral. **Não
-existem em nenhum documento deste repositório** — procurei em `docs/comercial/`,
-no changelog e na Spec:
+Fonte conferida por mim em 09/09/2026: `Cockpit/forum/02-piloto-pago-clearix.md`
+(decisão do fórum, Tema 02) e `Cockpit/forum/00-fatos-canonicos.md`.
 
-| termo | estado |
+| termo | procedência |
 |---|---|
-| **R$ 899 antecipado** | ⚠ não conferido — não achei a origem |
-| **teto de 5 h/semana** de assistência | ⚠ não conferido |
-| **isolamento antes de dado** | ⚠ não conferido |
-| **fiscal fora do escopo** | ✅ **este eu confirmo** — é a trava D4, escrita em `o-que-pode-prometer-2026-09-02.md` |
+| **R$ 899** | **fato** — é o plano do meio em `clearix.app.br/planos` (R$ 349 / 899 / 1.499 **por mês**) |
+| "antecipado" | **decisão do fórum**, 2 votos a 1 |
+| teto de **5 h/semana** | **decisão do fórum** (é o custo declarado: horas do dono, R$ 0 de infra nova) |
+| isolamento antes de dado | **decisão do fórum**, e é condição de parada — ver "Se falhar" |
+| **fiscal fora** | **trava D4**, escrita em `o-que-pode-prometer-2026-09-02.md` |
 
-**Preço errado num contrato é pior que contrato nenhum**, e valor eu não invento.
-O dono confirma os três primeiros antes de isto sair daqui.
+⚠ **UMA AMBIGUIDADE QUE PRECISA SER RESOLVIDA ANTES DE ISTO IR A UM CLIENTE:**
+R$ 899 é o preço **mensal** do plano do meio. O documento diz "R$ 899 antecipado".
+**Não está escrito se o piloto é um mês pago adiantado, ou um valor fechado pelo
+piloto inteiro, ou o que acontece no mês 2.** Com o primeiro cliente, essa frase
+é a que vira discussão. O dono decide a redação; eu não escolho por ele.
 
-O resto do documento — o que entra, o que não entra e o que não se promete — está
-ancorado em `docs/comercial/o-que-pode-prometer-2026-09-02.md`, que foi levantado
-lendo o código, não a Spec.
+⚠ E o próprio fórum deixou **uma pergunta em aberto ao dono**, que muda a forma de
+cobrar: **quantos dias levou, na prática, a importação da Mello?** É o único dado
+real da casa para precificar implantação — e se passar de 40 h, a decisão do fórum
+diz que isto **deixa de ser piloto de valor único e vira setup + mensalidade**.
 
 ---
 
@@ -69,25 +73,45 @@ O ambiente do cliente é **isolado e provado isolado antes de qualquer dado real
 entrar**. Sem essa prova, não se importa nada. É a ordem que protege os dois
 lados: o cliente, de ver dado de outra loja; e nós, de descobrir depois.
 
-⚠ *Termo relatado, não conferido — ver o quadro do topo.*
-
 ## Assistência
 
 Até **5 horas por semana** de acompanhamento — na tela, junto com quem vai usar.
 Fora disso, a rotina é do cliente; se ele precisar de mais, conversa-se.
 
-⚠ *Teto relatado, não conferido — ver o quadro do topo.*
-
 ## Investimento
 
-**R$ 899, antecipado.**
+**R$ 899, antecipado.** É o plano do meio da tabela pública, que é mensal.
 
-⚠ *Valor relatado, não conferido — ver o quadro do topo.* **Confirmar antes de
-usar em qualquer conversa.**
+⚠ **Antes de usar numa conversa, o dono precisa fechar a redação:** um mês
+adiantado? valor fechado pelo piloto todo? o que acontece no mês 2? A tabela diz
+"por mês"; o documento diz "antecipado"; entre as duas há uma pergunta que o
+cliente vai fazer.
 
-## Como termina
+## O que prova que deu certo — em 30 dias
 
-O piloto acaba com uma decisão explícita dos dois lados: continua, ajusta ou para.
+Da decisão do fórum, e nesta ordem de peso:
+
+1. contrato de uma página assinado;
+2. **teste de isolamento registrado, sem vazamento nos dois sentidos**;
+3. R$ 899 pagos;
+4. importação delimitada, conferida **por contagem**;
+5. e a prova que decide: **5 dias corridos de balcão operando sem voltar ao
+   sistema antigo**.
+
+> Fatura paga prova **disposição de pagar**. Só o não-retorno ao sistema velho
+> prova que **o produto serve**. São marcos diferentes e os dois entram no registro.
+
+## Se falhar — as condições de parada, escritas antes
+
+- **O teste de isolamento falhar → PARA TUDO.** Deixa de ser assunto comercial e
+  vira decisão de infraestrutura (banco separado, custo novo) — e a prova "roda em
+  produção" se perde.
+- **A implantação passar de 40 h** → o modelo muda: vira setup + mensalidade.
+- **Dois prospects seguidos recusarem explicitamente pelo preço** → a ressalva
+  registrada no fórum passa a valer (cobrar o preço cheio antes de existir caso de
+  referência eleva a barreira justamente quando o caso é o ativo que falta).
+
+O piloto acaba com decisão explícita dos dois lados: continua, ajusta ou para.
 Nada renova sozinho.
 
 ---
