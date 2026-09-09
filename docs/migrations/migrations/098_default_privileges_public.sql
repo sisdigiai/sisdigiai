@@ -72,8 +72,12 @@ alter default privileges for role postgres in schema public
 -- É por isso que a trava desta migration testa PRIVILÉGIO e não a entrada de
 -- `pg_default_acl`: a entrada dizia que estava fechado e a função nascia aberta.
 -- Se a prova olhasse a configuração em vez do efeito, teria passado.
+-- `revoke all` e não `revoke execute`: hoje EXECUTE é o único privilégio de
+-- função, então são equivalentes — mas enumerar o que sai é exatamente o método
+-- que deixou o TRUNCATE de pé na v2. Coerência não é preciosismo aqui: é a mesma
+-- regra aplicada ao mesmo tipo de risco.
 alter default privileges for role postgres
-  revoke execute on functions from public, anon;
+  revoke all on functions from public, anon;
 alter default privileges for role postgres in schema public
   revoke all on functions from anon, public;
 alter default privileges for role postgres in schema public
