@@ -45,14 +45,26 @@ create view public._prova_098_antes as select 1 as x;
 create function public._prova_098_antes_fn() returns int language sql immutable as $$ select 1 $$;
 
 -- ─── O CONSERTO ─────────────────────────────────────────────────────────────
+-- ⚠ REVOKE ALL + GRANT do que fica, em vez de enumerar o que sai.
+-- A 1ª tentativa fazia `revoke insert, update, delete` e sobrou `authenticated=rDxtm`
+-- — o `D` é TRUNCATE, que é escrita, e ficou de pé (achado do orquestrador geral ao
+-- ler o ACL do rollback). Enumerar o que se tira exige lembrar de TODOS os
+-- privilégios, hoje e nas versões futuras do Postgres; declarar o que FICA é
+-- fechado por construção: o que eu não conceder, não existe.
 alter default privileges for role postgres in schema public
   revoke all on tables from anon;
 alter default privileges for role postgres in schema public
-  revoke insert, update, delete on tables from authenticated;
+  revoke all on tables from authenticated;
+alter default privileges for role postgres in schema public
+  grant select on tables to authenticated;
+
 alter default privileges for role postgres in schema public
   revoke all on sequences from anon;
+
 alter default privileges for role postgres in schema public
-  revoke execute on functions from anon, public;
+  revoke all on functions from anon, public;
+alter default privileges for role postgres in schema public
+  grant execute on functions to authenticated;
 
 -- ─── PROVA, PARTE 2: como nasce um objeto DEPOIS ────────────────────────────
 create view public._prova_098_depois as select 1 as x;
@@ -79,9 +91,11 @@ begin
   if has_table_privilege('anon','public._prova_098_depois','SELECT') then
     raise exception '098 não pegou: view nova ainda é legível por anon (%)', v_depois;
   end if;
+  -- TRUNCATE incluído: foi o que sobrou na 1ª tentativa e a trava antiga não veria.
   if has_table_privilege('authenticated','public._prova_098_depois','INSERT')
      or has_table_privilege('authenticated','public._prova_098_depois','UPDATE')
-     or has_table_privilege('authenticated','public._prova_098_depois','DELETE') then
+     or has_table_privilege('authenticated','public._prova_098_depois','DELETE')
+     or has_table_privilege('authenticated','public._prova_098_depois','TRUNCATE') then
     raise exception '098 não pegou: view nova ainda dá escrita a authenticated (%)', v_depois;
   end if;
   if has_function_privilege('anon','public._prova_098_depois_fn()','EXECUTE') then
