@@ -32,4 +32,11 @@ isso nunca precise ser conferido de novo.
    rascunho e o teu apply, renumera o TEU (ainda não aplicado) — nunca o dele.
 4. Duas sessões no mesmo repo na mesma rodada = um executor por repo (lição 05/09).
 
-Próximo número livre em 09/09/2026: **097** — escritas e **NÃO aplicadas**, aguardando o dono: 093 (leads: consentimento R-013, papel `vendas`, `next_touch_at` + backfill), 095 (`v_telao_afericao`) e 096 (`ops.motivos_perda`, que **não aplica sem a semente** — a trava recusa com a tabela vazia). 094 é do agente do MKT (schema `marketing`).
+5. **Objeto novo concede EXPLICITAMENTE, e diz a quem serve** (a partir da 098).
+   Antes da 098 o silêncio concedia tudo — `pg_default_acl` do `public` dava
+   `arwdDxtm` a `anon`/`authenticated` em toda view nova e `EXECUTE` a `anon` em
+   toda função nova. Depois dela o silêncio não concede nada. Então:
+   `grant select on … to authenticated;` + `comment on … is 'Consumidor: … Grant: … porque …'`.
+   Grant a `anon` só como exceção documentada, com o motivo no comment.
+
+Próximo número livre em 09/09/2026: **100** — aplicadas hoje: 093, 095, 097. **Escritas e NÃO aplicadas:** 096 (`ops.motivos_perda`, recusa sem semente), 098 (default privileges do `public` — portão 66), 099 (`company.*` por RPC — portão 64, **exige mudança de front no mesmo passe e conferência das colunas**). 094 é do MKT.
