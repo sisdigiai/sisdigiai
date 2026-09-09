@@ -60,11 +60,16 @@ abandonada, não é migração.
 - **Migração dos dados antigos não está incluída.** O importador atual grava
   colunas que não existem no banco e não tem trava contra duplicar. Se o cliente
   quiser, vira **serviço à parte, orçado, com escopo escrito**.
-  > ⚠ **E agora há caso concreto, não só risco teórico:** a importação da própria
-  > Mello para o Clearix **subiu dado com erro e valores errados** (dono, 09/09).
-  > É a razão de a conferência **por contagem** estar entre as provas de 30 dias,
-  > e de as travas de importação virarem item próprio. Não é cláusula defensiva:
-  > é o que já aconteceu com a nossa própria loja.
+  > ⚠ **E há caso concreto, não risco teórico** — com a causa certa (dono, 09/09):
+  > o dado da Mello **já vinha errado do sistema antigo** (carnês não lançados,
+  > saldo herdado). **Não foi erro de importação: foi dado de origem ruim que o
+  > importador NÃO BARROU.** A diferença importa porque muda o conserto — não é
+  > corrigir como o importador escreve, é fazê-lo **recusar** o que não fecha.
+  >
+  > ⚠ E muda a PROVA: **contagem sozinha não teria pegado isto.** As linhas
+  > estavam lá; os VALORES é que estavam errados. Por isso a conferência é
+  > **por contagem E por soma**, batida contra o sistema de origem antes de
+  > aceitar. Contagem prova que nada se perdeu; só a soma prova que nada veio torto.
 - **Nada de "o sistema avisa o cliente sozinho no WhatsApp".** O que existe e se
   mostra é o botão com mensagem pronta.
 - **Não se fala em "pacote de 7 aplicativos"** (D3). Fala-se em módulos: venda,
@@ -112,7 +117,7 @@ Da decisão do fórum, e nesta ordem de peso:
 1. contrato de uma página assinado;
 2. **teste de isolamento registrado, sem vazamento nos dois sentidos**;
 3. R$ 349 pagos;
-4. importação delimitada, conferida **por contagem**;
+4. importação delimitada, conferida **por contagem E por soma** (ver a cláusula de migração: contagem sozinha não pega valor errado);
 5. e a prova que decide: **5 dias corridos de balcão operando sem voltar ao
    sistema antigo**.
 
