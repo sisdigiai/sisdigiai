@@ -62,29 +62,44 @@ create function public._prova_098_depois_fn() returns int language sql immutable
 -- Comparar o ACL do antes com o do depois é a única prova de que o ALTER pegou:
 -- ele não dá erro quando não surte efeito (papel errado, schema errado), então
 -- "rodou sem erro" não é prova de nada.
+-- ⚠ A prova PERGUNTA AO SISTEMA, não casa string de ACL. A primeira versão desta
+-- migration comparava com `like '%authenticated=%w%'` — e isso dava FALSO POSITIVO,
+-- porque o `w` de `service_role=arwdDxtm` aparece depois de `authenticated=r` na
+-- mesma linha. A migration teria falhado dizendo que não pegou, justamente quando
+-- pegou. Texto de ACL é para ler, não para decidir: `has_table_privilege` responde
+-- a pergunta certa.
 do $$
 declare
   v_antes  text := coalesce((select array_to_string(relacl,' | ') from pg_class where oid='public._prova_098_antes'::regclass), '');
   v_depois text := coalesce((select array_to_string(relacl,' | ') from pg_class where oid='public._prova_098_depois'::regclass), '');
-  f_antes  text := coalesce((select array_to_string(proacl,' | ') from pg_proc where oid='public._prova_098_antes_fn()'::regprocedure), '');
-  f_depois text := coalesce((select array_to_string(proacl,' | ') from pg_proc where oid='public._prova_098_depois_fn()'::regprocedure), '');
 begin
-  raise notice 'view  ANTES : %', v_antes;
-  raise notice 'view  DEPOIS: %', v_depois;
-  raise notice 'func  ANTES : %', f_antes;
-  raise notice 'func  DEPOIS: %', f_depois;
+  raise notice 'view ANTES : %', v_antes;
+  raise notice 'view DEPOIS: %', v_depois;
 
-  if v_depois like '%anon=%' then
-    raise exception '098 não pegou: view nova ainda concede a anon (%)', v_depois;
+  if has_table_privilege('anon','public._prova_098_depois','SELECT') then
+    raise exception '098 não pegou: view nova ainda é legível por anon (%)', v_depois;
   end if;
-  if v_depois like '%authenticated=a%' or v_depois like '%authenticated=%w%' then
+  if has_table_privilege('authenticated','public._prova_098_depois','INSERT')
+     or has_table_privilege('authenticated','public._prova_098_depois','UPDATE')
+     or has_table_privilege('authenticated','public._prova_098_depois','DELETE') then
     raise exception '098 não pegou: view nova ainda dá escrita a authenticated (%)', v_depois;
   end if;
-  if f_depois like '%anon=%' then
-    raise exception '098 não pegou: função nova ainda é executável por anon (%)', f_depois;
+  if has_function_privilege('anon','public._prova_098_depois_fn()','EXECUTE') then
+    raise exception '098 não pegou: função nova ainda é executável por anon';
   end if;
-  if v_antes = v_depois then
-    raise exception '098 sem efeito: ACL igual antes e depois (%). Papel ou schema errado.', v_antes;
+
+  -- Controle POSITIVO: o que devia continuar, continuou.
+  if not has_table_privilege('authenticated','public._prova_098_depois','SELECT') then
+    raise exception '098 foi longe demais: authenticated perdeu SELECT em view nova (%)', v_depois;
+  end if;
+  if not has_function_privilege('authenticated','public._prova_098_depois_fn()','EXECUTE') then
+    raise exception '098 foi longe demais: authenticated perdeu EXECUTE em função nova';
+  end if;
+
+  -- E o contraste: se antes e depois nascem iguais, o ALTER não surtiu efeito.
+  if has_table_privilege('anon','public._prova_098_antes','SELECT')
+     = has_table_privilege('anon','public._prova_098_depois','SELECT') then
+    raise exception '098 sem efeito: objeto novo nasce igual ao de antes. Papel ou schema errado.';
   end if;
 end $$;
 
