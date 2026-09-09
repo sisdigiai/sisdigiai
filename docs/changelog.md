@@ -23,6 +23,17 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Corrigido (2026-09-09 — Blogs também sai do literal: zero anon key embutida em `espelhoMotores.ts`)
+- `VITE_BLOGS_SUPABASE_URL` e `VITE_BLOGS_SUPABASE_ANON_KEY` criadas no Pages (production + preview), **e só depois** os literais saíram do código — a mesma ordem das outras quatro.
+- **Controle local:** com um `.env` que não tem nenhuma das seis variáveis, o build agora sai **sem as três chaves** (Limelight, Pulso e Blogs = `grep` 0). Antes deste passe, Blogs ainda dava 1.
+- Fecha a dívida das anon keys embutidas neste arquivo — item que a auditoria de 06/09 marcou e que eu tinha subido de 🟡 para laranja.
+
+### Pendente de verificação (2026-09-09 — o deploy da remoção ainda não subiu)
+- ⚠ **Medido e registrado como pendente, não como feito:** o bundle vivo ainda é `index-DTY3809e.js`, **o mesmo de antes** do push. O marcador do commit novo (`espelho desligado`) **não está** no bundle publicado.
+- **A armadilha que isso quase criou:** as três chaves aparecem no bundle vivo. Se eu olhasse só isso, concluiria *"variáveis injetadas, prova feita"* — e estaria lendo os **literais antigos**, não o painel. **Quem distingue é o marcador do commit**, não a presença da chave.
+- Hash igual depois de push que **toca o front** é fila até ~5 min e suspeita a partir de ~15. Sem re-disparar: o padrão de falha silenciosa é o hash **permanecer**, não aparecer tarde.
+- **Prova de produção pendente:** com o bundle novo, `espelho desligado` presente **e** as três chaves presentes = variáveis injetadas pelo painel. Mais os espelhos respondendo na tela.
+
 ### Corrigido (2026-09-09 — anon keys saem do código; espelho sem variável agora desliga e avisa)
 - **Portão 46 feito pelo dono/orquestrador (00:23):** `VITE_LIMELIGHT_*` e `VITE_PULSO_*` definidas no Pages `digiai-app` (production + preview). **Só então** removi os literais de reserva de `src/lib/espelhoMotores.ts` — painel primeiro, código depois.
 - **Por que essa ordem:** em 08/09 o bundle publicado provou que as variáveis **não existiam em lugar nenhum**; o `|| 'eyJ...'` **não era reserva, era a única fonte**. Remover antes teria cegado os espelhos de Limelight e Pulso em produção **sem erro de tela**.

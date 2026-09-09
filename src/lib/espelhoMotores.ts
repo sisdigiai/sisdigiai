@@ -18,10 +18,7 @@ const LIMELIGHT_URL = import.meta.env.VITE_LIMELIGHT_SUPABASE_URL;
 const LIMELIGHT_ANON = import.meta.env.VITE_LIMELIGHT_SUPABASE_ANON_KEY;
 const PULSO_URL = import.meta.env.VITE_PULSO_SUPABASE_URL;
 const PULSO_ANON = import.meta.env.VITE_PULSO_SUPABASE_ANON_KEY;
-// ⚠ Blogs continua com literal: VITE_BLOGS_* ainda não existe no Pages. Tirar
-// daqui antes de a variável existir apagaria o espelho dos Blogs. Ordem: painel
-// primeiro, código depois — a mesma que o resto deste bloco acabou de seguir.
-const BLOGS_URL = 'https://zgojkioieztikqhwcoae.supabase.co';
+const BLOGS_URL = import.meta.env.VITE_BLOGS_SUPABASE_URL;
 
 export interface EspelhoLimelight {
   episodios: number;
@@ -125,7 +122,7 @@ async function lerEspelho<T>(base: string | undefined, anon: string | undefined,
   }
 }
 
-const BLOGS_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpnb2praW9pZXp0aWtxaHdjb2FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNzk0NjYsImV4cCI6MjEwMjc1NTQ2Nn0.yV530Q6ZBTeGdega3rphtJFNKgShu1fR_ZV9mMZFHzY';
+const BLOGS_ANON = import.meta.env.VITE_BLOGS_SUPABASE_ANON_KEY;
 
 // 2026-09-08: v_espelho_pulso (agregado COM custo/receita do Pulso) deixou de ser lida com a
 // anon key do Pulso — era legível por qualquer portador da chave do bundle. Agora vem pela edge
