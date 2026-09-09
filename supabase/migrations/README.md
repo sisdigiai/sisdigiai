@@ -39,4 +39,4 @@ isso nunca precise ser conferido de novo.
    `grant select on … to authenticated;` + `comment on … is 'Consumidor: … Grant: … porque …'`.
    Grant a `anon` só como exceção documentada, com o motivo no comment.
 
-Próximo número livre em 09/09/2026: **100** — aplicadas hoje: 093, 095, 097. **Escritas e NÃO aplicadas:** 096 (`ops.motivos_perda`, recusa sem semente), 098 (default privileges do `public` — portão 66), 099 (`company.*` por RPC — portão 64, **exige mudança de front no mesmo passe e conferência das colunas**). 094 é do MKT.
+Próximo número livre em 09/09/2026: **101** — aplicadas hoje: 093, 095, 097. **Escritas e NÃO aplicadas:** 096 (motivos de perda, recusa sem semente), 098 (default privileges — portão 66), 099 (`company.*` por RPC — exige front no mesmo passe e conferência de colunas), 100 (patch parcial do lead + contexto de máquina — portões 68/69). 094 é do MKT.
