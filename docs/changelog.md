@@ -23,6 +23,20 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 
 ## [Não lançado]
 
+### Corrigido (2026-09-09 — 097: a 095 nasceu com escrita para `anon`, e a causa não é minha distração)
+- **Achado do Orquestrador Geral:** `v_telao_afericao` era a **única view do banco com INSERT/UPDATE/DELETE para `anon`**. Aplicada por mim hoje.
+- **A minha falha:** a 095 terminava com `revoke all … from public`. Isso mira o **papel `PUBLIC`**, que não tinha nada. Quem tinha era `anon` e `authenticated`. **É o mesmo erro que eu diagnostiquei em outros duas vezes hoje** — confundir o papel `PUBLIC` com os concessionários reais.
+- **A causa, medida em `pg_default_acl`:** o schema `public` tem default privileges concedendo **`arwdDxtm` a `anon` e `authenticated`** em toda tabela/view nova. **A view nasceu aberta.** As 135 views com escrita não foram concedidas uma a uma — foram **geradas**. Enquanto o default estiver assim, a próxima view nasce aberta também: consertar as 12 atualizáveis trata sintoma.
+- **097 aplicada:** revoke explícito de `anon, authenticated, public`; `SELECT` mantido. Provado: `anon` INSERT/UPDATE/DELETE = **false**, SELECT = **true**, e a leitura anon segue devolvendo **7 linhas**.
+
+### Medido (2026-09-09 — portão 64: a varredura simples mentiu, e a proposta de classe quebraria duas telas)
+- A proposta era revogar escrita em **todas** as views, partindo de que nenhum front escreve por view. Meu primeiro `grep` de uma linha confirmou: **"nenhum"**. Refiz com janela multilinha (o encadeamento do Supabase quebra linha) e apareceram **seis**.
+- **Dois são dependências VIVAS e quebrariam:** `companyStore.ts` escreve em `v_company_identity` e `v_company_legal_status`; as tabelas-base dão UPDATE a `authenticated`, então **funcionam hoje**. Revogar sem mais nada derrubaria **Cadastro Empresa**.
+- **Dois já estão MORTOS e ninguém sabia:** `copyStore.ts` → `v_copy_assets` e (no MKT) `Oticas.tsx` → `v_commercial_leads`. As tabelas-base **negam** UPDATE a `authenticated`, então esses saves **já falham hoje**.
+- ⚠ **E o `copyStore` mente para a tela:** o erro é registrado (`console.warn`), mas `syncToRemote()` **devolve o workspace como se tivesse sincronizado**. Quem usa vê "sincronizado" e o servidor não recebeu nada. Os textos não se perdem — ficam no `localStorage` —, mas o espelho remoto nunca foi escrito.
+- **Correção de uma afirmação minha:** eu disse primeiro que o upsert "nem verifica o erro". Verifica — eu tinha lido um trecho cortado. O defeito é o retorno otimista, não a ausência de checagem.
+- **Conclusão para o portão 64:** o conserto tem de ser **view a view com teste de consumidor**, e o conserto de raiz é o `ALTER DEFAULT PRIVILEGES` — sem ele, a torneira continua aberta.
+
 ### Corrigido (2026-09-09 — `mp-sync` adotada do deploy E consertada no mesmo passe, v13)
 - **O estado que encontrei:** função **em produção (v12, ACTIVE) sem fonte em repositório nenhum** — ninguém podia revisar nem reconstruir. Corpo recuperado pela Management API (`/functions/mp-sync/body`) e versionado em `supabase/functions/mp-sync/index.ts`. O original intacto ficou ao lado, em `_original_deploy_v12.ts`, para o diff mostrar que a **única** diferença é a trava.
 - **O furo:** ela escreve em `billing` com **service_role** (via `billing_ingest_mp_event`) e o único portão era `verify_jwt = true` — que prova **sessão**, não **papel**. Qualquer conta autenticada disparava a ingestão, **furando a trava que a 092 pôs em billing no dia anterior**.
