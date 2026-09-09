@@ -32,4 +32,4 @@ isso nunca precise ser conferido de novo.
    rascunho e o teu apply, renumera o TEU (ainda não aplicado) — nunca o dele.
 4. Duas sessões no mesmo repo na mesma rodada = um executor por repo (lição 05/09).
 
-Próximo número livre em 09/09/2026: **095** — 093 = leads (consentimento R-013, papel `vendas` sem alargar `is_staff()`, `next_touch_at` no lead), **escrita e NÃO aplicada**, aguarda o dono; 094 reservada para a reescrita de `marketing.v_whatsapp_followups_hoje`, que é do agente do MKT.
+Próximo número livre em 09/09/2026: **096** — 093 (leads: consentimento R-013, papel `vendas` sem alargar `is_staff()`, `next_touch_at` + backfill) e 095 (`v_telao_afericao`) estão **escritas e NÃO aplicadas**, aguardando o dono; 094 é do agente do MKT (schema `marketing`).
