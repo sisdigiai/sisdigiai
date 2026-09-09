@@ -8,3 +8,11 @@ project_id = "hswyopqvnolqpmprqvzh"
 
 [functions.espelho-pulso]
 verify_jwt = true
+
+# Rota para o Limelight: a autorização é o segredo próprio
+# (CONTENT_RULES_LIMELIGHT_SECRET, comparado por SHA-256 em tempo constante),
+# não uma sessão. `false` DECLARADO, nunca por omissão — se ficasse true, o
+# Limelight precisaria de um JWT do nosso projeto, que é exatamente o
+# acoplamento que esta rota existe para desfazer.
+[functions.espelho-content-rules]
+verify_jwt = false
