@@ -13,17 +13,19 @@ Fonte conferida por mim em 09/09/2026: `Cockpit/forum/02-piloto-pago-clearix.md`
 
 | termo | procedência |
 |---|---|
-| **R$ 899** | **fato** — é o plano do meio em `clearix.app.br/planos` (R$ 349 / 899 / 1.499 **por mês**) |
+| **R$ 349** | **emenda 09/09** (plano de operação do fórum). Antes era R$ 899; os dois são preços reais da tabela pública (R$ 349 / 899 / 1.499 **por mês**) — mudou a faixa escolhida, não o preço |
 | "antecipado" | **decisão do fórum**, 2 votos a 1 |
-| teto de **5 h/semana** | **decisão do fórum** (é o custo declarado: horas do dono, R$ 0 de infra nova) |
+| teto de **2 h/semana** | **emenda 09/09** (antes 5 h). Custo declarado: horas do dono, R$ 0 de infra nova |
+| entrada por faixa | **provisório até o tema 07** (custo de servir) — pode mudar |
 | isolamento antes de dado | **decisão do fórum**, e é condição de parada — ver "Se falhar" |
 | **fiscal fora** | **trava D4**, escrita em `o-que-pode-prometer-2026-09-02.md` |
 
-⚠ **UMA AMBIGUIDADE QUE PRECISA SER RESOLVIDA ANTES DE ISTO IR A UM CLIENTE:**
-R$ 899 é o preço **mensal** do plano do meio. O documento diz "R$ 899 antecipado".
-**Não está escrito se o piloto é um mês pago adiantado, ou um valor fechado pelo
+⚠ **A AMBIGUIDADE CONTINUA, e a emenda não a resolveu — só trocou o número:**
+R$ 349 é preço **mensal** na tabela pública. O documento diz "R$ 349 antecipado".
+**Continua sem dizer se o piloto é um mês pago adiantado, um valor fechado pelo
 piloto inteiro, ou o que acontece no mês 2.** Com o primeiro cliente, essa frase
-é a que vira discussão. O dono decide a redação; eu não escolho por ele.
+é a que vira discussão — e a discussão vem depois de ele já ter pago. O dono
+decide a redação; eu não escolho por ele.
 
 ⚠ E o próprio fórum deixou **uma pergunta em aberto ao dono**, que muda a forma de
 cobrar: **quantos dias levou, na prática, a importação da Mello?** É o único dado
@@ -75,17 +77,28 @@ lados: o cliente, de ver dado de outra loja; e nós, de descobrir depois.
 
 ## Assistência
 
-Até **5 horas por semana** de acompanhamento — na tela, junto com quem vai usar.
+Até **2 horas por semana** de acompanhamento — na tela, junto com quem vai usar.
 Fora disso, a rotina é do cliente; se ele precisar de mais, conversa-se.
+
+⚠ **Emenda de 09/09: era 5 h, passou a 2 h.** Vale reparar no que isso significa
+junto com a outra emenda: o preço caiu 61% (899 → 349) e a assistência caiu 60%
+(5 h → 2 h). A relação preço/hora ficou quase igual — a mudança foi de PORTE do
+compromisso, não de margem. É o argumento de defesa se um prospect perguntar
+por que o acompanhamento encolheu.
 
 ## Investimento
 
-**R$ 899, antecipado.** É o plano do meio da tabela pública, que é mensal.
+**R$ 349, antecipado.** É a faixa de entrada da tabela pública, que é mensal.
 
 ⚠ **Antes de usar numa conversa, o dono precisa fechar a redação:** um mês
 adiantado? valor fechado pelo piloto todo? o que acontece no mês 2? A tabela diz
 "por mês"; o documento diz "antecipado"; entre as duas há uma pergunta que o
 cliente vai fazer.
+
+⚠ E a entrada por faixa é **provisória até o tema 07** decidir o custo de servir.
+Medi o que dá para medir hoje e mandei os números — o resumo é que **um tenant
+não pesa neste banco**: o Clearix vive noutro projeto, e aqui o que cresce é log
+de máquina e material de marketing, não cliente.
 
 ## O que prova que deu certo — em 30 dias
 
@@ -93,7 +106,7 @@ Da decisão do fórum, e nesta ordem de peso:
 
 1. contrato de uma página assinado;
 2. **teste de isolamento registrado, sem vazamento nos dois sentidos**;
-3. R$ 899 pagos;
+3. R$ 349 pagos;
 4. importação delimitada, conferida **por contagem**;
 5. e a prova que decide: **5 dias corridos de balcão operando sem voltar ao
    sistema antigo**.
