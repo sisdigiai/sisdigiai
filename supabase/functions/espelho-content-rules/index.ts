@@ -9,14 +9,36 @@
 // ninguém olhava esse caminho. Contrato entre projetos por anon key é contrato
 // público; passa a ser por rota com segredo próprio.
 //
-// ESCOPO: uma view, uma marca por chamada. Medido no consumidor — a `gerar-roteiro`
-// lê SÓ `v_espelho_content_rules`, filtrada por `brand_code`.
+// ESCOPO: uma view, e só as marcas que o segredo pode ler (CONTENT_RULES_LIMELIGHT_BRANDS).
+// Medido no consumidor — a `gerar-roteiro` lê SÓ `v_espelho_content_rules`, por `brand_code`.
+//
+// CONTRATO DE RESPOSTA, para não haver dúvida do outro lado:
+//   200  marca no escopo e encontrada — persona/tom/publico/… preenchidos
+//   400  sem `brand_code`
+//   401  segredo ausente ou errado
+//   403  marca existe no pedido mas está FORA do escopo deste segredo
+//   404  marca dentro do escopo e NÃO ENCONTRADA na fonte
+//   405  método diferente de GET
+//   503  segredo/escopo/credencial não configurados, ou falha ao ler
+// NUNCA `200 []` nem `200 {persona:null}`: o fail-closed do consumidor depende de
+// distinguir "não tenho as travas" de "as travas estão vazias".
 // ============================================================================
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const SEGREDO = Deno.env.get('CONTENT_RULES_LIMELIGHT_SECRET') ?? '';
+
+// ESCOPO DO SEGREDO — v2 (09/09/2026). Na v1 `brand_code` era PARÂMETRO, não
+// escopo: um segredo lia o catálogo inteiro. Eu tinha escrito no comentário que
+// "a campainha vazada não abre o catálogo inteiro" e NÃO implementei isso — a
+// justificativa afirmava uma propriedade que o código não tinha. Achado do
+// agente do Limelight ao rever a v1.
+// Lista VAZIA ou ausente = NENHUMA marca (503, ver abaixo). Configuração que
+// falta não pode significar "libera tudo": é o mesmo fail-open que passámos a
+// semana a fechar.
+const MARCAS_PERMITIDAS = (Deno.env.get('CONTENT_RULES_LIMELIGHT_BRANDS') ?? '')
+  .split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
 
 // Allowlist do `universo`. ESPELHA a do consumidor (`UNIVERSO_PERMITIDO` em
 // gerar-roteiro), e é por isso que a resposta declara o que omitiu — ver §OMITIDO.
@@ -52,6 +74,7 @@ Deno.serve(async (req) => {
   // acaso — e no dia em que a causa mudasse, ele geraria roteiro sem voz de
   // marca sem erro visível. Erro tem de parecer erro.
   if (!SEGREDO) return json({ erro: 'sem_segredo_configurado' }, 503);
+  if (MARCAS_PERMITIDAS.length === 0) return json({ erro: 'sem_escopo_configurado' }, 503);
   if (!SUPABASE_URL || !SERVICE_ROLE) return json({ erro: 'sem_credencial' }, 503);
 
   const recebido = req.headers.get('x-espelho-secret') ?? '';
@@ -61,6 +84,11 @@ Deno.serve(async (req) => {
   // Segredo não é a única defesa — sem brand_code não há resposta.
   const code = new URL(req.url).searchParams.get('brand_code')?.trim();
   if (!code) return json({ erro: 'brand_code_obrigatorio' }, 400);
+  // 403 e não 404: dizer "não existe" para uma marca que existe mas está fora do
+  // escopo transformaria a rota num detector de marcas. Fora do escopo é recusa.
+  if (!MARCAS_PERMITIDAS.includes(code.toLowerCase())) {
+    return json({ erro: 'marca_fora_do_escopo_deste_segredo', brand_code: code }, 403);
+  }
 
   try {
     const cli = createClient(SUPABASE_URL, SERVICE_ROLE);
