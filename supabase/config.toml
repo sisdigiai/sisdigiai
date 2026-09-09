@@ -16,3 +16,10 @@ verify_jwt = true
 # acoplamento que esta rota existe para desfazer.
 [functions.espelho-content-rules]
 verify_jwt = false
+
+# Rota para o GJ puxar a ordem do dia: autorização é o segredo próprio
+# (ROADMAP_GJ_SECRET), não sessão. `false` DECLARADO — se ficasse true, o cron do
+# GJ precisaria de um JWT do nosso projeto, que é o acoplamento que a rota desfaz.
+# Substitui a push-ordem-gj, que sai depois do pull provado (portão 54).
+[functions.roadmap-gj]
+verify_jwt = false
