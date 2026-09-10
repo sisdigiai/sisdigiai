@@ -1,6 +1,14 @@
 -- 121 — a frase do fato osi_oferta passa a ser a do dono do texto (steward da OSI)
 --
--- ⚠ NÃO APLICADA. Portão 97. Frase canônica do steward da OSI, dono do texto da
+-- ✔ APLICADA em 10/09/2026 pelo Orquestrador Geral, sob o portão 97. Reconferido por
+--   mim com a trava final deste arquivo: a frase do steward byte a byte, o preço escrito
+--   na frase igual a valor_numerico, fresco e público, 0 fatos com preço velho.
+--   "Só o texto mudou" conferido contra o estado que a 118 deixou (valor 49.00,
+--   verificado_em 2026-09-10, fonte "Repete academy.products..."), e não pela tabela
+--   temporária da trava: depois de aplicada, ela nasceria do estado novo e compararia
+--   o fato consigo mesmo.
+--
+-- (Escrita como NÃO APLICADA.) Portão 97. Frase canônica do steward da OSI, dono do texto da
 --    promessa, repassada pelo Orquestrador Geral em 10/09/2026. Aplica quem tem o
 --    mandato do portão 97. (O pedido chamou-lhe "119"; a 119 e a 120 já estavam
 --    tomadas — nota da Hotmart/funil e drop da agenda de follow-up.)
