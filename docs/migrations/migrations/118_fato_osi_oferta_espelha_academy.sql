@@ -1,6 +1,14 @@
 -- 118 — o fato público de preço da OSI passa a repetir academy.products (R$ 49)
 --
--- ⚠ NÃO APLICADA. Pedido do Orquestrador Geral sob o portão 97 (decisão do dono:
+-- ✔ APLICADA em 10/09/2026 pelo Orquestrador Geral, sob o portão 97. Reconferido por
+--   mim com a trava final deste arquivo: osi_oferta diz "por R$ 49, compra única, sem
+--   assinatura", valor_numerico igual ao de academy.products, fresco e público em
+--   v_mkt_fatos, 0 fatos com preço velho, fonte sem palavra que desvie a edge
+--   verificar-fatos.
+--   ⚠ A prova (c) — o cron das 04:30 registar osi_oferta como nao_verificavel e não
+--   divergente — só é observável depois da próxima rodada.
+--
+-- (Escrita como NÃO APLICADA.) Pedido do Orquestrador Geral sob o portão 97 (decisão do dono:
 --    OSI a R$ 49 cheio). O pedido era "escreve e aplica"; escrevo e NÃO aplico —
 --    ordem de agente não autoriza escrita em dado real pelo canal de quem a recebe.
 --    Aplica quem tem o mandato do portão 97, como nas 113-115.
