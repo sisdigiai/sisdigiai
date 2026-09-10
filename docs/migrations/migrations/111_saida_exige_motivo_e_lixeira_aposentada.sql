@@ -1,7 +1,15 @@
 -- 111 — sair da base passa a exigir motivo, e a lixeira antiga se aposenta
 --
--- ⚠ NÃO APLICADA. Faz parte do passe do front (consumidor `v_motivos_saida` +
---    descarte pela tela). Tabela minha (096) — R-032.
+-- ✔ APLICADA em 10/09/2026 pelo Orquestrador Geral, DEPOIS de o front b3437a0
+--   estar no ar (meta build 18:36:57, e fn_delete_commercial_lead com 0 ocorrências
+--   no bundle publicado). Provas: (a) lixeira antiga → 0A000 apontando
+--   fn_descartar_lead; (b) deleted_at sem motivo → 23514; (c) não-regressão —
+--   fn_descartar_lead continua a gravar, numa transação desfeita. Reconferido por mim
+--   depois: CHECK presente e VALIDADA (convalidated), lixeira aposentada,
+--   authenticated executa fn_descartar_lead, 260 leads / 1 saída / 0 sem motivo.
+--   Falta a (d), com sessão do dono na tela.
+--   Faz parte do passe do front (consumidor `v_motivos_saida` + descarte pela
+--   tela). Tabela minha (096) — R-032.
 --
 -- ⚠ ORDEM DE APLICAÇÃO: **DEPOIS** de o front novo do digiai estar no ar.
 --    O front que está em produção quando esta migration foi escrita ainda chama
