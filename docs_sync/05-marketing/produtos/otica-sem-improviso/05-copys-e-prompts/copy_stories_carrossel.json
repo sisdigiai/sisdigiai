@@ -60,9 +60,9 @@
         {
           "slide": 7,
           "tipo": "cta",
-          "texto_principal": "Manual visual + App\nResultados em 72 horas",
+          "texto_principal": "Manual visual + App\nAplicação em 3 dias",
           "texto_secundario": "Link na bio",
-          "preco": "R$ 48,50"
+          "selo": "PDF + App + 90 dias de apoio no Nexus"
         }
       ]
     },
@@ -122,7 +122,7 @@
         {
           "slide": 9,
           "tipo": "cta",
-          "texto_principal": "Isso tem solução.\nOs 5 Movimentos. Resultados em 72h.",
+          "texto_principal": "Isso tem solução.\nOs 5 Movimentos. Aplicação em 3 dias.",
           "texto_secundario": "Link na bio"
         }
       ]
@@ -135,7 +135,7 @@
         {
           "slide": 1,
           "tipo": "capa",
-          "texto_principal": "Plano de 72 horas para sair do improviso",
+          "texto_principal": "Plano de 3 dias para sair do improviso",
           "texto_secundario": "Aplicação real. Sem teoria longa."
         },
         {
@@ -177,7 +177,7 @@
         {
           "slide": 5,
           "tipo": "cta",
-          "texto_principal": "Em 72h você sai do improviso.\nR$ 48,50 — Manual + App + Nexus",
+          "texto_principal": "Aplicação em 3 dias.\nPDF + App + 90 dias de apoio no Nexus",
           "texto_secundario": "Link na bio"
         }
       ]
@@ -204,12 +204,12 @@
         },
         {
           "story": 4,
-          "texto": "Existe um manual visual com 5 Movimentos que você aplica em 72 horas.\n\nSem curso longo. Sem plataforma.",
+          "texto": "Existe um manual visual com 5 Movimentos que você aplica em 3 dias.\n\nSem curso longo. Sem plataforma.",
           "interacao": "Enquete: 'Quer saber mais? Sim / Depois'"
         },
         {
           "story": 5,
-          "texto": "Ótica Sem Improviso\nManual + App + 90 dias de apoio\nR$ 48,50",
+          "texto": "Ótica Sem Improviso\nPDF + App + 90 dias de apoio no Nexus\nGarantia de 7 dias",
           "cta": "Link para LP",
           "sticker": "Link"
         }
@@ -235,7 +235,7 @@
         },
         {
           "story": 4,
-          "texto": "Os 5 Movimentos.\nR$ 48,50.\nLink aqui embaixo.",
+          "texto": "Os 5 Movimentos.\nAplicação em 3 dias.\nLink aqui embaixo.",
           "cta": "Link para LP",
           "sticker": "Link"
         }

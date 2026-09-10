@@ -1,6 +1,6 @@
 ---
 title: Narrativa — Clearix Calc como isca do funil OSI → Clearix
-last_updated: 2026-06-17
+last_updated: 2026-09-10
 status: ativo
 topic_key: marketing.osi.narrativa_brinde_calc
 source_kind: estrategia
@@ -22,7 +22,7 @@ superseded_by: null
 > resolve a rotina inteira da ótica.**
 
 Três camadas de valor, fricção crescente, preço crescente — e cada uma entrega de verdade antes de
-pedir a próxima. A calc é grátis e imediata; o OSI é low-ticket e aplica em 72h; o Clearix é o
+pedir a próxima. A calc é grátis e imediata; o OSI é low-ticket e aplica em 3 dias; o Clearix é o
 ecossistema B2B. **Distribuição > produto:** a calc espalha a marca pelo uso diário; o desejo nasce
 do uso, não do anúncio.
 
@@ -31,7 +31,7 @@ do uso, não do anúncio.
 ```
 USO GRÁTIS              →   DESEJO                →   VENDA OSI            →   ASCENSÃO CLEARIX
 Clearix Calc no balcão      "isso aqui é bom.          Os 5 Movimentos          "se a ferramenta
-todo dia (offline, sem      será que o resto é         (R$ 48,50): a conversa   simples já é assim,
+todo dia (offline, sem      será que o resto é         (3 dias): a conversa     simples já é assim,
 login). Sente a             tão bom assim?"            que faz vender.          imagina a rotina toda."
 qualidade Clearix sem
 ainda ter Clearix.

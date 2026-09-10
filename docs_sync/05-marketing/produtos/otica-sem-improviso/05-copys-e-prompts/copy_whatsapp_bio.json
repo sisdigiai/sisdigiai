@@ -6,9 +6,9 @@
     "data": "2026-04-30"
   },
   "bio_instagram": {
-    "opcao_1": "Manual visual para quem atende em ótica.\nOs 5 Movimentos. Resultados em 72h.\nPDF + App + 90 dias de apoio.\n↓ Acesse o método",
-    "opcao_2": "Pare de atender no improviso na ótica.\n5 Movimentos. 3 Dias. Sem curso longo.\nManual + App por R$ 48,50.\n↓ Link abaixo",
-    "opcao_3": "Atendimento de ótica sem improviso.\nMétodo visual em 5 Movimentos.\nAplicação em 72 horas.\n↓ Saiba mais"
+    "opcao_1": "Manual visual para quem atende em ótica.\nOs 5 Movimentos. Aplicação em 3 dias.\nPDF + App + 90 dias de apoio no Nexus.\n↓ Acesse o método",
+    "opcao_2": "Pare de atender no improviso na ótica.\n5 Movimentos. 3 Dias. Sem curso longo.\nPDF + App + 90 dias de apoio no Nexus.\n↓ Link abaixo",
+    "opcao_3": "Atendimento de ótica sem improviso.\nMétodo visual em 5 Movimentos.\nAplicação em 3 dias.\n↓ Saiba mais"
   },
   "whatsapp_broadcast": [
     {
@@ -18,18 +18,18 @@
     },
     {
       "id": "msg_lancamento_2",
-      "contexto": "Destaque de oferta",
-      "mensagem": "Só passando pra avisar:\n\nO Ótica Sem Improviso tá com 50% off de lançamento.\n\nManual completo + App + 90 dias de apoio por R$ 48,50.\n\nCompra única, sem assinatura.\n\n[LINK]\n\nSe já viu e ficou com dúvida, pode mandar aqui."
+      "contexto": "Destaque do que a pessoa recebe (sem preço)",
+      "mensagem": "Só passando pra lembrar:\n\nO Ótica Sem Improviso é PDF + App leitor + 90 dias de apoio no Nexus.\n\nAplicação em 3 dias. Compra única, sem assinatura. Garantia de 7 dias.\n\n[LINK]\n\nSe já viu e ficou com dúvida, pode mandar aqui."
     },
     {
       "id": "msg_prova_social",
-      "contexto": "Após depoimento recebido",
-      "mensagem": "Uma vendedora que usa o método me mandou isso:\n\n\"Antes eu ficava insegura na hora de indicar lente. Depois do manual, passei a fazer as perguntas certas e o cliente percebe que eu sei o que estou fazendo.\"\n\nSe você também quer mais segurança no balcão: [LINK]"
+      "contexto": "SUSPENSA até existir depoimento real: só usar com pessoa real, com nome e autorização (promessa-padrao-osi.md § 10). O texto fictício foi retirado em 2026-09-10.",
+      "mensagem": "[Nome real, com autorização] me mandou isso:\n\n\"[depoimento real, sem editar]\"\n\nSe você também quer mais segurança no balcão: [LINK]"
     },
     {
       "id": "msg_lembrete_final",
-      "contexto": "Último lembrete antes de encerrar oferta",
-      "mensagem": "Oi! Último aviso sobre o Ótica Sem Improviso.\n\nSe faz sentido pra você ter um método de atendimento que funciona em 72 horas — sem depender de improviso ou desconto cedo demais — o link tá aqui: [LINK]\n\nR$ 48,50. Compra única.\n\nSe não fizer sentido, sem problema. Só quis garantir que você soubesse."
+      "contexto": "Último lembrete da sequência (sem prazo de oferta)",
+      "mensagem": "Oi! Último aviso sobre o Ótica Sem Improviso.\n\nSe faz sentido pra você ter um método de atendimento que você aplica em 3 dias — sem depender de improviso ou desconto cedo demais — o link tá aqui: [LINK]\n\nCompra única. Garantia de 7 dias.\n\nSe não fizer sentido, sem problema. Só quis garantir que você soubesse."
     },
     {
       "id": "msg_brinde_calc_abertura",
@@ -39,7 +39,7 @@
     {
       "id": "msg_brinde_calc_followup",
       "contexto": "Brinde Clearix Calc — follow-up depois que a pessoa usou a calc, ponte pro OSI",
-      "mensagem": "E aí, conseguiu testar a calculadora?\n\nA de espessura por índice é minha favorita: ela desenha a lente, então você mostra pro cliente por que o índice alto vale — em vez de só falar.\n\nSó que o que faz o cliente fechar o índice alto é como você conduz a conversa. É isso que o Ótica Sem Improviso ensina — Os 5 Movimentos, aplica em 3 dias.\n\nSe quiser dar uma olhada: [LINK] (R$ 48,50, oferta de lançamento)"
+      "mensagem": "E aí, conseguiu testar a calculadora?\n\nA de espessura por índice é minha favorita: ela desenha a lente, então você mostra pro cliente por que o índice alto vale — em vez de só falar.\n\nSó que o que faz o cliente fechar o índice alto é como você conduz a conversa. É isso que o Ótica Sem Improviso ensina — Os 5 Movimentos, aplica em 3 dias.\n\nSe quiser dar uma olhada: [LINK]"
     }
   ],
   "whatsapp_status": [
@@ -53,11 +53,11 @@
     },
     {
       "id": "status_metodo",
-      "texto": "5 Movimentos pra atender sem improviso na ótica:\n\n1. Sair do Automático\n2. Ler o Cliente\n3. Indicar com Segurança\n4. Sustentar Valor\n5. WhatsApp que Converte\n\nManual visual. Resultados em 72h."
+      "texto": "5 Movimentos pra atender sem improviso na ótica:\n\n1. Sair do Automático\n2. Ler o Cliente\n3. Indicar com Segurança\n4. Sustentar Valor\n5. WhatsApp que Converte\n\nManual visual. Aplicação em 3 dias."
     },
     {
       "id": "status_oferta",
-      "texto": "Manual + App + 90 dias de apoio\nR$ 48,50 (50% off de lançamento)\n\nPra quem trabalha em ótica e quer parar de atender no improviso.\n\nMe chama ou acessa: [LINK]"
+      "texto": "PDF + App leitor + 90 dias de apoio no Nexus\nCompra única. Garantia de 7 dias.\n\nPra quem trabalha em ótica e quer parar de atender no improviso.\n\nMe chama ou acessa: [LINK]"
     }
   ]
 }

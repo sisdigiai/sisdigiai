@@ -1,6 +1,6 @@
 ---
 title: Funil OSI → Clearix — Mapa Mestre
-last_updated: 2026-05-20
+last_updated: 2026-09-10
 status: rascunho
 topic_key: marketing.osi.funil_master
 source_kind: consolidacao
@@ -14,11 +14,13 @@ superseded_by: null
 
 > **Status:** rascunho criado em 2026-05-20 a partir da reorientação estratégica "OSI = aquisição, Clearix = produto B2B real".
 
+> **Nota 2026-09-10 (preço):** o preço atual do OSI é **R$ 49, compra única** ([promessa-padrao-osi.md](D:/projetos/otica_sem_improviso/docs/divulgacao/promessa-padrao-osi.md)). Os R$ 97 e os tickets médios deste doc são do plano de 2026-05-20 (histórico): não valem como preço e não entram em copy.
+
 ---
 
 ## 0. Sumário executivo
 
-**Tese:** OSI (R$ 97) é isca paga vendida via marketplace Hotmart + Kiwify. **Marketing = espalhar o manual completo aberto** (leitor `oticasemimproviso.netlify.app`) pra viralizar — comprador compartilha com terceiros, gera SEO e autoridade. **Produto pago = camada Nexus de 90 dias** (Doug AI, workshops, gamificação) — só compradores entram, via token enviado pós-compra. É lá que o pitch Clearix B2B acontece de verdade. Meta: **3% dos alunos Academy viram clientes Clearix** (R$ 349–1.499/mês).
+**Tese:** OSI (R$ 49; R$ 97 no plano de 05/2026) é isca paga vendida via marketplace Hotmart + Kiwify. **Marketing = espalhar o manual completo aberto** (leitor `oticasemimproviso.netlify.app`) pra viralizar — comprador compartilha com terceiros, gera SEO e autoridade. **Produto pago = camada Nexus de 90 dias** (Doug AI, workshops, gamificação) — só compradores entram, via token enviado pós-compra. É lá que o pitch Clearix B2B acontece de verdade. Meta: **3% dos alunos Academy viram clientes Clearix** (R$ 349–1.499/mês).
 
 **Equação econômica alvo:**
 - CAC Clearix via Academy: R$ 500–1.500
@@ -70,7 +72,7 @@ OSI é a **primeira porta da Camada 1** — 7 outros guias virão na esteira (ve
 | `interesse_app_atendimento` | Quer ter o método na palma | Clearix Vendas |
 | `interesse_app_whatsapp` | Quer automatizar retomada | Clearix Marketing+Cliente |
 | `interesse_app_ia_objecoes` | Quer IA respondendo objeções | Clearix Vendas + AR Vision |
-| `comprador_low_ticket` | Validou que paga R$ 97 por método | (alvo Camada 1 contínua) |
+| `comprador_low_ticket` | Validou que paga por método (low-ticket) | (alvo Camada 1 contínua) |
 | `candidato_ecossistema_apps` | Sinalizou interesse em apps/automação | (alvo Camada 2 — demo Clearix) |
 
 Fonte: [plano-configuracao-funil-osi.md §12](../04-operacao-e-venda/plano-configuracao-funil-osi.md).
@@ -90,7 +92,7 @@ Fonte: [plano-configuracao-funil-osi.md §12](../04-operacao-e-venda/plano-confi
                       ↓
         [NURTURING pré-compra: email + WhatsApp 5–7 dias]
                       ↓
-        [CHECKOUT Hotmart OU Kiwify — R$ 97 + bumps + upsell]
+        [CHECKOUT Hotmart OU Kiwify — R$ 49 + bumps + upsell]
                       ↓
               [WEBHOOK gateway → backend]
                       ↓
@@ -129,11 +131,11 @@ Fonte: [plano-configuracao-funil-osi.md §12](../04-operacao-e-venda/plano-confi
 - **Hotmart**: `https://go.hotmart.com/B105515825L?dp=1` (produto OSI cadastrado).
 - **Kiwify**: a configurar (em paralelo).
 - **Estrutura da oferta:**
-  - Principal: Manual OSI + App R$ 97
+  - Principal: Manual OSI + App R$ 49 (R$ 97 no plano de 05/2026)
   - Bump 1: Kit Respostas WhatsApp R$ 27 (take rate alvo 25–40%)
   - Bump 2: Checklist 30 segundos R$ 19 (take rate alvo 20–35%)
   - Upsell 1-click: Treinamento OSI na Prática R$ 197 (conv. alvo 8–15%)
-- **Ticket médio esperado:** R$ 123 (conservador) — R$ 148 (agressivo).
+- **Ticket médio esperado:** R$ 123 (conservador) — R$ 148 (agressivo). *(Calculado sobre R$ 97, histórico; refazer com R$ 49.)*
 
 ### 3.5 Onboarding pós-compra (técnico — **load-bearing**)
 
@@ -154,7 +156,7 @@ A arquitetura de 3 camadas (leitor aberto + Nexus gateado) torna o stack token *
 ### 3.6 Ativação (consumo)
 - Conteúdo: manual PDF + app (Nexus) + IA Doug (simula cenários)
 - 6 módulos, 31 items, 23 lições + 8 workshops (banco Nexus já populado)
-- Trilha de aplicação 72h
+- Trilha de aplicação em 3 dias (inclui o "Plano de ação de 72 horas", tarefa do Movimento 5)
 - **Easter eggs Clearix** (12 pontos de contato — ver [plano-configuracao-funil-osi.md §11](../04-operacao-e-venda/plano-configuracao-funil-osi.md)):
   - "No manual você aprende a responder. No app completo, você treina e consulta em tempo real."
   - "Se hoje você faz essa retomada manualmente, imagine ter uma rotina que lembra, organiza e sugere a melhor mensagem."
@@ -255,7 +257,7 @@ Fonte: [07_gtm_estrategia.md §Calendário](../../clearix_eco_full/clearix_docs/
 **Verde = pronto. Amarelo = parcial. Vermelho = bloqueador.**
 
 ### Camada 1 — OSI Academy
-- 🟢 Produto OSI cadastrado em `content.products` (R$ 97, purchasable, checkout_url Hotmart)
+- 🟢 Produto OSI cadastrado em `content.products` (R$ 97 em 2026-05-20, conferir se já está R$ 49; purchasable, checkout_url Hotmart)
 - 🟢 Conteúdo OSI completo (6 módulos, 31 items, 23 lições, 8 workshops, Doug persona)
 - 🟢 Hub `/osi` + Paywall `/osi/continuar` no Nexus
 - 🟢 RPCs progresso/XP/moedas funcionais

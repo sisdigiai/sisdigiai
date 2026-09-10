@@ -1,6 +1,6 @@
 ---
 title: Fundamentos do Produto OSI — Os 5 Movimentos, esteira e objeções
-last_updated: 2026-06-17
+last_updated: 2026-09-10
 status: ativo — FONTE DE VERDADE DO PRODUTO
 topic_key: marketing.osi.fundamentos_produto
 source_kind: estrategia
@@ -14,6 +14,8 @@ superseded_by: null
 > limelight). Extraído do produto real — landing (`otica_sem_improviso/src`), FAQ, app leitor
 > (`app_oticasemimproviso`), sequências de e-mail. **Código/produto vence doc** (regra do workspace).
 > Se o `mkt.content_rules` divergir disto, corrigir a fonte lá — este doc reflete o que a Taty vende.
+
+> **Frases de venda** (promessa, pacote, preço, Taty, Nexus): a fonte é [`promessa-padrao-osi.md`](D:/projetos/otica_sem_improviso/docs/divulgacao/promessa-padrao-osi.md). Este doc é a fonte do *produto*; aquele, das *frases*.
 
 ---
 
@@ -62,7 +64,7 @@ WhatsApp" é uma **dor** que o **Movimento 5** resolve. Corrigir na fonte.
 
 ### Para a esteira de vídeo
 **5 temporadas = 5 Movimentos está CERTO** — é a espinha do produto. Uma temporada por Movimento, na
-ordem 1→5. Aplicação prometida: 72 horas / "os 5 movimentos, um por dia, 15 min cada".
+ordem 1→5. Aplicação prometida: 3 dias (landing e leitor); o "Plano de ação de 72 horas" é tarefa dentro do Movimento 5, não promessa de resultado.
 
 ---
 
@@ -102,8 +104,8 @@ o produto já responde (landing "não é pra quem", FAQ, e-mails de abandono):
 |---|---|---|---|
 | 1 | **"Meu problema é outro / isso é pra mim?"** (relevância) | antes de engajar | segmentar por dor; "feito pra quem vive o balcão todo dia" |
 | 2 | **"Já tentei script e não funcionou"** | ao entender que é método | **AUTORIDADE cedo** — Taty, 25 anos de balcão + diferencial: método visual, não "mais um script" |
-| 3 | **"Minha equipe não tem tempo de treinar"** | quando já acredita que funciona | implementação — 72h, 15 min/dia, aplica na próxima segunda |
-| 4 | **"Curso é caro"** | por último | **PREÇO no fim**, com valor já sustentado — R$ 48,50, menos que uma multifocal de entrada |
+| 3 | **"Minha equipe não tem tempo de treinar"** | quando já acredita que funciona | implementação — aplicação em 3 dias, 15 min/dia, aplica na próxima segunda |
+| 4 | **"Curso é caro"** | por último | **PREÇO no fim**, com valor já sustentado — a peça não diz o número (R$ 49 só na landing e no checkout); responde com compra única + garantia de 7 dias |
 
 > **Princípio:** preço cedo demais **queima**; autoridade tarde demais **chega atrasado**. As três
 > objeções travadas no content_rules encaixam em 2, 3 e 4 acima. **Canon desde 2026-06-17.**
@@ -122,7 +124,7 @@ existem como produto. Timing = decisão do dono; não assumir data.
 
 **#2 — Arco de 180 dias: autocontido ou ponte pro Vol2?**
 **Recomendação do steward (ancorada em canon):** arco **AUTOCONTIDO no método OSI**, com a **ascensão
-apontando pra Nexus/Clearix** — NÃO pro Vol2. Porque a tese canônica é: *o pago é o Nexus (90 dias,
+apontando pro Nexus/Clearix** — NÃO pro Vol2. Porque a tese canônica é: *o pago é o Nexus (90 dias,
 Doug AI), e é lá que o pitch Clearix acontece; meta = 3% dos alunos viram clientes Clearix; "Clearix
 vence"* (funil-master). O Vol2 é porta de aquisição paralela, não a ascensão. Desenhar ponte pro Vol2
 na temporada 5 (a) divide atenção da ascensão que dá dinheiro (Clearix), (b) mistura duas trilhas na

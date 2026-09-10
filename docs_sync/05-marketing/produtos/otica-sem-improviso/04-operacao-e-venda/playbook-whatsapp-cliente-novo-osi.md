@@ -1,6 +1,6 @@
 ---
 title: Playbook WhatsApp — Cliente Novo OSI (manual)
-last_updated: 2026-06-17
+last_updated: 2026-09-10
 status: ativo
 topic_key: marketing.osi.playbook_whatsapp_cliente_novo
 source_kind: operacao_e_venda
@@ -66,7 +66,7 @@ contato transacional. Sempre oferecer saída ("é só me avisar que paro de mand
 ```
 Oi, [Nome]! Aqui é da Ótica Sem Improviso 👓 Sua compra caiu certinho, seja bem-vindo(a)!
 
-Em alguns minutos chega no seu e-mail o acesso (PDF + app + Nexus). Se não aparecer, me chama aqui que eu resolvo.
+Em alguns minutos chega no seu e-mail o acesso (PDF + App leitor + 90 dias de apoio no Nexus). Se não aparecer, me chama aqui que eu resolvo.
 
 E já leva um brinde pra usar HOJE no balcão, de graça: a Clearix Calc — espessura por índice (com desenho da lente!), transposição, distância ao vértice, DNP. Sem cadastro, funciona offline: [LINK_CALC]
 ```
@@ -120,7 +120,7 @@ Me fala que eu destravo agora — não quero que você fique sem o que comprou. 
 ```
 Oi, [Nome]! Última vez que falo do método por aqui (prometo 🙂).
 
-Se fez sentido pra você ter um jeito de atender que funciona em 72h — sem improviso e sem desconto cedo demais — o Ótica Sem Improviso tá R$ 48,50 na oferta de lançamento: [LINK_OSI]
+Se fez sentido pra você ter um jeito de atender que você aplica em 3 dias — sem improviso e sem desconto cedo demais — o link do Ótica Sem Improviso tá aqui (tem garantia de 7 dias): [LINK_OSI]
 
 A calculadora continua sua de graça de qualquer jeito. Se não for a hora, sem problema — é só avisar que eu paro de mandar.
 ```

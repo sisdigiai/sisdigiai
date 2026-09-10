@@ -3,6 +3,8 @@
 Produto: Otica Sem Improviso  
 Objetivo: usar o low ticket como isca paga e primeira porta de entrada para o ecossistema de apps para oticas. A venda do ebook precisa buscar lucro ou break-even, mas a funcao estrategica principal e comprar atencao qualificada, educar o mercado e plantar a necessidade do produto principal.
 
+> **Nota 2026-09-10:** preco atual do produto principal: **R$ 49, compra unica**. Promessa e pacote seguem [promessa-padrao-osi.md](D:/projetos/otica_sem_improviso/docs/divulgacao/promessa-padrao-osi.md). As contas de ticket medio, CPA e ROAS abaixo foram feitas sobre R$ 97,00 (plano original, historico) e precisam ser refeitas.
+
 ## 0. Tese estrategica
 
 O OSI nao deve ser tratado como o produto final da empresa. Ele e o primeiro ativo de uma esteira de guias praticos para o varejo optico.
@@ -26,16 +28,16 @@ Por isso, o funil tem dois placares:
 ### Produto principal
 
 Nome comercial: Manual Otica Sem Improviso + App  
-Preco: R$ 97,00  
-Promessa central: sair do atendimento no improviso e conduzir vendas com mais clareza no balcao e no WhatsApp.
+Preco: R$ 49,00, compra unica (era R$ 97,00 no plano original)  
+Promessa central: "Em 3 dias, você reorganiza sua forma de atender, indicar e responder no WhatsApp."
 
 Entrega percebida:
 
-- Manual visual em PDF.
-- App de apoio para consulta rapida.
+- Manual em PDF para imprimir.
+- App leitor para estudar no celular.
 - Scripts e orientacoes por situacao real de atendimento.
 - Apoio pratico para objeções como caro, desconto, vou pensar e so quero orçamento.
-- Camada Nexus por 90 dias, quando aplicavel na comunicacao e entrega.
+- 90 dias de apoio complementar no Nexus.
 
 Mensagem de checkout:
 
@@ -96,7 +98,7 @@ Meta inicial de conversao: 8% a 15%.
 
 ## 2. Ordem recomendada na Kiwify
 
-1. Produto principal: R$ 97,00.
+1. Produto principal: R$ 49,00.
 2. Order bump 1: Kit WhatsApp por R$ 27,00.
 3. Order bump 2: Checklist 30 segundos por R$ 19,00.
 4. Upsell 1-click: Treinamento OSI na Pratica por R$ 197,00.
@@ -104,7 +106,7 @@ Meta inicial de conversao: 8% a 15%.
 
 ## 3. Precos e ticket medio esperado
 
-Ticket base: R$ 97,00.
+Ticket base: R$ 97,00 (historico; preco atual R$ 49,00, recalcular os cenarios).
 
 Cenario conservador:
 
@@ -134,7 +136,7 @@ Cenario agressivo:
 - Manter checkout direto.
 - Evitar excesso de explicacao depois do clique de compra.
 - Reforcar PDF + app no topo.
-- Usar garantia visivel, caso exista.
+- Usar garantia visivel: "Risco zero: garantia de 7 dias."
 - Usar imagem/mockup do produto, se disponivel.
 
 ### Elementos de decisao
@@ -214,7 +216,7 @@ Iterar criativo se:
 
 ## 7. Matematica de lucro
 
-Com ticket principal de R$ 97,00 e ROAS alvo 2,5:
+Com ticket principal de R$ 97,00 (historico; recalcular com R$ 49,00) e ROAS alvo 2,5:
 
 - CPA maximo pelo ticket base: R$ 38,80.
 - CPA maximo com ticket medio base de R$ 135,40: R$ 54,16.

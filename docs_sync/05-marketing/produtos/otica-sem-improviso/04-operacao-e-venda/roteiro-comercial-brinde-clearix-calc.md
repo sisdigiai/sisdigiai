@@ -1,6 +1,6 @@
 ---
 title: Roteiro Comercial — Brinde Clearix Calc como abertura de conversa
-last_updated: 2026-06-17
+last_updated: 2026-09-10
 status: ativo
 topic_key: marketing.osi.roteiro_brinde_calc
 source_kind: operacao_e_venda
@@ -12,7 +12,7 @@ superseded_by: null
 
 > **Para quem:** equipe comercial, afiliados e o time da Taty que conversa com dono(a) /
 > gestor(a) / vendedor(a) de ótica. **Objetivo:** usar o brinde grátis (Clearix Calc) como
-> abertura de conversa de baixíssima fricção → uso diário → desejo → venda do OSI (R$ 48,50) →
+> abertura de conversa de baixíssima fricção → uso diário → desejo → venda do OSI →
 > ascensão para o Clearix.
 
 > **Fio condutor (decore isto):** *a calculadora resolve o **cálculo**; o Ótica Sem Improviso
@@ -59,7 +59,7 @@ Abra **uma** calculadora com a pessoa — de preferência a de **espessura por �
 
 ### Passo 4 — Convidar pro OSI (sem empurrar)
 > "Quem criou a calc fez também um manual visual de atendimento — Os 5 Movimentos, você aplica em 3
-> dias. Custa menos que uma multifocal de entrada (R$ 48,50, oferta de lançamento). Te mando o link?
+> dias. E tem garantia de 7 dias. Te mando o link?
 > Mesmo que você não pegue agora, a calculadora é sua pra sempre."
 
 > **Se disser não / "depois":** "Tranquilo. Fica com a calculadora, usa à vontade. Quando quiser
@@ -110,7 +110,7 @@ pro cliente por que o índice alto vale — em vez de só falar.
 Só que o que faz o cliente fechar o índice alto é como você conduz a conversa.
 É isso que o Ótica Sem Improviso ensina — Os 5 Movimentos, aplica em 3 dias.
 
-Se quiser dar uma olhada: [LINK_OSI] (R$ 48,50, oferta de lançamento)
+Se quiser dar uma olhada: [LINK_OSI]
 ```
 
 ### Mensagem 3 — Reativação de lista / status (quem já recebeu a calc)
@@ -128,7 +128,7 @@ Os dois juntos mudam o balcão. Link do método: [LINK_OSI]
 ## 5. Objeções comuns (com a calc como muleta)
 
 - **"Não tenho tempo pra mais um curso."** → "Justo. Por isso comecei te dando a calculadora, que é
-  uso imediato. O OSI não é curso longo — é manual visual, 72h. E a calc continua sua de qualquer jeito."
+  uso imediato. O OSI não é curso longo — é manual visual, aplicação em 3 dias. E a calc continua sua de qualquer jeito."
 - **"Já sei atender, faço isso há anos."** → "Com certeza. A calc é pra agilizar o que você já faz.
   O método é pra quem quer parar de dar desconto cedo e recuperar orçamento parado — mesmo com experiência."
 - **"Isso é da onde? Não conheço o Clearix."** → "É de uma empresa que faz software pra óticas, a

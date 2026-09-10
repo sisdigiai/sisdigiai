@@ -2,7 +2,7 @@
   "meta": {
     "produto": "Ótica Sem Improviso",
     "tipo": "Landing Page de Conversão",
-    "ticket": "R$ 48,50 (50% off de R$ 97)",
+    "ticket": "R$ 49, compra única, sem assinatura (preço só na landing e no checkout)",
     "tom": "Prático, empático, firme (mentora experiente), focado em segurança comercial",
     "metodologia": "Os 5 Movimentos",
     "autoridade": "Tatiana Camargo — 25 anos no balcão",
@@ -26,7 +26,7 @@
         "badges": [
           "PDF para imprimir",
           "App para estudar",
-          "Resultados em 72 horas"
+          "Aplicação em 3 dias"
         ],
         "eyebrow": "Manual Visual para Óticas",
         "headline": "Pare de atender no improviso na ótica.",
@@ -154,7 +154,7 @@
             "resultado": "Você retoma conversas paradas com método — sem parecer cobrança."
           }
         ],
-        "fechamento": "Ao final de 72 horas, você não vai ser outro profissional. Vai ser o mesmo — com método, clareza e segurança para conduzir a venda sem improviso."
+        "fechamento": "Ao final dos 3 dias, você não vai ser outro profissional. Vai ser o mesmo — com método, clareza e segurança para conduzir a venda sem improviso."
       }
     },
     {
@@ -162,7 +162,7 @@
       "tipo": "explicacao",
       "elementos": {
         "titulo": "Não é curso longo. Não é plataforma. É um manual visual direto ao ponto.",
-        "corpo": "Ótica Sem Improviso não é um curso longo nem uma plataforma vendida separadamente. É um manual visual criado para consulta e aplicação na rotina da ótica. O conteúdo é entregue em dois formatos: PDF para baixar e imprimir e app leitor para estudar no celular. O método se chama Os 5 Movimentos — e você aplica em 72 horas."
+        "corpo": "Ótica Sem Improviso não é um curso longo nem uma plataforma vendida separadamente. É um manual visual criado para consulta e aplicação na rotina da ótica. O conteúdo é entregue em dois formatos: PDF para baixar e imprimir e app leitor para estudar no celular. O método se chama Os 5 Movimentos — e você aplica em 3 dias."
       }
     },
     {
@@ -181,7 +181,7 @@
           "Scripts de WhatsApp prontos para adaptar",
           "Respostas-base para objeções comuns",
           "Plano de ação de 72 horas",
-          "90 dias de apoio complementar na Nexus"
+          "90 dias de apoio complementar no Nexus"
         ]
       }
     },
@@ -266,32 +266,8 @@
         "eyebrow": "Quem já usa na prática",
         "titulo": "O que muda quando o atendimento deixa de ser no improviso.",
         "subtitulo": "Profissionais reais, resultados reais. Veja o que mudou para quem aplicou o método.",
-        "depoimentos": [
-          {
-            "nome": "[Nome real]",
-            "cargo": "Vendedora há 6 anos",
-            "destaque": "Indicação com mais segurança",
-            "texto": "Antes eu ficava insegura na hora de indicar lente. Depois do manual, passei a fazer as perguntas certas e o cliente percebe que eu sei o que estou fazendo."
-          },
-          {
-            "nome": "[Nome real]",
-            "cargo": "Consultor óptico",
-            "destaque": "Recuperação no WhatsApp",
-            "texto": "O módulo de WhatsApp mudou meu jogo. Eu perdia quase todo orçamento enviado. Agora retomo com contexto e fecho muito mais."
-          },
-          {
-            "nome": "[Nome real]",
-            "cargo": "Gerente de ótica",
-            "destaque": "Treinamento da equipe",
-            "texto": "Usei como material de treinamento para a equipe inteira. Em uma semana, o atendimento ficou mais uniforme e profissional."
-          },
-          {
-            "nome": "[Nome real]",
-            "cargo": "Atendente de balcão",
-            "destaque": "Menos desconto, mais valor",
-            "texto": "Antes eu dava desconto logo no começo porque não sabia sustentar o valor. Agora consigo explicar melhor e o cliente entende por que vale a pena."
-          }
-        ],
+        "status": "suspensa — só volta com depoimento de pessoa real, com nome e autorização. Os 4 textos fictícios com [Nome real] foram retirados em 2026-09-10 (promessa-padrao-osi.md § 10).",
+        "depoimentos": [],
         "cta": "Quero parar de atender no improviso"
       }
     },
@@ -318,7 +294,7 @@
       "elementos": {
         "eyebrow": "Apoio complementar",
         "titulo": "Nexus por 90 dias: para manter o método vivo.",
-        "descricao": "Depois da compra, você também conta com 90 dias de apoio complementar na Nexus para revisar, aplicar e manter o método vivo na rotina. A Nexus não substitui o manual. Ela ajuda você a continuar usando melhor o que aprendeu.",
+        "descricao": "Depois da compra, você também conta com 90 dias de apoio complementar no Nexus para revisar, aplicar e manter o método vivo na rotina. O Nexus não substitui o manual. Ele ajuda você a continuar usando melhor o que aprendeu.",
         "features": [
           {
             "icone": "BookOpen",
@@ -336,7 +312,7 @@
             "descricao": "Manter o que aprendeu ativo na rotina, não só na leitura."
           }
         ],
-        "nota": "A Nexus é complemento, não produto principal. Após os 90 dias, você decide se quer continuar. O manual PDF e o app continuam seus para sempre."
+        "nota": "O Nexus é complemento, não produto principal. Após os 90 dias, você decide se quer continuar. O manual PDF e o app continuam seus para sempre."
       }
     },
     {
@@ -362,17 +338,16 @@
       "id": "oferta",
       "tipo": "oferta",
       "elementos": {
-        "eyebrow": "Oferta de lançamento",
+        "eyebrow": "Compra única",
         "titulo": "Ótica Sem Improviso",
         "subtitulo": "Manual Visual de Atendimento e Conversão para Óticas",
-        "nota": "PDF para imprimir + App para estudar + 90 dias de Nexus",
-        "preco_original": "R$ 97,00",
-        "desconto": "50% off",
-        "preco_final": "R$ 48,50",
+        "nota": "PDF + App leitor + 90 dias de apoio no Nexus",
+        "preco_final": "R$ 49",
+        "garantia": "Risco zero: garantia de 7 dias.",
         "bullets": [
           "Aplicação em 3 dias (Os 5 Movimentos)",
-          "PDF + App",
-          "90 dias de Nexus"
+          "PDF + App leitor",
+          "90 dias de apoio no Nexus"
         ],
         "suporte": "Dúvidas? Fale com o suporte.",
         "cta": "Quero parar de atender no improviso",
@@ -402,16 +377,16 @@
             "resposta": "Sim. O app leitor foi pensado para uso em celular e desktop."
           },
           {
-            "pergunta": "O que é a Nexus?",
-            "resposta": "A Nexus é um apoio complementar por 90 dias para revisar e aplicar melhor o conteúdo do manual."
+            "pergunta": "O que é o Nexus?",
+            "resposta": "O Nexus é um apoio complementar por 90 dias para revisar e aplicar melhor o conteúdo do manual."
           },
           {
             "pergunta": "E depois dos 90 dias?",
             "resposta": "Após 90 dias, você decide se quer continuar. O manual PDF e o app continuam seus para sempre."
           },
           {
-            "pergunta": "A Nexus é o produto principal?",
-            "resposta": "Não. O produto principal é o manual Ótica Sem Improviso (Os 5 Movimentos). A Nexus entra como continuidade complementar."
+            "pergunta": "O Nexus é o produto principal?",
+            "resposta": "Não. O produto principal é o manual Ótica Sem Improviso (Os 5 Movimentos). O Nexus entra como continuidade complementar."
           },
           {
             "pergunta": "Onde a compra acontece?",
@@ -423,7 +398,7 @@
           },
           {
             "pergunta": "O que são Os 5 Movimentos?",
-            "resposta": "São os 5 pilares do método: Sair do Automático, Ler o Cliente, Indicar com Segurança, Sustentar Valor e WhatsApp que Converte. Você aplica em 72 horas."
+            "resposta": "São os 5 pilares do método: Sair do Automático, Ler o Cliente, Indicar com Segurança, Sustentar Valor e WhatsApp que Converte. Você aplica em 3 dias."
           }
         ]
       }
@@ -434,7 +409,7 @@
       "elementos": {
         "headline": "Você pode continuar no improviso.",
         "headline_destaque": "Ou virar o especialista que conduz a venda.",
-        "descricao": "Em 3 dias, você organiza sua forma de atender, indicar e responder no WhatsApp com mais segurança — sem depender de improviso ou desconto cedo demais. O método são Os 5 Movimentos. O resultado é em 72 horas.",
+        "descricao": "Em 3 dias, você reorganiza sua forma de atender, indicar e responder no WhatsApp — sem depender de improviso ou desconto cedo demais. O método são Os 5 Movimentos.",
         "cta": "Quero parar de atender no improviso"
       }
     },

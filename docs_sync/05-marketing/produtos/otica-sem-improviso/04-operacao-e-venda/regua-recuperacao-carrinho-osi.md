@@ -48,7 +48,7 @@ Mensagem deve reduzir risco:
 - acesso imediato;
 - o que recebe;
 - por que o material e pratico;
-- suporte/garantia, se aplicavel.
+- suporte e garantia de 7 dias.
 
 ### Segmento C - Clicou no link do e-mail/WhatsApp e nao comprou
 
@@ -89,7 +89,7 @@ Seu acesso ao Otica Sem Improviso ficou pendente.
 
 O material foi criado para ajudar profissionais de otica a conduzirem melhor o atendimento no balcao e no WhatsApp, com mais clareza na indicacao, mais seguranca na argumentacao e menos dependencia de desconto precoce.
 
-Voce recebe o manual visual em PDF e o apoio no app para consultar situacoes reais do dia a dia.
+Voce recebe o manual em PDF para imprimir, o App leitor para estudar no celular e 90 dias de apoio complementar no Nexus.
 
 Para finalizar:
 {{checkout_link}}
@@ -165,7 +165,7 @@ Passando para deixar o ultimo lembrete do seu acesso ao Otica Sem Improviso.
 
 Se hoje voce sente que o atendimento da otica depende muito da experiencia de cada pessoa, o OSI pode ajudar a criar uma linguagem mais clara, pratica e padronizada para o time.
 
-Manual visual + app de apoio:
+PDF + App leitor + 90 dias de apoio no Nexus. Garantia de 7 dias:
 {{checkout_link}}
 
 Depois deste e-mail, nao vou insistir por aqui.
@@ -187,7 +187,7 @@ WhatsApp:
 
 Entendo. E vale olhar pelo uso pratico: se uma unica venda deixar de ser perdida por falta de argumento, o material ja tende a se pagar.
 
-O foco e ajudar o atendimento a defender valor antes de partir para desconto.
+O foco e ajudar o atendimento a defender valor antes de partir para desconto. E tem garantia de 7 dias.
 
 Link:
 {{checkout_link}}

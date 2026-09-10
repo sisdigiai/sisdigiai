@@ -32,7 +32,7 @@
 | **REPESCAGEM** | **1 único follow-up, 48–72h após o 1º contato**, SE a ótica visualizou e não respondeu. Depois disso: silêncio. Quem aceitou "dicas grátis" → mover para `nutricao`, não repescar como venda. |
 
 **Texto da repescagem (follow-up único):**
-> Oi! Só pra não te deixar com a mensagem pendente 🙂 A turma de estreia a R$ 48,50 fecha quando virar a próxima (vai pra R$ 97). Se não fizer sentido agora, tudo bem — só me fala que não te incomodo mais 👍
+> Oi! Só pra não te deixar com a mensagem pendente 🙂 O Ótica Sem Improviso tem garantia de 7 dias, então dá pra conhecer sem risco. Se não fizer sentido agora, tudo bem — só me fala que não te incomodo mais 👍
 
 **Pipeline (CRM `ops.commercial_leads`):** `lead → contatado → conversa → negociacao → cliente`. Saídas: `perdido` · `optout` (pediu remoção → tirar do Google Contacts no mesmo dia) · `nutricao`.
 
@@ -46,3 +46,4 @@
 
 ## 4. Changelog
 - 2026-06-17 — Regra criada e travada (Gilberto). Conteúdo: 1/dia útil, 12h/18:30, 4:1. WhatsApp: rampa até teto 20/dia, Seg–Sex, follow-up único 48–72h. Geografia em escada a partir de Suzano.
+- 2026-09-10 — Texto da repescagem alinhado à [promessa padrão](D:/projetos/otica_sem_improviso/docs/divulgacao/promessa-padrao-osi.md): saiu "turma de estreia a R$ 48,50 / vai pra R$ 97" (preço e urgência falsa); entrou a garantia de 7 dias.

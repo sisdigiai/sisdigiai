@@ -81,9 +81,10 @@
     "como_usar": "Cada JSON está estruturado para ser consumido diretamente pelo agent visual. O campo 'meta' contém contexto, tom e objetivo. Os campos de conteúdo trazem texto exato para as peças.",
     "design_system": "Sempre consulte copy_design_system.json antes de criar qualquer peça. Ele define cores, tipografia, componentes e o que NÃO fazer.",
     "tom_geral": "Prático, empático, firme (como uma mentora experiente). Sem hype, sem urgência falsa, sem emoji excessivo. Editorial, não panfletário.",
+    "promessa_padrao": "Frases de venda (promessa, pacote, preço, Taty, Nexus): seguir otica_sem_improviso/docs/divulgacao/promessa-padrao-osi.md. Peça de divulgação e de afiliado não leva preço.",
     "palavras_chave": [
       "Os 5 Movimentos",
-      "72 horas",
+      "Aplicação em 3 dias",
       "Pare de atender no improviso",
       "Sem curso longo",
       "Método visual",
