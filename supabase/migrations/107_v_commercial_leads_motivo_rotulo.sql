@@ -19,8 +19,21 @@
 --    derivação vai para a view".
 --
 -- ═══════════════════════════════════════════════════════════════════════════
--- UMA RESTRIÇÃO DO POSTGRES QUE MUDA O RESULTADO — e o pedido não a previa
+-- UMA RESTRIÇÃO DO POSTGRES QUE MUDA O RESULTADO — e não é teoria: foi erro real
 -- ═══════════════════════════════════════════════════════════════════════════
+-- ⚠ O `5835ef7` (a tentativa de meter isto dentro da própria 106) FOI APLICADO e
+--   FOI RECUSADO pelo banco:
+--       42P16 — cannot change name of view column "perdido_em" to "motivo_rotulo"
+--   Eu tinha posto o rótulo ANTES de `perdido_em`. O Postgres não lê aquilo como
+--   "coluna nova no meio": lê como RENOMEAR a coluna que estava naquela posição.
+--   A transação caiu inteira e a view ficou intacta — confirmado depois: continua
+--   com as 3 colunas da 106, grants inalterados.
+--
+-- Corrijo o meu próprio registo: no commit da reversão escrevi que o `5835ef7`
+-- não entrou porque o aceite chegou depois do apply. Chegou — mas a razão de não
+-- ter entrado foi esta recusa do banco, não a ordem dos acontecimentos. As duas
+-- coisas são verdade e só a segunda explica o erro.
+--
 -- O pedido diz "o join do rótulo na view", ao lado do `motivo_tipo`. Não dá:
 -- `create or replace view` **só deixa acrescentar colunas NO FIM** da lista —
 -- não deixa inserir no meio, nem renomear, nem trocar tipo. Pôr o rótulo junto do
