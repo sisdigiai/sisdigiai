@@ -35,7 +35,6 @@ interface HotmartStats {
   last_sale_at: string | null;
 }
 
-const DOC_PRICE_BRL = 48.5; // plano-mestre §7 (reconciliado 2026-06-02: doc/app/Hotmart/Kiwify)
 
 export default function Marketplace() {
   const [items, setItems] = useState<MarketplaceItem[]>([]);
@@ -88,20 +87,24 @@ export default function Marketplace() {
     })();
   }, []);
 
-  // Parse preço Hotmart da observação ("R$ 97 tabela, R$ 48,50 lançamento" → 48.50)
+  // Preço do checkout Hotmart como foi OBSERVADO, na nota do ativo em
+  // company.digital_assets ("Checkout R$ 49,00 ..." → 49). Não é fonte do preço: é a
+  // leitura do que o marketplace cobra, para comparar com a fonte. O formato antigo
+  // ("R$ X lançamento") acabou com a condição de lançamento — migration 119.
   const hotmartItem = items.find(i => i.key === 'hotmart');
-  const hotmartPriceMatch = hotmartItem?.notes?.match(/R\$\s?(\d+[,.]?\d{0,2})\s*lan[çc]amento/i);
+  const hotmartPriceMatch = hotmartItem?.notes?.match(/checkout\s*R\$\s?(\d+(?:[,.]\d{1,2})?)/i);
   const hotmartPrice = hotmartPriceMatch
     ? parseFloat(hotmartPriceMatch[1].replace(',', '.'))
     : null;
 
-  // Reconciliação
-  const docVsApp = appPrice === DOC_PRICE_BRL;
-  const docVsHotmart = hotmartPrice === DOC_PRICE_BRL;
-  const allMatch = docVsApp && docVsHotmart;
+  // Reconciliação contra a FONTE (academy.products). O 48.5 escrito aqui antes fazia
+  // a tela acusar o preço certo de divergente. E sem dado não é divergência: se um dos
+  // dois preços não carregou, a tela diz isso em vez de acusar uma diferença que não mediu.
+  const semDado = appPrice == null || hotmartPrice == null;
+  const allMatch = !semDado && hotmartPrice === appPrice;
 
-  const PriceRow = ({ label, value, expected, source }: { label: string; value: number | null; expected: number; source: string }) => {
-    const ok = value === expected;
+  const PriceRow = ({ label, value, expected, source }: { label: string; value: number | null; expected: number | null; source: string }) => {
+    const ok = value != null && value === expected;
     const Icon = value == null ? Circle : ok ? CheckCircle2 : AlertTriangle;
     const cls = value == null ? 'text-muted' : ok ? 'text-success' : 'text-warning';
     return (
@@ -127,7 +130,7 @@ export default function Marketplace() {
           <>
             Hotmart e Kiwify são o <b className="text-on-surface-variant">canal primário</b> de aquisição
             (trava <b className="text-secondary">marketplace-first</b>). Esse painel mostra estado das
-            listings e reconcilia preço entre doc canônico, app e marketplace.
+            listings e confere o preço do marketplace com o preço canônico (academy.products).
           </>
         }
       />
@@ -135,21 +138,20 @@ export default function Marketplace() {
         <TravasBanner />
 
         {/* Reconciliação de preço — divergência §13 do plano-mestre */}
-        <div className={`border p-5 space-y-3 ${allMatch ? 'border-success/30 bg-success/[0.05]' : 'border-warning/30 bg-warning/[0.06]'}`}>
+        <div className={`border p-5 space-y-3 ${allMatch ? 'border-success/30 bg-success/[0.05]' : semDado ? 'border-outline/20 bg-surface-container' : 'border-warning/30 bg-warning/[0.06]'}`}>
           <div className="flex items-center gap-2">
-            {allMatch ? <CheckCircle2 className="w-4 h-4 text-success" /> : <AlertTriangle className="w-4 h-4 text-warning" />}
+            {allMatch ? <CheckCircle2 className="w-4 h-4 text-success" /> : semDado ? <Circle className="w-4 h-4 text-muted" /> : <AlertTriangle className="w-4 h-4 text-warning" />}
             <span className="text-xs font-mono uppercase tracking-widest text-muted">Reconciliação de preço</span>
-            <span className={`ml-auto text-[11px] font-mono tabular-nums ${allMatch ? 'text-success' : 'text-warning'}`}>
-              {allMatch ? '✓ tudo bate' : '⚠ divergência'}
+            <span className={`ml-auto text-[11px] font-mono tabular-nums ${allMatch ? 'text-success' : semDado ? 'text-muted' : 'text-warning'}`}>
+              {allMatch ? '✓ tudo bate' : semDado ? 'sem dado para conferir' : '⚠ divergência'}
             </span>
           </div>
           <div className="text-xs text-muted">
-            Reconciliado 2026-06-02: R$ 48,50 em doc + app + Hotmart + Kiwify.
+            Fonte do preço: academy.products. O checkout Hotmart é a observação registrada em company.digital_assets — confere com a fonte ou não.
           </div>
           <ul className="space-y-1.5">
-            <PriceRow label="Plano-mestre §7" value={DOC_PRICE_BRL} expected={DOC_PRICE_BRL} source="docs/digiai/docs/05-marketing" />
-            <PriceRow label="App (academy.products.price_brl)" value={appPrice} expected={DOC_PRICE_BRL} source="banco" />
-            <PriceRow label="Hotmart (listing real)" value={hotmartPrice} expected={DOC_PRICE_BRL} source="digital_assets.observacoes" />
+            <PriceRow label="Preço canônico (academy.products.price_brl)" value={appPrice} expected={appPrice} source="banco" />
+            <PriceRow label="Hotmart (checkout observado)" value={hotmartPrice} expected={appPrice} source="digital_assets.observacoes" />
           </ul>
         </div>
 

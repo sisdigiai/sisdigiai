@@ -32,6 +32,7 @@ import {
   type FunnelStepStatus,
   type FunnelWorkspace,
 } from '../lib/funnelStore';
+import { academyStore } from '../lib/academyStore';
 import CopysTab from './funnel/CopysTab';
 
 type TabId = 'dashboard' | 'controle' | 'produto' | 'oferta' | 'trafego' | 'automacao' | 'guias' | 'copys' | 'proximos';
@@ -86,6 +87,14 @@ export default function Funil() {
   const [tab, setTab] = useState<TabId>('dashboard');
   const [workspace, setWorkspace] = useState<FunnelWorkspace>(() => funnelStore.getWorkspace());
   const summary = useMemo(() => calculateFunnelSummary(workspace), [workspace]);
+  // Preço canônico da OSI (academy.products). A premissa do funil continua editável
+  // para simular cenários, mas quando diverge da fonte a tela diz — o 97 do modelo
+  // ficou meses a calcular receita com o dobro do preço real sem ninguém ver.
+  const [precoCanonico, setPrecoCanonico] = useState<number | null>(null);
+  useEffect(() => {
+    academyStore.getWorkspace().then((w) => setPrecoCanonico(w.product.price_brl ?? null)).catch(() => {});
+  }, []);
+  const premissaDiverge = precoCanonico != null && workspace.assumptions.mainPrice !== precoCanonico;
 
   // Carrega o workspace do Supabase no mount (cross-device); cai no cache local se offline.
   useEffect(() => {
@@ -144,6 +153,21 @@ export default function Funil() {
       <div className="space-y-7">
       <TravasBanner />
 
+      {premissaDiverge && (
+        <div className="border border-warning/30 bg-warning/10 p-4 flex flex-wrap items-center gap-3 text-sm">
+          <span className="text-warning">
+            A premissa de preço do funil ({brl(workspace.assumptions.mainPrice)}) é diferente do preço canônico da OSI
+            ({brl(precoCanonico as number)}, academy.products). Receita, ticket e CPA abaixo estão calculados sobre a premissa.
+          </span>
+          <button
+            onClick={() => updateAssumption('mainPrice', precoCanonico as number)}
+            className="ml-auto px-3 py-1.5 border border-warning/40 text-warning hover:bg-warning/15 text-xs font-mono uppercase tracking-wider"
+          >
+            usar o preço canônico
+          </button>
+        </div>
+      )}
+
       <div className="bg-secondary-container/40 border border-secondary/40 p-5 flex items-start gap-3">
         <Route className="w-5 h-5 text-secondary shrink-0 mt-0.5" />
         <div>
@@ -176,7 +200,7 @@ export default function Funil() {
 
       {tab === 'dashboard' && <DashboardTab workspace={workspace} summary={summary} updateAssumption={updateAssumption} />}
       {tab === 'controle' && <ControleTab workspace={workspace} summary={summary} updateActual={updateActual} />}
-      {tab === 'produto' && <ProdutoTab />}
+      {tab === 'produto' && <ProdutoTab precoCanonico={precoCanonico} />}
       {tab === 'oferta' && <OfertaTab workspace={workspace} summary={summary} updateAssumption={updateAssumption} />}
       {tab === 'trafego' && <TrafegoTab workspace={workspace} />}
       {tab === 'automacao' && <AutomacaoTab workspace={workspace} />}
@@ -344,7 +368,7 @@ function ControleTab({
   );
 }
 
-function ProdutoTab() {
+function ProdutoTab({ precoCanonico }: { precoCanonico: number | null }) {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-[0.9fr_1.1fr] gap-5">
       <section className="bg-surface-container border border-outline/15 p-6 space-y-5">
@@ -358,7 +382,7 @@ function ProdutoTab() {
 
         <div className="grid grid-cols-2 gap-3">
           <InfoBox label="Papel" value="Isca paga" />
-          <InfoBox label="Preco" value="R$ 97" />
+          <InfoBox label="Preco" value={precoCanonico != null ? brl(precoCanonico) : 'sem preço em academy.products'} />
           <InfoBox label="Status" value="Engenharia pronta" />
           <InfoBox label="Destino" value="Apps de otica" />
         </div>

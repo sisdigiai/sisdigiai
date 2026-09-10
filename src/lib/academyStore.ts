@@ -136,8 +136,10 @@ function defaultProduct(): AcademyProduct {
     subtitle: 'Manual Visual + App para Atendimento, WhatsApp e Objecoes em Oticas',
     status: 'in_production',
     offer_type: 'low_ticket',
-    price_brl: 48.50,
-    launch_condition: 'Preco de estreia para a turma inicial',
+    // Sem preço de propósito: o preço mora em academy.products e só é lido de lá. O
+    // 48.50 + "preço de estreia" que estava aqui era o que um cache vazio mostrava.
+    price_brl: null,
+    launch_condition: '',
     promise: 'Sair do atendimento no improviso, responder melhor no WhatsApp e vender com mais seguranca enquanto a otica e apresentada de forma sutil ao Clearix.',
     main_cta: 'Quero atender sem improviso',
     secondary_cta: 'Ver o que vem dentro',

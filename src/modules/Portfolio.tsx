@@ -118,7 +118,7 @@ const APPS: App[] = [
     verificado: '2026-07-10',
     tier: 'suporte', estado: 'no-ar', maturidade: 70, funcao: 'Universidade Clearix: 18 módulos · 196 lições · 74 workshops · gamificação + certificados',
     stack: 'Vite · React 19 · Express · Supabase (próprio + Clearix read-only) · Firebase · Gemini (Nex/Doug)',
-    repos: 'D:\\projetos\\nexus (Universidade Clearix + Manual OSI · landing vende OSI R$48,50)',
+    repos: 'D:\\projetos\\nexus (Universidade Clearix + Manual OSI · landing vende a OSI)',
     git: '3224d3f 01/jul/2026 (módulos do Manual Clearix)',
     proximo: 'Levar a equipe a treinar (dono já em 21%) · corrigir SSO → /clearix',
     bloqueio: '⚠ 4 chaves de API expostas no .env (rotacionar) · adoção ainda só o dono · SSO /clearix quebrado',

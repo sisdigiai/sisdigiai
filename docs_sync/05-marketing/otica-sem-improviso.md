@@ -64,8 +64,8 @@ Isso aparece em quatro frentes:
 Em 3 dias, o profissional de ótica sai do atendimento no improviso, responde melhor no WhatsApp e aprende a vender com mais segurança sem depender de desconto.
 
 ## Oferta oficial
-- preço base: R$ 97
-- condição de lançamento: preço de estreia para a turma inicial
+- preço: R$ 49, compra única, sem assinatura (desde 10/09/2026; fonte canônica: `academy.products`, slug `otica-sem-improviso` — este documento repete, não define)
+- condição de lançamento: nenhuma (a "turma de estreia" deixou de existir em 10/09/2026)
 - consumo principal: até 3 dias
 - CTA principal: Quero sair do improviso
 

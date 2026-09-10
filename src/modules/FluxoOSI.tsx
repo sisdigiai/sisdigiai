@@ -162,19 +162,22 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
         ],
       });
 
-      // 4. Preço reconciliado
+      // 4. Preço canônico — academy.products é a única fonte. Antes comparava contra
+      // 48.5 escrito aqui: com o preço mudado, a tela marcaria o preço CERTO como
+      // pendente. A conferência do checkout contra este valor mora no Marketplace.
       try {
         const w = await academyStore.getWorkspace();
         const appPrice = w.product.price_brl ?? null;
-        const docPrice = 48.5; // reconciliado 2026-06-02 (doc/app/Hotmart/Kiwify = R$ 48,50)
         items.push({
           key: 'preco',
-          label: 'Preço reconciliado (plano-mestre vs Hotmart vs app)',
-          status: appPrice === docPrice ? 'done' : 'pending',
-          detail: `Reconciliado 2026-06-02: R$ 48,50 em doc + app (${appPrice ? `R$ ${appPrice.toFixed(2)}` : '—'}) + Hotmart + Kiwify.`,
+          label: 'Preço canônico definido (academy.products)',
+          status: appPrice != null ? 'done' : 'pending',
+          detail: appPrice != null
+            ? `R$ ${appPrice.toFixed(2).replace('.', ',')} em academy.products — fonte única do preço. Checkout Hotmart/Kiwify: conferir no Marketplace.`
+            : 'academy.products sem preço legível — sem ele, nenhum outro sítio tem de onde repetir o preço.',
         });
       } catch {
-        items.push({ key: 'preco', label: 'Preço reconciliado (plano-mestre vs Hotmart vs app)', status: 'pending' });
+        items.push({ key: 'preco', label: 'Preço canônico definido (academy.products)', status: 'pending' });
       }
 
       // 5. Capa Hotmart + propagação de marca/avatar real (re-verificado 2026-06-06)
