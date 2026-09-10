@@ -1,7 +1,10 @@
 -- 107 — `motivo_rotulo` na v_commercial_leads
 --
--- ⚠ NÃO APLICADA. Pedido do MKT, aceite pelo Orquestrador Geral. Chegou depois
---    de a 106 já estar aplicada, por isso é migration própria e não emenda dela.
+-- ✔ APLICADA em 09/09/2026 pelo Orquestrador Geral, e provada: `motivo_rotulo`
+--   é a 17ª coluna (append aceite), 0 leads com motivo sem rótulo, anon sem
+--   select, authenticated com select, 260 leads intactos.
+--   Pedido do MKT. Chegou depois de a 106 já estar aplicada, por isso é migration
+--   própria e não emenda dela.
 --
 -- ═══════════════════════════════════════════════════════════════════════════
 -- POR QUE RESOLVER O RÓTULO AQUI E NÃO NA TELA
