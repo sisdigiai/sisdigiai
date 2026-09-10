@@ -7,8 +7,19 @@
 > 09/09/2026**, dois meses, a qualquer pessoa, sem login: pelo GitHub e pelo
 > domínio publicado. Não é suspeita de exposição; é exposição medida.
 >
-> **As nove contas estão sendo desabilitadas e a senha, rotacionada.** Qualquer
+> **As contas foram DESABILITADAS em 09/09/2026** — as 9 do documento e mais 11
+> irmãs, 20 no total, com zero sessões ativas no momento do bloqueio. Qualquer
 > credencial que tenha circulado a partir deste arquivo **não vale mais**.
+>
+> **E a medição do eco Clearix, que é a parte que tranquiliza:** nenhum desses
+> logins foi usado depois de 09/07 — os últimos acessos são de 26 e 30/06, ou
+> seja, **anteriores à publicação**. Os tenants eram sintéticos.
+>
+> ⚠ **O limite dessa tranquilidade, dito na íntegra:** isso prova que ninguém
+> usou ESTAS contas. Não prova que ninguém leu o arquivo, nem o que fez com o
+> resto do que ele trazia — os identificadores de tenant, por exemplo, não
+> deixam rastro de leitura. E o IP não era gravado, então não há de onde
+> confirmar. **Ausência de login não é ausência de acesso ao documento.**
 
 ## Como pedir acesso de demonstração agora
 
