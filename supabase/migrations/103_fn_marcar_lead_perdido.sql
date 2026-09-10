@@ -1,6 +1,6 @@
 -- 103 — `fn_marcar_lead_perdido`: a porta que faltava para registrar uma perda
 --
--- ⚠ NÃO APLICADA. Aguarda o "pode" do dono.
+-- ✔ APLICADA em 09/09/2026.
 --
 -- ═══════════════════════════════════════════════════════════════════════════
 -- POR QUE ISTO É MAIS URGENTE DO QUE PARECE

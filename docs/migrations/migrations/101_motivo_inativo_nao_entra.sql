@@ -1,6 +1,6 @@
 -- 101 — motivo APOSENTADO deixa de aceitar registro novo
 --
--- ⚠ NÃO APLICADA. Aguarda o "pode" do dono.
+-- ✔ APLICADA em 09/09/2026.
 --
 -- ═══════════════════════════════════════════════════════════════════════════
 -- FURO NO MEU PRÓPRIO DESENHO, achado pelo Orquestrador Geral ao TESTAR a 096

@@ -1,6 +1,6 @@
 -- 100 — `fn_upsert_commercial_lead`: patch parcial para de apagar o resto
 --
--- ⚠ NÃO APLICADA. Aguarda o "pode" do dono. Portões 68 e 69.
+-- ✔ APLICADA em 09/09/2026. Portões 68 e 69.
 --
 -- ═══════════════════════════════════════════════════════════════════════════
 -- §A — O BUG, E ELE PASSOU PELAS MINHAS MÃOS

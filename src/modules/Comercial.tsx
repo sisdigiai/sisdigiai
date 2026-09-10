@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Plus, Trash2, Briefcase, Pencil, X, Play, FileText, Search, Target, AlertTriangle, Clock, MessageCircle, Monitor } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { supabase } from '../lib/supabase';
+import { useToast } from '../contexts/ToastContext';
+import type { MotivoPerda } from '../lib/commercialStore';
 import { commercialStore, type CommercialLead, type LeadStage, type OutreachItem } from '../lib/commercialStore';
 import { playbookStore, type Playbook } from '../lib/playbookStore';
 import { meetingStore, type MeetingSession } from '../lib/meetingStore';
@@ -11,12 +13,15 @@ import MeetingRunner from './comercial/MeetingRunner';
 import ProposalEditor from './comercial/ProposalEditor';
 import { proposalFromMeeting } from './comercial/proposalGen';
 
-// Funil real do banco: lead → contatado → conversa → demo → piloto → cliente/perdido
+// Funil REAL do banco, conferido em 09/09/2026 contra a CHECK
+// `commercial_leads_stage_vocabulario`. A lista anterior tinha `lead` (que o banco
+// recusa) e não tinha `proposta` (que o banco aceita).
 const STAGES: { key: LeadStage; label: string; color: string }[] = [
-  { key: 'lead', label: 'Lead', color: 'var(--color-muted)' },
+  { key: 'captado', label: 'Captado', color: 'var(--color-muted)' },
   { key: 'contatado', label: 'Contatado', color: 'var(--color-info)' },
   { key: 'conversa', label: 'Conversa', color: 'var(--color-secondary)' },
   { key: 'demo', label: 'Demo', color: 'var(--color-action)' },
+  { key: 'proposta', label: 'Proposta', color: 'var(--color-secondary)' },
   { key: 'piloto', label: 'Piloto', color: 'var(--color-warning)' },
   { key: 'cliente', label: 'Cliente', color: 'var(--color-success)' },
   { key: 'perdido', label: 'Perdido', color: 'var(--color-danger)' },
@@ -101,7 +106,7 @@ function waLink(lead: LandingLead): string | null {
 const PRODUCTS = ['clearix', 'osi', 'academy', 'outro'];
 
 const emptyLead = (): CommercialLead => ({
-  name: '', company: '', product: 'clearix', stage: 'lead',
+  name: '', company: '', product: 'clearix', stage: 'captado',
   source: '', contact: '', value_brl: null, owner: '', next_step: '', notes: '',
 });
 
@@ -114,6 +119,12 @@ export default function Comercial() {
   const [leads, setLeads] = useState<CommercialLead[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<CommercialLead | null>(null);
+  const { show } = useToast();
+  // Fluxo de perda: o lead fica "em espera" enquanto se escolhe o motivo.
+  const [perdendo, setPerdendo] = useState<CommercialLead | null>(null);
+  const [motivoEscolhido, setMotivoEscolhido] = useState('');
+  const [motivos, setMotivos] = useState<MotivoPerda[]>([]);
+  useEffect(() => { commercialStore.motivosPerda().then(setMotivos); }, []);
   const [tab, setTab] = useState<'pipeline' | 'reunioes' | 'propostas'>('pipeline');
   const [playbooks, setPlaybooks] = useState<Playbook[]>([]);
   const [meetings, setMeetings] = useState<MeetingSession[]>([]);
@@ -165,7 +176,7 @@ export default function Comercial() {
 
   const kpis = useMemo(() => {
     const byStage = (s: LeadStage) => leads.filter((l) => l.stage === s).length;
-    const contatados = leads.filter((l) => l.stage !== 'lead' && l.stage !== 'perdido').length;
+    const contatados = leads.filter((l) => l.stage !== 'captado' && l.stage !== 'perdido').length;
     const openValue = leads
       .filter((l) => l.stage !== 'perdido' && l.stage !== 'cliente')
       .reduce((sum, l) => sum + (l.value_brl || 0), 0);
@@ -194,21 +205,43 @@ export default function Comercial() {
     return { followupsVencidos, parados, semNextStep, outreachVencido, outreachPorKind, outreachDatas };
   }, [meetings, leads, outreach]);
 
+  // ⚠ Estas três funções IGNORAVAM o retorno até 09/09/2026: o formulário fechava
+  // e a lista recarregava mesmo quando o banco recusava — e recusava sempre em
+  // dois casos (estágio `lead`, que não existe, e `perdido` sem motivo). A pessoa
+  // clicava em salvar, nada acontecia, e nada dizia. Zero leads perdidos em 260
+  // não era ausência de perda: era a tela a falhar em silêncio.
+  const avisarFalha = (o: string, erro: string) =>
+    show({ kind: 'warning', title: `Não foi possível ${o}`, description: erro, duration: 8000 });
+
   const save = async () => {
     if (!editing || !editing.company.trim()) return;
-    await commercialStore.upsert(editing);
+    const r = await commercialStore.upsert(editing);
+    if (!r.ok) { avisarFalha('salvar o lead', r.erro); return; }  // não fecha: o dado ainda está na tela
     setEditing(null);
     load();
   };
 
   const moveStage = async (lead: CommercialLead, stage: LeadStage) => {
-    await commercialStore.upsert({ ...lead, stage });
+    // Perder exige motivo (CHECK do banco). Sem isto, arrastar para "Perdido"
+    // falhava sempre — era o caminho mais usado e o único sem saída.
+    if (stage === 'perdido') { setPerdendo(lead); return; }
+    const r = await commercialStore.upsert({ ...lead, stage });
+    if (!r.ok) { avisarFalha('mudar o estágio', r.erro); return; }
+    load();
+  };
+
+  const confirmarPerda = async () => {
+    if (!perdendo?.id || !motivoEscolhido) return;
+    const r = await commercialStore.marcarPerdido(perdendo.id, motivoEscolhido);
+    if (!r.ok) { avisarFalha('marcar como perdido', r.erro); return; }
+    setPerdendo(null); setMotivoEscolhido('');
     load();
   };
 
   const remove = async (id?: string) => {
     if (!id) return;
-    await commercialStore.remove(id);
+    const r = await commercialStore.remove(id);
+    if (!r.ok) { avisarFalha('remover o lead', r.erro); return; }
     load();
   };
 
@@ -575,6 +608,44 @@ export default function Comercial() {
           onClose={() => setProposalEditor(null)}
           onSaved={load}
         />
+      )}
+
+      {/* Motivo da perda — o banco EXIGE (CHECK perdido_exige_motivo) e a tela não
+          pedia, então "Perdido" falhava sempre e em silêncio. A lista é fechada e
+          vem do banco: se ela não carregar, a tela DIZ isso em vez de deixar
+          marcar sem motivo — recusar é melhor que gravar errado. */}
+      {perdendo && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => { setPerdendo(null); setMotivoEscolhido(''); }}>
+          <div className="bg-surface-container border border-outline/15 w-full max-w-md p-5 space-y-3" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-base font-bold text-on-surface">Marcar como perdido</h3>
+            <p className="text-sm text-on-surface-variant">
+              {perdendo.company} — por que a venda não aconteceu?
+            </p>
+            {motivos.length === 0 ? (
+              <p className="text-sm text-warning border border-warning-bd bg-warning-bg p-2">
+                Não consegui carregar a lista de motivos. Sem motivo o banco recusa,
+                então marcar agora só daria erro. Tente recarregar a página.
+              </p>
+            ) : (
+              <div className="space-y-1.5">
+                {motivos.map((m) => (
+                  <button key={m.chave} onClick={() => setMotivoEscolhido(m.chave)}
+                    className={`w-full text-left px-3 py-2 text-sm border transition ${motivoEscolhido === m.chave ? 'border-secondary/60 bg-secondary/15 text-on-surface' : 'border-outline/15 text-on-surface-variant hover:border-outline/40'}`}>
+                    {m.rotulo}
+                  </button>
+                ))}
+              </div>
+            )}
+            <div className="flex justify-end gap-2 pt-1">
+              <button onClick={() => { setPerdendo(null); setMotivoEscolhido(''); }}
+                className="px-3 py-1.5 text-sm text-on-surface-variant hover:text-on-surface">Cancelar</button>
+              <button onClick={confirmarPerda} disabled={!motivoEscolhido}
+                className="px-3 py-1.5 text-sm bg-danger/15 border border-danger/40 text-danger disabled:opacity-40 disabled:cursor-not-allowed">
+                Marcar como perdido
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Form modal */}

@@ -1,6 +1,6 @@
 -- 096 — ops.motivos_perda: fechar a lista de motivo de perda
 --
--- ⚠ NÃO APLICADA, e NÃO APLICÁVEL COMO ESTÁ — falta a semente. Ver §0.
+-- ✔ APLICADA em 09/09/2026, com a semente. (O aviso de "não aplicável sem semente" do §0 fica: era verdade e é o motivo de a estrutura e a semente terem entrado juntas.)
 --    Estrutura pedida pelo Orquestrador Geral (09/09) para adiantar o desenho.
 --    A semente sai do dono, com as palavras dele. O MKT pergunta no canal dele.
 --

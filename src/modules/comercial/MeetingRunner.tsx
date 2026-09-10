@@ -6,10 +6,11 @@ import { meetingStore, type MeetingSession, type ActionItem } from '../../lib/me
 import PlaybookView from './PlaybookView';
 
 const STAGES: { key: LeadStage; label: string }[] = [
-  { key: 'lead', label: 'Lead' },
+  { key: 'captado', label: 'Captado' },
   { key: 'contatado', label: 'Contatado' },
   { key: 'conversa', label: 'Conversa' },
   { key: 'demo', label: 'Demo' },
+  { key: 'proposta', label: 'Proposta' },
   { key: 'piloto', label: 'Piloto' },
   { key: 'cliente', label: 'Cliente' },
   { key: 'perdido', label: 'Perdido' },

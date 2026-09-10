@@ -1,6 +1,6 @@
 -- 098 — fecha a TORNEIRA: default privileges de `public` param de conceder a anon
 --
--- ⚠ NÃO APLICADA. Aguarda o "pode" do dono. Portão 66.
+-- ✔ APLICADA em 09/09/2026. Portão 66.
 --
 -- ═══════════════════════════════════════════════════════════════════════════
 -- POR QUE ISTO É A CAUSA E NÃO MAIS UM SINTOMA

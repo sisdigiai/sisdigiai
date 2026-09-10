@@ -1,6 +1,6 @@
 -- 102 — a lista de motivos cai de 5 para 3: duas nasceram de uma frase mal lida
 --
--- ⚠ NÃO APLICADA. Aguarda o "pode" do dono.
+-- ✔ APLICADA em 09/09/2026.
 --
 -- ═══════════════════════════════════════════════════════════════════════════
 -- O QUE ACONTECEU, E POR QUE VALE ESCREVER INTEIRO
