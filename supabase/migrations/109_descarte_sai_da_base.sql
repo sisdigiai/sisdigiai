@@ -1,7 +1,11 @@
 -- 109 — descarte deixa de ser estágio e passa a ser saída da base
 --
--- ⚠ NÃO APLICADA. Desenho fechado entre o Orquestrador Geral e o MKT; a tabela é
---    minha (096), então a migration vem por aqui — R-032.
+-- ✔ APLICADA em 09/09/2026 pelo Orquestrador Geral, com as provas (a) a (g) —
+--   incluindo a (e), a de não-regressão. Reconferido por mim depois: fn_descartar_lead
+--   existe, authenticated executa e anon não, fn_marcar_lead_perdido recusa descarte,
+--   260 leads, 0 saídos, 1 perdido, e 0 views sem o filtro `deleted_at is null`.
+--   Desenho fechado entre o Orquestrador Geral e o MKT; a tabela é minha (096),
+--   então a migration veio por aqui — R-032.
 --
 -- ═══════════════════════════════════════════════════════════════════════════
 -- A PERGUNTA QUE ME FIZERAM, RESPONDIDA COM MEDIÇÃO
