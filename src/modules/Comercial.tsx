@@ -139,7 +139,18 @@ export default function Comercial() {
   const [demos, setDemos] = useState<LandingLead[]>([]);
 
   const load = () => {
-    commercialStore.list().then((rows) => { setLeads(rows); setLoading(false); });
+    commercialStore.list().then(({ rows, erro }) => {
+      setLeads(rows);
+      setLoading(false);
+      if (erro) {
+        show({
+          kind: 'warning',
+          title: 'A lista pode estar desatualizada',
+          description: `Não consegui ler os leads do banco (${erro}). O que está na tela é a última cópia local.`,
+          duration: 12000,
+        });
+      }
+    });
     playbookStore.list().then(setPlaybooks);
     meetingStore.list().then(setMeetings);
     proposalStore.list().then(setProposals);

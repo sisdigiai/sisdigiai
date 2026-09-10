@@ -82,16 +82,25 @@ export const commercialStore = {
     return (data ?? []) as OutreachItem[];
   },
 
-  async list(): Promise<CommercialLead[]> {
-    if (!isSupabaseReady()) return readLocal().map((l) => ({ ...l, stage: estagioLegado(l.stage) }));
+  /** Devolve as linhas E se elas vieram do banco ou do recurso local.
+   *
+   *  O recurso local existe de propósito (modo offline). O problema era não
+   *  distinguir "estou offline por configuração" de "a leitura falhou": em
+   *  09/09/2026 um grant em falta fez esta consulta morrer com 42501, e a tela
+   *  mostrou dado velho do localStorage sem uma palavra. Ninguém reparou até
+   *  outro app cair. Lista vazia e lista desatualizada são indistinguíveis de
+   *  "não há leads" — e é a mesma falha em silêncio que o salvar tinha. */
+  async list(): Promise<{ rows: CommercialLead[]; erro?: string }> {
+    const local = () => readLocal().map((l) => ({ ...l, stage: estagioLegado(l.stage) }));
+    if (!isSupabaseReady()) return { rows: local() };
     const { data, error } = await supabase.from('v_commercial_leads').select('*');
     if (error) {
       console.error('[commercialStore] list', error);
-      return readLocal().map((l) => ({ ...l, stage: estagioLegado(l.stage) }));
+      return { rows: local(), erro: error.message };
     }
     const rows = ((data ?? []) as CommercialLead[]).map((l) => ({ ...l, stage: estagioLegado(l.stage) }));
     writeLocal(rows);
-    return rows;
+    return { rows };
   },
 
   async upsert(lead: CommercialLead): Promise<Resultado> {

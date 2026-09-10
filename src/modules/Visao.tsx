@@ -51,12 +51,16 @@ function brl(n: number): string {
 export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => void }) {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [leads, setLeads] = useState<CommercialLead[]>([]);
+  // Funil a zeros por falha de leitura é indistinguível de funil a zeros de
+  // verdade. O aviso existe para essa diferença, não para o erro em si.
+  const [leadsDegradado, setLeadsDegradado] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const meshRef = useRef<HTMLCanvasElement>(null);
 
   const load = useCallback(async () => {
     const [s, l] = await Promise.all([dashboardStore.summary(), commercialStore.list()]);
-    setSummary(s); setLeads(l); setLoading(false);
+    setSummary(s); setLeads(l.rows); setLoading(false);
+    if (l.erro) setLeadsDegradado(l.erro);
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -214,7 +218,15 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
                   </div>
                 );
               })}
-              {leads.length === 0 && <div className="text-[12px] text-muted italic pt-1">Nenhum lead cadastrado ainda.</div>}
+              {leadsDegradado ? (
+                <div className="text-[12px] text-warning border border-warning/30 bg-warning/10 p-2.5 mt-1">
+                  Não consegui ler os leads do banco — estes números podem estar
+                  desatualizados ou incompletos.
+                  <span className="block font-mono text-[10px] text-warning/80 mt-1">{leadsDegradado}</span>
+                </div>
+              ) : leads.length === 0 ? (
+                <div className="text-[12px] text-muted italic pt-1">Nenhum lead cadastrado ainda.</div>
+              ) : null}
             </div>
           </div>
 
