@@ -100,6 +100,39 @@ O app/codigo/filesystem e a verdade factual. O Cockpit e a fonte documental oper
 - **Auth:** Supabase Auth â€” gate "Acesso restrito" na entrada
 - **Central Clearix (mÃ³dulo interno):** **Ãºnica exceÃ§Ã£o ao isolamento** â€” usa `VITE_CLEARIX_SUPABASE_URL` + auth super_admin **separada** do login DigiAI normal (gate explÃ­cito no UI). UsuÃ¡rio comum digiai **NUNCA** vÃª o banco Clearix.
 
+### 5.1 Checklist de view INVOKER — escrito depois de eu partir uma tela de outro app
+
+Aprendido em 09/09/2026 (migrations 106/107/108). Vale para **toda** view com
+`security_invoker = true` neste banco.
+
+1. **Toda tabela que a view toca precisa do GRANT no CHAMADOR**, não no dono.
+   Numa view invoker o `authenticated` é quem lê — e pela 098 nada nasce
+   concedido. Acrescentar uma coluna que faz join com uma tabela nova sem
+   conceder essa tabela mata a consulta inteira com **42501**.
+
+2. **O Postgres PODA subquery escalar cuja coluna ninguém pede** — e é por isso
+   que o defeito não aparece na hora. `select id, company` não referencia a
+   tabela do join no plano; `select *` traz o SubPlan e morre. Confirma com
+   `explain (costs off)` nas duas formas.
+   Consequência prática: **a avaria só surge quando alguém começa a usar a
+   coluna nova** — noutro app, dias depois, com a aparência de ter sido a
+   mudança dele que partiu.
+
+3. **Trava de migration corre como `postgres`, e postgres lê tudo.** Contar
+   colunas em `information_schema` e conferir valores não prova permissão
+   nenhuma. A verificação tem de:
+   - fazer `set local role authenticated`, **e**
+   - **pedir as colunas novas** (`count(*)` não serve — é podado na mesma).
+
+4. **`set role` prova GRANT, não RLS.** Para RLS continua a ser preciso chamada
+   real com JWT do papel. As duas coisas falham de formas diferentes e nenhuma
+   substitui a outra.
+
+5. **Não fugir do grant com uma view definer que já exista.** Foi a tentação
+   aqui (`v_vendas_motivos`): funcionaria hoje e falharia em silêncio depois,
+   porque ela filtra `where ativo` e um motivo aposentado passaria a devolver
+   NULO. Grant explícito numa lista de domínio sem PII é a resposta certa.
+
 ## 6. Comandos
 
 ### âœ… Verde (rodar sem confirmar)
