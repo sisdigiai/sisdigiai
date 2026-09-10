@@ -48,6 +48,39 @@
 --
 -- ⚠ E o MKT confirma do lado dele antes de aplicar: a definição é dele.
 
+-- ═══════════════════════════════════════════════════════════════════════════
+-- §3 — MEDIDO DEPOIS: quem de FACTO a consultou (pg_stat_statements), 10/09/2026
+-- ═══════════════════════════════════════════════════════════════════════════
+-- O §2 dizia que consulta à mão "não se prova por código". Prova-se pelo banco. O
+-- agente do MKT foi às estatísticas de consulta, e eu reconferi:
+--
+--   estatísticas desde ..................... 2026-07-31 15:48 UTC (41 dias)
+--   descartes por encher (dealloc) ......... 0   (max 5000, ocupadas 3085)
+--   consultas que citam a view:
+--     postgres (Management API) ............ 35 distintas, 57 chamadas —
+--                                            aplicações de migration e verificações
+--     authenticated ........................ 1 distinta, 1 chamada — e NÃO é leitor:
+--                                            um bloco DO de 09/09 18:43 UTC que tenta
+--                                            INSERIR em três views para provar que a
+--                                            escrita é recusada (42501). Não é PostgREST.
+--     service_role / anon .................. 0
+--   funções das rotinas diárias (ordem do dia, sentinela, status diário) ... 0
+--
+-- O `dealloc = 0` é o que fecha o limite que o MKT declarou com honestidade ("uma
+-- consulta rara pode ter sido expulsa quando a tabela enche"): nesta janela a tabela
+-- nunca encheu, logo nada foi expulso. Nenhuma tela, função, cliente da API ou pessoa
+-- com utilizador de app a leu em 41 dias.
+--
+-- O que continua sem prova: uso ANTES de 31/07. E o "briefing diário" do documento de
+-- cadência não existe em nenhuma rotina. A regra que a view tinha não se perde: desde a
+-- `_14` do MKT, `public.v_vendas_hoje` (ramo `sla_vencido`) filtra os mesmos estados e
+-- deu a mesma contagem (17 = 17) — e essa é lida (22 consultas distintas registadas).
+--
+-- O MKT confirmou, do lado dele, que nada seu a lê, e concorda com a linha 39 do
+-- documento de cadência passar a apontar para a /vendas.
+--
+-- Continua a ser do dono: é DROP, e é ele quem sabe se a usava antes de 31/07.
+
 begin;
 
 do $$
