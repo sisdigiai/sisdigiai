@@ -1,7 +1,12 @@
 -- 110 — `v_leads_descartados`: a memória do que se rejeitou passa a ser alcançável
 --
--- ⚠ NÃO APLICADA. Decisão do Orquestrador Geral com o MKT, depois da resposta ao
---    §4.2 da 109. A tabela é minha (096), então a migration vem por aqui — R-032.
+-- ✔ APLICADA em 09/09/2026 pelo Orquestrador Geral, e provada COMO COMPLEMENTO:
+--   descartável antes 0 aqui / 1 na v_commercial_leads → depois de nao_e_otica,
+--   1 aqui com rótulo "Não é ótica" e 0 lá — que é o passo 3, o único que prova
+--   complemento e não só leitura. Reconferido por mim depois: invoker on,
+--   authenticated lê, anon não, 260 vivos / 0 descartados / 260 na tabela.
+--   Decisão do Orquestrador Geral com o MKT, depois da resposta ao §4.2 da 109.
+--   A tabela é minha (096), então a migration veio por aqui — R-032.
 --
 -- ═══════════════════════════════════════════════════════════════════════════
 -- POR QUE ESTA VIEW EXISTE, E POR QUE A RESPOSTA MUDOU O DESENHO
