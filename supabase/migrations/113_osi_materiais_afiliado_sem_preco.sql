@@ -1,6 +1,12 @@
 -- 113 — materiais de afiliado da OSI sem preço (TEXTO PÚBLICO)
 --
--- ⚠ NÃO APLICADA. Decisão do dono (portão 97, canal do Orquestrador Geral): OSI a
+-- ✔ APLICADA em 10/09/2026 pelo Orquestrador Geral, sob o portão 97. Reconferido por
+--   mim depois, rodando a trava final DESTE arquivo contra o banco: 17 de 17 campos
+--   batem por md5 com o arquivo do steward; 0 materiais ativos com preço, estreia,
+--   lançamento ou "R$"; 7 com o texto antigo em metadata; 0 U+FFFD. Os 3 materiais
+--   fora do patch não foram tocados.
+--
+-- (Escrita como NÃO APLICADA.) Decisão do dono (portão 97, canal do Orquestrador Geral): OSI a
 --    R$ 49 cheio, sem "de R$ 97", sem "% off", sem turma de estreia/lançamento;
 --    materiais de afiliado SEM preço — o preço aparece só no checkout.
 --    Tabela minha (marketing.*) — R-032.
@@ -33,7 +39,9 @@
 --
 -- AS IMAGENS: conferi as artes-fonte no repositório da OSI (public/materiais-afiliado)
 -- — banner quadrado, banner story, card da Taty e o slide 7 (CTA) do carrossel.
--- Nenhuma tem preço desenhado: dizem "Manual visual + app + 90 dias de apoio",
+-- Nenhuma tem preço desenhado HOJE — conferi DEPOIS de o
+-- steward as refazer em 10/09 (mapa do Geral, §3), então isto confirma o conserto, não
+-- que nunca tiveram. Dizem "Manual visual + app + 90 dias de apoio",
 -- "Garantia de 7 dias", "Link na bio". O reel (mp4) NÃO conferi. Conferi o arquivo-
 -- fonte, não o publicado no Netlify — se o deploy da landing estiver atrasado em
 -- relação ao repositório, o publicado pode diferir.

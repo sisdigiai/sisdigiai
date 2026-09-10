@@ -1,6 +1,12 @@
 -- 115 — os dois prompts ativos que punham o preço velho da OSI em cada peça gerada
 --
--- ⚠ NÃO APLICADA. Decisão do dono (portão 97): sem preço nos materiais, sem
+-- ✔ APLICADA em 10/09/2026 pelo Orquestrador Geral, sob o portão 97. Reconferido por
+--   mim com a trava final deste arquivo: 0 ocorrências de 48,50/lançamento/estreia nos
+--   2 prompts, CTA novo presente nos 2, 0 U+FFFD. O que decidi não tocar ficou
+--   intacto: d5eec42f ainda com "Faixa de preço base: R$ 97"; 2353ec9b ainda com
+--   "estreia".
+--
+-- (Escrita como NÃO APLICADA.) Decisão do dono (portão 97): sem preço nos materiais, sem
 --    "lançamento". Tabela minha (marketing.*) — R-032.
 --
 -- ═══════════════════════════════════════════════════════════════════════════
