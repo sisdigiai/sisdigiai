@@ -3,7 +3,7 @@ import { Plus, Trash2, Briefcase, Pencil, X, Play, FileText, Search, Target, Ale
 import PageHeader from '../components/PageHeader';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../contexts/ToastContext';
-import type { MotivoPerda } from '../lib/commercialStore';
+import type { MotivoSaida, TipoSaida, LeadDescartado } from '../lib/commercialStore';
 import { commercialStore, type CommercialLead, type LeadStage, type OutreachItem } from '../lib/commercialStore';
 import { playbookStore, type Playbook } from '../lib/playbookStore';
 import { meetingStore, type MeetingSession } from '../lib/meetingStore';
@@ -120,12 +120,15 @@ export default function Comercial() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<CommercialLead | null>(null);
   const { show } = useToast();
-  // Fluxo de perda: o lead fica "em espera" enquanto se escolhe o motivo.
-  const [perdendo, setPerdendo] = useState<CommercialLead | null>(null);
+  // Saída do funil: o lead fica "em espera" enquanto se escolhe o motivo. O tipo
+  // decide a porta — perda (a ótica disse não) ou descarte (o cadastro não presta).
+  const [saindo, setSaindo] = useState<{ lead: CommercialLead; tipo: TipoSaida } | null>(null);
   const [motivoEscolhido, setMotivoEscolhido] = useState('');
-  const [motivos, setMotivos] = useState<MotivoPerda[]>([]);
-  useEffect(() => { commercialStore.motivosPerda().then(setMotivos); }, []);
-  const [tab, setTab] = useState<'pipeline' | 'reunioes' | 'propostas'>('pipeline');
+  const [motivos, setMotivos] = useState<MotivoSaida[]>([]);
+  useEffect(() => { commercialStore.motivosSaida().then(setMotivos); }, []);
+  const [descartados, setDescartados] = useState<LeadDescartado[]>([]);
+  const [descartadosErro, setDescartadosErro] = useState<string | null>(null);
+  const [tab, setTab] = useState<'pipeline' | 'reunioes' | 'propostas' | 'descartados'>('pipeline');
   const [playbooks, setPlaybooks] = useState<Playbook[]>([]);
   const [meetings, setMeetings] = useState<MeetingSession[]>([]);
   const [proposals, setProposals] = useState<Proposal[]>([]);
@@ -155,6 +158,7 @@ export default function Comercial() {
     meetingStore.list().then(setMeetings);
     proposalStore.list().then(setProposals);
     commercialStore.listOutreach().then(setOutreach);
+    commercialStore.listDescartados().then(({ rows, erro }) => { setDescartados(rows); setDescartadosErro(erro ?? null); });
     roadmapStore.listPhases().then((ps) => setFaseAtual(ps.find((p) => !p.completed_at && p.started_at) ?? null));
     supabase.from('v_marketing_landing_leads').select('id,product,name,email,phone_e164,notes,utm_source,utm_campaign,status,created_at')
       .in('product', DEMO_PRODUCTS).order('created_at', { ascending: false })
@@ -198,7 +202,7 @@ export default function Comercial() {
   const acao = useMemo(() => {
     const hoje = new Date().toISOString().slice(0, 10);
     const followupsVencidos = meetings.filter((m) => m.follow_up_date && m.follow_up_date <= hoje && m.next_action);
-    const trabalhados = leads.filter((l) => ['contatado', 'conversa', 'demo', 'piloto'].includes(l.stage));
+    const trabalhados = leads.filter((l) => ['contatado', 'conversa', 'demo', 'proposta', 'piloto'].includes(l.stage));
     const parados = trabalhados
       .map((l) => ({ lead: l, dias: diasParado(l.updated_at) ?? 0 }))
       .filter((x) => x.dias >= 7)
@@ -235,24 +239,22 @@ export default function Comercial() {
   const moveStage = async (lead: CommercialLead, stage: LeadStage) => {
     // Perder exige motivo (CHECK do banco). Sem isto, arrastar para "Perdido"
     // falhava sempre — era o caminho mais usado e o único sem saída.
-    if (stage === 'perdido') { setPerdendo(lead); return; }
+    if (stage === 'perdido') { setSaindo({ lead, tipo: 'perda' }); return; }
     const r = await commercialStore.upsert({ ...lead, stage });
     if (!r.ok) { avisarFalha('mudar o estágio', r.erro); return; }
     load();
   };
 
-  const confirmarPerda = async () => {
-    if (!perdendo?.id || !motivoEscolhido) return;
-    const r = await commercialStore.marcarPerdido(perdendo.id, motivoEscolhido);
-    if (!r.ok) { avisarFalha('marcar como perdido', r.erro); return; }
-    setPerdendo(null); setMotivoEscolhido('');
-    load();
-  };
+  const fecharSaida = () => { setSaindo(null); setMotivoEscolhido(''); };
 
-  const remove = async (id?: string) => {
-    if (!id) return;
-    const r = await commercialStore.remove(id);
-    if (!r.ok) { avisarFalha('remover o lead', r.erro); return; }
+  const confirmarSaida = async () => {
+    if (!saindo?.lead.id || !motivoEscolhido) return;
+    const perda = saindo.tipo === 'perda';
+    const r = perda
+      ? await commercialStore.marcarPerdido(saindo.lead.id, motivoEscolhido)
+      : await commercialStore.descartar(saindo.lead.id, motivoEscolhido);
+    if (!r.ok) { avisarFalha(perda ? 'marcar como perdido' : 'descartar o cadastro', r.erro); return; }
+    fecharSaida();
     load();
   };
 
@@ -275,7 +277,7 @@ export default function Comercial() {
 
       {/* Tabs */}
       <div className="flex items-center gap-1 border-b border-outline/10 mb-6">
-        {([['pipeline', 'Pipeline'], ['reunioes', `Reuniões (${meetings.length})`], ['propostas', `Propostas (${proposals.length})`]] as const).map(([k, label]) => (
+        {([['pipeline', 'Pipeline'], ['reunioes', `Reuniões (${meetings.length})`], ['propostas', `Propostas (${proposals.length})`], ['descartados', `Descartados (${descartados.length})`]] as const).map(([k, label]) => (
           <button
             key={k}
             onClick={() => setTab(k)}
@@ -496,7 +498,7 @@ export default function Comercial() {
                               <button onClick={() => setEditing(lead)} aria-label="Editar" className="text-muted hover:text-on-surface">
                                 <Pencil className="w-3.5 h-3.5" />
                               </button>
-                              <button onClick={() => remove(lead.id)} aria-label="Excluir" className="text-muted hover:text-danger">
+                              <button onClick={() => setSaindo({ lead, tipo: 'descarte' })} aria-label="Descartar cadastro" title="Descartar cadastro — sai da base e fica em Descartados" className="text-muted hover:text-warning">
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
@@ -511,9 +513,12 @@ export default function Comercial() {
                             )}
                           </div>
                           {lead.next_step && <div className="text-[10px] text-muted leading-snug">→ {lead.next_step}</div>}
+                          {lead.stage === 'perdido' && lead.motivo_rotulo && (
+                            <div className="text-[10px] text-danger leading-snug">✕ {lead.motivo_rotulo}</div>
+                          )}
                           {(() => {
                             const d = diasParado(lead.updated_at);
-                            if (d != null && d >= 7 && !['lead', 'cliente', 'perdido'].includes(lead.stage)) {
+                            if (d != null && d >= 7 && !['captado', 'cliente', 'perdido'].includes(lead.stage)) {
                               return <div className={`text-[9px] font-mono uppercase tracking-wider ${d >= 14 ? 'text-danger' : 'text-warning'}`}>parado há {d}d</div>;
                             }
                             return null;
@@ -601,6 +606,34 @@ export default function Comercial() {
         </div>
       )}
 
+      {tab === 'descartados' && (
+        <div className="space-y-2">
+          <p className="text-xs text-muted">
+            Cadastros que saíram da base por defeito do registro — não são vendas perdidas.
+            Ficam guardados para a próxima raspagem não os trazer de volta.
+          </p>
+          {descartadosErro ? (
+            <div className="text-sm text-warning border border-warning/30 bg-warning/10 p-2.5">
+              Não consegui ler os descartados do banco.
+              <span className="block font-mono text-[10px] text-warning/80 mt-1">{descartadosErro}</span>
+            </div>
+          ) : descartados.length === 0 ? (
+            <div className="text-sm text-muted">Nenhum cadastro descartado.</div>
+          ) : descartados.map((d) => (
+            <div key={d.id} className="border border-outline/10 bg-surface-low p-3 flex flex-wrap items-center gap-x-4 gap-y-1">
+              <span className="text-[11px] font-mono tabular-nums text-muted w-20">{dt(d.deleted_at)}</span>
+              <div className="min-w-0 flex-1">
+                <span className="text-sm font-medium text-on-surface">{d.company}</span>
+                {(d.contact || d.source) && <span className="text-[11px] text-muted ml-2">{[d.contact, d.source].filter(Boolean).join(' · ')}</span>}
+              </div>
+              {d.motivo_rotulo
+                ? <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 bg-warning/10 text-warning border border-warning/30">{d.motivo_rotulo}</span>
+                : <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 bg-surface-high text-muted" title="Saiu pela lixeira antiga, que não pedia motivo">sem motivo registrado</span>}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Runner de reunião */}
       {runner && (
         <MeetingRunner
@@ -621,43 +654,54 @@ export default function Comercial() {
         />
       )}
 
-      {/* Motivo da perda — o banco EXIGE (CHECK perdido_exige_motivo) e a tela não
-          pedia, então "Perdido" falhava sempre e em silêncio. A lista é fechada e
-          vem do banco: se ela não carregar, a tela DIZ isso em vez de deixar
-          marcar sem motivo — recusar é melhor que gravar errado. */}
-      {perdendo && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => { setPerdendo(null); setMotivoEscolhido(''); }}>
-          <div className="bg-surface-container border border-outline/15 w-full max-w-md p-5 space-y-3" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-base font-bold text-on-surface">Marcar como perdido</h3>
-            <p className="text-sm text-on-surface-variant">
-              {perdendo.company} — por que a venda não aconteceu?
-            </p>
-            {motivos.length === 0 ? (
-              <p className="text-sm text-warning border border-warning-bd bg-warning-bg p-2">
-                Não consegui carregar a lista de motivos. Sem motivo o banco recusa,
-                então marcar agora só daria erro. Tente recarregar a página.
+      {/* Saída do funil — perda ou descarte, cada um com a sua lista. O banco EXIGE
+          motivo nos dois e recusa o motivo do tipo errado (109); a tela só mostra os
+          do tipo certo para a pessoa nem chegar a errar. Se a lista não carregar, a
+          tela DIZ isso em vez de deixar sair sem motivo — recusar é melhor que
+          gravar errado. */}
+      {saindo && (() => {
+        const perda = saindo.tipo === 'perda';
+        const opcoes = motivos.filter((m) => m.tipo === saindo.tipo);
+        return (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={fecharSaida}>
+            <div className="bg-surface-container border border-outline/15 w-full max-w-md p-5 space-y-3" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-base font-bold text-on-surface">{perda ? 'Marcar como perdido' : 'Descartar cadastro'}</h3>
+              <p className="text-sm text-on-surface-variant">
+                {saindo.lead.company} — {perda ? 'por que a venda não aconteceu?' : 'o que há de errado com este cadastro?'}
               </p>
-            ) : (
-              <div className="space-y-1.5">
-                {motivos.map((m) => (
-                  <button key={m.chave} onClick={() => setMotivoEscolhido(m.chave)}
-                    className={`w-full text-left px-3 py-2 text-sm border transition ${motivoEscolhido === m.chave ? 'border-secondary/60 bg-secondary/15 text-on-surface' : 'border-outline/15 text-on-surface-variant hover:border-outline/40'}`}>
-                    {m.rotulo}
-                  </button>
-                ))}
+              {!perda && (
+                <p className="text-xs text-muted">
+                  Sai da base e do funil, e fica na aba Descartados. Se a ótica avaliou e
+                  disse não, não é descarte — é perda: mude o estágio para Perdido.
+                </p>
+              )}
+              {opcoes.length === 0 ? (
+                <p className="text-sm text-warning border border-warning-bd bg-warning-bg p-2">
+                  Não consegui carregar a lista de motivos. Sem motivo o banco recusa,
+                  então {perda ? 'marcar' : 'descartar'} agora só daria erro. Tente recarregar a página.
+                </p>
+              ) : (
+                <div className="space-y-1.5">
+                  {opcoes.map((m) => (
+                    <button key={m.chave} onClick={() => setMotivoEscolhido(m.chave)}
+                      className={`w-full text-left px-3 py-2 text-sm border transition ${motivoEscolhido === m.chave ? 'border-secondary/60 bg-secondary/15 text-on-surface' : 'border-outline/15 text-on-surface-variant hover:border-outline/40'}`}>
+                      {m.rotulo}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div className="flex justify-end gap-2 pt-1">
+                <button onClick={fecharSaida}
+                  className="px-3 py-1.5 text-sm text-on-surface-variant hover:text-on-surface">Cancelar</button>
+                <button onClick={confirmarSaida} disabled={!motivoEscolhido}
+                  className={`px-3 py-1.5 text-sm border disabled:opacity-40 disabled:cursor-not-allowed ${perda ? 'bg-danger/15 border-danger/40 text-danger' : 'bg-warning/15 border-warning/40 text-warning'}`}>
+                  {perda ? 'Marcar como perdido' : 'Descartar'}
+                </button>
               </div>
-            )}
-            <div className="flex justify-end gap-2 pt-1">
-              <button onClick={() => { setPerdendo(null); setMotivoEscolhido(''); }}
-                className="px-3 py-1.5 text-sm text-on-surface-variant hover:text-on-surface">Cancelar</button>
-              <button onClick={confirmarPerda} disabled={!motivoEscolhido}
-                className="px-3 py-1.5 text-sm bg-danger/15 border border-danger/40 text-danger disabled:opacity-40 disabled:cursor-not-allowed">
-                Marcar como perdido
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Form modal */}
       {editing && (

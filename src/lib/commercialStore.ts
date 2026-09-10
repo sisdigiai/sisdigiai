@@ -13,7 +13,24 @@ export type LeadStage = 'captado' | 'contatado' | 'conversa' | 'demo' | 'propost
  *  como se tivesse gravado. */
 export type Resultado = { ok: true; erro?: undefined } | { ok: false; erro: string };
 
-export interface MotivoPerda { chave: string; rotulo: string }
+/** Sair do funil tem DOIS sentidos, e o banco separa-os desde a 109:
+ *  `perda` — a ótica avaliou e disse não (fica no funil, coluna Perdido);
+ *  `descarte` — o cadastro não presta (sai da base, fica na aba Descartados).
+ *  Com 254 dos 260 leads vindos de raspagem, misturá-los fazia o relatório de
+ *  perda ser sobre higiene de dado e não sobre o mercado. */
+export type TipoSaida = 'perda' | 'descarte';
+export interface MotivoSaida { chave: string; rotulo: string; tipo: TipoSaida }
+
+export interface LeadDescartado {
+  id: string;
+  company: string;
+  contact: string | null;
+  source: string | null;
+  motivo_perda: string | null;
+  /** Nulo = saiu pela lixeira antiga, que não pedia motivo (a 111 fecha essa porta). */
+  motivo_rotulo: string | null;
+  deleted_at: string;
+}
 
 /** `lead` foi estágio válido nesta tela até 09/09 e pode estar no localStorage de
  *  quem usou antes. Sem esta tradução, esses cards sumiriam do quadro — nenhuma
@@ -35,6 +52,10 @@ export interface CommercialLead {
   next_step: string;
   notes: string;
   updated_at?: string;
+  /** Só leitura, vêm da view (106/107). A escrita não os envia: o upsert só lê
+   *  as chaves que conhece. */
+  motivo_perda?: string | null;
+  motivo_rotulo?: string | null;
 }
 
 const LS_KEY = 'digiai_commercial_leads';
@@ -119,11 +140,17 @@ export const commercialStore = {
     return { ok: true };
   },
 
-  async remove(id: string): Promise<Resultado> {
+  /** Tira o lead da base POR DEFEITO DO CADASTRO — não é perda de venda.
+   *  Substitui o antigo `remove()`, que gravava a saída sem motivo e deixava
+   *  "descartado" e "alguém carregou no lixo" indistinguíveis (a 111 aposenta essa
+   *  RPC e passa a exigir motivo). A linha fica guardada no banco: é a memória do
+   *  que já se rejeitou. A cópia local só perde o lead DEPOIS de o banco aceitar —
+   *  o `remove()` apagava antes, e uma recusa deixava as duas cópias a discordar. */
+  async descartar(id: string, motivo: string): Promise<Resultado> {
+    if (!isSupabaseReady()) return { ok: false, erro: 'sem conexão' };
+    const { error } = await supabase.rpc('fn_descartar_lead', { p_lead_id: id, p_motivo: motivo });
+    if (error) { console.error('[commercialStore] descartar', error); return { ok: false, erro: error.message }; }
     writeLocal(readLocal().filter((r) => r.id !== id));
-    if (!isSupabaseReady()) return { ok: true };
-    const { error } = await supabase.rpc('fn_delete_commercial_lead', { p_id: id });
-    if (error) { console.error('[commercialStore] remove', error); return { ok: false, erro: error.message }; }
     return { ok: true };
   },
 
@@ -137,15 +164,24 @@ export const commercialStore = {
     return { ok: true };
   },
 
-  /** Lista de motivos ATIVOS. Vem de `v_vendas_motivos`, que já existia para a
-   *  tela /vendas do digiai_mkt — reusar em vez de criar uma segunda view sobre a
-   *  mesma tabela, senão as duas telas passam a divergir sem ninguém reparar.
+  /** Motivos ATIVOS dos dois tipos, de `v_motivos_saida` — a view única que serve
+   *  as duas telas (`v_vendas_motivos` fica só como compatibilidade até o MKT a
+   *  apagar). Quem chama separa por `tipo`.
    *  Degrada em vazio: a tela diz que não conseguiu carregar, em vez de oferecer
    *  uma lista inventada que o banco depois recusa. */
-  async motivosPerda(): Promise<MotivoPerda[]> {
+  async motivosSaida(): Promise<MotivoSaida[]> {
     if (!isSupabaseReady()) return [];
-    const { data, error } = await supabase.from('v_vendas_motivos').select('chave, rotulo').order('ordem');
-    if (error) { console.error('[commercialStore] motivosPerda', error); return []; }
-    return (data ?? []) as MotivoPerda[];
+    const { data, error } = await supabase.from('v_motivos_saida').select('chave, rotulo, tipo').order('ordem');
+    if (error) { console.error('[commercialStore] motivosSaida', error); return []; }
+    return (data ?? []) as MotivoSaida[];
+  },
+
+  /** Os que saíram da base. Devolve o erro em vez de engolir — a mesma lição do
+   *  `list()`: lista vazia por falha é indistinguível de "nunca se descartou nada". */
+  async listDescartados(): Promise<{ rows: LeadDescartado[]; erro?: string }> {
+    if (!isSupabaseReady()) return { rows: [] };
+    const { data, error } = await supabase.from('v_leads_descartados').select('*');
+    if (error) { console.error('[commercialStore] listDescartados', error); return { rows: [], erro: error.message }; }
+    return { rows: (data ?? []) as LeadDescartado[] };
   },
 };
