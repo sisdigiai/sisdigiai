@@ -5,11 +5,15 @@
 --   Reconferido por mim com a trava final deste arquivo: 49.00, launch_condition nulo,
 --   canal nas notas E notas antigas preservadas, checkout intacto, nenhum produto com
 --   48,50 ou estreia.
---   ⚠ A prova (c) — totais de v_vendas_eventos ANTES e DEPOIS — ficou por fazer:
---   ninguém tirou o "antes". O que sustenta "não mexe no faturamento" é a leitura da
---   definição da view (soma o valor pago, não price_brl), não uma comparação medida.
---   Checkout: o mapa do Geral (Cockpit/osi-brecha-entre-apps-2026-09-11.md, §3) dá
---   Hotmart e Kiwify a R$ 49,00 desde 10/09. Não conferido por mim.
+--   ⚠ A prova (c) — totais de v_vendas_eventos ANTES e DEPOIS — foi tentada e é
+--   VAZIA: a view tem 0 linhas dos dois lados (0 pagamentos pagos, 0 vendas Hotmart,
+--   0 cancelamentos; conferido por mim em 10/09). Total 0 = 0 é verdadeiro e não prova
+--   nada. O que sustenta "não mexe no faturamento" é a leitura da definição da view
+--   (soma o valor pago, não price_brl). A prova só fica possível com a primeira venda.
+--   (Registo anterior deste cabeçalho dizia "ficou por fazer" — corrigido: foi feita,
+--   e o que falta não é a medição, é haver o que medir.)
+--   Checkout Hotmart a R$ 49,00: confirmado pelo steward da OSI no checkout público
+--   (10/09, segundo o Geral). Não conferido por mim.
 --
 -- (Escrita como NÃO APLICADA.) Decisão do dono (portão 97, canal do Orquestrador Geral): OSI a
 --    R$ 49 cheio, sem "de R$ 97", sem "% off", sem turma de estreia/lançamento.
