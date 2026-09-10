@@ -1,7 +1,7 @@
 -- 111 — sair da base passa a exigir motivo, e a lixeira antiga se aposenta
 --
 -- ✔ APLICADA em 10/09/2026 pelo Orquestrador Geral, DEPOIS de o front b3437a0
---   estar no ar (meta build 18:36:57, e fn_delete_commercial_lead com 0 ocorrências
+--   estar no ar (meta build 18:36:57 horário de Brasília (21:36 UTC), e fn_delete_commercial_lead com 0 ocorrências
 --   no bundle publicado). Provas: (a) lixeira antiga → 0A000 apontando
 --   fn_descartar_lead; (b) deleted_at sem motivo → 23514; (c) não-regressão —
 --   fn_descartar_lead continua a gravar, numa transação desfeita. Reconferido por mim
