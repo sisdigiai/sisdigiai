@@ -94,23 +94,14 @@ with (security_invoker = true) as
          -- aconteça o que acontecer do outro lado. Aqui `chave` é PK e o join
          -- seria igualmente seguro — mas view que alimenta contagem é o pior
          -- sítio para depender de uma unicidade que vive noutra migration.
-         (select m.tipo   from ops.motivos_perda m where m.chave = l.motivo_perda) as motivo_tipo,
-         -- `motivo_rotulo` resolvido aqui e não no cliente (pedido do MKT, e a
-         -- razão é boa): rótulo derivado no cliente obriga cada tela a lembrar-se
-         -- de derivar, e a que esquecer mostra o slug cru sem se queixar. Resolver
-         -- na leitura também garante que renomear um rótulo aparece em todo o lado
-         -- na chamada seguinte, sem deploy de front. Duas subqueries e não um
-         -- lateral: são duas buscas por PK numa tabela de 7 linhas, e o custo não
-         -- justifica trocar um construto que PROVADAMENTE não duplica por um que
-         -- depende de eu ter escrito o `limit 1` certo.
-         (select m.rotulo from ops.motivos_perda m where m.chave = l.motivo_perda) as motivo_rotulo,
+         (select m.tipo from ops.motivos_perda m where m.chave = l.motivo_perda) as motivo_tipo,
          l.perdido_em
   from ops.commercial_leads l
   where l.deleted_at is null
   order by l.created_at desc;
 
 comment on view public.v_commercial_leads is
-  'Leads vivos (deleted_at is null). INVOKER: a RLS de ops.commercial_leads é que manda, e é assim que tem de ser — isto é dado de pessoa. CONSUMIDORES: módulo Comercial do digiai (select *), Posto.tsx e Oticas.tsx do digiai_mkt (colunas nomeadas). `motivo_tipo` e `motivo_rotulo` acrescentados na 106: sem eles nenhuma tela consegue separar "a ótica disse não" (objeção de mercado) de "o cadastro não presta" (higiene de dado), e a contagem de "Perdidos" no ecrã soma as duas coisas. Contar perda de verdade é stage=perdido AND motivo_tipo=perda — e vem pronto de propósito, porque verdade derivável só é verdade se cada consumidor se lembrar de derivar.';
+  'Leads vivos (deleted_at is null). INVOKER: a RLS de ops.commercial_leads é que manda, e é assim que tem de ser — isto é dado de pessoa. CONSUMIDORES: módulo Comercial do digiai (select *), Posto.tsx e Oticas.tsx do digiai_mkt (colunas nomeadas). `motivo_tipo` acrescentado na 106: sem ele nenhuma tela consegue separar "a ótica disse não" de "o cadastro não presta", e a contagem de "Perdidos" no ecrã soma as duas coisas. Contar perda de verdade é stage=perdido AND motivo_tipo=perda.';
 
 -- ═══════════════════════════════════════════════════════════════════════════
 -- §4 — ⚠ SEGUNDO ACRÉSCIMO, pequeno: a mensagem de erro deixa de ensinar errado
@@ -199,9 +190,9 @@ begin
 
   select count(*) into n_view from information_schema.columns
    where table_schema='public' and table_name='v_commercial_leads'
-     and column_name in ('motivo_perda','motivo_tipo','motivo_rotulo','perdido_em');
-  if n_view <> 4 then
-    raise exception 'v_commercial_leads não expôs as 4 colunas de saída (achei %) — sem elas a tela continua a somar perda com descarte.', n_view;
+     and column_name in ('motivo_perda','motivo_tipo','perdido_em');
+  if n_view <> 3 then
+    raise exception 'v_commercial_leads não expôs as 3 colunas de saída (achei %) — sem elas a tela continua a somar perda com descarte.', n_view;
   end if;
 
   -- Controle de não-regressão do grant: a 098 diz que objeto não nasce concedido,
@@ -222,8 +213,6 @@ commit;
 --   a) `fn_marcar_lead_perdido(lead, 'cadastro_ruim')` → grava, e a view devolve
 --      motivo_tipo = 'descarte';
 --   b) o mesmo com 'medo_mudanca' → motivo_tipo = 'perda';
---   b2) nos dois, `motivo_rotulo` vem preenchido — nulo ali é o modo de falhar
---      silencioso destas subqueries, e a tela mostraria o slug cru sem reclamar;
 --   c) motivo inexistente → 23503 com a lista SEPARADA nos dois tipos (é o §4);
 --   d) `select count(*) filter (where stage='perdido') as ecra_hoje,
 --              count(*) filter (where stage='perdido' and motivo_tipo='perda') as perda_real
