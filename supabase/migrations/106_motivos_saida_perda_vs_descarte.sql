@@ -1,7 +1,9 @@
 -- 106 — separar "a ótica disse não" de "o cadastro não presta"
 --
--- ⚠ NÃO APLICADA. Escrita a pedido do Orquestrador Geral (decisão dele, com o
---    MKT). A tabela é minha (096), então a migration vem por aqui — R-032.
+-- ✔ APLICADA em 09/09/2026 pelo Orquestrador Geral, nesta versão (3 colunas de
+--   saída na view). O `motivo_rotulo`, aceite depois, entrou pela 107.
+--   Decisão dele com o MKT; a tabela é minha (096), então a migration veio por
+--   aqui — R-032.
 --
 -- ═══════════════════════════════════════════════════════════════════════════
 -- O PROBLEMA, MEDIDO ANTES DE ESCREVER — e é maior do que o caso que o motivou
