@@ -4,12 +4,18 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
 /**
  * Frota, agente 1 — o verificador de fatos.
  *
- * Le mkt.fatos (tabela do agente do MKT — so leitura, R-032), mede cada fato na
- * fonte que ele mesmo declara, e grava o veredito em ops.fato_medicao.
+ * Le os fatos publicaveis (mkt.fatos, pela view), mede cada fato na fonte que ele
+ * mesmo declara, e grava o veredito em ops.fato_medicao.
+ *
+ * DE QUEM E A TABELA: a curadoria de mkt.fatos e do DIGIAI e o MKT so le — regra do
+ * AGENTS.md do MKT (linha 35, 31/07/2026), confirmada na opcao 4.2(a) do mapa da brecha
+ * OSI (Cockpit/osi-brecha-entre-apps-2026-09-11.md). Este comentario dizia o contrario
+ * ("tabela do agente do MKT"), e cada lado tinha escrito que a tabela era do outro.
  *
  * O que ele NAO faz, de proposito:
  *   - nao reescreve o texto do fato (isso e copy, e copy tem dono);
- *   - nao renova `verificado_em` (a tabela e do MKT);
+ *   - nao renova `verificado_em`: medir nao e curar. Mudar um fato e curadoria, e
+ *     passa por migration do digiai (ex.: 118 e 121), nao por esta funcao;
  *   - nao inventa medicao para fonte que exige humano — marca nao_verificavel.
  *
  * Veredito:
@@ -53,8 +59,8 @@ Deno.serve(async (req: Request) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   );
 
-  // Le pela view publica do MKT, nao pela tabela: a tabela e dele (R-032) e o
-  // service_role nem tem grant nela. A view e o contrato que ele publicou.
+  // Le pela view publica, nao pela tabela: o service_role nao tem grant em mkt.fatos,
+  // e a view (criada pelo MKT) e o contrato de leitura. Quem cura a tabela e o digiai.
   const { data: fatos, error } = await sb
     .from('v_mkt_fatos')
     .select('chave, fato, valor_numerico, fonte, verificado_em, validade_dias')
