@@ -36,7 +36,7 @@
 
 **Pipeline (CRM `ops.commercial_leads`):** `lead → contatado → conversa → negociacao → cliente`. Saídas: `perdido` · `optout` (pediu remoção → tirar do Google Contacts no mesmo dia) · `nutricao`.
 
-**Repescagem operacional:** a view `marketing.v_whatsapp_followups_hoje` lista quem está em `contatado` há 48–72h sem ter avançado — é a fila de follow-up do dia, surgindo no briefing diário.
+**Repescagem operacional:** a fila de follow-up do dia está na **/vendas** do digiai_mkt (`public.v_vendas_hoje`, ramo `sla_vencido`): lead em estágio aberto com toque vencido. A antiga `marketing.v_whatsapp_followups_hoje` foi apagada em 10/09/2026 (migration 120 do digiai): nenhuma tela, rotina ou pessoa a consultava desde pelo menos 31/07/2026 (pg_stat_statements), e o "briefing diário" que este documento citava não existia em nenhuma rotina.
 
 ## 3. Travas inegociáveis
 

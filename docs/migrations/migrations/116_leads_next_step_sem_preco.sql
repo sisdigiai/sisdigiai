@@ -1,7 +1,18 @@
 -- 116 — o "próximo passo" de 247 leads deixa de citar o preço velho da OSI
 --
--- ⚠ NÃO APLICADA, e NÃO APLICAR sem a palavra do dono dita no canal do orquestrador
---    do app digiai. É UPDATE em massa em dado real de lead.
+-- ✔ APLICADA em 10/09/2026 às 22:20 (Brasília) = 11/09 01:20 UTC, por mim (orquestrador
+--   do app digiai), com a palavra do dono dita neste canal ("pode fazer as 3"). Segunda
+--   das três, depois da 117. Reconferido depois de aplicar:
+--   a) 0 leads vivos com 48,50 no next_step; 139 + 108 com os textos novos;
+--   b) dos 247, 0 com updated_at na última hora; o mais recente continua em 05/09
+--      04:02 UTC — o "parado há N dias" da tela Comercial ficou como estava;
+--   c) o trigger religou de facto: um update no lead 8dfe0333, dentro de um bloco
+--      desfeito por raise, levou updated_at de 05/09 para a hora da prova; depois do
+--      raise o lead continua em 05/09;
+--   d) o lead saído mantém o modelo velho e as notas do ca8095a3 mantêm o R$48,50.
+--
+-- (Escrita como NÃO APLICADA, à espera da palavra do dono no canal do orquestrador
+--    do app digiai.) É UPDATE em massa em dado real de lead.
 --    Tabela minha (ops.commercial_leads) — R-032.
 --
 -- ═══════════════════════════════════════════════════════════════════════════

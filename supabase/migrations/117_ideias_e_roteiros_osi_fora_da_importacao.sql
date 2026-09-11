@@ -1,7 +1,19 @@
 -- 117 — ideias e roteiros com o preço velho da OSI saem do alcance da importação
 --
--- ⚠ NÃO APLICADA, e NÃO APLICAR sem a palavra do dono dita no canal do orquestrador
---    do app digiai. É soft delete (reversível, mas é retirar conteúdo).
+-- ✔ APLICADA em 10/09/2026 às 22:19 (Brasília) = 11/09 01:19 UTC, por mim (orquestrador
+--   do app digiai), com a palavra do dono dita neste canal ("pode fazer as 3", depois
+--   de eu listar 117 → 116 → 120 prontas). Primeira das três. Reconferido depois:
+--   5 ideias e 5 itens do calendário com deleted_at e a nota da 117 — 10 linhas
+--   marcadas no total, só as da lista; 0 ideias e 0 itens do calendário ainda
+--   importáveis com preço, lançamento ou estreia; os 3 falsos positivos vivos;
+--   mkt.ideias e mkt.roteiros com 0 importados do digiai; 0 U+FFFD.
+--   Aplicada com os 10 ids: a alternativa de poupar a63f46b6 e a8c6e972 para o steward
+--   reescrever não foi pedida. Se for, reverte com deleted_at = null nesses dois.
+--   A prova (b) — chamar as funções de importação numa transação desfeita — não a fiz:
+--   a trava simula o WHERE delas, e com 0 importados não havia cópia a alcançar.
+--
+-- (Escrita como NÃO APLICADA, à espera da palavra do dono no canal do orquestrador
+--    do app digiai.) É soft delete (reversível, mas é retirar conteúdo).
 --    Tabelas minhas (marketing.*) — R-032.
 --
 -- ═══════════════════════════════════════════════════════════════════════════

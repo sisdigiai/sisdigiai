@@ -1,7 +1,16 @@
 -- 120 — `marketing.v_whatsapp_followups_hoje` sai: view sem leitor encontrado
 --
--- ⚠ NÃO APLICADA, e NÃO APLICAR sem a palavra do dono dita no canal do orquestrador do
---    app digiai. É DROP. E há uma razão além de ser drop para ser o dono: ver §2.
+-- ✔ APLICADA em 10/09/2026 às 22:20 (Brasília) = 11/09 01:20 UTC, por mim (orquestrador
+--   do app digiai), com a palavra do dono dita neste canal ("pode fazer as 3"). Terceira
+--   das três, depois da 116. Reconferido: a view não existe; public.v_vendas_hoje existe
+--   e lê (17 linhas); 0 funções e 0 jobs do cron citam a apagada. No mesmo passe, a
+--   linha 39 do documento de cadência passou a apontar para a /vendas (prova c).
+--   A prova (b) — a /vendas do MKT a mostrar o bloco de follow-up — não a vi na tela: a
+--   tela é do MKT. Pelo banco, a view que ela lê está de pé, e nada dependia da apagada
+--   (o drop é sem CASCADE e teria recusado).
+--
+-- (Escrita como NÃO APLICADA, à espera da palavra do dono no canal do orquestrador do
+--    app digiai.) É DROP. E há uma razão além de ser drop para ser o dono: ver §2.
 --
 -- ═══════════════════════════════════════════════════════════════════════════
 -- §1 — QUEM A FEZ E QUEM A LÊ, medido em 10/09/2026
