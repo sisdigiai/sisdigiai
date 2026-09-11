@@ -1,6 +1,21 @@
 -- 119 — a nota do checkout Hotmart e o funil guardado deixam de dizer 48,50 / 97
 --
--- ⚠ NÃO APLICADA. Portão 97 (OSI a R$ 49 cheio). Tabelas minhas (company.*, ops.*).
+-- ✔ APLICADA em 11/09/2026 às 00:23 (Brasília) = 03:23:44 UTC — hora do updated_at do
+--   funil e da linha do audit —, pelo Orquestrador Geral, sob o portão 97 (a palavra
+--   do dono foi dada no canal dele), depois de o `<meta name="build">` mostrar a7a13f6.
+--   Antes disso, conferi a produção com marcadores nos dois sentidos: os textos novos da
+--   f7ee18f estavam presentes e os de preço velho ausentes.
+--   Reconferido por mim com a trava final deste arquivo:
+--   nota do ativo Hotmart = a frase nova, byte a byte; casa com o padrão que a tela lê
+--   e o número extraído é 49,00, igual a academy.products (49.00); 0 preço velho no
+--   JSON do funil; mainPrice 49.00; bump/upsell 197/27/19 intactos; tasks.0 continua a
+--   ser checkout-kiwify, com os dois textos novos; 0 U+FFFD.
+--   d) iam.audit_logs registou o UPDATE da nota (resource ee5d96fc, 03:23:44 UTC,
+--      user_id nulo — foi pela Management API).
+--   a), b), c) são de tela e não as vi: o app pede o login do dono. A (c), editar uma
+--   premissa e ver o banco manter mainPrice 49, é a que prova o conserto do cache.
+--
+-- (Escrita como NÃO APLICADA.) Portão 97 (OSI a R$ 49 cheio). Tabelas minhas (company.*, ops.*).
 --
 -- ⚠ ORDEM: aplicar só DEPOIS de o front do mesmo commit estar no ar. Duas razões, e
 --    a segunda é a que desfaz esta migration se for ignorada:
