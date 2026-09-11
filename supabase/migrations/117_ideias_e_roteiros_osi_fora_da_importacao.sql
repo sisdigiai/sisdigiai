@@ -9,8 +9,15 @@
 --   mkt.ideias e mkt.roteiros com 0 importados do digiai; 0 U+FFFD.
 --   Aplicada com os 10 ids: a alternativa de poupar a63f46b6 e a8c6e972 para o steward
 --   reescrever não foi pedida. Se for, reverte com deleted_at = null nesses dois.
---   A prova (b) — chamar as funções de importação numa transação desfeita — não a fiz:
---   a trava simula o WHERE delas, e com 0 importados não havia cópia a alcançar.
+--   A prova (b) — chamar as funções de importação numa transação desfeita — não a fiz.
+--   Fiz outra, no mesmo dia, depois de aplicar: li os corpos (pg_get_functiondef) e
+--   medi com o WHERE COPIADO deles, e não com o que esta trava simula. Achado: a de
+--   ideias leva também target_audience e o nome do pilar, que a trava não olha.
+--   Com todos os campos que cada uma leva e regex mais larga (R$, 48,5, 47,9, 97,
+--   % off, desconto, lançamento, estreia, 1ª turma, preço): 94 ideias e 64 roteiros
+--   importáveis; casam 8 e 31, todos preço como TEMA de venda de ótica (R$ 890 de
+--   lente, "desconto antes de pedirem", "R$ X") ou falso positivo; 0 com o preço, a
+--   estreia ou o lançamento da OSI. O MKT viu a /vendas na tela: 17, sem erro.
 --
 -- (Escrita como NÃO APLICADA, à espera da palavra do dono no canal do orquestrador
 --    do app digiai.) É soft delete (reversível, mas é retirar conteúdo).
