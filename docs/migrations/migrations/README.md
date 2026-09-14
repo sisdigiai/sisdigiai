@@ -32,4 +32,11 @@ isso nunca precise ser conferido de novo.
    rascunho e o teu apply, renumera o TEU (ainda não aplicado) — nunca o dele.
 4. Duas sessões no mesmo repo na mesma rodada = um executor por repo (lição 05/09).
 
-Próximo número livre em 06/09/2026 (noite): **092** — 090 = revoke anon/PUBLIC em 13 views; 091 = RLS ligada + comentários de intenção em 6 tabelas de ops (portão 28); ambas do orquestrador geral, aplicadas e espelhadas.
+5. **Objeto novo concede EXPLICITAMENTE, e diz a quem serve** (a partir da 098).
+   Antes da 098 o silêncio concedia tudo — `pg_default_acl` do `public` dava
+   `arwdDxtm` a `anon`/`authenticated` em toda view nova e `EXECUTE` a `anon` em
+   toda função nova. Depois dela o silêncio não concede nada. Então:
+   `grant select on … to authenticated;` + `comment on … is 'Consumidor: … Grant: … porque …'`.
+   Grant a `anon` só como exceção documentada, com o motivo no comment.
+
+Próximo número livre em 09/09/2026: **105** — aplicadas: 093, 095, 096, 097, 098, 100, 101, 102. **Escritas e NÃO aplicadas:** 099 (`company.*` por RPC — exige front no mesmo passe), 103 (`fn_marcar_lead_perdido` — a porta que falta para registrar perda) e 104 (auditoria grava IP + `fn_audit_login`; **exige um passo de front** para o LOGIN não ficar inerte). 094 é do MKT.

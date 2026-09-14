@@ -7,10 +7,26 @@
 
 | Arquivo | O que é | Fonte de verdade? |
 |---|---|---|
-| `migrations/` | Cópia fiel das 25 migrations canônicas (`supabase/migrations`) | ✅ **sim** — DDL exato, ordem real |
-| `schema.sql` | Snapshot estrutural atual (CREATE TABLE + RLS + policies) via Management API | retrato legível (para DDL exato, ver `migrations/`) |
-| `seed-candidates.md` | Contagem por tabela — base para decidir o `seed.sql` | — |
-| `seed.sql` | Dados de referência/lookup (curado por humano, **sem PII** — LGPD) | a curar |
+| `migrations/` | Cópia fiel das 136 migrations canônicas (`supabase/migrations`) | ✅ **sim** — DDL exato, ordem real |
+| `schema.sql` | **Só tabelas.** O espelho completo está em `Cockpit/security/espelhos/digiai/schema-completo.sql` (repo privado), porque este repositório é público | retrato legível |
+| `seed-candidates.md` | Contagem por tabela — base para o `seed.sql` | — |
+
+## Prova de contagem (catálogo × escrito)
+
+| objeto | catálogo | escrito | omitido (segredo) | bate |
+|---|--:|--:|--:|:--:|
+| tabelas | 116 | 116 | 0 | ✅ |
+| views | 157 | 157 | 0 | ✅ |
+| materialized views | 0 | 0 | 0 | ✅ |
+| funções | 156 | 155 | 1 | ✅ |
+| triggers | 59 | 59 | 0 | ✅ |
+| constraints | 367 | 367 | 0 | ✅ |
+| índices | 349 | 349 | 0 | ✅ |
+| policies | 203 | 203 | 0 | ✅ |
+| cron.job | 11 | 11 | 0 | ✅ |
+
+- Views por `security_invoker`: **true 124** · **OFF explícito 2** · **ausente 31** (soma 157).
+- Fora do espelho por pertencerem a extensão: 0 view(s), 0 função(ões); agregadas/window (sem `pg_get_functiondef`): 0. `pg_class` bruto (relkind v): 157.
 
 ## Regenerar
 
@@ -18,9 +34,11 @@
 node Cockpit/scripts/dump-db-mirror.mjs digiai
 ```
 
-Lê `SUPABASE_TOKEN` + `VITE_SUPABASE_URL` do `digiai/.env` (nunca expõe). Read-only no banco.
+Lê token Supabase + URL do `digiai/.env` (nunca expõe). Read-only no banco.
 
 ## Ressalvas
 
-- `schema.sql` é estrutural (colunas/tipos/RLS/policies). Constraints, índices e triggers exatos: ver `migrations/`.
-- `seed.sql` **não é gerado automaticamente** — exige curadoria humana por causa da LGPD (R-013).
+- Retrato do banco, não script sequencial: views e funções que dependem umas das outras não estão ordenadas. DDL exato e ordem real: `migrations/`.
+- Fora do espelho: tipos/enums, sequências (só o grant), domínios, default privileges, objetos de extensão (voltam com `CREATE EXTENSION`).
+- Comandos de cron saem com credencial mascarada. Objeto com segredo cravado no corpo é omitido e listado, não mascarado.
+- `seed.sql` **não é gerado automaticamente** — curadoria humana por LGPD (R-013).

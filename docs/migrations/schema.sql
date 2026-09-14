@@ -1,8 +1,11 @@
 -- ============================================================
 -- ESPELHO DE SCHEMA — digiai  (projeto Supabase: digiai / region sa-east-1)
--- Snapshot estrutural gerado via Management API. Read-only.
--- Para o DDL EXATO (constraints/índices/triggers), a fonte canônica é ./migrations/.
--- Regenerar: node Cockpit/scripts/dump-db-mirror.mjs digiai
+-- Gerado em 2026-09-14 por Cockpit/scripts/dump-db-mirror.mjs. Read-only.
+--
+-- Aqui só as TABELAS: o repositório sisdigiai/sisdigiai é PÚBLICO. Grants, policies, corpos de função, RLS e cron são o mapa de
+-- acesso do banco e ficam no espelho completo, no repo privado do Cockpit:
+--   Cockpit/security/espelhos/digiai/schema-completo.sql
+-- Regra: portão 90 da ordem do dia (mapa de acesso sai de repo público). A fonte canônica do DDL é ./migrations/.
 -- ============================================================
 
 CREATE TABLE academy.product_assets (
@@ -127,6 +130,84 @@ CREATE TABLE academy.products (
     created_by uuid DEFAULT current_user_id()
 );
 
+CREATE TABLE analytics.events_catalog (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    code text NOT NULL,
+    funnel_stage text NOT NULL,
+    description text NOT NULL,
+    meta_pixel_event text,
+    tiktok_pixel_event text,
+    ga4_event text,
+    product text,
+    is_active boolean NOT NULL DEFAULT true,
+    sort_order integer NOT NULL DEFAULT 0,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE analytics.events_log (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    event_code text NOT NULL,
+    product text,
+    occurred_at timestamp with time zone NOT NULL DEFAULT now(),
+    session_id text,
+    url text,
+    utm_source text,
+    utm_medium text,
+    utm_campaign text,
+    utm_content text,
+    utm_term text,
+    metadata jsonb DEFAULT '{}'::jsonb,
+    user_agent text,
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE billing.mp_events_raw (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    received_at timestamp with time zone NOT NULL DEFAULT now(),
+    topic text,
+    resource_id text,
+    raw jsonb NOT NULL,
+    signature_ok boolean,
+    processed_at timestamp with time zone,
+    process_error text
+);
+
+CREATE TABLE billing.payments (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    subscriber_id uuid,
+    mp_payment_id text,
+    amount_brl numeric,
+    status text,
+    paid_at timestamp with time zone,
+    period_start date,
+    period_end date,
+    raw jsonb,
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE billing.subscribers (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    product text NOT NULL DEFAULT 'clearix'::text,
+    name text,
+    email text,
+    doc text,
+    phone text,
+    plan_name text,
+    plan_amount_brl numeric,
+    mp_preapproval_id text,
+    tenant_ref text,
+    status text NOT NULL DEFAULT 'active'::text,
+    dunning_stage text NOT NULL DEFAULT 'em_dia'::text,
+    started_on date,
+    last_paid_on date,
+    next_due_on date,
+    notes text,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone NOT NULL DEFAULT now(),
+    deleted_at timestamp with time zone
+);
+
 CREATE TABLE company.api_credentials (
     id uuid NOT NULL DEFAULT gen_random_uuid(),
     provider text NOT NULL,
@@ -204,7 +285,8 @@ CREATE TABLE company.financial_snapshots (
     fechado_em timestamp with time zone,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     updated_at timestamp with time zone NOT NULL DEFAULT now(),
-    created_by uuid
+    created_by uuid,
+    aporte_intelectual_brl numeric NOT NULL DEFAULT 0
 );
 
 CREATE TABLE company.identity (
@@ -294,7 +376,8 @@ CREATE TABLE company.metrics (
     period_end date,
     collected_at timestamp with time zone NOT NULL DEFAULT now(),
     raw_response jsonb,
-    created_at timestamp with time zone NOT NULL DEFAULT now()
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    site text NOT NULL DEFAULT 'digiai.app.br'::text
 );
 
 CREATE TABLE company.partners (
@@ -307,6 +390,38 @@ CREATE TABLE company.partners (
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     updated_at timestamp with time zone NOT NULL DEFAULT now(),
     deleted_at timestamp with time zone
+);
+
+CREATE TABLE company.seo_medicoes (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    site text NOT NULL,
+    medido_em date NOT NULL DEFAULT CURRENT_DATE,
+    janela text NOT NULL DEFAULT '3m'::text,
+    paginas_sitemap integer,
+    sitemap_url text,
+    sitemap_lido_em date,
+    cliques integer,
+    impressoes integer,
+    posicao_media numeric,
+    ctr numeric,
+    fonte text NOT NULL DEFAULT 'gsc-navegador'::text,
+    obs text,
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE company.seo_sites (
+    site text NOT NULL,
+    label text NOT NULL,
+    color text,
+    gsc_property text NOT NULL,
+    bing_site_url text NOT NULL,
+    cloudflare_zone_id text,
+    indexnow_key text,
+    github_repo text,
+    active boolean NOT NULL DEFAULT true,
+    sort_order integer NOT NULL DEFAULT 100,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone NOT NULL DEFAULT now()
 );
 
 CREATE TABLE company.tools (
@@ -331,6 +446,17 @@ CREATE TABLE company.tools (
     deleted_at timestamp with time zone,
     created_by uuid,
     frequencia_cobranca text NOT NULL DEFAULT 'mensal'::text
+);
+
+CREATE TABLE finance.aportes (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    data date NOT NULL,
+    origem text NOT NULL,
+    valor_brl numeric NOT NULL,
+    natureza text NOT NULL,
+    observacao text,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    deleted_at timestamp with time zone
 );
 
 CREATE TABLE finance.expenses (
@@ -374,7 +500,12 @@ CREATE TABLE finance.infra_costs (
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     updated_at timestamp with time zone NOT NULL DEFAULT now(),
     deleted_at timestamp with time zone,
-    created_by uuid
+    created_by uuid,
+    conta_pagadora text,
+    lancamentos integer,
+    parcial boolean NOT NULL DEFAULT false,
+    extrato_ate date,
+    sincronizado_em timestamp with time zone
 );
 
 CREATE TABLE finance.products (
@@ -398,7 +529,10 @@ CREATE TABLE finance.revenue (
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     updated_at timestamp with time zone NOT NULL DEFAULT now(),
     deleted_at timestamp with time zone,
-    created_by uuid
+    created_by uuid,
+    one_time_brl numeric NOT NULL DEFAULT 0,
+    sales_count integer NOT NULL DEFAULT 0,
+    refund_count integer NOT NULL DEFAULT 0
 );
 
 CREATE TABLE finance.subscriptions (
@@ -456,6 +590,18 @@ CREATE TABLE iam.users (
     lgpd_request_at timestamp with time zone,
     lgpd_completed_at timestamp with time zone,
     anonymized_at timestamp with time zone
+);
+
+CREATE TABLE marketing.account_status (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    account_code text NOT NULL,
+    platform text NOT NULL,
+    followers integer,
+    follows integer,
+    media_count integer,
+    captured_on date NOT NULL DEFAULT CURRENT_DATE,
+    raw jsonb NOT NULL DEFAULT '{}'::jsonb,
+    created_at timestamp with time zone NOT NULL DEFAULT now()
 );
 
 CREATE TABLE marketing.affiliate_downloads (
@@ -545,6 +691,13 @@ CREATE TABLE marketing.ai_prompt_templates (
     created_at timestamp with time zone DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now(),
     deleted_at timestamp with time zone
+);
+
+CREATE TABLE marketing.cadence_rules (
+    id text NOT NULL,
+    scope text NOT NULL,
+    rule jsonb NOT NULL,
+    updated_at timestamp with time zone NOT NULL DEFAULT now()
 );
 
 CREATE TABLE marketing.challenge_participations (
@@ -655,7 +808,9 @@ CREATE TABLE marketing.content_calendar (
     saves integer,
     link_clicks integer,
     conversions integer,
-    utm_slug text
+    utm_slug text,
+    art_prompt text,
+    art_filename text
 );
 
 CREATE TABLE marketing.content_ideas (
@@ -736,7 +891,64 @@ CREATE TABLE marketing.hotmart_sales (
     raw_event_id uuid,
     metadata jsonb DEFAULT '{}'::jsonb,
     created_at timestamp with time zone DEFAULT now(),
-    updated_at timestamp with time zone DEFAULT now()
+    updated_at timestamp with time zone DEFAULT now(),
+    platform text NOT NULL DEFAULT 'hotmart'::text
+);
+
+CREATE TABLE marketing.kiwify_events_raw (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    received_at timestamp with time zone NOT NULL DEFAULT now(),
+    event_type text,
+    kiwify_order_id text,
+    product_id text,
+    signature_ok boolean,
+    signature_provided text,
+    payload jsonb NOT NULL,
+    source_ip text,
+    processed boolean DEFAULT false,
+    process_error text,
+    processed_at timestamp with time zone
+);
+
+CREATE TABLE marketing.landing_leads (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    digiai_user_uuid uuid NOT NULL DEFAULT gen_random_uuid(),
+    product text NOT NULL DEFAULT 'osi'::text,
+    name text,
+    email text,
+    phone_e164 text,
+    wa_bsuid text,
+    wa_username text,
+    wa_phone_legacy text,
+    source_url text,
+    session_id text,
+    utm_source text,
+    utm_medium text,
+    utm_campaign text,
+    utm_content text,
+    utm_term text,
+    consent_text text,
+    consent_at timestamp with time zone NOT NULL DEFAULT now(),
+    user_agent text,
+    status text NOT NULL DEFAULT 'novo'::text,
+    notes text,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone NOT NULL DEFAULT now(),
+    deleted_at timestamp with time zone,
+    lgpd_request_at timestamp with time zone,
+    anonymized_at timestamp with time zone
+);
+
+CREATE TABLE marketing.outreach_schedule (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    lead_id uuid NOT NULL,
+    kind text NOT NULL DEFAULT 'primeiro_contato'::text,
+    scheduled_date date NOT NULL,
+    variation character(1),
+    status text NOT NULL DEFAULT 'agendado'::text,
+    sent_at timestamp with time zone,
+    notes text,
+    created_at timestamp with time zone NOT NULL DEFAULT now()
 );
 
 CREATE TABLE marketing.platforms (
@@ -775,6 +987,58 @@ CREATE TABLE marketing.post_ai_outputs (
     updated_at timestamp with time zone DEFAULT now()
 );
 
+CREATE TABLE marketing.post_metrics (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    calendar_post_id uuid,
+    account_code text NOT NULL,
+    external_post_id text NOT NULL,
+    platform text NOT NULL,
+    permalink text,
+    captured_on date NOT NULL DEFAULT CURRENT_DATE,
+    impressions integer,
+    reach integer,
+    likes integer,
+    comments integer,
+    shares integer,
+    saves integer,
+    video_views integer,
+    link_clicks integer,
+    raw jsonb NOT NULL DEFAULT '{}'::jsonb,
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE marketing.product_finance_map (
+    platform_product_id text NOT NULL,
+    finance_product_id text NOT NULL,
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE marketing.social_accounts (
+    account_code text NOT NULL,
+    display_name text NOT NULL,
+    platform text NOT NULL,
+    camada text NOT NULL,
+    meta_ig_user_id text,
+    meta_page_id text,
+    meta_business_id text,
+    public_url text,
+    metrics_enabled boolean NOT NULL DEFAULT false,
+    notes text,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE marketing.social_updates (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    account_code text NOT NULL,
+    update_type text NOT NULL,
+    title text NOT NULL,
+    url text,
+    notes text,
+    happened_on date NOT NULL DEFAULT CURRENT_DATE,
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
 CREATE TABLE marketing.testimonials (
     id uuid NOT NULL DEFAULT gen_random_uuid(),
     full_name text NOT NULL,
@@ -803,6 +1067,514 @@ CREATE TABLE marketing.testimonials (
     deleted_at timestamp with time zone
 );
 
+CREATE TABLE mkt.accounts (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    brand_id uuid,
+    platform text NOT NULL,
+    handle text,
+    url text,
+    account_ref text,
+    papel text DEFAULT 'principal'::text,
+    navegador text,
+    status text NOT NULL DEFAULT 'a_configurar'::text,
+    travado boolean DEFAULT false,
+    notas text,
+    metadata jsonb DEFAULT '{}'::jsonb,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now(),
+    modo_publicacao text NOT NULL DEFAULT 'manual'::text,
+    api_nota text,
+    api_impossivel boolean NOT NULL DEFAULT false,
+    publicar_ativo boolean NOT NULL DEFAULT false
+);
+
+CREATE TABLE mkt.ai_config (
+    chave text NOT NULL,
+    valor jsonb,
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+CREATE TABLE mkt.ai_usage (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    funcao text NOT NULL,
+    brand_id uuid,
+    modelo text,
+    unidades numeric,
+    custo_usd numeric NOT NULL DEFAULT 0,
+    created_at timestamp with time zone DEFAULT now()
+);
+
+CREATE TABLE mkt.ai_use_cases (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    brand_id uuid,
+    code text NOT NULL,
+    nome text,
+    prompt_mestre text,
+    config jsonb DEFAULT '{}'::jsonb,
+    ativo boolean DEFAULT true,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+CREATE TABLE mkt.app_users (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    auth_user_id uuid NOT NULL,
+    digiai_user_uuid uuid NOT NULL DEFAULT gen_random_uuid(),
+    email text NOT NULL,
+    nome text,
+    role text NOT NULL DEFAULT 'operador'::text,
+    phone_e164 text,
+    cpf text,
+    wa_bsuid text,
+    wa_username text,
+    wa_phone_legacy text,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone NOT NULL DEFAULT now(),
+    deleted_at timestamp with time zone
+);
+
+CREATE TABLE mkt.assets (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    brand_id uuid,
+    ideia_id uuid,
+    roteiro_id uuid,
+    tipo text NOT NULL,
+    nome text,
+    storage_path text,
+    public_url text,
+    duracao_segundos numeric,
+    tamanho_bytes bigint,
+    formato text,
+    provedor text DEFAULT 'elevenlabs'::text,
+    metadata jsonb DEFAULT '{}'::jsonb,
+    created_at timestamp with time zone DEFAULT now(),
+    status text NOT NULL DEFAULT 'a_postar'::text,
+    tema text,
+    reprova_motivo text,
+    decidida_por text,
+    decidida_em timestamp with time zone,
+    reprova_categorias text[]
+);
+
+CREATE TABLE mkt.audiencia_diaria (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    brand_id uuid NOT NULL,
+    platform text NOT NULL,
+    seguidores integer NOT NULL,
+    dia date NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    account_id uuid,
+    monthly_views bigint
+);
+
+CREATE TABLE mkt.brand_config (
+    brand_id uuid NOT NULL,
+    chave text NOT NULL,
+    valor jsonb NOT NULL,
+    updated_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE mkt.brands (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    code text NOT NULL,
+    name text NOT NULL,
+    accent_hex text,
+    created_at timestamp with time zone DEFAULT now(),
+    logo_url text,
+    logo_arte_url text
+);
+
+CREATE TABLE mkt.canais_saida (
+    canal_key text NOT NULL,
+    numero text NOT NULL,
+    marca_padrao text NOT NULL,
+    provedor text NOT NULL,
+    secret_ref text,
+    limite_diario integer NOT NULL DEFAULT 20,
+    ativo boolean NOT NULL DEFAULT false,
+    obs text,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE mkt.clickup_config (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    brand_id uuid NOT NULL,
+    workspace_id text NOT NULL,
+    list_id text NOT NULL,
+    trigger_status text NOT NULL DEFAULT 'agendado'::text,
+    writeback_status text NOT NULL DEFAULT 'publicado'::text,
+    enabled boolean NOT NULL DEFAULT false,
+    last_run_at timestamp with time zone,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE mkt.clickup_sync (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    clickup_task_id text NOT NULL,
+    brand_id uuid NOT NULL,
+    publish_job_id uuid,
+    last_status text,
+    title text,
+    synced_at timestamp with time zone NOT NULL DEFAULT now(),
+    published_back_at timestamp with time zone
+);
+
+CREATE TABLE mkt.cobertura_geo (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    pais text NOT NULL DEFAULT 'BR'::text,
+    uf text NOT NULL,
+    cidade text NOT NULL,
+    termo text NOT NULL DEFAULT 'ótica'::text,
+    anel integer NOT NULL,
+    status text NOT NULL DEFAULT 'pendente'::text,
+    varrido_em timestamp with time zone,
+    encontrados integer,
+    novos integer,
+    com_celular integer,
+    custo_usd numeric,
+    actor text,
+    run_id text,
+    obs text,
+    criado_em timestamp with time zone NOT NULL DEFAULT now(),
+    atualizado_em timestamp with time zone NOT NULL DEFAULT now(),
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE mkt.content_performance (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    brand_id uuid NOT NULL,
+    publication_id uuid,
+    gatilho text,
+    formato text,
+    engajamento numeric,
+    coletado_em timestamp with time zone DEFAULT now(),
+    alcance integer,
+    salvamentos integer,
+    compartilhamentos integer,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    views integer
+);
+
+CREATE TABLE mkt.content_rules (
+    brand_id uuid NOT NULL,
+    persona text,
+    tom text,
+    publico text,
+    proibicoes text[],
+    gatilhos text[],
+    formatos text[],
+    cta_padrao text,
+    exemplos text,
+    notas text,
+    updated_at timestamp with time zone DEFAULT now(),
+    voice_id text,
+    voice_settings jsonb,
+    cadencia jsonb,
+    fatos text,
+    guardrails jsonb,
+    norte jsonb,
+    playbook text,
+    universo jsonb
+);
+
+CREATE TABLE mkt.content_weights (
+    brand_id uuid NOT NULL,
+    dimensao text NOT NULL,
+    valor text NOT NULL,
+    peso numeric DEFAULT 1.0,
+    amostras integer DEFAULT 0,
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+CREATE TABLE mkt.content_weights_descartados_20260905 (
+    brand_id uuid,
+    dimensao text,
+    valor text,
+    peso numeric,
+    amostras integer,
+    updated_at timestamp with time zone,
+    descartado_em timestamp with time zone DEFAULT now(),
+    motivo text DEFAULT 'sem lastro em content_performance apos erosao de rotulo (ver 20260905_pesos_sem_lastro.sql)'::text
+);
+
+CREATE TABLE mkt.credentials (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    brand_id uuid,
+    platform text NOT NULL,
+    account_ref text,
+    vault_key text,
+    scopes text[],
+    expires_at timestamp with time zone,
+    status text DEFAULT 'ativo'::text,
+    updated_at timestamp with time zone DEFAULT now(),
+    access_token text,
+    refresh_token text,
+    metadata jsonb DEFAULT '{}'::jsonb,
+    provider text
+);
+
+CREATE TABLE mkt.datas_sazonais (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    data date NOT NULL,
+    titulo text NOT NULL,
+    brand_code text,
+    antecedencia_dias integer NOT NULL DEFAULT 21,
+    criado_em timestamp with time zone DEFAULT now()
+);
+
+CREATE TABLE mkt.fatos (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    brand_slug text,
+    chave text NOT NULL,
+    fato text NOT NULL,
+    valor_numerico numeric,
+    fonte text NOT NULL,
+    verificado_em date NOT NULL,
+    validade_dias integer NOT NULL DEFAULT 30,
+    publico boolean NOT NULL DEFAULT true,
+    ativo boolean NOT NULL DEFAULT true,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE mkt.ideias (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    brand_id uuid,
+    titulo text NOT NULL,
+    descricao text,
+    tags text[],
+    formato text,
+    gancho text,
+    emocao text,
+    prioridade integer,
+    gatilho text,
+    status text NOT NULL DEFAULT 'rascunho'::text,
+    origem text DEFAULT 'IA'::text,
+    metadata jsonb DEFAULT '{}'::jsonb,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+CREATE TABLE mkt.influencer_interacoes (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    influencer_id uuid NOT NULL,
+    tipo text NOT NULL DEFAULT 'mensagem'::text,
+    canal text,
+    direcao text,
+    conteudo text,
+    quem text,
+    ocorreu_em timestamp with time zone NOT NULL DEFAULT now(),
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE mkt.influencers (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    digiai_user_uuid uuid NOT NULL DEFAULT gen_random_uuid(),
+    brand_id uuid NOT NULL,
+    plataforma text NOT NULL,
+    handle text NOT NULL,
+    url text,
+    nome text,
+    bio text,
+    ramo text,
+    cidade text,
+    regiao text,
+    seguidores integer,
+    engajamento numeric,
+    posts integer,
+    coletado_em timestamp with time zone,
+    fonte text,
+    email text,
+    phone_e164 text,
+    cpf text,
+    wa_bsuid text,
+    wa_username text,
+    wa_phone_legacy text,
+    opt_in boolean NOT NULL DEFAULT false,
+    opt_in_em timestamp with time zone,
+    opt_in_origem text,
+    status text NOT NULL DEFAULT 'descoberto'::text,
+    score integer,
+    destaque text,
+    acordo text,
+    valor_brl numeric,
+    proximo_passo text,
+    observacoes text,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone NOT NULL DEFAULT now(),
+    deleted_at timestamp with time zone
+);
+
+CREATE TABLE mkt.mensagens (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    direcao text NOT NULL,
+    marca text NOT NULL,
+    canal text NOT NULL DEFAULT 'whatsapp_web'::text,
+    lead_id uuid,
+    empresa text,
+    fone text NOT NULL,
+    template_id text,
+    versao text,
+    texto text,
+    lote integer,
+    status text NOT NULL DEFAULT 'rascunho'::text,
+    provedor text,
+    provedor_msg_id text,
+    enviado_em timestamp with time zone DEFAULT now(),
+    entregue_em timestamp with time zone,
+    lida_em timestamp with time zone,
+    erro text,
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE mkt.metricas_diarias (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    publication_id uuid NOT NULL,
+    brand_id uuid NOT NULL,
+    dia date NOT NULL,
+    views bigint,
+    salvamentos bigint,
+    pin_click bigint,
+    outbound_click bigint,
+    curtidas bigint,
+    comentarios bigint,
+    engajamento bigint,
+    coletado_em timestamp with time zone NOT NULL DEFAULT now(),
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE mkt.osi_disparos_tabela_ate_20260909 (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    lead_id uuid,
+    empresa text,
+    fone text NOT NULL,
+    mensagem_versao text,
+    lote integer,
+    enviado_em timestamp with time zone DEFAULT now(),
+    canal text DEFAULT 'whatsapp_web'::text,
+    resposta text,
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE mkt.perfil_checklist (
+    account_id uuid NOT NULL,
+    items jsonb NOT NULL DEFAULT '[]'::jsonb,
+    updated_at timestamp with time zone DEFAULT now()
+);
+
+CREATE TABLE mkt.plataforma_capacidade (
+    platform text NOT NULL,
+    formatos text,
+    limite text,
+    destrava text,
+    medido_em date NOT NULL,
+    fonte text NOT NULL,
+    updated_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE mkt.publications (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    job_id uuid,
+    brand_id uuid,
+    platform text NOT NULL,
+    external_post_id text,
+    url text,
+    published_at timestamp with time zone,
+    created_at timestamp with time zone DEFAULT now(),
+    account_id uuid,
+    metadata jsonb NOT NULL DEFAULT '{}'::jsonb
+);
+
+CREATE TABLE mkt.publish_jobs (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    calendar_post_id uuid,
+    brand_id uuid,
+    platforms text[] NOT NULL,
+    status text NOT NULL DEFAULT 'pendente'::text,
+    confirmado boolean DEFAULT false,
+    scheduled_for timestamp with time zone,
+    resultado jsonb,
+    erro text,
+    created_at timestamp with time zone DEFAULT now(),
+    updated_at timestamp with time zone DEFAULT now(),
+    roteiro_id uuid,
+    asset_id uuid,
+    message text,
+    dry_run boolean NOT NULL DEFAULT false,
+    aprovado_por text,
+    account_id uuid
+);
+
+CREATE TABLE mkt.queue (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    kind text NOT NULL,
+    payload jsonb,
+    status text NOT NULL DEFAULT 'pendente'::text,
+    tentativas integer DEFAULT 0,
+    max_tentativas integer DEFAULT 3,
+    proximo_retry timestamp with time zone,
+    erro text,
+    resultado jsonb,
+    origem text DEFAULT 'manual'::text,
+    created_at timestamp with time zone DEFAULT now(),
+    started_at timestamp with time zone,
+    completed_at timestamp with time zone
+);
+
+CREATE TABLE mkt.roteiros (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    brand_id uuid,
+    ideia_id uuid,
+    titulo text,
+    conteudo text,
+    tipo text DEFAULT 'copy_post'::text,
+    nota_hook integer,
+    quality_score integer,
+    status text NOT NULL DEFAULT 'rascunho'::text,
+    metadata jsonb DEFAULT '{}'::jsonb,
+    created_at timestamp with time zone DEFAULT now()
+);
+
+CREATE TABLE mkt.sentinela_log (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    dia date NOT NULL,
+    resultado jsonb NOT NULL,
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE mkt.templates_vendas (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    marca text NOT NULL,
+    etapa text NOT NULL,
+    nome text NOT NULL,
+    texto text NOT NULL,
+    versao text NOT NULL DEFAULT 'v1'::text,
+    origem text,
+    aprovado_por text,
+    aprovado_em timestamp with time zone,
+    ativo boolean NOT NULL DEFAULT false,
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE mkt.tick_log (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    job text NOT NULL,
+    disparo text NOT NULL DEFAULT 'cron'::text,
+    status text NOT NULL DEFAULT 'rodando'::text,
+    iniciado_em timestamp with time zone NOT NULL DEFAULT now(),
+    finalizado_em timestamp with time zone,
+    resumo jsonb NOT NULL DEFAULT '{}'::jsonb,
+    erros jsonb NOT NULL DEFAULT '[]'::jsonb
+);
+
+CREATE TABLE mkt.user_brands (
+    user_id uuid NOT NULL,
+    brand_id uuid NOT NULL,
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
 CREATE TABLE ops.backlog_items (
     id uuid NOT NULL DEFAULT gen_random_uuid(),
     title text NOT NULL,
@@ -820,6 +1592,86 @@ CREATE TABLE ops.backlog_items (
     created_by uuid,
     origem text,
     blocker text
+);
+
+CREATE TABLE ops.comercial_config (
+    chave text NOT NULL,
+    valor jsonb NOT NULL,
+    descricao text,
+    updated_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE ops.commercial_leads (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    name text,
+    company text NOT NULL,
+    product text,
+    stage text NOT NULL DEFAULT 'lead'::text,
+    source text,
+    contact text,
+    value_brl numeric,
+    owner text,
+    next_step text,
+    notes text,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone NOT NULL DEFAULT now(),
+    deleted_at timestamp with time zone,
+    digiai_user_uuid uuid NOT NULL DEFAULT gen_random_uuid(),
+    email text,
+    phone_e164 text,
+    wa_bsuid text,
+    wa_username text,
+    wa_phone_legacy text,
+    lgpd_request_at timestamp with time zone,
+    anonymized_at timestamp with time zone,
+    wa_status text,
+    utm_source text,
+    utm_medium text,
+    utm_campaign text,
+    utm_content text,
+    session_id text,
+    source_url text,
+    first_touch_at timestamp with time zone,
+    utm_term text,
+    landing_lead_id uuid,
+    motivo_perda text,
+    perdido_em timestamp with time zone,
+    wa_opt_out_em timestamp with time zone,
+    wa_consentimento_em timestamp with time zone,
+    wa_consentimento_origem text,
+    wa_consentimento_categoria text,
+    wa_consentimento_texto text,
+    wa_consentimento_ip inet,
+    next_touch_at timestamp with time zone,
+    last_touch_at timestamp with time zone
+);
+
+CREATE TABLE ops.contas_servicos (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    servico text NOT NULL,
+    identificador text,
+    conta_dona text,
+    navegador text,
+    produtos text[] DEFAULT '{}'::text[],
+    plano text,
+    custo_mensal numeric,
+    moeda text NOT NULL DEFAULT 'BRL'::text,
+    vencimento_dia integer,
+    renova_em date,
+    secret_ref text,
+    status text NOT NULL DEFAULT 'desconhecido'::text,
+    ultima_verificacao timestamp with time zone,
+    ultimo_detalhe text,
+    dono_humano text NOT NULL DEFAULT 'Gilberto'::text,
+    url_painel text,
+    obs text,
+    ativo boolean NOT NULL DEFAULT true,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone NOT NULL DEFAULT now(),
+    empresa_slug text,
+    categoria text,
+    situacao text NOT NULL DEFAULT 'ativa'::text,
+    encerrada_em date
 );
 
 CREATE TABLE ops.copy_assets (
@@ -856,6 +1708,67 @@ CREATE TABLE ops.decisions (
     created_by uuid
 );
 
+CREATE TABLE ops.empresas (
+    slug text NOT NULL,
+    nome text NOT NULL,
+    cnpj text,
+    tipo text NOT NULL DEFAULT 'propria'::text,
+    situacao text NOT NULL DEFAULT 'ativa'::text,
+    desde date,
+    ate date,
+    responsavel text DEFAULT 'Gilberto'::text,
+    obs text,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    razao_social text
+);
+
+CREATE TABLE ops.fato_medicao (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    fato_id uuid,
+    chave text,
+    fonte text,
+    valor_texto numeric,
+    valor_medido numeric,
+    veredito text NOT NULL,
+    detalhe text,
+    medido_em timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE ops.funnel_workspace (
+    key text NOT NULL,
+    workspace jsonb NOT NULL,
+    version integer NOT NULL DEFAULT 1,
+    updated_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_by uuid
+);
+
+CREATE TABLE ops.meeting_sessions (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    lead_id uuid,
+    playbook_id uuid,
+    title text,
+    started_at timestamp with time zone NOT NULL DEFAULT now(),
+    ended_at timestamp with time zone,
+    duration_min integer,
+    pain_noted text,
+    objections_raised text[] NOT NULL DEFAULT '{}'::text[],
+    outcome text,
+    stage_changed_to text,
+    next_action text,
+    follow_up_date date,
+    effectiveness smallint,
+    notes text,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone NOT NULL DEFAULT now(),
+    deleted_at timestamp with time zone,
+    interest_plan text,
+    interest_apps text[] NOT NULL DEFAULT '{}'::text[],
+    budget_signal text,
+    quotes text[] NOT NULL DEFAULT '{}'::text[],
+    action_items jsonb NOT NULL DEFAULT '[]'::jsonb,
+    meet_url text
+);
+
 CREATE TABLE ops.milestones (
     id uuid NOT NULL DEFAULT gen_random_uuid(),
     phase smallint NOT NULL,
@@ -864,6 +1777,101 @@ CREATE TABLE ops.milestones (
     target_date date,
     completed_at date,
     notes text,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone NOT NULL DEFAULT now(),
+    deleted_at timestamp with time zone
+);
+
+CREATE TABLE ops.motivos_perda (
+    chave text NOT NULL,
+    rotulo text NOT NULL,
+    ativo boolean NOT NULL DEFAULT true,
+    ordem integer NOT NULL DEFAULT 100,
+    criado_em timestamp with time zone NOT NULL DEFAULT now(),
+    tipo text NOT NULL DEFAULT 'perda'::text
+);
+
+CREATE TABLE ops.ordem_do_dia (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    dia date NOT NULL DEFAULT CURRENT_DATE,
+    bloco text NOT NULL,
+    posicao smallint NOT NULL DEFAULT 0,
+    titulo text NOT NULL,
+    porque text,
+    dono text NOT NULL DEFAULT 'humano'::text,
+    origem_tipo text NOT NULL,
+    origem_id uuid,
+    origem_ref text,
+    estado text NOT NULL DEFAULT 'aberto'::text,
+    justificativa text,
+    cumprido_em timestamp with time zone,
+    gerado_em timestamp with time zone NOT NULL DEFAULT now(),
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE ops.pendencias_humanas (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    titulo text NOT NULL,
+    porque text,
+    severidade smallint NOT NULL DEFAULT 2,
+    area text,
+    prazo date,
+    fonte text,
+    status text NOT NULL DEFAULT 'aberta'::text,
+    resolvida_em timestamp with time zone,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone NOT NULL DEFAULT now(),
+    deleted_at timestamp with time zone
+);
+
+CREATE TABLE ops.plataformas (
+    slug text NOT NULL,
+    nome text NOT NULL,
+    tem_canal boolean NOT NULL DEFAULT false,
+    sort_order integer NOT NULL DEFAULT 99,
+    notas text,
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE ops.playbooks (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    slug text,
+    name text NOT NULL,
+    product text,
+    audience text,
+    objective text,
+    duration_min integer,
+    agenda jsonb NOT NULL DEFAULT '[]'::jsonb,
+    discovery jsonb NOT NULL DEFAULT '{}'::jsonb,
+    objections jsonb NOT NULL DEFAULT '[]'::jsonb,
+    checklist jsonb NOT NULL DEFAULT '[]'::jsonb,
+    access_info jsonb NOT NULL DEFAULT '{}'::jsonb,
+    followup jsonb NOT NULL DEFAULT '{}'::jsonb,
+    deck_url text,
+    pdf_url text,
+    notes text,
+    active boolean NOT NULL DEFAULT true,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone NOT NULL DEFAULT now(),
+    deleted_at timestamp with time zone
+);
+
+CREATE TABLE ops.proposals (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    lead_id uuid,
+    meeting_id uuid,
+    title text,
+    plan text,
+    monthly_price numeric,
+    discount_pct numeric,
+    trial_days integer,
+    setup_note text,
+    items jsonb NOT NULL DEFAULT '[]'::jsonb,
+    body text,
+    status text NOT NULL DEFAULT 'rascunho'::text,
+    sent_at timestamp with time zone,
+    sent_via text,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     updated_at timestamp with time zone NOT NULL DEFAULT now(),
     deleted_at timestamp with time zone
@@ -909,58 +1917,56 @@ CREATE TABLE ops.roadmap_tasks (
     deleted_at timestamp with time zone
 );
 
--- ============================================================
--- ROW LEVEL SECURITY
--- ============================================================
--- RLS HABILITADO (46): academy.product_assets, academy.product_checklist_items, academy.product_creation_records, academy.product_questions, academy.product_scenarios, academy.products, company.api_credentials, company.contacts, company.digital_assets, company.financial_snapshots, company.identity, company.legal_status, company.metrics, company.partners, company.tools, finance.expenses, finance.founder_time, finance.infra_costs, finance.products, finance.revenue, finance.subscriptions, finance.vendors, iam.audit_logs, iam.users, marketing.affiliate_downloads, marketing.affiliate_materials, marketing.affiliate_payouts, marketing.affiliates, marketing.ai_prompt_templates, marketing.challenge_participations, marketing.challenges, marketing.community_members, marketing.content_calendar, marketing.content_ideas, marketing.content_pillars, marketing.hotmart_events_raw, marketing.hotmart_sales, marketing.platforms, marketing.post_ai_outputs, marketing.testimonials, ops.backlog_items, ops.copy_assets, ops.decisions, ops.milestones, ops.roadmap_phases, ops.roadmap_tasks
+CREATE TABLE ops.scorecard_entries (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    metric_id uuid NOT NULL,
+    week_start date NOT NULL,
+    value numeric NOT NULL,
+    note text,
+    updated_at timestamp with time zone NOT NULL DEFAULT now()
+);
 
--- POLICIES (49):
---   academy.product_assets  [ALL]  academy_assets_staff_all
---   academy.product_checklist_items  [ALL]  academy_checklist_staff_all
---   academy.product_creation_records  [ALL]  academy_creation_staff_all
---   academy.product_questions  [ALL]  academy_questions_staff_all
---   academy.product_scenarios  [ALL]  academy_scenarios_staff_all
---   academy.products  [ALL]  academy_products_staff_all
---   company.contacts  [ALL]  contacts_staff_all
---   company.digital_assets  [ALL]  digital_staff_all
---   company.financial_snapshots  [ALL]  fsnap_staff_all
---   company.identity  [ALL]  identity_staff_all
---   company.legal_status  [ALL]  legal_staff_all
---   company.metrics  [SELECT]  metrics_staff_read
---   company.partners  [ALL]  partners_staff_all
---   company.tools  [ALL]  tools_staff_all
---   finance.expenses  [ALL]  expenses_staff_all
---   finance.founder_time  [ALL]  ftime_staff_all
---   finance.infra_costs  [ALL]  infra_staff_all
---   finance.products  [ALL]  products_staff_all
---   finance.revenue  [ALL]  revenue_staff_all
---   finance.subscriptions  [ALL]  subs_staff_all
---   finance.vendors  [ALL]  vendors_staff_all
---   iam.audit_logs  [SELECT]  audit_read_staff
---   iam.users  [ALL]  users_staff_all
---   marketing.affiliate_downloads  [ALL]  marketing_affdl_staff_all
---   marketing.affiliate_materials  [ALL]  marketing_affmat_staff_all
---   marketing.affiliate_payouts  [ALL]  payouts_staff_all
---   marketing.affiliates  [ALL]  marketing_aff_staff_all
---   marketing.ai_prompt_templates  [SELECT]  ai_prompts_staff_read
---   marketing.ai_prompt_templates  [ALL]  ai_prompts_staff_write
---   marketing.challenge_participations  [ALL]  part_staff_all
---   marketing.challenges  [ALL]  challenges_staff_all
---   marketing.community_members  [ALL]  community_staff_all
---   marketing.content_calendar  [ALL]  marketing_calendar_staff_all
---   marketing.content_ideas  [ALL]  marketing_ideas_staff_all
---   marketing.content_pillars  [ALL]  marketing_pillars_staff_all
---   marketing.hotmart_events_raw  [SELECT]  hotmart_raw_staff_read
---   marketing.hotmart_sales  [SELECT]  hotmart_sales_staff_read
---   marketing.platforms  [SELECT]  marketing_platforms_read
---   marketing.platforms  [ALL]  marketing_platforms_staff_all
---   marketing.post_ai_outputs  [ALL]  outputs_staff_all
---   marketing.testimonials  [SELECT]  testim_staff_read
---   marketing.testimonials  [ALL]  testim_staff_write
---   ops.backlog_items  [ALL]  backlog_staff_all
---   ops.copy_assets  [SELECT]  staff_read_copy_assets
---   ops.copy_assets  [ALL]  staff_write_copy_assets
---   ops.decisions  [ALL]  decisions_staff_all
---   ops.milestones  [ALL]  milestones_staff_all
---   ops.roadmap_phases  [ALL]  phases_staff_all
---   ops.roadmap_tasks  [ALL]  tasks_staff_all
+CREATE TABLE ops.scorecard_metrics (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    slug text NOT NULL,
+    label text NOT NULL,
+    owner text NOT NULL DEFAULT 'Gilberto'::text,
+    target numeric NOT NULL,
+    direction text NOT NULL DEFAULT '>='::text,
+    unit text,
+    hint text,
+    sort_order integer NOT NULL DEFAULT 100,
+    active boolean NOT NULL DEFAULT true,
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE ops.servicos (
+    slug text NOT NULL,
+    nome text NOT NULL,
+    familia text NOT NULL,
+    plataforma_slug text,
+    sort_order integer NOT NULL DEFAULT 99,
+    created_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.espelho_telao_bi (
+    id integer NOT NULL DEFAULT 1,
+    vendas_qtd_dia integer,
+    entregas_dia integer,
+    faturamento_liquido_dia numeric,
+    ticket_medio_dia numeric,
+    gerado_em timestamp with time zone,
+    sincronizado_em timestamp with time zone NOT NULL DEFAULT now(),
+    payload jsonb,
+    dia_referencia date,
+    mes_referencia text,
+    vendas_qtd_mes integer,
+    faturamento_liquido_mes numeric,
+    media_diaria_30d numeric,
+    os_ativas_60d integer,
+    os_prontas_retirada_60d integer,
+    os_finalizadas_hoje integer,
+    observacoes jsonb,
+    lojas_operantes integer,
+    por_loja jsonb
+);
