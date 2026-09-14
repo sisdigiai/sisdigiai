@@ -18,7 +18,7 @@
 | tabelas | 116 | 116 | 0 | ✅ |
 | views | 157 | 157 | 0 | ✅ |
 | materialized views | 0 | 0 | 0 | ✅ |
-| funções | 156 | 155 | 1 | ✅ |
+| funções | 156 | 156 | 0 | ✅ |
 | triggers | 59 | 59 | 0 | ✅ |
 | constraints | 367 | 367 | 0 | ✅ |
 | índices | 349 | 349 | 0 | ✅ |

@@ -5,7 +5,7 @@
 
 | Tabela | Linhas (estim.) | Vira seed? |
 |---|--:|:--:|
-| mkt.tick_log | 32754 | |
+| mkt.tick_log | 32759 | |
 | mkt.ai_usage | 618 | |
 | ops.ordem_do_dia | 524 | |
 | mkt.publications | 334 | |
