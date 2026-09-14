@@ -28,6 +28,15 @@
 --   outras funções / views / cron que a citam ........................ 0
 --   sobrecargas ....................................................... 1
 --
+-- REMEDIDO EM 14/09/2026, para o pedido ao dono:
+--   pg_stat_statements desde 31/07 (dealloc 0): postgres 7 chamadas (migrations e
+--     verificações); authenticated, service_role e anon: 0
+--   bundle publicado do digiai (a7a13f6) ............................. 0
+--   fontes do workspace ............................................... 0
+--     (continua só em digiai_mkt/src/lib/database.types.ts, gerado)
+--   funções / cron que a citam ........................................ 0
+--   grants de execute ainda abertos: authenticated, service_role, postgres
+--
 -- O ÚNICO "CHAMADOR" QUE SOBRA é uma aba de navegador aberta com o bundle
 -- anterior ao b3437a0. Depois do drop, essa aba leva "função não encontrada" em
 -- vez da mensagem da 111. A tela mostra o erro (desde o 0503c7b) e nada é gravado.
