@@ -172,7 +172,10 @@ Deno.serve(async (req: Request) => {
         message: results[0].error, doc: SETUP_DOC, results }, 503);
     }
     if (payload.site && results.length === 1 && results[0].error) {
-      await supabase.rpc("fn_mark_sync", { p_provider: PROVIDER, p_status: "error", p_error: results[0].error }).catch(() => {});
+      // O builder do supabase-js só tem then(): `.catch(...)` lançava TypeError aqui mesmo,
+      // no caminho de erro — a função caía com 500, o erro real sumia e o status ficava
+      // no último "ok" (GSC parado desde 22/06/2026 mostrando ok).
+      try { await supabase.rpc("fn_mark_sync", { p_provider: PROVIDER, p_status: "error", p_error: results[0].error }); } catch { /* marcar o status não pode esconder o erro que se está a devolver */ }
       return jsonResp({ ok: false, configured: true, provider: PROVIDER, error: results[0].error, results }, 500);
     }
 
@@ -180,7 +183,7 @@ Deno.serve(async (req: Request) => {
     const totalRows = results.reduce((a, r) => a + (r.rows_written ?? 0), 0);
     return jsonResp({ ok: true, configured: true, provider: PROVIDER, results, rows_written: totalRows });
   } catch (e) {
-    await supabase.rpc("fn_mark_sync", { p_provider: PROVIDER, p_status: "error", p_error: String(e) }).catch(() => {});
+    try { await supabase.rpc("fn_mark_sync", { p_provider: PROVIDER, p_status: "error", p_error: String(e) }); } catch { /* marcar o status não pode esconder o erro que se está a devolver */ }
     return jsonResp({ ok: false, error: String(e) }, 500);
   }
 });
