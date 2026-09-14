@@ -77,6 +77,41 @@ async function syncOneSite(supabase: Supa, apiKey: string, s: SiteRow): Promise<
   return rows.length;
 }
 
+// Portão (migration 125). verify_jwt só exige UM JWT válido, e a chave anon é um — pública.
+// Passa: (a) o cron, com x-marketing-sync-cron igual ao segredo do vault; ou (b) staff: JWT de
+// usuário validado no Auth (não decode local) e public.is_staff() verdadeiro no banco (R-037).
+// Qualquer falha fecha.
+async function sha256(s: string): Promise<Uint8Array> {
+  return new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)));
+}
+async function iguais(a: string, b: string): Promise<boolean> {
+  const [x, y] = [await sha256(a), await sha256(b)];
+  let dif = 0;
+  for (let i = 0; i < x.length; i++) dif |= x[i] ^ y[i];
+  return dif === 0;
+}
+// deno-lint-ignore no-explicit-any
+async function quemChama(req: Request, supabase: any): Promise<"cron" | "staff" | null> {
+  try {
+    const cron = req.headers.get("x-marketing-sync-cron");
+    if (cron) {
+      const { data: esperado, error } = await supabase.rpc("fn_marketing_sync_cron_secret");
+      return !error && typeof esperado === "string" && esperado.length > 0 && await iguais(cron, esperado) ? "cron" : null;
+    }
+    const jwt = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "").trim();
+    if (!jwt) return null;
+    const cli = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_ANON_KEY") ?? "", {
+      global: { headers: { Authorization: `Bearer ${jwt}` } },
+    });
+    const { data: u, error: eu } = await cli.auth.getUser(jwt);
+    if (eu || !u?.user?.id) return null;
+    const { data: staff, error: es } = await cli.rpc("is_staff");
+    return !es && staff === true ? "staff" : null;
+  } catch {
+    return null;
+  }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   if (req.method !== "POST") return jsonResp({ ok: false, error: "method_not_allowed" }, 405);
@@ -85,6 +120,9 @@ Deno.serve(async (req: Request) => {
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
   );
+
+  const quem = await quemChama(req, supabase);
+  if (!quem) return jsonResp({ ok: false, error: "nao_autorizado" }, 401);
 
   let payload: { site?: string } = {};
   try { payload = await req.json(); } catch { /* sem body = todos os sites */ }
