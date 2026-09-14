@@ -62,10 +62,24 @@ O pedido diz que "não existe tabela de VENDA do Clearix". **Existe, e está vaz
 |---|---|---|
 | 1 | Venda = primeiro pagamento pago, ou contrato assinado? | primeiro pagamento pago |
 | 2 | Atribuição do A/B quando o lead recebeu os dois braços | **primeiro toque**: o braço da primeira mensagem de saída ao lead antes da venda |
-| 3 | Como o braço aparece em `mkt.mensagens` | **a confirmar com o MKT.** Hoje `marca` = `osi` e `versao` = a/b/c/d: são versões de copy dentro da OSI, ainda não OSI × Clearix. |
+| 3 | Como o braço aparece em `mkt.mensagens` | **Respondido pelo MKT em 14/09** (migration `20260914_03`, commit `c8ec018` do digiai_mkt, escrita e não aplicada). `oferta` ('osi' \| 'clearix') é o **braço**. `marca` é a voz de quem envia. `variante` = `<oferta>.<template_id>.<versao>`, coluna gerada. As 43 mensagens antigas ficam sem oferta, fora do experimento. **Aceito**, com a atribuição abaixo. |
 | 4 | Vocabulário de `canal_origem` | `whatsapp_zapi`, `whatsapp_manual`, `landing`, `indicacao`, `organico`, `outro` |
 | 5 | Pagamento fora do Mercado Pago (Pix direto, boleto) conta? | sim, com `mp_payment_id` nulo e comprovante no `notes`. Senão a 1ª venda pode não contar. |
 | 6 | Lancaster (123) entra também como assinante? | sim, com `parte_relacionada = true`, depois da 122 ajustada |
+
+### Atribuição do A/B (acordada com o MKT em 14/09)
+
+Na venda ficam **três fotografias**, tiradas por `fn_registrar_venda_clearix` no momento do registro:
+
+- `braco_ab`: a `oferta` ('osi' | 'clearix'). É o que as metas comparam.
+- `variante_ab`: a `variante` completa (`oferta.template.versao`). Serve à análise de copy dentro do braço.
+- `atribuicao_mensagem_id`: a mensagem que decidiu. Sem ela, a fotografia não se audita.
+
+A regra é a do MKT: a **primeira** saída com `oferta` não nula **para o número do lead**, e não só para o `lead_id`. Uma rede usa o mesmo WhatsApp em várias lojas: a venda pela loja B herda a célula da abordagem à loja A. Contam `status` em ('enviada', 'entregue', 'lida'), com `enviado_em` **antes** da venda. As variações com e sem nono dígito vêm de `mkt.fn_wa_variantes_fone`. A função de venda é `security definer`, então não precisa de grant novo.
+
+Venda sem nenhuma saída com oferta: as três ficam nulas. A venda conta para as metas (1ª → 50 → 200) e fica **fora** do A/B. Não se força um braço.
+
+Pré-requisito que não é do app: não há texto de oferta aprovado. Os 2 templates Clearix estão inativos. O primeiro envio do experimento depende de o dono aprovar um texto de cada braço.
 
 ## 7. Sequência
 
