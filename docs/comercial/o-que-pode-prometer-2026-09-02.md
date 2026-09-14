@@ -20,7 +20,7 @@ Medidos em 02/09 no banco, só no tenant real (Grupo Mello):
 | Vendas registradas | **20.312** |
 | Ordens de serviço acompanhadas (produção) | **20.676** |
 | Receitas arquivadas e pesquisáveis | **5.862** |
-| Parcelas de carnê administradas | **56.369** |
+| Parcelas de carnê administradas | **22.440** |
 | Vendas nos últimos 30 dias | **209 vendas · R$ 94.445** |
 | OS em andamento agora / prontas para retirada | **122 / 48** |
 | Montagens registradas com montador e custo | **936** |
@@ -56,7 +56,7 @@ vendas."* Nunca dizer "vários clientes": **é um grupo, e é a nossa casa.**
   código**, promissórias/documentos do carnê.
 - **Prova:** `clearix_vendas/src/app/carnes/page.tsx` (recibo térmico,
   `ModalRenegociarCarne`, `DocumentosCarneActions`);
-  `src/app/contratos/verify/[hash]/page.tsx`; banco: 56.369 parcelas.
+  `src/app/contratos/verify/[hash]/page.tsx`; banco: 22.440 parcelas.
 - **Demo em 2 min:** dar baixa numa parcela e imprimir o recibo — o efeito
   visual mais imediato para dono de loja pequena.
 - **Cuidado:** renegociação tem **zero uso real** — demonstrar sim; citar como
@@ -252,3 +252,6 @@ de Estoque; receita na gaveta → 2 min de Clinics.
 | "Emita sua nota pelo sistema" | D4. Fora de contrato, proposta, demo e conversa. |
 | "Pacote com 7 aplicativos" | D3. Falar em módulos ("venda, laboratório, carnê, estoque, financeiro, painel") sem contar aplicativo. |
 | "Gestão clínica completa" | Ficha, receita e agenda são reais; anamnese quase sem uso e o público pode nem ter optometrista. Vender como "receitas que não se perdem". |
+
+
+> **Errata 14/09/2026 (orquestrador geral, medição do eco):** `sales_finance.installments` mistura carnê de cliente (`order_id`) e parcelas de contas a pagar/receber do Finance (`order_id` nulo). O número anterior desta linha (56.369) somava os dois; **22.440 são parcelas de carnê de OS**; 34.679 são de contas. Fonte: `Cockpit/comercial/inventario-clearix-em-uso-na-mello-2026-09-14.md` (errata no fim).
