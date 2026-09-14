@@ -20,7 +20,7 @@ Medidos em 02/09 no banco, só no tenant real (Grupo Mello):
 | Vendas registradas | **20.312** |
 | Ordens de serviço acompanhadas (produção) | **20.676** |
 | Receitas arquivadas e pesquisáveis | **5.862** |
-| Parcelas de carnê administradas | **22.440** |
+| Parcelas de carnê administradas | **22.440** (medido em 14/09/2026; o 56.369 anterior era carnê + contas em 02/09) |
 | Vendas nos últimos 30 dias | **209 vendas · R$ 94.445** |
 | OS em andamento agora / prontas para retirada | **122 / 48** |
 | Montagens registradas com montador e custo | **936** |
