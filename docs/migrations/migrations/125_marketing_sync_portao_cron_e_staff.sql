@@ -1,6 +1,27 @@
 -- 125 — as marketing-sync-* deixam de obedecer a qualquer portador da chave anon
 --
--- ⚠ NÃO APLICADA. Pedido do Orquestrador Geral (14/09/2026), prioridade: o fecho tem de
+-- ✔ APLICADA em 14/09/2026 às 16:19:34 UTC = 13:19 (Brasília), pelo Orquestrador Geral,
+--   sob o mandato dele (portão 131). Hora tirada do created_at do segredo no vault.
+--   Deploy das três edges logo DEPOIS, na ordem pedida: gsc v34 às 16:19:37,
+--   bing v35 às 16:19:42, cloudflare v35 às 16:19:44 UTC; verify_jwt continua true.
+--   Reconferido por mim no banco: segredo no vault com 64 hex; RPC do segredo executável
+--   só por service_role (anon e authenticated: false); run_marketing_sync_daily manda o
+--   header, sem JWT literal no corpo, e anon não a executa.
+--   Provas:
+--   a) refeita por mim, sem gravar: anon sem header → 401 nao_autorizado nas três;
+--      anon com header de cron falso → 401;
+--   b) refeita por mim: exchange_code com a anon → 401; o vault_secret_id do refresh
+--      token do GSC continua o mesmo (a8220006…);
+--   c) do Geral, conferida no banco: run_marketing_sync_daily() às 16:20 UTC →
+--      bing ok 16:20:03, cloudflare ok 16:20:02, gsc error invalid_grant 16:20:00.
+--      Não houve 401: o cron passou no portão com o segredo do vault;
+--   d) botão da tela SEO com a sessão do dono: não vista (login do dono).
+--   ⚠ Reautorizar o GSC (portão 130) NÃO tem tela: nenhuma UI chama exchange_code.
+--     Os caminhos são uma chamada com o JWT do dono ou o SQL editor de
+--     docs/setup-gsc-oauth.md. E o label que a edge lê ('gsc-refresh-token') não é o
+--     que o doc manda gravar ('sisdigiai-gmail').
+--
+-- (Escrita como NÃO APLICADA.) Pedido do Orquestrador Geral (14/09/2026), prioridade: o fecho tem de
 --    vir ANTES de o dono reautorizar o GSC (portão 130).
 --
 -- ORDEM: 125 aplicada → deploy das três edges do mesmo commit.
