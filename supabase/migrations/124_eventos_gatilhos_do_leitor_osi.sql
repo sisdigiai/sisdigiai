@@ -1,6 +1,21 @@
 -- 124 — os gatilhos do leitor OSI entram no catálogo de eventos
 --
--- ⚠ NÃO APLICADA. Aditiva: 2 linhas em analytics.events_catalog, nenhuma escrita em
+-- ✔ APLICADA em 14/09/2026 às 15:24:05 UTC = 12:24 (Brasília), pelo Orquestrador Geral,
+--   sob o mandato dele. A edge events-ingest v30, com o corpo de 7652b04, foi publicada
+--   23 s DEPOIS (15:24:28 UTC, pelo updated_at da função), na ordem que este arquivo pede.
+--   (A mensagem do Geral dizia 16:30; os relógios do banco e da API dão 15:24 UTC.)
+--   Reconferido por mim:
+--   catálogo com os 2 códigos (osi-leitor, retention, 70/80); v_analytics_funnel_summary
+--   com os dois em osi-leitor e 0 código reader_ em osi (o card da landing não mudou);
+--   0 U+FFFD; verify_jwt false mantido.
+--   Provas pela edge publicada:
+--   a) a linha do Geral: reader_gatilho_click, utm_content g1, session prova-124,
+--      product osi, 15:24:32 UTC — única linha reader_ no log;
+--   b) e c), refeitas por mim sem gravar: reader_inventado → bad_code, inserted 0;
+--      reader_gatilho_click com g9 → bad_gatilho, inserted 0.
+--   d) a linha prova-124 continua no log; tirá-la é do dono.
+--
+-- (Escrita como NÃO APLICADA.) Aditiva: 2 linhas em analytics.events_catalog, nenhuma escrita em
 --    events_log. Pedido do Orquestrador Geral (14/09/2026) para o desenho aprovado
 --    `otica_sem_improviso/_DESENHO_2026-09-14_GATILHOS_LEITOR.md`.
 --
