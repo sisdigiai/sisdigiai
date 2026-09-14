@@ -39,77 +39,70 @@ Doc de uso interno. Cria 1 OAuth client + 1 refresh token de longa duração que
 ## Passo 4 — Criar OAuth client ID
 
 1. **APIs & Services** → **Credentials** → **+ CREATE CREDENTIALS** → **OAuth client ID**.
-2. Application type: **Desktop app**.
-3. Name: `digiai-marketing-cli`.
+2. Application type: **Aplicativo da Web** (não "Desktop": o botão do app precisa de URI de redirecionamento de site, ver Passo 5).
+3. Name: `digiai-marketing-web`.
 4. **CREATE** → janela mostra `Client ID` e `Client secret`. **Copiar e guardar temporariamente** — vai colar no Supabase em seguida.
 
-## Passo 5 — Gerar refresh token (uma vez só)
+## Passo 5 — Cadastrar o endereço de retorno do app no client (uma vez só)
 
-⚠️ **CORREÇÃO 2026-06-15:** o OAuth Playground **NÃO funciona com o client "Desktop"** do Passo 4 (dá `redirect_uri_mismatch`, pois Desktop usa loopback, não o redirect do Playground). Crie um client **"Aplicativo da Web"** (ex.: `digiai-marketing-playground`) com o URI de redirecionamento **`https://developers.google.com/oauthplayground`** e use o client_id/secret DELE no Playground. O refresh token fica atrelado a esse client Web → o Vault precisa dos 3 valores (client_id + secret + refresh) desse client.
+> **Reescrito em 14/09/2026.** O caminho é o botão **Reautorizar Google** da tela **SEO** do app digiai. O Playground e o SQL de antes gravavam labels (`sisdigiai-gmail`, `sisdigiai-client-id`) que a edge nunca leu. Quem seguisse o doc gravava a credencial e o sync continuava sem a achar.
 
-Use o OAuth Playground (caminho mais rápido sem rodar script local):
+A edge `marketing-sync-gsc` lê três credenciais de `company.api_credentials`, `provider = 'google_search_console'`:
 
-1. Abrir <https://developers.google.com/oauthplayground/>.
-2. Engrenagem (canto superior direito) → marcar **Use your own OAuth credentials** → colar Client ID e Client secret do passo 4 → Close.
-3. Coluna esquerda → seção **Step 1 Select & authorize APIs** → no campo de input colar manualmente: `https://www.googleapis.com/auth/webmasters.readonly`.
-4. **Authorize APIs** → login `sisdigiai@gmail.com` → tela de aviso "App não verificado" → **Advanced** → **Go to DIGIAI Marketing Sync (unsafe)** → Allow → Allow.
-5. De volta no Playground, **Step 2 → Exchange authorization code for tokens**.
-6. Aparece JSON com `access_token` (curto, ignora) e `refresh_token` (longo, **este é o que guarda**). Copiar refresh_token.
+| label | o que é |
+|---|---|
+| `gsc-client-id` | Client ID do OAuth client |
+| `gsc-client-secret` | Client secret do **mesmo** client |
+| `gsc-refresh-token` | refresh token emitido **para esse client** |
 
-## Passo 6 — Cadastrar no banco (via SQL editor Supabase)
+O botão usa o client cujo ID está em `gsc-client-id`. No Google Cloud Console (projeto `digiai-marketing`) → **APIs & Services** → **Credentials**, abra esse client e confira:
 
-1. Supabase Dashboard → SQL Editor.
-2. Rodar (substituindo `<REFRESH_TOKEN>`, `<CLIENT_ID>`, `<CLIENT_SECRET>` pelos valores reais):
+1. **Tipo "Aplicativo da Web".** Um client "Desktop" não aceita URI de redirecionamento de site. Se for Desktop, crie um client Web e grave o ID e o secret dele pelo SQL do Passo 7 antes de usar o botão.
+2. Em **URIs de redirecionamento autorizados**, adicione exatamente, com a barra final:
+   - `https://app.digiai.app.br/`
+   - (só para teste local: `http://localhost:3000/`)
+3. **Save.** O Google pode levar alguns minutos para aceitar a URI nova.
 
-```sql
--- 1. Guardar refresh token no Vault
-WITH s AS (
-  SELECT vault.create_secret(
-    '<REFRESH_TOKEN>',
-    'gsc_refresh_token_sisdigiai',
-    'OAuth refresh token GSC — sisdigiai@gmail.com, scope webmasters.readonly'
-  ) AS id
-)
-INSERT INTO company.api_credentials (provider, credential_type, vault_secret_id, label, scope, notes)
-SELECT 'google_search_console', 'oauth_refresh_token', s.id, 'sisdigiai-gmail',
-       'https://www.googleapis.com/auth/webmasters.readonly',
-       'OAuth client desktop "digiai-marketing-cli" do projeto google cloud "digiai-marketing"'
-FROM s;
+Esses são os mesmos endereços que a edge aceita. Um endereço fora dessa lista é recusado com `redirect_uri_fora_da_lista`.
 
--- 2. Guardar client_id (visível, mas guarda junto pra edge function montar token request)
-WITH s AS (
-  SELECT vault.create_secret('<CLIENT_ID>', 'gsc_oauth_client_id_sisdigiai', 'OAuth client_id GSC') AS id
-)
-INSERT INTO company.api_credentials (provider, credential_type, vault_secret_id, label, notes)
-SELECT 'google_search_console', 'oauth_client_secret', s.id, 'sisdigiai-client-id', 'pareado com gsc_refresh_token_sisdigiai'
-FROM s;
+## Passo 6 — Reautorizar pelo app
 
--- 3. Guardar client_secret
-WITH s AS (
-  SELECT vault.create_secret('<CLIENT_SECRET>', 'gsc_oauth_client_secret_sisdigiai', 'OAuth client_secret GSC') AS id
-)
-INSERT INTO company.api_credentials (provider, credential_type, vault_secret_id, label, notes)
-SELECT 'google_search_console', 'oauth_client_secret', s.id, 'sisdigiai-client-secret', 'pareado com gsc_refresh_token_sisdigiai'
-FROM s;
-```
+1. Entrar no app digiai com um usuário de staff (`super_admin`, `admin`, `founder` ou `staff`). O botão não aparece para os outros papéis, e a edge confere `is_staff()` no banco.
+2. Menu **Produtos → SEO** → **Reautorizar Google**.
+3. Login com a conta que tem acesso às propriedades no Search Console (`sisdigiai@gmail.com`). Na tela "App não verificado": **Avançado** → **Acessar DIGIAI Marketing Sync** → **Permitir**.
+4. O Google volta para o app, na mesma tela SEO:
+   - **"Autorização gravada"**: a edge trocou o code e gravou o refresh token novo em `gsc-refresh-token`; o antigo fica com `deleted_at`.
+   - **"Não gravou: …"** mostra o erro real. Os comuns:
+     - `redirect_uri_mismatch`: falta o Passo 5, ou o Google ainda não propagou a URI.
+     - `invalid_client`: `gsc-client-id` e `gsc-client-secret` são de clients diferentes.
+     - `exchange_failed` sem refresh token: o Google não reemitiu; tente de novo (o botão já pede `prompt=consent`).
+     - "não pertence a esta aba": a volta chegou numa aba sem o início do fluxo; clique no botão de novo na mesma aba.
+5. Teste na hora pelo botão **Sincronizar** do card GSC, ou espere a coleta diária das 06:00 (Brasília). Confira `company.api_credentials.last_sync_status = 'ok'` para `google_search_console`.
 
-3. Verificar:
+## Passo 7 — Alternativa sem o botão (SQL editor do Supabase)
+
+Serve para trocar o client ou quando o app estiver fora do ar. `fn_set_credential_service` faz soft delete da credencial anterior com o mesmo label e grava a nova no vault. Os labels são os que a edge lê:
 
 ```sql
-SELECT provider, credential_type, label, created_at
-FROM company.api_credentials
-WHERE provider = 'google_search_console' AND deleted_at IS NULL;
+select public.fn_set_credential_service('google_search_console', 'oauth_client_secret', '<CLIENT_ID>',     'gsc-client-id',     null, 'client Web digiai-marketing');
+select public.fn_set_credential_service('google_search_console', 'oauth_client_secret', '<CLIENT_SECRET>', 'gsc-client-secret', null, 'client Web digiai-marketing');
+-- só se já tiver um refresh token deste client; senão, use o botão (Passo 6)
+select public.fn_set_credential_service('google_search_console', 'oauth_refresh_token', '<REFRESH_TOKEN>', 'gsc-refresh-token',
+       'https://www.googleapis.com/auth/webmasters.readonly', 'gerado fora do app');
 ```
 
-## Passo 7 — Testar edge function
+Conferir:
 
-No DIGIAI App, abrir o módulo **Marketing & SEO** e clicar **Sincronizar agora** no card Google Search Console. Esperado:
-
-- Antes do cadastro: card mostra "Credenciais não configuradas. Veja `/docs/setup-gsc-oauth.md`".
-- Depois do cadastro: card mostra `configured: true`, `credential_id`, `label`. (Sync real será implementado em F5.)
+```sql
+select label, credential_type, created_at, last_sync_at, last_sync_status, left(last_sync_error, 120)
+from company.api_credentials
+where provider = 'google_search_console' and deleted_at is null
+order by label;
+```
 
 ## Notas
 
-- ⚠️ **CORRIGIDO 2026-06-14:** no modo **"Testing" o refresh token expira em 7 dias — SEMPRE**, mesmo com test user explícito (a nota antiga dizia o contrário; estava errada e foi a causa do GSC sync cair com 500/`invalid_grant`). **A correção é publicar o app (Production)**; aí o token não expira. App publicado em 2026-06-14.
-- Se algum dia precisar revogar: <https://myaccount.google.com/permissions> → encontrar "DIGIAI Marketing Sync" → revogar acesso. Depois disso, qualquer chamada usando o refresh token devolve `invalid_grant` — rodar o setup de novo.
-- **Rotação a cada 90 dias** (R-021): refazer passo 5 (gerar novo refresh token), `UPDATE company.api_credentials` com novo `vault_secret_id`, soft-delete o antigo via `deleted_at`.
+- **Em "Testing", o refresh token expira em 7 dias, sempre**, mesmo com test user. Antes de reautorizar, confira em **OAuth consent screen** que o status é **In production**. Um token emitido enquanto o app estava em Testing continua a expirar. Em 14/09/2026 o `invalid_grant` apareceu depois de o sync ter ficado mostrando "ok" desde 22/06, porque um defeito no caminho de erro da edge escondia a falha (corrigido no commit d0360ce). A causa exata da revogação não foi medida.
+- Se precisar revogar: <https://myaccount.google.com/permissions> → "DIGIAI Marketing Sync" → remover acesso. Toda chamada passa a devolver `invalid_grant` até reautorizar pelo botão.
+- **Rotação a cada 90 dias** (R-021): basta clicar em **Reautorizar Google**. O token novo substitui o antigo.
+- Quem pode disparar a edge (migration 125): o cron diário, com segredo do vault, ou staff logado. `exchange_code` e `auth_url` são só de staff. A chave anon recebe 401.

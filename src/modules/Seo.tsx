@@ -1,7 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ExternalLink, TriangleAlert, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
+import { ExternalLink, TriangleAlert, ArrowUpRight, ArrowDownRight, Minus, KeyRound, Loader2, CheckCircle2 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { seoStore, DIAGNOSTICOS, type SeoEstado } from '../lib/seoStore';
+import { useAuth } from '../contexts/AuthContext';
+import { ehRetornoDoGoogle, iniciarReautorizacao, concluirReautorizacao, type ResultadoReauth } from '../lib/gscReauth';
+
+// Só esconde o botão de quem não é staff. Quem decide é a edge: is_staff() no banco (R-037).
+const PAPEIS_STAFF = ['super_admin', 'admin', 'founder', 'staff'];
 
 // SEO — busca orgânica dos três sites da empresa.
 //
@@ -42,6 +47,22 @@ export default function Seo() {
   const [sites, setSites] = useState<SeoEstado[]>([]);
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(true);
+  const { role } = useAuth();
+  const ehStaff = !!role && PAPEIS_STAFF.includes(role);
+  const [reauth, setReauth] = useState<'idle' | 'indo' | 'trocando'>(() => (ehRetornoDoGoogle() ? 'trocando' : 'idle'));
+  const [reauthResultado, setReauthResultado] = useState<ResultadoReauth | null>(null);
+
+  useEffect(() => {
+    if (!ehRetornoDoGoogle()) return;
+    concluirReautorizacao().then((r) => { setReauthResultado(r); setReauth('idle'); });
+  }, []);
+
+  const reautorizar = async () => {
+    setReauthResultado(null);
+    setReauth('indo');
+    const r = await iniciarReautorizacao();
+    if (!r.ok) { setReauthResultado(r); setReauth('idle'); }
+  };
 
   useEffect(() => {
     seoStore.estado()
@@ -64,6 +85,33 @@ export default function Seo() {
         title="SEO"
         subtitle="Busca orgânica dos três sites. Cada um tem um problema diferente — e confundi-los é o jeito mais rápido de gastar esforço no lugar errado."
       />
+
+      {ehStaff && (
+        <div className="border border-outline bg-surface-container p-4 mb-6 flex flex-wrap items-center gap-3">
+          <div className="min-w-0 flex-1 text-sm text-on-surface-variant leading-relaxed">
+            <strong className="text-on-surface">Conexão com o Google Search Console.</strong>{' '}
+            Se a coleta diária do Google der erro de autorização, reautorize com a conta Google que tem acesso às propriedades.
+          </div>
+          <button
+            onClick={reautorizar}
+            disabled={reauth !== 'idle'}
+            className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-on-surface border border-outline/40 hover:bg-surface-highest transition-colors disabled:opacity-50"
+          >
+            {reauth === 'idle' ? <KeyRound className="w-3.5 h-3.5" /> : <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+            {reauth === 'indo' ? 'Abrindo o Google…' : reauth === 'trocando' ? 'Gravando a autorização…' : 'Reautorizar Google'}
+          </button>
+          {reauthResultado && (
+            <div className={`basis-full text-sm flex items-start gap-2 ${reauthResultado.ok ? 'text-success' : 'text-danger'}`}>
+              {reauthResultado.ok ? <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" /> : <TriangleAlert className="w-4 h-4 shrink-0 mt-0.5" />}
+              <span>
+                {reauthResultado.ok
+                  ? 'Autorização gravada. A próxima coleta diária (06:00) já usa a nova; o botão Sincronizar do card GSC testa agora.'
+                  : `Não gravou: ${reauthResultado.erro}`}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
 
       {carregando && <div className="font-mono text-xs uppercase tracking-widest text-muted">Carregando…</div>}
       {erro && <div className="border border-danger/40 bg-surface-container p-4 text-sm text-danger">{erro}</div>}

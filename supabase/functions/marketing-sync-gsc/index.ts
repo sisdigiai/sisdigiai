@@ -4,6 +4,15 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 const PROVIDER = "google_search_console";
 const SETUP_DOC = "/docs/setup-gsc-oauth.md";
 const TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
+const AUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth";
+const SCOPE = "https://www.googleapis.com/auth/webmasters.readonly";
+// Para onde o Google pode devolver o code. O Google já recusa URI não cadastrada no client;
+// esta lista impede que a edge monte ou troque um code para um destino que não é o app.
+const REDIRECTS = new Set([
+  "https://app.digiai.app.br/",
+  "http://localhost:3000/",
+  "http://localhost:3100/",
+]);
 const GSC_BASE = "https://searchconsole.googleapis.com/webmasters/v3/sites";
 
 const corsHeaders = {
@@ -184,13 +193,42 @@ Deno.serve(async (req: Request) => {
   const quem = await quemChama(req, supabase);
   if (!quem) return jsonResp({ ok: false, error: "nao_autorizado" }, 401);
 
-  let payload: { action?: string; code?: string; redirect_uri?: string; site?: string } = {};
+  let payload: { action?: string; code?: string; redirect_uri?: string; state?: string; site?: string } = {};
   try { payload = await req.json(); } catch { /* sem body = sync de todos os sites */ }
+
+  // --- Modo 0: URL de consentimento para o botão "Reautorizar Google" da tela SEO ---
+  // O client_id mora no vault; a tela não o conhece e não precisa de o levar no bundle.
+  if (payload.action === "auth_url") {
+    if (quem !== "staff") return jsonResp({ ok: false, error: "auth_url_exige_staff" }, 403);
+    if (!payload.redirect_uri || !REDIRECTS.has(payload.redirect_uri)) {
+      return jsonResp({ ok: false, error: "redirect_uri_fora_da_lista" }, 400);
+    }
+    if (!payload.state || payload.state.length > 200) return jsonResp({ ok: false, error: "state_invalido" }, 400);
+    const clientId = await getSecret(supabase, "gsc-client-id");
+    if (!clientId) return jsonResp({ ok: false, error: "client_id ausente no vault (label gsc-client-id)" }, 503);
+    const url = new URL(AUTH_ENDPOINT);
+    url.search = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: payload.redirect_uri,
+      response_type: "code",
+      scope: SCOPE,
+      // offline + consent: sem os dois o Google pode devolver só access_token, e o
+      // exchange falha com "exchange_failed" por falta de refresh_token
+      access_type: "offline",
+      prompt: "consent",
+      state: payload.state,
+    }).toString();
+    return jsonResp({ ok: true, url: url.toString() });
+  }
 
   // --- Modo 1: troca authorization code por refresh_token (uma vez) ---
   if (payload.action === "exchange_code") {
     // grava credencial: nunca o cron, só uma pessoa de staff
     if (quem !== "staff") return jsonResp({ ok: false, error: "exchange_code_exige_staff" }, 403);
+    if (!payload.code) return jsonResp({ ok: false, error: "code_ausente" }, 400);
+    if (!payload.redirect_uri || !REDIRECTS.has(payload.redirect_uri)) {
+      return jsonResp({ ok: false, error: "redirect_uri_fora_da_lista" }, 400);
+    }
     try {
       const clientId = await getSecret(supabase, "gsc-client-id");
       const clientSecret = await getSecret(supabase, "gsc-client-secret");
@@ -200,8 +238,8 @@ Deno.serve(async (req: Request) => {
       const body = new URLSearchParams({
         client_id: clientId,
         client_secret: clientSecret,
-        code: payload.code ?? "",
-        redirect_uri: payload.redirect_uri ?? "http://localhost",
+        code: payload.code,
+        redirect_uri: payload.redirect_uri,
         grant_type: "authorization_code",
       });
       const r = await fetch(TOKEN_ENDPOINT, {
@@ -218,8 +256,8 @@ Deno.serve(async (req: Request) => {
         p_credential_type: "oauth_refresh_token",
         p_value: j.refresh_token,
         p_label: "gsc-refresh-token",
-        p_scope: "https://www.googleapis.com/auth/webmasters.readonly",
-        p_notes: "Obtido via OAuth code exchange (Claude in Chrome 2026-05-27)",
+        p_scope: SCOPE,
+        p_notes: `Obtido pelo botão Reautorizar Google (tela SEO), por staff, em ${new Date().toISOString()}`,
       });
       if (setErr) return jsonResp({ ok: false, error: `save_refresh: ${setErr.message}` }, 500);
       return jsonResp({ ok: true, exchanged: true, message: "refresh_token salvo no vault" });

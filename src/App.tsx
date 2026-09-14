@@ -34,6 +34,7 @@ import Comercial from './modules/Comercial';
 import Billing from './modules/Billing';
 import Inventario from './modules/Inventario';
 import Seo from './modules/Seo';
+import { ehRetornoDoGoogle } from './lib/gscReauth';
 import Vendas from './modules/Vendas';
 import { ModuleStub } from './modules/Stub';
 import { useAuth } from './contexts/AuthContext';
@@ -55,6 +56,8 @@ const MODULES: ModuleId[] = [
 
 function moduleFromHash(): ModuleId {
   if (typeof window === 'undefined') return 'visao';
+  // volta do consentimento do Google: o redirect_uri não leva hash, então a rota vem do state
+  if (ehRetornoDoGoogle()) return 'seo';
   const h = window.location.hash.replace(/^#\/?/, '');
   return (MODULES as string[]).includes(h) ? (h as ModuleId) : 'visao';
 }
