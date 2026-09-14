@@ -11,8 +11,10 @@
  * POST / { events: [{ event_code, product?, session_id?, url?, utm_*?, metadata? }] }
  *   → { ok, inserted, errors }
  *
- * Só aceita os 3 eventos CLIENT-SIDE. purchase_approved / first_login_nexus são
- * server-side (webhook Hotmart) e ficam de fora pra evitar spoof de conversão.
+ * Só aceita eventos CLIENT-SIDE: os da landing, o da Calc e os gatilhos do leitor OSI.
+ * purchase_approved / first_login_nexus são server-side (webhook Hotmart) e ficam de
+ * fora pra evitar spoof de conversão. Todo código aceito aqui precisa de linha em
+ * analytics.events_catalog (FK) — os do leitor entram pela migration 124.
  */
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
@@ -28,7 +30,14 @@ const json = (body: unknown, status = 200) =>
     headers: { ...CORS, 'Content-Type': 'application/json' },
   });
 
-const ALLOWED = new Set(['landing_visit', 'click_checkout', 'checkout_started', 'calc_used']);
+const ALLOWED = new Set([
+  'landing_visit', 'click_checkout', 'checkout_started', 'calc_used',
+  'reader_gatilho_view', 'reader_gatilho_click',
+]);
+// Os gatilhos do leitor só valem com o id do gatilho do desenho (g1…g4, e1, e2), vindo
+// em utm_content ou em metadata.gatilho. Sem ele o evento não diz QUAL gatilho, e o
+// endpoint é público: texto livre aqui vira lixo, ou dado de terceiro, na tabela.
+const GATILHOS = new Set(['g1', 'g2', 'g3', 'g4', 'e1', 'e2']);
 const MAX_EVENTS = 20;
 
 Deno.serve(async (req) => {
@@ -53,6 +62,13 @@ Deno.serve(async (req) => {
       const code = String(e?.event_code ?? '');
       if (!ALLOWED.has(code)) { errors.push(`bad_code:${code}`); continue; }
 
+      let utmContent = e?.utm_content ? String(e.utm_content).slice(0, 120) : null;
+      if (code.startsWith('reader_gatilho_')) {
+        const gatilho = String(e?.utm_content ?? e?.metadata?.gatilho ?? '').toLowerCase();
+        if (!GATILHOS.has(gatilho)) { errors.push(`bad_gatilho:${gatilho}`); continue; }
+        utmContent = gatilho;
+      }
+
       const { error } = await supabase.rpc('fn_log_event', {
         p_event_code: code,
         p_product: e?.product ?? 'osi',
@@ -61,7 +77,7 @@ Deno.serve(async (req) => {
         p_utm_source: e?.utm_source ? String(e.utm_source).slice(0, 120) : null,
         p_utm_medium: e?.utm_medium ? String(e.utm_medium).slice(0, 120) : null,
         p_utm_campaign: e?.utm_campaign ? String(e.utm_campaign).slice(0, 120) : null,
-        p_utm_content: e?.utm_content ? String(e.utm_content).slice(0, 120) : null,
+        p_utm_content: utmContent,
         p_utm_term: e?.utm_term ? String(e.utm_term).slice(0, 120) : null,
         p_metadata: (e?.metadata && typeof e.metadata === 'object') ? e.metadata : {},
         p_user_agent: ua,
