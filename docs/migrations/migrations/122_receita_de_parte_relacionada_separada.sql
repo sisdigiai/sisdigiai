@@ -1,5 +1,11 @@
 -- 122 — receita de parte relacionada ganha nome próprio antes de existir
 --
+-- ⛔ NÃO APLICAR COMO ESTÁ (achado de 14/09/2026, docs/desenho-venda-clearix-2026-09-14.md §4):
+--    fn_gate_evidencia também conta `count(*) from billing.subscribers` — todos, inclusive
+--    apagados, cancelados e parte relacionada. Esta migration só separa a RECEITA; um
+--    assinante da Lancaster viraria o gate do mesmo jeito. Reescrever junto com a estrutura
+--    de venda (lead_id/parte_relacionada em billing.subscribers) antes de aplicar.
+--
 -- ⚠ NÃO APLICADA. Estrutura sem dado: 0 linhas mudam hoje (finance.revenue tem 0).
 --    Muda duas funções e duas views que a casa lê todo dia (gate da fase, placar),
 --    por isso só com a palavra do dono. É pré-requisito da 123 (Lancaster cliente-zero,
