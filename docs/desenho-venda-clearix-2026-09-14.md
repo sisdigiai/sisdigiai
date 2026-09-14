@@ -77,6 +77,11 @@ Na venda ficam **três fotografias**, tiradas por `fn_registrar_venda_clearix` n
 
 A regra é a do MKT: a **primeira** saída com `oferta` não nula **para o número do lead**, e não só para o `lead_id`. Uma rede usa o mesmo WhatsApp em várias lojas: a venda pela loja B herda a célula da abordagem à loja A. Contam `status` em ('enviada', 'entregue', 'lida'), com `enviado_em` **antes** da venda. As variações com e sem nono dígito vêm de `mkt.fn_wa_variantes_fone`. A função de venda é `security definer`, então não precisa de grant novo.
 
+Sobre os dados, segundo o MKT em 14/09:
+
+- `enviado_em` é sempre UTC. Nas saídas pela API é a hora do servidor do MKT. Nas digitadas no aparelho (canal `zapi_aparelho`) é o `momment` da Z-API. A comparação com a data da venda deve ser feita em UTC.
+- A mesma migration traz `mkt.mensagens.origem` ('site' | 'site-contato' | nulo). É o código que a landing do Clearix põe no fim da mensagem, e ele vem nas mensagens **recebidas**, não nas enviadas. Proposta: preencher `canal_origem` a partir da **primeira mensagem recebida** do número. `site` e `site-contato` viram `landing`; o resto fica com quem registra a venda. É também uma fotografia. É decisão do dono, junto com o item 4.
+
 Venda sem nenhuma saída com oferta: as três ficam nulas. A venda conta para as metas (1ª → 50 → 200) e fica **fora** do A/B. Não se força um braço.
 
 Pré-requisito que não é do app: não há texto de oferta aprovado. Os 2 templates Clearix estão inativos. O primeiro envio do experimento depende de o dono aprovar um texto de cada braço.
