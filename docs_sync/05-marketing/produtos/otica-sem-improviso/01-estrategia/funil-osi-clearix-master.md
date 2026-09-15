@@ -22,6 +22,10 @@ superseded_by: null
 
 **Tese:** OSI (R$ 49; R$ 97 no plano de 05/2026) é isca paga vendida via marketplace Hotmart + Kiwify. **Marketing = espalhar o manual completo aberto** (leitor `oticasemimproviso.netlify.app`) pra viralizar — comprador compartilha com terceiros, gera SEO e autoridade. **Produto pago = camada Nexus de 90 dias** (Doug AI, workshops, gamificação) — só compradores entram, via token enviado pós-compra. É lá que o pitch Clearix B2B acontece de verdade. Meta: **3% dos alunos Academy viram clientes Clearix** (R$ 349–1.499/mês).
 
+> ⚠ **Estimativa antiga, não promessa (carimbo de 15/09/2026).** O LTV abaixo (18 × R$ 899) e a faixa "R$ 349–1.499/mês" são
+> planejamento de 05/2026. Preço vigente do Clearix: a tabela do banco (`iam.clearix_packages`) — Essencial 349 · Controle 899 ·
+> Crescimento 1.499 · Completo sob consulta, por mês, sem período grátis, sem % off. Não citar estes números a cliente como oferta.
+
 **Equação econômica alvo:**
 - CAC Clearix via Academy: R$ 500–1.500
 - LTV Clearix: ~R$ 15.000 (18 meses × R$ 899 gross margin)

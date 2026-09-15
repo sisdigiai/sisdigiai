@@ -1,5 +1,9 @@
 # 📥 ORDEM — incluir os 5 leads de prospecção (Kimi) no digiai + no mkt
 
+> ⛔ **SUPERADO em 15/09/2026.** A prospecção é a esteira do digiai_mkt (ADR-0057), com oferta do A/B e registro por número.
+> O "plano-alvo" com preço por ótica na tabela abaixo **não vale**: plano e preço saem da tabela do banco
+> (`iam.clearix_packages`) na hora da proposta, pelo porte da ótica. Documento mantido como histórico de julho.
+
 > **Status: ORDEM (pedido do dono, 2026-07).** Handoff para o agente do app DIGIAI.
 > Objetivo: os 5 leads qualificados (prospecção IA, SP/Grande SP) entram no **CRM comercial** e na **esteira de outreach do digiai_mkt**, prontos pra abordagem.
 > Regra: dados comerciais seguem [`00-DADOS-COMERCIAIS-CANONICOS.md`] (R-036). Não prometer nada fora da oferta.

@@ -1,5 +1,10 @@
 # Piloto assistido Clearix — uma página
 
+> ⛔ **SUPERADO pelo termo de piloto D7 (carimbo de 15/09/2026): ver `Cockpit/comercial/termo-de-piloto-clearix-v1.md`.**
+> Diverge em PREÇO: esta página fixa "R$ 349 antecipado"; o termo remete à **mensalidade do plano correspondente ao porte
+> da ótica, pela tabela pública na data da assinatura**, sem período gratuito, e deixa o valor como campo. A ambiguidade do
+> "antecipado" (mês 1 ou piloto inteiro) continua aberta no termo como **portão 72**. Vale o termo; esta página é histórico de 09/09.
+
 > **Rascunho, não contrato.** Documento para o dono revisar e decidir; não foi
 > assinado, enviado nem mostrado a ninguém.
 > Redigido em 09/09/2026 pelo orquestrador do app digiai.
