@@ -101,6 +101,10 @@ begin
 
   -- Compra-teste de verdade (paga, pelo link marcado "teste."): grava à parte, para provar o
   -- encanamento sem virar receita, gate nem venda em view nenhuma (131).
+  -- ⚠ "teste" é PALAVRA RESERVADA no início do sck/utm_campaign. Hoje não colide: a variante do MKT é
+  -- '<oferta>.<template>.<versao>' e mkt.mensagens.oferta só aceita osi|clearix (CHECK). Oferta ou
+  -- campanha nova nunca pode começar por "teste." — seria desviada e nunca contaria como venda.
+  -- Portas: utm_campaign ~* '^teste\.' OU metadata.teste = true (que o ingest deriva da mesma regra).
   if coalesce(new.utm_campaign, '') ~* '^teste\.' or coalesce(new.metadata->>'teste', '') = 'true' then
     insert into marketing.hotmart_sales_teste select new.*
     on conflict (hotmart_transaction) do update set
