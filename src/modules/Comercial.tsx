@@ -12,6 +12,8 @@ import { proposalStore, type Proposal } from '../lib/proposalStore';
 import { roadmapStore, type RoadmapPhase } from '../lib/roadmapStore';
 import MeetingRunner from './comercial/MeetingRunner';
 import ProposalEditor from './comercial/ProposalEditor';
+import FilaVendasHoje from './comercial/FilaVendasHoje';
+import SiteClearixCard from './comercial/SiteClearixCard';
 import { proposalFromMeeting } from './comercial/proposalGen';
 
 // Funil REAL do banco, conferido em 09/09/2026 contra a CHECK
@@ -375,6 +377,9 @@ export default function Comercial() {
               </div>
             </div>
           )}
+
+          <FilaVendasHoje />
+          <SiteClearixCard />
 
           {/* Fila real da prospecção: o trabalho que ainda dá para fazer no WhatsApp */}
           <div className="border border-outline/15 bg-surface-container px-4 py-3 mb-5 flex items-center gap-4 flex-wrap">
