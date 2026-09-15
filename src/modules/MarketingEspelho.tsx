@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ExternalLink, RefreshCw, Info, Radio, DollarSign, Send, Target, CalendarClock } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { TravasBanner } from './TravasMarketing';
+import ResultadoConteudoCard from './marketing/ResultadoConteudoCard';
 import { supabase } from '../lib/supabase';
 import { clearixSupabase } from '../lib/clearixSupabase';
 import { espelhoMotores, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
@@ -150,6 +151,7 @@ export default function MarketingEspelho() {
 
       <div className="space-y-6">
         <TravasBanner />
+        <ResultadoConteudoCard />
 
         {loading ? (
           <div className="text-sm text-muted py-6">Carregando espelho…</div>
