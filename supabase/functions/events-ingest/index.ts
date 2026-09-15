@@ -34,8 +34,12 @@ const json = (body: unknown, status = 200) =>
 const ALLOWED = new Set([
   'landing_visit', 'click_checkout', 'checkout_started', 'calc_used',
   'reader_gatilho_view', 'reader_gatilho_click',
-  'clearix_site_visit', 'clearix_demo_solicitada',
+  'clearix_site_visit', 'clearix_demo_solicitada', 'clearix_whatsapp_click',
 ]);
+// Preview local não mede nada: em 15/09 o preview da landing OSI mandou landing_visit reais com
+// url localhost, e todo funil passou a precisar de filtro. Recusar aqui protege todas as landings
+// de uma vez, em vez de confiar que cada site lembre do filtro.
+const ORIGEM_LOCAL = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?(\/|$)/i;
 // Os gatilhos do leitor só valem com o id do gatilho do desenho (g1…g4, e1, e2), vindo
 // em utm_content ou em metadata.gatilho. Sem ele o evento não diz QUAL gatilho, e o
 // endpoint é público: texto livre aqui vira lixo, ou dado de terceiro, na tabela.
@@ -67,6 +71,7 @@ Deno.serve(async (req) => {
     for (const e of events) {
       const code = String(e?.event_code ?? '');
       if (!ALLOWED.has(code)) { errors.push(`bad_code:${code}`); continue; }
+      if (typeof e?.url === 'string' && ORIGEM_LOCAL.test(e.url)) { errors.push('origem_local'); continue; }
 
       let utmContent = e?.utm_content ? String(e.utm_content).slice(0, 120) : null;
       if (code.startsWith('reader_gatilho_')) {

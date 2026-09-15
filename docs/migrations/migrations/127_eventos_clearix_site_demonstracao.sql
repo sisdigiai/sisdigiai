@@ -1,8 +1,16 @@
 -- 127 — eventos da landing clearix.app.br no catálogo (visita e pedido de demonstração)
 --
--- ⚠ NÃO APLICADA. Nomes PROPOSTOS ao orquestrador do eco Clearix em 15/09/2026 (despacho
---    Cockpit/comercial/_DESPACHO_2026-09-15_RECEBER_INTERESSADOS.md §3.1) — aplicar só depois do
---    "aceito" dele e com a palavra do dono. Aditiva: 2 linhas em analytics.events_catalog.
+-- ⚠ NÃO APLICADA. Nomes ACEITOS pelo orquestrador do eco Clearix em 15/09/2026, com um terceiro
+--    evento pedido por ele (despacho Cockpit/comercial/_DESPACHO_2026-09-15_RECEBER_INTERESSADOS.md
+--    §3.1). Aplicar com a palavra do dono. Aditiva: 3 linhas em analytics.events_catalog.
+--    (O Agent da landing propôs prospect_link_open/demo_request_submit; o eco decidiu por estes.)
+--
+-- ⚠ ACHADO, medido em 15/09: o site do Clearix manda HOJE `landing_visit` (134) e `click_checkout`
+--    (13) com product 'clearix-site' no payload. No catálogo esses códigos são product 'osi', e
+--    v_analytics_funnel_summary agrupa pelo produto do CATÁLOGO: o card "Funil de conversão ·
+--    first-party" da tela OSI soma as visitas do site do Clearix como se fossem da landing da OSI.
+--    Com a troca para clearix_site_visit o erro para daqui em diante; as 147 linhas antigas ficam
+--    (dado real) — a leitura do card OSI precisa filtrar events_log.product (outro portão).
 --
 -- ORDEM: 127 ANTES do deploy da events-ingest do mesmo commit (a FK de events_log recusa código
 --   fora do catálogo, e a edge responde ok:true com o erro em `errors` — lição da 124).
@@ -19,7 +27,7 @@ begin;
 do $$
 declare n int;
 begin
-  select count(*) into n from analytics.events_catalog where code in ('clearix_site_visit', 'clearix_demo_solicitada');
+  select count(*) into n from analytics.events_catalog where code in ('clearix_site_visit', 'clearix_demo_solicitada', 'clearix_whatsapp_click');
   if n > 0 then raise exception '% código(s) clearix-site já no catálogo — a 127 já foi aplicada?', n; end if;
 
   select count(*) into n from pg_constraint
@@ -35,14 +43,17 @@ values
    null, null, null, 'clearix-site', 90),
   ('clearix_demo_solicitada', 'consideration',
    'Formulário "Agendar 20 minutos de demonstração" ENVIADO com sucesso (não o clique). Mesmos UTM. O pedido em si (contato) vai por outro caminho e cria/atualiza o lead. Migration 127.',
-   null, null, null, 'clearix-site', 100);
+   null, null, null, 'clearix-site', 100),
+  ('clearix_whatsapp_click', 'consideration',
+   'Clique no link/botão de WhatsApp da landing clearix.app.br (caminho de conversão; botão hoje desligado por D2 até o dono definir o número). Mesmos UTM, zero PII. Migration 127.',
+   null, null, null, 'clearix-site', 95);
 
 do $$
 declare n int;
 begin
   select count(*) into n from public.v_analytics_funnel_summary
-   where product = 'clearix-site' and event_code in ('clearix_site_visit', 'clearix_demo_solicitada');
-  if n <> 2 then raise exception 'Os 2 códigos não aparecem em v_analytics_funnel_summary (achei %).', n; end if;
+   where product = 'clearix-site' and event_code in ('clearix_site_visit', 'clearix_demo_solicitada', 'clearix_whatsapp_click');
+  if n <> 3 then raise exception 'Os 3 códigos não aparecem em v_analytics_funnel_summary (achei %).', n; end if;
 
   select count(*) into n from public.v_analytics_funnel_summary where product in ('osi', 'clearix-calc', 'osi-leitor') and event_code like 'clearix_site%';
   if n > 0 then raise exception 'Código do site caiu em outro produto.'; end if;
@@ -54,6 +65,7 @@ end $$;
 commit;
 
 -- PROVAS (depois da 127 E do deploy da events-ingest)
+--   0) POST com url http://localhost:... → errors ['origem_local'], inserted 0 (qualquer código);
 --   a) POST clearix_demo_solicitada com utm_content = um uuid → ok, inserted 1;
 --   b) POST clearix_site_visit com utm_content que não é uuid → grava com utm_content nulo
 --      (a edge não guarda texto livre nesse campo para eventos do site);

@@ -7,8 +7,12 @@
  * keyless do events-ingest.
  *
  * POST / { product?, name, email?, whatsapp?, source_url?, session_id?, utm_*?,
- *          consent_text?, notes?, website? (honeypot) }
- *   → { ok, lead_id } | { error }
+ *          consent_text?, notes?, website? (honeypot), commercial_lead_id? }
+ *   → { ok, lead_id, commercial_lead_id? } | { error }
+ *
+ * commercial_lead_id (migration 128, despacho de 15/09): o lead_id do link da prospecção.
+ * Se vier no body, a resposta traz SEMPRE a chave: o id quando ele existe na base (e o pedido
+ * foi ligado a ele), ou null. Nunca cria lead a partir de id vindo da URL.
  *
  * Anti-bot: campo honeypot 'website' (humano não vê; bot preenche → descarta em silêncio).
  * R-013/LGPD: consentimento registrado (consent_text + user_agent); dados mínimos.
@@ -20,6 +24,8 @@ const CORS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'content-type',
 };
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -73,7 +79,24 @@ Deno.serve(async (req) => {
       return json({ error: code }, code === 'capture_failed' ? 500 : 400);
     }
 
-    return json({ ok: true, lead_id: data });
+    if (!('commercial_lead_id' in (body ?? {}))) return json({ ok: true, lead_id: data });
+
+    // O pedido já está gravado: falhar o vínculo não pode derrubar a captura. Devolve null e
+    // o site marca o evento como lead_id desconhecido.
+    const pedido = typeof body.commercial_lead_id === 'string' ? body.commercial_lead_id.trim() : '';
+    let casou: string | null = null;
+    if (UUID.test(pedido)) {
+      const { data: v, error: ev } = await supabase.rpc('fn_ligar_pedido_ao_lead', {
+        p_commercial_lead_id: pedido,
+        p_landing_lead_id: data,
+        p_utm_source: typeof body?.utm_source === 'string' ? body.utm_source.slice(0, 120) : null,
+        p_utm_medium: typeof body?.utm_medium === 'string' ? body.utm_medium.slice(0, 120) : null,
+        p_utm_campaign: typeof body?.utm_campaign === 'string' ? body.utm_campaign.slice(0, 120) : null,
+      });
+      if (ev) console.error('[lead-capture] fn_ligar_pedido_ao_lead', ev.message);
+      else casou = (v as string | null) ?? null;
+    }
+    return json({ ok: true, lead_id: data, commercial_lead_id: casou });
   } catch (e) {
     return json({ error: String(e instanceof Error ? e.message : e) }, 500);
   }
