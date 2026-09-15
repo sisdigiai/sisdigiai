@@ -1,6 +1,11 @@
 -- 130 — compra-teste do Clearix não conta como venda
 --
--- ⚠ NÃO APLICADA. Pede a palavra do dono. Pedido do Orquestrador Geral (15/09/2026): o dono quer
+-- ✔ APLICADA em 15/09/2026 às 14:29:17 BRT (17:29 UTC), por mim, com a palavra do dono neste canal
+--   ("fazer todos"). Travas passaram. Reconferido: coluna billing.subscribers.teste; uma só
+--   fn_registrar_venda_clearix (10 args), sem anon e com authenticated; gate falso e com NOT s.teste;
+--   v_vendas_clearix invoker. O botão já envia p_teste só quando marcado (no ar desde e689bec).
+--
+-- (Escrita como NÃO APLICADA.) Pede a palavra do dono. Pedido do Orquestrador Geral (15/09/2026): o dono quer
 --    fazer uma compra-teste do Clearix, e pela 126 uma venda registrada no botão é venda de MERCADO:
 --    viraria o gate da fase 2 para "sustentado" e contaria como a 1ª venda das metas e do A/B.
 --

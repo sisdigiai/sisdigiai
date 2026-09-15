@@ -1,6 +1,13 @@
 -- 131 — a venda da Hotmart volta a entrar: data em milissegundos, origem do link e compra-teste à parte
 --
--- ⚠ NÃO APLICADA. Pede a palavra do dono. Achado da compra-teste da OSI (dono, 15/09/2026 12:52 BRT,
+-- ✔ APLICADA em 15/09/2026 às 14:28:59 BRT (17:28:59 UTC), por mim, com a palavra do dono neste canal
+--   ("fazer todos"). Travas e reprocesso passaram. Reconferido:
+--   hotmart_sales_teste com HP0118808393, 15:52:01 UTC, whatsapp/prospeccao, teste.compra_teste.v1,
+--   utm_content 722057eb…, 4900 centavos, approved, produto 7611033; hotmart_sales 0; revenue osi 0;
+--   gate falso; 0 purchase_approved; linha crua processada sem erro; hotmart_sales_teste sem SELECT
+--   para anon/authenticated.
+--
+-- (Escrita como NÃO APLICADA.) Pede a palavra do dono. Achado da compra-teste da OSI (dono, 15/09/2026 12:52 BRT,
 --    transação HP0118808393), relatado pelo Orquestrador Geral e medido por mim no banco.
 --
 -- ═══════════════════════════════════════════════════════════════════════════
