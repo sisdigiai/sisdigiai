@@ -91,6 +91,8 @@ export interface VendaClearix {
   tenantRef: string;
   parteRelacionada: boolean;
   comprovante: string;
+  /** Compra-teste (130): grava tudo, mas não conta como venda em gate, placar nem A/B. */
+  teste: boolean;
 }
 
 export interface VendaRegistrada {
@@ -99,6 +101,7 @@ export interface VendaRegistrada {
   braco_ab: 'osi' | 'clearix' | null;
   variante_ab: string | null;
   parte_relacionada: boolean;
+  teste: boolean;
 }
 
 export interface OutreachItem {
@@ -201,6 +204,9 @@ export const commercialStore = {
       p_tenant_ref: v.tenantRef || null,
       p_parte_relacionada: v.parteRelacionada,
       p_comprovante: v.comprovante || null,
+      // Só vai quando é teste: sem a 130 no banco a função não conhece p_teste, e a venda normal
+      // não pode quebrar por isso. Compra-teste sem a 130 falha — é o certo, senão contaria.
+      ...(v.teste ? { p_teste: true } : {}),
     });
     if (error) { console.error('[commercialStore] registrarVenda', error); return { ok: false, erro: error.message }; }
     return { ok: true, venda: data as VendaRegistrada };

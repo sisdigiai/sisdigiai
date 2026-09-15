@@ -40,7 +40,7 @@ const CANAIS: { valor: CanalOrigem | ''; rotulo: string }[] = [
   { valor: 'outro', rotulo: 'Outro' },
 ];
 
-type RascunhoVenda = { lead: CommercialLead; plano: string; valor: string; pagoEm: string; canal: CanalOrigem | ''; tenant: string; parteRelacionada: boolean; comprovante: string };
+type RascunhoVenda = { lead: CommercialLead; plano: string; valor: string; pagoEm: string; canal: CanalOrigem | ''; tenant: string; parteRelacionada: boolean; comprovante: string; teste: boolean };
 
 function hojeBR(): string {
   return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
@@ -280,7 +280,7 @@ export default function Comercial() {
   const fecharSaida = () => { setSaindo(null); setMotivoEscolhido(''); };
 
   const abrirVenda = (lead: CommercialLead) =>
-    setVendendo({ lead, plano: '', valor: lead.value_brl != null ? String(lead.value_brl) : '', pagoEm: hojeBR(), canal: '', tenant: '', parteRelacionada: false, comprovante: '' });
+    setVendendo({ lead, plano: '', valor: lead.value_brl != null ? String(lead.value_brl) : '', pagoEm: hojeBR(), canal: '', tenant: '', parteRelacionada: false, comprovante: '', teste: false });
 
   const valorVenda = vendendo ? Number(vendendo.valor.replace(/\./g, '').replace(',', '.')) : NaN;
   const vendaPronta = !!vendendo?.lead.id && !!vendendo.plano.trim() && valorVenda > 0 && !!vendendo.pagoEm && vendendo.pagoEm <= hojeBR();
@@ -297,13 +297,14 @@ export default function Comercial() {
       tenantRef: vendendo.tenant.trim(),
       parteRelacionada: vendendo.parteRelacionada,
       comprovante: vendendo.comprovante.trim(),
+      teste: vendendo.teste,
     });
     setGravandoVenda(false);
     if (!r.ok || !r.venda) { avisarFalha('registrar a venda', r.erro ?? 'resposta vazia do banco'); return; }  // não fecha: o dado continua na tela
     const braco = r.venda.braco_ab
       ? `Atribuída ao braço ${r.venda.braco_ab.toUpperCase()} (${r.venda.variante_ab}).`
       : 'Sem mensagem de oferta antes do pagamento: conta nas metas, fora do A/B.';
-    show({ kind: 'success', title: `Venda registrada — ${vendendo.lead.company}`, description: `${braco} Canal: ${r.venda.canal_origem}.${r.venda.parte_relacionada ? ' Parte relacionada: não conta no gate.' : ''}`, duration: 9000 });
+    show({ kind: 'success', title: `${r.venda.teste ? 'Compra-teste registrada' : 'Venda registrada'} — ${vendendo.lead.company}`, description: r.venda.teste ? 'Gravada como teste: não conta no gate, no placar nem no A/B.' : `${braco} Canal: ${r.venda.canal_origem}.${r.venda.parte_relacionada ? ' Parte relacionada: não conta no gate.' : ''}`, duration: 9000 });
     setVendendo(null);
     load();
   };
@@ -809,6 +810,10 @@ export default function Comercial() {
             <label className="flex items-start gap-2 text-sm text-on-surface-variant">
               <input type="checkbox" checked={vendendo.parteRelacionada} onChange={(e) => setVendendo({ ...vendendo, parteRelacionada: e.target.checked })} className="mt-0.5" />
               <span>Empresa do mesmo dono (parte relacionada) — conta como venda, <strong className="text-on-surface">não</strong> conta como validação de mercado.</span>
+            </label>
+            <label className="flex items-start gap-2 text-sm text-on-surface-variant">
+              <input type="checkbox" checked={vendendo.teste} onChange={(e) => setVendendo({ ...vendendo, teste: e.target.checked })} className="mt-0.5" />
+              <span><strong className="text-on-surface">Compra-teste</strong> — grava assinante e pagamento para testar o fluxo, mas não conta como venda em lugar nenhum.</span>
             </label>
             <p className="text-xs text-muted">
               O braço do A/B não se escolhe: o banco fotografa a primeira mensagem de oferta enviada a este número antes do pagamento.
