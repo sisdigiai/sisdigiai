@@ -256,7 +256,7 @@ export default function Billing() {
             <div className="space-y-3">
               {([
                 ['name', 'Nome da ótica'], ['email', 'E-mail'], ['phone', 'WhatsApp'],
-                ['plan_name', 'Plano (Essencial/Controle/Crescimento — ADR-0022)'], ['plan_amount_brl', 'Mensal (R$)'],
+                ['plan_name', 'Plano (Essencial/Controle/Crescimento/Completo)'], ['plan_amount_brl', 'Mensal (R$)'],
                 ['mp_preapproval_id', 'ID da assinatura MP (preapproval)'], ['tenant_ref', 'Tenant no Clearix (ref)'],
                 ['next_due_on', 'Próximo vencimento (AAAA-MM-DD)'],
               ] as [string, string][]).map(([k, label]) => (
