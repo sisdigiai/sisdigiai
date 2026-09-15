@@ -11,7 +11,8 @@
  * POST / { events: [{ event_code, product?, session_id?, url?, utm_*?, metadata? }] }
  *   → { ok, inserted, errors }
  *
- * Só aceita eventos CLIENT-SIDE: os da landing, o da Calc e os gatilhos do leitor OSI.
+ * Só aceita eventos CLIENT-SIDE: os da landing, o da Calc, os gatilhos do leitor OSI e os da
+ * landing do Clearix (migration 127).
  * purchase_approved / first_login_nexus são server-side (webhook Hotmart) e ficam de
  * fora pra evitar spoof de conversão. Todo código aceito aqui precisa de linha em
  * analytics.events_catalog (FK) — os do leitor entram pela migration 124.
@@ -33,11 +34,16 @@ const json = (body: unknown, status = 200) =>
 const ALLOWED = new Set([
   'landing_visit', 'click_checkout', 'checkout_started', 'calc_used',
   'reader_gatilho_view', 'reader_gatilho_click',
+  'clearix_site_visit', 'clearix_demo_solicitada',
 ]);
 // Os gatilhos do leitor só valem com o id do gatilho do desenho (g1…g4, e1, e2), vindo
 // em utm_content ou em metadata.gatilho. Sem ele o evento não diz QUAL gatilho, e o
 // endpoint é público: texto livre aqui vira lixo, ou dado de terceiro, na tabela.
 const GATILHOS = new Set(['g1', 'g2', 'g3', 'g4', 'e1', 'e2']);
+// Na landing do Clearix, utm_content é o lead_id do link da prospecção (despacho de 15/09 §1).
+// Só um uuid entra; qualquer outra coisa vira nulo — o endpoint é público e texto livre ali
+// seria dado de terceiro ou lixo colado a um lead que não existe.
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_EVENTS = 20;
 
 Deno.serve(async (req) => {
@@ -68,6 +74,7 @@ Deno.serve(async (req) => {
         if (!GATILHOS.has(gatilho)) { errors.push(`bad_gatilho:${gatilho}`); continue; }
         utmContent = gatilho;
       }
+      if (code.startsWith('clearix_') && utmContent && !UUID.test(utmContent)) utmContent = null;
 
       const { error } = await supabase.rpc('fn_log_event', {
         p_event_code: code,
