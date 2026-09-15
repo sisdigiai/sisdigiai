@@ -25,7 +25,8 @@ const STAGES: { key: LeadStage; label: string; color: string }[] = [
   { key: 'proposta', label: 'Proposta', color: 'var(--color-secondary)' },
   { key: 'piloto', label: 'Piloto', color: 'var(--color-warning)' },
   { key: 'cliente', label: 'Cliente', color: 'var(--color-success)' },
-  { key: 'perdido', label: 'Perdido', color: 'var(--color-danger)' },
+  // "recusa": desde a 109 o cadastro ruim sai da base (aba Descartados); o que fica aqui é quem disse não.
+  { key: 'perdido', label: 'Perdido (recusa)', color: 'var(--color-danger)' },
 ];
 
 // Só esconde o botão. Quem decide é o banco: fn_registrar_venda_clearix exige is_admin() (R-037).
@@ -168,9 +169,11 @@ export default function Comercial() {
   const { role } = useAuth();
   const ehAdmin = !!role && PAPEIS_ADMIN.includes(role);
   const [vendendo, setVendendo] = useState<RascunhoVenda | null>(null);
+  const [filaReal, setFilaReal] = useState<{ n: number | null; erro?: string } | null>(null);
   const [gravandoVenda, setGravandoVenda] = useState(false);
 
   const load = () => {
+    commercialStore.filaReal().then(setFilaReal);
     commercialStore.list().then(({ rows, erro }) => {
       setLeads(rows);
       setLoading(false);
@@ -373,6 +376,23 @@ export default function Comercial() {
             </div>
           )}
 
+          {/* Fila real da prospecção: o trabalho que ainda dá para fazer no WhatsApp */}
+          <div className="border border-outline/15 bg-surface-container px-4 py-3 mb-5 flex items-center gap-4 flex-wrap">
+            <MessageCircle className="w-4 h-4 text-secondary shrink-0" />
+            <div className="min-w-0 flex-1">
+              <div className="font-mono text-[10px] uppercase tracking-widest text-muted">Fila real · com celular</div>
+              <div className="text-xs text-on-surface-variant mt-0.5">
+                Captados nunca contatados, com celular, sem opt-out e sem WhatsApp inválido.
+              </div>
+            </div>
+            <div className="text-right shrink-0" title={filaReal?.erro ? `Não consegui contar: ${filaReal.erro}` : undefined}>
+              <div className={`font-serif text-2xl font-semibold tabular-nums ${filaReal?.n == null ? 'text-muted' : 'text-on-surface'}`}>
+                {filaReal == null ? '…' : filaReal.n == null ? '—' : filaReal.n}
+              </div>
+              {filaReal?.erro && <div className="font-mono text-[9px] text-danger">não contado</div>}
+            </div>
+          </div>
+
           {/* Ação hoje — demos aguardando 1º contato + follow-ups vencidos + leads esfriando + esteira parada */}
           {(demos.some((d) => d.status === 'novo') || acao.followupsVencidos.length > 0 || acao.parados.length > 0 || acao.semNextStep > 0 || acao.outreachVencido.length > 0) && (
             <div className="border border-warning/30 bg-warning/5 mb-5">
@@ -541,7 +561,10 @@ export default function Comercial() {
                   <div key={stage.key} className="border border-outline/10 bg-surface-low/50 min-h-[120px]">
                     <div className="flex items-center gap-2 px-3 py-2 border-b border-outline/10">
                       <span className="w-2 h-2" style={{ background: stage.color }} />
-                      <span className="text-xs font-semibold text-on-surface">{stage.label}</span>
+                      <span className="text-xs font-semibold text-on-surface"
+                        title={stage.key === 'perdido' ? 'Quem avaliou e disse não. Cadastro ruim não entra aqui: desde a 109 sai da base e fica na aba Descartados.' : undefined}>
+                        {stage.label}
+                      </span>
                       <span className="ml-auto text-[10px] font-mono text-muted tabular-nums">{all.length}</span>
                     </div>
                     <div className="p-2 space-y-2">

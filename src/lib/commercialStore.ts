@@ -212,6 +212,28 @@ export const commercialStore = {
     return { ok: true, venda: data as VendaRegistrada };
   },
 
+  /** "Fila real" da prospecção por WhatsApp (o que o /posto do MKT mostrava; decisão do Geral,
+   *  15/09): captado, nunca tocado, com CELULAR brasileiro (+55 DDD 9 xxxx-xxxx), sem opt-out e
+   *  sem WhatsApp marcado inválido. Conta no banco (head + count), não na lista da tela: a view da
+   *  tela não traz telefone nem toques. Medido em 15/09 13:55: 550 de 946 vivos.
+   *  Erro devolve null — a tela mostra "—", nunca zero. */
+  async filaReal(): Promise<{ n: number | null; erro?: string }> {
+    if (!isSupabaseReady()) return { n: null, erro: 'sem conexão' };
+    const { count, error } = await supabase
+      .schema('ops')
+      .from('commercial_leads')
+      .select('id', { count: 'exact', head: true })
+      .is('deleted_at', null)
+      .eq('stage', 'captado')
+      .is('first_touch_at', null)
+      .is('last_touch_at', null)
+      .is('wa_opt_out_em', null)
+      .like('phone_e164', '+55__9________')
+      .or('wa_status.is.null,wa_status.not.in.(sem_whatsapp,fixo,invalido)');
+    if (error) { console.error('[commercialStore] filaReal', error); return { n: null, erro: error.message }; }
+    return { n: count ?? null };
+  },
+
   /** Motivos ATIVOS dos dois tipos, de `v_motivos_saida`. Quem chama separa por `tipo`.
    *  Degrada em vazio: a tela diz que não conseguiu carregar, em vez de oferecer
    *  uma lista inventada que o banco depois recusa. */
