@@ -2,6 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, Target, Bot, RefreshCw, Check, MessageSquareWarning } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { ordemStore, placarStore, type ItemOrdem, type BlocoOrdem, type PlacarHoje, type PontoMrr } from '../lib/ordemStore';
+import { useAuth } from '../contexts/AuthContext';
+import ProspeccaoHoje from './hoje/ProspeccaoHoje';
+
+// Quem a RLS do placar do MKT deixa ler. Só esconde o card; quem decide é o banco (R-037).
+const PAPEIS_PROSPECCAO = ['super_admin', 'admin', 'founder', 'staff', 'vendas'];
 
 const BLOCOS: { id: BlocoOrdem; titulo: string; regra: string; icon: typeof Target; cor: string }[] = [
   { id: 'trava',   titulo: 'Trava',   regra: 'Apaga a empresa se ignorado',  icon: AlertTriangle, cor: 'text-danger border-danger/40' },
@@ -19,6 +24,8 @@ export default function Hoje() {
   const [erro, setErro] = useState<string | null>(null);
   const [justificando, setJustificando] = useState<string | null>(null);
   const [texto, setTexto] = useState('');
+  const { role } = useAuth();
+  const veProspeccao = !!role && PAPEIS_PROSPECCAO.includes(role);
 
   const hoje = new Date().toISOString().slice(0, 10);
 
@@ -127,6 +134,8 @@ export default function Hoje() {
           </div>
         </div>
       )}
+
+      {veProspeccao && <ProspeccaoHoje />}
 
       {erro && (
         <div className="border border-danger/40 bg-danger/5 px-4 py-2.5 mb-5 text-sm text-on-surface">
