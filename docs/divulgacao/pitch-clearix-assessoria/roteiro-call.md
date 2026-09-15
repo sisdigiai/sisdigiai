@@ -1,3 +1,8 @@
+> ⚠️ **SUPERADO EM 15/09/2026 — não usar como está.** Este material carrega oferta e números que a casa proibiu: "30 dias grátis", "30% OFF",
+> "setup isento", "cancela quando quiser", contagem de apps por plano, "Demo R$ 0 / 30 dias", "IA/SLA" em plano. O que vale: banco
+> `iam.clearix_packages` (Essencial 349 · Controle 899 · Crescimento 1.499 · Completo sob consulta; lojas 1/4/8) + `Cockpit/comercial/
+> verdade-landing-vs-app-2026-09-14.md` + roteiro `Cockpit/comercial/roteiro-demo-clearix-20min.md`. Reescrita só depois da D5/D7 (dono).
+
 # Roteiro cronometrado da call (~38 min)
 
 > **Interlocutores:** a assessoria + um dono de ótica. **Regra de ouro:** o dono é a estrela da demo; vire pra assessoria a cada bloco com *"e pra você, isso significa…"*. **Dois fechamentos.**

@@ -1,3 +1,8 @@
+> ⚠️ **SUPERADO EM 15/09/2026 — não usar como está.** Este material carrega oferta e números que a casa proibiu: "30 dias grátis", "30% OFF",
+> "setup isento", "cancela quando quiser", contagem de apps por plano, "Demo R$ 0 / 30 dias", "IA/SLA" em plano. O que vale: banco
+> `iam.clearix_packages` (Essencial 349 · Controle 899 · Crescimento 1.499 · Completo sob consulta; lojas 1/4/8) + `Cockpit/comercial/
+> verdade-landing-vs-app-2026-09-14.md` + roteiro `Cockpit/comercial/roteiro-demo-clearix-20min.md`. Reescrita só depois da D5/D7 (dono).
+
 # Pitch Clearix — Reunião com Assessoria de Óticas
 
 > **Blueprint do pitch.** Documento-base que vamos transformar em slides/vídeo.
@@ -95,13 +100,13 @@ Os dois rodam juntos:
 
 ## 6. Apps por tier (referência rápida)
 
-| Tier | Preço/mês | Apps | Alvo |
+| Plano | Preço/mês | Lojas · usuários (banco) | Para quem |
 |------|----------:|:----:|------|
-| 🟢 Essencial | R$ 349 | 7 | Ótica solo, 3–5 func |
-| 🔵 Controle | R$ 899 | 11 | Rede pequena, multi-loja |
-| 🟣 Crescimento | R$ 1.499 | 16 | Rede média + BI + IA |
-| ⭐ Completo | sob consulta | 16 + SLA | Franquia / rede grande |
-| 🎁 Demo | R$ 0 / 30d | 10 | Trial |
+| 🟢 Essencial | R$ 349 | 1 · 3 | Ótica solo |
+| 🔵 Controle | R$ 899 | 4 · 15 | Mais de uma loja |
+| 🟣 Crescimento | R$ 1.499 | 8 · 40 | Controle + quem chamar hoje e painel do dono |
+| ⚫ Completo | sob consulta | rede/franquia | Todos os módulos; composição na proposta |
+| — | — | — | **Sem demo grátis:** demonstração assistida de 20 min → piloto pago (fonte `iam.clearix_packages`, 15/09) |
 
 *(Composição detalhada e add-ons: `clearix_docs/clearix_pitch/04_produto.md` e `06_pricing_concorrencia.md`.)*
 
