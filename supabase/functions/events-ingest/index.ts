@@ -34,7 +34,7 @@ const json = (body: unknown, status = 200) =>
 const ALLOWED = new Set([
   'landing_visit', 'click_checkout', 'checkout_started', 'calc_used',
   'reader_gatilho_view', 'reader_gatilho_click',
-  'clearix_site_visit', 'clearix_demo_solicitada', 'clearix_whatsapp_click',
+  'clearix_site_visit', 'clearix_demo_solicitada', 'clearix_whatsapp_click', 'clearix_cta_click',
 ]);
 // Preview local não mede nada: em 15/09 o preview da landing OSI mandou landing_visit reais com
 // url localhost, e todo funil passou a precisar de filtro. Recusar aqui protege todas as landings
