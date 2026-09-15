@@ -1,4 +1,5 @@
 # O QUE O AGENTE COMERCIAL PODE PROMETER — Clearix, piloto pago e assistido
+> **Derivado da FOLHA ÚNICA `Cockpit/comercial/verdade-landing-vs-app-2026-09-14.md` (dono: Orquestrador Geral, 14/09/2026).** Divergência entre este kit e a folha: vale a folha; número público leva a data da medição.
 
 > Levantado no código em 02/09/2026 pelo subagente VENDEDOR do orquestrador
 > (55 leituras de código + queries agregadas no banco de produção, sem PII),
@@ -16,9 +17,9 @@ Medidos em 02/09 no banco, só no tenant real (Grupo Mello):
 
 | O que | Número |
 |---|---|
-| Pacientes cadastrados | **15.845** |
+| Fichas de pacientes no histórico (data de importação; nunca "cadastrados no Clearix") | **15.870** (14/09/2026) |
 | Vendas registradas | **20.312** |
-| Ordens de serviço acompanhadas (produção) | **20.676** |
+| Ordens de serviço no histórico preservado (2020–2025 é migração; 1.694 criadas em 2026 na loja viva) | **20.375** (14/09/2026) |
 | Receitas arquivadas e pesquisáveis | **5.862** |
 | Parcelas de carnê administradas | **22.440** (medido em 14/09/2026; o 56.369 anterior era carnê + contas em 02/09) |
 | Vendas nos últimos 30 dias | **209 vendas · R$ 94.445** |
@@ -116,7 +117,7 @@ clique", nunca "avisa sozinho").
 ### 1. Ficha do paciente com histórico de receitas que não se perde
 - **Prova:** `clearix_clinics/src/app/dashboard/pacientes/[id]/page.tsx`,
   `prescricoes/[id]/imprimir/page.tsx`, CEP automático (`src/app/api/cep/`),
-  CPF validado (`src/lib/cpf.ts`). Banco: 15.845 pacientes, 5.862 receitas.
+  CPF validado (`src/lib/cpf.ts`). Banco: 15.870 fichas de pacientes no histórico (14/09/2026), 652 receitas registradas no balcão desde abril.
 
 ### 2. Receita ligada direto na venda
 - **Prova:** `attach-prescription-to-order-modal.tsx` + busca por receita no
@@ -248,7 +249,7 @@ de Estoque; receita na gaveta → 2 min de Clinics.
 | "Escolhemos a melhor lente automaticamente" | O ranking usa preço e prazo; "qualidade" é rótulo interno, não histórico. É a promessa que a auditoria proibiu por escrito. |
 | "Teste grátis de 7 dias" | Nenhuma função lê prazo de expiração; mecanismo (D5) em construção. Oferta é demo assistida, conosco na tela. |
 | "Importamos seus últimos 2 meses" | Importador incompatível com o banco vivo; sem proteção contra duplicar. Vira serviço manual orçado, com escopo nomeado. |
-| "48 mil ordens de serviço" | O total inclui 3 ambientes de teste sintéticos. O número honesto do tenant real é **20.676** — e é esse que se fala. |
+| "48 mil ordens de serviço" | O total inclui 3 ambientes de teste sintéticos. O número honesto do tenant real é **20.375** no histórico preservado (14/09/2026), com 1.694 OS criadas em 2026 — e é esse que se fala. |
 | "Emita sua nota pelo sistema" | D4. Fora de contrato, proposta, demo e conversa. |
 | "Pacote com 7 aplicativos" | D3. Falar em módulos ("venda, laboratório, carnê, estoque, financeiro, painel") sem contar aplicativo. |
 | "Gestão clínica completa" | Ficha, receita e agenda são reais; anamnese quase sem uso e o público pode nem ter optometrista. Vender como "receitas que não se perdem". |
