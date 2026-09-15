@@ -1,6 +1,12 @@
 -- 129 — o funil first-party deixa de somar o site do Clearix na OSI e o preview local em tudo
 --
--- ⚠ NÃO APLICADA. Pede a palavra do dono. Pedido do Orquestrador Geral (15/09/2026): o card
+-- ✔ APLICADA em 15/09/2026 às 12:33:59 BRT (15:33 UTC), por mim, com a palavra do dono neste canal
+--   ("aplicar tudo"). Travas passaram. Card OSI lido depois de aplicar: landing_visit 137 total /
+--   54 em 7 dias, click_checkout 2 / 1. Houve tráfego real entre 10:27 e 12:34: +8 visitas e
+--   +1 clique, que já passaram na regra nova. Outros: calc_used 41, reader_gatilho_click 1. A view
+--   continua com invoker.
+--
+-- (Escrita como NÃO APLICADA.) Pedido do Orquestrador Geral (15/09/2026): o card
 --    "Funil de conversão · first-party" da tela OSI é número que pode ir a público.
 --
 -- ═══════════════════════════════════════════════════════════════════════════

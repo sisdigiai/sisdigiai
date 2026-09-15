@@ -1,6 +1,13 @@
 -- 128 — o pedido de demonstração do site do Clearix se liga ao lead da prospecção
 --
--- ⚠ NÃO APLICADA. Pede a palavra do dono. Despacho de 15/09 §3.1 ("o pedido de demonstração
+-- ✔ APLICADA em 15/09/2026 às 12:33:33 BRT (15:33 UTC), por mim, com a palavra do dono neste canal
+--   ("aplicar tudo"). fn_ligar_pedido_ao_lead: só service_role executa (anon e authenticated false).
+--   lead-capture v31 publicada pelo Geral às 15:34:10 UTC, DEPOIS da migration; verify_jwt false.
+--   O corpo publicado chama fn_ligar_pedido_ao_lead e devolve commercial_lead_id.
+--   Prova de comportamento: o ensaio desfeito (5/5 casos). A prova b, com POST real, grava um pedido
+--   em landing_leads e não a fiz. Fica com o envio de teste marcado da landing.
+--
+-- (Escrita como NÃO APLICADA.) Pede a palavra do dono. Despacho de 15/09 §3.1 ("o pedido de demonstração
 --    cria/atualiza o lead em ops.commercial_leads pelo mesmo lead_id quando vier do link"), com o
 --    contrato combinado com o Agent da landing Clearix: campo `commercial_lead_id` no body do
 --    lead-capture; resposta sempre com a chave (id que casou | null).

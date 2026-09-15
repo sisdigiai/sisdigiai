@@ -1,6 +1,16 @@
 -- 127 — eventos da landing clearix.app.br no catálogo (visita e pedido de demonstração)
 --
--- ⚠ NÃO APLICADA. Nomes ACEITOS pelo orquestrador do eco Clearix em 15/09/2026, com dois eventos
+-- ✔ APLICADA em 15/09/2026 às 12:33:18 BRT (15:33:18 UTC), por mim, com a palavra do dono neste canal
+--   ("aplicar tudo"). Primeira da leva, por urgência: o site já no ar mandava os 4 códigos e a
+--   edge recusava tudo desde 10:15 BRT.
+--   Catálogo com os 4 (clearix-site, 90/92/95/100). events-ingest v32 publicada pelo Geral às
+--   15:33:38 UTC, DEPOIS da migration, na ordem certa; verify_jwt false. No corpo publicado estão
+--   clearix_cta_click, ORIGEM_LOCAL e o filtro de uuid.
+--   Provas sem gravar: 0) url localhost → origem_local, inserted 0; c) código inventado → bad_code.
+--   a/b/d (gravar evento do site) ficam para o tráfego real ou o envio de teste da landing, e não
+--   para linha de prova minha no log real. Até 15:34 UTC não tinha chegado evento real.
+--
+-- (Escrita como NÃO APLICADA.) Nomes ACEITOS pelo orquestrador do eco Clearix em 15/09/2026, com dois eventos
 --    acrescentados por ele (whatsapp_click e cta_click; despacho
 --    Cockpit/comercial/_DESPACHO_2026-09-15_RECEBER_INTERESSADOS.md §3.1). Aplicar com a palavra do
 --    dono. Aditiva: 4 linhas em analytics.events_catalog. A branch da landing já emite os 4 e deixa

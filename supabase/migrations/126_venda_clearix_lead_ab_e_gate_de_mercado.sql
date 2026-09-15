@@ -1,6 +1,15 @@
 -- 126 — venda do Clearix ligada ao lead e ao A/B; o gate da fase 2 conta só venda de mercado
 --
--- ⚠ NÃO APLICADA. Pede a palavra do dono no canal do orquestrador do app digiai.
+-- ✔ APLICADA em 15/09/2026 às 12:33:44 BRT (15:33 UTC), por mim, com a palavra do dono neste canal
+--   ("aplicar tudo" = 126 a 129; o push não estava incluído). Ratifica as 5 decisões abaixo.
+--   Travas pré e pós passaram. Reconferido:
+--   gate "NAO sustentado: zero venda de mercado…"; placar caixa 0, pagantes 0; as 6 colunas
+--   novas em billing.subscribers; revenue.parte_relacionada; fn_registrar_venda_clearix sem
+--   anon e com authenticated (a função confere admin); 0 vendas; v_vendas_incoerencias com 1
+--   lead_cliente_sem_venda (Grupo Mello, verdadeiro até a 123/registro); 5 views com invoker;
+--   aportes aceita encontro_de_contas. A prova do comportamento é o ensaio desfeito (PROVAS a).
+--
+-- (Escrita como NÃO APLICADA, à espera da palavra do dono no canal do orquestrador do app digiai.)
 --    SUBSTITUI a 122 (que fica "não aplicar"): traz tudo o que ela trazia (receita de parte
 --    relacionada separada) e fecha o buraco que ela deixava (assinantes).
 --    Despacho: Cockpit/comercial/_DESPACHO_2026-09-15_RECEBER_INTERESSADOS.md §3.4.
