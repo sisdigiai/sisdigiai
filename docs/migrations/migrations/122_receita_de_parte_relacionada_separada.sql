@@ -1,5 +1,9 @@
 -- 122 — receita de parte relacionada ganha nome próprio antes de existir
 --
+-- ⛔ SUBSTITUÍDA PELA 126 (15/09/2026) — NÃO APLICAR. A 126 traz tudo o que está aqui (receita de
+--    parte relacionada, rebuild, aportes) e fecha o buraco abaixo. As travas da 126 recusam se esta
+--    for aplicada antes.
+--
 -- ⛔ NÃO APLICAR COMO ESTÁ (achado de 14/09/2026, docs/desenho-venda-clearix-2026-09-14.md §4):
 --    fn_gate_evidencia também conta `count(*) from billing.subscribers` — todos, inclusive
 --    apagados, cancelados e parte relacionada. Esta migration só separa a RECEITA; um

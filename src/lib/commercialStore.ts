@@ -78,6 +78,29 @@ function writeLocal(rows: CommercialLead[]) {
   localStorage.setItem(LS_KEY, JSON.stringify(rows));
 }
 
+export type CanalOrigem = 'whatsapp' | 'landing' | 'indicacao' | 'organico' | 'outro';
+
+export interface VendaClearix {
+  leadId: string;
+  plano: string;
+  valorBrl: number;
+  /** Venda = pagamento feito (decisão 1 do desenho). Sem data, o banco recusa. */
+  pagoEm: string;
+  /** Nulo = o banco deduz pela conversa (1ª recebida do site → landing; houve saída → whatsapp). */
+  canal: CanalOrigem | null;
+  tenantRef: string;
+  parteRelacionada: boolean;
+  comprovante: string;
+}
+
+export interface VendaRegistrada {
+  subscriber_id: string;
+  canal_origem: CanalOrigem;
+  braco_ab: 'osi' | 'clearix' | null;
+  variante_ab: string | null;
+  parte_relacionada: boolean;
+}
+
 export interface OutreachItem {
   id: string;
   kind: string;
@@ -162,6 +185,25 @@ export const commercialStore = {
     const { error } = await supabase.rpc('fn_marcar_lead_perdido', { p_lead_id: id, p_motivo: motivo });
     if (error) { console.error('[commercialStore] marcarPerdido', error); return { ok: false, erro: error.message }; }
     return { ok: true };
+  },
+
+  /** Registra a venda do Clearix pela RPC da 126: assinante + pagamento + lead em
+   *  "cliente", numa transação só, com o braço do A/B fotografado. Só admin (o banco
+   *  confere). Devolve o erro do banco para a tela dizer por que não gravou. */
+  async registrarVenda(v: VendaClearix): Promise<{ ok: boolean; erro?: string; venda?: VendaRegistrada }> {
+    if (!isSupabaseReady()) return { ok: false, erro: 'sem conexão' };
+    const { data, error } = await supabase.rpc('fn_registrar_venda_clearix', {
+      p_lead_id: v.leadId,
+      p_plano: v.plano,
+      p_valor_brl: v.valorBrl,
+      p_pago_em: v.pagoEm,
+      p_canal_origem: v.canal,
+      p_tenant_ref: v.tenantRef || null,
+      p_parte_relacionada: v.parteRelacionada,
+      p_comprovante: v.comprovante || null,
+    });
+    if (error) { console.error('[commercialStore] registrarVenda', error); return { ok: false, erro: error.message }; }
+    return { ok: true, venda: data as VendaRegistrada };
   },
 
   /** Motivos ATIVOS dos dois tipos, de `v_motivos_saida` — a view única que serve

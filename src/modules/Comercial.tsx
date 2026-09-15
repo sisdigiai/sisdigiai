@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Plus, Trash2, Briefcase, Pencil, X, Play, FileText, Search, Target, AlertTriangle, Clock, MessageCircle, Monitor } from 'lucide-react';
+import { Plus, Trash2, Briefcase, Pencil, X, Play, FileText, Search, Target, AlertTriangle, Clock, MessageCircle, Monitor, BadgeDollarSign } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../contexts/ToastContext';
+import { useAuth } from '../contexts/AuthContext';
 import type { MotivoSaida, TipoSaida, LeadDescartado } from '../lib/commercialStore';
-import { commercialStore, type CommercialLead, type LeadStage, type OutreachItem } from '../lib/commercialStore';
+import { commercialStore, type CommercialLead, type LeadStage, type OutreachItem, type CanalOrigem } from '../lib/commercialStore';
 import { playbookStore, type Playbook } from '../lib/playbookStore';
 import { meetingStore, type MeetingSession } from '../lib/meetingStore';
 import { proposalStore, type Proposal } from '../lib/proposalStore';
@@ -26,6 +27,30 @@ const STAGES: { key: LeadStage; label: string; color: string }[] = [
   { key: 'cliente', label: 'Cliente', color: 'var(--color-success)' },
   { key: 'perdido', label: 'Perdido', color: 'var(--color-danger)' },
 ];
+
+// Só esconde o botão. Quem decide é o banco: fn_registrar_venda_clearix exige is_admin() (R-037).
+const PAPEIS_ADMIN = ['super_admin', 'admin', 'founder'];
+
+const CANAIS: { valor: CanalOrigem | ''; rotulo: string }[] = [
+  { valor: '', rotulo: 'Deduzir pela conversa' },
+  { valor: 'whatsapp', rotulo: 'WhatsApp (prospecção)' },
+  { valor: 'landing', rotulo: 'Site / landing' },
+  { valor: 'indicacao', rotulo: 'Indicação' },
+  { valor: 'organico', rotulo: 'Orgânico' },
+  { valor: 'outro', rotulo: 'Outro' },
+];
+
+type RascunhoVenda = { lead: CommercialLead; plano: string; valor: string; pagoEm: string; canal: CanalOrigem | ''; tenant: string; parteRelacionada: boolean; comprovante: string };
+
+function hojeBR(): string {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+}
+
+/** Pagamento de hoje leva a hora de agora; de outro dia, meio-dia de Brasília. Assim a
+ *  janela de atribuição ("mensagem antes do pagamento") não inclui o resto do dia. */
+function momentoDoPagamento(dia: string): string {
+  return dia === hojeBR() ? new Date().toISOString() : `${dia}T12:00:00-03:00`;
+}
 
 const COL_CAP = 8; // cards visíveis por coluna antes do "+N mais" (232 leads numa coluna só = inutilizável)
 
@@ -140,6 +165,10 @@ export default function Comercial() {
   const [faseAtual, setFaseAtual] = useState<RoadmapPhase | null>(null);
   const [outreach, setOutreach] = useState<OutreachItem[]>([]);
   const [demos, setDemos] = useState<LandingLead[]>([]);
+  const { role } = useAuth();
+  const ehAdmin = !!role && PAPEIS_ADMIN.includes(role);
+  const [vendendo, setVendendo] = useState<RascunhoVenda | null>(null);
+  const [gravandoVenda, setGravandoVenda] = useState(false);
 
   const load = () => {
     commercialStore.list().then(({ rows, erro }) => {
@@ -240,12 +269,44 @@ export default function Comercial() {
     // Perder exige motivo (CHECK do banco). Sem isto, arrastar para "Perdido"
     // falhava sempre — era o caminho mais usado e o único sem saída.
     if (stage === 'perdido') { setSaindo({ lead, tipo: 'perda' }); return; }
+    // Cliente = venda registrada (126). Mover o card sem registrar deixava o lead "cliente"
+    // sem venda, que o gate não conta e a v_vendas_incoerencias acusa.
+    if (stage === 'cliente') { abrirVenda(lead); return; }
     const r = await commercialStore.upsert({ ...lead, stage });
     if (!r.ok) { avisarFalha('mudar o estágio', r.erro); return; }
     load();
   };
 
   const fecharSaida = () => { setSaindo(null); setMotivoEscolhido(''); };
+
+  const abrirVenda = (lead: CommercialLead) =>
+    setVendendo({ lead, plano: '', valor: lead.value_brl != null ? String(lead.value_brl) : '', pagoEm: hojeBR(), canal: '', tenant: '', parteRelacionada: false, comprovante: '' });
+
+  const valorVenda = vendendo ? Number(vendendo.valor.replace(/\./g, '').replace(',', '.')) : NaN;
+  const vendaPronta = !!vendendo?.lead.id && !!vendendo.plano.trim() && valorVenda > 0 && !!vendendo.pagoEm && vendendo.pagoEm <= hojeBR();
+
+  const confirmarVenda = async () => {
+    if (!vendendo?.lead.id || !vendaPronta) return;
+    setGravandoVenda(true);
+    const r = await commercialStore.registrarVenda({
+      leadId: vendendo.lead.id,
+      plano: vendendo.plano.trim(),
+      valorBrl: valorVenda,
+      pagoEm: momentoDoPagamento(vendendo.pagoEm),
+      canal: vendendo.canal || null,
+      tenantRef: vendendo.tenant.trim(),
+      parteRelacionada: vendendo.parteRelacionada,
+      comprovante: vendendo.comprovante.trim(),
+    });
+    setGravandoVenda(false);
+    if (!r.ok || !r.venda) { avisarFalha('registrar a venda', r.erro ?? 'resposta vazia do banco'); return; }  // não fecha: o dado continua na tela
+    const braco = r.venda.braco_ab
+      ? `Atribuída ao braço ${r.venda.braco_ab.toUpperCase()} (${r.venda.variante_ab}).`
+      : 'Sem mensagem de oferta antes do pagamento: conta nas metas, fora do A/B.';
+    show({ kind: 'success', title: `Venda registrada — ${vendendo.lead.company}`, description: `${braco} Canal: ${r.venda.canal_origem}.${r.venda.parte_relacionada ? ' Parte relacionada: não conta no gate.' : ''}`, duration: 9000 });
+    setVendendo(null);
+    load();
+  };
 
   const confirmarSaida = async () => {
     if (!saindo?.lead.id || !motivoEscolhido) return;
@@ -495,6 +556,11 @@ export default function Comercial() {
                               <button onClick={() => setProposalEditor({ proposal: proposalFromMeeting(null, lead), lead })} aria-label="Gerar proposta" title="Gerar proposta" className="text-muted hover:text-secondary">
                                 <FileText className="w-3.5 h-3.5" />
                               </button>
+                              {ehAdmin && lead.stage !== 'cliente' && (
+                                <button onClick={() => abrirVenda(lead)} aria-label="Registrar venda" title="Registrar venda — assinante + pagamento, e o lead vira cliente" className="text-muted hover:text-success">
+                                  <BadgeDollarSign className="w-3.5 h-3.5" />
+                                </button>
+                              )}
                               <button onClick={() => setEditing(lead)} aria-label="Editar" className="text-muted hover:text-on-surface">
                                 <Pencil className="w-3.5 h-3.5" />
                               </button>
@@ -702,6 +768,61 @@ export default function Comercial() {
           </div>
         );
       })()}
+
+      {/* Registrar venda do Clearix (126). O banco é quem decide: exige admin, pagamento
+          feito, e recusa segunda venda para o mesmo lead. A tela só evita o erro óbvio. */}
+      {vendendo && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => !gravandoVenda && setVendendo(null)}>
+          <div className="bg-surface-container border border-outline/15 w-full max-w-lg p-5 space-y-3" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-on-surface flex items-center gap-2">
+                <BadgeDollarSign className="w-4 h-4 text-success" /> Registrar venda do Clearix
+              </h3>
+              <button onClick={() => setVendendo(null)} disabled={gravandoVenda} aria-label="Fechar" className="text-muted hover:text-on-surface"><X className="w-4 h-4" /></button>
+            </div>
+            <p className="text-sm text-on-surface-variant">
+              {vendendo.lead.company} — só registre com o <strong className="text-on-surface">pagamento feito</strong>. Grava o assinante e o pagamento, e o lead passa a Cliente.
+            </p>
+            {!ehAdmin && (
+              <p className="text-sm text-warning border border-warning-bd bg-warning-bg p-2">
+                Registrar venda exige papel admin. O banco vai recusar com o seu acesso.
+              </p>
+            )}
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Plano *" value={vendendo.plano} onChange={(v) => setVendendo({ ...vendendo, plano: v })} />
+              <Field label="Valor mensal (R$) *" value={vendendo.valor} onChange={(v) => setVendendo({ ...vendendo, valor: v })} />
+              <label className="block">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Pago em *</span>
+                <input type="date" value={vendendo.pagoEm} max={hojeBR()} onChange={(e) => setVendendo({ ...vendendo, pagoEm: e.target.value })}
+                  className="w-full mt-1 bg-surface-high border border-outline/15 px-2.5 py-1.5 text-sm text-on-surface focus:border-secondary/50 outline-none" />
+              </label>
+              <label className="block">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Canal de origem</span>
+                <select value={vendendo.canal} onChange={(e) => setVendendo({ ...vendendo, canal: e.target.value as CanalOrigem | '' })}
+                  className="w-full mt-1 bg-surface-high border border-outline/15 px-2.5 py-1.5 text-sm text-on-surface focus:border-secondary/50 outline-none">
+                  {CANAIS.map((c) => <option key={c.valor} value={c.valor}>{c.rotulo}</option>)}
+                </select>
+              </label>
+              <Field label="Tenant no Clearix (id)" value={vendendo.tenant} onChange={(v) => setVendendo({ ...vendendo, tenant: v })} />
+              <Field label="Comprovante (Pix, nº, link)" value={vendendo.comprovante} onChange={(v) => setVendendo({ ...vendendo, comprovante: v })} />
+            </div>
+            <label className="flex items-start gap-2 text-sm text-on-surface-variant">
+              <input type="checkbox" checked={vendendo.parteRelacionada} onChange={(e) => setVendendo({ ...vendendo, parteRelacionada: e.target.checked })} className="mt-0.5" />
+              <span>Empresa do mesmo dono (parte relacionada) — conta como venda, <strong className="text-on-surface">não</strong> conta como validação de mercado.</span>
+            </label>
+            <p className="text-xs text-muted">
+              O braço do A/B não se escolhe: o banco fotografa a primeira mensagem de oferta enviada a este número antes do pagamento.
+            </p>
+            <div className="flex justify-end gap-2 pt-1">
+              <button onClick={() => setVendendo(null)} disabled={gravandoVenda} className="px-3 py-2 text-sm text-muted hover:text-on-surface">Cancelar</button>
+              <button onClick={confirmarVenda} disabled={!vendaPronta || gravandoVenda}
+                className="px-4 py-2 text-sm font-medium bg-success/15 border border-success/40 text-success hover:bg-success/25 disabled:opacity-40 disabled:cursor-not-allowed">
+                {gravandoVenda ? 'Gravando…' : 'Registrar venda'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Form modal */}
       {editing && (

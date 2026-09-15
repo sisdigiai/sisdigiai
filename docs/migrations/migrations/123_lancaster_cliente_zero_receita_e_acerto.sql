@@ -5,7 +5,7 @@
 --    Cockpit/desenho-lancaster-cliente-zero-2026-09-11.md). Dado real de dinheiro.
 --
 -- ORDEM:
---   1. 122 aplicada (coluna parte_relacionada; gate e placar ignoram parte relacionada).
+--   1. 126 aplicada (substituiu a 122: parte_relacionada em receita e assinantes; gate e placar só contam mercado).
 --   2. Dono decide: PREÇO mensal do Completo e DATA de início (10/03 ou 01/04/2026).
 --   3. Contador valida a forma (portão 74): NF de serviço, compensação ou pagamento.
 --   4. Front da tela Financeiro com o rótulo de 'encontro_de_contas' no ar (ver §4) —
@@ -52,7 +52,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- §4 — O QUE MUDA NA TELA (antes → depois), com o cenário B e início 10/03
 -- ═══════════════════════════════════════════════════════════════════════════
---   Hoje (placar) / ordem do dia ... "Gate NAO sustentado" → igual (122 exclui).
+--   Hoje (placar) / ordem do dia ... "Gate NAO sustentado" → igual (126 exclui).
 --   Financeiro, receita ............ 0 linhas → 7 linhas Clearix R$ 2.197 (mar–set).
 --                                    O front ainda não lê parte_relacionada: as linhas
 --                                    aparecem sem rótulo de parte relacionada.
@@ -60,7 +60,7 @@
 --                                    (NATUREZA_LABEL não conhece encontro_de_contas) —
 --                                    o líquido de caixa (4.710) não muda: soma por natureza.
 --   Telão Financeiro ............... MRR 0 → R$ 2.197 em abr–set (últimos 6 meses), SEM
---                                    separar parte relacionada (a 122 não mexe no telão).
+--                                    separar parte relacionada (a 126 não mexe no telão).
 --   Telão Aportes .................. aparece a linha com rótulo cru "encontro_de_contas";
 --                                    herói (investimento − devolução) não muda.
 --   Snapshots (company.financial_snapshots) só mudam quando alguém correr
@@ -91,7 +91,7 @@ begin
 
   select count(*) into n from information_schema.columns
    where table_schema = 'finance' and table_name = 'revenue' and column_name = 'parte_relacionada';
-  if n <> 1 then raise exception 'A 122 não está aplicada — sem ela esta receita viraria o gate da fase 2.'; end if;
+  if n <> 1 then raise exception 'A 126 não está aplicada — sem ela esta receita viraria o gate da fase 2.'; end if;
 
   select count(*) into n from finance.revenue where parte_relacionada;
   if n > 0 then raise exception 'Já há % linha(s) de parte relacionada — a 123 já foi aplicada?', n; end if;
@@ -141,9 +141,9 @@ begin
   select count(*) into n from finance.revenue where parte_relacionada and new_subscriptions = 1;
   if n <> 1 then raise exception 'new_subscriptions = 1 devia estar só no mês de início.'; end if;
 
-  -- o que a 122 prometeu: nada disto sustenta o gate
+  -- o que a 126 prometeu: nada disto sustenta o gate
   select gate_cumprido into v_gate from public.fn_gate_evidencia();
-  if v_gate then raise exception 'O gate da fase virou com receita de parte relacionada — a 122 não está a funcionar.'; end if;
+  if v_gate then raise exception 'O gate da fase virou com receita de parte relacionada — a 126 não está a funcionar.'; end if;
   select count(*) into n from public.v_ops_placar_hoje where caixa <> 0;
   if n > 0 then raise exception 'O placar passou a mostrar caixa com receita de parte relacionada.'; end if;
 
