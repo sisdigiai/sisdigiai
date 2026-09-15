@@ -27,7 +27,7 @@ Medidos em 02/09 no banco, só no tenant real (Grupo Mello):
 | Montagens registradas com montador e custo | **936** |
 | Linhas de extrato bancário processadas na conciliação | **36.080** |
 | Etiquetas de produto impressas | **2.174** |
-| Catálogo de lentes: lentes oftálmicas ativas / acordos de laboratório | **5.569 (+274 de contato) / 319** (folha única, 14/09/2026; a contagem de 02/09 "20.904 / 83" veio do repositório do DCL e não é a que vale — eco confirma o que ela media) |
+| Catálogo de lentes: lentes oftálmicas ativas / acordos de laboratório | **5.569 (+274 de contato) / 319** (folha única, 14/09/2026; a contagem de 02/09 "20.904 / 83" contava o banco inteiro — 4 tenants, inclusive sintéticos, e 1.505 linhas apagadas — e laboratórios de todos os tenants em 02/09; o tenant real tem 5.569 lentes, 28 laboratórios cadastrados e 319 acordos — medição do eco, 15/09) |
 
 Frase honesta que esses números autorizam: *"O sistema roda todo dia numa rede
 real de óticas há anos — hoje ele carrega quase 16 mil pacientes, mais de 20
