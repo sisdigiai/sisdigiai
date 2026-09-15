@@ -27,7 +27,7 @@ Medidos em 02/09 no banco, só no tenant real (Grupo Mello):
 | Montagens registradas com montador e custo | **936** |
 | Linhas de extrato bancário processadas na conciliação | **36.080** |
 | Etiquetas de produto impressas | **2.174** |
-| Catálogo de lentes: lentes reais / laboratórios ativos | **20.904 / 83** |
+| Catálogo de lentes: lentes oftálmicas ativas / acordos de laboratório | **5.569 (+274 de contato) / 319** (folha única, 14/09/2026; a contagem de 02/09 "20.904 / 83" veio do repositório do DCL e não é a que vale — eco confirma o que ela media) |
 
 Frase honesta que esses números autorizam: *"O sistema roda todo dia numa rede
 real de óticas há anos — hoje ele carrega quase 16 mil pacientes, mais de 20
@@ -97,7 +97,9 @@ histórico).
 ### 3. Comparação de preço e prazo entre laboratórios antes de comprar a lente
 - **Capacidade:** para a lente vendida, lista as alternativas equivalentes com
   custo efetivo (acordo negociado) e prazo, ranqueadas — **a escolha final é
-  sempre da pessoa**. Sustenta: 20.904 lentes, 83 laboratórios.
+  sempre da pessoa**. Sustenta: 5.569 lentes ativas (+274 de contato) e 319 acordos de laboratório (14/09/2026).
+  **Plano:** pelo banco (`iam.clearix_packages`, 15/09), o comparador depende de Lens + DCL e Lens hoje só está no
+  Completo — não prometer nos planos menores até o dono decidir (D5).
 - **Prova:** `clearix_dcl/src/lib/data/lentes-repository.ts:394`
   (`rpc_canonical_best_purchase`);
   `src/components/forms/wizard-steps/components/SeletorMelhoresOpcoesCompra.tsx`.
