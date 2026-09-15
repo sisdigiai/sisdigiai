@@ -212,9 +212,7 @@ export const commercialStore = {
     return { ok: true, venda: data as VendaRegistrada };
   },
 
-  /** Motivos ATIVOS dos dois tipos, de `v_motivos_saida` — a view única que serve
-   *  as duas telas (`v_vendas_motivos` fica só como compatibilidade até o MKT a
-   *  apagar). Quem chama separa por `tipo`.
+  /** Motivos ATIVOS dos dois tipos, de `v_motivos_saida`. Quem chama separa por `tipo`.
    *  Degrada em vazio: a tela diz que não conseguiu carregar, em vez de oferecer
    *  uma lista inventada que o banco depois recusa. */
   async motivosSaida(): Promise<MotivoSaida[]> {
