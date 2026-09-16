@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Plus, Trash2, Briefcase, Pencil, X, Play, FileText, Search, Target, AlertTriangle, Clock, MessageCircle, Monitor, BadgeDollarSign } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { supabase } from '../lib/supabase';
+import { hojeBrasilia } from '../lib/datas';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/AuthContext';
 import type { MotivoSaida, TipoSaida, LeadDescartado } from '../lib/commercialStore';
@@ -45,9 +46,7 @@ const CANAIS: { valor: CanalOrigem | ''; rotulo: string }[] = [
 
 type RascunhoVenda = { lead: CommercialLead; plano: string; valor: string; pagoEm: string; canal: CanalOrigem | ''; tenant: string; parteRelacionada: boolean; comprovante: string; teste: boolean };
 
-function hojeBR(): string {
-  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
-}
+const hojeBR = hojeBrasilia;
 
 /** Pagamento de hoje leva a hora de agora; de outro dia, meio-dia de Brasília. Assim a
  *  janela de atribuição ("mensagem antes do pagamento") não inclui o resto do dia. */
@@ -234,7 +233,7 @@ export default function Comercial() {
 
   // Painel de ação: o que precisa de atenção HOJE
   const acao = useMemo(() => {
-    const hoje = new Date().toISOString().slice(0, 10);
+    const hoje = hojeBR();
     const followupsVencidos = meetings.filter((m) => m.follow_up_date && m.follow_up_date <= hoje && m.next_action);
     const trabalhados = leads.filter((l) => ['contatado', 'conversa', 'demo', 'proposta', 'piloto'].includes(l.stage));
     const parados = trabalhados

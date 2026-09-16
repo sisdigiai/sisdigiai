@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { hojeBrasilia } from './datas';
 
 function isSupabaseReady(): boolean {
   const url = import.meta.env.VITE_SUPABASE_URL;
@@ -336,7 +337,7 @@ export const financeStore = {
     if (!isSupabaseReady()) return;
     const { error } = await supabase.rpc('rpc_finance_close_subscription', {
       p_subscription_id: id,
-      p_ended_on: endedOn || new Date().toISOString().slice(0, 10),
+      p_ended_on: endedOn || hojeBrasilia(),
     });
     if (error) throw error;
   },

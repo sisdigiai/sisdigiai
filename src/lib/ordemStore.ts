@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { hojeBrasilia } from './datas';
 
 // Mesmo guard do financeStore: dev sem .env cai em modo offline em vez de quebrar.
 function isSupabaseReady(): boolean {
@@ -30,7 +31,7 @@ export type ItemOrdem = {
 export const ordemStore = {
   async doDia(dia?: string): Promise<ItemOrdem[]> {
     if (!isSupabaseReady()) return [];
-    const alvo = dia ?? new Date().toISOString().slice(0, 10);
+    const alvo = dia ?? hojeBrasilia();
     const { data, error } = await supabase
       .from('v_ops_ordem_do_dia')
       .select('*')

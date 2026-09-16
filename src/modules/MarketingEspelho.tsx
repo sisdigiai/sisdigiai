@@ -4,6 +4,7 @@ import PageHeader from '../components/PageHeader';
 import { TravasBanner } from './TravasMarketing';
 import ResultadoConteudoCard from './marketing/ResultadoConteudoCard';
 import { supabase } from '../lib/supabase';
+import { hojeBrasilia } from '../lib/datas';
 import { clearixSupabase } from '../lib/clearixSupabase';
 import { espelhoMotores, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
 
@@ -368,7 +369,7 @@ export default function MarketingEspelho() {
                   </div>
                   <div className="text-[11px] text-muted">
                     Seguidores: {Object.entries(limelight.seguidores).filter(([, v]) => v > 0).map(([k, v]) => `${k} ${v}`).join(' · ') || '—'}
-                    {' · '}coleta {limelight.ultima_coleta === new Date().toISOString().slice(0, 10) ? <span className="text-success">hoje ✓</span> : limelight.ultima_coleta ?? '—'}
+                    {' · '}coleta {limelight.ultima_coleta === hojeBrasilia() ? <span className="text-success">hoje ✓</span> : limelight.ultima_coleta ?? '—'}
                   </div>
                 </>
               ) : <div className="text-sm text-muted italic">Espelho indisponível.</div>}

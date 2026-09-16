@@ -11,6 +11,7 @@ import {
 import { Bar } from 'react-chartjs-2';
 import PageHeader from '../components/PageHeader';
 import { Sparkline, DeltaBadge, deltaPct } from '../components/ChartKit';
+import { hojeBrasilia, diaBrasilia } from '../lib/datas';
 import {
   financeStore,
   CATEGORY_LABELS, CATEGORY_COLORS,
@@ -164,7 +165,7 @@ function DashboardTab() {
   const total12m = expenses.reduce((a, e) => a + Number(e.amount_brl), 0);
 
   const now = new Date();
-  const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1).toISOString().slice(0, 10);
+  const threeMonthsAgo = diaBrasilia(new Date(now.getFullYear(), now.getMonth() - 3, 1));
   // Burn = saída de CAIXA. O aporte intelectual (sweat equity) é não-caixa — nunca entra no burn.
   const recentExpenses = expenses.filter(e => e.month >= threeMonthsAgo && e.kind !== 'aporte_intelectual');
   const uniqueRecentMonths = new Set(recentExpenses.map(e => e.month)).size || 1;
@@ -899,7 +900,7 @@ function SubscriptionsTab() {
     product_id: 'clearix',
     plan_name: '',
     monthly_amount_brl: 0,
-    started_on: new Date().toISOString().slice(0, 10),
+    started_on: hojeBrasilia(),
     notes: '',
   };
   const [draft, setDraft] = useState(emptyDraft);
@@ -1338,7 +1339,7 @@ function RelatorioTab() {
     const a = document.createElement('a');
     a.href = url;
     const slug = filterProduct === 'all' ? 'digiai_todos' : filterProduct;
-    a.download = `investimento_${slug}_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `investimento_${slug}_${hojeBrasilia()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     setExporting(false);

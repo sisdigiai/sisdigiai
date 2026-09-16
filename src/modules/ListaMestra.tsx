@@ -3,6 +3,7 @@ import { Search, AlertTriangle, LayoutList, Boxes, CheckSquare, Square, CheckCir
 import { backlogStore } from '../lib/backlogStore';
 import { roadmapStore } from '../lib/roadmapStore';
 import { realtimeStore } from '../lib/realtimeStore';
+import { hojeBrasilia } from '../lib/datas';
 import { PRODUTOS, PRODUTO_BY_SLUG, DEGRAU_LABEL, type ProdutoInfo } from './Portfolio';
 import PageHeader from '../components/PageHeader';
 
@@ -94,7 +95,7 @@ export default function ListaMestra() {
   const [busca, setBusca] = useState('');
 
   const load = useCallback(async () => {
-    const hoje = new Date().toISOString().slice(0, 10);
+    const hoje = hojeBrasilia();
     try {
       const [backlog, tasks] = await Promise.all([backlogStore.list(), roadmapStore.listTasks()]);
       const b: MasterItem[] = backlog.map(x => ({

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { BarChart3, TrendingUp, Users, Eye, Bookmark, Share2, RefreshCw, Loader2, ExternalLink, Sparkles, Target, HeartPulse, Film, Newspaper } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { hojeBrasilia, diaBrasilia } from '../lib/datas';
 import { espelhoMotores, type PulsoDia, type LimelightDia, type LimePubDia, type BlogDia, type EspelhoBlogs } from '../lib/espelhoMotores';
 
 // RADAR 360 (2026-08-25) — o analytics social completo do grupo, aprovado em mock.
@@ -142,9 +143,9 @@ export default function MktCrescimento() {
     if (custom) return fDe;
     if (fDias === 0) return '2000-01-01';
     const d = new Date(); d.setDate(d.getDate() - (fDias - 1));
-    return d.toISOString().slice(0, 10);
+    return diaBrasilia(d);
   }, [fDias, custom, fDe]);
-  const fimDia = useMemo(() => (custom ? fAte : new Date().toISOString().slice(0, 10)), [custom, fAte]);
+  const fimDia = useMemo(() => (custom ? fAte : hojeBrasilia()), [custom, fAte]);
   const corteISO = corteDia + 'T00:00:00Z';
   const fimISO = fimDia + 'T23:59:59Z';
   const noRecorte = (dia: string) => dia >= corteDia && dia <= fimDia;
@@ -346,7 +347,7 @@ export default function MktCrescimento() {
 
   // Saúde: cobertura — toda conta cadastrada × existe censo recente?
   const cobertura = useMemo(() => {
-    const censoKeys = new Set(aud.filter((a) => a.dia >= new Date(Date.now() - 3 * 864e5).toISOString().slice(0, 10)).map((a) => `${brandOf(a.brand_id)?.name ?? ''}|${a.platform}`));
+    const censoKeys = new Set(aud.filter((a) => a.dia >= diaBrasilia(new Date(Date.now() - 3 * 864e5))).map((a) => `${brandOf(a.brand_id)?.name ?? ''}|${a.platform}`));
     return contas
       .filter((c) => !/whats/i.test(c.platform))
       .map((c) => ({ ...c, medida: censoKeys.has(`${c.brand_name ?? ''}|${c.platform}`) }))
@@ -744,8 +745,8 @@ export default function MktCrescimento() {
             <>
               <Decide texto={<><b>O que se decide aqui:</b> se dá para confiar nos números das outras abas. Fonte sem data fresca congela em silêncio — esta aba é o antídoto.</>} />
               <section className="grid gap-2.5 mb-5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
-                <Health cor={ultimoCenso === new Date().toISOString().slice(0, 10) ? COR_OK : COR_WARN} titulo="Censo de redes" sub={`${contasMedidas || '—'} contas · último ${ultimoCenso ? fmtDM(ultimoCenso) : '—'}`} />
-                <Health cor={pulsoDias.some((d) => d.dia === new Date().toISOString().slice(0, 10)) ? COR_OK : COR_WARN} titulo="Pulso" sub="crons Vercel · série viva" />
+                <Health cor={ultimoCenso === hojeBrasilia() ? COR_OK : COR_WARN} titulo="Censo de redes" sub={`${contasMedidas || '—'} contas · último ${ultimoCenso ? fmtDM(ultimoCenso) : '—'}`} />
+                <Health cor={pulsoDias.some((d) => d.dia === hojeBrasilia()) ? COR_OK : COR_WARN} titulo="Pulso" sub="crons Vercel · série viva" />
                 <Health cor={COR_OK} titulo="Limelight" sub="coleta própria da fábrica" />
                 <Health cor={COR_OK} titulo="Blogs" sub={blogsEsp ? `últ. leitura ${blogsEsp.ultima_leitura ? fmtDM(blogsEsp.ultima_leitura) : '—'}` : 'espelho indisponível'} />
                 {fila && <Health cor={fila.atrasados > 50 || fila.com_erro > 0 ? COR_DANGER : COR_OK} titulo="Fila do motor MKT" sub={`${fila.atrasados} atrasados · ${fila.com_erro} com erro`} />}

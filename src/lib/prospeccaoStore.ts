@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { hojeBrasilia } from './datas';
 
 // Placar da prospecção por WhatsApp — contrato do MKT `public.v_mkt_placar_prospeccao` (15/09/2026).
 // Ordem do dono: resultado da prospecção se lê no digiai, não no MKT. A view é invoker e a RLS do
@@ -51,9 +52,7 @@ export interface PlacarProspeccao {
   erro?: string;
 }
 
-export function hojeBrasilia(): string {
-  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
-}
+export { hojeBrasilia };
 
 export const prospeccaoStore = {
   async placar(): Promise<PlacarProspeccao> {

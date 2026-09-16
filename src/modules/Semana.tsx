@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { CalendarCheck, CheckCircle2, ChevronRight, Target, XCircle } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { supabase } from '../lib/supabase';
+import { hojeBrasilia } from '../lib/datas';
 import { roadmapStore } from '../lib/roadmapStore';
 import { backlogStore } from '../lib/backlogStore';
 import type { ModuleId } from '../components/Sidebar';
@@ -99,7 +100,7 @@ export default function Semana({ onNavigate }: { onNavigate?: (id: ModuleId) => 
   useEffect(() => {
     carregar();
     (async () => {
-      const hoje = new Date().toISOString().slice(0, 10);
+      const hoje = hojeBrasilia();
       const [fases, tarefas, backlog, demos] = await Promise.all([
         roadmapStore.listPhases().catch(() => []),
         roadmapStore.listTasks().catch(() => []),

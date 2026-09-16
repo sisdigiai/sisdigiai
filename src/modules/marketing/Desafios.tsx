@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Trophy, Plus, RefreshCw, Calendar, Users, Award, Flag, Loader2, X, Hash, ExternalLink, CheckCircle2, MessageCircle } from 'lucide-react';
 import { marketingStore } from '../../lib/marketingStore';
+import { hojeBrasilia, diaBrasilia } from '../../lib/datas';
 
 type Challenge = Awaited<ReturnType<typeof marketingStore.listChallenges>>[number];
 type Participation = Awaited<ReturnType<typeof marketingStore.getChallengeLeaderboard>>[number];
@@ -191,8 +192,8 @@ function ChallengeCard({ c, onOpen }: { c: Challenge; onOpen: () => void }) {
 function NewChallengeModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
   const [form, setForm] = useState({
     name: '', description: '', movement: 1,
-    start_date: new Date().toISOString().slice(0,10),
-    end_date: new Date(Date.now() + 7 * 86400000).toISOString().slice(0,10),
+    start_date: hojeBrasilia(),
+    end_date: diaBrasilia(new Date(Date.now() + 7 * 86400000)),
     status: 'draft', prize_description: '', rules: '', hashtag: ''
   });
   const [busy, setBusy] = useState(false);
