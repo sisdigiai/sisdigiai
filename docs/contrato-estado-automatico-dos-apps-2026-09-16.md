@@ -1,7 +1,14 @@
 # Contrato — estado de cada app e fase atualizado sem mão humana
 
 **Data:** 16/09/2026 · **Autor:** agente do app digiai · **Para:** Orquestrador Geral (revisão) → dono (palavra para DDL/DML)
-**Status:** PROPOSTA. Nada construído, nenhuma DDL.
+**Status:** REVISADO pelo Geral em 16/09 — decisões abaixo. Passo 2 escrito como rascunho: `supabase/migrations/140_estado_automatico_dos_apps_tabelas_funcoes_view.sql` (compila no ensaio; não aplicado).
+
+> **Decisões do Geral (16/09), que prevalecem sobre o texto abaixo:**
+> 1. Medido × declarado com validade: aceito. **Portão NÃO fecha por sumir do índice** — ausência não é prova. Fecha só por entrada na seção **Fechados** de `Cockpit/portoes-abertos.md` (NN · data · prova · fonte). Sumiu sem entrada em Fechados = estado **"sumiu do índice, reconfirmar"** (nunca fechado, nunca apagado). Decisão: só o dono fecha/revoga, por arquivo datado.
+> 2. Decisões em `Cockpit/decisoes/AAAA-MM-DD-slug.md` com frontmatter (id, data, quem, onde, palavra textual, apps, validade, fontes). Portões seguem em `portoes-abertos.md` (NN · título · dono · sev · prova para fechar · fonte) + seção Fechados. **Fichas: reaproveitar `Cockpit/Apps/<app>/ficha.md`** (20 existentes), mantidas pelo agente de cada app; sub-apps do Clearix pelo eco. O Geral mantém decisões e portões.
+> 3. Runner local nesta máquina, 30 min, um segredo só; agentes não recebem segredo nem chamam a edge — escrevem arquivo. Deploy pelo cron na nuvem. Máquina desligada = estado envelhece e a validade acusa.
+>
+> **Consequência medida para o item C:** as 20 fichas atuais são texto livre de 09/07, sem campos estruturados. O runner lê só um **bloco de frontmatter** (slug, nome, tier, tagline, funcao, proximo, bloqueio, maturidade, urls, eventos_product, vendas_fonte, degrau_declarado + fonte, declarado_em, validade_dias) que cada agente acrescenta no topo da própria ficha; o texto livre continua embaixo.
 **Origem:** palavra do dono, 16/09: *"o seu é as atualizações automáticas de cada fase dos apps"*. Leitura confirmada pelo Geral: manter no digiai o estado de cada app e de cada fase sem mão humana — roadmap e fases, ordem do dia, decisões e portões.
 
 ---
