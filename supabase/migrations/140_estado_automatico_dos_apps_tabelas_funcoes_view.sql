@@ -33,8 +33,10 @@ begin
   if exists (select 1 from information_schema.columns where table_schema='ops' and table_name='pendencias_humanas' and column_name='indice_estado') then
     raise exception 'pendencias_humanas ja tem indice_estado.';
   end if;
-  if exists (select 1 from ops.pendencias_humanas where fonte like 'Cockpit/portoes-abertos.md#%') then
-    raise exception 'ja ha portao do indice gravado — a semente rodou? conferir a ordem dos passos.';
+  -- a semente (passo 1) grava portões com fonte 'Cockpit/portoes-abertos.md#NN' antes desta migration; o índice único
+  -- abaixo exige que não haja fonte repetida — a primeira sincronização adota essas linhas (upsert por fonte).
+  if exists (select fonte from ops.pendencias_humanas where fonte like 'Cockpit/portoes-abertos.md#%' group by fonte having count(*) > 1) then
+    raise exception 'ha portao do indice gravado em duplicidade — limpar antes do indice unico.';
   end if;
 end $$;
 
