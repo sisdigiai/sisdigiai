@@ -1,7 +1,9 @@
 // roadmap-gj — o GJ PUXA a ordem do dia, em vez de o digiai empurrar
 // ============================================================================
-// ⚠ ESCRITA E NÃO PUBLICADA. Aguarda o segredo digitado pelo dono nos dois
-//    projetos. Portão 53.
+// ⚠ PUBLICADA E DESLIGADA (medido em 16/09/2026): v2 no ar desde 09/09 16:11 BRT, mas
+//    ROADMAP_GJ_SECRET não existe nos secrets — toda chamada responde 503. Falta só o
+//    segredo, digitado pelo dono nos dois projetos. Portão 54. A versão deste arquivo
+//    (dia em Brasília + estado no item) ainda não foi publicada: sobe junto com o segredo.
 //
 // POR QUE INVERTE O SENTIDO: hoje a `push-ordem-gj` empurra, e para isso guarda
 // `GJ_SERVICE_ROLE_KEY` — a CHAVE-MESTRA do banco do GJ — dentro do projeto
@@ -15,7 +17,10 @@
 // daqui a três meses, "conserta" repondo a chave-mestra por boa intenção.
 //
 // CONTRATO DE RESPOSTA:
-//   200  { dia, itens: [...] } — pode vir `itens: []` num dia sem ordem humana,
+//   200  { dia, itens: [...] } — cada item traz `estado` (aberto | cumprido | justificado):
+//        item encerrado VEM, com o estado, para o GJ fechar do lado dele em vez de
+//        adivinhar pela ausência. `origem_ref` é estável dentro do dia (migration 141:
+//        regerar a ordem atualiza no lugar, não troca o id). Pode vir `itens: []` num dia sem ordem humana,
 //        e isso é RESPOSTA VÁLIDA, não falha: existe `dia` no corpo para o GJ
 //        distinguir "li e não há nada" de "não consegui ler".
 //   400  `dia` fora do formato ou fora da janela
@@ -36,6 +41,10 @@ const SEGREDO = Deno.env.get('ROADMAP_GJ_SECRET') ?? '';
 const JANELA_DIAS = 31;
 
 const PREFIXO: Record<string, string> = { trava: '🔴 TRAVA', gate: '🎯 GATE' };
+
+// A ordem do dia é gravada pelo dia de Brasília. `toISOString()` daria o dia UTC e, das
+// 21h à meia-noite, pediria o dia seguinte — que ainda não tem ordem.
+const hojeBrasilia = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -65,7 +74,7 @@ Deno.serve(async (req) => {
   const recebido = req.headers.get('x-agenda-gj-secret') ?? '';
   if (!recebido || !(await segredoConfere(recebido))) return json({ erro: 'nao_autorizado' }, 401);
 
-  const hoje = new Date().toISOString().slice(0, 10);
+  const hoje = hojeBrasilia();
   const dia = new URL(req.url).searchParams.get('dia')?.trim() || hoje;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dia)) return json({ erro: 'dia_invalido', esperado: 'AAAA-MM-DD' }, 400);
 
@@ -84,12 +93,12 @@ Deno.serve(async (req) => {
       // Colunas NOMEADAS, e só as que viram evento. Nada de `select('*')`:
       // a tabela pode ganhar coluna interna e ela viajaria para outro projeto
       // sem ninguém decidir.
-      .select('id, bloco, posicao, titulo, porque')
+      .select('id, bloco, posicao, titulo, porque, estado')
       .eq('dia', dia)
       // O mesmo recorte da push-ordem-gj, e pelo mesmo motivo: obrigação da
       // máquina não vira compromisso de gente.
       .eq('dono', 'humano')
-      .eq('estado', 'aberto')
+      .in('estado', ['aberto', 'cumprido', 'justificado'])
       .order('posicao');
 
     if (error) {
@@ -113,6 +122,7 @@ Deno.serve(async (req) => {
       tipo: 'tarefa',
       local: null,
       posicao: it.posicao,
+      estado: it.estado,
     }));
 
     // `itens: []` é resposta válida (dia sem ordem humana) e vem COM `dia`:
