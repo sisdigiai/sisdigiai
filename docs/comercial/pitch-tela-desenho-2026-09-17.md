@@ -67,6 +67,10 @@ Uma tela, cinco estados em sequência. Tudo no navegador do dono, logado.
 
 O "1 dia de tela" do recomendado não cabe com gravação da reunião, cronômetro por bloco e os estados de erro (sem bloco, sem fato, sem usuário de teste) — daí 1,5 + conferência.
 
+## 4b. Registro para depois (sem obra agora)
+
+- **Respostas da esteira: humano × robô** (Geral, 16/09 23:58). Das 22 respostas da prospecção, 18 foram robôs de atendimento das óticas e 4 pessoas (1 interessada). Quando o MKT gravar `resposta_humana`, a fila "respostas esperando o dono" do Comercial (e o preparo do pitch) deve separar humano de robô. Nada criado até lá.
+
 ## 5. Decisões pendentes (não bloqueiam a 142)
 
 1. **Rótulo do pacote (15–17 min):** o preço dos pacotes não está no banco do digiai. Opções: (a) fatos por pacote em `mkt.fatos` (`clearix_pacote_essencial` etc., curadoria do app, palavra do dono), lidos como os outros números; (b) espelho publicado pelo eco, como o do aporte. **(a) é mais rápido e usa régua que já existe.**
