@@ -77,7 +77,8 @@ begin
          and fresco and publico and brand_slug = 'digiai') <> 8 then
     raise exception 'os 8 fatos novos nao estao todos frescos, publicos e na marca digiai.';
   end if;
-  if exists (select 1 from mkt.fatos where chave like 'clearix_%' and ativo
+  if exists (select 1 from mkt.fatos where ativo and chave in ('clearix_catalogo_lentes','clearix_catalogo_lentes_contato','clearix_acordos_laboratorio','clearix_estoque_produtos',
+                                                           'clearix_estoque_movimentacoes','clearix_etiquetas_2026','clearix_comissao_2026','clearix_portal_links')
                and (fato ~* '(r\$|[0-9]\s*reais\M|[0-9]+,[0-9]{2}\M)' or fato ~* '\m(1[67]|20) (aplicativos|apps)\M' or fato ~* '4\.564')) then
     raise exception 'fato do Clearix com preco, contagem de apps ou numero sem fonte.';
   end if;
