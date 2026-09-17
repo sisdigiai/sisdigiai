@@ -35,10 +35,16 @@ begin;
 
 do $$
 begin
+  if to_regtype('ops.pitch_link_motivo') is not null then
+    raise exception 'tipo ops.pitch_link_motivo ja existe.';
+  end if;
   if to_regclass('ops.pitch_blocos') is not null or to_regclass('ops.pitch_nao_faz') is not null then
     raise exception 'tabelas do pitch ja existem.';
   end if;
 end $$;
+
+-- por que o link para a tela do Clearix está desligado (revisão do Geral com o eco/Lens, 17/09)
+create type ops.pitch_link_motivo as enum ('sem_registro_seguro', 'lgpd', 'sigilo_comercial');
 
 create table ops.pitch_blocos (
   id                  uuid primary key default gen_random_uuid(),
@@ -51,9 +57,15 @@ create table ops.pitch_blocos (
   registro_seguro     text,                                                       -- registro do tenant real que pode ser mostrado, nomeado pelo agente
   url_demo            text check (url_demo is null or url_demo ~ '^https://'),    -- tela exata no tenant real
   nao_clicar          text,                                                       -- o que grava em produção e não se clica na demo
-  -- LGPD: mostrar a tela do tenant real a um terceiro expõe dado de cliente do Grupo Mello. Fail-closed: presume que a tela
-  -- mostra dado pessoal (nome, CPF, telefone, receita) até o agente que consolidou afirmar que não mostra.
-  dados_pessoais_na_tela boolean not null default true,
+  -- LGPD: mostrar a tela do tenant real a um terceiro expõe dado de cliente ou funcionário real. Fail-closed: presume que a
+  -- tela mostra dado pessoal até o agente que consolidou afirmar que não. Nome/papel do usuário logado na moldura NÃO conta
+  -- (é o dono apresentando) — condição fixa de todo bloco: demo logada como o dono; não clicar no menu do usuário.
+  dado_pessoal_na_tela    boolean not null default true,
+  vista_sem_dado          text,                      -- como mostrar sem o dado (filtro, aba, recorte), se existir
+  -- Sigilo comercial: markup, custo, acordo com laboratório real, extrato/saldo bancário. Decisão do dono item a item;
+  -- default desligado — só libera com sigilo_liberado_por (quem, onde, quando).
+  sigilo_comercial        boolean not null default true,
+  sigilo_liberado_por     text,
   ressalva            text not null,
   roteiro_60s         text not null,
   fato_chave          text,                                                       -- chave em mkt.fatos
@@ -174,10 +186,14 @@ grant execute on function ops.fn_pitch_bloco_problemas(uuid) to authenticated, s
 create view public.v_comercial_pitch
 with (security_invoker = on) as
   select b.id, b.app_slug, b.duvida, b.pergunta_numero, b.pergunta_texto, b.solucao, b.rota,
-         b.registro_seguro, b.url_demo, b.nao_clicar, (b.url_demo is not null and b.registro_seguro is not null and not b.dados_pessoais_na_tela) as link_liberado,
-         case when b.url_demo is null or b.registro_seguro is null then 'sem registro seguro nomeado'
-              when b.dados_pessoais_na_tela then 'a tela mostra dado pessoal de cliente real (LGPD)'
-         end as link_motivo_desligado,
+         b.registro_seguro, b.url_demo, b.nao_clicar, (b.url_demo is not null and b.registro_seguro is not null and not b.dado_pessoal_na_tela
+          and (not b.sigilo_comercial or b.sigilo_liberado_por is not null)) as link_liberado,
+         (case when b.url_demo is null or b.registro_seguro is null then 'sem_registro_seguro'
+               when b.dado_pessoal_na_tela then 'lgpd'
+               when b.sigilo_comercial and b.sigilo_liberado_por is null then 'sigilo_comercial'
+          end)::ops.pitch_link_motivo as link_motivo_desligado,
+         b.vista_sem_dado,
+         'demo logada como o dono; não clicar no menu do usuário'::text as condicao_fixa,
          b.ressalva, b.roteiro_60s, b.pacote_minimo, b.valido_ate, b.rota_verificada_em,
          b.fato_chave, f.fato as fato_texto, f.verificado_em as fato_verificado_em
     from ops.pitch_blocos b
@@ -236,12 +252,22 @@ begin
     -- LGPD: com url e registro, o link continua desligado enquanto ninguém afirmar que a tela não mostra dado pessoal
     update ops.pitch_blocos set url_demo = 'https://clearixhub.netlify.app/vendas/entregas', registro_seguro = 'OC-000015' where id = v_ok;
     if (select link_liberado from public.v_comercial_pitch where id = v_ok)
-    or (select link_motivo_desligado from public.v_comercial_pitch where id = v_ok) not like '%LGPD%' then
+    or (select link_motivo_desligado from public.v_comercial_pitch where id = v_ok) <> 'lgpd' then
       raise exception 'PROVA_142_FALHOU: link liberado sem declarar a tela livre de dado pessoal';
     end if;
-    update ops.pitch_blocos set dados_pessoais_na_tela = false where id = v_ok;
-    if not (select link_liberado from public.v_comercial_pitch where id = v_ok) then
-      raise exception 'PROVA_142_FALHOU: tela declarada sem dado pessoal nao liberou o link';
+    update ops.pitch_blocos set dado_pessoal_na_tela = false where id = v_ok;
+    if (select link_liberado from public.v_comercial_pitch where id = v_ok)
+    or (select link_motivo_desligado from public.v_comercial_pitch where id = v_ok) <> 'sigilo_comercial' then
+      raise exception 'PROVA_142_FALHOU: sigilo comercial liberado sem decisao do dono';
+    end if;
+    update ops.pitch_blocos set sigilo_comercial = false where id = v_ok;
+    if not (select link_liberado from public.v_comercial_pitch where id = v_ok)
+    or (select link_motivo_desligado from public.v_comercial_pitch where id = v_ok) is not null then
+      raise exception 'PROVA_142_FALHOU: tela sem dado pessoal e sem sigilo nao liberou o link';
+    end if;
+    update ops.pitch_blocos set url_demo = null, registro_seguro = null where id = v_ok;
+    if (select link_motivo_desligado from public.v_comercial_pitch where id = v_ok) <> 'sem_registro_seguro' then
+      raise exception 'PROVA_142_FALHOU: sem registro seguro nao desligou o link';
     end if;
     raise exception 'PROVA_142_OK';
   exception when others then
