@@ -1,6 +1,6 @@
 -- 143 — fatos do Clearix para os números que os blocos do pitch citam
 --
--- ⛔ NÃO APLICADA. Curadoria do app → revisão do Orquestrador Geral → palavra do dono neste canal.
+-- ⛔ NÃO APLICADA. Curadoria do app → revisão do Orquestrador Geral (aprovada como escrita, 16/09) → palavra do dono neste canal.
 --
 -- DE ONDE VEM: consolidado da anamnese no palco real (Cockpit/comercial/consolidado-anamnese-palco-real-2026-09-17.md, v1.2)
 --   cita números que não existiam em mkt.fatos; pela régua da 142, bloco só cita número de fato vivo. Pedido do Geral, 17/09:
@@ -12,7 +12,9 @@
 --   319 acordos de laboratório ...... folha §1 (l.26) · INV §10d (l.287) · 14/09
 --   2.243 produtos · 3.212 movim. ... folha l.61 (INV §9) · INV l.32 e §9d (l.272) · 14/09
 --   2.227 etiquetas ................. folha l.30 e l.61 · INV §9d (l.272: jul 1.897 · ago 233 · set 97) · 14/09
---   1.206 linhas de comissão ........ folha §1 (l.26) e l.47 · folha de mesa l.18 · 17/09 (errata já tira a carga retroativa)
+--   1.206 linhas de comissão ........ folha §1 (l.26) e l.47 · folha de mesa l.18 · a folha diz "17/09", mas é carimbo UTC de
+--                                      16/09 à noite (relógio conferido em 16/09 22:16 BRT); o fato usa 16/09 — data futura
+--                                      em verificado_em seria "fresco" por um dia a mais e mentiria a data
 --   1.562 links do portal ........... folha l.30 e l.51 · INV l.193 (abr→set por mês) · 14/09
 --   FORA: "4.564 conversas" — não aparece na folha nem no INV.
 --
@@ -62,8 +64,8 @@ values
    2227, 'folha única · INV §9d', date '2026-09-14', 30, true, true),
 
   ('digiai', 'clearix_comissao_2026',
-   '1.206 linhas de comissão calculadas sobre OS entregues em 2026, para 9 vendedores (medido em 17/09/2026).',
-   1206, 'folha única §1 (errata de 17/09: sem a carga retroativa de abril) · folha de mesa', date '2026-09-17', 30, true, true),
+   '1.206 linhas de comissão calculadas sobre OS entregues em 2026, para 9 vendedores (medido em 16/09/2026).',
+   1206, 'folha única §1 (errata de 16/09 à noite, carimbada "17/09" em UTC: sem a carga retroativa de abril) · folha de mesa', date '2026-09-16', 30, true, true),
 
   ('digiai', 'clearix_portal_links',
    '1.562 links do portal do paciente emitidos de abril a setembro de 2026 (medido em 14/09/2026).',
