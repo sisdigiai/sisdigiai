@@ -1,6 +1,8 @@
 -- 137 — Central de Materiais da OSI: o prazo do apoio no Nexus sai do texto dos afiliados
 --
--- ⛔ NÃO APLICADA. Pede a palavra do dono neste canal.
+-- ⛔ NÃO APLICADA — E NÃO SERÁ POR ESTE APP. Dono, 16/09: "mandar o orquestrador falar ao OSI para resolver".
+--   Fica como proposta pronta, ensaiada, para o agente da OSI usar ou refazer. Atenção: metadata também cita
+--   "90 dias" em 4 materiais (varredura de 16/09 ~21:13), e esta migration só reescreve copy_*.
 --
 -- DE ONDE VEM: decisão do dono de 16/09 (~21:30, canal do Orquestrador Geral): "OSI no nexus 30 dias". Achado do
 --   steward da OSI, repassado pelo Geral: materiais de afiliado dizem "90 dias de apoio". O Nexus já tem a própria
