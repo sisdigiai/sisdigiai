@@ -2,6 +2,7 @@
 
 **Data:** 17/09/2026 · **Autor:** agente do app digiai · **Para:** Orquestrador Geral (revisão) → dono (palavra)
 **Status:** RASCUNHO. Nada de tela commitado; migration `142_pitch_blocos_e_nao_faz.sql` só ensaiada (rollback).
+**Revisão do Geral (17/09):** aceitas as 5 diferenças e a estimativa de 3 dias, com duas decisões que prevalecem sobre o texto abaixo — (1) rótulo = fatos por pacote em `mkt.fatos` (`clearix_pacote_essencial/controle/crescimento/completo`, texto do rótulo publicado em clearix.app.br, validade 30 dias); (2) **demonstração no tenant REAL (Grupo Mello), logado como o dono** (ordem do dono de 17/09 00h50), com `registro_seguro` + `url_demo` + `nao_clicar` por bloco, e link desligado sem registro seguro; o usuário de teste (portão 83) sai da dependência. A migration 142 já foi ajustada a isso.
 **Base:** `Cockpit/comercial/pitch-dinamico-recomendacao-2026-09-17.md` e `Cockpit/comercial/pitch-20min-anamnese-2026-09-16.md` (v0).
 
 ---

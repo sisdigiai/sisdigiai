@@ -16,6 +16,12 @@
 --      next_action, follow_up_date, duration_min, interest_plan e interest_apps. A tela grava ali e em
 --      ops.commercial_leads (next_step, next_touch_at) pelas RPCs que já existem.
 --
+-- REVISÃO DO GERAL (17/09): aceitas as diferenças acima, com duas decisões:
+--   • rótulo do pacote = fatos em mkt.fatos (clearix_pacote_essencial/controle/crescimento/completo), leva de fatos
+--     separada — esta migration não depende dela;
+--   • demonstração no TENANT REAL (Grupo Mello), logado como o dono (ordem do dono de 17/09 00h50, repassada). Por isso
+--     cada bloco traz registro_seguro + url_demo + nao_clicar; sem registro seguro nomeado, o link fica desligado na tela.
+--
 -- A RÉGUA (mesma lógica das ideias, 135): bloco só aparece se
 --   • aprovado (palavra do dono por lote, pela função, nunca por UPDATE);
 --   • dentro de valido_ate (dia de Brasília);
@@ -42,12 +48,14 @@ create table ops.pitch_blocos (
   pergunta_texto      text not null,                                              -- a de acompanhamento que revela a dor
   solucao             text not null,
   rota                text not null check (rota ~ '^[A-Za-z0-9/_\[\]\-. ›·]+$'),
-  registro_demo       text,                                                       -- registro seguro nomeado pelo agente
+  registro_seguro     text,                                                       -- registro do tenant real que pode ser mostrado, nomeado pelo agente
+  url_demo            text check (url_demo is null or url_demo ~ '^https://'),    -- tela exata no tenant real
+  nao_clicar          text,                                                       -- o que grava em produção e não se clica na demo
   ressalva            text not null,
   roteiro_60s         text not null,
   fato_chave          text,                                                       -- chave em mkt.fatos
   pacote_minimo       text check (pacote_minimo in ('essencial', 'controle', 'crescimento', 'completo')),
-  fonte_arquivo       text not null check (fonte_arquivo ~ '^clearix_eco_full/clearix_[a-z]+/_ANAMNESE_[0-9-]+_DUVIDAS_E_SOLUCOES\.md$'),
+  fonte_arquivo       text not null check (fonte_arquivo ~ '^(clearix_eco_full|Cockpit/comercial)/[^ ]+\.md$'),
   rota_verificada_em  date not null,
   valido_ate          date not null,
   aprovado_por        text,
@@ -56,6 +64,7 @@ create table ops.pitch_blocos (
   created_at          timestamptz not null default now(),
   updated_at          timestamptz not null default now(),
   constraint pitch_blocos_aprovacao_coerente check ((aprovado_em is null) = (aprovado_por is null)),
+  constraint pitch_blocos_link_com_registro check (url_demo is null or registro_seguro is not null),
   constraint pitch_blocos_uq unique (app_slug, duvida)
 );
 
@@ -65,7 +74,7 @@ create table ops.pitch_nao_faz (
   duvida           text not null,
   pergunta_texto   text,
   resposta         text not null,                                                 -- o que responder, sem inventar
-  fonte_arquivo    text not null check (fonte_arquivo ~ '^clearix_eco_full/clearix_[a-z]+/_ANAMNESE_[0-9-]+_DUVIDAS_E_SOLUCOES\.md$'),
+  fonte_arquivo    text not null check (fonte_arquivo ~ '^(clearix_eco_full|Cockpit/comercial)/[^ ]+\.md$'),
   valido_ate       date not null,
   aprovado_por     text,
   aprovado_em      timestamptz,
@@ -161,7 +170,8 @@ grant execute on function ops.fn_pitch_bloco_problemas(uuid) to authenticated, s
 -- ── o que a tela lê ───────────────────────────────────────────────────────────
 create view public.v_comercial_pitch
 with (security_invoker = on) as
-  select b.id, b.app_slug, b.duvida, b.pergunta_numero, b.pergunta_texto, b.solucao, b.rota, b.registro_demo,
+  select b.id, b.app_slug, b.duvida, b.pergunta_numero, b.pergunta_texto, b.solucao, b.rota,
+         b.registro_seguro, b.url_demo, b.nao_clicar, (b.url_demo is not null and b.registro_seguro is not null) as link_liberado,
          b.ressalva, b.roteiro_60s, b.pacote_minimo, b.valido_ate, b.rota_verificada_em,
          b.fato_chave, f.fato as fato_texto, f.verificado_em as fato_verificado_em
     from ops.pitch_blocos b
