@@ -62,6 +62,10 @@ create table ops.pitch_blocos (
   -- (é o dono apresentando) — condição fixa de todo bloco: demo logada como o dono; não clicar no menu do usuário.
   dado_pessoal_na_tela    boolean not null default true,
   vista_sem_dado          text,                      -- como mostrar sem o dado (filtro, aba, recorte), se existir
+  -- "sem dado pessoal" só vale com CONTROLE POSITIVO (método do eco, aceito pelo Geral em 17/09): a mesma tela/consulta num
+  -- registro que TEM dado foi conferida e devolveu dado — senão o "não" pode ser só uma recusa da simulação. Texto curto:
+  -- qual registro com dado foi conferido e o que apareceu. Afirmação só pelo código, sem abrir logado, não é controle.
+  controle_positivo       text,
   -- Sigilo comercial: markup, custo, acordo com laboratório real, extrato/saldo bancário. Decisão do dono item a item;
   -- default desligado — só libera com sigilo_liberado_por (quem, onde, quando).
   sigilo_comercial        boolean not null default true,
@@ -80,6 +84,7 @@ create table ops.pitch_blocos (
   updated_at          timestamptz not null default now(),
   constraint pitch_blocos_aprovacao_coerente check ((aprovado_em is null) = (aprovado_por is null)),
   constraint pitch_blocos_link_com_registro check (url_demo is null or registro_seguro is not null),
+  constraint pitch_blocos_sem_dado_exige_controle check (dado_pessoal_na_tela or coalesce(btrim(controle_positivo), '') <> ''),
   constraint pitch_blocos_uq unique (app_slug, duvida)
 );
 
@@ -255,7 +260,14 @@ begin
     or (select link_motivo_desligado from public.v_comercial_pitch where id = v_ok) <> 'lgpd' then
       raise exception 'PROVA_142_FALHOU: link liberado sem declarar a tela livre de dado pessoal';
     end if;
-    update ops.pitch_blocos set dado_pessoal_na_tela = false where id = v_ok;
+    -- "sem dado pessoal" sem controle positivo é recusado pelo banco
+    begin
+      update ops.pitch_blocos set dado_pessoal_na_tela = false where id = v_ok;
+      raise exception 'PROVA_142_FALHOU: aceitou sem dado pessoal sem controle positivo';
+    exception when check_violation then null;
+    end;
+    update ops.pitch_blocos set dado_pessoal_na_tela = false,
+           controle_positivo = 'OC-000092 (tem cliente): a mesma rota mostrou nome e telefone; OC-000015 nao mostrou' where id = v_ok;
     if (select link_liberado from public.v_comercial_pitch where id = v_ok)
     or (select link_motivo_desligado from public.v_comercial_pitch where id = v_ok) <> 'sigilo_comercial' then
       raise exception 'PROVA_142_FALHOU: sigilo comercial liberado sem decisao do dono';
