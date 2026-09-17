@@ -51,6 +51,9 @@ create table ops.pitch_blocos (
   registro_seguro     text,                                                       -- registro do tenant real que pode ser mostrado, nomeado pelo agente
   url_demo            text check (url_demo is null or url_demo ~ '^https://'),    -- tela exata no tenant real
   nao_clicar          text,                                                       -- o que grava em produção e não se clica na demo
+  -- LGPD: mostrar a tela do tenant real a um terceiro expõe dado de cliente do Grupo Mello. Fail-closed: presume que a tela
+  -- mostra dado pessoal (nome, CPF, telefone, receita) até o agente que consolidou afirmar que não mostra.
+  dados_pessoais_na_tela boolean not null default true,
   ressalva            text not null,
   roteiro_60s         text not null,
   fato_chave          text,                                                       -- chave em mkt.fatos
@@ -171,7 +174,10 @@ grant execute on function ops.fn_pitch_bloco_problemas(uuid) to authenticated, s
 create view public.v_comercial_pitch
 with (security_invoker = on) as
   select b.id, b.app_slug, b.duvida, b.pergunta_numero, b.pergunta_texto, b.solucao, b.rota,
-         b.registro_seguro, b.url_demo, b.nao_clicar, (b.url_demo is not null and b.registro_seguro is not null) as link_liberado,
+         b.registro_seguro, b.url_demo, b.nao_clicar, (b.url_demo is not null and b.registro_seguro is not null and not b.dados_pessoais_na_tela) as link_liberado,
+         case when b.url_demo is null or b.registro_seguro is null then 'sem registro seguro nomeado'
+              when b.dados_pessoais_na_tela then 'a tela mostra dado pessoal de cliente real (LGPD)'
+         end as link_motivo_desligado,
          b.ressalva, b.roteiro_60s, b.pacote_minimo, b.valido_ate, b.rota_verificada_em,
          b.fato_chave, f.fato as fato_texto, f.verificado_em as fato_verificado_em
     from ops.pitch_blocos b
@@ -226,6 +232,16 @@ begin
     perform ops.fn_aprovar_pitch(array[v_ok], null, 'PROVA_142');
     if not exists (select 1 from public.v_comercial_pitch where id = v_ok and fato_texto is not null) then
       raise exception 'PROVA_142_FALHOU: bloco bom aprovado nao aparece na tela com o numero da folha';
+    end if;
+    -- LGPD: com url e registro, o link continua desligado enquanto ninguém afirmar que a tela não mostra dado pessoal
+    update ops.pitch_blocos set url_demo = 'https://clearixhub.netlify.app/vendas/entregas', registro_seguro = 'OC-000015' where id = v_ok;
+    if (select link_liberado from public.v_comercial_pitch where id = v_ok)
+    or (select link_motivo_desligado from public.v_comercial_pitch where id = v_ok) not like '%LGPD%' then
+      raise exception 'PROVA_142_FALHOU: link liberado sem declarar a tela livre de dado pessoal';
+    end if;
+    update ops.pitch_blocos set dados_pessoais_na_tela = false where id = v_ok;
+    if not (select link_liberado from public.v_comercial_pitch where id = v_ok) then
+      raise exception 'PROVA_142_FALHOU: tela declarada sem dado pessoal nao liberou o link';
     end if;
     raise exception 'PROVA_142_OK';
   exception when others then
