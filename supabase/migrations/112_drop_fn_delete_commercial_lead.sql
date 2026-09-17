@@ -1,5 +1,9 @@
 -- 112 — `fn_delete_commercial_lead` sai de vez
 --
+-- ✔ APLICADA em 17/09/2026 às 00:21:39 BRT, com a palavra do dono neste canal ("temos que aplicar todas as migrations em nosso banco todo"),
+--   reensaiada contra o banco do dia antes. Medido depois: fn_delete_commercial_lead não existe mais (0 funções).
+--
+-- (Escrita como NÃO APLICADA.)
 -- ⚠ NÃO APLICADA. É `drop function` — ação DESTRUTIVA. Só com a palavra do dono.
 --
 -- ═══════════════════════════════════════════════════════════════════════════

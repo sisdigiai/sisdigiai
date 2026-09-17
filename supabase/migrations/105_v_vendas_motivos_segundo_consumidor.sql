@@ -1,3 +1,6 @@
+-- ⛔ SUPERADA — NÃO APLICAR (17/09/2026): public.v_vendas_motivos não existe mais no banco; a lista de motivos
+--   é public.v_motivos_saida, e nenhuma tela lê v_vendas_motivos. Este comentário não tem mais objeto.
+--
 -- 105 — a view de motivos passa a ter DOIS consumidores, e o comentário diz isso
 --
 -- Só comentário. Zero mudança de comportamento, zero DDL de estrutura.

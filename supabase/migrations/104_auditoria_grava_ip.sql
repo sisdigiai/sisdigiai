@@ -1,5 +1,9 @@
 -- 104 — a auditoria passa a gravar DE ONDE veio a ação
 --
+-- ✔ APLICADA em 17/09/2026 às 00:21:37 BRT, com a palavra do dono neste canal ("temos que aplicar todas as migrations em nosso banco todo"),
+--   reensaiada contra o banco do dia antes. Medido depois: iam.audit_logs com user_agent.
+--
+-- (Escrita como NÃO APLICADA.)
 -- ⚠ NÃO APLICADA. Aguarda o "pode" do dono. Portão 91.
 --
 -- ═══════════════════════════════════════════════════════════════════════════
