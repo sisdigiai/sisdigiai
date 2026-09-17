@@ -264,6 +264,7 @@ grant execute on function ops.fn_atualizar_ficha_app(jsonb)                     
 grant execute on function ops.fn_registrar_sinal_app(jsonb)                     to service_role;
 
 -- ── a view das telas ──────────────────────────────────────────────────────────
+-- uso = ação de pessoa; carga de agente (import, backfill, preview, teste) nunca conta.
 -- degrau: 5 só declarado (escala) · 4 venda de mercado registrada · 3 evento nos últimos 30 dias, ou uso declarado válido
 --         (quando a prova de uso mora fora deste banco, ex.: Clearix no crm_erp) · 2 deploy respondendo nas últimas 2 h ·
 --         1 existe. Cada degrau diz de onde veio (degrau_por).
@@ -283,6 +284,12 @@ ev as (
       on l.product = any (a.eventos_product) and l.occurred_at > now() - interval '30 days'
      and coalesce(l.session_id, '') not ilike 'teste%' and coalesce(l.utm_medium, '') !~* '^teste'
      and coalesce(l.utm_campaign, '') !~* '^teste\.'   -- palavra reservada do contrato de link
+     -- "carga de agente não é uso" (regra do Geral, 16/09): preview local e de deploy é agente conferindo, não pessoa;
+     -- evento sem url não prova de onde veio, então não conta. Medido em 16/09: 78 de localhost e 31 de preview em 30 dias.
+     and l.url is not null
+     and l.url !~* '^https?://(localhost|127\.0\.0\.1|\[::1\])(:[0-9]+)?(/|$)'
+     and l.url !~* '^https?://[0-9a-f]{20,}--[a-z0-9-]+\.netlify\.app'
+     and l.url !~* '^https?://([a-z0-9-]+\.)+pages\.dev'
    group by a.slug
 ),
 ven as (
@@ -359,14 +366,19 @@ begin
       'declarado_em', (now() at time zone 'America/Sao_Paulo')::date - 40, 'validade_dias', 30));
 
     -- teste nunca conta como uso: sessão teste*, utm_medium teste*, utm_campaign "teste."
-    insert into analytics.events_log (event_code, product, session_id, utm_medium, utm_campaign, occurred_at) values
-      ('landing_visit', 'prova-140', 'teste-140', null, null, now()),
-      ('landing_visit', 'prova-140', 's1', 'teste-eco', null, now()),
-      ('landing_visit', 'prova-140', 's2', 'prospeccao', 'teste.compra_teste.v1', now());
+    insert into analytics.events_log (event_code, product, session_id, utm_medium, utm_campaign, url, occurred_at) values
+      ('landing_visit', 'prova-140', 'teste-140', null, null, 'https://prova.example/', now()),
+      ('landing_visit', 'prova-140', 's1', 'teste-eco', null, 'https://prova.example/', now()),
+      ('landing_visit', 'prova-140', 's2', 'prospeccao', 'teste.compra_teste.v1', 'https://prova.example/', now()),
+      -- carga de agente: preview local, preview de deploy, sem url
+      ('landing_visit', 'prova-140', 's4', null, null, 'http://localhost:3000/', now()),
+      ('landing_visit', 'prova-140', 's5', null, null, 'https://6aaadf9116443d000801efb3--landingoticasemimproviso.netlify.app/', now()),
+      ('landing_visit', 'prova-140', 's6', null, null, 'https://abc123.clearix-site.pages.dev/', now()),
+      ('landing_visit', 'prova-140', 's7', null, null, null, now());
     if (select eventos_30d from public.v_ops_apps_estado where slug = 'prova_140') <> 0 then
-      raise exception 'PROVA_140_FALHOU: evento de teste contou como uso';
+      raise exception 'PROVA_140_FALHOU: evento de teste ou carga de agente contou como uso';
     end if;
-    insert into analytics.events_log (event_code, product, session_id, occurred_at) values ('landing_visit', 'prova-140', 's3', now());
+    insert into analytics.events_log (event_code, product, session_id, url, occurred_at) values ('landing_visit', 'prova-140', 's3', 'https://landingoticasemimproviso.netlify.app/', now());
     if (select eventos_30d from public.v_ops_apps_estado where slug = 'prova_140') <> 1
     or (select degrau from public.v_ops_apps_estado where slug = 'prova_140') <> 3 then
       raise exception 'PROVA_140_FALHOU: evento real nao virou uso (degrau 3)';
