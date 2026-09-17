@@ -1,5 +1,7 @@
 # Prompt da landing de Ótica Sem Improviso
 
+> ⚠ **Carimbo de 16/09/2026:** o apoio no Nexus incluído na compra do Ótica Sem Improviso passou de 90 para **30 dias** (decisão do dono; Nexus `supabase/migrations/0092_osi_30_dias.sql`), e depois dele a continuidade no Nexus é opcional, por assinatura. Onde este documento diz "90 dias" sobre o Nexus da OSI, vale 30, e "sem assinatura" não vale mais para o pacote. O texto abaixo fica como histórico.
+
 ## Classificação documental
 - tipo: prompt operacional de criação
 - status: canônico atual

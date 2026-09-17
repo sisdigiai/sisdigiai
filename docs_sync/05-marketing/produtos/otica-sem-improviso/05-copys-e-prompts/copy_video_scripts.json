@@ -46,8 +46,8 @@
         {
           "tempo": "1:30-1:50",
           "fase": "Oferta",
-          "texto": "Você recebe o manual em PDF pra imprimir, o App leitor pra estudar no celular e 90 dias de apoio complementar no Nexus. Compra única, sem assinatura. E tem garantia de 7 dias.",
-          "nota_visual": "Pacote na tela (PDF + App + 90 dias de apoio no Nexus) com selo 'Garantia de 7 dias'. Sem preço."
+          "texto": "Você recebe o manual em PDF pra imprimir, o App leitor pra estudar no celular e apoio complementar no Nexus incluído. Compra única. E tem garantia de 7 dias.",
+          "nota_visual": "Pacote na tela (PDF + App + apoio no Nexus incluído) com selo 'Garantia de 7 dias'. Sem preço."
         },
         {
           "tempo": "1:50-2:00",
@@ -111,7 +111,7 @@
         {
           "tempo": "0:13-0:18",
           "fase": "CTA",
-          "texto": "PDF + App + 90 dias de apoio no Nexus. Link na bio."
+          "texto": "PDF + App + apoio no Nexus incluído. Link na bio."
         }
       ]
     },

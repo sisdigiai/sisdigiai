@@ -10,6 +10,8 @@ superseded_by: null
 
 # Funil OSI → Clearix — Mapa Mestre
 
+> ⚠ **Carimbo de 16/09/2026:** o apoio no Nexus incluído na compra do Ótica Sem Improviso passou de 90 para **30 dias** (decisão do dono; Nexus `supabase/migrations/0092_osi_30_dias.sql`), e depois dele a continuidade no Nexus é opcional, por assinatura. Onde este documento diz "90 dias" sobre o Nexus da OSI, vale 30, e "sem assinatura" não vale mais para o pacote. O texto abaixo fica como histórico.
+
 > **O que este doc é:** consolidação dos 8 docs canônicos existentes em UMA visão linear do funil, com lacunas marcadas como TODO. Não substitui os docs originais — aponta pra eles. Atualizar este doc quando os docs-fonte mudarem.
 
 > **Status:** rascunho criado em 2026-05-20 a partir da reorientação estratégica "OSI = aquisição, Clearix = produto B2B real".

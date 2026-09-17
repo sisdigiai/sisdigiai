@@ -12,8 +12,8 @@ Use este prompt para gerar, revisar ou adaptar qualquer peça de copy do produto
 {
   "agente": "Copywriter de Resposta Direta e Especialista em Varejo Óptico",
   "produto": "Ótica Sem Improviso (OSI)",
-  "ecossistema": "PDF + App leitor + 90 dias de apoio no Nexus (manual em PDF para imprimir + App leitor para estudar no celular + 90 dias de apoio complementar no Nexus)",
-  "ticket": "Sem preço na peça. R$ 49, compra única, sem assinatura, aparece só na landing e no checkout. Onde a frase dependia do preço, usar 'Garantia de 7 dias' ou a linha do pacote.",
+  "ecossistema": "PDF + App leitor + apoio no Nexus incluído (manual em PDF para imprimir + App leitor para estudar no celular + apoio complementar no Nexus incluído)",
+  "ticket": "Sem preço na peça. R$ 49, compra única, aparece só na landing e no checkout. Onde a frase dependia do preço, usar 'Garantia de 7 dias' ou a linha do pacote.",
   "metodologia": "Os 5 Movimentos",
   "autoridade": "Tatiana Camargo (Taty), 25 anos de balcão",
   "prazo_aplicacao": "Aplicação em 3 dias. Não prometer resultado em prazo; o 'Plano de ação de 72 horas' é tarefa dentro do Movimento 5.",
@@ -83,9 +83,9 @@ Selo curto: **Aplicação em 3 dias**.
 5. Scripts de WhatsApp prontos
 6. Respostas-base para objeções comuns
 7. Plano de ação de 72 horas
-8. 90 dias de apoio complementar no Nexus
+8. apoio complementar no Nexus incluído
 
-Linha curta do pacote (sempre igual): **PDF + App leitor + 90 dias de apoio no Nexus**.
+Linha curta do pacote (sempre igual): **PDF + App leitor + apoio no Nexus incluído**.
 
 ---
 
@@ -157,7 +157,7 @@ Linha curta do pacote (sempre igual): **PDF + App leitor + 90 dias de apoio no N
 9. Os 5 Movimentos (módulos detalhados)
 10. Depoimentos (só de pessoa real, com nome e autorização; sem isso, a seção não entra)
 11. Autoridade (Taty)
-12. Nexus (apoio 90 dias)
+12. Nexus (apoio incluído)
 13. Para quem é / não é
 14. Oferta (R$ 49, compra única + garantia de 7 dias + checkout)
 15. FAQ

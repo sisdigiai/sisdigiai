@@ -62,7 +62,7 @@
           "tipo": "cta",
           "texto_principal": "Manual visual + App\nAplicação em 3 dias",
           "texto_secundario": "Link na bio",
-          "selo": "PDF + App + 90 dias de apoio no Nexus"
+          "selo": "PDF + App + apoio no Nexus incluído"
         }
       ]
     },
@@ -177,7 +177,7 @@
         {
           "slide": 5,
           "tipo": "cta",
-          "texto_principal": "Aplicação em 3 dias.\nPDF + App + 90 dias de apoio no Nexus",
+          "texto_principal": "Aplicação em 3 dias.\nPDF + App + apoio no Nexus incluído",
           "texto_secundario": "Link na bio"
         }
       ]
@@ -209,7 +209,7 @@
         },
         {
           "story": 5,
-          "texto": "Ótica Sem Improviso\nPDF + App + 90 dias de apoio no Nexus\nGarantia de 7 dias",
+          "texto": "Ótica Sem Improviso\nPDF + App + apoio no Nexus incluído\nGarantia de 7 dias",
           "cta": "Link para LP",
           "sticker": "Link"
         }

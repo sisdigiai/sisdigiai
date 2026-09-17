@@ -66,7 +66,7 @@ contato transacional. Sempre oferecer saída ("é só me avisar que paro de mand
 ```
 Oi, [Nome]! Aqui é da Ótica Sem Improviso 👓 Sua compra caiu certinho, seja bem-vindo(a)!
 
-Em alguns minutos chega no seu e-mail o acesso (PDF + App leitor + 90 dias de apoio no Nexus). Se não aparecer, me chama aqui que eu resolvo.
+Em alguns minutos chega no seu e-mail o acesso (PDF + App leitor + apoio no Nexus incluído). Se não aparecer, me chama aqui que eu resolvo.
 
 E já leva um brinde pra usar HOJE no balcão, de graça: a Clearix Calc — espessura por índice (com desenho da lente!), transposição, distância ao vértice, DNP. Sem cadastro, funciona offline: [LINK_CALC]
 ```
@@ -91,7 +91,7 @@ Me conta como foi.
 ```
 Oi, [Nome]! Fechando sua 1ª semana com o método — como tá sendo no balcão?
 
-Quando quiser ir além do manual, lá no Nexus tem o curso assistido (o Doug tira dúvida sua sobre atendimento na hora) e o apoio dos 90 dias: [LINK_NEXUS]
+Quando quiser ir além do manual, lá no Nexus tem o curso assistido (o Doug tira dúvida sua sobre atendimento na hora) e o apoio incluído no Nexus: [LINK_NEXUS]
 
 Qualquer travada, é só chamar.
 ```

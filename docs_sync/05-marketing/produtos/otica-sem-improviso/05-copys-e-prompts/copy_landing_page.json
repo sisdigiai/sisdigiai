@@ -2,7 +2,7 @@
   "meta": {
     "produto": "Ótica Sem Improviso",
     "tipo": "Landing Page de Conversão",
-    "ticket": "R$ 49, compra única, sem assinatura (preço só na landing e no checkout)",
+    "ticket": "R$ 49, compra única (preço só na landing e no checkout)",
     "tom": "Prático, empático, firme (mentora experiente), focado em segurança comercial",
     "metodologia": "Os 5 Movimentos",
     "autoridade": "Tatiana Camargo — 25 anos no balcão",
@@ -60,7 +60,7 @@
             },
             {
               "icone": "ShieldCheck",
-              "titulo": "90 dias de Nexus",
+              "titulo": "Apoio no Nexus",
               "descricao": "Apoio complementar para manter o método vivo na rotina."
             }
           ],
@@ -181,7 +181,7 @@
           "Scripts de WhatsApp prontos para adaptar",
           "Respostas-base para objeções comuns",
           "Plano de ação de 72 horas",
-          "90 dias de apoio complementar no Nexus"
+          "apoio complementar no Nexus incluído"
         ]
       }
     },
@@ -293,8 +293,8 @@
       "tipo": "complemento",
       "elementos": {
         "eyebrow": "Apoio complementar",
-        "titulo": "Nexus por 90 dias: para manter o método vivo.",
-        "descricao": "Depois da compra, você também conta com 90 dias de apoio complementar no Nexus para revisar, aplicar e manter o método vivo na rotina. O Nexus não substitui o manual. Ele ajuda você a continuar usando melhor o que aprendeu.",
+        "titulo": "Apoio no Nexus: para manter o método vivo.",
+        "descricao": "Depois da compra, você também conta com apoio complementar no Nexus incluído para revisar, aplicar e manter o método vivo na rotina. O Nexus não substitui o manual. Ele ajuda você a continuar usando melhor o que aprendeu.",
         "features": [
           {
             "icone": "BookOpen",
@@ -312,7 +312,7 @@
             "descricao": "Manter o que aprendeu ativo na rotina, não só na leitura."
           }
         ],
-        "nota": "O Nexus é complemento, não produto principal. Após os 90 dias, você decide se quer continuar. O manual PDF e o app continuam seus para sempre."
+        "nota": "O Nexus é complemento, não produto principal. Depois do apoio incluído, continuar no Nexus é opcional, por assinatura. O manual PDF e o app continuam seus para sempre."
       }
     },
     {
@@ -341,13 +341,13 @@
         "eyebrow": "Compra única",
         "titulo": "Ótica Sem Improviso",
         "subtitulo": "Manual Visual de Atendimento e Conversão para Óticas",
-        "nota": "PDF + App leitor + 90 dias de apoio no Nexus",
+        "nota": "PDF + App leitor + apoio no Nexus incluído",
         "preco_final": "R$ 49",
         "garantia": "Risco zero: garantia de 7 dias.",
         "bullets": [
           "Aplicação em 3 dias (Os 5 Movimentos)",
           "PDF + App leitor",
-          "90 dias de apoio no Nexus"
+          "apoio no Nexus incluído"
         ],
         "suporte": "Dúvidas? Fale com o suporte.",
         "cta": "Quero parar de atender no improviso",
@@ -378,11 +378,11 @@
           },
           {
             "pergunta": "O que é o Nexus?",
-            "resposta": "O Nexus é um apoio complementar por 90 dias para revisar e aplicar melhor o conteúdo do manual."
+            "resposta": "O Nexus é um apoio complementar, incluído na compra, para revisar e aplicar melhor o conteúdo do manual."
           },
           {
-            "pergunta": "E depois dos 90 dias?",
-            "resposta": "Após 90 dias, você decide se quer continuar. O manual PDF e o app continuam seus para sempre."
+            "pergunta": "E depois do apoio incluído?",
+            "resposta": "Continuar no Nexus é opcional, por assinatura. O manual PDF e o app continuam seus para sempre."
           },
           {
             "pergunta": "O Nexus é o produto principal?",

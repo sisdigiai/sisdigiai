@@ -89,7 +89,7 @@ Seu acesso ao Otica Sem Improviso ficou pendente.
 
 O material foi criado para ajudar profissionais de otica a conduzirem melhor o atendimento no balcao e no WhatsApp, com mais clareza na indicacao, mais seguranca na argumentacao e menos dependencia de desconto precoce.
 
-Voce recebe o manual em PDF para imprimir, o App leitor para estudar no celular e 90 dias de apoio complementar no Nexus.
+Voce recebe o manual em PDF para imprimir, o App leitor para estudar no celular e apoio complementar no Nexus incluído.
 
 Para finalizar:
 {{checkout_link}}
@@ -165,7 +165,7 @@ Passando para deixar o ultimo lembrete do seu acesso ao Otica Sem Improviso.
 
 Se hoje voce sente que o atendimento da otica depende muito da experiencia de cada pessoa, o OSI pode ajudar a criar uma linguagem mais clara, pratica e padronizada para o time.
 
-PDF + App leitor + 90 dias de apoio no Nexus. Garantia de 7 dias:
+PDF + App leitor + apoio no Nexus incluído. Garantia de 7 dias:
 {{checkout_link}}
 
 Depois deste e-mail, nao vou insistir por aqui.

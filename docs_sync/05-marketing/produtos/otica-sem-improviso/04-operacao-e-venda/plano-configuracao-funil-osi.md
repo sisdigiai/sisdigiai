@@ -37,7 +37,7 @@ Entrega percebida:
 - App leitor para estudar no celular.
 - Scripts e orientacoes por situacao real de atendimento.
 - Apoio pratico para objeções como caro, desconto, vou pensar e so quero orçamento.
-- 90 dias de apoio complementar no Nexus.
+- apoio complementar no Nexus incluído.
 
 Mensagem de checkout:
 

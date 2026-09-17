@@ -6,8 +6,8 @@
     "data": "2026-04-30"
   },
   "bio_instagram": {
-    "opcao_1": "Manual visual para quem atende em ótica.\nOs 5 Movimentos. Aplicação em 3 dias.\nPDF + App + 90 dias de apoio no Nexus.\n↓ Acesse o método",
-    "opcao_2": "Pare de atender no improviso na ótica.\n5 Movimentos. 3 Dias. Sem curso longo.\nPDF + App + 90 dias de apoio no Nexus.\n↓ Link abaixo",
+    "opcao_1": "Manual visual para quem atende em ótica.\nOs 5 Movimentos. Aplicação em 3 dias.\nPDF + App + apoio no Nexus incluído.\n↓ Acesse o método",
+    "opcao_2": "Pare de atender no improviso na ótica.\n5 Movimentos. 3 Dias. Sem curso longo.\nPDF + App + apoio no Nexus incluído.\n↓ Link abaixo",
     "opcao_3": "Atendimento de ótica sem improviso.\nMétodo visual em 5 Movimentos.\nAplicação em 3 dias.\n↓ Saiba mais"
   },
   "whatsapp_broadcast": [
@@ -19,7 +19,7 @@
     {
       "id": "msg_lancamento_2",
       "contexto": "Destaque do que a pessoa recebe (sem preço)",
-      "mensagem": "Só passando pra lembrar:\n\nO Ótica Sem Improviso é PDF + App leitor + 90 dias de apoio no Nexus.\n\nAplicação em 3 dias. Compra única, sem assinatura. Garantia de 7 dias.\n\n[LINK]\n\nSe já viu e ficou com dúvida, pode mandar aqui."
+      "mensagem": "Só passando pra lembrar:\n\nO Ótica Sem Improviso é PDF + App leitor + apoio no Nexus incluído.\n\nAplicação em 3 dias. Compra única. Garantia de 7 dias.\n\n[LINK]\n\nSe já viu e ficou com dúvida, pode mandar aqui."
     },
     {
       "id": "msg_prova_social",
@@ -57,7 +57,7 @@
     },
     {
       "id": "status_oferta",
-      "texto": "PDF + App leitor + 90 dias de apoio no Nexus\nCompra única. Garantia de 7 dias.\n\nPra quem trabalha em ótica e quer parar de atender no improviso.\n\nMe chama ou acessa: [LINK]"
+      "texto": "PDF + App leitor + apoio no Nexus incluído\nCompra única. Garantia de 7 dias.\n\nPra quem trabalha em ótica e quer parar de atender no improviso.\n\nMe chama ou acessa: [LINK]"
     }
   ]
 }

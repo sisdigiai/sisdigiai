@@ -10,6 +10,8 @@ superseded_by: null
 
 # Plano de desenvolvimento — Nexus Premium (OSI)
 
+> ⚠ **Carimbo de 16/09/2026:** o apoio no Nexus incluído na compra do Ótica Sem Improviso passou de 90 para **30 dias** (decisão do dono; Nexus `supabase/migrations/0092_osi_30_dias.sql`), e depois dele a continuidade no Nexus é opcional, por assinatura. Onde este documento diz "90 dias" sobre o Nexus da OSI, vale 30, e "sem assinatura" não vale mais para o pacote. O texto abaixo fica como histórico.
+
 > O que este doc é: roadmap das features que precisam estar prontas pra entregar valor real no **gate de 90 dias** do produto Ótica Sem Improviso. Complementa o [funil-osi-clearix-master.md](./funil-osi-clearix-master.md) — onde o gate aparece como bloco crítico (Nexus premium) mas sem detalhamento técnico.
 
 ## 0. Visão

@@ -285,7 +285,7 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
       } catch { /* silencioso */ }
     })();
 
-    // M4.2 — Nexus 90 dias (cross-DB read)
+    // M4.2 — Nexus: apoio incluído na compra (cross-DB read)
     (async () => {
       const result = await fetchOsiOnboardingSummary();
       setNexus(result);
@@ -547,12 +547,12 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
         );
       })()}
 
-      {/* M4.2 — Entrega Nexus 90 dias (cross-DB read, anon key) */}
+      {/* M4.2 — Entrega Nexus: o prazo do apoio vem do fato osi_oferta, não daqui (cross-DB read, anon key) */}
       {nexus && (
         <div className="border border-outline/10 bg-surface-low p-5 space-y-3">
           <div className="flex items-center gap-2">
             <Heart className="w-4 h-4 text-secondary" />
-            <span className="text-xs font-mono uppercase tracking-widest text-muted">Nexus · ativação 90 dias</span>
+            <span className="text-xs font-mono uppercase tracking-widest text-muted">Nexus · ativação</span>
             {nexus.data && (
               <span className="ml-auto text-[11px] text-on-surface-variant font-mono tabular-nums">
                 {nexus.data.total_buyers} compradores

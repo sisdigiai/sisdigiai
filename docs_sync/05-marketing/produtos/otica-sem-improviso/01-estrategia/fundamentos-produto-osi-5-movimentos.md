@@ -10,6 +10,8 @@ superseded_by: null
 
 # Fundamentos do Produto OSI
 
+> ⚠ **Carimbo de 16/09/2026:** o apoio no Nexus incluído na compra do Ótica Sem Improviso passou de 90 para **30 dias** (decisão do dono; Nexus `supabase/migrations/0092_osi_30_dias.sql`), e depois dele a continuidade no Nexus é opcional, por assinatura. Onde este documento diz "90 dias" sobre o Nexus da OSI, vale 30, e "sem assinatura" não vale mais para o pacote. O texto abaixo fica como histórico.
+
 > **O que é:** fonte única de verdade do **PRODUTO** OSI para os motores de conteúdo (digiai_mkt +
 > limelight). Extraído do produto real — landing (`otica_sem_improviso/src`), FAQ, app leitor
 > (`app_oticasemimproviso`), sequências de e-mail. **Código/produto vence doc** (regra do workspace).
