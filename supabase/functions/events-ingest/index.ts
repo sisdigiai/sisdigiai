@@ -6,6 +6,8 @@
  * SERVICE_ROLE — mesmo padrão keyless do affiliate-materials-public.
  *
  * Captura até quem tem ad blocker (nosso endpoint não é alvo de bloqueador, ≠ Meta/TikTok).
+ * Recusa na entrada o que não é pessoa: evento sem url, localhost e preview de deploy (Netlify <hash>--,
+ * Cloudflare *.pages.dev) — 16/09/2026, junto da allowlist da migration 134.
  * R-013 (LGPD): só session_id anônimo + UTM + user_agent truncado. ZERO PII.
  *
  * POST / { events: [{ event_code, product?, session_id?, url?, utm_*?, metadata? }] }
@@ -43,6 +45,10 @@ const ALLOWED = new Set([
 // url localhost, e todo funil passou a precisar de filtro. Recusar aqui protege todas as landings
 // de uma vez, em vez de confiar que cada site lembre do filtro.
 const ORIGEM_LOCAL = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?(\/|$)/i;
+// Preview de deploy é agente conferindo, não pessoa ("carga de agente não é uso", regra do Geral, 16/09). Medido em
+// 16/09: 31 eventos de preview em 30 dias, quase todos da OSI, contando como visita. Netlify publica cada deploy em
+// <hash>--site.netlify.app; Cloudflare Pages em <algo>.pages.dev.
+const ORIGEM_PREVIEW = /^https?:\/\/([0-9a-f]{20,}--[a-z0-9-]+\.netlify\.app|([a-z0-9-]+\.)+pages\.dev)(:\d+)?(\/|$)/i;
 // Os gatilhos do leitor só valem com o id do gatilho do desenho (g1…g4, e1, e2), vindo
 // em utm_content ou em metadata.gatilho. Sem ele o evento não diz QUAL gatilho, e o
 // endpoint é público: texto livre aqui vira lixo, ou dado de terceiro, na tabela.
@@ -74,7 +80,10 @@ Deno.serve(async (req) => {
     for (const e of events) {
       const code = String(e?.event_code ?? '');
       if (!ALLOWED.has(code)) { errors.push(`bad_code:${code}`); continue; }
-      if (typeof e?.url === 'string' && ORIGEM_LOCAL.test(e.url)) { errors.push('origem_local'); continue; }
+      // Sem url não dá para saber de onde veio: não entra (a view de uso já não contaria).
+      if (typeof e?.url !== 'string' || !e.url.trim()) { errors.push('sem_url'); continue; }
+      if (ORIGEM_LOCAL.test(e.url)) { errors.push('origem_local'); continue; }
+      if (ORIGEM_PREVIEW.test(e.url)) { errors.push('origem_preview'); continue; }
 
       let utmContent = e?.utm_content ? String(e.utm_content).slice(0, 120) : null;
       if (code.startsWith('reader_gatilho_')) {
