@@ -374,7 +374,7 @@ function defaultChecklist(): AcademyChecklistItem[] {
     },
     {
       id: crypto.randomUUID(),
-      title: 'Definir regra de acesso no Nexus por 90 dias',
+      title: 'Definir regra de acesso no Nexus por 30 dias',
       area: 'delivery',
       done: false,
       notes: 'Consumo e curto, mas precisa janela para revisao e suporte.',

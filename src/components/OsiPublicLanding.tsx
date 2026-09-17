@@ -162,7 +162,7 @@ export default function OsiPublicLanding() {
           </div>
           <div className="p-4 bg-white/5 border border-white/10 rounded-lg text-center">
             <Users className="w-5 h-5 mx-auto mb-2 text-[#06B6D4]" />
-            <div className="text-xs text-slate-300">Acesso 90 dias<br/>pra implantar</div>
+            <div className="text-xs text-slate-300">30 dias de apoio<br/>no Nexus</div>
           </div>
         </div>
 
@@ -170,7 +170,7 @@ export default function OsiPublicLanding() {
         <div className="bg-gradient-to-br from-[#06B6D4]/20 to-transparent border border-[#06B6D4]/40 rounded-lg p-8 text-center mb-6">
           <Wallet className="w-6 h-6 mx-auto mb-3 text-[#06B6D4]" />
           <div className="text-xs font-mono uppercase tracking-widest text-slate-400 mb-2">
-            Investimento único · acesso 90 dias
+            Investimento único · 30 dias de apoio no Nexus
           </div>
           <div className="text-4xl font-bold mb-4">
             R$ {PRICE_BRL.toFixed(2).replace('.', ',')}

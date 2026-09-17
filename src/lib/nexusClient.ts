@@ -1,7 +1,7 @@
 // Cliente Supabase secundário pra leitura cross-DB do Nexus.
 // Banco: tkbhhbzhlqsgcwljeesg (anon key, only read).
 // M4.2 (RECONCILIACAO_marketing_2026-05-31.md): mostra ativação Nexus dos
-// compradores OSI durante 90 dias pós-compra.
+// compradores OSI durante o apoio incluído na compra (30 dias desde 16/09/2026).
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
