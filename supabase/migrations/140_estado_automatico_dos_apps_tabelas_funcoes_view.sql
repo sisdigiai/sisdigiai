@@ -49,12 +49,12 @@ create table ops.apps (
   funcao            text,
   proximo           text,
   bloqueio          text,
-  maturidade        smallint check (maturidade between 0 and 100),
+  maturidade        text check (maturidade in ('ideia', 'protótipo', 'em uso interno', 'em uso externo', 'à venda')),
   urls              jsonb not null default '[]'::jsonb,
   repo_path         text,
   ficha_fonte       text not null,                        -- Cockpit/Apps/<app>/ficha.md
   eventos_product   text[] not null default '{}',         -- valores de analytics.events_log.product deste app
-  vendas_fonte      text check (vendas_fonte in ('clearix', 'osi')),
+  vendas_fonte      text check (vendas_fonte in ('v_vendas_clearix', 'hotmart_sales')),   -- nulo = "nenhuma"
   degrau_declarado  smallint check (degrau_declarado between 1 and 5),  -- só quando a prova não está neste banco
   degrau_fonte      text,
   declarado_em      date not null,
@@ -215,15 +215,15 @@ security definer
 set search_path to 'ops', 'public'
 as $function$
 begin
-  if coalesce(p->>'slug','') !~ '^[a-z0-9-]+$' or coalesce(p->>'nome','') = ''
+  if coalesce(p->>'slug','') !~ '^[a-z0-9_-]+$' or coalesce(p->>'nome','') = ''
   or coalesce(p->>'ficha_fonte','') !~ '^Cockpit/Apps/[^/]+/ficha\.md$' or coalesce(p->>'declarado_em','') = '' then
     raise exception 'ficha sem slug valido, nome, ficha_fonte (Cockpit/Apps/<app>/ficha.md) ou declarado_em.';
   end if;
   insert into ops.apps (slug, nome, tier, tagline, funcao, proximo, bloqueio, maturidade, urls, repo_path, ficha_fonte,
                         eventos_product, vendas_fonte, degrau_declarado, degrau_fonte, declarado_em, validade_dias)
   values (p->>'slug', p->>'nome', p->>'tier', p->>'tagline', p->>'funcao', p->>'proximo', p->>'bloqueio',
-          nullif(p->>'maturidade','')::smallint, coalesce(p->'urls', '[]'::jsonb), p->>'repo_path', p->>'ficha_fonte',
-          coalesce(array(select jsonb_array_elements_text(p->'eventos_product')), '{}'), nullif(p->>'vendas_fonte',''),
+          nullif(p->>'maturidade',''), coalesce(p->'urls', '[]'::jsonb), p->>'repo_path', p->>'ficha_fonte',
+          coalesce(array(select x from jsonb_array_elements_text(case jsonb_typeof(p->'eventos_product') when 'array' then p->'eventos_product' when 'string' then jsonb_build_array(p->'eventos_product') else '[]'::jsonb end) x where x not in ('', 'nenhum')), '{}'), nullif(nullif(p->>'vendas_fonte',''), 'nenhuma'),
           nullif(p->>'degrau_declarado','')::smallint, nullif(p->>'degrau_fonte',''),
           (p->>'declarado_em')::date, coalesce(nullif(p->>'validade_dias','')::int, 30))
   on conflict (slug) do update
@@ -282,13 +282,16 @@ ev as (
     left join analytics.events_log l
       on l.product = any (a.eventos_product) and l.occurred_at > now() - interval '30 days'
      and coalesce(l.session_id, '') not ilike 'teste%' and coalesce(l.utm_medium, '') !~* '^teste'
+     and coalesce(l.utm_campaign, '') !~* '^teste\.'   -- palavra reservada do contrato de link
    group by a.slug
 ),
 ven as (
   select a.slug,
          case a.vendas_fonte
-           when 'clearix' then (select count(*) from public.v_vendas_clearix)
-           when 'osi'     then (select count(*) from marketing.hotmart_sales where status = 'approved')
+           -- v_vendas_clearix já exclui billing.subscribers.teste (migration 130); hotmart_sales_teste nunca entra
+           when 'v_vendas_clearix' then (select count(*) from public.v_vendas_clearix)
+           when 'hotmart_sales'    then (select count(*) from marketing.hotmart_sales
+                                          where status = 'approved' and coalesce(utm_campaign, '') !~* '^teste\.')
            else 0 end as vendas_mercado
     from ops.apps a
 )
@@ -344,5 +347,81 @@ with (security_invoker = on) as
 
 revoke all on public.v_ops_apps_estado, public.v_ops_reconfirmar from public, anon;
 grant select on public.v_ops_apps_estado, public.v_ops_reconfirmar to authenticated, service_role;
+
+-- ── provas de comportamento, desfeitas na hora ────────────────────────────────
+do $$
+declare v jsonb;
+begin
+  begin
+    perform ops.fn_atualizar_ficha_app(jsonb_build_object(
+      'slug', 'prova_140', 'nome', 'Prova 140', 'ficha_fonte', 'Cockpit/Apps/prova_140/ficha.md',
+      'maturidade', 'protótipo', 'eventos_product', 'prova-140', 'vendas_fonte', 'hotmart_sales',
+      'declarado_em', (now() at time zone 'America/Sao_Paulo')::date - 40, 'validade_dias', 30));
+
+    -- teste nunca conta como uso: sessão teste*, utm_medium teste*, utm_campaign "teste."
+    insert into analytics.events_log (event_code, product, session_id, utm_medium, utm_campaign, occurred_at) values
+      ('landing_visit', 'prova-140', 'teste-140', null, null, now()),
+      ('landing_visit', 'prova-140', 's1', 'teste-eco', null, now()),
+      ('landing_visit', 'prova-140', 's2', 'prospeccao', 'teste.compra_teste.v1', now());
+    if (select eventos_30d from public.v_ops_apps_estado where slug = 'prova_140') <> 0 then
+      raise exception 'PROVA_140_FALHOU: evento de teste contou como uso';
+    end if;
+    insert into analytics.events_log (event_code, product, session_id, occurred_at) values ('landing_visit', 'prova-140', 's3', now());
+    if (select eventos_30d from public.v_ops_apps_estado where slug = 'prova_140') <> 1
+    or (select degrau from public.v_ops_apps_estado where slug = 'prova_140') <> 3 then
+      raise exception 'PROVA_140_FALHOU: evento real nao virou uso (degrau 3)';
+    end if;
+
+    -- venda: compra-teste nunca conta (o gatilho da 131 desvia "teste." para hotmart_sales_teste; o filtro da view é a
+    -- segunda camada); venda de mercado aprovada leva ao degrau 4
+    insert into marketing.hotmart_sales (hotmart_transaction, product_id, status, utm_campaign)
+    values ('PROVA140TESTE', 'prova', 'approved', 'teste.compra_teste.v1');
+    if (select vendas_mercado from public.v_ops_apps_estado where slug = 'prova_140') <> (select count(*) from marketing.hotmart_sales where status = 'approved' and coalesce(utm_campaign,'') !~* '^teste\.')
+    or exists (select 1 from marketing.hotmart_sales where hotmart_transaction = 'PROVA140TESTE') then
+      raise exception 'PROVA_140_FALHOU: compra-teste chegou em hotmart_sales ou contou como venda';
+    end if;
+
+    -- ficha declarada há 40 dias com validade 30 → vencida e na lista de reconfirmar
+    if not (select declaracao_vencida from public.v_ops_apps_estado where slug = 'prova_140')
+    or not exists (select 1 from public.v_ops_reconfirmar where tipo = 'ficha_vencida' and ref = 'prova_140') then
+      raise exception 'PROVA_140_FALHOU: ficha vencida nao aparece para reconfirmar';
+    end if;
+
+    -- portões: fecha só com prova; sumido não fecha; parse vazio recusa
+    v := ops.fn_sincronizar_portoes(
+      '[{"numero":"9001","titulo":"Portao prova A","severidade":1},{"numero":"9002","titulo":"Portao prova B","severidade":2}]'::jsonb,
+      '[]'::jsonb, now() - interval '1 minute');
+    v := ops.fn_sincronizar_portoes('[{"numero":"9001","titulo":"Portao prova A","severidade":1}]'::jsonb,
+      '[{"numero":"9001","data":"2026-09-16","prova":"prova do ensaio","fonte":"ensaio 140"}]'::jsonb, now());
+    if (select indice_estado from ops.pendencias_humanas where fonte = 'Cockpit/portoes-abertos.md#9002') <> 'sumiu_do_indice'
+    or (select status from ops.pendencias_humanas where fonte = 'Cockpit/portoes-abertos.md#9002') <> 'aberta'
+    or (select indice_estado from ops.pendencias_humanas where fonte = 'Cockpit/portoes-abertos.md#9001') <> 'fechado' then
+      raise exception 'PROVA_140_FALHOU: portao sumido fechou, ou fechado com prova nao fechou';
+    end if;
+
+    raise exception 'PROVA_140_OK';
+  exception
+    when others then
+      if sqlerrm <> 'PROVA_140_OK' then raise; end if;
+  end;
+end $$;
+
+do $$
+begin
+  begin
+    perform ops.fn_sincronizar_portoes('[]'::jsonb, '[]'::jsonb, now());
+    raise exception 'PROVA_140_FALHOU: retrato vazio foi aceito';
+  exception
+    when others then
+      if sqlerrm not like 'retrato do indice sem nenhum portao aberto%' then raise; end if;
+  end;
+  begin
+    perform ops.fn_registrar_decisao('{"fonte_arquivo":"Cockpit/decisoes/2026-09-16-prova.md","titulo":"x","decisao":"y","data":"2026-09-16","quem":"dono","onde":"canal"}'::jsonb);
+    raise exception 'PROVA_140_FALHOU: decisao sem palavra foi aceita';
+  exception
+    when others then
+      if sqlerrm not like 'decisao sem titulo, decisao, data, quem, onde ou palavra%' then raise; end if;
+  end;
+end $$;
 
 commit;
