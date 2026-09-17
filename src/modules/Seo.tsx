@@ -105,7 +105,7 @@ export default function Seo() {
               {reauthResultado.ok ? <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" /> : <TriangleAlert className="w-4 h-4 shrink-0 mt-0.5" />}
               <span>
                 {reauthResultado.ok
-                  ? 'Autorização gravada. A próxima coleta diária (06:00) já usa a nova; o botão Sincronizar do card GSC testa agora.'
+                  ? 'Autorização gravada. A próxima coleta diária (06:00) já usa a nova.'
                   : `Não gravou: ${reauthResultado.erro}`}
               </span>
             </div>
