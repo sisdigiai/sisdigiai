@@ -11,8 +11,8 @@
  * POST / { events: [{ event_code, product?, session_id?, url?, utm_*?, metadata? }] }
  *   → { ok, inserted, errors }
  *
- * Só aceita eventos CLIENT-SIDE: os da landing, o da Calc, os gatilhos do leitor OSI e os da
- * landing do Clearix (migration 127).
+ * Só aceita eventos CLIENT-SIDE: os da landing (brinde, suporte e lead-capture pela migration 134),
+ * o da Calc, os gatilhos do leitor OSI e os da landing do Clearix (migration 127).
  * purchase_approved / first_login_nexus são server-side (webhook Hotmart) e ficam de
  * fora pra evitar spoof de conversão. Todo código aceito aqui precisa de linha em
  * analytics.events_catalog (FK) — os do leitor entram pela migration 124.
@@ -31,8 +31,11 @@ const json = (body: unknown, status = 200) =>
     headers: { ...CORS, 'Content-Type': 'application/json' },
   });
 
+// checkout_started saiu em 16/09 (migration 134): nunca disparou — o checkout é da Hotmart e a
+// landing não enxerga o início dele.
 const ALLOWED = new Set([
-  'landing_visit', 'click_checkout', 'checkout_started', 'calc_used',
+  'landing_visit', 'click_checkout', 'calc_used',
+  'click_brinde_calc', 'click_whatsapp_suporte', 'lead_capture_submit',
   'reader_gatilho_view', 'reader_gatilho_click',
   'clearix_site_visit', 'clearix_demo_solicitada', 'clearix_whatsapp_click', 'clearix_cta_click',
 ]);

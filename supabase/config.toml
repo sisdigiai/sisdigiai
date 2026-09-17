@@ -23,3 +23,33 @@ verify_jwt = false
 # Substitui a push-ordem-gj, que sai depois do pull provado (portão 54).
 [functions.roadmap-gj]
 verify_jwt = false
+
+# Chamadas SEM sessão por desenho — medido na Management API em 16/09/2026 (todas verify_jwt=false em
+# produção e, até aqui, sem bloco: um deploy pela CLI sem flag as teria virado para true e derrubado a
+# landing, os webhooks e o health). Declaradas para o repo dizer o que a produção faz.
+#
+# Landings chamam sem chave (keyless first-party); a trava é a allowlist de códigos e de origem.
+[functions.events-ingest]
+verify_jwt = false
+
+# Formulário das landings (sem chave); a trava é validação de payload + service_role só no servidor.
+[functions.lead-capture]
+verify_jwt = false
+
+# Materiais públicos de afiliado (leitura keyless).
+[functions.affiliate-materials-public]
+verify_jwt = false
+
+# Webhooks de terceiros: a autorização é a assinatura/token próprio de cada um (hottok, Kiwify, Mercado Pago).
+[functions.hotmart-webhook]
+verify_jwt = false
+
+[functions.kiwify-webhook]
+verify_jwt = false
+
+[functions.mercadopago-webhook]
+verify_jwt = false
+
+# Sonda de disponibilidade.
+[functions.health]
+verify_jwt = false

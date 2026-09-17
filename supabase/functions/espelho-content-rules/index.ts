@@ -1,7 +1,10 @@
 // espelho-content-rules — serve as travas de marca ao Limelight, por rota gateada
 // ============================================================================
-// ⚠ ESCRITA E NÃO PUBLICADA. Aguarda o "pode" do dono e o segredo digitado por
-//    ele nos dois projetos. Portão 71.
+// ⚠ PUBLICADA E DESLIGADA (medido em 16/09/2026): v3 no ar desde 09/09 16:11 BRT, mas
+//    CONTENT_RULES_LIMELIGHT_SECRET e CONTENT_RULES_LIMELIGHT_BRANDS não existem nos
+//    secrets do projeto — toda chamada responde 503, como o contrato abaixo manda.
+//    Falta só o segredo, digitado pelo dono nos dois projetos. Portão 71.
+//    (Este cabeçalho dizia "não publicada" e ficou para trás do deploy.)
 //
 // POR QUE EXISTE: a edge `gerar-roteiro` do Limelight lia `v_espelho_content_rules`
 // com a ANON KEY DO DIGIAI. Desde 08/09 aquela view não responde a anon, e a
