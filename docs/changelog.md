@@ -2,6 +2,12 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-21 — SEO religada na coleta diária do GSC (147)
+
+- **Por quê:** a tela lia `company.seo_medicoes`, que só tinha a leitura manual de 17/08; a coleta diária gravava em `company.metrics` (sobrescrita, 7d/30d).
+- **Conserto:** `fn_seo_registrar_medicao` (só service_role) + `marketing-sync-gsc` v40 grava 1 linha/site/dia BRT, janela 3m, fonte `gsc-api`; não sobrescreve leitura manual do mesmo dia.
+- **Prova (21/09 23:35):** 3 medições de 21/09; tela SEO mostra digiai 401 imp (+120), clearix pos 17,5, mello 29 cliques (+29) contra 17/08.
+
 ## 2026-09-21 — OSI por dia com dados reais (146) nas duas telas
 
 - **146 aplicada (21/09 23:26:56 BRT, palavra do dono):** régua única `analytics.fn_origem_real` (fora localhost, prévia de deploy, campanha `teste.*`); `v_analytics_funnel_summary` passa a usá-la (osi 163→123, clearix-site 52→47, clearix-calc 43→43); nova `v_mkt_osi_dias` (90 dias BRT, sem PII).

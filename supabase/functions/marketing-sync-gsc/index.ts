@@ -90,9 +90,11 @@ async function syncOneSite(supabase: Supa, accessToken: string, s: SiteRow): Pro
   const end = isoDaysAgo(2);       // GSC tem ~2 dias de atraso
   const start7 = isoDaysAgo(9);
   const start30 = isoDaysAgo(32);
+  const start90 = isoDaysAgo(92);  // janela "3m" da tela SEO (company.seo_medicoes)
 
   const totals7 = await gscQuery(accessToken, SITE_URL, { startDate: start7, endDate: end });
   const totals30 = await gscQuery(accessToken, SITE_URL, { startDate: start30, endDate: end });
+  const totals90 = await gscQuery(accessToken, SITE_URL, { startDate: start90, endDate: end });
   const queries7 = await gscQuery(accessToken, SITE_URL, { startDate: start7, endDate: end, dimensions: ["query"], rowLimit: 5 });
   const pages7 = await gscQuery(accessToken, SITE_URL, { startDate: start7, endDate: end, dimensions: ["page"], rowLimit: 5 });
 
@@ -120,6 +122,7 @@ async function syncOneSite(supabase: Supa, accessToken: string, s: SiteRow): Pro
   if (repErr) throw new Error(`replace_metrics: ${repErr.message}`);
 
   // Saúde do sitemap (best-effort) — popula o card Sitemap a partir do GSC, por site.
+  let smUrls: number | null = null, smPath: string | null = null, smLido: string | null = null;
   try {
     const smUrl = `${GSC_BASE}/${encodeURIComponent(SITE_URL)}/sitemaps`;
     const smR = await fetch(smUrl, { headers: { "Authorization": `Bearer ${accessToken}` } });
@@ -134,7 +137,9 @@ async function syncOneSite(supabase: Supa, accessToken: string, s: SiteRow): Pro
           urls += Number(c.submitted ?? 0);
         }
         if (sm.lastDownloaded) lastRead = String(sm.lastDownloaded).slice(0, 10);
+        if (!smPath && sm.path) smPath = String(sm.path);
       }
+      if (list.length > 0) { smUrls = urls; smLido = lastRead || null; }
       await supabase.rpc("fn_replace_metrics", { p_source: "sitemap", p_site: s.site, p_rows: [
         { metric_type: "gsc_last_read", period: "all_time", value_text: lastRead || "—" },
         { metric_type: "urls_discovered", period: "all_time", value_numeric: urls },
@@ -142,6 +147,20 @@ async function syncOneSite(supabase: Supa, accessToken: string, s: SiteRow): Pro
       ] });
     }
   } catch (_) { /* sitemap best-effort */ }
+
+  // A tela SEO lê company.seo_medicoes (histórico); company.metrics é sobrescrita a cada rodada (147).
+  const t90 = (totals90.rows as Array<Record<string, number>> | undefined)?.[0];
+  const { error: medErr } = await supabase.rpc("fn_seo_registrar_medicao", {
+    p_site: s.site,
+    p_cliques: Math.round(t90?.clicks ?? 0),
+    p_impressoes: Math.round(t90?.impressions ?? 0),
+    p_posicao: t90?.position ?? null,
+    p_ctr_pct: t90 ? (t90.ctr ?? 0) * 100 : null,
+    p_paginas_sitemap: smUrls,
+    p_sitemap_url: smPath,
+    p_sitemap_lido_em: smLido,
+  });
+  if (medErr) throw new Error(`seo_medicao: ${medErr.message}`);
 
   return rows.length;
 }
