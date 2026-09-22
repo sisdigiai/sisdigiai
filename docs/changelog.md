@@ -2,6 +2,12 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-22 — Estado automático dos apps, passo 3: sinais de deploy na nuvem (148)
+
+- Edge `sinais-deploy` + job `sinais-deploy` (7 e 37 de cada hora): abre as URLs de produção de cada ficha em `ops.apps` (repo fica fora), grava 1 sinal `deploy` por app com http e `<meta name="build">`. Sem segredo novo (reusa `marketing_sync_cron_secret`).
+- Prova com app temporário: url quebrada → degrau 1; tudo no ar → degrau 2 "medido: no ar". Apagado depois.
+- **Limite:** `ops.apps` está vazia até o runner do passo 4 (espera o segredo do dono); até lá o job responde "ops.apps vazia".
+
 ## 2026-09-21 — SEO religada na coleta diária do GSC (147)
 
 - **Por quê:** a tela lia `company.seo_medicoes`, que só tinha a leitura manual de 17/08; a coleta diária gravava em `company.metrics` (sobrescrita, 7d/30d).
