@@ -2,6 +2,11 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-21 — OSI por dia com dados reais (146) nas duas telas
+
+- **146 aplicada (21/09 23:26:56 BRT, palavra do dono):** régua única `analytics.fn_origem_real` (fora localhost, prévia de deploy, campanha `teste.*`); `v_analytics_funnel_summary` passa a usá-la (osi 163→123, clearix-site 52→47, clearix-calc 43→43); nova `v_mkt_osi_dias` (90 dias BRT, sem PII).
+- **Card `OsiDiasCard`** (molde do card dos blogs): em OSI › Mapa (30 dias) e Mkt › Radar 360 › Vídeo & motores (segue o recorte e o filtro de marca). Verificado no navegador com login do dono: 58 visitas / 36 sessões de 23/08 a 21/09 = banco.
+
 ## 2026-09-08 — espelho do Pulso passa a vir por função gateada (custo/receita não é anon)
 
 - **Por quê:** `public.v_espelho_pulso` (agregado do Pulso COM custo_caixa/consumo/receita) era lida com a anon key do Pulso — legível por qualquer portador da chave do bundle. O Pulso revogou o anon (certo) e a tela MarketingEspelho ficou vazia.

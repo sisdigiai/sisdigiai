@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { BarChart3, TrendingUp, Users, Eye, Bookmark, Share2, RefreshCw, Loader2, ExternalLink, Sparkles, Target, HeartPulse, Film, Newspaper } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia, diaBrasilia } from '../lib/datas';
+import OsiDiasCard from '../components/OsiDiasCard';
 import { espelhoMotores, type PulsoDia, type LimelightDia, type LimePubDia, type BlogDia, type EspelhoBlogs } from '../lib/espelhoMotores';
 
 // RADAR 360 (2026-08-25) — o analytics social completo do grupo, aprovado em mock.
@@ -277,6 +278,7 @@ export default function MktCrescimento() {
   const codePulso = useMemo(() => brands.find((b) => /pulso/i.test(b.name))?.code ?? '__pulso', [brands]);
   const codeMello = useMemo(() => brands.find((b) => /mello/i.test(b.name))?.code ?? '__mello', [brands]);
   const codeDigiai = useMemo(() => brands.find((b) => /^digiai$/i.test(b.name))?.code ?? '__digiai', [brands]);
+  const codeOsi = useMemo(() => brands.find((b) => /sem improviso/i.test(b.name))?.code ?? '__osi', [brands]);
   const pulsoF = useMemo(() => pulsoDias.filter((d) => noRecorte(d.dia) && (!fRede || d.plataforma === fRede)), [pulsoDias, corteDia, fimDia, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
   const limePubF = useMemo(() => limePub.filter((d) => noRecorte(d.dia) && (!fRede || d.plataforma === fRede)), [limePub, corteDia, fimDia, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
   const blogF = useMemo(() => blogDias.filter((d) => noRecorte(d.dia)), [blogDias, corteDia, fimDia]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -669,6 +671,9 @@ export default function MktCrescimento() {
                     blogsDetalhe={blogPorSlug}
                     sacada={blogPorSlug.length >= 2 && blogPorSlug[0].leituras > 0 ? `${blogPorSlug[0].slug} puxa a rede (${blogPorSlug[0].leituras} leituras)` : undefined} />
                 ) : <MotorVazio titulo="Blogs regionais · 5 sites" motivo={fRede ? 'blogs não têm recorte por rede' : 'filtro de marca exclui os blogs'} />}
+                {(!fMarca || fMarca === codeOsi) && !fRede
+                  ? <OsiDiasCard desde={corteDia} ate={fimDia} cor={COR_SEC} />
+                  : <MotorVazio titulo="OSI · landing e leitor" motivo={fRede ? 'a OSI não tem recorte por rede' : 'filtro de marca exclui a OSI'} />}
               </section>
             </>
           )}

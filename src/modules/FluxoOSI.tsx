@@ -6,6 +6,7 @@ import { funnelStore, calculateFunnelSummary } from '../lib/funnelStore';
 import { marketingStore } from '../lib/marketingStore';
 import { supabase } from '../lib/supabase';
 import { fetchOsiOnboardingSummary, nexusReady, OsiOnboardingSummary } from '../lib/nexusClient';
+import OsiDiasCard from '../components/OsiDiasCard';
 import { TravasBanner } from './TravasMarketing';
 import type { ModuleId } from '../components/Sidebar';
 
@@ -390,6 +391,8 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
           </div>
         );
       })()}
+
+      <OsiDiasCard />
 
       {/* Funil de conversão first-party (analytics.events_log via view) */}
       {funnel.length > 0 && (() => {
