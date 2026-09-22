@@ -2,6 +2,12 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-22 — Estado automático dos apps, passo 4: edge estado-ingest + runner local
+
+- Edge `estado-ingest` v1 (verify_jwt true + `x-estado-secret` contra o secret `ESTADO_INGEST_SECRET`; sem secret → 503, fecha). Repassa fichas, decisões, portões e sinais de repo às funções da 140.
+- Runner `Cockpit/scripts/estado-runner.mjs` (`--dry` só lê) + tarefa do Windows "DIGIAI estado-runner" a cada 30 min, oculta. Ensaio: 16 fichas, 7 não declaradas, 18 portões abertos, 8 fechados com data, 15 repos.
+- **Espera:** o dono digitar o segredo (secrets do projeto + `Cockpit/.env`) e o Geral corrigir 124/125/117 no índice.
+
 ## 2026-09-22 — Estado automático dos apps, passo 3: sinais de deploy na nuvem (148)
 
 - Edge `sinais-deploy` + job `sinais-deploy` (7 e 37 de cada hora): abre as URLs de produção de cada ficha em `ops.apps` (repo fica fora), grava 1 sinal `deploy` por app com http e `<meta name="build">`. Sem segredo novo (reusa `marketing_sync_cron_secret`).
