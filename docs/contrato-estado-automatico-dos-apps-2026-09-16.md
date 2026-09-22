@@ -1,7 +1,7 @@
 # Contrato — estado de cada app e fase atualizado sem mão humana
 
 **Data:** 16/09/2026 · **Autor:** agente do app digiai · **Para:** Orquestrador Geral (revisão) → dono (palavra para DDL/DML)
-**Status:** REVISADO pelo Geral em 16/09 — decisões abaixo. Passo 2 escrito como rascunho: `supabase/migrations/140_estado_automatico_dos_apps_tabelas_funcoes_view.sql` (compila no ensaio; não aplicado).
+**Status (22/09):** passos 2, 3, 5 e 6 NO AR (140, 148, 149, telas); passo 4 construído e agendado, espera o segredo do dono. **Antes:** REVISADO pelo Geral em 16/09 — decisões abaixo. Passo 2 escrito como rascunho: `supabase/migrations/140_estado_automatico_dos_apps_tabelas_funcoes_view.sql` (compila no ensaio; não aplicado).
 
 > **Decisões do Geral (16/09), que prevalecem sobre o texto abaixo:**
 > 1. Medido × declarado com validade: aceito. **Portão NÃO fecha por sumir do índice** — ausência não é prova. Fecha só por entrada na seção **Fechados** de `Cockpit/portoes-abertos.md` (NN · data · prova · fonte). Sumiu sem entrada em Fechados = estado **"sumiu do índice, reconfirmar"** (nunca fechado, nunca apagado). Decisão: só o dono fecha/revoga, por arquivo datado.

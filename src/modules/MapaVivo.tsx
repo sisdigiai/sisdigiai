@@ -1,21 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRight, ExternalLink } from 'lucide-react';
 import type { ModuleId } from '../components/Sidebar';
 import { initEcosystemMesh, initReveal, type EcoMeshNode } from '../lib/dhMesh';
 import { PRODUTOS, TIER_LABEL_CURTO, DEGRAU_LABEL, type ProdutoInfo } from './Portfolio';
 import { roadmapStore } from '../lib/roadmapStore';
+import { useAppsEstado, urlsDaFicha, type AppEstado } from '../lib/appsEstado';
 
-// Verdade única: os nós derivam do índice PRODUTOS do Portfólio (mesma fonte do
-// Placar e da Lista Mestra). Nada de retrato manual — mudou lá, mudou aqui.
+// Os nós são os produtos do Portfólio (identidade); o estado de cada um vem de v_ops_apps_estado
+// (mesma leitura do Placar e da Lista Mestra). Sem ficha no banco = sem estado, e o mapa diz isso.
 
 interface Marca extends EcoMeshNode {
   produto: ProdutoInfo;
+  estado?: AppEstado;
   modulo?: ModuleId;
 }
 
-// Frente com tração = uso real pra cima (degrau ≥ 3) ou alavanca de lançamento
-function temTracao(p: ProdutoInfo): boolean {
-  return (p.degrau ?? 0) >= 3 || p.tier === 'alavanca';
+// Frente com tração = uso real pra cima (degrau ≥ 3, medido ou declarado com fonte) ou alavanca de lançamento
+function temTracao(p: ProdutoInfo, e?: AppEstado): boolean {
+  return (e?.degrau ?? 0) >= 3 || p.tier === 'alavanca';
 }
 
 // Onde abre dentro do painel (senão, abre o app externo pela URL do Portfólio)
@@ -26,26 +28,33 @@ const MODULO_INTERNO: Partial<Record<string, ModuleId>> = {
   'digiai-app': 'visao',
 };
 
-const MARCAS: Marca[] = PRODUTOS.map((p) => ({
-  id: p.slug,
-  label: p.nome,
-  colorVar: p.cor.replace(/^var\(/, '').replace(/\)$/, ''),
-  foco: temTracao(p),
-  produto: p,
-  modulo: MODULO_INTERNO[p.slug],
-}));
 
 interface Props { onNavigate?: (id: ModuleId) => void }
 
 export default function MapaVivo({ onNavigate }: Props) {
-  const [selecionada, setSelecionada] = useState<Marca>(MARCAS[0]);
+  const { porSlug, carregando } = useAppsEstado();
+  const MARCAS: Marca[] = useMemo(() => PRODUTOS.map((p) => {
+    const e = p.ficha ? porSlug.get(p.ficha) : undefined;
+    return {
+      id: p.slug,
+      label: p.nome,
+      colorVar: p.cor.replace(/^var\(/, '').replace(/\)$/, ''),
+      foco: temTracao(p, e),
+      produto: p,
+      estado: e,
+      modulo: MODULO_INTERNO[p.slug],
+    };
+  }), [porSlug]);
+  const [selId, setSelId] = useState<string>(PRODUTOS[0].slug);
+  const selecionada = MARCAS.find(m => m.id === selId) ?? MARCAS[0];
+  const setSelecionada = (m: Marca) => setSelId(m.id);
   const [faseAtual, setFaseAtual] = useState<number | null>(null);
   const selRef = useRef(MARCAS[0].id);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current || carregando) return;
     return initEcosystemMesh(
       canvasRef.current,
       MARCAS,
@@ -55,7 +64,7 @@ export default function MapaVivo({ onNavigate }: Props) {
       },
       () => selRef.current,
     );
-  }, []);
+  }, [MARCAS, carregando]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => (rootRef.current ? initReveal(rootRef.current) : undefined), []);
   useEffect(() => {
     roadmapStore.listPhases().then((ps) => {
@@ -65,8 +74,10 @@ export default function MapaVivo({ onNavigate }: Props) {
   }, []);
 
   const foco = MARCAS.filter(m => m.foco);
-  const noAr = PRODUTOS.filter(p => p.estado === 'no-ar').length;
+  const noAr = MARCAS.filter(m => (m.estado?.degrau ?? 0) >= 2).length;
   const sel = selecionada.produto;
+  const selE = selecionada.estado;
+  const selUrl = selE ? urlsDaFicha(selE.urls).find(u => !/github\.com/.test(u.url))?.url : undefined;
 
   return (
     <div ref={rootRef} className="min-h-full flex flex-col">
@@ -103,21 +114,22 @@ export default function MapaVivo({ onNavigate }: Props) {
               <span className="w-2.5 h-2.5 shrink-0" style={{ background: sel.cor }} />
               <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">{sel.nome} · {TIER_LABEL_CURTO[sel.tier]}</span>
             </div>
-            <p className="font-serif text-base leading-relaxed text-on-surface mb-4">{sel.tagline}</p>
-            <div className="mb-4">
-              <div className="flex items-baseline justify-between gap-4 border-t border-outline/15 py-2">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Maturidade</span>
-                <span className="text-sm text-right text-success font-medium tabular-nums">{sel.maturidade}%</span>
+            <p className="font-serif text-base leading-relaxed text-on-surface mb-4">{selE?.tagline ?? (selE === undefined && !carregando ? 'Não declarado — sem ficha no banco.' : '')}</p>
+            {selE && (
+              <div className="mb-4">
+                <div className="flex items-baseline justify-between gap-4 border-t border-outline/15 py-2">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Degrau</span>
+                  <span className="text-sm text-right text-on-surface">{selE.degrau} · {DEGRAU_LABEL[selE.degrau]}</span>
+                </div>
+                <div className="border-t border-outline/15 py-2 text-[11px] text-muted">{selE.degrau_por}</div>
+                {selE.funcao && (
+                  <div className="border-t border-outline/15 py-2">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Função hoje</span>
+                    <p className="text-[12px] text-on-surface leading-snug mt-1 line-clamp-3">{selE.funcao}</p>
+                  </div>
+                )}
               </div>
-              <div className="flex items-baseline justify-between gap-4 border-t border-outline/15 py-2">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Estado</span>
-                <span className="text-sm text-right text-on-surface">{sel.estado === 'no-ar' ? 'No ar' : sel.estado === 'travado' ? 'Travado' : sel.estado === 'funciona' ? 'Funciona' : 'Protótipo'}{sel.degrau ? ` · ${DEGRAU_LABEL[sel.degrau]}` : ''}</span>
-              </div>
-              <div className="border-t border-outline/15 py-2">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-muted">Função hoje</span>
-                <p className="text-[12px] text-on-surface leading-snug mt-1 line-clamp-3">{sel.funcao}</p>
-              </div>
-            </div>
+            )}
             {selecionada.modulo && (
               <button
                 onClick={() => onNavigate?.(selecionada.modulo!)}
@@ -126,9 +138,9 @@ export default function MapaVivo({ onNavigate }: Props) {
                 Abrir no painel <ArrowRight className="w-4 h-4" />
               </button>
             )}
-            {!selecionada.modulo && sel.url && (
+            {!selecionada.modulo && selUrl && (
               <a
-                href={sel.url} target="_blank" rel="noreferrer"
+                href={selUrl} target="_blank" rel="noreferrer"
                 className="w-full flex items-center justify-center gap-2 border border-outline/30 text-on-surface px-4 py-2.5 text-sm font-medium hover:border-action/50 transition-colors"
               >
                 Abrir app externo <ExternalLink className="w-4 h-4" />
@@ -156,13 +168,13 @@ export default function MapaVivo({ onNavigate }: Props) {
               <span className="w-2 h-2 shrink-0" style={{ background: m.produto.cor }} />
               <span className="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant">{m.produto.nome}</span>
             </div>
-            <div className="text-sm text-on-surface">Maturidade: <span className="text-success tabular-nums">{m.produto.maturidade}%</span>{m.produto.degrau ? <span className="text-muted"> · {DEGRAU_LABEL[m.produto.degrau]}</span> : null}</div>
+            <div className="text-sm text-on-surface">{m.estado ? <>{DEGRAU_LABEL[m.estado.degrau]} <span className="text-muted">· degrau {m.estado.degrau}</span></> : <span className="text-muted">não declarado</span>}</div>
           </button>
         ))}
       </div>
 
       <div className="px-6 py-3 text-[10px] font-mono text-muted border-t border-outline/10">
-        Fonte viva: índice PRODUTOS do Portfólio (mesma verdade do Placar e da Lista Mestra) + fase atual do Roadmap
+        Fonte viva: v_ops_apps_estado (fichas + medição de deploy e repo; mesma leitura do Placar e da Lista Mestra) + fase atual do Roadmap
       </div>
     </div>
   );

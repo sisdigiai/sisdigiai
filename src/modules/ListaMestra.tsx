@@ -5,6 +5,7 @@ import { roadmapStore } from '../lib/roadmapStore';
 import { realtimeStore } from '../lib/realtimeStore';
 import { hojeBrasilia } from '../lib/datas';
 import { PRODUTOS, PRODUTO_BY_SLUG, DEGRAU_LABEL, type ProdutoInfo } from './Portfolio';
+import { useAppsEstado } from '../lib/appsEstado';
 import PageHeader from '../components/PageHeader';
 
 type Fonte = 'Backlog' | 'Roadmap';
@@ -88,6 +89,8 @@ function Escada({ degrau }: { degrau: number }) {
 
 export default function ListaMestra() {
   const [items, setItems] = useState<MasterItem[] | null>(null);
+  const { porSlug: estadoApps } = useAppsEstado();
+  const degrauDe = (info?: ProdutoInfo) => (info?.ficha ? estadoApps.get(info.ficha)?.degrau : undefined);
   const [vista, setVista] = useState<Vista>('produto');
   const [fonte, setFonte] = useState<'todos' | Fonte>('todos');
   const [status, setStatus] = useState<'todos' | StatusNorm>('todos');
@@ -200,11 +203,11 @@ export default function ListaMestra() {
       };
     });
     const comPendencia = all.filter(g => g.items.length > 0)
-      .sort((a, b) => b.bloqueados - a.bloqueados || b.abertos - a.abertos || (a.info?.maturidade ?? 0) - (b.info?.maturidade ?? 0));
+      .sort((a, b) => b.bloqueados - a.bloqueados || b.abertos - a.abertos || (degrauDe(a.info) ?? 0) - (degrauDe(b.info) ?? 0));
     const semPendencia = all.filter(g => g.items.length === 0)
-      .sort((a, b) => (b.info?.maturidade ?? 0) - (a.info?.maturidade ?? 0));
+      .sort((a, b) => (degrauDe(b.info) ?? 0) - (degrauDe(a.info) ?? 0));
     return { grupos: comPendencia, emDia: semPendencia };
-  }, [items, passaFiltro]);
+  }, [items, passaFiltro, estadoApps]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const abertosTotal = (items ?? []).filter(i => i.status !== 'done' && i.status !== 'cancelled').length;
   const bloqueadosTotal = (items ?? []).filter(i => i.status === 'blocked').length;
@@ -310,12 +313,9 @@ export default function ListaMestra() {
                   <div className="flex-1 min-w-0">
                     <div className="font-serif text-base font-semibold text-on-surface truncate">{g.nome}</div>
                     <div className="mt-1 flex items-center gap-3">
-                      {g.info?.degrau
-                        ? <Escada degrau={g.info.degrau} />
-                        : g.info
-                          ? <div className="h-1.5 w-28 bg-surface-lowest overflow-hidden"><div className="h-full" style={{ width: `${g.info.maturidade}%`, background: g.info.cor }} /></div>
-                          : <span className="font-mono text-[9px] uppercase tracking-wider text-muted">frente da holding</span>}
-                      {g.info && <span className="font-mono text-[10px] text-muted tabular-nums">{g.info.maturidade}%</span>}
+                      {degrauDe(g.info)
+                        ? <Escada degrau={degrauDe(g.info)!} />
+                        : <span className="font-mono text-[9px] uppercase tracking-wider text-muted">{g.info ? 'não declarado' : 'frente da holding'}</span>}
                     </div>
                   </div>
                   <div className="text-right shrink-0">
@@ -365,7 +365,7 @@ export default function ListaMestra() {
                       <ProdutoTile info={g.info} slug={g.slug} size={7} />
                       <div className="flex-1 min-w-0">
                         <div className="text-[13px] font-medium text-on-surface truncate">{g.nome}</div>
-                        {g.info && <span className="font-mono text-[9px] text-muted tabular-nums">{g.info.maturidade}% · {g.info.degrau ? DEGRAU_LABEL[g.info.degrau] : g.info.tier}</span>}
+                        {g.info && <span className="font-mono text-[9px] text-muted tabular-nums">{degrauDe(g.info) ? DEGRAU_LABEL[degrauDe(g.info)!] : 'não declarado'}</span>}
                       </div>
                       <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0" />
                     </div>

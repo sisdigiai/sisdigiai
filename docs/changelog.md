@@ -2,6 +2,13 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-22 — Estado automático dos apps, passos 5 e 6: telas lendo o banco + reconfirmar e virada de fase (149)
+
+- **Portfólio, Lista Mestra e Mapa Vivo** leem `v_ops_apps_estado` (`src/lib/appsEstado.ts`). A constante de estado saiu de `Portfolio.tsx` (maturidade %, estado, função, próximo, bloqueio, git, host, "verificado" de julho, "suíte de 17 apps"); ficou só a identidade (nome, marca, hierarquia, slug do Backlog → slug da ficha). Sem ficha = "não declarado"; view com erro = aviso, sem fallback.
+- Carga inicial das 16 fichas pelo banco (mesmo retrato do runner) + 1ª medição de deploy: 16/16 no ar; 5 com uso real (3 medidos, 2 declarados com fonte). Verificado no navegador com login do dono.
+- **149:** `fn_ordem_maquina_reconfirmar` (ficha vencida / portão que sumiu do índice / decisão vencida → item do dono na ordem do dia) + gate sustentado vira pedido ao dono ("Virar a Fase N — confirmar no Roadmap"). Gerador editado por uma linha, com trava de md5.
+- Runner: comentário ` # ...` no frontmatter não entra no valor (polapetit tinha `validade_dias: 10  # ...`); `validade_dias` não numérico é recusado.
+
 ## 2026-09-22 — Estado automático dos apps, passo 4: edge estado-ingest + runner local
 
 - Edge `estado-ingest` v1 (verify_jwt true + `x-estado-secret` contra o secret `ESTADO_INGEST_SECRET`; sem secret → 503, fecha). Repassa fichas, decisões, portões e sinais de repo às funções da 140.
