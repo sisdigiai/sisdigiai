@@ -11,7 +11,7 @@ type Camp = { utm_source: string; utm_campaign: string; usos: number; sessoes: n
 type Dia = { dia: string; usos: number; sessoes: number; leads: number };
 
 const nf = (n: number) => n.toLocaleString('pt-BR');
-const CALC_URL = 'https://clearixcalc.netlify.app';
+const CALC_URL = 'https://calc.clearix.app.br';
 
 export default function MktCalc() {
   const [uso, setUso] = useState<Uso[]>([]);

@@ -33,7 +33,7 @@
     },
     {
       "id": "msg_brinde_calc_abertura",
-      "contexto": "Brinde Clearix Calc — abertura fria de fricção zero, só entrega (sem pedir nada). Trocar [LINK_CALC] por https://clearixcalc.netlify.app/",
+      "contexto": "Brinde Clearix Calc — abertura fria de fricção zero, só entrega (sem pedir nada). Trocar [LINK_CALC] por https://calc.clearix.app.br/",
       "mensagem": "Oi! Você trabalha com ótica, então acho que isso vai te servir.\n\nÉ a Clearix Calc — uma calculadora óptica grátis: transposição, espessura de lente (com desenho da lente em corte!), distância ao vértice, DNP/DP… tudo num link só.\n\nSem cadastro, funciona offline, instala no celular do balcão: [LINK_CALC]\n\nUsa à vontade. Qualquer dúvida me chama."
     },
     {

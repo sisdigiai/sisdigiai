@@ -19,7 +19,7 @@ superseded_by: null
 > resolve a **conversa que vende**; o Clearix resolve a **rotina inteira da ótica**.* Cada passo
 > entrega valor real antes de pedir qualquer coisa.
 
-- **Calculadora:** https://clearixcalc.netlify.app/ (grátis, sem login, instala no celular, offline)
+- **Calculadora:** https://calc.clearix.app.br/ (grátis, sem login, instala no celular, offline)
 - **Landing OSI:** https://landingoticasemimproviso.netlify.app/ (link recíproco — a calc já aponta pra cá)
 - **Clearix:** https://clearix.app.br/
 
@@ -85,7 +85,7 @@ Use estes ganchos para qualquer canal. Cada cálculo é uma porta para uma dor c
 
 ## 4. Mensagens de WhatsApp — abertura com o brinde
 
-> Trocar `[LINK_CALC]` por `https://clearixcalc.netlify.app/` (ou link com sua UTM/afiliado) e
+> Trocar `[LINK_CALC]` por `https://calc.clearix.app.br/` (ou link com sua UTM/afiliado) e
 > `[LINK_OSI]` por `https://landingoticasemimproviso.netlify.app/`.
 
 ### Mensagem 1 — Abertura fria (frio → morno, só entrega)
