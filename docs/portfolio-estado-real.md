@@ -1,5 +1,10 @@
 # Portfólio DIGIAI — Estado Real dos Apps
 
+> ⛔ **SUPERADO em 22/09/2026.** O estado de cada app não mora mais em documento nem em constante: vem de
+> `public.v_ops_apps_estado` (ficha declarada em `Cockpit/Apps/<app>/ficha.md` + deploy e repo medidos por máquina).
+> Este arquivo fica como registro do levantamento de 10/07/2026. Endereços atualizados em 23/09: Hub `app.clearix.app.br`,
+> calculadora `calc.clearix.app.br`.
+
 > Levantamento mecânico das pastas em `D:\projetos` (git + deploy config + README/AGENTS).
 > Data: 2026-07-10. Fonte para os cards do módulo Portfólio (`#/portfolio`).
 > Legenda de estado: **NO AR** (deploy ativo confirmado) · **FUNCIONA** (infra pronta, deploy provável/não 100% confirmado) · **TRAVADO** (bloqueio real) · **PROTÓTIPO** (sem deploy).
@@ -33,7 +38,7 @@ Cada URL foi aberta no navegador. Resultado real:
 | Marca | URL testada | Online |
 |---|---|---|
 | Clearix site | `clearix.app.br` | ✅ vivo |
-| Clearix Hub | `clearixhub.netlify.app` | ✅ vivo (login) |
+| Clearix Hub | `app.clearix.app.br` | ✅ vivo (login) |
 | Clearix Atlas | `digiaiatlas.netlify.app` | ✅ vivo (atrás do SSO; `returnTo` aponta pra localhost — bug de config) |
 | OSI leitor | `oticasemimproviso.netlify.app` | ✅ vivo |
 | OSI landing | `landingoticasemimproviso.netlify.app` | ✅ vivo |

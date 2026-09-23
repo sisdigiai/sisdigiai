@@ -132,7 +132,7 @@
 
 ### 🔴 Bug 1 — convite por e-mail não chega  (CAUSA CONFIRMADA NO CÓDIGO)
 - Fluxo: `clearix_hub/src/app/(dashboard)/users/actions.ts:417` chama `admin.auth.admin.inviteUserByEmail()`. **Não há provedor de e-mail próprio** (Resend/SES) no código → entrega depende 100% do **SMTP do Supabase Auth** (config de dashboard, fora do repo) e do `redirectTo` (linha 415) que usa `NEXT_PUBLIC_SITE_URL` — **não definido no .env** → cai pra localhost/Vercel, podendo não bater com os redirect URLs permitidos.
-- **Correções:** (a) [dono] configurar SMTP próprio no Supabase Auth; (b) [código] definir `NEXT_PUBLIC_SITE_URL=https://clearixhub.netlify.app`; (c) logar o `authError` do invite. **Workaround que JÁ funciona** (vai pro manual): "Esqueci minha senha" na tela de login (`resetPasswordForEmail`).
+- **Correções:** (a) [dono] configurar SMTP próprio no Supabase Auth; (b) [código] definir `NEXT_PUBLIC_SITE_URL=https://app.clearix.app.br`; (c) logar o `authError` do invite. **Workaround que JÁ funciona** (vai pro manual): "Esqueci minha senha" na tela de login (`resetPasswordForEmail`).
 
 ### 🔴 Bug 2 — "hub vazio / sem apps no 1º acesso"  (NÃO é bug universal)
 - **Banco confirma:** o sandbox Essencial (2c72ff48) tem **1 linha `admin` ativa + pacote atribuído** → um admin desse tenant **deveria ver os tiles**. Sem duplicatas de `(tenant_id, role_code)` em todo o banco.

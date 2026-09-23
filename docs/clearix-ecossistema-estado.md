@@ -6,7 +6,7 @@
 
 ## Verificação online (Chrome Junior, logado)
 
-- **Hub** (`clearixhub.netlify.app`) ✅ — control plane multi-tenant vivo: **4 tenants** (Mello real + 3 sandboxes), **93 usuários** (26 ativos), **11 papéis** (RBAC), **34 entregas** rastreadas (25 atrasadas). Lançador SSO pra 16 apps + Universidade.
+- **Hub** (`app.clearix.app.br`) ✅ — control plane multi-tenant vivo: **4 tenants** (Mello real + 3 sandboxes), **93 usuários** (26 ativos), **11 papéis** (RBAC), **34 entregas** rastreadas (25 atrasadas). Lançador SSO pra 16 apps + Universidade.
 - **BI** (`clearixbi.netlify.app`) ✅ — Command Center executivo com dados reais: financeiro (262 lançamentos, R$28,6k receber / R$67,4k pagar, 100 parcelas vencidas, saldo −R$38,8k), Saúde do Ecossistema (Vendas 62 pedidos, Pacientes 10k, Estoque 1.866 SKUs, Growth, Loyalty), reconciliação Vendas↔DRE, DRE completo.
 
 **Conclusão:** o Clearix é uma **suíte SaaS multi-tenant de varejo óptico em produção real** (dados vivos do Mello atravessando vendas, finance, estoque, RH, BI). O que trava não é a tecnologia — é comercial/jurídico (DPA / gap ADR-0020 pra 1ª venda externa).
@@ -15,7 +15,7 @@
 
 | Sub-app | URL | Stack | O que faz | Evidência real |
 |---|---|---|---|---|
-| **Hub** | clearixhub.netlify.app | Next 16 | Gateway SSO (ticket AES-256, 60s) + admin: tenants, usuários, lojas, papéis, compliance, marcas, custos IA, agentes IA, GEO | 4 tenants · 93 users · 11 papéis |
+| **Hub** | app.clearix.app.br | Next 16 | Gateway SSO (ticket AES-256, 60s) + admin: tenants, usuários, lojas, papéis, compliance, marcas, custos IA, agentes IA, GEO | 4 tenants · 93 users · 11 papéis |
 | **Vendas** | clearixvendas.netlify.app | Next 15 | PDV: caixa, carnês, clientes, orçamentos, contratos, produtos, lentes, anamnese, autorização | códigos reais `042-2026-XXXXX` |
 | **Estoque** | clearixestoque.netlify.app | SvelteKit 2 | Inventário: entrada/saída/ajuste/transferência, barcode, etiquetas QR, fotos catálogo (remoção fundo IA), notas-entrada | 1.716 produtos Mello |
 | **Lens** | clearixlens.netlify.app | SvelteKit 2 | Catálogo de lentes + pricing engine (SKU, tabela por tenant), simulador de receita, ranking; alimenta Vendas e DCL | — |
@@ -51,7 +51,7 @@ Vivem na pasta `clearix_eco_full/` mas são produtos/ferramentas à parte:
 
 | App | URL | O que é | Onde aparece |
 |---|---|---|---|
-| **Clearix Calc** | clearixcalc.netlify.app | Calculadora de grau (PWA grátis, sem login) — isca do Clearix; 13 calculadoras | **card próprio** no Portfólio (Suporte) |
+| **Clearix Calc** | calc.clearix.app.br | Calculadora de grau (PWA grátis, sem login) — isca do Clearix; 13 calculadoras | **card próprio** no Portfólio (Suporte) |
 | **Atlas** | digiaiatlas.netlify.app | Organograma visual da suíte (schemas, deps, RPCs, health) — ferramenta interna de arquitetura | app à parte (não é da suíte comercial) |
 
 ## Notas

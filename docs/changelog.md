@@ -2,6 +2,13 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-23 — Endereços novos do Clearix (dono): Hub app.clearix.app.br, calculadora calc.clearix.app.br
+
+- Medido: os dois respondem (Hub 307 → /login; calc 200). Os antigos da Netlify seguem no ar como alias.
+- Código do app já estava certo (`MktCalc.tsx` usa calc.clearix.app.br; `src/modules/clearix/api.ts` não tem mapa de URL — ADR-0060 item (a) já satisfeito) e a ficha/ops.apps do Clearix já trazem app.clearix.app.br pelo runner.
+- Doc corrigida no mesmo turno: `clearix-ecossistema-estado.md`, `comercial/plano-259`, blueprint do pitch. `portfolio-estado-real.md` marcado como SUPERADO (estado vem de `v_ops_apps_estado` desde 22/09).
+- Fora do app: `Cockpit/Spec/calculadora_grau.md` ainda cita clearixcalc.netlify.app — avisado ao Geral (Spec é do agente do app dono).
+
 ## 2026-09-22 — Estado automático dos apps, passos 5 e 6: telas lendo o banco + reconfirmar e virada de fase (149)
 
 - **Portfólio, Lista Mestra e Mapa Vivo** leem `v_ops_apps_estado` (`src/lib/appsEstado.ts`). A constante de estado saiu de `Portfolio.tsx` (maturidade %, estado, função, próximo, bloqueio, git, host, "verificado" de julho, "suíte de 17 apps"); ficou só a identidade (nome, marca, hierarquia, slug do Backlog → slug da ficha). Sem ficha = "não declarado"; view com erro = aviso, sem fallback.
