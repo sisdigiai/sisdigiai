@@ -5,7 +5,6 @@ import { TravasBanner } from './TravasMarketing';
 import ResultadoConteudoCard from './marketing/ResultadoConteudoCard';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia } from '../lib/datas';
-import { clearixSupabase } from '../lib/clearixSupabase';
 import { espelhoMotores, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
 
 // Cadeia de resultados (v_marketing_cadeia + espelhos + uso vivo Clearix).
@@ -81,14 +80,13 @@ export default function MarketingEspelho() {
   const [blogs, setBlogs] = useState<EspelhoBlogs | null>(null);
   const [fatos, setFatos] = useState<FatoMkt[]>([]);
   const [cadeia, setCadeia] = useState<Cadeia | null>(null);
-  const [usoVivoTx, setUsoVivoTx] = useState<number | null>(null);
   const [fila, setFila] = useState<{ atrasados: number; com_erro: number; ultima_publicacao: string | null } | null>(null);
   const [seo, setSeo] = useState<{ cliques: number; impressoes: number; sites: number; medido_em: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
     setLoading(true);
-    const [{ data: e }, { data: m }, { data: p }, ll, pu, bl, { data: f }, { data: cad }, vida, { data: fs }, { data: se }] = await Promise.all([
+    const [{ data: e }, { data: m }, { data: p }, ll, pu, bl, { data: f }, { data: cad }, { data: fs }, { data: se }] = await Promise.all([
       supabase.from('v_mkt_espelho').select('*').maybeSingle(),
       supabase.from('v_mkt_marcas').select('*'),
       supabase.from('v_mkt_publicacoes_recentes').select('*'),
@@ -97,13 +95,10 @@ export default function MarketingEspelho() {
       espelhoMotores.blogs(),
       supabase.from('v_mkt_fatos').select('*'),
       supabase.from('v_marketing_cadeia').select('*').maybeSingle(),
-      clearixSupabase.from('v_admin_tenant_vida').select('transacoes_30d').then((r) => r, () => ({ data: null })),
       supabase.from('v_mkt_fila_saude').select('atrasados, com_erro, ultima_publicacao').maybeSingle(),
       supabase.from('v_seo_estado').select('cliques, impressoes, medido_em'),
     ]);
     setCadeia((cad ?? null) as Cadeia | null);
-    const rows = (vida as { data: { transacoes_30d: number }[] | null }).data;
-    setUsoVivoTx(rows ? rows.reduce((s, t) => s + (t.transacoes_30d || 0), 0) : null);
     setFila((fs ?? null) as { atrasados: number; com_erro: number; ultima_publicacao: string | null } | null);
     const seoRows = (se ?? []) as { cliques: number | null; impressoes: number | null; medido_em: string | null }[];
     setSeo(seoRows.length ? {
@@ -172,7 +167,7 @@ export default function MarketingEspelho() {
                 { rotulo: 'captar', valor: String(cadeia.leads_30d), sub: 'leads 30d', stamp: carimbo(cadeia.ultimo_lead, 14), zero: cadeia.leads_30d === 0 },
                 { rotulo: 'prospectar', valor: String(cadeia.disparos_30d), sub: 'disparos OSI 30d', stamp: carimbo(cadeia.ultimo_disparo, 7), zero: cadeia.disparos_30d === 0 },
                 { rotulo: 'vender', valor: cadeia.vendas_30d > 0 ? `${cadeia.vendas_30d} · ${brl(cadeia.receita_30d_brl)}` : '0', sub: 'vendas 30d', stamp: carimbo(cadeia.ultima_venda, 30), zero: cadeia.vendas_30d === 0 },
-                { rotulo: 'provar', valor: usoVivoTx != null ? usoVivoTx.toLocaleString('pt-BR') : '—', sub: 'transações 30d no Clearix · só nosso', stamp: usoVivoTx != null ? { txt: 'vivo', ruim: false } : { txt: 'sem leitura', ruim: true } },
+                { rotulo: 'provar', valor: '—', sub: 'uso do Clearix mora no banco dele (ADR-0001): ver na Central Clearix', stamp: { txt: 'outra porta', ruim: false } },
               ];
               return (
                 <div className="border border-outline/15 bg-surface-container">
@@ -456,7 +451,7 @@ export default function MarketingEspelho() {
                 { nome: 'Blogs regionais (5 sites)', chave: blogs ? `${blogs.posts_no_ar} posts · ${blogs.leituras_total} leituras` : '—', quando: blogs?.ultima_leitura ?? null, href: '#/marketing', destino: 'acima' },
                 { nome: 'Vendas (canais Hotmart/Kiwify/MP)', chave: cadeia ? `${cadeia.vendas_30d} vendas 30d` : '—', quando: cadeia?.ultima_venda?.slice(0, 10) ?? null, href: '#/vendas', destino: 'Vendas', alerta: (cadeia?.vendas_30d ?? 0) === 0 },
                 { nome: 'OSI (funil + prospeccao)', chave: cadeia ? `${cadeia.disparos_30d} disparos 30d` : '—', quando: cadeia?.ultimo_disparo?.slice(0, 10) ?? null, href: '#/fluxo-osi', destino: 'OSI', alerta: cadeia ? (Date.now() - new Date(cadeia.ultimo_disparo ?? 0).getTime()) / 864e5 > 7 : false },
-                { nome: 'Uso vivo Clearix (prova interna)', chave: usoVivoTx != null ? `${usoVivoTx.toLocaleString('pt-BR')} transacoes 30d` : '—', quando: null, href: '#/clearix', destino: 'Central Clearix' },
+                { nome: 'Uso vivo Clearix (prova interna)', chave: 'lido na Central Clearix, com o login dela', quando: null, href: '#/clearix', destino: 'Central Clearix' },
                 { nome: 'Fatos publicaveis (trava por marca)', chave: `${fatos.filter((x) => x.fresco).length}/${fatos.length} frescos`, quando: null, href: '#/marketing', destino: 'abaixo' },
                 { nome: 'Scorecard da semana', chave: 'metas + preenchimento automatico', quando: null, href: '#/semana', destino: 'Semana' },
               ] as { nome: string; chave: string; quando: string | null; href: string; destino: string; alerta?: boolean }[]).map((fonte) => {

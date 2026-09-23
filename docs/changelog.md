@@ -2,6 +2,13 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-23 — Console limpo: os 3 erros que apareciam em toda navegação
+
+- **Espelhos "desligados" no local:** faltavam `VITE_{PULSO,LIMELIGHT,BLOGS}_SUPABASE_*` no `.env` da máquina (produção já as tinha). Preenchidas com as chaves ANON públicas — as mesmas do bundle publicado. `.env` é gitignored; `.env.example` já documentava as chaves.
+- **CORS do `espelho-pulso`:** a lista de origens tinha `localhost:5173/5183` (Vite antigo) e não a porta real do dev (3000/3100). Publicada com as portas certas; preflight de localhost:3000 responde 200 com a origem certa.
+- **401 em `v_admin_tenant_vida`:** o Espelho do MKT lia o banco do Clearix direto, sem sessão dele — proibido pela [ADR-0001] e sempre 401, aqui e em produção. A leitura saiu; o campo aponta para a Central Clearix, que tem o login próprio (`TabTenants` segue lendo lá dentro, depois do portão).
+- Prova: aba nova, 28 rotas percorridas — 0 requisição ≥400 e 0 erro de console.
+
 ## 2026-09-23 — Padronização das páginas (dono): moldura única, mesma largura, mesmo cabeçalho
 
 - `App.tsx` passa a envolver toda página numa moldura única (`max-w-7xl mx-auto px-4 md:px-8 py-8`, alinhada à barra de comando). **Exceção: Mapa Vivo**, que segue em tela cheia por causa da malha.

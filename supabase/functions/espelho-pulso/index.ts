@@ -20,6 +20,8 @@ const ORIGENS = new Set([
   'https://digiai-telao.pages.dev',
   'http://localhost:5173',
   'http://localhost:5183',
+  'http://localhost:3000',   // porta real do dev do digiai (5173/5183 eram do Vite antigo)
+  'http://localhost:3100',
 ]);
 
 function cors(req: Request): Record<string, string> {
