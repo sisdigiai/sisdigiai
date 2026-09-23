@@ -214,18 +214,50 @@ Roteamento real em `App.tsx` (`activeModule` por estado, nÃ£o por URL). **~22 
 - Mudar verdades canÃ´nicas, decisÃµes registradas ou ADRs sem ADR formal
 - Tratar este app como produto comercial (Ã© infraestrutura interna por Verdade CanÃ´nica)
 
-## 9. Secrets
+## 9. Variáveis (R-042)
 
-- **Onde:** sempre via `.env` na raiz do app â€” nunca hardcoded
-- **VariÃ¡veis exigidas (mas opcionais para dev â€” modo fallback):**
-  - `VITE_SUPABASE_URL` â€” `https://hswyopqvnolqpmprqvzh.supabase.co` (banco prÃ³prio digiai)
-  - `VITE_SUPABASE_ANON_KEY` â€” anon public key do projeto digiai
-- **VariÃ¡veis opcionais:**
-  - `VITE_CLEARIX_SUPABASE_URL` â€” projeto Clearix (para mÃ³dulo Central Clearix â€” auth super_admin separado)
-  - `VITE_CLEARIX_SUPABASE_ANON_KEY`
-  - `VITE_ATLAS_URL` â€” default `https://digiaiatlas.netlify.app` (link no header)
-- **Edge functions (secrets no Supabase Vault / Dashboard, NÃƒO em `.env`):** `HOTMART_HOTTOK` (webhook Hotmart), credenciais GSC/Bing/Cloudflare do Marketing & SEO. **R-021:** as 3 credenciais de Marketing & SEO foram cadastradas em 2026-05-28 â†’ **rotacionar atÃ© 2026-08-26**.
-- **NUNCA commitar `.env*`** â€” `.gitignore` cobre `.env*` e `.mcp.json` (verificado).
+> Levantado do código em 23/09/2026: `import.meta.env.*` no `src/` (build) e `Deno.env.get()` nas 22 edge functions.
+> **Quem digita segredo é o dono** (R-042 §6); o agente só prepara o nome e o lugar. `.env*` nunca vai ao git.
+
+### 9.1 Públicas de build (vão ao navegador — nunca um segredo aqui)
+
+Ficam no `.env` local e no painel da Cloudflare Pages (projeto `digiai-app`). Todas são endereço ou **anon key**, que é pública por desenho.
+
+| Nome | Para quê | Sem ela |
+|---|---|---|
+| `VITE_SUPABASE_URL` · `VITE_SUPABASE_ANON_KEY` | banco próprio do digiai (`hswyopqvnolqpmprqvzh`) | app cai no modo offline, sem login |
+| `VITE_CLEARIX_SUPABASE_URL` · `VITE_CLEARIX_SUPABASE_ANON_KEY` | Central Clearix (login próprio do Clearix, ADR-0001) | a aba mostra o aviso de configuração |
+| `VITE_NEXUS_SUPABASE_URL` · `VITE_NEXUS_SUPABASE_ANON_KEY` | leitura do onboarding OSI no Nexus | o bloco do Nexus fica vazio |
+| `VITE_PULSO_SUPABASE_URL` · `VITE_PULSO_SUPABASE_ANON_KEY` | espelho do Pulso (séries por dia) | "espelho desligado" no console e card vazio |
+| `VITE_LIMELIGHT_SUPABASE_URL` · `VITE_LIMELIGHT_SUPABASE_ANON_KEY` | espelho do Limelight | idem |
+| `VITE_BLOGS_SUPABASE_URL` · `VITE_BLOGS_SUPABASE_ANON_KEY` | espelho dos blogs (Ecoax) | idem |
+
+### 9.2 Segredos de execução (só no servidor — secrets do projeto Supabase, nunca no `.env` do front)
+
+Lidos por edge function deste repo. **Nenhum tem prefixo `VITE_`** — se algum ganhar, vai ao navegador de qualquer visitante.
+
+| Nome | Quem usa | Para quê |
+|---|---|---|
+| `SUPABASE_URL` · `SUPABASE_SERVICE_ROLE_KEY` · `SUPABASE_ANON_KEY` | todas | a função fala com o próprio banco (o service role passa por cima da RLS) |
+| `HOTMART_HOTTOK` | `hotmart-webhook` | prova que o webhook é da Hotmart |
+| `KIWIFY_WEBHOOK_TOKEN` | `kiwify-webhook` | idem, Kiwify |
+| `MP_ACCESS_TOKEN` · `MP_WEBHOOK_SECRET` | `mercadopago-webhook`, `mp-sync` | cobrança Mercado Pago |
+| `ESPELHO_SECRET` · `PULSO_URL` · `PULSO_ESPELHO_ROTA` | `espelho-pulso` | lê o espelho do Pulso pela rota dele (a chave-mestra do Pulso **não** mora aqui — portão 38) |
+| `PULSO_ANON_KEY` | `verificar-fatos` | confere fato publicável contra o Pulso |
+| `ESPELHO_DIGIAI_TOKEN` | `sync-aporte-digiai` | espelho do custo de infra vindo do Finance |
+| `ESPELHO_TELAO_TOKEN` | `sync-telao-bi` | espelho do telão |
+| `CONTENT_RULES_LIMELIGHT_SECRET` · `CONTENT_RULES_LIMELIGHT_BRANDS` | `espelho-content-rules` | travas de conteúdo servidas ao Limelight |
+| `GJ_URL` · `GJ_SERVICE_ROLE_KEY` · `GJ_USER_ID` | `push-ordem-gj` | empurra a ordem para o app GJ (banco próprio dele) |
+| `ROADMAP_GJ_SECRET` | `roadmap-gj` | portão do roadmap do GJ |
+| `ESTADO_INGEST_SECRET` | `estado-ingest` | só o runner local do Cockpit entra (passo 4 do estado automático) |
+
+O segredo do cron das coletas (`marketing_sync_cron_secret`) e a `supabase_anon_key` usada pelo pg_cron moram no **vault do banco**, não nos secrets da função — quem dispara é o banco (`run_marketing_sync_daily`, `run_sinais_deploy`).
+
+### 9.3 A conferir no painel (auditoria do R-042 §4, aberta)
+
+- O `.env` **local** ainda guarda `MP_ACCESS_TOKEN`, `MP_CLIENT_ID`, `MP_CLIENT_SECRET`, `MP_PUBLIC_KEY`, `TELEGRAM_BOT_TOKEN`, `GITHUB_TOKEN_1` e `SUPABASE_TOKEN` (PAT da conta). Nenhum é lido pelo build; os do Mercado Pago já vivem nos secrets do projeto. **Ficam à espera da palavra do dono** para sair do arquivo — e a rotação vem depois da limpeza, nunca antes.
+- O projeto Supabase é **compartilhado com o digiai_mkt**: secrets como `META_TOKEN*`, `TIKTOK_*`, `LINKEDIN_*`, `YOUTUBE_*`, `OPENAI_API_KEY`, `ELEVENLABS_API_KEY`, `FAL_KEY`, `CLICKUP_TOKEN` e `WA_WEBHOOK_SECRET` são das funções do MKT, não deste app.
+- Falta conferir a lista do painel da **Cloudflare Pages** contra a tabela 9.1 (só o dono enxerga o painel).
 
 ## 10. PendÃªncias conhecidas (do Spec Â§13 + Â§8)
 
