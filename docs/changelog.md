@@ -2,6 +2,13 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-23 — Padronização das páginas (dono): moldura única, mesma largura, mesmo cabeçalho
+
+- `App.tsx` passa a envolver toda página numa moldura única (`max-w-7xl mx-auto px-4 md:px-8 py-8`, alinhada à barra de comando). **Exceção: Mapa Vivo**, que segue em tela cheia por causa da malha.
+- As 28 páginas perderam largura, margem e padding próprios (antes havia 5xl, 7xl, p-6, p-8, min-h-screen misturados).
+- Cabeçalho `PageHeader` agora em todas: Visão, Radar 360 e Clearix Calc tinham cabeçalho próprio; OsiHub perdeu a faixa de abas grudada e usa o cabeçalho de cada aba.
+- Verificado no navegador com login do dono: as 29 rotas começam no mesmo x (240 px) e têm a mesma largura; console sem erro novo.
+
 ## 2026-09-23 — Endereços novos do Clearix (dono): Hub app.clearix.app.br, calculadora calc.clearix.app.br
 
 - Medido: os dois respondem (Hub 307 → /login; calc 200). Os antigos da Netlify seguem no ar como alias.

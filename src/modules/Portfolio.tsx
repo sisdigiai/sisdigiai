@@ -103,7 +103,7 @@ export default function Portfolio() {
   const ranking = [...PRODUTOS].sort((a, b) => (est(b)?.degrau ?? 0) - (est(a)?.degrau ?? 0) || TIER_ORDER.indexOf(a.tier) - TIER_ORDER.indexOf(b.tier));
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+    <div>
       <PageHeader
         eyebrow="Hierarquia Canônica"
         title="Portfólio de Produtos"

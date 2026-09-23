@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { RefreshCw } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 import { dashboardStore, type DashboardSummary } from '../lib/dashboardStore';
 import { commercialStore, type CommercialLead, type LeadStage } from '../lib/commercialStore';
 import { realtimeStore } from '../lib/realtimeStore';
@@ -122,7 +123,12 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
 
   return (
     <div className="text-on-surface">
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 pb-16 space-y-5">
+      <PageHeader
+        eyebrow="Command center"
+        title="Visão"
+        subtitle="O retrato do dia da DIGIAI: foco, fase, motores e dinheiro, lido do banco."
+      />
+      <div className="pb-8 space-y-5">
 
         {/* ===== FOCO DO DIA ===== */}
         <div className="relative border border-outline/25 bg-gradient-to-r from-surface-container to-surface p-5 flex flex-col md:flex-row md:items-center gap-5 overflow-hidden">

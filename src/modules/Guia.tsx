@@ -96,7 +96,7 @@ function Connector({ label }: { label?: string }) {
 
 export default function Guia({ onNavigate }: { onNavigate?: (id: ModuleId) => void }) {
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div>
       <PageHeader
         eyebrow="Como Operar"
         title="Guia Operacional"

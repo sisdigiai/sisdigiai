@@ -85,7 +85,7 @@ export default function Inventario() {
   };
 
   return (
-    <div className="max-w-5xl">
+    <div>
       <PageHeader
         eyebrow="EMPRESA"
         title="Inventário"

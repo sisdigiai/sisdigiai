@@ -67,7 +67,7 @@ export default function Ecossistemas() {
   const orderedKeys = Object.keys(groups).sort((a, b) => groups[b].length - groups[a].length);
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div>
       <PageHeader
         eyebrow="Mapa de apps"
         title="Ecossistemas"

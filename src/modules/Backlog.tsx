@@ -128,7 +128,7 @@ export default function Backlog() {
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div>
       <PageHeader
         eyebrow="Execução"
         title="Backlog Executivo"

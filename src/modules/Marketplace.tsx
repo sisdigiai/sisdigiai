@@ -122,7 +122,7 @@ export default function Marketplace() {
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div>
       <PageHeader
         eyebrow="Operacional · canal primário"
         title="Marketplace"

@@ -22,7 +22,7 @@ export default function CadastroEmpresa() {
   const online = companyStore.isOnline();
 
   return (
-    <div className="max-w-7xl mx-auto p-8">
+    <div>
       <PageHeader
         eyebrow="Registro Canônico"
         title="Cadastro Empresa"

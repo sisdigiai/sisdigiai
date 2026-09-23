@@ -73,7 +73,7 @@ export default function BrandGuidelines() {
   );
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface">
+    <div>
       {/* Abas: identidade da holding + temas de produto registrados no brand */}
       <nav className="sticky top-0 z-20 bg-surface/95 backdrop-blur-sm border-b border-outline/20 px-6 flex gap-2" aria-label="Abas do Brand Guidelines">
         <TabButton id="house" kicker="Holding" label="DIGIAI House" />
@@ -82,7 +82,7 @@ export default function BrandGuidelines() {
       </nav>
 
       {tab === 'clearix' ? <BrandClearixLens /> : tab === 'mkt' ? <BrandMktAtelie /> : (
-    <div ref={rootRef} className="min-h-screen bg-surface text-on-surface selection:bg-secondary selection:text-on-action pb-32">
+    <div ref={rootRef} className="selection:bg-secondary selection:text-on-action pb-8">
       {/* Cover — malha de convergência 3D (dhMesh) */}
       <section className="relative overflow-hidden border-b border-outline/10 min-h-[88vh] flex items-center">
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden />

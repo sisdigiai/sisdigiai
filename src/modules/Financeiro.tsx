@@ -50,7 +50,7 @@ export default function Financeiro() {
   const [tab, setTab] = useState<TabId>('dashboard');
 
   return (
-    <div className="max-w-7xl mx-auto p-8">
+    <div>
       <PageHeader
         eyebrow="Investimento Real"
         title="Financeiro"

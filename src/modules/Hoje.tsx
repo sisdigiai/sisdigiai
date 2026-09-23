@@ -74,7 +74,7 @@ export default function Hoje() {
   const humanosAbertos = abertos.filter((i) => i.dono === 'humano').length;
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div>
       <PageHeader
         eyebrow="Operacional · ordem do dia"
         title={dataLonga(hoje).replace(/^\w/, (c) => c.toUpperCase())}

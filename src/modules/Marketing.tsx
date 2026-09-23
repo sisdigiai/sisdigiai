@@ -41,7 +41,7 @@ export default function Marketing({ view = 'engajamento' }: { view?: MarketingVi
   const tabs = view === 'engajamento' ? ENGAJAMENTO_TABS : null;
 
   return (
-    <div className="h-full flex flex-col max-w-7xl mx-auto w-full">
+    <div className="h-full flex flex-col w-full">
       <div className="px-8 pt-8">
         <PageHeader eyebrow={meta.eyebrow} title={meta.title} subtitle={meta.subtitle} />
         <TravasBanner />

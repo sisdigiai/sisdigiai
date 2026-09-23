@@ -23,7 +23,7 @@ export default function OsiHub({ onNavigate }: { onNavigate?: (id: ModuleId) => 
 
   return (
     <div>
-      <div className="sticky top-0 z-10 flex gap-1 px-6 pt-4 pb-0 bg-surface border-b border-outline/10">
+      <div className="flex gap-1 mb-6 border-b border-outline/10 overflow-x-auto">
         {ABAS.map((a) => (
           <button
             key={a.id}

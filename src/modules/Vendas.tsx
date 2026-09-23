@@ -89,7 +89,7 @@ export default function Vendas() {
   const semVenda = eventos.length === 0;
 
   return (
-    <div className="max-w-5xl">
+    <div>
       <PageHeader
         eyebrow="DINHEIRO"
         title="Vendas"

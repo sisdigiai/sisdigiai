@@ -128,7 +128,7 @@ export default function MarketingEspelho() {
   const pulsoUltimaPubDias = diasDesde(pulso?.ultima_publicacao);
 
   return (
-    <div className="max-w-7xl mx-auto p-8">
+    <div>
       <PageHeader
         eyebrow="Distribuição & conteúdo"
         title="Marketing"

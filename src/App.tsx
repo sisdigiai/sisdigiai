@@ -249,7 +249,11 @@ export default function App() {
           </div>
         </header>
         <main key={activeModule} className="flex-1 overflow-y-auto">
-          {renderContent()}
+          {/* Moldura única de página: mesma largura e alinhamento da barra de comando.
+              Mapa Vivo fica de fora — é tela cheia com a malha 3D. */}
+          {activeModule === 'mapa-vivo'
+            ? renderContent()
+            : <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">{renderContent()}</div>}
         </main>
       </div>
       <CommandPalette onNavigate={navigate} />

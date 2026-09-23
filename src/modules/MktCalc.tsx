@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Calculator, Loader2, ExternalLink } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 import { supabase } from '../lib/supabase';
 
 // Clearix Calc — MOVIDO do app MKT em 2026-08-25 (mesma decisão do Crescimento:
@@ -52,20 +53,18 @@ export default function MktCalc() {
   const lbl = 'font-mono text-[10px] uppercase tracking-widest text-muted';
 
   return (
-    <div className="max-w-7xl mx-auto p-8">
-      <header className="mb-6">
-        <h1 className="flex items-center gap-2.5 font-serif text-2xl font-semibold text-on-surface">
-          <Calculator className="w-5 h-5 text-secondary" /> Clearix Calc
-        </h1>
-        <div className={lbl + ' mt-1'}>isca do funil · telemetria first-party</div>
-        <p className="text-[13px] text-on-surface-variant mt-2 max-w-2xl">
-          A isca do funil do Clearix. Quem usa a calculadora vira público de retargeting —
-          e quem deixa contato vira lead.{' '}
-          <a href={CALC_URL} target="_blank" rel="noreferrer" className="text-secondary inline-flex items-center gap-1 hover:underline">
-            abrir o calc <ExternalLink className="w-3 h-3" />
+    <div>
+      <PageHeader
+        eyebrow="Isca do funil · telemetria first-party"
+        title="Clearix Calc"
+        subtitle="A isca do funil do Clearix. Quem usa a calculadora vira público de retargeting — e quem deixa contato vira lead."
+        actions={
+          <a href={CALC_URL} target="_blank" rel="noreferrer"
+            className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-outline/30 text-on-surface-variant hover:bg-surface-highest">
+            abrir o calc <ExternalLink className="w-3.5 h-3.5" />
           </a>
-        </p>
-      </header>
+        }
+      />
 
       <div className={lbl + ' mb-2'}>funil da isca ▸ 90 dias</div>
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-6">

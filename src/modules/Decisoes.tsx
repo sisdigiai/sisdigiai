@@ -123,7 +123,7 @@ export default function Decisoes() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-8">
+    <div>
       <PageHeader
         eyebrow="Memória Institucional"
         title="Decisões"

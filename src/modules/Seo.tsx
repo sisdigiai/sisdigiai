@@ -79,7 +79,7 @@ export default function Seo() {
   }), [sites]);
 
   return (
-    <div className="max-w-5xl">
+    <div>
       <PageHeader
         eyebrow="PRODUTOS"
         title="SEO"

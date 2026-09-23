@@ -125,7 +125,7 @@ export default function TravasMarketing() {
   }, []);
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div>
       <PageHeader
         eyebrow="Governança"
         title="Travas de Marketing"

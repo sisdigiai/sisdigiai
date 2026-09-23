@@ -112,7 +112,7 @@ export default function Biblioteca() {
   const grupos = [...new Set(docs.map(d => d.categoria))];
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div>
       <PageHeader
         eyebrow="Acervo Canônico"
         title="Biblioteca Central"

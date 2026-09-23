@@ -229,7 +229,7 @@ export default function ListaMestra() {
   );
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div>
       <PageHeader
         eyebrow="Implantação"
         title="Lista Mestra"

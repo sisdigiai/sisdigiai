@@ -19,7 +19,7 @@ export default function Clearix() {
 
   return (
     <ClearixAuthGate>
-      <div className="max-w-7xl mx-auto">
+      <div>
         <div className="px-6 pt-6">
           <PageHeader
             eyebrow="Produto-âncora"

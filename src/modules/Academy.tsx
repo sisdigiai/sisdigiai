@@ -66,7 +66,7 @@ export default function Academy() {
 
   if (loading || !ws) {
     return (
-      <div className="max-w-7xl mx-auto p-8">
+      <div>
         <div className="text-sm text-muted">Carregando Academy…</div>
       </div>
     );
@@ -78,7 +78,7 @@ export default function Academy() {
   const cenarioRecomendado = ws.scenarios.find((s) => s.status === 'recommended');
 
   return (
-    <div className="max-w-7xl mx-auto p-8">
+    <div>
       <PageHeader
         eyebrow="Educação"
         title="Academy"

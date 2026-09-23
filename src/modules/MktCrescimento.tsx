@@ -3,6 +3,7 @@ import { BarChart3, TrendingUp, Users, Eye, Bookmark, Share2, RefreshCw, Loader2
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia, diaBrasilia } from '../lib/datas';
 import OsiDiasCard from '../components/OsiDiasCard';
+import PageHeader from '../components/PageHeader';
 import { espelhoMotores, type PulsoDia, type LimelightDia, type LimePubDia, type BlogDia, type EspelhoBlogs } from '../lib/espelhoMotores';
 
 // RADAR 360 (2026-08-25) — o analytics social completo do grupo, aprovado em mock.
@@ -369,17 +370,18 @@ export default function MktCrescimento() {
   const rotuloRecorte = `${fmtDM(corteDia === '2000-01-01' ? (aud[0]?.dia ?? corteDia) : corteDia)} → ${fmtDM(fimDia)}`;
 
   return (
-    <div className="max-w-7xl mx-auto p-8">
-      <div className="flex items-center gap-3 mb-1">
-        <BarChart3 className="w-5 h-5 text-secondary" />
-        <h1 className="font-serif text-2xl font-semibold text-on-surface">Radar 360</h1>
-        <span className={lbl + ' hidden sm:inline'}>analytics social · todas as redes, canais e marcas</span>
-        <button onClick={sincronizar} disabled={sincronizando}
-          className="ml-auto flex items-center gap-1.5 text-xs px-3 py-1.5 border border-outline/30 text-on-surface-variant hover:bg-surface-highest disabled:opacity-50">
-          {sincronizando ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />} sincronizar agora
-        </button>
-      </div>
-      <p className="text-on-surface-variant text-sm mb-4">Estrutura completa desde já: o que ainda não tem coleta aparece como "a ligar" — nunca some. Motor de postagem vive no MKT; a leitura vive aqui.</p>
+    <div>
+      <PageHeader
+        eyebrow="Analytics social · todas as redes, canais e marcas"
+        title="Radar 360"
+        subtitle={'Estrutura completa desde já: o que ainda não tem coleta aparece como "a ligar" — nunca some. Motor de postagem vive no MKT; a leitura vive aqui.'}
+        actions={
+          <button onClick={sincronizar} disabled={sincronizando}
+            className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-outline/30 text-on-surface-variant hover:bg-surface-highest disabled:opacity-50">
+            {sincronizando ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />} sincronizar agora
+          </button>
+        }
+      />
 
       {/* abas */}
       <div className="flex gap-1 border-b border-outline/20 mb-4 overflow-x-auto">

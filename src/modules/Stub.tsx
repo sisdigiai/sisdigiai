@@ -11,7 +11,7 @@ interface StubProps {
 
 export function ModuleStub({ numero, nome, descricao, entregaveis }: StubProps) {
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div>
       <PageHeader eyebrow={`Módulo ${numero}`} title={nome} subtitle={descricao} />
       <div className="space-y-8">
       <div className="border border-warning/20 bg-warning/5 p-8 flex flex-col items-center text-center gap-4">
