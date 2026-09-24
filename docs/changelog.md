@@ -2,6 +2,13 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-23 — Retrato do roadmap e do placar entra no banco (154)
+
+- Retrato do Geral (`Cockpit/roadmap-retrato-2026-09-23.md`) gravado: fase 2 segue aberta (0 ótica pagante), as 6 tarefas de 14/08 continuam **não feitas** com a nota do estado real, e as 5 entregas de setembro entram como tarefas novas já concluídas com a prova. Tarefa de fase 0/1 superada ganha nota — nada apagado.
+- Placar da semana 6/6: 4 automáticas do banco + demos agendadas 0 e follow-ups 0, com a palavra do dono. Validade do retrato: 7 dias (próximo 30/09).
+- O Geral também declarou o frontmatter das 7 fichas sem agente: o runner passou de 17 para 18 fichas e **nenhum app fica invisível** no Portfólio.
+- Telas ainda paradas, de outros donos: academy (18/06), financeiro declarado (09/06) e redes sociais (23/06).
+
 ## 2026-09-23 — O app volta a ser espelho: as 4 frentes que o dono apontou (151, 152, 153)
 
 **Medido antes:** das 101 fontes que o app lê, 24 vivas (48 h), 35 mornas e 42 paradas há mais de 21 dias.
