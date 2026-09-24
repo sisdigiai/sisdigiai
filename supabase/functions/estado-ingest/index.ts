@@ -31,6 +31,7 @@ type Retrato = {
   fichas?: Record<string, unknown>[];
   decisoes?: Record<string, unknown>[];
   portoes?: { abertos: unknown[]; fechados: unknown[]; lido_em: string } | null;
+  passada?: { fichas?: number; nao_declarados?: string[]; recusadas?: string[] } | null;
   sinais_repo?: Record<string, unknown>[];
 };
 
@@ -68,6 +69,12 @@ Deno.serve(async (req: Request) => {
   for (const s of r.sinais_repo ?? []) {
     const { error } = await ops.rpc("fn_registrar_sinal_app", { p: { ...s, tipo: "repo" } });
     if (error) erros.push(`sinal ${s.slug}: ${error.message}`); else feito.sinais_repo++;
+  }
+
+  // 150: o que NÃO entrou (ficha sem frontmatter, ficha recusada) vira item da tela Hoje, não linha de log.
+  if (r.passada) {
+    const { error } = await ops.rpc("fn_registrar_passada", { p: r.passada });
+    if (error) erros.push(`passada: ${error.message}`);
   }
 
   return jsonResp({ ok: erros.length === 0, feito, erros });

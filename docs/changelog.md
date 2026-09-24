@@ -2,6 +2,14 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-23 — Limpeza do .env, R-042 e as sobras do runner na tela Hoje (150)
+
+- **`.env` do app (palavra do dono):** saíram `MP_ACCESS_TOKEN`, `MP_CLIENT_ID`, `MP_CLIENT_SECRET`, `MP_PUBLIC_KEY`, `TELEGRAM_BOT_TOKEN` e `GITHUB_TOKEN_1` — nenhum era lido pelo build ou por script; os do MP seguem nos secrets do projeto. `SUPABASE_TOKEN` fica (é o PAT de SQL/deploy). Arquivo é gitignored: sem commit, registro aqui.
+- **AGENTS.md §9 Variáveis (R-042)** + `.env.example` sincronizado (commit 5eada02).
+- **150:** `ops.estado_passada` guarda o retrato de cada passada do runner; `v_ops_reconfirmar` ganha `app_nao_declarado`, `ficha_recusada` e `runner_parado`; a ordem do dia rotula os 6 tipos. Ficha sem frontmatter deixa de morrer no log: hoje são 7 apps invisíveis no Portfólio, e a Hoje diz isso.
+- Ficha do `editora` corrigida (maturidade `incubação` → `protótipo`): o runner passou de 16 para 17 fichas.
+- Lead comercial com "R$48,50" na nota: o fato do envio fica, o preço velho sai ("com o preço da época — hoje R$ 49, portão 107"). Achados de preço no meu domínio: 1 → 0.
+
 ## 2026-09-23 — Console limpo: os 3 erros que apareciam em toda navegação
 
 - **Espelhos "desligados" no local:** faltavam `VITE_{PULSO,LIMELIGHT,BLOGS}_SUPABASE_*` no `.env` da máquina (produção já as tinha). Preenchidas com as chaves ANON públicas — as mesmas do bundle publicado. `.env` é gitignored; `.env.example` já documentava as chaves.
