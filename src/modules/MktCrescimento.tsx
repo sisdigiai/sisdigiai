@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { BarChart3, TrendingUp, Users, Eye, Bookmark, Share2, RefreshCw, Loader2, ExternalLink, Sparkles, Target, HeartPulse, Film, Newspaper } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, Eye, Bookmark, Share2, RefreshCw, Loader2, ExternalLink, Sparkles, Target, HeartPulse, Film, Newspaper, MapPin } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia, diaBrasilia } from '../lib/datas';
 import OsiDiasCard from '../components/OsiDiasCard';
+import MapaCobertura from '../components/MapaCobertura';
 import PageHeader from '../components/PageHeader';
 import { espelhoMotores, type PulsoDia, type LimelightDia, type LimePubDia, type BlogDia, type EspelhoBlogs } from '../lib/espelhoMotores';
 
@@ -40,6 +41,7 @@ const ABAS = [
   { k: 'conteudo', label: 'Conteúdo', Icon: Newspaper },
   { k: 'video', label: 'Vídeo & motores', Icon: Film },
   { k: 'funil', label: 'Funil', Icon: Target },
+  { k: 'territorio', label: 'Território', Icon: MapPin },
   { k: 'saude', label: 'Saúde da coleta', Icon: HeartPulse },
 ] as const;
 type AbaK = typeof ABAS[number]['k'];
@@ -748,6 +750,13 @@ export default function MktCrescimento() {
           )}
 
           {/* ═══ SAÚDE ═══ */}
+          {aba === 'territorio' && (
+            <>
+              <Decide texto={<><b>O que se decide aqui:</b> para onde levar a próxima raspagem. O branco manda mais que a cor — cidade sem raspagem é mercado que nem sabemos que existe.</>} />
+              <MapaCobertura />
+            </>
+          )}
+
           {aba === 'saude' && (
             <>
               <Decide texto={<><b>O que se decide aqui:</b> se dá para confiar nos números das outras abas. Fonte sem data fresca congela em silêncio — esta aba é o antídoto.</>} />

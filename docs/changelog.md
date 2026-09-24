@@ -2,6 +2,13 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-23 — Mapa de calor da prospecção no digiai (pedido do dono)
+
+- Nova aba **Território** em Mkt › Radar 360 (`src/components/MapaCobertura.tsx`), lendo a view de contrato do MKT `public.v_mkt_cobertura_geografica` (sem PII). Resultado mora no digiai, não no MKT.
+- 4 zooms: Grande São Paulo (39 municípios do IBGE), Estado de SP (645), Sudeste (4 UFs) e Brasil (27 UFs).
+- **O vazio é o dado:** a grade nasce do território, não do dado. Cidade sem raspagem aparece vazada, com borda tracejada e "raspagem não passou aqui" — nunca some.
+- Medido em 23/09: Grande SP 15 de 39 cidades tocadas, 937 óticas, 41 respostas, **24 cidades sem raspagem** (Osasco, Barueri, Cotia entre elas); Sudeste 1 de 4 UFs.
+
 ## 2026-09-23 — Retrato do roadmap e do placar entra no banco (154)
 
 - Retrato do Geral (`Cockpit/roadmap-retrato-2026-09-23.md`) gravado: fase 2 segue aberta (0 ótica pagante), as 6 tarefas de 14/08 continuam **não feitas** com a nota do estado real, e as 5 entregas de setembro entram como tarefas novas já concluídas com a prova. Tarefa de fase 0/1 superada ganha nota — nada apagado.
