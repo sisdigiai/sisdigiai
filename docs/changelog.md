@@ -2,6 +2,11 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-24 — Filtro por estado no mapa (opção, não padrão)
+
+- Chips de estado no Mapa de calor: `todos` (padrão) + um por UF com a contagem. Filtrar reenquadra o mapa e recalcula os quadros; o rodapé segue mostrando a conta da base inteira, com a linha "o filtro é só da tela".
+- **Achado para o MKT:** a UF vem despadronizada na fonte — as linhas de São Paulo usam `SP` (sigla) e a da Paraíba usa `Paraíba` (nome por extenso).
+
 ## 2026-09-24 — Conta do mapa fechada pelo MKT
 
 - MKT reconciliou: 946 leads vivos = 687 com coordenada + 253 sem + 6 sem ficha (1 interno Grupo Mello + 5 da raspagem Kimi jul/2026, todos sem telefone). Verdade da base = `v_mkt_cobertura_geografica`; o mapa é o subconjunto com coordenada.

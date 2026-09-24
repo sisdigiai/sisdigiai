@@ -25,6 +25,9 @@ export default function MapaDeCalor() {
   const [pontos, setPontos] = useState<PontoLeads[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [semCoordenada, setSemCoordenada] = useState<{ oticas: number; total: number } | null>(null);
+  // Filtro por estado: OPÇÃO, nunca padrão. O mapa nasce mostrando tudo — esconder dado certo por
+  // conveniência visual é o começo de acreditar num retrato que não existe (dono, 24/09).
+  const [uf, setUf] = useState<string>('');
 
   useEffect(() => {
     if (via !== 'leads') return;
@@ -44,14 +47,22 @@ export default function MapaDeCalor() {
     return () => { vivo = false; };
   }, [via]);
 
-  const doMapa: PontoCalor[] = useMemo(() => (pontos ?? []).map((p) => ({
+  const ufs = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const p of pontos ?? []) m.set(p.uf, (m.get(p.uf) ?? 0) + p.oticas);
+    return [...m.entries()].sort((a, b) => b[1] - a[1]);
+  }, [pontos]);
+
+  const filtrados = useMemo(() => (pontos ?? []).filter((p) => !uf || p.uf === uf), [pontos, uf]);
+
+  const doMapa: PontoCalor[] = useMemo(() => filtrados.map((p) => ({
     lat: Number(p.lat), lng: Number(p.lng), peso: p.oticas,
     rotulo: [p.bairro, p.cidade].filter(Boolean).join(' · ') || p.cidade,
     detalhe: [p.com_celular != null ? `${p.com_celular} com celular` : null,
               p.ja_receberam != null ? `${p.ja_receberam} já receberam` : null,
               p.responderam != null ? `${p.responderam} responderam` : null].filter(Boolean).join(' · ') || undefined,
     destaque: p.responderam ?? 0,
-  })), [pontos]);
+  })), [filtrados]);
 
   const noMapa = doMapa.reduce((a, p) => a + p.peso, 0);
   const foraDoMapa = semCoordenada?.total != null ? Math.max(0, semCoordenada.total - noMapa) : null;
@@ -93,11 +104,27 @@ export default function MapaDeCalor() {
             </div>
           )}
 
+          {ufs.length > 1 && (
+            <div className="flex flex-wrap items-center gap-1 mb-4">
+              <span className="font-mono text-[9px] uppercase tracking-widest text-muted mr-1">estado</span>
+              <button onClick={() => setUf('')}
+                className={`font-mono text-[10px] uppercase tracking-widest px-2.5 py-1 border transition-colors ${!uf ? 'bg-secondary text-on-action border-secondary' : 'border-outline/20 text-muted hover:text-on-surface'}`}>
+                todos
+              </button>
+              {ufs.map(([sigla, n]) => (
+                <button key={sigla} onClick={() => setUf(sigla === uf ? '' : sigla)}
+                  className={`font-mono text-[10px] uppercase tracking-widest px-2.5 py-1 border transition-colors ${uf === sigla ? 'bg-secondary text-on-action border-secondary' : 'border-outline/20 text-muted hover:text-on-surface'}`}>
+                  {sigla} · {n}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
             {[
               { r: 'óticas no mapa', v: noMapa.toLocaleString('pt-BR') },
-              { r: 'pontos', v: (pontos?.length ?? 0).toLocaleString('pt-BR') },
-              { r: 'responderam', v: (pontos ?? []).reduce((a, p) => a + (p.responderam ?? 0), 0).toLocaleString('pt-BR') },
+              { r: 'pontos', v: filtrados.length.toLocaleString('pt-BR') },
+              { r: 'responderam', v: filtrados.reduce((a, p) => a + (p.responderam ?? 0), 0).toLocaleString('pt-BR') },
               { r: 'fora do mapa', v: foraDoMapa != null ? foraDoMapa.toLocaleString('pt-BR') : '—' },
             ].map((k) => (
               <div key={k.r} className="border border-outline/15 bg-surface-container px-3 py-2">
@@ -113,6 +140,12 @@ export default function MapaDeCalor() {
 
           {foraDoMapa != null && foraDoMapa > 0 && (
             <div className="mt-3 border border-dashed border-outline/40 px-3 py-2 text-[12px] text-muted space-y-1">
+              {uf && (
+                <div className="text-on-surface-variant">
+                  Filtrado por <b>{uf}</b>: {noMapa.toLocaleString('pt-BR')} óticas em {filtrados.length} pontos.
+                  O filtro é só da tela — a conta abaixo é da base inteira.
+                </div>
+              )}
               <div>
                 <b className="text-on-surface-variant">{(semCoordenada?.total ?? 0).toLocaleString('pt-BR')} na base</b> ·
                 {' '}{noMapa.toLocaleString('pt-BR')} no mapa (com coordenada) ·
