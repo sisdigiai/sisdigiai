@@ -2,6 +2,17 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-23 — O app volta a ser espelho: as 4 frentes que o dono apontou (151, 152, 153)
+
+**Medido antes:** das 101 fontes que o app lê, 24 vivas (48 h), 35 mornas e 42 paradas há mais de 21 dias.
+
+- **Dinheiro (Visão):** o MRR vinha de snapshot digitado, parado em 09/06. Agora `v_ops_dinheiro` mede: receita de mercado R$ 0 (0 assinante, 0 venda OSI) e custo de infra do mês R$ 1.903,38 pelo espelho do Finance, com série de 6 meses no gráfico.
+- **Semana:** `v_ops_scorecard_auto` já calculava a semana e ninguém gravava (tela mostrava 27/07). `fn_scorecard_auto_gravar` + job diário 06:10 BRT gravam a semana corrente; valor digitado por gente nunca é sobrescrito.
+- **Idade em toda tela declarada:** `v_ops_frescor` + aviso no topo (Trilha, Academy, Inventário) + tipo `tela_parada` na Hoje. Hoje acusam: roadmap (14/08), financeiro declarado (09/06), academy (18/06), redes (23/06).
+- **Inventário:** `v_ops_contas_custo` casa a conta com o custo medido no extrato (nome normalizado: slug × nome do Finance). R$ 614,49 em 3 serviços; o extrato mede o serviço, não a conta — 10 contas de Supabase dividem a mesma fatura.
+- **153:** as duas views novas liam com a permissão do usuário, mas `ops.contas_servicos` e `ops.scorecard_entries` têm RLS **sem policy** — o padrão da casa é view de dono. Falhava calado (banner e custo sumiam). Débito anotado: dar policy `is_staff()` às duas e voltar tudo a invoker.
+- **O que a máquina NÃO faz:** marcar tarefa de roadmap como feita. Progresso de fase é palavra do dono; sem ela, a tela diz desde quando está parada.
+
 ## 2026-09-23 — Limpeza do .env, R-042 e as sobras do runner na tela Hoje (150)
 
 - **`.env` do app (palavra do dono):** saíram `MP_ACCESS_TOKEN`, `MP_CLIENT_ID`, `MP_CLIENT_SECRET`, `MP_PUBLIC_KEY`, `TELEGRAM_BOT_TOKEN` e `GITHUB_TOKEN_1` — nenhum era lido pelo build ou por script; os do MP seguem nos secrets do projeto. `SUPABASE_TOKEN` fica (é o PAT de SQL/deploy). Arquivo é gitignored: sem commit, registro aqui.

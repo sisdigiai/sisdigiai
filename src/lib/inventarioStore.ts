@@ -90,6 +90,22 @@ export function notaOriginal(c: ContaServico): string {
 }
 
 export const inventarioStore = {
+  // 151/152: custo MEDIDO no extrato pelo Finance (public.v_ops_contas_custo), no mês corrente.
+  // O extrato mede o SERVIÇO, não a conta: 10 contas de Supabase dividem a mesma fatura. Por isso a chave
+  // aqui é o serviço — somar por conta contaria a mesma nota 10 vezes.
+  async custoMedidoPorServico(): Promise<Map<string, { brl: number; contas: number; extrato_ate: string | null }>> {
+    const { data, error } = await supabase.from('v_ops_contas_custo').select('servico, custo_medido_brl, extrato_ate');
+    if (error) { console.error('[inventarioStore] custoMedidoPorServico', error); return new Map(); }
+    const m = new Map<string, { brl: number; contas: number; extrato_ate: string | null }>();
+    for (const r of (data ?? []) as { servico: string; custo_medido_brl: number | null; extrato_ate: string | null }[]) {
+      if (r.custo_medido_brl == null) continue;
+      const atual = m.get(r.servico);
+      if (atual) atual.contas += 1;
+      else m.set(r.servico, { brl: Number(r.custo_medido_brl), contas: 1, extrato_ate: r.extrato_ate });
+    }
+    return m;
+  },
+
   async listar(): Promise<ContaServico[]> {
     const { data, error } = await supabase
       .from('v_ops_contas_servicos')

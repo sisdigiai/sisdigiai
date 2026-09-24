@@ -11,6 +11,7 @@ import { realtimeStore } from '../lib/realtimeStore';
 import RoadmapCalendar from './RoadmapCalendar';
 import RoadmapHistorico from './RoadmapHistorico';
 import PageHeader from '../components/PageHeader';
+import AvisoFrescor from '../components/AvisoFrescor';
 
 const TRACK_INFO: Record<Track, { nome: string; descricao: string; cor: string; badge: string }> = {
   A: {
@@ -180,6 +181,7 @@ export default function Trilha() {
           </button>
         }
       />
+      <AvisoFrescor tela="roadmap" oQueFazer="Quem mexe em fase e tarefa é o dono (ou o Geral, com a palavra dele) — a máquina não marca tarefa como feita." />
 
       <div className="space-y-6">
       {/* Abas de visualização */}

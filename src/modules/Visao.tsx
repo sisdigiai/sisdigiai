@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { RefreshCw } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
+import { haQuanto } from '../lib/appsEstado';
 import { dashboardStore, type DashboardSummary } from '../lib/dashboardStore';
 import { commercialStore, type CommercialLead, type LeadStage } from '../lib/commercialStore';
 import { realtimeStore } from '../lib/realtimeStore';
@@ -96,19 +97,27 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
   if (summary.backlogCritical > 0) alertas.push({ tone: 'var(--color-danger)', texto: `${summary.backlogCritical} item(ns) crítico(s) no Backlog`, go: 'backlog' });
   if (!summary.hasCnpj) alertas.push({ tone: 'var(--color-warning)', texto: 'CNPJ não cadastrado', sub: 'Cadastro Empresa → Identidade', go: 'cadastro-empresa' });
   if (!summary.hasDpo) alertas.push({ tone: 'var(--color-warning)', texto: 'DPO não nomeado', sub: 'Cadastro Empresa → LGPD', go: 'cadastro-empresa' });
-  if (summary.latestMrr === null) alertas.push({ tone: 'var(--color-warning)', texto: 'Snapshot financeiro pendente', sub: 'Cadastro Empresa → Financeiro', go: 'cadastro-empresa' });
+  if (summary.espelhoFinanceEm && Date.now() - new Date(summary.espelhoFinanceEm).getTime() > 36 * 3600e3) {
+    alertas.push({ tone: 'var(--color-warning)', texto: 'Espelho do Finance parado', sub: `última sincronização ${haQuanto(summary.espelhoFinanceEm)}`, go: 'financeiro' });
+  }
 
   const focoTask = summary.nextTasks[0];
 
-  // Gráfico MRR real (dos snapshots). Só desenha com ≥2 pontos.
-  const series = summary.mrrSeries || [];
+  // 151: gráfico do custo de infra MEDIDO por mês (finance.infra_costs, espelho do Finance).
+  // O MRR vinha de snapshot digitado, parado desde 09/06 — número velho com cara de novo.
+  const series = (summary.custoPorMes || []).map(m => m.custo);
   const mrrDelta = deltaPct(series);
 
   const kpis: { idx: string; label: string; value: string; sub: string; go: ModuleId; spark?: number[]; delta?: number | null }[] = [
-    { idx: '01', label: 'MRR ATUAL', value: summary.latestMrr != null ? brl(summary.latestMrr) : '—', sub: summary.runwayMonths != null ? `runway ${summary.runwayMonths} meses` : 'preencher cadastro', go: 'financeiro', spark: series, delta: mrrDelta },
-    { idx: '02', label: 'LEADS NO FUNIL', value: String(activeLeads), sub: `${leads.length} no total`, go: 'comercial' },
-    { idx: '03', label: 'NEGOCIAÇÕES', value: String(negociacoes), sub: `${brl(pipelineValue)} em jogo`, go: 'comercial' },
-    { idx: '04', label: 'CONVERSÃO', value: conversao > 0 ? conversao.toFixed(1).replace('.', ',') + '%' : '—', sub: `${clientes} cliente(s)`, go: 'comercial' },
+    { idx: '01', label: 'RECEITA DE MERCADO', value: summary.receitaMercado != null ? brl(summary.receitaMercado) : '—',
+      sub: summary.receitaMercado === 0
+        ? `medido: ${summary.assinantesMercado ?? 0} assinante(s), ${summary.vendasOsi ?? 0} venda(s) OSI`
+        : `${summary.assinantesMercado ?? 0} assinante(s) de mercado`, go: 'financeiro' },
+    { idx: '02', label: 'CUSTO DE INFRA (MÊS)', value: summary.custoInfraMes != null ? brl(summary.custoInfraMes) : '—',
+      sub: summary.espelhoFinanceEm ? `espelho do Finance ${haQuanto(summary.espelhoFinanceEm)}` : 'sem espelho', go: 'financeiro', spark: series, delta: mrrDelta },
+    { idx: '03', label: 'LEADS NO FUNIL', value: String(activeLeads), sub: `${leads.length} no total`, go: 'comercial' },
+    { idx: '04', label: 'NEGOCIAÇÕES', value: String(negociacoes), sub: `${brl(pipelineValue)} em jogo`, go: 'comercial' },
+    { idx: '05', label: 'CONVERSÃO', value: conversao > 0 ? conversao.toFixed(1).replace('.', ',') + '%' : '—', sub: `${clientes} cliente(s)`, go: 'comercial' },
   ];
   const hasChart = series.length >= 2;
   let areaLine = '', areaFill = '', dots: { x: number; y: number }[] = [];
@@ -166,7 +175,7 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
                 {k.spark && <Sparkline data={k.spark} />}
               </div>
               <div className="font-mono text-[10px] text-muted mt-2.5 truncate">
-                {k.delta != null ? <DeltaBadge pct={k.delta} suffix="vs snapshot anterior" /> : k.sub}
+                {k.delta != null ? <DeltaBadge pct={k.delta} suffix="vs mês anterior" /> : k.sub}
               </div>
             </button>
           ))}
@@ -178,8 +187,8 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
           <div className="border border-outline/15 bg-surface-container p-4">
             <div className="flex items-start justify-between">
               <div>
-                <div className="font-mono text-[9px] tracking-[0.14em] text-secondary uppercase">§ 01 — Receita</div>
-                <div className="font-serif text-[17px] text-on-surface mt-1">Evolução do MRR</div>
+                <div className="font-mono text-[9px] tracking-[0.14em] text-secondary uppercase">§ 01 — Custo de infra</div>
+                <div className="font-serif text-[17px] text-on-surface mt-1">Quanto a empresa gasta por mês</div>
               </div>
               {mrrDelta != null && <span className="font-mono text-[9px] px-2 py-1 border border-outline/20 text-muted uppercase tracking-wider"><DeltaBadge pct={mrrDelta} suffix="" /></span>}
             </div>
@@ -196,14 +205,14 @@ export default function Visao({ onNavigate }: { onNavigate?: (id: ModuleId) => v
                   </svg>
                   <span className="absolute left-1 top-0 font-mono text-[9px] text-muted">{brl(Math.max(...series))}</span>
                   <span className="absolute left-1 bottom-0 font-mono text-[9px] text-muted">{brl(Math.min(...series))}</span>
-                  <span className="absolute right-0 -top-1 font-mono text-[10px] px-1.5 py-0.5 bg-secondary-container text-on-secondary-container border border-secondary/40">{summary.latestMrr != null ? brl(summary.latestMrr) : ''}</span>
+                  <span className="absolute right-0 -top-1 font-mono text-[10px] px-1.5 py-0.5 bg-secondary-container text-on-secondary-container border border-secondary/40">{summary.custoInfraMes != null ? brl(summary.custoInfraMes) : ''}</span>
                 </div>
-                <div className="font-mono text-[9px] text-muted mt-2">Últimos {series.length} snapshots · fonte: financeiro</div>
+                <div className="font-mono text-[9px] text-muted mt-2">Últimos {series.length} meses · medido no extrato pelo Finance{summary.espelhoFinanceEm ? ` · espelho ${haQuanto(summary.espelhoFinanceEm)}` : ''}</div>
               </>
             ) : (
               <div className="mt-6 flex flex-col items-start">
-                <div className="font-serif font-bold text-[40px] leading-none text-on-surface tabular-nums">{summary.latestMrr != null ? brl(summary.latestMrr) : '—'}</div>
-                <div className="font-mono text-[10px] text-muted mt-3">Histórico insuficiente para o gráfico — registre mais snapshots.</div>
+                <div className="font-serif font-bold text-[40px] leading-none text-on-surface tabular-nums">{summary.custoInfraMes != null ? brl(summary.custoInfraMes) : '—'}</div>
+                <div className="font-mono text-[10px] text-muted mt-3">Sem meses suficientes para o gráfico — o espelho do Finance alimenta isto sozinho.</div>
               </div>
             )}
           </div>

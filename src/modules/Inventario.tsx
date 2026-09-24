@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronDown, ExternalLink, ShieldAlert, CircleCheck, CircleSlash, CircleHelp, Search, TriangleAlert } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
+import AvisoFrescor from '../components/AvisoFrescor';
 import {
   inventarioStore, familiaDe, FAMILIAS_ORDEM, foiConferido, blocosDe, notaOriginal,
   type ContaServico,
@@ -37,6 +38,7 @@ function moeda(v: number | null, m: string | null): string | null {
 
 export default function Inventario() {
   const [itens, setItens] = useState<ContaServico[]>([]);
+  const [custos, setCustos] = useState<Map<string, { brl: number; contas: number; extrato_ate: string | null }>>(new Map());
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [familia, setFamilia] = useState<string>('todas');
@@ -48,6 +50,7 @@ export default function Inventario() {
       .then(setItens)
       .catch((e) => setErro(e instanceof Error ? e.message : String(e)))
       .finally(() => setCarregando(false));
+    inventarioStore.custoMedidoPorServico().then(setCustos).catch(() => {});
   }, []);
 
   // O 4º quadro NÃO é custo. `custo_mensal` está vazio em todas as linhas — o custo
@@ -96,6 +99,7 @@ export default function Inventario() {
           </>
         }
       />
+      <AvisoFrescor tela="inventario" oQueFazer="Cada conta tem data de verificação; o custo vem medido do Finance na coluna ao lado." />
 
       {carregando && (
         <div className="font-mono text-xs uppercase tracking-widest text-muted">Carregando inventário…</div>
@@ -115,6 +119,9 @@ export default function Inventario() {
               { rotulo: 'conferidos', valor: `${placar.conferidos}/${placar.total}` },
               { rotulo: 'com problema', valor: String(placar.problema) },
               { rotulo: 'falta conferir', valor: String(placar.pendentes) },
+              { rotulo: 'custo medido no mês', valor: custos.size
+                  ? [...custos.values()].reduce((a, c) => a + c.brl, 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) + ` · ${custos.size} serviço(s)`
+                  : '—' },
             ].map((c) => (
               <div key={c.rotulo} className="bg-surface-low p-4">
                 <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted mb-1">{c.rotulo}</div>
@@ -188,11 +195,18 @@ export default function Inventario() {
                             {i.ultimo_detalhe && (
                               <p className="text-on-surface-variant text-sm mt-1 leading-snug">{i.ultimo_detalhe}</p>
                             )}
-                            {moeda(i.custo_mensal, i.moeda) && (
-                              <span className="font-mono text-[11px] text-muted mt-1 inline-block">
-                                {moeda(i.custo_mensal, i.moeda)}/mês
-                              </span>
-                            )}
+                            {(() => {
+                              const medido = custos.get(i.servico);
+                              if (medido) return (
+                                <span className="font-mono text-[11px] text-success mt-1 inline-block">
+                                  {medido.brl.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}/mês no serviço · medido no extrato{medido.contas > 1 ? ` (${medido.contas} contas dividem a fatura)` : ''}
+                                  {moeda(i.custo_mensal, i.moeda) ? ` (declarado ${moeda(i.custo_mensal, i.moeda)})` : ''}
+                                </span>
+                              );
+                              return moeda(i.custo_mensal, i.moeda) ? (
+                                <span className="font-mono text-[11px] text-muted mt-1 inline-block">{moeda(i.custo_mensal, i.moeda)}/mês · declarado</span>
+                              ) : null;
+                            })()}
                           </div>
                           {temDetalhe && (
                             <ChevronDown className={`w-4 h-4 shrink-0 text-muted transition-transform ${expandido ? 'rotate-180' : ''}`} />

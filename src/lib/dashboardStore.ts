@@ -30,6 +30,13 @@ export type DashboardSummary = {
 
   // Financial (from latest snapshot)
   latestMrr: number | null;
+  // 151: dinheiro MEDIDO (public.v_ops_dinheiro) — o snapshot digitado só sustenta o runway
+  receitaMercado: number | null;
+  vendasOsi: number | null;
+  assinantesMercado: number | null;
+  custoInfraMes: number | null;
+  custoPorMes: { mes: string; custo: number }[];
+  espelhoFinanceEm: string | null;
   latestBurn: number | null;
   runwayMonths: number | null;
   mrrSeries: number[]; // MRR real dos últimos snapshots (ordem cronológica), p/ o gráfico
@@ -53,6 +60,12 @@ const emptySummary: DashboardSummary = {
   recentDecisions: [],
   totalDecisions: 0,
   latestMrr: null,
+  receitaMercado: null,
+  vendasOsi: null,
+  assinantesMercado: null,
+  custoInfraMes: null,
+  custoPorMes: [],
+  espelhoFinanceEm: null,
   latestBurn: null,
   runwayMonths: null,
   mrrSeries: [],
@@ -75,6 +88,7 @@ export const dashboardStore = {
       backlogRes,
       decisionsRes,
       financialRes,
+      dinheiroRes,
       identityRes,
       legalRes,
     ] = await Promise.all([
@@ -84,6 +98,7 @@ export const dashboardStore = {
       supabase.from('v_backlog_items').select('*'),
       supabase.from('v_decisions').select('*'),
       supabase.from('v_company_financial_snapshots').select('*'),
+      supabase.from('v_ops_dinheiro').select('*').maybeSingle(),
       supabase.from('v_company_identity').select('cnpj').maybeSingle(),
       supabase.from('v_company_legal_status').select('dpo_nomeado').maybeSingle(),
     ]);
@@ -94,6 +109,10 @@ export const dashboardStore = {
     const backlog = (backlogRes.data as BacklogItem[]) || [];
     const decisions = (decisionsRes.data as Decision[]) || [];
     const snapshots = (financialRes.data as any[]) || [];
+    const dinheiro = (dinheiroRes.data ?? null) as {
+      receita_mercado_brl: number; vendas_osi_aprovadas: number; assinantes_mercado: number;
+      custo_infra_mes_brl: number; custo_por_mes: { mes: string; custo: number }[] | null; espelho_finance_em: string | null;
+    } | null;
 
     const currentPhase = phases.find((p) => !p.completed_at && progress.find((pr) => pr.phase_number === p.phase_number && pr.total_tasks > 0)) || phases[0] || null;
     const currentProg = currentPhase ? progress.find((p) => p.phase_number === currentPhase.phase_number) || null : null;
@@ -156,6 +175,12 @@ export const dashboardStore = {
       recentDecisions,
       totalDecisions: decisions.length,
       latestMrr,
+      receitaMercado: dinheiro?.receita_mercado_brl ?? null,
+      vendasOsi: dinheiro?.vendas_osi_aprovadas ?? null,
+      assinantesMercado: dinheiro?.assinantes_mercado ?? null,
+      custoInfraMes: dinheiro?.custo_infra_mes_brl ?? null,
+      custoPorMes: dinheiro?.custo_por_mes ?? [],
+      espelhoFinanceEm: dinheiro?.espelho_finance_em ?? null,
       latestBurn,
       runwayMonths,
       mrrSeries,
