@@ -2,6 +2,12 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-24 — Conta do mapa fechada pelo MKT
+
+- MKT reconciliou: 946 leads vivos = 687 com coordenada + 253 sem + 6 sem ficha (1 interno Grupo Mello + 5 da raspagem Kimi jul/2026, todos sem telefone). Verdade da base = `v_mkt_cobertura_geografica`; o mapa é o subconjunto com coordenada.
+- Rodapé passa a dizer a conta inteira, sem "em conferência".
+- O ponto isolado na Paraíba é dado certo: "Ótica Santo André" fica em Santo André/PB — a raspagem de "Santo André" pegou o município xará. Fica no mapa, com a explicação escrita; filtro por UF pode entrar depois, se o dono quiser.
+
 ## 2026-09-24 — Rodapé do mapa: as duas contagens do MKT não fecham
 
 - O Geral pediu "687 no mapa · 253 sem coordenada". Medido: `mkt.leads_perfil` tem 940 perfis, 687 com coordenada e **253 sem** — mas `v_mkt_cobertura_geografica` soma **946** óticas. Seis a mais que o cadastro.

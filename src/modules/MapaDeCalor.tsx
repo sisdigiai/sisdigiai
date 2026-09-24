@@ -114,12 +114,14 @@ export default function MapaDeCalor() {
           {foraDoMapa != null && foraDoMapa > 0 && (
             <div className="mt-3 border border-dashed border-outline/40 px-3 py-2 text-[12px] text-muted space-y-1">
               <div>
-                <b className="text-on-surface-variant">{noMapa.toLocaleString('pt-BR')} óticas no mapa · {foraDoMapa.toLocaleString('pt-BR')} fora dele</b> —
-                a raspagem não guardou coordenada delas. Essas contam no Território (por cidade), não aqui.
+                <b className="text-on-surface-variant">{(semCoordenada?.total ?? 0).toLocaleString('pt-BR')} na base</b> ·
+                {' '}{noMapa.toLocaleString('pt-BR')} no mapa (com coordenada) ·
+                {' '}{Math.max(0, foraDoMapa - 6).toLocaleString('pt-BR')} sem coordenada · 6 sem ficha.
+                A conta fecha: quem não tem coordenada conta no Território (por cidade), não aqui.
               </div>
               <div>
-                As duas views do MKT não fecham entre si: a cobertura por bairro soma {(semCoordenada?.total ?? 0).toLocaleString('pt-BR')} óticas
-                e o cadastro tem 940 perfis (253 sem coordenada). A diferença de 6 está em conferência com o MKT — o número do mapa (687) é o que tem coordenada.
+                O ponto isolado na Paraíba é dado certo, conferido pelo MKT: "Ótica Santo André" fica em Santo André/PB —
+                a raspagem de "Santo André" pegou o município xará. Sem telefone, não entra na prospecção.
               </div>
             </div>
           )}
