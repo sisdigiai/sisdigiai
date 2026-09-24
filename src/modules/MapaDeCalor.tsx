@@ -98,7 +98,7 @@ export default function MapaDeCalor() {
               { r: 'óticas no mapa', v: noMapa.toLocaleString('pt-BR') },
               { r: 'pontos', v: (pontos?.length ?? 0).toLocaleString('pt-BR') },
               { r: 'responderam', v: (pontos ?? []).reduce((a, p) => a + (p.responderam ?? 0), 0).toLocaleString('pt-BR') },
-              { r: 'fora do mapa (sem coordenada)', v: foraDoMapa != null ? foraDoMapa.toLocaleString('pt-BR') : '—' },
+              { r: 'fora do mapa', v: foraDoMapa != null ? foraDoMapa.toLocaleString('pt-BR') : '—' },
             ].map((k) => (
               <div key={k.r} className="border border-outline/15 bg-surface-container px-3 py-2">
                 <div className="font-mono text-[9px] uppercase tracking-widest text-muted">{k.r}</div>
@@ -112,9 +112,15 @@ export default function MapaDeCalor() {
             : !erro && <div className="border border-outline/15 bg-surface-container p-6 text-sm text-muted">Lendo os pontos…</div>}
 
           {foraDoMapa != null && foraDoMapa > 0 && (
-            <div className="mt-3 border border-dashed border-outline/40 px-3 py-2 text-[12px] text-muted">
-              <b className="text-on-surface-variant">{foraDoMapa.toLocaleString('pt-BR')} óticas levantadas não aparecem no mapa</b> — a raspagem não guardou coordenada delas.
-              Elas contam no Território (por cidade), não aqui.
+            <div className="mt-3 border border-dashed border-outline/40 px-3 py-2 text-[12px] text-muted space-y-1">
+              <div>
+                <b className="text-on-surface-variant">{noMapa.toLocaleString('pt-BR')} óticas no mapa · {foraDoMapa.toLocaleString('pt-BR')} fora dele</b> —
+                a raspagem não guardou coordenada delas. Essas contam no Território (por cidade), não aqui.
+              </div>
+              <div>
+                As duas views do MKT não fecham entre si: a cobertura por bairro soma {(semCoordenada?.total ?? 0).toLocaleString('pt-BR')} óticas
+                e o cadastro tem 940 perfis (253 sem coordenada). A diferença de 6 está em conferência com o MKT — o número do mapa (687) é o que tem coordenada.
+              </div>
             </div>
           )}
         </>

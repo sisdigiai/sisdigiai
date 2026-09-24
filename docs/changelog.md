@@ -2,6 +2,11 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-24 — Rodapé do mapa: as duas contagens do MKT não fecham
+
+- O Geral pediu "687 no mapa · 253 sem coordenada". Medido: `mkt.leads_perfil` tem 940 perfis, 687 com coordenada e **253 sem** — mas `v_mkt_cobertura_geografica` soma **946** óticas. Seis a mais que o cadastro.
+- O rodapé mostra os dois números com a fonte de cada um, em vez de escolher um: 687 no mapa, 259 fora pela cobertura por bairro, e a nota de que o MKT conta 253 — diferença de 6 em conferência.
+
 ## 2026-09-24 — Mapa de calor de verdade, com menu próprio e duas vias (dono)
 
 - Menu **Mercado › Mapa de calor** (rota `#/mapa-calor`) com duas vias: **Leads** (prospecção) e **Clientes** (hoje diz que não há cliente de mercado, em vez de desenhar mancha de mentira).
