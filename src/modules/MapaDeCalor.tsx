@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Users, Building2 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
-import MapaCalor, { type PontoCalor } from '../components/MapaCalor';
+import MapaCalor, { PRECISAO, type PontoCalor } from '../components/MapaCalor';
 import { supabase } from '../lib/supabase';
 
 // Mapa de calor da DIGIAI — duas vias (dono, 24/09/2026):
@@ -23,6 +23,7 @@ interface PontoLeads {
   uf: string; cidade: string; bairro: string | null;
   lat: number; lng: number; oticas: number;
   com_celular?: number | null; ja_receberam?: number | null; responderam?: number | null;
+  precisao?: 'medida' | 'endereco' | null;   // MKT, 25/09: 'medida' = raspagem, 'endereco' = derivada de rua+número
 }
 
 export default function MapaDeCalor() {
@@ -34,6 +35,8 @@ export default function MapaDeCalor() {
   // Filtro por estado: OPÇÃO, nunca padrão. O mapa nasce mostrando tudo — esconder dado certo por
   // conveniência visual é o começo de acreditar num retrato que não existe (dono, 24/09).
   const [uf, setUf] = useState<string>('');
+  // Filtro por precisão: também opção, nunca padrão. Serve para responder "e se eu olhar só o que foi medido?"
+  const [precisao, setPrecisao] = useState<'' | 'medida' | 'endereco' | 'bairro'>('');
 
   useEffect(() => {
     if (via !== 'leads') return;
@@ -63,12 +66,24 @@ export default function MapaDeCalor() {
     return [...m.entries()].sort((a, b) => b[1] - a[1]);
   }, [pontos]);
 
-  const filtrados = useMemo(() => (pontos ?? []).filter((p) => !uf || p.uf === uf), [pontos, uf]);
-  const aproxNoMapa = useMemo(() => aprox.filter((a) => a.lat != null && a.lng != null && (!uf || a.uf === uf)), [aprox, uf]);
+  const filtrados = useMemo(() => (pontos ?? []).filter((p) =>
+    (!uf || p.uf === uf) && (!precisao || (p.precisao ?? 'medida') === precisao)), [pontos, uf, precisao]);
+  const aproxNoMapa = useMemo(() => aprox.filter((a) => a.lat != null && a.lng != null && (!uf || a.uf === uf)
+    && (!precisao || precisao === 'bairro')), [aprox, uf, precisao]);
+
+  // contagem por precisão, sempre da base inteira do filtro de estado — o quadro não muda quando se filtra precisão
+  const porPrecisao = useMemo(() => {
+    const base = (pontos ?? []).filter((p) => !uf || p.uf === uf);
+    const m = { medida: 0, endereco: 0, bairro: 0 };
+    for (const p of base) m[(p.precisao ?? 'medida') as 'medida' | 'endereco'] += p.oticas;
+    m.bairro = aprox.filter((a) => a.lat != null && (!uf || a.uf === uf)).reduce((x, a) => x + a.oticas_sem_coordenada, 0);
+    return m;
+  }, [pontos, aprox, uf]);
   const aproxOticas = aproxNoMapa.reduce((a, x) => a + x.oticas_sem_coordenada, 0);
   const foraDeVez = aprox.filter((a) => a.lat == null && (!uf || a.uf === uf)).reduce((a, x) => a + x.oticas_sem_coordenada, 0);
 
   const doMapa: PontoCalor[] = useMemo(() => filtrados.map((p) => ({
+    precisao: (p.precisao ?? 'medida') as 'medida' | 'endereco',
     lat: Number(p.lat), lng: Number(p.lng), peso: p.oticas,
     rotulo: [p.bairro, p.cidade].filter(Boolean).join(' · ') || p.cidade,
     detalhe: [p.com_celular != null ? `${p.com_celular} com celular` : null,
@@ -79,7 +94,7 @@ export default function MapaDeCalor() {
 
   const doMapaAprox: PontoCalor[] = useMemo(() => aproxNoMapa.map((a) => ({
     lat: Number(a.lat), lng: Number(a.lng), peso: a.oticas_sem_coordenada,
-    rotulo: `${a.bairro} · ${a.cidade}`, aproximado: true,
+    rotulo: `${a.bairro} · ${a.cidade}`, precisao: 'bairro' as const,
     detalhe: 'sem coordenada na raspagem — desenhada no centro do bairro',
   })), [aproxNoMapa]);
 
@@ -141,11 +156,26 @@ export default function MapaDeCalor() {
             </div>
           )}
 
+          <div className="flex flex-wrap items-center gap-1 mb-4">
+            <span className="font-mono text-[9px] uppercase tracking-widest text-muted mr-1">precisão</span>
+            <button onClick={() => setPrecisao('')}
+              className={`font-mono text-[10px] uppercase tracking-widest px-2.5 py-1 border transition-colors ${!precisao ? 'bg-secondary text-on-action border-secondary' : 'border-outline/20 text-muted hover:text-on-surface'}`}>
+              todas
+            </button>
+            {(['medida', 'endereco', 'bairro'] as const).map((k) => (
+              <button key={k} onClick={() => setPrecisao(k === precisao ? '' : k)} disabled={porPrecisao[k] === 0}
+                className={`flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest px-2.5 py-1 border transition-colors disabled:opacity-40 ${precisao === k ? 'bg-secondary text-on-action border-secondary' : 'border-outline/20 text-muted hover:text-on-surface'}`}>
+                <span className="w-2.5 h-2.5 rounded-full" style={{ border: `1.5px ${PRECISAO[k].traco} ${PRECISAO[k].cor}` }} />
+                {PRECISAO[k].rotulo} · {porPrecisao[k]}
+              </button>
+            ))}
+          </div>
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
             {[
-              { r: 'posição medida', v: noMapa.toLocaleString('pt-BR') },
-              { r: 'posição aproximada', v: aproxOticas.toLocaleString('pt-BR') },
-              { r: 'responderam', v: filtrados.reduce((a, p) => a + (p.responderam ?? 0), 0).toLocaleString('pt-BR') },
+              { r: 'posição medida', v: porPrecisao.medida.toLocaleString('pt-BR') },
+              { r: 'derivada do endereço', v: porPrecisao.endereco.toLocaleString('pt-BR') },
+              { r: 'centro do bairro', v: porPrecisao.bairro.toLocaleString('pt-BR') },
               { r: 'fora do mapa', v: foraDeVez.toLocaleString('pt-BR') },
             ].map((k) => (
               <div key={k.r} className="border border-outline/15 bg-surface-container px-3 py-2">
@@ -169,10 +199,11 @@ export default function MapaDeCalor() {
               )}
               <div>
                 <b className="text-on-surface-variant">{(semCoordenada?.total ?? 0).toLocaleString('pt-BR')} na base</b> ·
-                {' '}{noMapa.toLocaleString('pt-BR')} com coordenada do Google ·
-                {' '}{aproxOticas.toLocaleString('pt-BR')} no centro do bairro (tracejadas) ·
+                {' '}{porPrecisao.medida.toLocaleString('pt-BR')} medidas na raspagem ·
+                {' '}{porPrecisao.endereco.toLocaleString('pt-BR')} derivadas do endereço (pontilhadas) ·
+                {' '}{porPrecisao.bairro.toLocaleString('pt-BR')} no centro do bairro (tracejadas) ·
                 {' '}{foraDeVez.toLocaleString('pt-BR')} ainda fora do mapa (bairro que o mapa aberto não conhece; aí moram também os 6 leads sem ficha).
-                A conta fecha: {noMapa.toLocaleString('pt-BR')} + {aproxOticas.toLocaleString('pt-BR')} + {foraDeVez.toLocaleString('pt-BR')} = {(semCoordenada?.total ?? 0).toLocaleString('pt-BR')}.
+                A conta fecha: {porPrecisao.medida.toLocaleString('pt-BR')} + {porPrecisao.endereco.toLocaleString('pt-BR')} + {porPrecisao.bairro.toLocaleString('pt-BR')} + {foraDeVez.toLocaleString('pt-BR')} = {(semCoordenada?.total ?? 0).toLocaleString('pt-BR')}.
                 As tracejadas dizem em que bairro estão, não em que esquina — quem decide raspagem decide por bairro.
               </div>
               <div>

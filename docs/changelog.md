@@ -2,6 +2,12 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-25 — Mapa: legenda e filtro por precisão (⚠ falta ver na tela)
+
+- `v_mkt_cobertura_pontos` ganhou a coluna `precisao` do MKT: `medida` (raspagem) e `endereco` (derivada de rua+número, `mkt.leads_geo`). Hoje só há `medida` (535 pontos / 687 óticas); os derivados entram nas próximas horas.
+- Mapa passa a desenhar **três precisões**: medida (cheia), derivada do endereço (pontilhada) e centro do bairro (tracejada), cada uma com cor própria e dita no popup. Filtro por precisão entrou como opção, padrão continua mostrando tudo; os quadros e o rodapé contam as três + fora do mapa.
+- **Não verificado no navegador**: o dev reiniciou e o app pede login (dono dormindo). Código compila e tipa; a conferência de tela fica para a manhã, junto com os pontos derivados do MKT quando chegarem.
+
 ## 2026-09-24 — As óticas sem coordenada entram no mapa pelo centro do bairro (155)
 
 - **Não deu para usar CEP**, e isso foi medido antes: o serviço público devolve o centro da CIDADE para toda a capital — Jardim Capela, Vila Perus e Penha de França vieram no mesmo ponto. Usar CEP empilharia centenas de óticas no centro de São Paulo.

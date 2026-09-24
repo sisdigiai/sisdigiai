@@ -17,8 +17,16 @@ import 'leaflet.heat';
 export interface PontoCalor {
   lat: number; lng: number; peso: number;
   rotulo: string; detalhe?: string; destaque?: number;   // destaque: nº que merece cor (ex.: respostas)
-  aproximado?: boolean;   // posição do centro do bairro, não da loja — desenhada vazada, nunca igual ao medido
+  // De onde veio a posição. Nunca some no desenho: 'medida' é a coordenada da raspagem, 'endereco' é derivada
+  // de rua+número (MKT) e 'bairro' é o centro do bairro (nossa). Cada uma tem cara própria.
+  precisao?: 'medida' | 'endereco' | 'bairro';
 }
+
+export const PRECISAO = {
+  medida:   { rotulo: 'medida (raspagem)',        cor: 'var(--color-action)',    traco: 'solid' },
+  endereco: { rotulo: 'derivada do endereço',     cor: 'var(--color-secondary)', traco: 'dotted' },
+  bairro:   { rotulo: 'centro do bairro',         cor: 'var(--color-warning)',   traco: 'dashed' },
+} as const;
 
 interface Props {
   pontos: PontoCalor[];
@@ -67,29 +75,35 @@ export default function MapaCalor({ pontos, altura = 520, centro = [-23.55, -46.
 
     const bolhas = L.layerGroup(pontos.map((p) => {
       const r = 10 + Math.min(26, Math.sqrt(p.peso) * 5);
-      const fundo = p.aproximado
-        ? 'transparent'
-        : `color-mix(in srgb, var(--color-action) ${Math.round(45 + (p.peso / max) * 50)}%, var(--color-surface-lowest))`;
+      const pr = PRECISAO[p.precisao ?? 'medida'];
+      const exata = (p.precisao ?? 'medida') === 'medida';
+      const fundo = exata
+        ? `color-mix(in srgb, ${pr.cor} ${Math.round(45 + (p.peso / max) * 50)}%, var(--color-surface-lowest))`
+        : 'transparent';
       return L.marker([p.lat, p.lng], {
         icon: L.divIcon({
           className: '',
           iconSize: [r * 2, r * 2],
           html: `<div style="width:${r * 2}px;height:${r * 2}px;border-radius:50%;display:flex;align-items:center;justify-content:center;
                    background:${fundo};
-                   border:1.5px ${p.aproximado ? 'dashed var(--color-warning)' : 'solid var(--color-action)'};
-                   color:${p.aproximado ? 'var(--color-warning)' : 'var(--color-surface-lowest)'};
-                   ${p.aproximado ? '' : 'text-shadow:0 1px 0 color-mix(in srgb, var(--color-action) 60%, transparent);'}
+                   border:1.5px ${pr.traco} ${pr.cor};
+                   color:${exata ? 'var(--color-surface-lowest)' : pr.cor};
+                   ${exata ? `text-shadow:0 1px 0 color-mix(in srgb, ${pr.cor} 60%, transparent);` : ''}
                    font:600 ${r > 16 ? 13 : 11}px ui-monospace,monospace">${p.peso}</div>`,
         }),
-      }).bindPopup(`<b>${p.rotulo}</b><br>${p.peso} no ponto${p.detalhe ? `<br>${p.detalhe}` : ''}${p.aproximado ? '<br><i>posição aproximada — centro do bairro</i>' : ''}`);
+      }).bindPopup(`<b>${p.rotulo}</b><br>${p.peso} no ponto${p.detalhe ? `<br>${p.detalhe}` : ''}<br><i>posição ${pr.rotulo}</i>`);
     }));
 
-    const finos = L.layerGroup(pontos.map((p) => L.circleMarker([p.lat, p.lng], {
-      radius: 5, weight: 1.5, dashArray: p.aproximado ? '3 2' : undefined,
-      color: p.aproximado ? 'var(--color-warning)' : 'var(--color-action)',
-      fillColor: p.aproximado ? 'transparent' : (p.destaque ? 'var(--color-success)' : 'var(--color-action)'),
-      fillOpacity: p.aproximado ? 0 : 0.85,
-    }).bindPopup(`<b>${p.rotulo}</b><br>${p.peso} aqui${p.detalhe ? `<br>${p.detalhe}` : ''}${p.aproximado ? '<br><i>posição aproximada — centro do bairro</i>' : ''}`)));
+    const finos = L.layerGroup(pontos.map((p) => {
+      const pr = PRECISAO[p.precisao ?? 'medida'];
+      const exata = (p.precisao ?? 'medida') === 'medida';
+      return L.circleMarker([p.lat, p.lng], {
+        radius: 5, weight: 1.5, dashArray: exata ? undefined : (p.precisao === 'endereco' ? '1 2' : '3 2'),
+        color: pr.cor,
+        fillColor: exata ? (p.destaque ? 'var(--color-success)' : pr.cor) : 'transparent',
+        fillOpacity: exata ? 0.85 : 0,
+      }).bindPopup(`<b>${p.rotulo}</b><br>${p.peso} aqui${p.detalhe ? `<br>${p.detalhe}` : ''}<br><i>posição ${pr.rotulo}</i>`);
+    }));
 
     camadas.current = { heat, bolhas, pontos: finos };
 
@@ -127,7 +141,7 @@ export default function MapaCalor({ pontos, altura = 520, centro = [-23.55, -46.
         ver tudo
       </button>
       <div className="absolute bottom-2 left-2 z-[400] bg-surface/90 backdrop-blur-sm border border-outline/20 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-wider text-muted">
-        afaste = mancha de calor · aproxime = bolha com número · mais perto = ponto a ponto · tracejado = posição aproximada (centro do bairro)
+        afaste = mancha de calor · aproxime = bolha com número · mais perto = ponto a ponto
       </div>
     </div>
   );
