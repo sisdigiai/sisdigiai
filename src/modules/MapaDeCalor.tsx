@@ -14,6 +14,11 @@ import { supabase } from '../lib/supabase';
 
 type Via = 'leads' | 'clientes';
 
+interface Aproximado {
+  uf: string; cidade: string; bairro: string;
+  oticas_sem_coordenada: number; lat: number | null; lng: number | null;
+}
+
 interface PontoLeads {
   uf: string; cidade: string; bairro: string | null;
   lat: number; lng: number; oticas: number;
@@ -25,6 +30,7 @@ export default function MapaDeCalor() {
   const [pontos, setPontos] = useState<PontoLeads[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [semCoordenada, setSemCoordenada] = useState<{ oticas: number; total: number } | null>(null);
+  const [aprox, setAprox] = useState<Aproximado[]>([]);
   // Filtro por estado: OPÇÃO, nunca padrão. O mapa nasce mostrando tudo — esconder dado certo por
   // conveniência visual é o começo de acreditar num retrato que não existe (dono, 24/09).
   const [uf, setUf] = useState<string>('');
@@ -37,6 +43,10 @@ export default function MapaDeCalor() {
       if (error) { setErro(error.message); setPontos([]); return; }
       setErro(null);
       setPontos((data ?? []) as PontoLeads[]);
+    });
+    // 155: as óticas sem coordenada entram pelo centro do bairro, marcadas como aproximadas
+    supabase.from('v_ops_cobertura_aproximada').select('*').then(({ data }) => {
+      if (vivo && data) setAprox(data as Aproximado[]);
     });
     // o total sem coordenada vem da view que já existe (por bairro), para dizer quanto ficou fora do mapa
     supabase.from('v_mkt_cobertura_geografica').select('oticas').then(({ data }) => {
@@ -54,6 +64,9 @@ export default function MapaDeCalor() {
   }, [pontos]);
 
   const filtrados = useMemo(() => (pontos ?? []).filter((p) => !uf || p.uf === uf), [pontos, uf]);
+  const aproxNoMapa = useMemo(() => aprox.filter((a) => a.lat != null && a.lng != null && (!uf || a.uf === uf)), [aprox, uf]);
+  const aproxOticas = aproxNoMapa.reduce((a, x) => a + x.oticas_sem_coordenada, 0);
+  const foraDeVez = aprox.filter((a) => a.lat == null && (!uf || a.uf === uf)).reduce((a, x) => a + x.oticas_sem_coordenada, 0);
 
   const doMapa: PontoCalor[] = useMemo(() => filtrados.map((p) => ({
     lat: Number(p.lat), lng: Number(p.lng), peso: p.oticas,
@@ -63,6 +76,14 @@ export default function MapaDeCalor() {
               p.responderam != null ? `${p.responderam} responderam` : null].filter(Boolean).join(' · ') || undefined,
     destaque: p.responderam ?? 0,
   })), [filtrados]);
+
+  const doMapaAprox: PontoCalor[] = useMemo(() => aproxNoMapa.map((a) => ({
+    lat: Number(a.lat), lng: Number(a.lng), peso: a.oticas_sem_coordenada,
+    rotulo: `${a.bairro} · ${a.cidade}`, aproximado: true,
+    detalhe: 'sem coordenada na raspagem — desenhada no centro do bairro',
+  })), [aproxNoMapa]);
+
+  const todosOsPontos = useMemo(() => [...doMapa, ...doMapaAprox], [doMapa, doMapaAprox]);
 
   const noMapa = doMapa.reduce((a, p) => a + p.peso, 0);
   const foraDoMapa = semCoordenada?.total != null ? Math.max(0, semCoordenada.total - noMapa) : null;
@@ -122,10 +143,10 @@ export default function MapaDeCalor() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
             {[
-              { r: 'óticas no mapa', v: noMapa.toLocaleString('pt-BR') },
-              { r: 'pontos', v: filtrados.length.toLocaleString('pt-BR') },
+              { r: 'posição medida', v: noMapa.toLocaleString('pt-BR') },
+              { r: 'posição aproximada', v: aproxOticas.toLocaleString('pt-BR') },
               { r: 'responderam', v: filtrados.reduce((a, p) => a + (p.responderam ?? 0), 0).toLocaleString('pt-BR') },
-              { r: 'fora do mapa', v: foraDoMapa != null ? foraDoMapa.toLocaleString('pt-BR') : '—' },
+              { r: 'fora do mapa', v: foraDeVez.toLocaleString('pt-BR') },
             ].map((k) => (
               <div key={k.r} className="border border-outline/15 bg-surface-container px-3 py-2">
                 <div className="font-mono text-[9px] uppercase tracking-widest text-muted">{k.r}</div>
@@ -134,8 +155,8 @@ export default function MapaDeCalor() {
             ))}
           </div>
 
-          {doMapa.length > 0
-            ? <MapaCalor pontos={doMapa} />
+          {todosOsPontos.length > 0
+            ? <MapaCalor pontos={todosOsPontos} />
             : !erro && <div className="border border-outline/15 bg-surface-container p-6 text-sm text-muted">Lendo os pontos…</div>}
 
           {foraDoMapa != null && foraDoMapa > 0 && (
@@ -148,9 +169,11 @@ export default function MapaDeCalor() {
               )}
               <div>
                 <b className="text-on-surface-variant">{(semCoordenada?.total ?? 0).toLocaleString('pt-BR')} na base</b> ·
-                {' '}{noMapa.toLocaleString('pt-BR')} no mapa (com coordenada) ·
-                {' '}{Math.max(0, foraDoMapa - 6).toLocaleString('pt-BR')} sem coordenada · 6 sem ficha.
-                A conta fecha: quem não tem coordenada conta no Território (por cidade), não aqui.
+                {' '}{noMapa.toLocaleString('pt-BR')} com coordenada do Google ·
+                {' '}{aproxOticas.toLocaleString('pt-BR')} no centro do bairro (tracejadas) ·
+                {' '}{foraDeVez.toLocaleString('pt-BR')} ainda fora do mapa (bairro que o mapa aberto não conhece; aí moram também os 6 leads sem ficha).
+                A conta fecha: {noMapa.toLocaleString('pt-BR')} + {aproxOticas.toLocaleString('pt-BR')} + {foraDeVez.toLocaleString('pt-BR')} = {(semCoordenada?.total ?? 0).toLocaleString('pt-BR')}.
+                As tracejadas dizem em que bairro estão, não em que esquina — quem decide raspagem decide por bairro.
               </div>
               <div>
                 O ponto isolado na Paraíba é dado certo, conferido pelo MKT: "Ótica Santo André" fica em Santo André/PB —

@@ -2,6 +2,14 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-24 — As óticas sem coordenada entram no mapa pelo centro do bairro (155)
+
+- **Não deu para usar CEP**, e isso foi medido antes: o serviço público devolve o centro da CIDADE para toda a capital — Jardim Capela, Vila Perus e Penha de França vieram no mesmo ponto. Usar CEP empilharia centenas de óticas no centro de São Paulo.
+- Posição aproximada = **centro do bairro** (Nominatim/OpenStreetMap, 1 req/s, cacheado em `ops.bairro_coordenada`). Desenhadas **tracejadas**, contadas em quadro separado e com "posição aproximada" no popup — nunca misturadas com o medido.
+- **Trava contra chute:** 19 bairros vieram na cidade errada (nome de bairro que também é nome de cidade: "Santana" a 426 km, "Pompeia" a 401 km). Foram apagados e o script passou a descartar qualquer resultado a mais de 30 km do miolo da cidade.
+- Resultado: 687 medidas + 196 aproximadas + 63 ainda fora = 946. Recuperamos 196 das 259 que estavam fora do mapa, sem inventar precisão.
+- **Para o MKT:** o campo bairro traz complemento de endereço ("Loja 320 - Lauzane Paulista", "13º Andar - Sala 1309 - Tatuapé"); o script limpa para consultar, mas a origem merece conserto.
+
 ## 2026-09-24 — Filtro por estado no mapa (opção, não padrão)
 
 - Chips de estado no Mapa de calor: `todos` (padrão) + um por UF com a contagem. Filtrar reenquadra o mapa e recalcula os quadros; o rodapé segue mostrando a conta da base inteira, com a linha "o filtro é só da tela".
