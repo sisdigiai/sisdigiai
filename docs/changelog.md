@@ -2,6 +2,14 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-24 — Mapa de calor de verdade, com menu próprio e duas vias (dono)
+
+- Menu **Mercado › Mapa de calor** (rota `#/mapa-calor`) com duas vias: **Leads** (prospecção) e **Clientes** (hoje diz que não há cliente de mercado, em vez de desenhar mancha de mentira).
+- Mapa real: Leaflet + OpenStreetMap, **sem chave e sem cobrança**. A base escura da CARTO passou a exigir chave (marca d'água "API KEY REQUIRED" em 24/09) — o escuro vem por filtro de estilo da casa.
+- Três leituras por zoom: mancha de calor (longe), bolha com o número (médio) e ponto a ponto (perto), mais botão "ver tudo". Fonte: `v_mkt_cobertura_pontos`, publicada pelo MKT a pedido, sem PII e arredondada a ~110 m.
+- Medido em 24/09: 687 óticas em 535 pontos, 42 respostas e **259 óticas fora do mapa** (raspagem sem coordenada) — o número aparece escrito, porque quem olha mapa acha que está vendo o total.
+- O componente `MapaCalor.tsx` é genérico de propósito: a mesma tela vai servir para mostrar ao cliente onde estão os clientes dele.
+
 ## 2026-09-23 — Mapa de calor da prospecção no digiai (pedido do dono)
 
 - Nova aba **Território** em Mkt › Radar 360 (`src/components/MapaCobertura.tsx`), lendo a view de contrato do MKT `public.v_mkt_cobertura_geografica` (sem PII). Resultado mora no digiai, não no MKT.

@@ -34,6 +34,7 @@ import Comercial from './modules/Comercial';
 import Billing from './modules/Billing';
 import Inventario from './modules/Inventario';
 import Seo from './modules/Seo';
+import MapaDeCalor from './modules/MapaDeCalor';
 import { ehRetornoDoGoogle } from './lib/gscReauth';
 import Vendas from './modules/Vendas';
 import { ModuleStub } from './modules/Stub';
@@ -52,6 +53,7 @@ const MODULES: ModuleId[] = [
   'cadastro-empresa', 'financeiro', 'academy', 'marketplace', 'clearix', 'cobranca',
   'marketing', 'mkt-crescimento', 'mkt-calc', 'marketing-engajamento', 'fluxo-osi', 'travas-marketing',
   'ecossistemas', 'mapa-vivo', 'decisoes', 'biblioteca', 'brand', 'guia', 'inventario', 'seo', 'vendas',
+  'mapa-calor',
 ];
 
 function moduleFromHash(): ModuleId {
@@ -75,13 +77,14 @@ const MODULE_LABEL: Record<ModuleId, string> = {
   inventario: 'Inventário',
   seo: 'SEO',
   vendas: 'Vendas',
+  'mapa-calor': 'Mapa de calor',
 };
 
 // Seção da navegação a que cada módulo pertence — usado como breadcrumb no header.
 const MODULE_SECTION: Record<ModuleId, string> = {
   hoje: 'Hoje', visao: 'Hoje', semana: 'Hoje', trilha: 'Hoje', 'lista-mestra': 'Hoje', backlog: 'Hoje',
   vendas: 'Dinheiro', financeiro: 'Dinheiro', cobranca: 'Dinheiro', marketplace: 'Dinheiro',
-  comercial: 'Mercado', 'fluxo-osi': 'Mercado', 'marketing-engajamento': 'Mercado',
+  comercial: 'Mercado', 'fluxo-osi': 'Mercado', 'marketing-engajamento': 'Mercado', 'mapa-calor': 'Mercado',
   portfolio: 'Produtos', ecossistemas: 'Produtos', 'mapa-vivo': 'Produtos', clearix: 'Produtos', academy: 'Produtos', seo: 'Produtos',
   marketing: 'Marketing', 'travas-marketing': 'Marketing',
   'mkt-crescimento': 'Marketing', 'mkt-calc': 'Marketing',
@@ -185,6 +188,7 @@ export default function App() {
       case 'guia': return <Guia onNavigate={navigate} />;
       case 'inventario': return <Inventario />;
       case 'seo': return <Seo />;
+      case 'mapa-calor': return <MapaDeCalor />;
       case 'vendas': return <Vendas />;
       case 'comercial': return <Comercial />;
       default: {

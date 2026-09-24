@@ -141,3 +141,11 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* Mapa de calor: a base do OpenStreetMap é clara e o painel é escuro. Inverter + girar o matiz devolve
+   um mapa escuro legível sem depender de provedor com chave (MapaCalor.tsx). */
+.mapa-escuro { filter: invert(1) hue-rotate(185deg) brightness(0.92) contrast(0.88) saturate(0.7); }
+.leaflet-container { background: var(--color-surface-lowest); }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--color-surface-container); color: var(--color-on-surface); border-radius: 0; }
+.leaflet-control-zoom a { background: var(--color-surface-container); color: var(--color-on-surface); border-color: var(--color-outline); }
+.leaflet-control-attribution { background: color-mix(in srgb, var(--color-surface) 80%, transparent); color: var(--color-muted); }

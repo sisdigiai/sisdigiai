@@ -6,8 +6,7 @@ import {
   Camera, Wand2, Boxes, Search, ShieldCheck, Workflow, ChevronDown,
   GraduationCap, Languages, Calendar as CalendarIcon, Globe, BarChart3,
   Lightbulb, Heart, Package, Users, Receipt, Radio, CalendarCheck,
-  Sunrise, Calculator,
-} from 'lucide-react';
+  Sunrise, Calculator, MapPin } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
 import { canAccessModule } from '../lib/permissions';
@@ -20,7 +19,7 @@ export type ModuleId =
   | 'clearix' | 'cobranca' | 'marketing'
   | 'marketplace' | 'ecossistemas' | 'mapa-vivo' | 'travas-marketing'
   | 'fluxo-osi' | 'guia'
-  | 'marketing-engajamento' | 'inventario' | 'seo' | 'vendas'
+  | 'marketing-engajamento' | 'inventario' | 'seo' | 'vendas' | 'mapa-calor'
   | 'mkt-crescimento' | 'mkt-calc';
 
 interface NavItem {
@@ -61,6 +60,7 @@ const mercado: NavItem[] = [
   { id: 'comercial',        label: 'Pipeline',          icon: <TrendingUp className="w-4 h-4" /> },
   { id: 'fluxo-osi',        label: 'OSI',               icon: <Workflow className="w-4 h-4" /> },
   { id: 'marketing-engajamento', label: 'Engajamento',  icon: <Heart className="w-4 h-4" /> },
+  { id: 'mapa-calor',       label: 'Mapa de calor',     icon: <MapPin className="w-4 h-4" /> },
 ];
 
 const produtos: NavItem[] = [
