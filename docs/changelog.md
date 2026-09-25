@@ -2,6 +2,12 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-09-25 — Maturidade ganha `parado`, `aposentado` e `estudo` (156)
+
+- 7 fichas estavam sendo recusadas porque o Geral escreveu estados que a lista da 140 não tinha. CHECK ampliado com os três que descrevem realidade; "material" e "piloto" ficaram de fora (o Geral corrigiu as duas fichas).
+- Medido: runner 18 → 25 fichas, **recusadas = 0**, não declarados = 0. Nenhum app invisível.
+- **Palavra do Geral, não do dono** (dono dormindo; mudança aditiva e reversível). Fica para o turno do dono: rever a decisão e o pedido de tela — `estudo`/`parado` fora do bloco comercial do Portfólio, `aposentado` só no histórico, e identidade para os apps novos (trade_lab, editora) que ainda não aparecem lá.
+
 ## 2026-09-25 — Mapa: legenda e filtro por precisão (⚠ falta ver na tela)
 
 - `v_mkt_cobertura_pontos` ganhou a coluna `precisao` do MKT: `medida` (raspagem) e `endereco` (derivada de rua+número, `mkt.leads_geo`). Hoje só há `medida` (535 pontos / 687 óticas); os derivados entram nas próximas horas.
