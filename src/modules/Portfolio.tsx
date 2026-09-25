@@ -8,7 +8,7 @@ import { useAppsEstado, haQuanto, urlsDaFicha, type AppEstado } from '../lib/app
 // O ESTADO — degrau, no ar, próximo passo, bloqueio, maturidade — vem de public.v_ops_apps_estado:
 // medido pela máquina ou declarado na ficha do agente do app, sempre com data. Nada de estado neste arquivo.
 
-export type Tier = 'ancora' | 'alavanca' | 'suporte' | 'incubacao' | 'autonomo' | 'institucional' | 'infra';
+export type Tier = 'ancora' | 'alavanca' | 'suporte' | 'incubacao' | 'autonomo' | 'institucional' | 'infra' | 'acervo';
 
 export type ProdutoInfo = {
   slug: string;          // product_id no Backlog (ops.backlog_items)
@@ -42,6 +42,10 @@ export const PRODUTOS: ProdutoInfo[] = [
   P('digiai-mkt', 'digiai_mkt', 'DIGIAI MKT', 'infra', 'MK', 'var(--color-eco-app)', '/brand/digiai.svg'),
   P('digiai-telao', 'digiai_telao', 'DIGIAI Telão', 'infra', 'TV', 'var(--color-secondary)', '/brand/digiai.svg'),
   P('gj', 'gj', 'GJ', 'infra', 'GJ', 'var(--color-muted)'),
+  P('editora', 'editora', 'Editora DIGIAI', 'incubacao', 'ED', 'var(--color-secondary)'),
+  P('trade-lab', 'trade_lab', 'Trade Lab', 'incubacao', 'TL', 'var(--color-muted)'),
+  P('normalizacao-clientes', 'normalizacao_clientes', 'Normalização de clientes', 'infra', 'NC', 'var(--color-muted)'),
+  P('import-design', 'import_design', 'Clearix Import · design', 'acervo', 'ID', 'var(--color-eco-clearix)', '/brand/clearix.svg'),
 ];
 
 export const PRODUTO_BY_SLUG: Record<string, ProdutoInfo> = Object.fromEntries(PRODUTOS.map(p => [p.slug, p]));
@@ -53,13 +57,31 @@ export const DEGRAU_LABEL: Record<number, string> = {
 export const TIER_LABEL_CURTO: Record<Tier, string> = {
   ancora: 'Produto-âncora', alavanca: 'Alavanca crítica', suporte: 'Suporte prioritário',
   autonomo: 'Autônomo', incubacao: 'Incubação', institucional: 'Institucional', infra: 'Infra interna',
+  acervo: 'Acervo (não é app)',
 };
 
 const TIER_LABEL: Record<Tier, string> = {
   ancora: 'Produto-âncora', alavanca: 'Alavancas críticas', suporte: 'Suporte prioritário',
   autonomo: 'Autônomos', incubacao: 'Incubação', institucional: 'Institucional', infra: 'Infraestrutura interna',
+  acervo: 'Acervo · material, não app',
 };
-const TIER_ORDER: Tier[] = ['ancora', 'alavanca', 'suporte', 'autonomo', 'incubacao', 'institucional', 'infra'];
+const TIER_ORDER: Tier[] = ['ancora', 'alavanca', 'suporte', 'autonomo', 'incubacao', 'institucional', 'infra', 'acervo'];
+
+// Onde o produto aparece é decidido pela MATURIDADE declarada na ficha (vocabulário da 156), não pelo tier.
+// Produto parado ou em estudo dentro do bloco comercial faz o portfólio parecer maior do que a empresa é —
+// e aposentado ali é mentira direta. Nada some: fora da linha e histórico têm lugar próprio, com a palavra
+// que o agente do app escreveu.
+type Situacao = 'ativo' | 'fora' | 'historico';
+const SITUACAO_LABEL: Record<Exclude<Situacao, 'ativo'>, string> = {
+  fora: 'Fora da linha ativa · parado ou em estudo',
+  historico: 'Histórico · tirado de circulação',
+};
+
+function situacao(e?: AppEstado): Situacao {
+  if (e?.maturidade === 'aposentado') return 'historico';
+  if (e?.maturidade === 'parado' || e?.maturidade === 'estudo') return 'fora';
+  return 'ativo';
+}
 
 const DEGRAU_COR: Record<number, string> = {
   1: 'var(--color-muted)', 2: 'var(--color-secondary)', 3: 'var(--color-warning)', 4: 'var(--color-success)', 5: 'var(--color-success)',
@@ -90,24 +112,30 @@ function Degraus({ degrau }: { degrau: number }) {
 }
 
 export default function Portfolio() {
-  const { porSlug, carregando, erro } = useAppsEstado();
+  const { porSlug, linhas, carregando, erro } = useAppsEstado();
   const [sel, setSel] = useState<ProdutoInfo | null>(null);
   const [modo, setModo] = useState<'placar' | 'detalhe'>('placar');
 
   const est = (p: ProdutoInfo) => (p.ficha ? porSlug.get(p.ficha) : undefined);
-  const declarados = PRODUTOS.filter(p => est(p));
+  const ativos = PRODUTOS.filter(p => situacao(est(p)) === 'ativo');
+  const foraDaLinha = PRODUTOS.filter(p => situacao(est(p)) === 'fora');
+  const historico = PRODUTOS.filter(p => situacao(est(p)) === 'historico');
+  const declarados = ativos.filter(p => est(p));
   const noAr = declarados.filter(p => est(p)!.degrau >= 2).length;
   const usoReal = declarados.filter(p => est(p)!.degrau >= 3).length;
   const vencidas = declarados.filter(p => est(p)!.declaracao_vencida).length;
   const comBloqueio = declarados.filter(p => temBloqueio(est(p)!)).length;
-  const ranking = [...PRODUTOS].sort((a, b) => (est(b)?.degrau ?? 0) - (est(a)?.degrau ?? 0) || TIER_ORDER.indexOf(a.tier) - TIER_ORDER.indexOf(b.tier));
+  const ranking = [...ativos].sort((a, b) => (est(b)?.degrau ?? 0) - (est(a)?.degrau ?? 0) || TIER_ORDER.indexOf(a.tier) - TIER_ORDER.indexOf(b.tier));
+  // Ficha que chegou ao banco e não tem identidade nesta tela sumiria calada — que foi exatamente o que a 156
+  // consertou no runner. Aqui o aviso aparece em vez do sumiço.
+  const semIdentidade = linhas.filter(l => !PRODUTOS.some(p => p.ficha === l.slug));
 
   return (
     <div>
       <PageHeader
         eyebrow="Hierarquia Canônica"
         title="Portfólio de Produtos"
-        subtitle={`${PRODUTOS.length} frentes · ${declarados.length} com ficha declarada · estado lido do banco, medido ou declarado com data`}
+        subtitle={`${ativos.length} frentes na linha ativa · ${declarados.length} com ficha declarada${foraDaLinha.length ? ` · ${foraDaLinha.length} fora da linha` : ''}${historico.length ? ` · ${historico.length} no histórico` : ''} · estado lido do banco, medido ou declarado com data`}
       />
 
       {erro && (
@@ -188,14 +216,14 @@ export default function Portfolio() {
         </div>
       )}
 
-      {modo === 'detalhe' && TIER_ORDER.filter(t => PRODUTOS.some(p => p.tier === t)).map(tier => (
+      {modo === 'detalhe' && TIER_ORDER.filter(t => ativos.some(p => p.tier === t)).map(tier => (
         <div key={tier} className="mb-8">
           <div className="flex items-center gap-3 mb-4">
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">{TIER_LABEL[tier]}</span>
             <span className="h-px flex-1 bg-outline/15" />
           </div>
           <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
-            {PRODUTOS.filter(p => p.tier === tier).map(p => {
+            {ativos.filter(p => p.tier === tier).map(p => {
               const e = est(p);
               return (
                 <button key={p.slug} onClick={() => setSel(p)}
@@ -222,7 +250,52 @@ export default function Portfolio() {
         </div>
       ))}
 
+      {foraDaLinha.length > 0 && <Faixa titulo={SITUACAO_LABEL.fora} produtos={foraDaLinha} est={est} onAbrir={setSel} />}
+      {historico.length > 0 && <Faixa titulo={SITUACAO_LABEL.historico} produtos={historico} est={est} onAbrir={setSel} apagado />}
+
+      {semIdentidade.length > 0 && (
+        <div className="border border-warning/40 bg-warning/5 p-4 mt-8 text-sm text-on-surface">
+          <b>{semIdentidade.length} ficha(s) no banco sem identidade nesta tela:</b>{' '}
+          <span className="font-mono text-[12px]">{semIdentidade.map(l => l.slug).join(', ')}</span>.
+          <span className="text-muted"> O app aparece no banco e não no Portfólio — falta a entrada em <span className="font-mono text-[12px]">PRODUTOS</span>.</span>
+        </div>
+      )}
+
       {sel && <Gaveta p={sel} e={est(sel)} onClose={() => setSel(null)} />}
+    </div>
+  );
+}
+
+// Lista enxuta para quem não está na linha ativa: nome, a palavra da ficha e quando foi declarada.
+// Sem degrau e sem KPI de propósito — degrau de app parado é número que ninguém vai usar para decidir.
+function Faixa({ titulo, produtos, est, onAbrir, apagado }: {
+  titulo: string; produtos: ProdutoInfo[]; est: (p: ProdutoInfo) => AppEstado | undefined;
+  onAbrir: (p: ProdutoInfo) => void; apagado?: boolean;
+}) {
+  return (
+    <div className={`mt-8 ${apagado ? 'opacity-60' : ''}`}>
+      <div className="flex items-center gap-3 mb-3">
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">{titulo}</span>
+        <span className="h-px flex-1 bg-outline/15" />
+      </div>
+      <div className="border border-outline/15 bg-surface-container">
+        {produtos.map(p => {
+          const e = est(p);
+          return (
+            <button key={p.slug} onClick={() => onAbrir(p)}
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 border-b border-outline/10 last:border-b-0 hover:bg-surface-high transition-colors text-left">
+              <Marca p={p} />
+              <div className="flex-1 min-w-0">
+                <span className="font-serif text-sm font-semibold text-on-surface truncate block">{p.nome}</span>
+                <span className="font-mono text-[9px] uppercase tracking-wider text-muted truncate block">
+                  {e ? `${e.maturidade} · ficha ${haQuanto(e.declarado_em)}` : 'sem ficha'}
+                </span>
+              </div>
+              <span className="text-[11px] text-muted truncate max-w-[45%] hidden md:block">{e?.funcao ?? e?.tagline ?? ''}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
