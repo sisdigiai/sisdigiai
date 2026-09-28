@@ -40,6 +40,9 @@ const ALLOWED = new Set([
   'click_brinde_calc', 'click_whatsapp_suporte', 'lead_capture_submit',
   'reader_gatilho_view', 'reader_gatilho_click',
   'clearix_site_visit', 'clearix_demo_solicitada', 'clearix_whatsapp_click', 'clearix_cta_click',
+  // 160 (28/09): site institucional passa a medir visita, por ordem do dono. Sobe junto com o catálogo —
+  // código no catálogo sem allowlist aqui é recusa silenciosa na borda.
+  'digiai_site_visit', 'digiai_cta_click',
 ]);
 // Preview local não mede nada: em 15/09 o preview da landing OSI mandou landing_visit reais com
 // url localhost, e todo funil passou a precisar de filtro. Recusar aqui protege todas as landings
