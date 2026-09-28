@@ -4,7 +4,7 @@ import PageHeader from '../components/PageHeader';
 import AvisoFrescor from '../components/AvisoFrescor';
 import {
   inventarioStore, familiaDe, FAMILIAS_ORDEM, foiConferido, blocosDe, notaOriginal,
-  type ContaServico,
+  type ContaServico, type SitePixel,
 } from '../lib/inventarioStore';
 
 // Inventário — o quadro de disjuntores da empresa.
@@ -44,6 +44,7 @@ export default function Inventario() {
   const [familia, setFamilia] = useState<string>('todas');
   const [busca, setBusca] = useState('');
   const [aberto, setAberto] = useState<Set<string>>(new Set());
+  const [pixels, setPixels] = useState<SitePixel[]>([]);
 
   useEffect(() => {
     inventarioStore.listar()
@@ -51,6 +52,7 @@ export default function Inventario() {
       .catch((e) => setErro(e instanceof Error ? e.message : String(e)))
       .finally(() => setCarregando(false));
     inventarioStore.custoMedidoPorServico().then(setCustos).catch(() => {});
+    inventarioStore.pixels().then(setPixels).catch(() => {});
   }, []);
 
   // O 4º quadro NÃO é custo. `custo_mensal` está vazio em todas as linhas — o custo
@@ -244,6 +246,8 @@ export default function Inventario() {
             ))}
           </div>
 
+          <BlocoPixels pixels={pixels} />
+
           <p className="text-xs text-muted mt-10 leading-relaxed">
             A verdade destes dados vive em <code className="font-mono">ops.contas_servicos</code>, tabela do
             app DIGIAI MKT. Esta tela é leitura — quando falta um ativo aqui, vai despacho
@@ -252,5 +256,55 @@ export default function Inventario() {
         </>
       )}
     </div>
+  );
+}
+
+// Pixel declarado no inventário × pixel achado no ar (migrations 158/159). Vitrine sem medição é alarme;
+// app com login aparece só na contagem, porque ali não há visitante para contar.
+function BlocoPixels({ pixels }: { pixels: SitePixel[] }) {
+  if (pixels.length === 0) return null;
+  const vitrines = pixels.filter((p) => p.mede_visitante);
+  const cegas = vitrines.filter((p) => p.veredito.startsWith('vitrine cega'));
+  const medido = pixels.find((p) => p.medido_em)?.medido_em ?? null;
+
+  return (
+    <section className="mt-10">
+      <div className="flex items-center gap-3 mb-3">
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">Medição dos sites</span>
+        <span className="h-px flex-1 bg-outline/15" />
+        <span className="font-mono text-[9px] uppercase tracking-wider text-muted">
+          {vitrines.length} vitrines · {cegas.length} cegas · {pixels.length - vitrines.length} apps com login
+        </span>
+      </div>
+
+      <div className="border border-outline/15 bg-surface-container">
+        {vitrines.map((p) => {
+          const ruim = p.veredito.startsWith('vitrine cega') || p.veredito.startsWith('site fora') || p.veredito.startsWith('pixel no ar');
+          return (
+            <div key={p.url} className="flex items-center gap-3 px-3 py-2.5 border-b border-outline/10 last:border-b-0">
+              <div className="flex-1 min-w-0">
+                <a href={p.url} target="_blank" rel="noreferrer" className="font-serif text-sm font-semibold text-on-surface hover:text-secondary truncate block">
+                  {p.site}
+                </a>
+                <span className="font-mono text-[9px] uppercase tracking-wider text-muted truncate block">
+                  {p.produto ?? '—'} · {p.meta_no_ar ? `meta ${p.meta_no_ar}` : 'sem meta'}
+                  {p.tiktok_no_ar && ' · tiktok'}{p.ga_gtm && ` · ${p.ga_gtm}`}
+                </span>
+              </div>
+              <span className={`font-mono text-[10px] uppercase tracking-wider text-right ${ruim ? 'text-warning' : 'text-success'}`}>
+                {p.veredito}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      <p className="text-xs text-muted mt-3 leading-relaxed">
+        Medido no HTML e nos bundles publicados{medido ? ` em ${new Date(medido).toLocaleDateString('pt-BR')}` : ''} por
+        {' '}<code className="font-mono">scripts/medir-pixel.mjs</code>. Achar o ID prova que o código está no ar —
+        se o evento chegou à Meta, só o Events Manager responde. O ID de cada pixel vive no inventário acima,
+        nunca no código do site.
+      </p>
+    </section>
   );
 }

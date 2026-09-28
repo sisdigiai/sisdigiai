@@ -89,7 +89,22 @@ export function notaOriginal(c: ContaServico): string {
   return (i >= 0 ? o.slice(0, i) : o).trim();
 }
 
+// 158/159: cada site público com o pixel declarado no inventário AO LADO do que foi achado no ar.
+// Declaração e medição separadas de propósito — "tem pixel" escrito no inventário não prova que dispara.
+export interface SitePixel {
+  site: string; url: string; produto: string | null; provider: string | null; mede_visitante: boolean;
+  medido_em: string | null; http_code: number | null;
+  meta_no_ar: string | null; tiktok_no_ar: boolean; ga_gtm: string | null; clarity: boolean;
+  meta_declarado: string | null; tiktok_declarado: string | null; veredito: string;
+}
+
 export const inventarioStore = {
+  async pixels(): Promise<SitePixel[]> {
+    const { data, error } = await supabase.from('v_ops_pixels').select('*');
+    if (error) { console.error('[inventarioStore] pixels', error); throw new Error(error.message); }
+    return (data ?? []) as SitePixel[];
+  },
+
   // 151/152: custo MEDIDO no extrato pelo Finance (public.v_ops_contas_custo), no mês corrente.
   // O extrato mede o SERVIÇO, não a conta: 10 contas de Supabase dividem a mesma fatura. Por isso a chave
   // aqui é o serviço — somar por conta contaria a mesma nota 10 vezes.
