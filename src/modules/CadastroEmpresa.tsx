@@ -927,6 +927,14 @@ function FinanceiroTab() {
 
   return (
     <div>
+      {/* 162: este formulário parou em jun/2026 e deixou de ser cobrado pela tela Hoje — o que ele pedia à
+          mão (custo, receita, aportes) hoje é medido e chega sozinho do Finance. Fica como histórico. */}
+      <div className="border border-outline/20 bg-surface-container p-4 mb-6 text-sm text-on-surface-variant">
+        <b className="text-on-surface">Histórico digitado, até jun/2026.</b> Custo, receita e aportes agora vêm
+        medidos do Finance (tela Financeiro e Visão), atualizados todo dia às 04:20. Preencher mês novo aqui é
+        opcional — e só vale a pena para o que não tem medição, como saldo em conta.
+      </div>
+
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-semibold">Snapshots financeiros mensais</h2>
         <button onClick={() => setEditing(newSnapshot())} className="px-3 py-2 bg-secondary hover:bg-secondary/90 text-surface text-sm flex items-center gap-2">

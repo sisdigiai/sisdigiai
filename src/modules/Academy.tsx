@@ -4,7 +4,6 @@ import {
   Layers, HelpCircle, RefreshCw, Info,
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
-import AvisoFrescor from '../components/AvisoFrescor';
 import { TravasBanner } from './TravasMarketing';
 import {
   academyStore,
@@ -87,7 +86,6 @@ export default function Academy() {
         actions={
           <button onClick={load} className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface" title="Recarregar">
             <RefreshCw size={16} />
-      <AvisoFrescor tela="academy" oQueFazer="O material da Academy é declarado: quem cuida do produto reconfirma." />
           </button>
         }
       />
