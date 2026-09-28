@@ -98,7 +98,22 @@ export interface SitePixel {
   meta_declarado: string | null; tiktok_declarado: string | null; veredito: string;
 }
 
+// 161: retrato da audiência dos blogs do Ecoax. `page_views` é bruto (inclui máquina); o único número
+// que descreve gente é `eventos_humanos`. A tela nunca mostra um sem o outro.
+export interface BlogAudiencia {
+  blog_slug: string; nome: string; medido_em: string;
+  page_views: number; leituras_30s: number; sessoes: number;
+  eventos_humanos: number; eventos_rajada: number; eventos_internos: number;
+  ultimo_humano: string | null; retrato_velho: boolean;
+}
+
 export const inventarioStore = {
+  async blogsAudiencia(): Promise<BlogAudiencia[]> {
+    const { data, error } = await supabase.from('v_ops_blog_audiencia').select('*');
+    if (error) { console.error('[inventarioStore] blogsAudiencia', error); throw new Error(error.message); }
+    return (data ?? []) as BlogAudiencia[];
+  },
+
   async pixels(): Promise<SitePixel[]> {
     const { data, error } = await supabase.from('v_ops_pixels').select('*');
     if (error) { console.error('[inventarioStore] pixels', error); throw new Error(error.message); }

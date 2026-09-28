@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ExternalLink, Globe } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { companyStore } from '../lib/companyStore';
+import { inventarioStore, type BlogAudiencia } from '../lib/inventarioStore';
 import type { DigitalAsset } from '../lib/supabase';
 import { PRODUTO_BY_SLUG, type ProdutoInfo } from './Portfolio';
 
@@ -78,6 +79,8 @@ export default function Ecossistemas() {
           </>
         }
       />
+      <BlocoBlogs />
+
       <div className="space-y-6">
       {assets === null && <div className="text-sm text-muted">Carregando ecossistemas do banco…</div>}
       {assets !== null && sites.length === 0 && (
@@ -134,5 +137,67 @@ export default function Ecossistemas() {
       </div>
       </div>
     </div>
+  );
+}
+
+// Audiência dos 5 blogs do Ecoax (migration 161). O Ecoax é dono do dado; aqui é retrato com data.
+// Gente e máquina aparecem separadas de propósito: a rede tem 277 acessos brutos e 2 de pessoa —
+// juntar os dois números numa coluna só seria inventar plateia.
+function BlocoBlogs() {
+  const [linhas, setLinhas] = useState<BlogAudiencia[] | null>(null);
+  useEffect(() => { inventarioStore.blogsAudiencia().then(setLinhas).catch(() => setLinhas([])); }, []);
+  if (!linhas || linhas.length === 0) return null;
+
+  const gente = linhas.reduce((n, l) => n + l.eventos_humanos, 0);
+  const maquina = linhas.reduce((n, l) => n + l.eventos_rajada + l.eventos_internos, 0);
+  const medido = linhas[0].medido_em;
+  const velho = linhas.some((l) => l.retrato_velho);
+
+  return (
+    <section className="mb-8">
+      <div className="flex items-center gap-3 mb-3">
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">Blogs regionais · Ecoax</span>
+        <span className="h-px flex-1 bg-outline/15" />
+        <span className={`font-mono text-[9px] uppercase tracking-wider ${velho ? 'text-warning' : 'text-muted'}`}>
+          retrato de {new Date(medido).toLocaleDateString('pt-BR')}{velho ? ' · velho' : ''}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">
+        <div className="border border-outline/15 bg-surface-container p-4">
+          <div className="font-mono text-[10px] uppercase tracking-widest text-muted">Leitor de verdade</div>
+          <div className={`font-serif text-3xl font-semibold tabular-nums mt-1 ${gente ? 'text-on-surface' : 'text-warning'}`}>{gente}</div>
+          <div className="text-[11px] text-muted mt-0.5">eventos fora de rajada, desde 20/08</div>
+        </div>
+        <div className="border border-outline/15 bg-surface-container p-4">
+          <div className="font-mono text-[10px] uppercase tracking-widest text-muted">Máquina</div>
+          <div className="font-serif text-3xl font-semibold tabular-nums mt-1 text-muted">{maquina}</div>
+          <div className="text-[11px] text-muted mt-0.5">rajada nos 5 blogs + interno declarado</div>
+        </div>
+        <div className="border border-outline/15 bg-surface-container p-4 col-span-2 md:col-span-1">
+          <div className="font-mono text-[10px] uppercase tracking-widest text-muted">Blogs no ar</div>
+          <div className="font-serif text-3xl font-semibold tabular-nums mt-1 text-on-surface">{linhas.length}</div>
+          <div className="text-[11px] text-muted mt-0.5">medição própria, sem pixel de terceiro</div>
+        </div>
+      </div>
+
+      <div className="border border-outline/15 bg-surface-container">
+        {linhas.map((l) => (
+          <div key={l.blog_slug} className="flex items-center gap-3 px-3 py-2 border-b border-outline/10 last:border-b-0">
+            <span className="flex-1 min-w-0 font-serif text-sm text-on-surface truncate">{l.nome}</span>
+            <span className="font-mono text-[10px] text-muted">{l.page_views} brutos</span>
+            <span className={`font-mono text-[11px] w-24 text-right ${l.eventos_humanos ? 'text-success' : 'text-warning'}`}>
+              {l.eventos_humanos} de gente
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <p className="text-xs text-muted mt-2 leading-relaxed">
+        Medido no banco do Ecoax por <code className="font-mono">scripts/espelhar-audiencia-blogs.mjs</code>.
+        Rajada = os 5 blogs abrindo a home no mesmo minuto, que é assinatura de verificador automático.
+        Só o agregado atravessa: nada de leitor sai do Ecoax.
+      </p>
+    </section>
   );
 }
