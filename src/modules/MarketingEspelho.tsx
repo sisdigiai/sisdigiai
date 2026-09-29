@@ -83,6 +83,9 @@ export default function MarketingEspelho() {
   const [fila, setFila] = useState<{ atrasados: number; com_erro: number; ultima_publicacao: string | null } | null>(null);
   const [seo, setSeo] = useState<{ cliques: number; impressoes: number; sites: number; medido_em: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
+  // Página longa esconde o que importa: o dono rolava seis seções para chegar à cadeia de resultados.
+  // Cada aba responde UMA pergunta; a primeira é sempre "está dando resultado?".
+  const [aba, setAba] = useState<'resultado' | 'marcas' | 'publicacoes' | 'motores' | 'fontes'>('resultado');
 
   const load = async () => {
     setLoading(true);
@@ -147,14 +150,28 @@ export default function MarketingEspelho() {
 
       <div className="space-y-6">
         <TravasBanner />
-        <ResultadoConteudoCard />
+
+        <div className="flex items-center gap-1 border border-outline/15 w-fit p-0.5 overflow-x-auto">
+          {([
+            ['resultado', 'Resultado'], ['marcas', 'Marcas'], ['publicacoes', 'Publicações'],
+            ['motores', 'Motores'], ['fontes', 'Fatos & fontes'],
+          ] as const).map(([id, rotulo]) => (
+            <button key={id} onClick={() => setAba(id)}
+              className={`font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 whitespace-nowrap transition-colors ${
+                aba === id ? 'bg-secondary text-on-action' : 'text-muted hover:text-on-surface'}`}>
+              {rotulo}
+            </button>
+          ))}
+        </div>
+
+        {aba === 'resultado' && <ResultadoConteudoCard />}
 
         {loading ? (
           <div className="text-sm text-muted py-6">Carregando espelho…</div>
         ) : (
           <>
             {/* Cadeia de resultados — o funil real, cada elo com carimbo de frescor */}
-            {cadeia && (() => {
+            {aba === 'resultado' && cadeia && (() => {
               const diasDe = (iso: string | null) => iso ? Math.floor((Date.now() - new Date(iso).getTime()) / 86400000) : null;
               const carimbo = (iso: string | null, limite: number) => {
                 const d = diasDe(iso);
@@ -196,7 +213,7 @@ export default function MarketingEspelho() {
             })()}
 
             {/* Placar do motor */}
-            {esp && (
+            {aba === 'resultado' && esp && (
               <div className="border border-outline/15 bg-surface-container">
                 <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2 flex-wrap">
                   <Radio className="w-3.5 h-3.5 text-secondary" />
@@ -226,6 +243,7 @@ export default function MarketingEspelho() {
             )}
 
             {/* Cards por marca */}
+            {aba === 'marcas' && (
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">Marcas operadas ({marcas.length})</span>
@@ -305,8 +323,10 @@ export default function MarketingEspelho() {
                 })}
               </div>
             </div>
+            )}
 
             {/* Publicações recentes */}
+            {aba === 'publicacoes' && (
             <div className="border border-outline/15 bg-surface-container">
               <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2">
                 <Send className="w-3.5 h-3.5 text-secondary" />
@@ -333,10 +353,12 @@ export default function MarketingEspelho() {
                 </div>
               )}
             </div>
+            )}
           </>
         )}
 
         {/* Outros motores de conteúdo — espelhos vivos dos bancos próprios (2026-07-30) */}
+        {aba === 'motores' && (
         <div className="border border-outline/15 bg-surface-container">
           <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2">
             <Radio className="w-3.5 h-3.5 text-secondary" />
@@ -428,12 +450,13 @@ export default function MarketingEspelho() {
             </div>
           </div>
         </div>
+        )}
 
         {/* FATOS publicáveis — o que a IA do MKT PODE citar (fonte: mkt.fatos, com validade) */}
         {/* Central de fontes — o indice de comando: toda fonte de marketing da casa,
             numero-chave + frescor + onde aprofundar. Pedido do dono 25/08:
             "este espelho tem que trazer tudo que temos de opções". */}
-        {!loading && (
+        {aba === 'fontes' && !loading && (
           <div className="border border-outline/15 bg-surface-container">
             <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2 flex-wrap">
               <Info className="w-3.5 h-3.5 text-secondary" />
