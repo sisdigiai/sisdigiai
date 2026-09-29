@@ -59,6 +59,7 @@ export default function Prospeccao() {
   const [leads, setLeads] = useState<Lead[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [uf, setUf] = useState<string>('todas');
+  const [frente, setFrente] = useState<string>('todas');
   const [carregando, setCarregando] = useState(true);
 
   const carregar = () => {
@@ -71,15 +72,28 @@ export default function Prospeccao() {
   };
   useEffect(carregar, []);
 
-  const ufs = useMemo(() => {
+  const contar = (lista: Lead[], chave: (l: Lead) => string) => {
     const m = new Map<string, number>();
-    for (const l of leads ?? []) m.set(l.uf ?? '?', (m.get(l.uf ?? '?') ?? 0) + 1);
+    for (const l of lista) { const k = chave(l); m.set(k, (m.get(k) ?? 0) + 1); }
     return [...m.entries()].sort((a, b) => b[1] - a[1]);
-  }, [leads]);
+  };
+  const daFrente = (l: Lead) => l.ramal ?? 'sem frente';
+
+  // Cada contador respeita o OUTRO filtro: botão cujo número não muda quando o vizinho muda faz a pessoa
+  // clicar e achar que a tela quebrou.
+  const frentes = useMemo(
+    () => contar((leads ?? []).filter((l) => uf === 'todas' || (l.uf ?? '?') === uf), daFrente),
+    [leads, uf],
+  );
+  const ufs = useMemo(
+    () => contar((leads ?? []).filter((l) => frente === 'todas' || daFrente(l) === frente), (l) => l.uf ?? '?'),
+    [leads, frente],
+  );
 
   const visiveis = useMemo(
-    () => (leads ?? []).filter((l) => uf === 'todas' || (l.uf ?? '?') === uf),
-    [leads, uf],
+    () => (leads ?? []).filter((l) =>
+      (uf === 'todas' || (l.uf ?? '?') === uf) && (frente === 'todas' || daFrente(l) === frente)),
+    [leads, uf, frente],
   );
 
   const porEtapa = useMemo(() => {
@@ -108,13 +122,14 @@ export default function Prospeccao() {
 
   const total = visiveis.length;
   const esfriaram = visiveis.filter((l) => l.esfriou).length;
+  const semFrente = visiveis.filter((l) => !l.ramal).length;
 
   return (
     <div>
       <PageHeader
         eyebrow="Mercado"
         title="Prospecção"
-        subtitle={`${total} óticas no funil · ${esfriaram} esfriaram sem responder · lido de v_mkt_funil_leads, sem telefone nem nome de pessoa`}
+        subtitle={`${total} óticas no funil · ${esfriaram} esfriaram sem responder · ${semFrente} ainda sem frente definida · lido de v_mkt_funil_leads, sem telefone nem nome de pessoa`}
         actions={
           <button onClick={carregar} className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface" title="Recarregar">
             <RefreshCw size={16} className={carregando ? 'animate-spin' : ''} />
@@ -122,14 +137,11 @@ export default function Prospeccao() {
         }
       />
 
-      <div className="flex flex-wrap items-center gap-1 mb-6 border border-outline/15 w-fit p-0.5">
-        {[['todas', total] as const, ...ufs].map(([id, n]) => (
-          <button key={id} onClick={() => setUf(id as string)}
-            className={`font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 transition-colors ${
-              uf === id ? 'bg-secondary text-on-action' : 'text-muted hover:text-on-surface'}`}>
-            {id === 'todas' ? 'Todas' : id} <span className="opacity-60">{n}</span>
-          </button>
-        ))}
+      <div className="flex flex-wrap items-start gap-x-6 gap-y-3 mb-6">
+        <Filtro rotulo="Frente" valor={frente} opcoes={frentes} aoTrocar={setFrente}
+          total={(leads ?? []).filter((l) => uf === 'todas' || (l.uf ?? '?') === uf).length} />
+        <Filtro rotulo="UF" valor={uf} opcoes={ufs} aoTrocar={setUf}
+          total={(leads ?? []).filter((l) => frente === 'todas' || daFrente(l) === frente).length} />
       </div>
 
       {/* Régua de conversão: quantos ALCANÇARAM cada marco, não quantos estão nele agora. */}
@@ -170,6 +182,25 @@ export default function Prospeccao() {
         Hotmart cruzadas por <span className="font-mono">utm_content</span>; enquanto ninguém comprou, a coluna
         fica vazia — e vazio aqui é medição, não falta de dado.
       </p>
+    </div>
+  );
+}
+
+function Filtro({ rotulo, valor, opcoes, aoTrocar, total }: {
+  rotulo: string; valor: string; opcoes: [string, number][]; aoTrocar: (v: string) => void; total: number;
+}) {
+  return (
+    <div>
+      <div className="font-mono text-[9px] uppercase tracking-widest text-muted mb-1">{rotulo}</div>
+      <div className="flex flex-wrap items-center gap-1 border border-outline/15 w-fit p-0.5">
+        {([['todas', total] as [string, number]]).concat(opcoes).map(([id, n]) => (
+          <button key={id} onClick={() => aoTrocar(id)}
+            className={`font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 transition-colors ${
+              valor === id ? 'bg-secondary text-on-action' : 'text-muted hover:text-on-surface'}`}>
+            {id === 'todas' ? 'Todas' : id} <span className="opacity-60">{n}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
