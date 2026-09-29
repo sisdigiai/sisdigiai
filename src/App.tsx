@@ -35,6 +35,7 @@ import Billing from './modules/Billing';
 import Inventario from './modules/Inventario';
 import Seo from './modules/Seo';
 import MapaDeCalor from './modules/MapaDeCalor';
+import Prospeccao from './modules/Prospeccao';
 import { ehRetornoDoGoogle } from './lib/gscReauth';
 import Vendas from './modules/Vendas';
 import { ModuleStub } from './modules/Stub';
@@ -54,6 +55,7 @@ const MODULES: ModuleId[] = [
   'marketing', 'mkt-crescimento', 'mkt-calc', 'marketing-engajamento', 'fluxo-osi', 'travas-marketing',
   'ecossistemas', 'mapa-vivo', 'decisoes', 'biblioteca', 'brand', 'guia', 'inventario', 'seo', 'vendas',
   'mapa-calor',
+  'prospeccao',
 ];
 
 function moduleFromHash(): ModuleId {
@@ -77,14 +79,14 @@ const MODULE_LABEL: Record<ModuleId, string> = {
   inventario: 'Inventário',
   seo: 'SEO',
   vendas: 'Vendas',
-  'mapa-calor': 'Mapa de calor',
+  'mapa-calor': 'Mapa de calor', prospeccao: 'Prospecção',
 };
 
 // Seção da navegação a que cada módulo pertence — usado como breadcrumb no header.
 const MODULE_SECTION: Record<ModuleId, string> = {
   hoje: 'Hoje', visao: 'Hoje', semana: 'Hoje', trilha: 'Hoje', 'lista-mestra': 'Hoje', backlog: 'Hoje',
   vendas: 'Dinheiro', financeiro: 'Dinheiro', cobranca: 'Dinheiro', marketplace: 'Dinheiro',
-  comercial: 'Mercado', 'fluxo-osi': 'Mercado', 'marketing-engajamento': 'Mercado', 'mapa-calor': 'Mercado',
+  comercial: 'Mercado', 'fluxo-osi': 'Mercado', 'marketing-engajamento': 'Mercado', 'mapa-calor': 'Mercado', prospeccao: 'Mercado',
   portfolio: 'Produtos', ecossistemas: 'Produtos', 'mapa-vivo': 'Produtos', clearix: 'Produtos', academy: 'Produtos', seo: 'Produtos',
   marketing: 'Marketing', 'travas-marketing': 'Marketing',
   'mkt-crescimento': 'Marketing', 'mkt-calc': 'Marketing',
@@ -189,6 +191,7 @@ export default function App() {
       case 'inventario': return <Inventario />;
       case 'seo': return <Seo />;
       case 'mapa-calor': return <MapaDeCalor />;
+      case 'prospeccao': return <Prospeccao />;
       case 'vendas': return <Vendas />;
       case 'comercial': return <Comercial />;
       default: {
