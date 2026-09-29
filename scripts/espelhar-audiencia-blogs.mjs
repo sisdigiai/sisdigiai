@@ -50,8 +50,11 @@ select b.slug as blog_slug, b.nome,
        count(*) filter (where e.evento = 'page_view')                                        as page_views,
        count(*) filter (where e.evento = 'leitura_30s')                                      as leituras_30s,
        count(distinct e.sessao)                                                              as sessoes,
+       -- os três baldes são DISJUNTOS de propósito: rajada e interno se sobrepõem quase todo (a rajada É o
+       -- verificador interno), e somar os dois na tela deu "764 de máquina" num total de 473 eventos.
        count(*) filter (where e.cliente = 'navegador' and not e.em_rajada)                   as eventos_humanos,
-       count(*) filter (where e.em_rajada)                                                   as eventos_rajada,
+       count(*) filter (where e.em_rajada
+                          and e.cliente not like 'interno%' and e.cliente <> 'robo')         as eventos_rajada,
        count(*) filter (where e.cliente like 'interno%' or e.cliente = 'robo')               as eventos_internos,
        max(e.created_at) filter (where e.cliente = 'navegador' and not e.em_rajada)           as ultimo_humano
   from core.blogs b

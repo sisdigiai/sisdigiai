@@ -3,7 +3,10 @@
 -- ✔ APLICADA em 28/09/2026 às 17:50:28 BRT, reensaiada antes. Commentários de coluna ajustados logo depois,
 --   quando o espelho revelou que o "83 page_views" do Ecoax é já filtrado (navegador + desconhecido) e o bruto
 --   é 277 — a tabela guarda o BRUTO, e a tela nunca o mostra sem o número de gente ao lado.
---   Primeiro retrato gravado: 5 blogs, 277 acessos brutos, 394 de máquina declarada, **2 de pessoa**.
+--   Primeiro retrato gravado: 5 blogs, 277 acessos brutos e **2 de pessoa**.
+--   CORRIGIDO em 29/09, quando o dono viu a tela: os baldes 'rajada' e 'interno' se sobrepõem (a rajada É o
+--   verificador interno) e a tela somava os dois, mostrando '764 de máquina' num universo de 473 eventos.
+--   Agora são disjuntos: interno declarado (360) + rajada que passou como leitor (70) + gente (3).
 --
 -- (Escrita como NÃO APLICADA.)
 --
