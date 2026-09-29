@@ -82,7 +82,7 @@ interface MaterialEntry {
 }
 
 const MATERIAIS: MaterialEntry[] = [
-  { titulo: 'Manual Clearix — Bíblia do App', arquivo: 'Manual-Clearix-Biblia.pdf', descricao: 'Manual completo do ecossistema: o Hub e os 17 apps, tela por tela, com passo a passo, sacadas e cuidados. Onboarding e apoio à venda. 238 páginas (edição de 27/09/2026).', badge: 'manual', tamanho: '22 MB · PDF' },
+  { titulo: 'Manual Clearix — Bíblia do App', arquivo: 'Manual-Clearix-Biblia.pdf', descricao: 'Manual completo do ecossistema: o Hub e os 17 apps, tela por tela, com passo a passo, sacadas e cuidados. Onboarding e apoio à venda. 240 páginas (edição de 29/09/2026).', badge: 'manual', tamanho: '22 MB · PDF' },
   { titulo: 'Pitch Clearix — Óticas', arquivo: 'Clearix-Pitch-Oticas.pdf', descricao: 'Deck B2B para donos de ótica: dores, solução, planos, prova com a ótica piloto e a oferta de teste.', badge: 'pitch', tamanho: '~1 MB · PDF' },
 ];
 
