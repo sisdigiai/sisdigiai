@@ -85,7 +85,7 @@ export default function MarketingEspelho() {
   const [loading, setLoading] = useState(true);
   // Página longa esconde o que importa: o dono rolava seis seções para chegar à cadeia de resultados.
   // Cada aba responde UMA pergunta; a primeira é sempre "está dando resultado?".
-  const [aba, setAba] = useState<'resultado' | 'marcas' | 'publicacoes' | 'motores' | 'fontes'>('resultado');
+  const [aba, setAba] = useState<'resultado' | 'marcas' | 'publicacoes' | 'motores' | 'fatos' | 'fontes'>('resultado');
 
   const load = async () => {
     setLoading(true);
@@ -154,7 +154,7 @@ export default function MarketingEspelho() {
         <div className="flex items-center gap-1 border border-outline/15 w-fit p-0.5 overflow-x-auto">
           {([
             ['resultado', 'Resultado'], ['marcas', 'Marcas'], ['publicacoes', 'Publicações'],
-            ['motores', 'Motores'], ['fontes', 'Fatos & fontes'],
+            ['motores', 'Motores'], ['fatos', 'Fatos'], ['fontes', 'Fontes'],
           ] as const).map(([id, rotulo]) => (
             <button key={id} onClick={() => setAba(id)}
               className={`font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 whitespace-nowrap transition-colors ${
@@ -475,7 +475,7 @@ export default function MarketingEspelho() {
                 { nome: 'Vendas (canais Hotmart/Kiwify/MP)', chave: cadeia ? `${cadeia.vendas_30d} vendas 30d` : '—', quando: cadeia?.ultima_venda?.slice(0, 10) ?? null, href: '#/vendas', destino: 'Vendas', alerta: (cadeia?.vendas_30d ?? 0) === 0 },
                 { nome: 'OSI (funil + prospeccao)', chave: cadeia ? `${cadeia.disparos_30d} disparos 30d` : '—', quando: cadeia?.ultimo_disparo?.slice(0, 10) ?? null, href: '#/fluxo-osi', destino: 'OSI', alerta: cadeia ? (Date.now() - new Date(cadeia.ultimo_disparo ?? 0).getTime()) / 864e5 > 7 : false },
                 { nome: 'Uso vivo Clearix (prova interna)', chave: 'lido na Central Clearix, com o login dela', quando: null, href: '#/clearix', destino: 'Central Clearix' },
-                { nome: 'Fatos publicaveis (trava por marca)', chave: `${fatos.filter((x) => x.fresco).length}/${fatos.length} frescos`, quando: null, href: '#/marketing', destino: 'abaixo' },
+                { nome: 'Fatos publicaveis (trava por marca)', chave: `${fatos.filter((x) => x.fresco).length}/${fatos.length} frescos`, quando: null, href: '#/marketing', destino: 'aba Fatos' },
                 { nome: 'Scorecard da semana', chave: 'metas + preenchimento automatico', quando: null, href: '#/semana', destino: 'Semana' },
               ] as { nome: string; chave: string; quando: string | null; href: string; destino: string; alerta?: boolean }[]).map((fonte) => {
                 const dias = fonte.quando ? Math.floor((Date.now() - new Date(fonte.quando + 'T12:00:00').getTime()) / 864e5) : null;
@@ -497,6 +497,7 @@ export default function MarketingEspelho() {
           </div>
         )}
 
+        {aba === 'fatos' && (
         <div className="border border-outline/15 bg-surface-container">
           <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2">
             <Target className="w-3.5 h-3.5 text-secondary" />
@@ -523,6 +524,7 @@ export default function MarketingEspelho() {
             </div>
           )}
         </div>
+        )}
 
         <div className="border border-outline/15 bg-surface-lowest p-3 flex items-start gap-2.5 text-[12px] text-on-surface-variant">
           <Info className="w-4 h-4 text-secondary shrink-0 mt-0.5" />
