@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, Target, Bot, RefreshCw, Check, MessageSquareWarning } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
+import ToqueVenda from '../components/ToqueVenda';
 import { ordemStore, placarStore, type ItemOrdem, type BlocoOrdem, type PlacarHoje, type PontoMrr } from '../lib/ordemStore';
 import { useAuth } from '../contexts/AuthContext';
 import ProspeccaoHoje from './hoje/ProspeccaoHoje';
@@ -93,6 +94,12 @@ export default function Hoje() {
           </button>
         </div>
       </PageHeader>
+
+      {/* 166: o bloco de venda é diário e o gargalo é o tempo do dono — o registro fica na PRIMEIRA tela que
+          ele abre, acima de tudo. Registro que exige procurar a tela some da rotina na terceira ligação. */}
+      <div className="mb-5">
+        <ToqueVenda />
+      </div>
 
       {placar && (
         <div className="mb-5 space-y-3">

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Snowflake, RefreshCw } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
+import ToqueVenda from '../components/ToqueVenda';
 import { supabase } from '../lib/supabase';
 
 // Kanban da prospecção — pedido do dono (29/09/2026), fonte public.v_mkt_funil_leads (MKT).
@@ -25,9 +26,16 @@ interface Lead {
   comprou_em: string | null; saiu_em: string | null; esfriou: boolean;
 }
 
+// 166: "morno" é o lead que o DONO tocou (ligação, demo ou piloto registrado em 1 toque). Não é etapa do
+// MKT e não pedi que virasse: a coluna é derivada aqui, do nosso próprio registro. Fica ANTES das colunas do
+// robô porque quem falou com uma pessoa está na frente de quem recebeu mensagem automática — e misturar os
+// dois foi exatamente o que fez "48 responderam" parecer pipeline quando 39 eram resposta a robô.
+const MORNO = 'morno';
+
 const ORDEM: { id: string; rotulo: string }[] = [
   { id: 'captada', rotulo: 'Captada' },
   { id: 'abordada', rotulo: 'Abordada' },
+  { id: MORNO, rotulo: 'Morno · o dono tocou' },
   { id: 'respondeu_robo', rotulo: 'Respondeu ao robô' },
   { id: 'respondeu_a_conferir', rotulo: 'Respondeu · a conferir' },
   { id: 'respondeu_pessoa', rotulo: 'Falou com pessoa' },
@@ -61,9 +69,14 @@ export default function Prospeccao() {
   const [uf, setUf] = useState<string>('todas');
   const [frente, setFrente] = useState<string>('todas');
   const [carregando, setCarregando] = useState(true);
+  const [tocados, setTocados] = useState<Map<string, { tipo: string; quando: string }>>(new Map());
 
   const carregar = () => {
     setCarregando(true);
+    supabase.from('v_ops_toques_lead').select('*').then(({ data }) => {
+      setTocados(new Map(((data ?? []) as { lead_id: string; tipo: string; quando: string }[])
+        .filter((t) => t.lead_id).map((t) => [t.lead_id, { tipo: t.tipo, quando: t.quando }])));
+    });
     supabase.from('v_mkt_funil_leads').select('*').then(({ data, error }) => {
       if (error) { setErro(error.message); setLeads([]); }
       else { setErro(null); setLeads((data ?? []) as Lead[]); }
@@ -96,17 +109,28 @@ export default function Prospeccao() {
     [leads, uf, frente],
   );
 
+  // Lead tocado pelo dono sai da coluna do robô e vai para "morno" — a menos que já tenha andado além
+  // (interessada, link, clicou, comprou), onde a etapa do MKT diz mais que o nosso registro.
+  const ADIANTE = new Set(['interessada', 'link_enviado', 'clicou', 'comprou', 'saiu', 'perdida']);
   const porEtapa = useMemo(() => {
     const m = new Map<string, Lead[]>();
-    for (const l of visiveis) m.set(l.etapa, [...(m.get(l.etapa) ?? []), l]);
+    for (const l of visiveis) {
+      const etapa = tocados.has(l.lead_id) && !ADIANTE.has(l.etapa) ? MORNO : l.etapa;
+      m.set(etapa, [...(m.get(etapa) ?? []), l]);
+    }
     return m;
-  }, [visiveis]);
+  }, [visiveis, tocados]);
 
   // Etapa que a view devolve e esta tela não conhece: aparece no fim, nomeada, em vez de sumir.
   const desconhecidas = useMemo(
     () => [...porEtapa.keys()].filter((e) => !ORDEM.some((o) => o.id === e) && !FIM.some((f) => f.id === e)),
     [porEtapa],
   );
+  const recarregarToques = () =>
+    supabase.from('v_ops_toques_lead').select('*').then(({ data }) => {
+      setTocados(new Map(((data ?? []) as { lead_id: string; tipo: string; quando: string }[])
+        .filter((t) => t.lead_id).map((t) => [t.lead_id, { tipo: t.tipo, quando: t.quando }])));
+    });
 
   if (erro) {
     return (
@@ -136,6 +160,8 @@ export default function Prospeccao() {
           </button>
         }
       />
+
+      <div className="mb-6"><ToqueVenda aoRegistrar={recarregarToques} /></div>
 
       <div className="flex flex-wrap items-start gap-x-6 gap-y-3 mb-6">
         <Filtro rotulo="Frente" valor={frente} opcoes={frentes} aoTrocar={setFrente}
@@ -177,7 +203,8 @@ export default function Prospeccao() {
       </div>
 
       <p className="text-xs text-muted mt-6 leading-relaxed">
-        Somente leitura — quem move lead é a esteira do DIGIAI MKT. <b>Esfriou</b> é o lead que parou de
+        A esteira do DIGIAI MKT move o lead pelas etapas; <b>Morno</b> é nosso: sai do registro em 1 toque
+        acima, e some quando o lead anda além (interessada em diante), porque aí a etapa do MKT diz mais. <b>Esfriou</b> é o lead que parou de
         responder onde estava, não uma recusa: fica na própria coluna, com o floco. Compra vem das vendas da
         Hotmart cruzadas por <span className="font-mono">utm_content</span>; enquanto ninguém comprou, a coluna
         fica vazia — e vazio aqui é medição, não falta de dado.
