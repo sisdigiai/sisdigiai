@@ -257,64 +257,13 @@ export const marketingStore = {
     return (data ?? []) as Platform[];
   },
 
-  // ── Social updates (aba Redes — migration 041) ──
-  // null = view ausente (migration 041 ainda não aplicada) ou erro de rede
-  async listSocialUpdates(): Promise<SocialUpdate[] | null> {
-    const { data, error } = await supabase
-      .from('v_marketing_social_updates')
-      .select('*')
-      .order('happened_on', { ascending: false })
-      .order('created_at', { ascending: false });
-    if (error) { console.error('[marketingStore] listSocialUpdates:', error.message); return null; }
-    return (data ?? []) as SocialUpdate[];
-  },
+  // 30/09/2026: as cinco funções que liam marketing.social_updates, social_accounts, account_status e
+  // post_metrics saíram daqui. Na varredura do app o dono apontou dado atrasado; ao conferir, essas
+  // quatro fontes (99 a 105 dias, duas vazias) NÃO eram lidas por tela nenhuma — zero chamadas fora
+  // deste arquivo. Código morto apontando para tabela velha é pior que tabela velha: faz quem lê o
+  // store acreditar que a tela mostra aquilo. O censo vivo das redes é mkt.audiencia_diaria, que a
+  // corrente de resultados já usa. As tabelas ficam no banco como histórico.
 
-  async logSocialUpdate(input: { account_code: string; update_type: SocialUpdateType; title: string; url?: string; notes?: string; happened_on?: string }): Promise<string | null> {
-    const { data, error } = await supabase.rpc('marketing_log_social_update', {
-      p_account_code: input.account_code,
-      p_update_type: input.update_type,
-      p_title: input.title,
-      p_url: input.url ?? null,
-      p_notes: input.notes ?? null,
-      p_happened_on: input.happened_on ?? null,
-    });
-    if (error) { console.error('[marketingStore] logSocialUpdate:', error.message); return null; }
-    return data as string;
-  },
-
-  // ── Central de Postagens: performance (ADR-0039) ──
-  // null = views ausentes (mig 042 não aplicada) ou erro
-  async listSocialAccounts(): Promise<SocialAccount[] | null> {
-    const { data, error } = await supabase.from('v_marketing_social_accounts').select('*').order('camada');
-    if (error) { console.error('[marketingStore] listSocialAccounts:', error.message); return null; }
-    return (data ?? []) as SocialAccount[];
-  },
-
-  // Último status de cada conta (placar de seguidores)
-  async latestAccountStatus(): Promise<AccountStatus[] | null> {
-    const { data, error } = await supabase.from('v_marketing_account_status').select('*').order('captured_on', { ascending: false });
-    if (error) { console.error('[marketingStore] latestAccountStatus:', error.message); return null; }
-    const seen = new Set<string>();
-    const latest: AccountStatus[] = [];
-    for (const r of (data ?? []) as AccountStatus[]) {
-      if (!seen.has(r.account_code)) { seen.add(r.account_code); latest.push(r); }
-    }
-    return latest;
-  },
-
-  // Métricas mais recentes por post (último snapshot de cada external_post_id)
-  async latestPostMetrics(limit = 60): Promise<PostMetric[] | null> {
-    const { data, error } = await supabase.from('v_marketing_post_metrics').select('*').order('captured_on', { ascending: false }).limit(400);
-    if (error) { console.error('[marketingStore] latestPostMetrics:', error.message); return null; }
-    const seen = new Set<string>();
-    const latest: PostMetric[] = [];
-    for (const r of (data ?? []) as PostMetric[]) {
-      const key = `${r.account_code}|${r.external_post_id}`;
-      if (!seen.has(key)) { seen.add(key); latest.push(r); }
-      if (latest.length >= limit) break;
-    }
-    return latest;
-  },
 
   // ── Ideas ──
   async listIdeas(filters?: { pillarCode?: string; status?: ContentIdeaStatus }): Promise<ContentIdea[]> {
