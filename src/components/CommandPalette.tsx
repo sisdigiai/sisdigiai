@@ -20,7 +20,8 @@ const ITEMS: Item[] = [
   { id: 'marketing', label: 'Marketing (espelho MKT)', group: 'Marketing' },
   { id: 'mkt-crescimento', label: 'Radar 360 (analytics social)', group: 'Marketing' },
   { id: 'mkt-calc', label: 'Clearix Calc (isca)', group: 'Marketing' },
-  { id: 'marketing-engajamento', label: 'Engajamento', group: 'Marketing' },
+  // escondida em 30/09/2026 junto com a entrada do menu (ver Sidebar.tsx) — programa da OSI não começou
+  // { id: 'marketing-engajamento', label: 'Engajamento', group: 'Marketing' },
   { id: 'fluxo-osi', label: 'OSI (mapa · economia · materiais · afiliados)', group: 'Marketing' },
   { id: 'travas-marketing', label: 'Travas Marketing', group: 'Marketing' },
   { id: 'ecossistemas', label: 'Ecossistemas (Painel)', group: 'Ecossistemas' },

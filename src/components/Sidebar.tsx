@@ -5,7 +5,7 @@ import {
   Compass, Flame, LogOut, Store, Sparkles, Music2, Activity,
   Camera, Wand2, Boxes, Search, ShieldCheck, Workflow, ChevronDown,
   GraduationCap, Languages, Calendar as CalendarIcon, Globe, BarChart3,
-  Lightbulb, Heart, Package, Users, Receipt, Radio, CalendarCheck,
+  Lightbulb, Package, Users, Receipt, Radio, CalendarCheck,
   Sunrise, Calculator, MapPin, Columns3 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
@@ -59,7 +59,12 @@ const dinheiro: NavItem[] = [
 const mercado: NavItem[] = [
   { id: 'comercial',        label: 'Pipeline',          icon: <TrendingUp className="w-4 h-4" /> },
   { id: 'fluxo-osi',        label: 'OSI',               icon: <Workflow className="w-4 h-4" /> },
-  { id: 'marketing-engajamento', label: 'Engajamento',  icon: <Heart className="w-4 h-4" /> },
+  // 30/09/2026, palavra do dono: "tira a tela de engajamento do caminho por enquanto". A tela mostra o
+  // programa de comunidade da OSI, que não começou — 1 depoimento e 1 membro, ambos de 26/05; desafios e
+  // afiliados vazios. Tela de programa inexistente ocupa lugar no menu e ensina a ignorar menu.
+  // NÃO foi apagada: o módulo e a rota continuam inteiros, e basta descomentar esta linha quando o
+  // programa começar — reimportando `Heart` do lucide-react junto.
+  // { id: 'marketing-engajamento', label: 'Engajamento', icon: <Heart className="w-4 h-4" /> },
   { id: 'mapa-calor',       label: 'Mapa de calor',     icon: <MapPin className="w-4 h-4" /> },
   { id: 'prospeccao',       label: 'Prospecção',        icon: <Columns3 className="w-4 h-4" /> },
 ];
