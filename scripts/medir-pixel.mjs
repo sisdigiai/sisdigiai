@@ -32,13 +32,16 @@ async function sql(query) {
   return JSON.parse(t);
 }
 
+// 01/10: o catch devolvia texto vazio e engolia o motivo. Com isso "não consegui ler o bundle" e "o site
+// não tem pixel" viravam a MESMA resposta — e o painel chamaria de vitrine cega quem só teve timeout.
+// Agora a falha volta nomeada e sobe até o retrato; medição que não sabe que falhou é pior que medição nenhuma.
 async function baixar(url, ms = 20000) {
-  const ctrl = AbortSignal.timeout(ms);
   try {
-    const r = await fetch(url, { redirect: 'follow', signal: ctrl, headers: { 'User-Agent': 'digiai-medidor/1.0 (painel interno)' } });
-    return { code: r.status, texto: r.status < 400 ? await r.text() : '' };
-  } catch {
-    return { code: 0, texto: '' };
+    const r = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(ms),
+      headers: { 'User-Agent': 'digiai-medidor/1.0 (painel interno)' } });
+    return { code: r.status, texto: r.status < 400 ? await r.text() : '', erro: r.status >= 400 ? `HTTP ${r.status}` : null };
+  } catch (e) {
+    return { code: 0, texto: '', erro: e?.name === 'TimeoutError' ? 'timeout' : (e?.cause?.code ?? e?.name ?? 'falhou') };
   }
 }
 
@@ -46,11 +49,26 @@ async function medir(url) {
   const base = url.replace(/\/$/, '');
   const pagina = await baixar(base);
   let todo = pagina.texto;
-  const scripts = [...new Set([...todo.matchAll(/(?:\/assets\/|\/_next\/static\/[^"']*?\/|\/_astro\/)[^"']*?\.js/g)].map((m) => m[0]))].slice(0, 3);
-  for (const s of scripts) todo += (await baixar(base + s, 25000)).texto;
+  // 01/10: buscava só /assets, /_next e /_astro. Os pixels de digiai.app.br e clearix.app.br vivem em
+  // arquivo próprio (/digiai-pixel.js, /clearix-pixel.js), então o medidor dizia "sem meta" sobre dois
+  // sites que TÊM pixel — e o painel ia chamar de vitrine cega quem estava medindo. Agora segue todo
+  // <script src> do próprio site, que é o que o navegador faria.
+  const scripts = [...new Set([...todo.matchAll(/<script[^>]+src=["']([^"']+)["']/g)]
+    .map((m) => m[1]).filter((u) => !/^https?:/i.test(u)))].slice(0, 8);
+  const falhas = [];
+  for (const s of scripts) {
+    const r = await baixar(base + (s.startsWith('/') ? s : '/' + s), 25000);
+    if (r.erro) falhas.push(`${s}: ${r.erro}`); else todo += r.texto;
+  }
+  if (pagina.erro) falhas.push(`página: ${pagina.erro}`);
 
   const meta = /fbevents\.js|fbq\s*\(/.test(todo);
-  const id = todo.match(/\b(1[0-9]{14,15})\b/)?.[1] ?? null;
+  // O ID pode vir de três lugares: a variável que o layout injeta, o init do fbq, ou solto no bundle.
+  // Ler só "número começado em 1" era palpite meu: o pixel do site institucional começa em 3.
+  const id = todo.match(/META_PIXEL_ID\s*=\s*["']([0-9]{14,17})["']/)?.[1]
+          ?? todo.match(/const id\s*=\s*["']([0-9]{14,17})["']/)?.[1]
+          ?? todo.match(/fbq\s*\(\s*["']init["']\s*,\s*["']([0-9]{14,17})["']/)?.[1]
+          ?? todo.match(/\b([0-9]{15,16})\b/)?.[1] ?? null;
   return {
     url,
     http_code: pagina.code,
@@ -58,8 +76,17 @@ async function medir(url) {
     tiktok: /analytics\.tiktok\.com|ttq\.load/.test(todo),
     ga_gtm: todo.match(/\b(G-[A-Z0-9]{8,12}|GTM-[A-Z0-9]{5,8})\b/)?.[1] ?? null,
     clarity: /clarity\.ms/.test(todo),
-    obs: scripts.length ? `html + ${scripts.length} bundle(s)` : 'só html',
+    obs: (falhas.length ? `NÃO LIDO: ${falhas.join('; ')} — ` : '') +
+         (scripts.length ? `html + ${scripts.length - falhas.length} de ${scripts.length} script(s)` : 'só html'),
   };
+}
+
+// Um site só, com o retrato inteiro: `node scripts/medir-pixel.mjs https://site --dry`. Serve para
+// conferir um caso sem varrer 33 e sem gravar.
+const alvo = process.argv.find((a) => /^https?:\/\//.test(a));
+if (alvo) {
+  console.log(JSON.stringify(await medir(alvo), null, 2));
+  process.exit(0);
 }
 
 const sites = await sql(`select valor url from company.digital_assets
@@ -69,7 +96,8 @@ const medidos = [];
 for (const s of sites) {
   const m = await medir(s.url);
   medidos.push(m);
-  console.log(`${String(m.http_code).padEnd(3)} ${m.url}  meta:${m.meta_pixel_id ?? 'não'}  tiktok:${m.tiktok ? 'sim' : 'não'}  ga:${m.ga_gtm ?? 'não'}`);
+  console.log(`${String(m.http_code).padEnd(3)} ${m.url}  meta:${m.meta_pixel_id ?? 'não'}  tiktok:${m.tiktok ? 'sim' : 'não'}  ga:${m.ga_gtm ?? 'não'}` +
+    (m.obs.startsWith('NÃO LIDO') ? `  ⚠ ${m.obs}` : ''));
 }
 
 if (DRY) { console.log(`\n--dry: ${medidos.length} medidos, nada gravado.`); process.exit(0); }
