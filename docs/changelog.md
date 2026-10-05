@@ -2,7 +2,12 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
-## 2026-10-05 — Robô e teste param de contar como gente (173–179)
+## 2026-10-05 — Robô e teste param de contar como gente (173–180)
+
+- **`create or replace view` apaga as reloptions, e eu aprendi isso errando duas vezes na mesma view.** A 177 pôs `security_invoker` em `analytics.events_humanos` por `alter view`; a 178, uma hora depois, recriou a view para somar o filtro de teste e **zerou a opção** — o log voltou a abrir para qualquer `authenticated`. Quem achou foi o agente do MKT, medindo `reloptions`. Pela segunda vez, o olho dele e não o meu.
+  - **Conserto (180):** `with (security_invoker = true)` vai na **definição**, nunca em `alter view` depois. A regra que eu tinha escrito ("view nova nasce invoker") não cobria recriação, e foi exatamente por lá que o erro passou.
+  - **Medidor, para não depender de olho:** `ops.v_views_sem_invoker` lista toda view legível pelo app que roda como dona. A prova da própria migration usa a lista, com controle positivo — se o medidor viesse vazio, a migration falha.
+  - **Achado que fica aberto:** **36 views** (de 194 legíveis) rodam como dona; **1 é legível por `anon`** (`public.v_telao_afericao`). Não consertei no escuro: view de contrato que agrega entre tenants pode ser definer de propósito, e virar invoker esvaziaria a tela. Vai para o dono e para o agente de segurança com a lista.
 
 - **O log passou a separar três coisas que estavam juntas:** gente, máquina e teste. `analytics.events_log` ganhou duas colunas geradas — `automatico` (user-agent de robô, 175) e `teste` (a própria origem declarou, 178) — e a view `analytics.events_humanos` exclui as duas. Coluna gerada de propósito: vale para o que já está gravado e não depende de ninguém lembrar de filtrar na escrita.
 - **Achado grande:** `clearix_demo_solicitada` tinha **3 registros e só 1 é real** — dois eram teste da landing, de 15/09, contados como pedido de demonstração há três semanas. Pedido de demo é número de lead; estava inflado em 200%.
