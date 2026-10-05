@@ -15,7 +15,8 @@ import { espelhoMotores, type PulsoDia, type LimelightDia, type LimePubDia, type
 // v_marketing_cadeia + v_mkt_fila_saude + v_seo_estado + v_mkt_accounts.
 
 type Brand = { id: string; code: string; name: string; accent_hex: string | null; logo_url: string | null };
-type Pub = { id: string; brand_id: string; platform: string; url: string | null; published_at: string };
+type Pub = { id: string; brand_id: string; platform: string; url: string | null; published_at: string;
+  metadata: Record<string, unknown> | null };
 type Perf = {
   publication_id: string; brand_id: string; gatilho: string | null; formato: string | null;
   engajamento: number | null; alcance: number | null; salvamentos: number | null; compartilhamentos: number | null;
@@ -119,7 +120,7 @@ export default function MktCrescimento() {
     setLoading(true);
     const [b, p, cp, ad, pd, ld, bd, lp, be, { data: cad }, { data: fs }, { data: ac }, cr, { data: cfu }, { data: nv }] = await Promise.all([
       supabase.schema('mkt').from('brands').select('id, code, name, accent_hex, logo_url').order('name'),
-      supabase.schema('mkt').from('publications').select('id, brand_id, platform, url, published_at').order('published_at', { ascending: false }).limit(2000),
+      supabase.schema('mkt').from('publications').select('id, brand_id, platform, url, published_at, metadata').order('published_at', { ascending: false }).limit(2000),
       supabase.schema('mkt').from('content_performance').select('publication_id, brand_id, gatilho, formato, engajamento, alcance, salvamentos, compartilhamentos, views'),
       supabase.schema('mkt').from('audiencia_diaria').select('brand_id, platform, seguidores, dia').order('dia'),
       espelhoMotores.pulsoDias(),
@@ -171,10 +172,18 @@ export default function MktCrescimento() {
   const fimISO = fimDia + 'T23:59:59Z';
   const noRecorte = (dia: string) => dia >= corteDia && dia <= fimDia;
 
-  const pubsF = useMemo(() => pubs.filter((p) =>
+  // 05/10 (despacho do MKT): 88 publicações estão marcadas `excluido_em` — foram APAGADAS das redes na
+  // limpeza dos rostos de IA e dos pins — e 2 são teste de conexão. Post que não existe mais não é alcance
+  // nem cadência: contar aqui inflava tudo que esta tela mede. Story continua contando, porque foi ao ar.
+  const pubsVivas = useMemo(() => pubs.filter((p) => {
+    const m = (p.metadata ?? {}) as Record<string, unknown>;
+    return m.excluido_em == null && m.teste_de_conexao !== true;
+  }), [pubs]);
+
+  const pubsF = useMemo(() => pubsVivas.filter((p) =>
     p.published_at >= corteISO && p.published_at <= fimISO &&
     (!fMarca || brandOf(p.brand_id)?.code === fMarca) &&
-    (!fRede || p.platform === fRede)), [pubs, corteISO, fimISO, fMarca, fRede, brands]); // eslint-disable-line react-hooks/exhaustive-deps
+    (!fRede || p.platform === fRede)), [pubsVivas, corteISO, fimISO, fMarca, fRede, brands]); // eslint-disable-line react-hooks/exhaustive-deps
   const perfByPub = useMemo(() => new Map(perf.map((x) => [x.publication_id, x])), [perf]);
   const linhas = useMemo(() => pubsF.map((p) => ({ p, m: perfByPub.get(p.id) }))
     .filter((l) => !fConteudo || l.m?.gatilho === fConteudo || l.m?.formato === fConteudo), [pubsF, perfByPub, fConteudo]);
