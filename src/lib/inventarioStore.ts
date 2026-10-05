@@ -107,7 +107,20 @@ export interface BlogAudiencia {
   ultimo_humano: string | null; retrato_velho: boolean;
 }
 
+// 05/10: o vigia do MKT (public.v_mkt_vigia_sites) diz se o site RESPONDE. Complementa a medição de pixel,
+// que diz se ele CONTA quem entra — um site pode medir bem e estar fora do ar, e vice-versa.
+export interface VigiaSite {
+  site: string; url: string; estado: string; desde: string | null;
+  ultimo_check: string | null; motivo: string | null; ativo: boolean;
+}
+
 export const inventarioStore = {
+  async vigiaSites(): Promise<VigiaSite[]> {
+    const { data, error } = await supabase.from('v_mkt_vigia_sites').select('*');
+    if (error) { console.error('[inventarioStore] vigiaSites', error); return []; }
+    return (data ?? []) as VigiaSite[];
+  },
+
   async blogsAudiencia(): Promise<BlogAudiencia[]> {
     const { data, error } = await supabase.from('v_ops_blog_audiencia').select('*');
     if (error) { console.error('[inventarioStore] blogsAudiencia', error); throw new Error(error.message); }

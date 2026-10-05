@@ -4,7 +4,7 @@ import PageHeader from '../components/PageHeader';
 import AvisoFrescor from '../components/AvisoFrescor';
 import {
   inventarioStore, familiaDe, FAMILIAS_ORDEM, foiConferido, blocosDe, notaOriginal,
-  type ContaServico, type SitePixel,
+  type ContaServico, type SitePixel, type VigiaSite,
 } from '../lib/inventarioStore';
 
 // Inventário — o quadro de disjuntores da empresa.
@@ -45,6 +45,7 @@ export default function Inventario() {
   const [busca, setBusca] = useState('');
   const [aberto, setAberto] = useState<Set<string>>(new Set());
   const [pixels, setPixels] = useState<SitePixel[]>([]);
+  const [vigia, setVigia] = useState<VigiaSite[]>([]);
 
   useEffect(() => {
     inventarioStore.listar()
@@ -53,6 +54,7 @@ export default function Inventario() {
       .finally(() => setCarregando(false));
     inventarioStore.custoMedidoPorServico().then(setCustos).catch(() => {});
     inventarioStore.pixels().then(setPixels).catch(() => {});
+    inventarioStore.vigiaSites().then(setVigia).catch(() => {});
   }, []);
 
   // O 4º quadro NÃO é custo. `custo_mensal` está vazio em todas as linhas — o custo
@@ -246,7 +248,7 @@ export default function Inventario() {
             ))}
           </div>
 
-          <BlocoPixels pixels={pixels} />
+          <BlocoPixels pixels={pixels} vigia={vigia} />
 
           <p className="text-xs text-muted mt-10 leading-relaxed">
             A verdade destes dados vive em <code className="font-mono">ops.contas_servicos</code>, tabela do
@@ -261,8 +263,16 @@ export default function Inventario() {
 
 // Pixel declarado no inventário × pixel achado no ar (migrations 158/159). Vitrine sem medição é alarme;
 // app com login aparece só na contagem, porque ali não há visitante para contar.
-function BlocoPixels({ pixels }: { pixels: SitePixel[] }) {
+function BlocoPixels({ pixels, vigia }: { pixels: SitePixel[]; vigia: VigiaSite[] }) {
   if (pixels.length === 0) return null;
+  // O vigia (MKT) diz se o site RESPONDE; a medição diz se ele CONTA quem entra. São perguntas diferentes e
+  // ficam lado a lado: site pode medir bem e estar fora do ar. Quem o vigia não vigia aparece como
+  // "sem vigia" — nunca como "no ar", que seria afirmar o que ninguém conferiu.
+  const estadoDe = (url: string) => {
+    const v = vigia.filter((x) => x.ativo && x.url.replace(/\/$/, '') === url.replace(/\/$/, ''));
+    if (v.length === 0) return null;
+    return v.some((x) => x.estado === 'fora') ? v.find((x) => x.estado === 'fora')! : v[0];
+  };
   const vitrines = pixels.filter((p) => p.mede_visitante);
   const cegas = vitrines.filter((p) => p.veredito.startsWith('vitrine cega'));
   const medido = pixels.find((p) => p.medido_em)?.medido_em ?? null;
@@ -274,6 +284,7 @@ function BlocoPixels({ pixels }: { pixels: SitePixel[] }) {
         <span className="h-px flex-1 bg-outline/15" />
         <span className="font-mono text-[9px] uppercase tracking-wider text-muted">
           {vitrines.length} vitrines · {cegas.length} cegas · {pixels.length - vitrines.length} apps com login
+          {vigia.length > 0 && ` · ${vigia.filter((v) => v.ativo).length} vigiados`}
         </span>
       </div>
 
@@ -291,6 +302,17 @@ function BlocoPixels({ pixels }: { pixels: SitePixel[] }) {
                   {p.tiktok_no_ar && ' · tiktok'}{p.ga_gtm && ` · ${p.ga_gtm}`}
                 </span>
               </div>
+              {(() => {
+                const v = estadoDe(p.url);
+                const fora = v?.estado === 'fora';
+                return (
+                  <span className={`font-mono text-[9px] uppercase tracking-wider w-24 text-right shrink-0 ${
+                    fora ? 'text-danger' : v?.estado === 'no_ar' ? 'text-success' : 'text-muted'}`}
+                    title={v ? `vigia: ${v.motivo ?? '—'} · ${v.ultimo_check ? new Date(v.ultimo_check).toLocaleString('pt-BR') : 'sem check'}` : 'ninguém vigia este site'}>
+                    {v ? (fora ? `fora (${v.motivo ?? '?'})` : 'no ar') : 'sem vigia'}
+                  </span>
+                );
+              })()}
               <span className={`font-mono text-[10px] uppercase tracking-wider text-right ${ruim ? 'text-warning' : 'text-success'}`}>
                 {p.veredito}
               </span>
