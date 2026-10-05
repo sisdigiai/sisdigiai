@@ -57,6 +57,13 @@ const ORIGEM_LOCAL = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?(\/|$)/
 // 173 (05/10): `*.workers.dev` entrou. A loja Mello virou Cloudflare Worker em 02/10 e as prévias dela
 // vivem em <hash>-mello-ecommerce.sisdigiai.workers.dev — passavam como visita de gente. Produção é
 // mellooticas.com.br, então recusar o domínio inteiro não perde nada real.
+// 05/10: navegador automático não é visitante. A loja Mello estreou a medição e a PRIMEIRA visita a
+// chegar foi um HeadlessChrome — a mesma coisa que fez o Radar do Ecoax mostrar máquina como leitor por
+// duas semanas. A recusa de host já pegava preview; esta pega quem roda sem gente na frente, venha de onde
+// vier. Lista conservadora e só de assinatura declarada: quem se identifica como robô é recusado; quem se
+// disfarça não é problema desta linha.
+const UA_ROBO = /headless|puppeteer|playwright|phantomjs|lighthouse|selenium|bot[\s/\);]|bot$|crawler|spider|curl\/|wget\/|python-requests|axios\/|node-fetch|java\/|okhttp/i;
+
 const ORIGEM_PREVIEW = /^https?:\/\/([0-9a-f]{20,}--[a-z0-9-]+\.netlify\.app|([a-z0-9-]+\.)+pages\.dev|([a-z0-9-]+\.)+workers\.dev)(:\d+)?(\/|$)/i;
 // Os gatilhos do leitor só valem com o id do gatilho do desenho (g1…g4, e1, e2), vindo
 // em utm_content ou em metadata.gatilho. Sem ele o evento não diz QUAL gatilho, e o
@@ -93,6 +100,7 @@ Deno.serve(async (req) => {
       if (typeof e?.url !== 'string' || !e.url.trim()) { errors.push('sem_url'); continue; }
       if (ORIGEM_LOCAL.test(e.url)) { errors.push('origem_local'); continue; }
       if (ORIGEM_PREVIEW.test(e.url)) { errors.push('origem_preview'); continue; }
+      if (UA_ROBO.test(ua)) { errors.push('agente_automatico'); continue; }
 
       let utmContent = e?.utm_content ? String(e.utm_content).slice(0, 120) : null;
       if (code.startsWith('reader_gatilho_')) {
