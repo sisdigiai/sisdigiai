@@ -1116,7 +1116,7 @@ function CardNivel({ r }: { r: Nivel }) {
         <div>
           <div className="font-mono text-[9px] uppercase tracking-widest text-muted">O nível dá</div>
           <div className="text-[13px] text-on-surface">
-            {r.stories_dia != null ? `${r.stories_dia} story${r.stories_dia === 1 ? '' : 'ies'}/dia` : 'stories: sem dado'}
+            {r.stories_dia != null ? `${r.stories_dia} ${r.stories_dia === 1 ? 'story' : 'stories'}/dia` : 'stories: sem dado'}
           </div>
           <div className="text-[13px] text-on-surface-variant">Reels {reels}</div>
         </div>
