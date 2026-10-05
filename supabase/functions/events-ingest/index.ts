@@ -47,6 +47,16 @@ const ALLOWED = new Set([
   'loja_visit', 'loja_produto_visto', 'loja_carrinho', 'loja_checkout', 'loja_lead',
   'loja_newsletter', 'loja_compra',
 ]);
+// 188 (05/10): produto também é validado. Até aqui a borda gravava QUALQUER string como produto, e evento
+// sem produto caía como `osi` — então "melloloja" criaria funil fantasma e a loja mandando sem o campo
+// infla a OSI. A lista de verdade é `analytics.produtos_aceitos`; esta é a cópia da borda, e produto novo
+// entra nos DOIS lugares, igual aos códigos. O padrão `osi` fica: a landing da OSI não manda o campo.
+const PRODUTOS = new Set([
+  'osi', 'osi-leitor', 'clearix-site', 'clearix-calc', 'digiai-site', 'mello-loja',
+]);
+// NÃO valido o par código×produto, e é decisão medida: `reader_gatilho_*` chega hoje com produto `osi`
+// enquanto o catálogo diz `osi-leitor`, e `clearix-site` carrega `landing_visit` do histórico anterior a
+// 15/09. Exigir o par recusaria tráfego vivo para consertar um registro — o conserto é no catálogo.
 // Preview local não mede nada: em 15/09 o preview da landing OSI mandou landing_visit reais com
 // url localhost, e todo funil passou a precisar de filtro. Recusar aqui protege todas as landings
 // de uma vez, em vez de confiar que cada site lembre do filtro.
@@ -96,6 +106,8 @@ Deno.serve(async (req) => {
     for (const e of events) {
       const code = String(e?.event_code ?? '');
       if (!ALLOWED.has(code)) { errors.push(`bad_code:${code}`); continue; }
+      const produto = e?.product ? String(e.product) : 'osi';
+      if (!PRODUTOS.has(produto)) { errors.push(`bad_product:${produto}`); continue; }
       // Sem url não dá para saber de onde veio: não entra (a view de uso já não contaria).
       if (typeof e?.url !== 'string' || !e.url.trim()) { errors.push('sem_url'); continue; }
       if (ORIGEM_LOCAL.test(e.url)) { errors.push('origem_local'); continue; }
@@ -112,7 +124,7 @@ Deno.serve(async (req) => {
 
       const { error } = await supabase.rpc('fn_log_event', {
         p_event_code: code,
-        p_product: e?.product ?? 'osi',
+        p_product: produto,
         p_session_id: e?.session_id ? String(e.session_id).slice(0, 64) : null,
         p_url: e?.url ? String(e.url).slice(0, 500) : null,
         p_utm_source: e?.utm_source ? String(e.utm_source).slice(0, 120) : null,
