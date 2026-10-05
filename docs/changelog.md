@@ -2,6 +2,40 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-10-05 — Robô e teste param de contar como gente (173–179)
+
+- **O log passou a separar três coisas que estavam juntas:** gente, máquina e teste. `analytics.events_log` ganhou duas colunas geradas — `automatico` (user-agent de robô, 175) e `teste` (a própria origem declarou, 178) — e a view `analytics.events_humanos` exclui as duas. Coluna gerada de propósito: vale para o que já está gravado e não depende de ninguém lembrar de filtrar na escrita.
+- **Achado grande:** `clearix_demo_solicitada` tinha **3 registros e só 1 é real** — dois eram teste da landing, de 15/09, contados como pedido de demonstração há três semanas. Pedido de demo é número de lead; estava inflado em 200%.
+- **57 eventos** eram de robô (175). As telas de funil (`v_analytics_funnel_daily`, `_summary`) e o painel de pixels passaram a ler `events_humanos` (176).
+- **Erro meu, achado pelo MKT:** criei `events_humanos` sem `security_invoker` — violação da R-043, expondo sessão, url e `utm_content` (que carrega `lead_id`). Corrigido na 177, que de carona encontrou **INSERT/UPDATE/DELETE/TRUNCATE concedidos a `authenticated`** nas duas views de funil, e revogou.
+- **Loja Mello no ar:** 7 códigos de evento da loja (173) + o pixel atrás de consentimento. A compra de teste do dono não vai nascer como a primeira venda: o servidor da loja marca `metadata.teste` pela lista de e-mails de teste (decisão do agente do Ecommerce, 03d2d4d) e a 178 filtra.
+- **As visitas de conferência do Ecommerce não foram apagadas** (179) — foram marcadas como teste. Saem da conta, ficam no log. Apagar é destrutivo em dado real, e pedido de par é coordenação, não autorização.
+- **Telão honesto (174):** `v_mkt_publicacoes_dias` contava **88 publicações apagadas, 2 de teste e 11 stories** como se fossem post no feed — 46% de inflação. Agora separa `feed` / `stories` / `sem_url`.
+- **Inventário (169–171):** Worker `mello-ecommerce`, Cloudflare Email Routing e chave Resend registrados; o site da loja mudou de casa em 02/10 (Netlify → Cloudflare Workers) e o registro apontava para o endereço antigo — o medidor de pixel media a casa errada.
+
+## 2026-10-01 — Pilar da OSI renomeado pelo caminho da casa (168)
+
+- "convite direto pra turma" → "convite direto pro manual" em **25 ideias** (o despacho dizia 1; quem contou olhou só as que têm marca). As 24 sementes foram renomeadas direto; a curada foi **revogada, editada e devolvida à pauta** — o gatilho da casa recusa editar ideia aprovada, e estava certo. Aprovação é portão do dono (reaprovada em 05/10, migration 172).
+
+## 2026-09-30 — Venda em um toque e placar que se preenche sozinho (165–167)
+
+- **`ops.toque_venda`**: três botões (ligação, follow-up, piloto) + ótica + nota. A pessoa registra o toque em um gesto, e o placar da semana (`ligacoes_dono`, `pilotos_pagos`) passa a se preencher do que foi feito, em vez de alguém transcrever. `followups_feitos` desativada — estava medindo duas vezes a mesma coisa.
+- **Kanban do funil** ganhou a coluna derivada `MORNO` (toque recente sem avanço) e filtros por UF e por frente, cada contador respeitando o outro filtro.
+- **Telão** passou a receber publicações por dia (165) com prova de soma na própria migration.
+
+## 2026-09-29 — Passada sabe se veio da máquina ou do servidor (157, 163, 164)
+
+- `ops.estado_passada.origem`: "runner parado" era um diagnóstico só — virou dois, `estado_parado` e `sinais_repo_velhos`. A Action `estado-runner.yml` passa a ser a origem servidor (falta o dono preencher dois campos no GitHub).
+- **Fatos do Clearix pela folha única de 25/09** (157): carnê 1477 → 1528; entraram receita vencida 12m (926) e a vencer em 30d (70).
+- **Dívida da 153 paga, e a lição (164):** criei política em `ops.contas_servicos` sem o GRANT. A tela dava 403 e o `catch` engolia o erro — o bloco de pixels simplesmente desaparecia, sem nada na tela dizendo por quê. Virou a **R-043 §4-A**: provar que a porta está trancada não é provar que a chave certa abre. Toda prova de acesso daqui pra frente tem controle positivo.
+
+## 2026-09-28 — Pixel declarado ao lado do pixel medido (158–162)
+
+- **`ops.pixel_medicao` + `v_ops_pixels`**: o inventário dizia qual pixel é de qual produto, mas ninguém sabia se ele dispara. Agora a declaração aparece ao lado do que o `scripts/medir-pixel.mjs` achou no ar, e o veredito distingue "mede com pixel próprio" de "não mede".
+- **Três defeitos no medidor, achados porque o número não fechava:** ele só buscava `/assets/` (e os pixels de digiai.app.br e clearix.app.br vivem em arquivo próprio); tinha um caractere **backspace** literal onde devia ter `` no regex; e o `catch` devolvia texto vazio, fazendo "não consegui ler" parecer igual a "não tem pixel". O mesmo bug do backspace apareceu uma **terceira** vez no `UA_ROBO` da edge — Googlebot passava. Só foi achado testando o regex **lido do arquivo**, não digitado de novo.
+- **Três relógios no lugar errado (162):** `v_ops_frescor` media `academy` e `financeiro_declarado`, que ninguém alimenta, e não media o espelho do financeiro nem a publicação em redes. Trocadas as fontes.
+- **Audiência dos blogs (161):** os baldes somavam sobrepostos e davam "máquina 764" num universo de 473 eventos. Agora são disjuntos (humanos / rajada-não-interno / interno) e `page_views` nunca aparece sem `eventos_humanos` ao lado.
+
 ## 2026-09-25 — Maturidade ganha `parado`, `aposentado` e `estudo` (156)
 
 - 7 fichas estavam sendo recusadas porque o Geral escreveu estados que a lista da 140 não tinha. CHECK ampliado com os três que descrevem realidade; "material" e "piloto" ficaram de fora (o Geral corrigiu as duas fichas).
