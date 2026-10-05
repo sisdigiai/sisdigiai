@@ -18,6 +18,8 @@ const OWNER_LABEL: Record<string, string> = {
   easyidiomas: 'Easy Idiomas',
   niposchool: 'Nipo School',
   qualfoto: 'Qual a Foto',
+  // 171: o e-commerce saiu do bloco do Clearix — roda lá, mas é da Mello.
+  mello: 'Mello Óticas',
 };
 
 // owner_product (digital_assets) → slug do índice PRODUTOS (verdade única do Portfólio)
@@ -25,6 +27,7 @@ const OWNER_TO_SLUG: Record<string, string> = {
   clearix: 'clearix', digiai: 'digiai-app', osi: 'osi', polapetit: 'polapetit',
   pulso: 'pulso', nexus: 'nexus', lumina: 'lumina',
   easyidiomas: 'easy-idiomas', niposchool: 'nipo-school', qualfoto: 'qual-a-foto',
+  mello: 'mello-eyewear',
 };
 
 function produtoDoOwner(owner: string): ProdutoInfo | undefined {
