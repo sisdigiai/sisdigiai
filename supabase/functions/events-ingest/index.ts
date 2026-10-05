@@ -43,6 +43,9 @@ const ALLOWED = new Set([
   // 160 (28/09): site institucional passa a medir visita, por ordem do dono. Sobe junto com o catálogo —
   // código no catálogo sem allowlist aqui é recusa silenciosa na borda.
   'digiai_site_visit', 'digiai_cta_click',
+  // 173 (05/10): loja Mello. Sobem junto com o catálogo — código em um lado só é recusa calada.
+  'loja_visit', 'loja_produto_visto', 'loja_carrinho', 'loja_checkout', 'loja_lead',
+  'loja_newsletter', 'loja_compra',
 ]);
 // Preview local não mede nada: em 15/09 o preview da landing OSI mandou landing_visit reais com
 // url localhost, e todo funil passou a precisar de filtro. Recusar aqui protege todas as landings
@@ -51,7 +54,10 @@ const ORIGEM_LOCAL = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?(\/|$)/
 // Preview de deploy é agente conferindo, não pessoa ("carga de agente não é uso", regra do Geral, 16/09). Medido em
 // 16/09: 31 eventos de preview em 30 dias, quase todos da OSI, contando como visita. Netlify publica cada deploy em
 // <hash>--site.netlify.app; Cloudflare Pages em <algo>.pages.dev.
-const ORIGEM_PREVIEW = /^https?:\/\/([0-9a-f]{20,}--[a-z0-9-]+\.netlify\.app|([a-z0-9-]+\.)+pages\.dev)(:\d+)?(\/|$)/i;
+// 173 (05/10): `*.workers.dev` entrou. A loja Mello virou Cloudflare Worker em 02/10 e as prévias dela
+// vivem em <hash>-mello-ecommerce.sisdigiai.workers.dev — passavam como visita de gente. Produção é
+// mellooticas.com.br, então recusar o domínio inteiro não perde nada real.
+const ORIGEM_PREVIEW = /^https?:\/\/([0-9a-f]{20,}--[a-z0-9-]+\.netlify\.app|([a-z0-9-]+\.)+pages\.dev|([a-z0-9-]+\.)+workers\.dev)(:\d+)?(\/|$)/i;
 // Os gatilhos do leitor só valem com o id do gatilho do desenho (g1…g4, e1, e2), vindo
 // em utm_content ou em metadata.gatilho. Sem ele o evento não diz QUAL gatilho, e o
 // endpoint é público: texto livre aqui vira lixo, ou dado de terceiro, na tabela.
