@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { BarChart3, TrendingUp, Users, Eye, Bookmark, Share2, RefreshCw, Loader2, ExternalLink, Sparkles, Target, HeartPulse, Film, Newspaper, MapPin } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, Eye, Bookmark, Share2, RefreshCw, Loader2, ExternalLink, Sparkles, Target, HeartPulse, Film, Newspaper, MapPin, Gauge, ArrowUp, ArrowDown, Minus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia, diaBrasilia } from '../lib/datas';
 import OsiDiasCard from '../components/OsiDiasCard';
@@ -41,6 +41,7 @@ const ABAS = [
   { k: 'conteudo', label: 'Conteúdo', Icon: Newspaper },
   { k: 'video', label: 'Vídeo & motores', Icon: Film },
   { k: 'funil', label: 'Funil', Icon: Target },
+  { k: 'regua', label: 'Régua por marca', Icon: Gauge },
   { k: 'territorio', label: 'Território', Icon: MapPin },
   { k: 'saude', label: 'Saúde da coleta', Icon: HeartPulse },
 ] as const;
@@ -72,6 +73,18 @@ const fmtDM = (iso: string) => {
 const COR_OK = 'var(--color-action)';
 const COR_WARN = 'var(--color-warning)';
 const COR_DANGER = 'var(--color-danger)';
+// Contrato da public.v_mkt_nivel_crescimento (MKT 20261005_01). Vários campos nascem nulos de propósito —
+// marca sem comparação ainda, ou Reels cuja base não é do MKT. A tela tem de dizer isso em palavra, nunca 0.
+interface Nivel {
+  marca: string; marca_nome: string; seguidores_ig: number; posts_2sem: number;
+  alcance_mediano_2sem: number | null; alcance_mediano_2sem_anterior: number | null;
+  semanas_em_queda: number; nivel: number; nivel_anterior: number | null; nivel_desde: string | null;
+  subiu_ou_desceu: string | null; nivel_max: number; stories_dia: number | null;
+  reels_semana_base: number | null; reels_semana_extra: number | null; reels_semana: number | null;
+  proximo_nivel: number | null; faltam_seguidores: number | null;
+  motivo: string | null; limitado_por: string | null; medido_em: string | null;
+}
+
 const COR_SEC = 'var(--color-secondary)';
 
 export default function MktCrescimento() {
@@ -88,6 +101,8 @@ export default function MktCrescimento() {
   const [cadeia, setCadeia] = useState<Cadeia | null>(null);
   const [fila, setFila] = useState<Fila | null>(null);
   const [contas, setContas] = useState<Conta[]>([]);
+  // Régua de crescimento por marca (MKT 20261005_01). Só leitura: quem calcula é o MKT, toda segunda 6h15.
+  const [regua, setRegua] = useState<Nivel[]>([]);
   const [creds, setCreds] = useState<Cred[]>([]);
   const [calcDias, setCalcDias] = useState<CalcFunil[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,7 +117,7 @@ export default function MktCrescimento() {
 
   async function load() {
     setLoading(true);
-    const [b, p, cp, ad, pd, ld, bd, lp, be, { data: cad }, { data: fs }, { data: ac }, cr, { data: cfu }] = await Promise.all([
+    const [b, p, cp, ad, pd, ld, bd, lp, be, { data: cad }, { data: fs }, { data: ac }, cr, { data: cfu }, { data: nv }] = await Promise.all([
       supabase.schema('mkt').from('brands').select('id, code, name, accent_hex, logo_url').order('name'),
       supabase.schema('mkt').from('publications').select('id, brand_id, platform, url, published_at').order('published_at', { ascending: false }).limit(2000),
       supabase.schema('mkt').from('content_performance').select('publication_id, brand_id, gatilho, formato, engajamento, alcance, salvamentos, compartilhamentos, views'),
@@ -117,6 +132,7 @@ export default function MktCrescimento() {
       supabase.from('v_mkt_accounts').select('brand_name, platform, handle, status'),
       supabase.from('v_mkt_credenciais_saude').select('platform, marca, status, expires_at'),
       supabase.from('v_mkt_calc_funil').select('dia, usos, sessoes, leads').limit(400),
+      supabase.from('v_mkt_nivel_crescimento').select('*'),
     ]);
     setBrands((b.data ?? []) as Brand[]);
     setPubs((p.data ?? []) as Pub[]);
@@ -128,6 +144,7 @@ export default function MktCrescimento() {
     setContas((ac ?? []) as Conta[]);
     setCreds(((cr.data ?? []) as Cred[]));
     setCalcDias((cfu ?? []) as CalcFunil[]);
+    setRegua((nv ?? []) as Nivel[]);
     setLoading(false);
   }
   useEffect(() => { load(); }, []);
@@ -749,6 +766,27 @@ export default function MktCrescimento() {
             </>
           )}
 
+          {/* ═══ RÉGUA POR MARCA ═══ */}
+          {aba === 'regua' && (
+            <>
+              <Decide texto={<><b>O que se decide aqui:</b> quanto cada marca pode postar esta semana. O nível não é meta — é permissão: sobe quando a audiência aguenta, desce quando o alcance cai duas semanas seguidas.</>} />
+              {regua.length === 0 ? (
+                <div className="text-sm text-muted py-6">A régua ainda não foi calculada. O MKT recalcula toda segunda às 6h15.</div>
+              ) : (
+                <>
+                  <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))' }}>
+                    {[...regua].sort((a, b) => b.nivel - a.nivel || b.seguidores_ig - a.seguidores_ig).map((r) => <CardNivel key={r.marca} r={r} />)}
+                  </div>
+                  <p className="text-xs text-muted mt-4 leading-relaxed">
+                    Lido de <code className="font-mono">v_mkt_nivel_crescimento</code>; quem calcula é o DIGIAI MKT, toda
+                    segunda às 6h15. Esta tela não faz conta nenhuma — se um número parecer errado, o conserto é lá.
+                    Régua aprovada pelo dono em 03/10.
+                  </p>
+                </>
+              )}
+            </>
+          )}
+
           {/* ═══ SAÚDE ═══ */}
           {aba === 'territorio' && (
             <>
@@ -1017,6 +1055,105 @@ function MotorCard({ titulo, cor, headline, sub, serie, rotuloSerie, plats, blog
       {sacada && (
         <div className="mt-2 text-[11px] flex items-center gap-1.5" style={{ color: cor }}>
           <span>▲</span><span className="text-on-surface-variant">{sacada}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Um cartão por marca. Regra da tela: todo campo que a view pode mandar nulo vira PALAVRA, nunca zero —
+// "sem comparação ainda" é diferente de "o alcance caiu para zero", e marca em primeira medição não pode
+// parecer marca em queda. Nada aqui calcula: o que não vier da view, a tela não inventa.
+function CardNivel({ r }: { r: Nivel }) {
+  const subiu = r.subiu_ou_desceu === 'subiu';
+  const desceu = r.subiu_ou_desceu === 'desceu';
+  const Seta = subiu ? ArrowUp : desceu ? ArrowDown : Minus;
+  const corMov = subiu ? 'text-success' : desceu ? 'text-danger' : 'text-muted';
+  const emQueda = (r.semanas_em_queda ?? 0) > 0;
+
+  const dias = r.nivel_desde
+    ? Math.floor((Date.now() - new Date(r.nivel_desde + 'T12:00:00').getTime()) / 864e5)
+    : null;
+
+  // Reels: a Lancaster tem base fora do MKT, então o total vem nulo. Mostrar "2" sozinho faria parecer
+  // que ela publica 2 por semana, quando são 2 ALÉM do que a loja já faz.
+  const reels = r.reels_semana != null
+    ? `${r.reels_semana}/sem`
+    : r.reels_semana_extra != null
+      ? `+${r.reels_semana_extra}/sem (base fora do MKT)`
+      : 'sem dado';
+
+  return (
+    <div className="border border-outline/15 bg-surface-container p-4">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <div className="font-serif text-lg font-semibold text-on-surface truncate">{r.marca_nome}</div>
+          <div className="font-mono text-[9px] uppercase tracking-wider text-muted">
+            {r.seguidores_ig.toLocaleString('pt-BR')} seguidores no IG
+          </div>
+        </div>
+        <div className="text-right shrink-0">
+          <div className="font-serif text-2xl font-semibold tabular-nums text-on-surface">
+            {r.nivel}<span className="text-sm text-muted">/{r.nivel_max}</span>
+          </div>
+          <div className={`flex items-center justify-end gap-0.5 font-mono text-[9px] uppercase tracking-wider ${corMov}`}>
+            <Seta className="w-2.5 h-2.5" />{r.subiu_ou_desceu ?? 'sem histórico'}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-1 mt-3">
+        {Array.from({ length: r.nivel_max }, (_, i) => (
+          <span key={i} className="h-1.5 flex-1"
+            style={{ background: i < r.nivel ? COR_SEC : 'var(--color-outline)', opacity: i < r.nivel ? 1 : 0.25 }} />
+        ))}
+      </div>
+      <div className="font-mono text-[9px] uppercase tracking-wider text-muted mt-1">
+        {dias != null ? (dias === 0 ? 'neste nível desde hoje' : `neste nível há ${dias} dia${dias === 1 ? '' : 's'}`) : 'sem data de nível'}
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-outline/10">
+        <div>
+          <div className="font-mono text-[9px] uppercase tracking-widest text-muted">O nível dá</div>
+          <div className="text-[13px] text-on-surface">
+            {r.stories_dia != null ? `${r.stories_dia} story${r.stories_dia === 1 ? '' : 'ies'}/dia` : 'stories: sem dado'}
+          </div>
+          <div className="text-[13px] text-on-surface-variant">Reels {reels}</div>
+        </div>
+        <div>
+          <div className="font-mono text-[9px] uppercase tracking-widest text-muted">Alcance mediano (2 sem)</div>
+          <div className="text-[13px] text-on-surface tabular-nums">
+            {r.alcance_mediano_2sem ?? '—'}
+            {r.alcance_mediano_2sem_anterior != null && (
+              <span className={`ml-1 font-mono text-[10px] ${(r.alcance_mediano_2sem ?? 0) < r.alcance_mediano_2sem_anterior ? 'text-danger' : 'text-success'}`}>
+                vs {r.alcance_mediano_2sem_anterior}
+              </span>
+            )}
+          </div>
+          <div className="font-mono text-[9px] uppercase tracking-wider text-muted">
+            {r.alcance_mediano_2sem_anterior == null ? 'sem comparação ainda' : emQueda ? `${r.semanas_em_queda} sem. em queda` : 'sem queda'}
+          </div>
+        </div>
+      </div>
+
+      {r.proximo_nivel != null && r.faltam_seguidores != null && (
+        <div className="mt-3 pt-3 border-t border-outline/10 text-[12px] text-on-surface-variant">
+          Faltam <b className="text-on-surface tabular-nums">{r.faltam_seguidores.toLocaleString('pt-BR')}</b> seguidores
+          para o nível {r.proximo_nivel}.
+        </div>
+      )}
+      {emQueda && (
+        <div className="mt-2 text-[12px] text-warning">
+          Cai de nível se o alcance recuar mais {2 - (r.semanas_em_queda ?? 0)} semana(s) seguida(s).
+        </div>
+      )}
+      {r.limitado_por && (
+        <div className="mt-2 text-[11px] text-muted leading-snug"><b>Travado por:</b> {r.limitado_por}</div>
+      )}
+      {r.motivo && <div className="mt-1 text-[11px] text-muted leading-snug">{r.motivo}</div>}
+      {r.medido_em && (
+        <div className="font-mono text-[9px] uppercase tracking-wider text-muted mt-2">
+          medido em {new Date(r.medido_em).toLocaleDateString('pt-BR')}
         </div>
       )}
     </div>
