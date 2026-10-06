@@ -25,6 +25,16 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Telão honesto (174):** `v_mkt_publicacoes_dias` contava **88 publicações apagadas, 2 de teste e 11 stories** como se fossem post no feed — 46% de inflação. Agora separa `feed` / `stories` / `sem_url`.
 - **Inventário (169–171):** Worker `mello-ecommerce`, Cloudflare Email Routing e chave Resend registrados; o site da loja mudou de casa em 02/10 (Netlify → Cloudflare Workers) e o registro apontava para o endereço antigo — o medidor de pixel media a casa errada.
 
+## 2026-10-06 — Leitura do billing sai de "qualquer logado" e passa a ser da equipe (189)
+
+- **Palavra do dono no canal deste agente:** *"pode fechar o billing para a equipe"*. Esperei a frase aqui porque policy de leitura de dado financeiro é portão (R-037) e repasse de par não autoriza — o Geral já tinha ratificado com ele e eu ainda esperei. As três policies `billing_leitura_logado` passaram de `using (true)` para `using (is_staff())`: `subscribers`, `mp_events_raw` e **`payments`**.
+- **Eram duas quando contei a primeira vez, e eram três.** Perdi a `payments` porque cheguei às outras duas seguindo as views definer, e nenhuma das 17 que examinei lê a `payments` — ela nunca apareceu no caminho que eu estava percorrendo. **Censo por caminho acha o que está no caminho.**
+- **`is_staff()` e não `pode_tocar_lead()`:** `is_staff()` aceita super_admin, admin, founder e staff, e **não** aceita `vendas`. É o que "equipe" quer dizer aqui, e é exatamente o que o portão 65 (09/09) pedia — o papel `vendas` nasceu não-privilegiado para não ver Financeiro no front, e lia tudo pelo banco. Agora front e banco dizem a mesma coisa.
+- **O aperto valeu porque as 3 views de billing já eram invoker (182).** Se ainda fossem donas, fechar a base não mudaria nada — foi o motivo de virá-las primeiro.
+- **⚠ Honestidade sobre o tamanho disto:** as três tabelas estão quase vazias — `subscribers` **0**, `payments` **1**, `mp_events_raw` **2**. **Nada estava exposto**, porque quase não há o que expor. É aperto **preventivo**: quando a primeira cobrança real entrar, a porta já está fechada. Não é "vazamento tapado" — era porta aberta em quarto vazio.
+- **A prova recusou a minha primeira versão** e foi ela que me contou isso: eu exigia `subscribers` não-vazia para medir efeito. Trocada para `payments` (1 linha) — pouco, mas medição de verdade: como dona lê 1, como `authenticated` sem papel lê **0**.
+- **Tirei do arquivo uma prova que não podia falhar:** eu contava as linhas antes e depois, por hábito das migrations de dado. `alter policy` sobre SELECT não apaga nem insere nada — aquele retrato era cerimônia. **Prova que não pode falhar não é prova.**
+
 ## 2026-10-05 — Loja Mello: view de contrato e produto validado na borda (187, 188)
 
 - **A loja ganhou `public.v_ops_loja_mello`**: funil por dia e por `utm_content` (visita → produto → carrinho → checkout → compra), com receita só do que a loja declara em centavos. Lê `events_humanos`, logo **sem robô e sem compra de teste**. Resultado mora no digiai, não no MKT (regra do dono de 15/09). Hoje mostra **1 visita** — a única de gente de verdade; as outras eram conferência de agente.
