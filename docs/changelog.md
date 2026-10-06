@@ -25,6 +25,16 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Telão honesto (174):** `v_mkt_publicacoes_dias` contava **88 publicações apagadas, 2 de teste e 11 stories** como se fossem post no feed — 46% de inflação. Agora separa `feed` / `stories` / `sem_url`.
 - **Inventário (169–171):** Worker `mello-ecommerce`, Cloudflare Email Routing e chave Resend registrados; o site da loja mudou de casa em 02/10 (Netlify → Cloudflare Workers) e o registro apontava para o endereço antigo — o medidor de pixel media a casa errada.
 
+## 2026-10-06 — O toque de venda passa a guardar a abertura e a frase do dono da ótica (191)
+
+- **Por que existe:** eu mesmo achei o buraco respondendo a pauta das dores — **67 pessoas clicaram no WhatsApp do Clearix, 1 demo foi pedida, 0 toques registrados, e a dor não estava escrita em lugar nenhum do banco.** A `nota` que já existia é *o que quem registra achou*; faltava *o que o dono da ótica disse*.
+- **Dois campos, não um:** `abertura` em **lista fechada** (dinheiro parado · cliente não volta · lente cara · outra), porque "qual abertura faz responder" só tem resposta se o valor for comparável — texto livre daria 20 grafias da mesma coisa; e `frase_do_dono`, texto curto com as palavras dele, **separado da nota**. Misturados, perde-se exatamente o dado que a pauta quer, e nota antiga ninguém reescreve depois.
+- **Opcionais de propósito, e a frase vem antes da nota na tela.** Obrigar mataria o registro na terceira ligação — foi sem elas que a tela chegou a **0 toques em 6 dias**. A ordem e o tamanho do campo é o que ensina qual importa, sem travar quem está com o telefone na mão.
+- **LGPD resolvida na origem:** `frase_do_dono` é fala de pessoa identificável. A view `public.v_ops_toques` **mascara a frase** quando o lead pediu exclusão (`lgpd_request_at`) **ou quando o lead não está visível** para quem lê — por `not exists`, logo falha **fechada**. Fica escrito que atender um pedido de exclusão exige pôr a coluna a nulo nos toques do lead: a view esconde, o dado continua lá.
+- **Uma função, não duas:** não dá `create or replace` com assinatura nova, e deixar as duas vivas tornaria a chamada **ambígua** (a tela chama por argumentos nomeados). A antiga saiu e a nova aceita a chamada antiga pelos defaults — nenhuma janela com o botão quebrado entre deploys. A prova confere que existe **uma só**, com 6 parâmetros e 4 defaults.
+- **A prova foi barrada pelo próprio portão, e isso virou teste:** tentei chamar a RPC e `is_staff()` me recusou, porque lê o JWT e a Management API não tem nenhum. Em vez de contornar, a recusa passou a ser a prova de que o portão está fechado — e o que a RPC grava nas posições certas fica declarado como **conferência na tela** (R-005), que é do dono.
+- **Controle positivo da máscara:** a prova cria um toque com lead, confirma que a frase aparece, marca o `lgpd_request_at`, confirma que a frase **desaparece**, e desfaz. Sem isso, "a máscara funciona" seria afirmação sem medida.
+
 ## 2026-10-06 — A funnel_daily para de contar preview como visita, e o dia dela passa a ser BRT (190)
 
 - **Duas correções de regras que a casa já tinha decidido**, nenhuma nova: (1) preview local não conta — regra da 129, com a palavra do dono em 15/09, que a view irmã cumpria e esta não; (2) o dia é **BRT**, não UTC.
