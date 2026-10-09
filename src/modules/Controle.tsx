@@ -20,7 +20,17 @@ interface Item {
   titulo: string | null; texto: string; data: string;
   numero: number | null; estado: string | null;
   risco_data: string | null; ordem_tipo: number; risco_no_prazo_hoje: boolean;
+  nivel: number;
 }
+
+// Nível do problema (195, ordem do dono em 09/10): 1 = dinheiro, dado exposto ou prazo <= 7 dias;
+// 2 = risco sem data ou pendência que trava venda/agente; 3 = o resto. Quem classifica é o gerador do
+// Geral; aqui só se agrupa. Nível 1 em cima, e dentro do nível a ordem que já existia (risco primeiro).
+const NIVEL = {
+  1: { rotulo: 'Nível 1 · dinheiro, dado exposto ou prazo em 7 dias', cor: 'border-danger/40' },
+  2: { rotulo: 'Nível 2 · risco sem data, ou o que trava venda e agente', cor: 'border-warning/30' },
+  3: { rotulo: 'Nível 3 · o resto', cor: 'border-outline/15' },
+} as const;
 
 const TIPO = {
   risco:         { rotulo: 'Risco',            Icone: AlertTriangle, cor: 'text-danger' },
@@ -35,10 +45,11 @@ export default function Controle() {
   const [erro, setErro] = useState<string | null>(null);
   const [agente, setAgente] = useState<string>('todos');
   const [tipo, setTipo] = useState<string>('todos');
+  const [nivel, setNivel] = useState<string>('todos');
 
   useEffect(() => {
     supabase.from('v_controle_itens').select('*')
-      .order('ordem_tipo').order('data', { ascending: false }).order('agente')
+      .order('nivel').order('ordem_tipo').order('data', { ascending: false }).order('agente')
       .then(({ data, error }) => {
         if (error) { setErro(error.message); return; }
         setItens((data ?? []) as Item[]);
@@ -51,14 +62,17 @@ export default function Controle() {
   );
 
   // Cada contador respeita o OUTRO filtro: o número do chip tem de ser o que aparece se eu clicar nele.
-  const contaTipo = (t: string) =>
-    (itens ?? []).filter((i) => (agente === 'todos' || i.agente === agente) && (t === 'todos' || i.tipo === t)).length;
-  const contaAgente = (a: string) =>
-    (itens ?? []).filter((i) => (tipo === 'todos' || i.tipo === tipo) && (a === 'todos' || i.agente === a)).length;
+  const casa = (i: Item, f: { a?: string; t?: string; n?: string }) =>
+    ((f.a ?? agente) === 'todos' || i.agente === (f.a ?? agente))
+    && ((f.t ?? tipo) === 'todos' || i.tipo === (f.t ?? tipo))
+    && ((f.n ?? nivel) === 'todos' || String(i.nivel) === (f.n ?? nivel));
 
-  const visiveis = (itens ?? []).filter(
-    (i) => (agente === 'todos' || i.agente === agente) && (tipo === 'todos' || i.tipo === tipo),
-  );
+  const contaTipo = (t: string) => (itens ?? []).filter((i) => casa(i, { t })).length;
+  const contaAgente = (a: string) => (itens ?? []).filter((i) => casa(i, { a })).length;
+  const contaNivel = (n: string) => (itens ?? []).filter((i) => casa(i, { n })).length;
+
+  const visiveis = (itens ?? []).filter((i) => casa(i, {}));
+  const niveisVisiveis = [...new Set(visiveis.map((i) => i.nivel))].sort((x, y) => x - y);
 
   const riscos = (itens ?? []).filter((i) => i.tipo === 'risco');
   const vencidos = riscos.filter((i) => i.risco_no_prazo_hoje);
@@ -136,6 +150,9 @@ export default function Controle() {
 
       {itens && itens.length > 0 && (
         <div className="space-y-2">
+          <Filtro rotulo="nível" valor={nivel} aoTrocar={setNivel}
+            opcoes={[{ id: 'todos', label: 'todos', n: contaNivel('todos') },
+                     ...[1, 2, 3].map((n) => ({ id: String(n), label: `nível ${n}`, n: contaNivel(String(n)) }))]} />
           <Filtro rotulo="tipo" valor={tipo} aoTrocar={setTipo}
             opcoes={[{ id: 'todos', label: 'todos', n: contaTipo('todos') },
                      ...Object.entries(TIPO).map(([id, t]) => ({ id, label: t.rotulo, n: contaTipo(id) }))]} />
@@ -145,8 +162,14 @@ export default function Controle() {
         </div>
       )}
 
-      <div className="space-y-1.5">
-        {visiveis.map((i) => {
+      {niveisVisiveis.map((nv) => (
+        <div key={nv} className="space-y-1.5">
+          <div className={`border-l-2 pl-2 font-mono text-[10px] uppercase tracking-[0.18em] ${
+            nv === 1 ? 'border-danger text-danger' : nv === 2 ? 'border-warning text-warning' : 'border-outline/30 text-muted'}`}>
+            {NIVEL[nv as 1 | 2 | 3]?.rotulo ?? `Nível ${nv}`}
+            <span className="ml-2 text-muted">{visiveis.filter((i) => i.nivel === nv).length}</span>
+          </div>
+          {visiveis.filter((i) => i.nivel === nv).map((i) => {
           const t = TIPO[i.tipo as keyof typeof TIPO] ?? TIPO.aberto;
           return (
             <div key={i.id}
@@ -179,8 +202,11 @@ export default function Controle() {
               )}
             </div>
           );
-        })}
+          })}
+        </div>
+      ))}
 
+      <div className="space-y-1.5">
         {itens && itens.length > 0 && visiveis.length === 0 && (
           <div className="border border-outline/15 bg-surface-container p-3 text-[13px] text-muted">
             Nenhum item com estes filtros. Há {itens.length} no total — o vazio é do filtro, não da base.

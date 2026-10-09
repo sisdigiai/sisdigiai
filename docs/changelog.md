@@ -25,6 +25,14 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Telão honesto (174):** `v_mkt_publicacoes_dias` contava **88 publicações apagadas, 2 de teste e 11 stories** como se fossem post no feed — 46% de inflação. Agora separa `feed` / `stories` / `sem_url`.
 - **Inventário (169–171):** Worker `mello-ecommerce`, Cloudflare Email Routing e chave Resend registrados; o site da loja mudou de casa em 02/10 (Netlify → Cloudflare Workers) e o registro apontava para o endereço antigo — o medidor de pixel media a casa errada.
 
+## 2026-10-09 — Nível do problema, e o Telão sem texto de risco fora do login (195)
+
+- **Ordem do dono:** *"trabalhar por níveis de problema, e o Telão e o digiai têm de ter a real, sem depender da conversa"*. `ops.controle_itens.nivel` (1 = dinheiro, dado exposto ou prazo ≤ 7 dias; 2 = risco sem data ou pendência que trava venda/agente; 3 = o resto), a tela agrupa por nível e ganhou filtro de nível, e o Telão ganhou `public.v_telao_controle`.
+- **`default 3` de propósito:** item que chega sem nível **não se promove a urgente sozinho**.
+- **Recusei o `anon` do pedido, e por medição.** O pedido pedia a view do Telão legível por `anon` "como os outros espelhos do Telão" — e essa premissa está errada: as **7** views do Telão são `anon = false` desde 27/08, por decisão do dono ("o login é a porta"), e eu tirei a última (`v_telao_afericao`) em 05/10 pela 181. A casa tem **zero** view legível por `anon`. O Telão não precisa: lê com sessão (`tokenDaSessao`).
+- **Recusei o `top_riscos` com texto, e medi antes de recusar.** O pedido queria os 60 primeiros caracteres do texto dos riscos nível 1, "sem segredo". O que esses 60 caracteres seriam hoje: um nome de arquivo com segredos reais (`clearix_client/.env.bak-…`), um valor de fatura (`US$ 29,40`) e o nome da view com o furo de telefone de lead. **Cortar em 60 não torna nada seguro — o começo de um risco é onde está o que ele é**, e num telão quem lê é quem está na sala. O contrato leva número, prazo e **nome do agente**: diz a quem perguntar sem dizer o quê. A prova falha se alguém acrescentar coluna de texto depois.
+- **`nivel` entra no fim da lista de colunas:** `create or replace view` não reordena nem renomeia coluna, e dropar a view para pôr o campo no meio derrubaria o grant de uma view que a tela já lê. O ensaio recusou a primeira versão por isso.
+
 ## 2026-10-09 — Página Controle: o estado dos 13 agentes e as decisões do dono num lugar (194)
 
 - **Hoje → Controle** (`#/controle`): um item por linha do estado que cada agente escreve em `Cockpit/sessoes/<data>-<agente>.md`, mais a lista de decisões do dono. Abre com **risco**, depois **pendente do dono**; filtro por agente e por tipo, cada contador respeitando o outro filtro. A carga é do Geral (`controle-sync.mjs`, via Management API); a tela só lê. Hoje o parser dele vê 13 agentes e 151 itens, 15 riscos e 32 pendentes do dono.
