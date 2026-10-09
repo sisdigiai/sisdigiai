@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, CircleHelp, Inbox, Lightbulb, UserCheck } from 'lucide-react';
+import { AlertTriangle, Check, CircleHelp, Inbox, Lightbulb, RotateCcw, UserCheck } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 // Página Controle (migration 194; pedido do Geral em 09/10, aprovado pelo dono).
@@ -21,6 +21,7 @@ interface Item {
   numero: number | null; estado: string | null;
   risco_data: string | null; ordem_tipo: number; risco_no_prazo_hoje: boolean;
   nivel: number;
+  resolvido: boolean; resolvido_em: string | null; nota_resolucao: string | null;
 }
 
 // Nível do problema (195, ordem do dono em 09/10): 1 = dinheiro, dado exposto ou prazo <= 7 dias;
@@ -46,6 +47,9 @@ export default function Controle() {
   const [agente, setAgente] = useState<string>('todos');
   const [tipo, setTipo] = useState<string>('todos');
   const [nivel, setNivel] = useState<string>('todos');
+  const [verResolvidos, setVerResolvidos] = useState(false);
+  const [emCurso, setEmCurso] = useState<number | null>(null);
+  const [erroAcao, setErroAcao] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.from('v_controle_itens').select('*')
@@ -73,6 +77,18 @@ export default function Controle() {
     );
   }, [itens]);
 
+  const marcar = async (id: number, resolver: boolean) => {
+    setEmCurso(id); setErroAcao(null);
+    const { error } = await supabase.rpc(
+      resolver ? 'rpc_controle_resolver' : 'rpc_controle_reabrir',
+      resolver ? { p_id: id } : { p_id: id });
+    setEmCurso(null);
+    if (error) { setErroAcao(error.message); return; }
+    setItens((ant) => (ant ?? []).map((i) => (i.id === id
+      ? { ...i, resolvido: resolver, resolvido_em: resolver ? new Date().toISOString() : null }
+      : i)));
+  };
+
   const agentes = useMemo(
     () => [...new Set((itensUnicos ?? []).map((i) => i.agente))].sort(),
     [itensUnicos],
@@ -82,7 +98,8 @@ export default function Controle() {
   const casa = (i: Item, f: { a?: string; t?: string; n?: string }) =>
     ((f.a ?? agente) === 'todos' || i.agente === (f.a ?? agente))
     && ((f.t ?? tipo) === 'todos' || i.tipo === (f.t ?? tipo))
-    && ((f.n ?? nivel) === 'todos' || String(i.nivel) === (f.n ?? nivel));
+    && ((f.n ?? nivel) === 'todos' || String(i.nivel) === (f.n ?? nivel))
+    && (verResolvidos || !i.resolvido);
 
   const contaTipo = (t: string) => (itensUnicos ?? []).filter((i) => casa(i, { t })).length;
   const contaAgente = (a: string) => (itensUnicos ?? []).filter((i) => casa(i, { a })).length;
@@ -94,9 +111,10 @@ export default function Controle() {
   // A lista do dono é CUMULATIVA, não diária: a conta dela é por estado, não por data. Mostrar "N abertas
   // de M" em vez de contar linhas evita que decisão já riscada apareça como coisa a fazer.
   const decisoes = (itensUnicos ?? []).filter((i) => i.origem === 'decisao' && i.numero !== null);
-  const decisoesAbertas = decisoes.filter((i) => i.estado === 'aberto');
+  const decisoesAbertas = decisoes.filter((i) => i.estado === 'aberto' && !i.resolvido);
 
-  const riscos = (itensUnicos ?? []).filter((i) => i.tipo === 'risco');
+  const riscos = (itensUnicos ?? []).filter((i) => i.tipo === 'risco' && !i.resolvido);
+  const qtdResolvidos = (itensUnicos ?? []).filter((i) => i.resolvido).length;
   const vencidos = riscos.filter((i) => i.risco_no_prazo_hoje);
   const ultimaData = (itensUnicos ?? []).reduce<string | null>((max, i) => (!max || i.data > max ? i.data : max), null);
 
@@ -150,6 +168,13 @@ export default function Controle() {
         </div>
       )}
 
+      {erroAcao && (
+        <div className="flex items-start gap-2 border border-danger/30 bg-danger/5 p-3 text-[13px] text-danger">
+          <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+          <span>Não gravou — o item ficou onde estava: {erroAcao}</span>
+        </div>
+      )}
+
       {sumiram.length > 0 && (
         <div className="flex items-start gap-2 border border-warning/30 bg-warning-bg/40 p-3 text-[13px]">
           <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-warning" />
@@ -181,6 +206,15 @@ export default function Controle() {
 
       {itensUnicos && itensUnicos.length > 0 && (
         <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted mr-0.5 w-12">ver</span>
+            <button onClick={() => setVerResolvidos(!verResolvidos)}
+              className={`font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 border transition-colors ${
+                verResolvidos ? 'border-secondary bg-secondary/15 text-on-surface'
+                              : 'border-outline/20 text-muted hover:text-on-surface hover:border-outline/40'}`}>
+              mostrar resolvidos <span className="text-muted">{qtdResolvidos}</span>
+            </button>
+          </div>
           <Filtro rotulo="nível" valor={nivel} aoTrocar={setNivel}
             opcoes={[{ id: 'todos', label: 'todos', n: contaNivel('todos') },
                      ...[1, 2, 3].map((n) => ({ id: String(n), label: `nível ${n}`, n: contaNivel(String(n)) }))]} />
@@ -220,6 +254,14 @@ export default function Controle() {
                 <span className="font-mono text-[9px] text-muted ml-auto">
                   {i.data.slice(8, 10)}/{i.data.slice(5, 7)}
                 </span>
+                <button onClick={() => marcar(i.id, !i.resolvido)} disabled={emCurso === i.id}
+                  title={i.resolvido ? 'volta para a lista' : 'some da lista; a linha não é apagada'}
+                  className={`inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 border transition-colors disabled:opacity-40 ${
+                    i.resolvido ? 'border-outline/25 text-muted hover:text-on-surface'
+                                : 'border-success/40 text-success hover:bg-success/10'}`}>
+                  {i.resolvido ? <><RotateCcw className="w-3 h-3" /> reabrir</>
+                               : <><Check className="w-3 h-3" /> resolvido</>}
+                </button>
               </div>
               {i.titulo && <div className="text-[13px] text-on-surface font-medium">{i.titulo}</div>}
               <div className="text-[13px] text-on-surface whitespace-pre-wrap">{i.texto}</div>

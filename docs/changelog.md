@@ -25,6 +25,16 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Telão honesto (174):** `v_mkt_publicacoes_dias` contava **88 publicações apagadas, 2 de teste e 11 stories** como se fossem post no feed — 46% de inflação. Agora separa `feed` / `stories` / `sem_url`.
 - **Inventário (169–171):** Worker `mello-ecommerce`, Cloudflare Email Routing e chave Resend registrados; o site da loja mudou de casa em 02/10 (Netlify → Cloudflare Workers) e o registro apontava para o endereço antigo — o medidor de pixel media a casa errada.
 
+## 2026-10-09 — "Resolvido" na Controle: clicar e sumir, sem apagar nada (196)
+
+- Pedido do dono: *"opção de resolvido: clicar e sumir"*. Botão em cada item, um clique, some na hora; chip **mostrar resolvidos** com **reabrir**.
+- **Não se apaga a linha.** A carga espelha os arquivos de estado e roda sozinha às 9h e 18h — apagar faria a passada seguinte reinserir o item, e o dono veria voltar no dia seguinte o que ele resolveu. Isso é a forma mais rápida de um botão perder a confiança de quem clica. A resolução mora em `ops.controle_resolvidos`, por **chave estável (agente, tipo, texto_hash)**, e a view esconde.
+- **Desfazer existe, e não é luxo:** "clicar e sumir" sem volta transforma clique errado em item perdido — e numa tela de controle o item perdido pode ser o risco. Duas RPCs separadas em vez de um botão que alterna, porque alternar some no primeiro clique e desfaz no segundo sem ninguém perceber.
+- **O hash pode mudar, e isso já aconteceu hoje** (88 linhas duplicaram quando o parser passou a limpar markdown). O mesmo mecanismo faz um resolvido ressuscitar se o texto mudar. Não há como evitar sem casar item por aproximação, o que esconderia item novo de verdade — pior. Então `texto_quando` guarda a redação do momento: quando um resolvido voltar, dá para ver que já tinha sido resolvido e com que palavras. É diagnóstico, não disfarce.
+- **Resolver ≠ o agente ter fechado.** `v_controle_resolvidos_dia` tem `ainda_no_estado`, que diz se o agente continua escrevendo o item — é a lista de quem o Geral precisa avisar na passada das 18h.
+- **O Telão passou a contar só o não resolvido**, senão o número da parede divergiria do da tela.
+- `resolvido` é **coluna, não filtro na view**: a tela esconde por padrão e oferece mostrar, para clique errado ser visível e reversível. Escrita só pelas RPCs (`security definer` com `is_staff()` explícito); a prova falha se `authenticated` puder escrever direto, e o portão recusando a própria prova é o teste de que ele está fechado.
+
 ## 2026-10-09 — Nível do problema, e o Telão sem texto de risco fora do login (195)
 
 - **Ordem do dono:** *"trabalhar por níveis de problema, e o Telão e o digiai têm de ter a real, sem depender da conversa"*. `ops.controle_itens.nivel` (1 = dinheiro, dado exposto ou prazo ≤ 7 dias; 2 = risco sem data ou pendência que trava venda/agente; 3 = o resto), a tela agrupa por nível e ganhou filtro de nível, e o Telão ganhou `public.v_telao_controle`.
