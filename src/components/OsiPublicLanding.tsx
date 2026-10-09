@@ -1,7 +1,7 @@
 /**
  * Landing pública /osi no app DIGIAI — versão minimalista institucional.
  *
- * NÃO substitui a landing completa em landingoticasemimproviso.netlify.app.
+ * NÃO substitui a landing completa em osi.digiai.app.br.
  * Existe pra dar ao app DIGIAI uma rota pública oficial com CTA → Hotmart, garantindo
  * controle institucional do funil no domínio app.digiai.app.br (antes sisdigiai.netlify.app).
  *
@@ -15,7 +15,8 @@ import { ArrowRight, BookOpen, Send, Target, Users, Wallet } from 'lucide-react'
 import { useState } from 'react';
 
 const HOTMART_URL = 'https://go.hotmart.com/B105515825L?dp=1';
-const FULL_LANDING_URL = 'https://landingoticasemimproviso.netlify.app/';
+// 197 (09/10): era landingoticasemimproviso.netlify.app, que morre com a Netlify em ~14/10.
+const FULL_LANDING_URL = 'https://osi.digiai.app.br/';
 const PRICE_BRL = 48.5;
 const CAPTURE_URL = 'https://hswyopqvnolqpmprqvzh.supabase.co/functions/v1/lead-capture';
 const CONSENT_TEXT =

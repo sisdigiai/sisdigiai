@@ -24,7 +24,7 @@ PLANO ${p.plan ?? ''} — R$ ${brl(price)}/mês
 • Pagamento mensal via Mercado Pago — sem cartão preso, sem fidelidade (cancela quando quiser)
 ${apps}${dor}
 Acesso de demonstração: clearix.app.br (login enviado em separado).
-Manual completo (o ecossistema tela por tela): manual-clearix.netlify.app
+Manual completo (o ecossistema tela por tela): manual.clearix.app.br
 
 Qualquer dúvida, estou à disposição.
 ${CONSULTOR.nome} — ${CONSULTOR.whatsapp}`;

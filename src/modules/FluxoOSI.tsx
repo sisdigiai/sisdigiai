@@ -222,13 +222,13 @@ export default function FluxoOSI({ onNavigate }: { onNavigate?: (id: ModuleId) =
           status: total > 0 ? 'done' : 'pending',
           detail: `${total} materiais ativos (${comArte} com arte pronta) · ${reels} reels AI (voz clonada + avatar) + banners + carrossel + textos. Servidos do nosso próprio sistema via edge function pública — sem Google Drive. Programa de afiliação Hotmart ligado; suporte = vendas@digiai.app.br.`,
           how: [
-            'Página pública: landingoticasemimproviso.netlify.app/materiais-afiliado (baixar artes + copiar textos + assistir/baixar reels)',
+            'Página pública: osi.digiai.app.br/materiais-afiliado (baixar artes + copiar textos + assistir/baixar reels)',
             'Backend: edge function affiliate-materials-public (DIGIAI App) serve marketing.affiliate_materials read-only',
             'Artes servidas como estáticos em otica_sem_improviso/public/materiais-afiliado/ (sem Storage/service_role)',
             'Edição/curadoria dos materiais: Marketing > Materiais de Afiliados (este app)',
             'Recrutar afiliados só APÓS a 1ª venda real (item acima) — R-011',
           ],
-          action_url: 'https://landingoticasemimproviso.netlify.app/materiais-afiliado',
+          action_url: 'https://osi.digiai.app.br/materiais-afiliado',
           action_label: 'Abrir Central de Materiais',
         });
       } catch {
