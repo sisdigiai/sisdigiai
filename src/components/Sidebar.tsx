@@ -6,7 +6,7 @@ import {
   Camera, Wand2, Boxes, Search, ShieldCheck, Workflow, ChevronDown,
   GraduationCap, Languages, Calendar as CalendarIcon, Globe, BarChart3,
   Lightbulb, Package, Users, Receipt, Radio, CalendarCheck,
-  Sunrise, Calculator, MapPin, Columns3 } from 'lucide-react';
+  Sunrise, Calculator, MapPin, Columns3, Rows3 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
 import { canAccessModule } from '../lib/permissions';
@@ -20,7 +20,7 @@ export type ModuleId =
   | 'marketplace' | 'ecossistemas' | 'mapa-vivo' | 'travas-marketing'
   | 'fluxo-osi' | 'guia'
   | 'marketing-engajamento' | 'inventario' | 'seo' | 'vendas' | 'mapa-calor' | 'prospeccao'
-  | 'mkt-crescimento' | 'mkt-calc';
+  | 'mkt-crescimento' | 'mkt-calc' | 'comparativo';
 
 interface NavItem {
   id: ModuleId;
@@ -79,6 +79,7 @@ const produtos: NavItem[] = [
 ];
 
 const marketing: NavItem[] = [
+  { id: 'comparativo',      label: 'Comparativo',       icon: <Rows3 className="w-4 h-4" /> },
   { id: 'marketing',        label: 'Espelho do MKT',    icon: <Radio className="w-4 h-4" /> },
   { id: 'mkt-crescimento',  label: 'Radar 360',         icon: <TrendingUp className="w-4 h-4" /> },
   { id: 'mkt-calc',         label: 'Calc (isca)',       icon: <Calculator className="w-4 h-4" /> },

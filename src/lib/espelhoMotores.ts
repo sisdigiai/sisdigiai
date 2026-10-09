@@ -86,24 +86,41 @@ export interface LimePubDia { dia: string; plataforma: string; publicacoes: numb
 export interface LimelightDia { dia: string; plataforma: string; seguidores: number | null; alcance: number | null }
 export interface BlogDia { dia: string; blog_slug: string; leituras: number; sessoes: number }
 
-// Os tres leitores abaixo devolvem vazio quando falham — e isso e proposital: espelho de outro
-// produto fora do ar nao pode derrubar a tela do digiai. Mas ficar em silencio TAMBEM nao serve:
-// era assim que 'motor rodando, painel cego' passava por normalidade. Falha agora vai ao console
-// com a view e o status; a tela continua degradando sem quebrar. (08/09/2026)
-async function lerLinhas<T>(base: string | undefined, anon: string | undefined, view: string): Promise<T[]> {
-  if (!base || !anon) { console.error('[espelho] %s: variavel de ambiente ausente — espelho desligado', view); return []; }
+// Os tres leitores abaixo devolvem vazio quando falham — e isso e proposital: espelho de outro
+// produto fora do ar nao pode derrubar a tela do digiai. Mas ficar em silencio TAMBEM nao serve:
+// era assim que 'motor rodando, painel cego' passava por normalidade. Falha agora vai ao console
+// com a view e o status; a tela continua degradando sem quebrar. (08/09/2026)
+// 09/10: o console não basta. A tela do comparativo põe os motores lado a lado, e ali "0 publicações"
+// e "não consegui ler o espelho" levam a decisões opostas — o primeiro é o motor parado, o segundo é o
+// painel cego. Então o leitor passa a devolver o MOTIVO junto das linhas, e a tela escreve qual é.
+// `lerLinhas` continua existindo com a assinatura antiga porque as outras telas dependem dela.
+export type EstadoEspelho = 'ok' | 'sem_credencial' | 'erro';
+
+async function lerLinhasEstado<T>(base: string | undefined, anon: string | undefined, view: string):
+  Promise<{ linhas: T[]; estado: EstadoEspelho; detalhe?: string }> {
+  if (!base || !anon) {
+    console.error('[espelho] %s: variavel de ambiente ausente — espelho desligado', view);
+    return { linhas: [], estado: 'sem_credencial', detalhe: 'variável de ambiente ausente' };
+  }
   try {
     const r = await fetch(`${base}/rest/v1/${view}?select=*&order=dia.asc`, {
       headers: { apikey: anon, Authorization: `Bearer ${anon}` },
       signal: AbortSignal.timeout(12000),
     });
-    if (!r.ok) { console.error('[espelho] %s: HTTP %s', view, r.status); return []; }
+    if (!r.ok) {
+      console.error('[espelho] %s: HTTP %s', view, r.status);
+      return { linhas: [], estado: 'erro', detalhe: `HTTP ${r.status}` };
+    }
     const rows = await r.json();
-    return Array.isArray(rows) ? (rows as T[]) : [];
+    return { linhas: Array.isArray(rows) ? (rows as T[]) : [], estado: 'ok' };
   } catch (e) {
     console.error('[espelho] %s inacessivel', view, e);
-    return [];
+    return { linhas: [], estado: 'erro', detalhe: e instanceof Error ? e.message : 'inacessível' };
   }
+}
+
+async function lerLinhas<T>(base: string | undefined, anon: string | undefined, view: string): Promise<T[]> {
+  return (await lerLinhasEstado<T>(base, anon, view)).linhas;
 }
 
 async function lerEspelho<T>(base: string | undefined, anon: string | undefined, view: string): Promise<T | null> {
@@ -148,6 +165,21 @@ async function lerPulsoGateado(): Promise<EspelhoPulso | null> {
     return null;
   }
 }
+
+// 09/10: espelho do Polá (`v_pola_redes_metricas_dia`, só números, sem PII, BRT). As variáveis ainda não
+// existem no painel do Cloudflare — e é por isso que o estado importa: sem elas a linha do Polá tem de
+// dizer "falta credencial", não "0 publicações".
+const POLA_URL = import.meta.env.VITE_POLA_SUPABASE_URL as string | undefined;
+const POLA_ANON = import.meta.env.VITE_POLA_SUPABASE_ANON_KEY as string | undefined;
+export interface PolaDia { dia: string; plataforma: string; publicacoes: number; views: number }
+
+// Leitores com motivo, para a tela do comparativo. Os sem estado continuam para as telas antigas.
+export const espelhoMotoresEstado = {
+  pulsoDias: () => lerLinhasEstado<PulsoDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_dias'),
+  limelightPubDias: () => lerLinhasEstado<LimePubDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_pub_dias'),
+  blogsDias: () => lerLinhasEstado<BlogDia>(BLOGS_URL, BLOGS_ANON, 'v_espelho_blogs_dias'),
+  polaDias: () => lerLinhasEstado<PolaDia>(POLA_URL, POLA_ANON, 'v_pola_redes_metricas_dia'),
+};
 
 export const espelhoMotores = {
   limelight: () => lerEspelho<EspelhoLimelight>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight'),
