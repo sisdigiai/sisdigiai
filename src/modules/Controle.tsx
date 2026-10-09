@@ -64,6 +64,21 @@ export default function Controle() {
   const vencidos = riscos.filter((i) => i.risco_no_prazo_hoje);
   const ultimaData = (itens ?? []).reduce<string | null>((max, i) => (!max || i.data > max ? i.data : max), null);
 
+  // 09/10: a carga ESPELHA o arquivo — a cada passada, item do dia que não está mais no estado é removido.
+  // Isso conserta duplicata, e abre um buraco: passada que falhe ou leia vazio para um agente APAGA os
+  // riscos dele, e a tela mostra menos risco sem dizer por quê. Numa página de controle isso é pior que a
+  // tela vazia, porque parece plausível. Então a tela compara com o último dia anterior e avisa quem sumiu.
+  // Não afirmo a causa: pode ser agente que não escreveu o estado, ou carga incompleta. As duas merecem olho.
+  const sumiram = useMemo(() => {
+    if (!itens || !ultimaData) return [];
+    const anterior = itens.reduce<string | null>(
+      (max, i) => (i.data < ultimaData && (!max || i.data > max) ? i.data : max), null);
+    if (!anterior) return [];
+    const hoje = new Set(itens.filter((i) => i.data === ultimaData).map((i) => i.agente));
+    return [...new Set(itens.filter((i) => i.data === anterior).map((i) => i.agente))]
+      .filter((a) => !hoje.has(a));
+  }, [itens, ultimaData]);
+
   return (
     <div className="space-y-5">
       <div>
@@ -90,6 +105,19 @@ export default function Controle() {
             porque não há risco. Os agentes escrevem o estado em <code className="text-[11px]">Cockpit/sessoes/</code> e
             o Geral carrega por <code className="text-[11px]">controle-sync.mjs</code>. Enquanto não houver uma
             passada, o número honesto aqui é “não sei”, e não zero.
+          </span>
+        </div>
+      )}
+
+      {sumiram.length > 0 && (
+        <div className="flex items-start gap-2 border border-warning/30 bg-warning-bg/40 p-3 text-[13px]">
+          <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-warning" />
+          <span className="text-on-surface">
+            <strong className="font-normal">
+              {sumiram.length === 1 ? 'Um agente tinha estado e hoje não tem' : `${sumiram.length} agentes tinham estado e hoje não têm`}
+            </strong>: {sumiram.join(', ')}. A carga espelha o arquivo, então isto pode ser estado não escrito
+            <em> ou</em> passada incompleta — e nos dois casos o risco dele sai da contagem acima sem avisar.
+            Vale olhar antes de confiar no número.
           </span>
         </div>
       )}
