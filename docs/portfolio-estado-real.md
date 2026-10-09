@@ -40,9 +40,9 @@ Cada URL foi aberta no navegador. Resultado real:
 | Clearix site | `clearix.app.br` | ✅ vivo |
 | Clearix Hub | `app.clearix.app.br` | ✅ vivo (login) |
 | Clearix Atlas | `digiaiatlas.netlify.app` | ✅ vivo (atrás do SSO; `returnTo` aponta pra localhost — bug de config) |
-| OSI leitor | `oticasemimproviso.netlify.app` | ✅ vivo |
-| OSI landing | `landingoticasemimproviso.netlify.app` | ✅ vivo |
-| Nexus | `sisnexus.netlify.app` | ✅ vivo |
+| OSI leitor | `leitor-osi.digiai.app.br` | ✅ vivo |
+| OSI landing | `osi.digiai.app.br` | ✅ vivo |
+| Nexus | `nexus.digiai.app.br` | ✅ vivo |
 | Lumina | `luminabox.netlify.app` | ✅ vivo (dashboard logado) |
 | Pulso Control | `pulsoprojects.vercel.app` | ✅ vivo |
 | Polapetit | `polapetit.netlify.app` | ✅ **vivo (landing)** — sidebar já estava certa |
@@ -91,13 +91,13 @@ Cada URL foi aberta no navegador. Resultado real:
 ### 2. Ótica Sem Improviso — app leitor (alavanca crítica)
 - **Propósito:** app leitor do manual OSI (28 páginas, 5 módulos) acessado pós-compra.
 - **Stack:** React 19 · Vite 6 · Tailwind 4 · @google/genai · sem banco (localStorage).
-- **Deploy:** Netlify — `oticasemimproviso.netlify.app`. Git: `6f5840a` 2026-06-09.
+- **Deploy:** Netlify — `leitor-osi.digiai.app.br`. Git: `6f5840a` 2026-06-09.
 - **Estado:** NO AR. Bloqueio: —
 
 ### 3. OSI landing (alavanca crítica)
 - **Propósito:** landing comercial pública + área interna placeholder; aquisição via Hotmart/Kiwify.
 - **Stack:** React 19 · Vite 6 · Tailwind 4 · pixels Meta/TikTok · sem banco.
-- **Deploy:** Netlify (`landingoticasemimproviso.netlify.app`). Git: `2d12fbc` 2026-06-09 · ~10 pendências.
+- **Deploy:** Netlify (`osi.digiai.app.br`). Git: `2d12fbc` 2026-06-09 · ~10 pendências.
 - **Estado:** NO AR. Bloqueio: form de leads + fix de tracking pendentes de commit/deploy.
 
 ### 4. DIGIAI App (infraestrutura — este painel)
@@ -151,7 +151,7 @@ Cada URL foi aberta no navegador. Resultado real:
 ### 12. Nexus (suporte)
 - **Propósito:** plataforma multi-produto de aprendizado (OSI/Manual + Clearix University) com IA.
 - **Stack:** React 19 · Vite · Express · Supabase · Firebase · Gemini.
-- **Deploy:** Netlify — `sisnexus.netlify.app` (landing + `/clearix`). Git: `3224d3f` 2026-07-01.
+- **Deploy:** Netlify — `nexus.digiai.app.br` (landing + `/clearix`). Git: `3224d3f` 2026-07-01.
 - **Estado:** NO AR (parcial) — landing pública; MVP em dev ativo (126 tabelas). Verticais idiomas/concursos deprecadas. Bloqueio: adoção zero.
 
 ### 13. Nipo School (institucional)
