@@ -25,6 +25,13 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Telão honesto (174):** `v_mkt_publicacoes_dias` contava **88 publicações apagadas, 2 de teste e 11 stories** como se fossem post no feed — 46% de inflação. Agora separa `feed` / `stories` / `sem_url`.
 - **Inventário (169–171):** Worker `mello-ecommerce`, Cloudflare Email Routing e chave Resend registrados; o site da loja mudou de casa em 02/10 (Netlify → Cloudflare Workers) e o registro apontava para o endereço antigo — o medidor de pixel media a casa errada.
 
+## 2026-10-09 — Os dois hosts sem destino fechados, com prova do ar (198)
+
+- `pulsohub.netlify.app` → **`pulsohub.vercel.app`** e `limelight-studio.netlify.app` → **`limelight.digiai.app.br`**. Mapa completo: **37 hosts, zero `a_definir`** — 21 redirecionam, 12 migram, 3 aposentados, 1 já morto.
+- **Medi os dois antes de gravar, e um contrariou o despacho:** mandaram-me fechar o Limelight só com prova do ar, "porque link que parece bom e não responde é pior que `a_definir`" — regra com que concordo. Medindo, **`limelight.digiai.app.br` já estava no ar**: 200, `<title>Limelight Studio</title>`. Horas antes, na 197, o mesmo endereço não respondia nada; a migração andou no meio. Esperar para escrever o que já dá para ver seria cerimônia — o que a regra proíbe é gravar endereço que não responde.
+- **O que eu conferi foi o `<title>`, não o tamanho:** 469 bytes é a casca de um SPA Vite (é como o próprio digiai serve). Projeto vazio do Cloudflare não se chama "Limelight Studio".
+- **A prova exige prova:** nenhuma linha pode ficar em `migrar` sem `prova` contendo a medição — é o que impede alguém de preencher destino de cabeça. E o controle positivo confere que os aposentados e o morto **continuam no mapa**: se a conta zerasse, eu teria "resolvido" junto quem também morre em 14/10.
+
 ## 2026-10-09 — Links novos: o mapa Netlify medido host por host (197)
 
 - **Risco que motiva:** a Netlify não será paga e `*.netlify.app` morre por volta de **14/10** — cinco dias. Ordem do dono: *"atualizar no digiai todos os links novos"*.
