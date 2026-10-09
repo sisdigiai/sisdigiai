@@ -25,6 +25,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Telão honesto (174):** `v_mkt_publicacoes_dias` contava **88 publicações apagadas, 2 de teste e 11 stories** como se fossem post no feed — 46% de inflação. Agora separa `feed` / `stories` / `sem_url`.
 - **Inventário (169–171):** Worker `mello-ecommerce`, Cloudflare Email Routing e chave Resend registrados; o site da loja mudou de casa em 02/10 (Netlify → Cloudflare Workers) e o registro apontava para o endereço antigo — o medidor de pixel media a casa errada.
 
+## 2026-10-08 — Endereços novos da OSI no conteúdo que o app serve
+
+- `docs_sync` e `docs/portfolio-estado-real.md` passaram a apontar a landing da OSI para **`osi.digiai.app.br`** e o leitor para **`leitor-osi.digiai.app.br`** (commits `ad3cb12` e `f3b5433`). O domínio próprio `oticasemimproviso.com.br` continua não comprado.
+- **Conferido em 09/10 que a mudança NÃO cortou a medição**, que era o risco real de trocar endereço: chegam **36 eventos** de `osi.digiai.app.br`, o último hoje, e o host antigo (`landingoticasemimproviso.netlify.app`) parou em 08/10. Os dois passam em `analytics.fn_origem_real` — ela só recusa preview de deploy com hash, não um subdomínio próprio. Sem buraco no funil da OSI.
+
 ## 2026-10-06 — O funil passa a contar gente, e a minha própria manchete cai (192)
 
 - **Eu estava errado, e o erro foi ao dono.** Escrevi na pauta das dores e disse a ele que "67 pessoas clicaram no WhatsApp do Clearix e só 1 pediu demo", concluindo que o gargalo era *depois do clique*. O Geral mediu e me corrigiu; conferi: **66 dos 68 cliques são de 28/09, entre 04:40:20 e 04:52:30 BRT, em 6 sessões** — verificação automatizada da landing, que o filtro de user-agent não pega porque o agente se apresenta como navegador normal.
