@@ -56,9 +56,26 @@ export default function Controle() {
       });
   }, []);
 
+  // A lista de decisões do dono vem de VÁRIOS arquivos (30/09, 01/10, 05/10) e a mesma decisão pode estar em
+  // mais de um — medido em 09/10: 112 linhas para 109 números, e a de número 19 é um RISCO repetido. Contar
+  // duas vezes o mesmo risco numa tela de controle é pior que não mostrá-lo, porque infla a urgência. Fica a
+  // ocorrência mais recente de cada número, que é a que carrega o estado atual.
+  const itensUnicos = useMemo(() => {
+    if (!itens) return null;
+    const maisNovo = new Map<number, Item>();
+    for (const i of itens) {
+      if (i.origem !== 'decisao' || i.numero === null) continue;
+      const atual = maisNovo.get(i.numero);
+      if (!atual || i.data > atual.data) maisNovo.set(i.numero, i);
+    }
+    return itens.filter(
+      (i) => i.origem !== 'decisao' || i.numero === null || maisNovo.get(i.numero)?.id === i.id,
+    );
+  }, [itens]);
+
   const agentes = useMemo(
-    () => [...new Set((itens ?? []).map((i) => i.agente))].sort(),
-    [itens],
+    () => [...new Set((itensUnicos ?? []).map((i) => i.agente))].sort(),
+    [itensUnicos],
   );
 
   // Cada contador respeita o OUTRO filtro: o número do chip tem de ser o que aparece se eu clicar nele.
@@ -67,31 +84,36 @@ export default function Controle() {
     && ((f.t ?? tipo) === 'todos' || i.tipo === (f.t ?? tipo))
     && ((f.n ?? nivel) === 'todos' || String(i.nivel) === (f.n ?? nivel));
 
-  const contaTipo = (t: string) => (itens ?? []).filter((i) => casa(i, { t })).length;
-  const contaAgente = (a: string) => (itens ?? []).filter((i) => casa(i, { a })).length;
-  const contaNivel = (n: string) => (itens ?? []).filter((i) => casa(i, { n })).length;
+  const contaTipo = (t: string) => (itensUnicos ?? []).filter((i) => casa(i, { t })).length;
+  const contaAgente = (a: string) => (itensUnicos ?? []).filter((i) => casa(i, { a })).length;
+  const contaNivel = (n: string) => (itensUnicos ?? []).filter((i) => casa(i, { n })).length;
 
-  const visiveis = (itens ?? []).filter((i) => casa(i, {}));
+  const visiveis = (itensUnicos ?? []).filter((i) => casa(i, {}));
   const niveisVisiveis = [...new Set(visiveis.map((i) => i.nivel))].sort((x, y) => x - y);
 
-  const riscos = (itens ?? []).filter((i) => i.tipo === 'risco');
+  const riscos = (itensUnicos ?? []).filter((i) => i.tipo === 'risco');
   const vencidos = riscos.filter((i) => i.risco_no_prazo_hoje);
-  const ultimaData = (itens ?? []).reduce<string | null>((max, i) => (!max || i.data > max ? i.data : max), null);
+  const ultimaData = (itensUnicos ?? []).reduce<string | null>((max, i) => (!max || i.data > max ? i.data : max), null);
 
   // 09/10: a carga ESPELHA o arquivo — a cada passada, item do dia que não está mais no estado é removido.
   // Isso conserta duplicata, e abre um buraco: passada que falhe ou leia vazio para um agente APAGA os
   // riscos dele, e a tela mostra menos risco sem dizer por quê. Numa página de controle isso é pior que a
   // tela vazia, porque parece plausível. Então a tela compara com o último dia anterior e avisa quem sumiu.
   // Não afirmo a causa: pode ser agente que não escreveu o estado, ou carga incompleta. As duas merecem olho.
+  // SÓ `origem = 'agente'`: a lista de decisões do dono tem a data do arquivo dela, não é estado diário.
+  // Sem este filtro o aviso dispararia dizendo que o "agente dono" sumiu — medi em 09/10 e era exatamente
+  // isso que ia aparecer. Falso alarme numa tela de controle ensina a ignorar o aviso verdadeiro.
   const sumiram = useMemo(() => {
-    if (!itens || !ultimaData) return [];
-    const anterior = itens.reduce<string | null>(
-      (max, i) => (i.data < ultimaData && (!max || i.data > max) ? i.data : max), null);
+    const deAgente = (itens ?? []).filter((i) => i.origem === 'agente');
+    const ultima = deAgente.reduce<string | null>((max, i) => (!max || i.data > max ? i.data : max), null);
+    if (!ultima) return [];
+    const anterior = deAgente.reduce<string | null>(
+      (max, i) => (i.data < ultima && (!max || i.data > max) ? i.data : max), null);
     if (!anterior) return [];
-    const hoje = new Set(itens.filter((i) => i.data === ultimaData).map((i) => i.agente));
-    return [...new Set(itens.filter((i) => i.data === anterior).map((i) => i.agente))]
-      .filter((a) => !hoje.has(a));
-  }, [itens, ultimaData]);
+    const agora = new Set(deAgente.filter((i) => i.data === ultima).map((i) => i.agente));
+    return [...new Set(deAgente.filter((i) => i.data === anterior).map((i) => i.agente))]
+      .filter((a) => !agora.has(a));
+  }, [itens]);
 
   return (
     <div className="space-y-5">
@@ -111,7 +133,7 @@ export default function Controle() {
       )}
 
       {/* Estado vazio honesto: sem itens, a tela NÃO diz "nenhum risco" — diz que não sabe. */}
-      {itens && itens.length === 0 && (
+      {itensUnicos && itensUnicos.length === 0 && (
         <div className="flex items-start gap-2 border border-warning/30 bg-warning-bg/40 p-3 text-[13px]">
           <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-warning" />
           <span className="text-on-surface">
@@ -136,7 +158,7 @@ export default function Controle() {
         </div>
       )}
 
-      {itens && itens.length > 0 && (
+      {itensUnicos && itensUnicos.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           <Quadro rotulo="Riscos" valor={riscos.length} tom={riscos.length ? 'text-danger' : 'text-muted'} />
           <Quadro rotulo="Com prazo vencido ou hoje" valor={vencidos.length}
@@ -148,7 +170,7 @@ export default function Controle() {
         </div>
       )}
 
-      {itens && itens.length > 0 && (
+      {itensUnicos && itensUnicos.length > 0 && (
         <div className="space-y-2">
           <Filtro rotulo="nível" valor={nivel} aoTrocar={setNivel}
             opcoes={[{ id: 'todos', label: 'todos', n: contaNivel('todos') },
@@ -207,9 +229,9 @@ export default function Controle() {
       ))}
 
       <div className="space-y-1.5">
-        {itens && itens.length > 0 && visiveis.length === 0 && (
+        {itensUnicos && itensUnicos.length > 0 && visiveis.length === 0 && (
           <div className="border border-outline/15 bg-surface-container p-3 text-[13px] text-muted">
-            Nenhum item com estes filtros. Há {itens.length} no total — o vazio é do filtro, não da base.
+            Nenhum item com estes filtros. Há {itensUnicos.length} no total — o vazio é do filtro, não da base.
           </div>
         )}
       </div>
