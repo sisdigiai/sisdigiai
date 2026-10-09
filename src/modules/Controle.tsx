@@ -91,6 +91,11 @@ export default function Controle() {
   const visiveis = (itensUnicos ?? []).filter((i) => casa(i, {}));
   const niveisVisiveis = [...new Set(visiveis.map((i) => i.nivel))].sort((x, y) => x - y);
 
+  // A lista do dono é CUMULATIVA, não diária: a conta dela é por estado, não por data. Mostrar "N abertas
+  // de M" em vez de contar linhas evita que decisão já riscada apareça como coisa a fazer.
+  const decisoes = (itensUnicos ?? []).filter((i) => i.origem === 'decisao' && i.numero !== null);
+  const decisoesAbertas = decisoes.filter((i) => i.estado === 'aberto');
+
   const riscos = (itensUnicos ?? []).filter((i) => i.tipo === 'risco');
   const vencidos = riscos.filter((i) => i.risco_no_prazo_hoje);
   const ultimaData = (itensUnicos ?? []).reduce<string | null>((max, i) => (!max || i.data > max ? i.data : max), null);
@@ -159,13 +164,17 @@ export default function Controle() {
       )}
 
       {itensUnicos && itensUnicos.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
           <Quadro rotulo="Riscos" valor={riscos.length} tom={riscos.length ? 'text-danger' : 'text-muted'} />
           <Quadro rotulo="Com prazo vencido ou hoje" valor={vencidos.length}
                   tom={vencidos.length ? 'text-danger' : 'text-muted'} />
           <Quadro rotulo="Pendentes do dono" valor={contaTipo('pendente_dono')}
                   tom={contaTipo('pendente_dono') ? 'text-warning' : 'text-muted'} />
-          <Quadro rotulo="Agentes com estado" valor={agentes.length} tom="text-on-surface"
+          <Quadro rotulo="Lista do dono" valor={decisoesAbertas.length}
+                  tom={decisoesAbertas.length ? 'text-warning' : 'text-muted'}
+                  nota={decisoes.length ? `abertas de ${decisoes.length}` : undefined} />
+          <Quadro rotulo="Agentes com estado" valor={agentes.filter((a) => a !== 'dono').length}
+                  tom="text-on-surface"
                   nota={ultimaData ? `mais recente ${ultimaData.slice(8, 10)}/${ultimaData.slice(5, 7)}` : undefined} />
         </div>
       )}
