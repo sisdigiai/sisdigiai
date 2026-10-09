@@ -19,7 +19,7 @@ superseded_by: null
 > funcionar à mão vira template de automação. (Decisão do dono em 2026-06-17.)
 
 - **Calc (brinde):** https://calc.clearix.app.br/ → `[LINK_CALC]`
-- **Landing OSI:** https://landingoticasemimproviso.netlify.app/ → `[LINK_OSI]`
+- **Landing OSI:** https://osi.digiai.app.br/ → `[LINK_OSI]`
 - **Nexus / acesso ao método:** `[LINK_NEXUS]` (do e-mail de acesso pós-compra)
 - **Suporte:** `wa.me/5511986027415` *(confirmar se é o número oficial — pendência do dono)*
 

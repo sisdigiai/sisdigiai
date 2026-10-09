@@ -22,7 +22,7 @@ superseded_by: null
 
 ## 0. Sumário executivo
 
-**Tese:** OSI (R$ 49; R$ 97 no plano de 05/2026) é isca paga vendida via marketplace Hotmart + Kiwify. **Marketing = espalhar o manual completo aberto** (leitor `oticasemimproviso.netlify.app`) pra viralizar — comprador compartilha com terceiros, gera SEO e autoridade. **Produto pago = camada Nexus de 90 dias** (Doug AI, workshops, gamificação) — só compradores entram, via token enviado pós-compra. É lá que o pitch Clearix B2B acontece de verdade. Meta: **3% dos alunos Academy viram clientes Clearix** (R$ 349–1.499/mês).
+**Tese:** OSI (R$ 49; R$ 97 no plano de 05/2026) é isca paga vendida via marketplace Hotmart + Kiwify. **Marketing = espalhar o manual completo aberto** (leitor `leitor-osi.digiai.app.br`) pra viralizar — comprador compartilha com terceiros, gera SEO e autoridade. **Produto pago = camada Nexus de 90 dias** (Doug AI, workshops, gamificação) — só compradores entram, via token enviado pós-compra. É lá que o pitch Clearix B2B acontece de verdade. Meta: **3% dos alunos Academy viram clientes Clearix** (R$ 349–1.499/mês).
 
 > ⚠ **Estimativa antiga, não promessa (carimbo de 15/09/2026).** O LTV abaixo (18 × R$ 899) e a faixa "R$ 349–1.499/mês" são
 > planejamento de 05/2026. Preço vigente do Clearix: a tabela do banco (`iam.clearix_packages`) — Essencial 349 · Controle 899 ·
@@ -127,7 +127,7 @@ Fonte: [plano-configuracao-funil-osi.md §12](../04-operacao-e-venda/plano-confi
 - **Marketplace:** Hotmart (canal primário) + Kiwify (paralelo). Ver §6.
 
 ### 3.2 Captura
-- Landing OSI: `oticasemimproviso.netlify.app` (provisório, sem domínio próprio ainda)
+- Landing OSI: `leitor-osi.digiai.app.br` (provisório, sem domínio próprio ainda)
 - Lead magnets ativos: a definir — plano diz 5 lead magnets até dia 60 ([08_academy_low_ticket.md §Plano editorial](../../clearix_eco_full/clearix_docs/clearix_pitch/08_academy_low_ticket.md)).
 
 ### 3.3 Nurturing pré-compra
@@ -337,5 +337,5 @@ Fonte: [07_gtm_estrategia.md §Calendário](../../clearix_eco_full/clearix_docs/
 
 - **Plataforma checkout:** doc `08_academy_low_ticket.md` (22/04/2026) decidiu **Kiwify-only**. Decisão atual (20/05/2026): **Hotmart + Kiwify em paralelo** — Hotmart como marketplace primário (já com produto cadastrado, renomeado de "Achismo" → "Improviso"), Kiwify em paralelo para checkout otimizado.
 - **Stack email/CRM:** prazo de decisão era 02/05 — ainda pendente (Lacuna #6).
-- **Domínio Academy:** doc fala `academy.clearix.com.br`. Hoje provisório em `landingoticasemimproviso.netlify.app` (landing 1, venda) / `oticasemimproviso.netlify.app` (landing 2, manual visual aberto). Domínio próprio `oticasemimproviso.com.br` ainda não comprado.
+- **Domínio Academy:** doc fala `academy.clearix.com.br`. Hoje provisório em `osi.digiai.app.br` (landing 1, venda) / `leitor-osi.digiai.app.br` (landing 2, manual visual aberto). Domínio próprio `oticasemimproviso.com.br` ainda não comprado.
 - **Arquitetura 3 camadas (refinamento 2026-05-20):** confirmado que o **leitor é viral, o Nexus é o pago**. Manual visual completo fica aberto no leitor pra distribuição/SEO/boca-a-boca; o que difere comprador de visitante é o token que dá 90 dias no Nexus premium (Doug AI, workshops, gamificação). Stack token → email custom → redeem volta a ser obrigatório.
