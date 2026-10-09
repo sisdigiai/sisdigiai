@@ -43,7 +43,7 @@ Cada URL foi aberta no navegador. Resultado real:
 | OSI leitor | `leitor-osi.digiai.app.br` | ✅ vivo |
 | OSI landing | `osi.digiai.app.br` | ✅ vivo |
 | Nexus | `nexus.digiai.app.br` | ✅ vivo |
-| Lumina | `luminabox.netlify.app` | ✅ vivo (dashboard logado) |
+| Lumina | `lumina.digiai.app.br` | ✅ vivo (dashboard logado) |
 | Pulso Control | `pulsoprojects.vercel.app` | ✅ vivo |
 | Polapetit | `polapetit.netlify.app` | ✅ **vivo (landing)** — sidebar já estava certa |
 | Polapetit (.com.br) | `polapetit.com.br` | ❌ DNS não resolve (domínio não configurado) |
