@@ -25,6 +25,17 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Telão honesto (174):** `v_mkt_publicacoes_dias` contava **88 publicações apagadas, 2 de teste e 11 stories** como se fossem post no feed — 46% de inflação. Agora separa `feed` / `stories` / `sem_url`.
 - **Inventário (169–171):** Worker `mello-ecommerce`, Cloudflare Email Routing e chave Resend registrados; o site da loja mudou de casa em 02/10 (Netlify → Cloudflare Workers) e o registro apontava para o endereço antigo — o medidor de pixel media a casa errada.
 
+## 2026-10-09 — Tela Comparativo de motores (193)
+
+- **Marketing → Comparativo** (`#/comparativo`): esforço por motor × marca e resultado por marca, por semana (BRT), últimas 9 semanas completas. Tabela crua, sem gráfico. A semana corrente não aparece — meia semana sempre parece queda contra uma semana inteira.
+- **A regra que manda na tela:** não mostrar zero onde a resposta é "não sei". Três casos caem na mesma célula vazia e levam a decisões opostas: o motor publicou e não deu resultado (**0**, e é o número), a métrica ainda não foi medida (**"ainda não"**), o espelho não foi lido (**"falta credencial"** ou **"não li"**, com o motivo).
+- **`views_d7` está nulo em 100% das linhas** — 0 de 33 na semana corrente, 0 em 70 dias. A foto de 7 dias do MKT começou a encher em 09/10, então o primeiro número real sai perto de 16/10 e o placar é segunda, 12/10. A view devolve `views` **e** `views_medidas`, e a tela escreve "ainda não". O engajamento ao lado está medido: **4 interações em 33 publicações** na semana corrente, 1 em 11 na anterior.
+- **Venda é da marca, não do motor** — o Mello publica por MKT e Limelight ao mesmo tempo, e venda na linha de cada motor seria a mesma venda somada duas vezes. São duas views, e a de esforço **não tem coluna de venda**; a prova da migration falha se alguém acrescentar. Trava estrutural, não visual.
+- **Uma view do digiai não alcança Pulso, Limelight, blogs e Polá:** esses espelhos vivem em projetos Supabase **separados**, lidos pelo navegador com a anon key de cada um. A view cobre MKT + `analytics` e a tela junta os outros pelos canos que já existem. View que fingisse cobrir todos devolveria metade dos motores em silêncio.
+- **O leitor de espelho passou a devolver o motivo** (`ok | sem_credencial | erro`). Antes devolvia `[]` tanto para "não publicou" quanto para "não consegui ler" — o próprio comentário dele dizia que silêncio não serve, mas a tela não tinha como saber. Agora a linha do Polá diz **"falta credencial"** em vez de "0 publicações".
+- **Última semana completa (28/09–04/10), medida:** MKT 11 publicações (mello 5, osi 4, digiai 1, lancaster 1), 2 dias com publicação, engajamento 1. Resultado: digiai 42 visitas, osi 18, **0 cliques, 0 vendas**.
+- **Corte de semana único** em `src/lib/datas.ts`, no mesmo critério do `date_trunc('week')` do Postgres. Se a tela e a view cortassem a semana diferente, a comparação mentiria sem dar erro.
+
 ## 2026-10-08 — Endereços novos da OSI no conteúdo que o app serve
 
 - `docs_sync` e `docs/portfolio-estado-real.md` passaram a apontar a landing da OSI para **`osi.digiai.app.br`** e o leitor para **`leitor-osi.digiai.app.br`** (commits `ad3cb12` e `f3b5433`). O domínio próprio `oticasemimproviso.com.br` continua não comprado.

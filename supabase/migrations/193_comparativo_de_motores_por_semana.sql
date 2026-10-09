@@ -1,5 +1,8 @@
 -- 193 — comparativo de motores por semana: o que o banco do digiai pode responder, e só isso
 --
+-- ✔ APLICADA em 09/10/2026 às 11:16:24 BRT, reensaiada antes. Tela em `src/modules/ComparativoMotores.tsx`,
+--   menu Marketing → **Comparativo** (`#/comparativo`), commit `1ec9dc5`.
+--
 -- (Escrita como NÃO APLICADA.)
 --
 -- PEDIDO: Geral, 07/10, aprovado pelo dono ("pode"), em `Cockpit/sessoes/_PARA_APP_2026-10-07.md`. Tabela
