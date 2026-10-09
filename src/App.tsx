@@ -21,6 +21,7 @@ import Academy from './modules/Academy';
 import Marketing from './modules/Marketing';
 import MarketingEspelho from './modules/MarketingEspelho';
 import ComparativoMotores from './modules/ComparativoMotores';
+import Controle from './modules/Controle';
 import MktCrescimento from './modules/MktCrescimento';
 import MktCalc from './modules/MktCalc';
 import Marketplace from './modules/Marketplace';
@@ -58,6 +59,7 @@ const MODULES: ModuleId[] = [
   'mapa-calor',
   'prospeccao',
   'comparativo',
+  'controle',
 ];
 
 function moduleFromHash(): ModuleId {
@@ -73,7 +75,7 @@ const MODULE_LABEL: Record<ModuleId, string> = {
   backlog: 'Backlog Executivo', comercial: 'Comercial', 'cadastro-empresa': 'Cadastro Empresa',
   financeiro: 'Financeiro', academy: 'Academy', 'fluxo-osi': 'OSI',
   marketing: 'Marketing', 'marketing-engajamento': 'Engajamento',
-  'mkt-crescimento': 'Radar 360', 'mkt-calc': 'Calc', comparativo: 'Comparativo de motores',
+  'mkt-crescimento': 'Radar 360', 'mkt-calc': 'Calc', comparativo: 'Comparativo de motores', controle: 'Controle',
   marketplace: 'Marketplace', clearix: 'Central Clearix', cobranca: 'Cobrança',
   ecossistemas: 'Ecossistemas', 'mapa-vivo': 'Mapa Vivo', decisoes: 'Decisões', biblioteca: 'Biblioteca', brand: 'Brand Guidelines',
   'travas-marketing': 'Travas Marketing',
@@ -91,7 +93,7 @@ const MODULE_SECTION: Record<ModuleId, string> = {
   comercial: 'Mercado', 'fluxo-osi': 'Mercado', 'marketing-engajamento': 'Mercado', 'mapa-calor': 'Mercado', prospeccao: 'Mercado',
   portfolio: 'Produtos', ecossistemas: 'Produtos', 'mapa-vivo': 'Produtos', clearix: 'Produtos', academy: 'Produtos', seo: 'Produtos',
   marketing: 'Marketing', 'travas-marketing': 'Marketing',
-  'mkt-crescimento': 'Marketing', 'mkt-calc': 'Marketing', comparativo: 'Marketing',
+  'mkt-crescimento': 'Marketing', 'mkt-calc': 'Marketing', comparativo: 'Marketing', controle: 'Hoje',
   inventario: 'Empresa', 'cadastro-empresa': 'Empresa', decisoes: 'Empresa', brand: 'Empresa', biblioteca: 'Empresa', guia: 'Empresa',
 };
 
@@ -181,6 +183,7 @@ export default function App() {
       case 'academy': return <Academy />;
       case 'marketing': return <MarketingEspelho />;
       case 'comparativo': return <ComparativoMotores />;
+      case 'controle': return <Controle />;
       case 'mkt-crescimento': return <MktCrescimento />;
       case 'mkt-calc': return <MktCalc />;
       case 'marketing-engajamento': return <Marketing view="engajamento" />;

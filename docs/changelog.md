@@ -25,6 +25,16 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Telão honesto (174):** `v_mkt_publicacoes_dias` contava **88 publicações apagadas, 2 de teste e 11 stories** como se fossem post no feed — 46% de inflação. Agora separa `feed` / `stories` / `sem_url`.
 - **Inventário (169–171):** Worker `mello-ecommerce`, Cloudflare Email Routing e chave Resend registrados; o site da loja mudou de casa em 02/10 (Netlify → Cloudflare Workers) e o registro apontava para o endereço antigo — o medidor de pixel media a casa errada.
 
+## 2026-10-09 — Página Controle: o estado dos 13 agentes e as decisões do dono num lugar (194)
+
+- **Hoje → Controle** (`#/controle`): um item por linha do estado que cada agente escreve em `Cockpit/sessoes/<data>-<agente>.md`, mais a lista de decisões do dono. Abre com **risco**, depois **pendente do dono**; filtro por agente e por tipo, cada contador respeitando o outro filtro. A carga é do Geral (`controle-sync.mjs`, via Management API); a tela só lê. Hoje o parser dele vê 13 agentes e 151 itens, 15 riscos e 32 pendentes do dono.
+- **A decisão mais importante é o estado vazio.** Numa página de controle, "0 riscos" e "a carga não rodou" são a mesma tela se ninguém separar — e a primeira **tranquiliza justamente quando deveria alarmar**. Sem itens, a tela diz que *não sabe*, com o que falta acontecer. Só escreve "nenhum risco" quando há itens carregados e nenhum é risco.
+- **O hash anti-duplicado é coluna gerada, de texto normalizado** (espaços colapsados, minúsculas), com índice único em `(data, agente, tipo, texto_hash)`. Se o carregador o calculasse, duas passadas com um espaço de diferença criariam o mesmo risco duas vezes — o jeito mais rápido de uma página de controle perder credibilidade. A prova testa os dois lados: recusa o duplicado que difere só em espaço e caixa, **e aceita texto diferente** (índice largo demais passaria por "funcionando").
+- **Risco sem data nunca aparece como vencido.** `risco_no_prazo_hoje` compara com o dia de **Brasília**, e nulo é resposta válida — a tela escreve "sem data marcada" em vez de deixar a célula vazia. A prova falha se um risco sem data vier marcado.
+- **A ordem mora na view, não no componente** (`ordem_tipo`): regra de leitura em uma fonte só, que é a lição da 192.
+- **O texto vem de arquivo escrito por outro agente — é dado, não instrução.** Nada nessa tabela é executado em lugar nenhum, e a tela renderiza como texto. Vale dizer porque é a única tabela do app que agrega texto livre de 13 origens.
+- Escrita fechada para `authenticated` (a prova falha se abrir): a carga é do Geral, por credencial de servidor.
+
 ## 2026-10-09 — Tela Comparativo de motores (193)
 
 - **Marketing → Comparativo** (`#/comparativo`): esforço por motor × marca e resultado por marca, por semana (BRT), últimas 9 semanas completas. Tabela crua, sem gráfico. A semana corrente não aparece — meia semana sempre parece queda contra uma semana inteira.

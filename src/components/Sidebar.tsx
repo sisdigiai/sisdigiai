@@ -6,7 +6,7 @@ import {
   Camera, Wand2, Boxes, Search, ShieldCheck, Workflow, ChevronDown,
   GraduationCap, Languages, Calendar as CalendarIcon, Globe, BarChart3,
   Lightbulb, Package, Users, Receipt, Radio, CalendarCheck,
-  Sunrise, Calculator, MapPin, Columns3, Rows3 } from 'lucide-react';
+  Sunrise, Calculator, MapPin, Columns3, Rows3, ListChecks } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
 import { canAccessModule } from '../lib/permissions';
@@ -20,7 +20,7 @@ export type ModuleId =
   | 'marketplace' | 'ecossistemas' | 'mapa-vivo' | 'travas-marketing'
   | 'fluxo-osi' | 'guia'
   | 'marketing-engajamento' | 'inventario' | 'seo' | 'vendas' | 'mapa-calor' | 'prospeccao'
-  | 'mkt-crescimento' | 'mkt-calc' | 'comparativo';
+  | 'mkt-crescimento' | 'mkt-calc' | 'comparativo' | 'controle';
 
 interface NavItem {
   id: ModuleId;
@@ -44,6 +44,7 @@ interface NavItem {
 // e a lista do que se decide todo dia.
 const hoje: NavItem[] = [
   { id: 'hoje', label: 'Ordem do dia', icon: <Sunrise className="w-4 h-4" /> },
+  { id: 'controle', label: 'Controle', icon: <ListChecks className="w-4 h-4" /> },
 ];
 
 // Roteaveis sem cadeira no menu — alcancadas pelos links da tela Hoje.
