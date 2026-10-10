@@ -25,6 +25,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Telão honesto (174):** `v_mkt_publicacoes_dias` contava **88 publicações apagadas, 2 de teste e 11 stories** como se fossem post no feed — 46% de inflação. Agora separa `feed` / `stories` / `sem_url`.
 - **Inventário (169–171):** Worker `mello-ecommerce`, Cloudflare Email Routing e chave Resend registrados; o site da loja mudou de casa em 02/10 (Netlify → Cloudflare Workers) e o registro apontava para o endereço antigo — o medidor de pixel media a casa errada.
 
+## 2026-10-10 — Bloco "Publicação urgente" no topo da Controle
+
+- Protocolo aprovado pelo dono às 09:09 (R-048: um "pode" por pacote). A carga do Geral já traz os pacotes como `agente='urgente'` — **nenhuma migration**, só tela. Hoje há 1 pacote: Lancaster · Dia das Crianças, vale até 17h, 0 de 13 peças pendentes, "pode" registrado.
+- **A autorização não mora no app.** É o "pode" escrito no arquivo do pacote; a tela só mostra se está lá. E mostra os três estados: registrado, **não registrado** (em vermelho, "não publicar") e **"o texto não diz"** — porque silêncio não é autorização.
+- **Leitura defensiva do texto, que é escrito por outro agente.** O que casa vira campo; o que não casa faz o **texto inteiro** aparecer. Testei o leitor com o texto real da tabela, com um sem "pode" e com a redação mudada: no último tudo vem nulo e a tela degrada mostrando a frase, em vez de inventar "0 pendentes". Se o sync mudar a redação, o bloco fica feio e continua verdadeiro.
+- **Vencido pela hora, não só pelo dia:** o pacote vale até 17h e a carga que o fecha roda às 18h — entre as duas a tela mostraria vencido como vivo. A conta é no fuso de Brasília e marca "validade encerrada" na hora certa.
+- **Caminho, não link:** o hub de leitura é repo local e não gera `comercial/`. Mostro o caminho do pacote e do protocolo em texto selecionável — link que não abre é pior que caminho que se copia (foi a mesma decisão da varredura Netlify).
+- Os pacotes saem da lista normal de risco para não aparecerem duas vezes, e o botão **resolvido** funciona igual.
+
 ## 2026-10-09 — "Temos esse controle?" Não — e onde havia valor, o valor estava errado (202)
 
 - **Pergunta do dono:** temos no digiai o controle de conta a pagar que trava app? **A resposta medida é não**, e é pior que campo vazio:

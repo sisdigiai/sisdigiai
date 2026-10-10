@@ -27,6 +27,39 @@ interface Item {
 // Nível do problema (195, ordem do dono em 09/10): 1 = dinheiro, dado exposto ou prazo <= 7 dias;
 // 2 = risco sem data ou pendência que trava venda/agente; 3 = o resto. Quem classifica é o gerador do
 // Geral; aqui só se agrupa. Nível 1 em cima, e dentro do nível a ordem que já existia (risco primeiro).
+// Publicação urgente (protocolo aprovado pelo dono em 10/10, R-048). Os itens chegam com `agente='urgente'`
+// e TODA a informação vive no texto, escrito pelo sync do Geral. Então a leitura é defensiva: o que casa
+// aparece em campo, o que não casa aparece como texto cru — nunca como "0 pendentes" inventado. Se ele mudar
+// a redação, o bloco degrada mostrando a frase inteira, e não mentindo um número.
+//
+// A autorização NÃO mora aqui: é o "pode" escrito no arquivo do pacote (R-048). O app só mostra se está lá.
+function lerPacote(texto: string) {
+  const ate = texto.match(/vale at[ée]\s+(\d{4}-\d{2}-\d{2})(?:\s+(\d{1,2}:\d{2}))?/i);
+  const pecas = texto.match(/pe[çc]as pendentes\s+(\d+)\s*\/\s*(\d+)/i);
+  const podeSim = /"?pode"?\s+registrado/i.test(texto);
+  const podeNao = /"?pode"?\s+(n[ãa]o registrado|ausente|pendente)/i.test(texto);
+  const arquivo = texto.match(/Arquivo:\s*([^\s]+\.md)/i);
+  return {
+    dia: ate?.[1] ?? null,
+    hora: ate?.[2] ?? null,
+    pendentes: pecas ? Number(pecas[1]) : null,
+    total: pecas ? Number(pecas[2]) : null,
+    // só afirmo "pode registrado" quando o texto o diz. Silêncio não é autorização.
+    pode: podeSim ? 'sim' : podeNao ? 'nao' : 'nao_diz',
+    arquivo: arquivo?.[1] ?? null,
+  };
+}
+
+// Vencido pela HORA, não só pelo dia: o pacote vale até 17h e a carga que o fecha roda às 18h — entre as
+// duas a tela mostraria vencido como vivo. A conta é no fuso de Brasília, como todo dia de negócio da casa.
+function venceuAgora(dia: string | null, hora: string | null) {
+  if (!dia) return false;
+  const agora = new Date().toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' }).slice(0, 16);
+  return agora > `${dia} ${hora ?? '23:59'}`;
+}
+
+const PROTOCOLO = 'Cockpit/comercial/protocolo-publicacao-urgente.md';
+
 const NIVEL = {
   1: { rotulo: 'Nível 1 · dinheiro, dado exposto ou prazo em 7 dias', cor: 'border-danger/40' },
   2: { rotulo: 'Nível 2 · risco sem data, ou o que trava venda e agente', cor: 'border-warning/30' },
@@ -105,13 +138,17 @@ export default function Controle() {
   const contaAgente = (a: string) => (itensUnicos ?? []).filter((i) => casa(i, { a })).length;
   const contaNivel = (n: string) => (itensUnicos ?? []).filter((i) => casa(i, { n })).length;
 
-  const visiveis = (itensUnicos ?? []).filter((i) => casa(i, {}));
+  const visiveis = (itensUnicos ?? []).filter((i) => casa(i, {}) && i.agente !== 'urgente');
   const niveisVisiveis = [...new Set(visiveis.map((i) => i.nivel))].sort((x, y) => x - y);
 
   // A lista do dono é CUMULATIVA, não diária: a conta dela é por estado, não por data. Mostrar "N abertas
   // de M" em vez de contar linhas evita que decisão já riscada apareça como coisa a fazer.
   const decisoes = (itensUnicos ?? []).filter((i) => i.origem === 'decisao' && i.numero !== null);
   const decisoesAbertas = decisoes.filter((i) => i.estado === 'aberto' && !i.resolvido);
+
+  // Publicação urgente fica no TOPO da área de risco: é o item com hora marcada, e hora marcada perde valor
+  // depois da hora. Sai da lista normal para não aparecer duas vezes.
+  const urgentes = (itensUnicos ?? []).filter((i) => i.agente === 'urgente' && !i.resolvido);
 
   const riscos = (itensUnicos ?? []).filter((i) => i.tipo === 'risco' && !i.resolvido);
   const qtdResolvidos = (itensUnicos ?? []).filter((i) => i.resolvido).length;
@@ -224,6 +261,68 @@ export default function Controle() {
           <Filtro rotulo="agente" valor={agente} aoTrocar={setAgente}
             opcoes={[{ id: 'todos', label: 'todos', n: contaAgente('todos') },
                      ...agentes.map((a) => ({ id: a, label: a, n: contaAgente(a) }))]} />
+        </div>
+      )}
+
+      {urgentes.length > 0 && (
+        <div className="space-y-1.5">
+          <div className="border-l-2 border-danger pl-2 font-mono text-[10px] uppercase tracking-[0.18em] text-danger">
+            Publicação urgente
+            <span className="ml-2 text-muted">{urgentes.length}</span>
+          </div>
+          {urgentes.map((i) => {
+            const p = lerPacote(i.texto);
+            const venceu = venceuAgora(p.dia, p.hora);
+            return (
+              <div key={i.id}
+                className={`border bg-surface-container p-3 ${venceu ? 'border-outline/25' : 'border-danger/40'}`}>
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <span className="text-[13px] text-on-surface font-medium">
+                    {i.titulo ?? 'Pacote sem título'}
+                  </span>
+                  <button onClick={() => marcar(i.id, true)} disabled={emCurso === i.id}
+                    title="some da lista; a linha não é apagada"
+                    className="ml-auto inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 border border-success/40 text-success hover:bg-success/10 disabled:opacity-40">
+                    <Check className="w-3 h-3" /> resolvido
+                  </button>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-wider">
+                  <span className={venceu ? 'text-muted' : 'text-on-surface'}>
+                    {p.dia
+                      ? <>vale até {p.dia.slice(8, 10)}/{p.dia.slice(5, 7)}{p.hora ? ` ${p.hora}` : ''}
+                          {venceu && <span className="text-danger"> · validade encerrada</span>}</>
+                      : <span className="text-muted">validade não dita no texto</span>}
+                  </span>
+
+                  {p.pode === 'sim' && <span className="text-success">“pode” registrado</span>}
+                  {p.pode === 'nao' && <span className="text-danger">“pode” NÃO registrado — não publicar</span>}
+                  {p.pode === 'nao_diz' && (
+                    <span className="text-warning">o texto não diz se há “pode” — conferir no arquivo</span>
+                  )}
+
+                  {p.total !== null
+                    ? <span className={p.pendentes ? 'text-on-surface' : 'text-success'}>
+                        {p.pendentes} de {p.total} peças pendentes
+                      </span>
+                    : <span className="text-muted">peças não ditas no texto</span>}
+                </div>
+
+                {/* Quando o leitor não entendeu algo, o texto inteiro aparece: nada se perde por eu não ter
+                    casado um padrão. */}
+                {(!p.dia || p.total === null || p.pode === 'nao_diz') && (
+                  <div className="mt-1.5 text-[12px] text-muted whitespace-pre-wrap">{i.texto}</div>
+                )}
+
+                {/* Caminho, não link: o hub de leitura é repo local e não gera `comercial/`. Link que não
+                    abre é pior que caminho que se copia. */}
+                <div className="mt-2 space-y-0.5 font-mono text-[10px] text-muted">
+                  {p.arquivo && <div>pacote: <span className="text-on-surface select-all">Cockpit/{p.arquivo}</span></div>}
+                  <div>protocolo: <span className="text-on-surface select-all">{PROTOCOLO}</span></div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 
