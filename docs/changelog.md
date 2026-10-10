@@ -25,6 +25,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Telão honesto (174):** `v_mkt_publicacoes_dias` contava **88 publicações apagadas, 2 de teste e 11 stories** como se fossem post no feed — 46% de inflação. Agora separa `feed` / `stories` / `sem_url`.
 - **Inventário (169–171):** Worker `mello-ecommerce`, Cloudflare Email Routing e chave Resend registrados; o site da loja mudou de casa em 02/10 (Netlify → Cloudflare Workers) e o registro apontava para o endereço antigo — o medidor de pixel media a casa errada.
 
+## 2026-10-09 — Eu anunciei um buraco que não existia, e a trava do banco me corrigiu (201)
+
+- **A correção primeiro:** a 200 anunciou "14 contas que o MKT publica e o inventário não tem", e eu disse ao dono e ao MKT que entre elas havia **4 números de WhatsApp sem dono em lugar nenhum**. Tentei inseri-los e a constraint `contas_servicos_servico_identificador_key` recusou: **já existiam** — como `categoria = 'telefonia'`, ativos, **com `conta_dona`**. Um número de WhatsApp é telefone e canal ao mesmo tempo, e quem cadastrou arquivou como telefonia, o que é defensável. O que faltava neles era só o **vínculo**.
+- **O defeito era da minha view:** ela perguntava "existe linha ativa com este `mkt_account_id`?" e chamava o "não" de conta ausente. **Linha não vinculada não é conta ausente.** A view passou a ter a coluna `caso` — "sem linha nenhuma" × "existe sem vínculo" — e é isso que impede o próximo relatório errado.
+- **O que de fato faltava eram 6, não 14:** 3 canais de YouTube (`rede_youtube` não tinha nenhuma linha), `@polapetit` no pinterest e no tiktok, e a ficha do Google da Lancaster Suzano. Cadastradas com status **`desconhecido`** e `ultima_verificacao` nula — não conferi nenhuma; copiei do MKT que existem. `ok` seria afirmar verificação que não houve.
+- **Vincular não mexeu na categoria dos WhatsApp:** "telefonia" é classificação defensável, e trocá-la num passo de vínculo seria eu decidir vocabulário da casa de carona.
+- **E o buraco do dono é maior do que eu disse.** Reportei "7 das 9 sem par". A pergunta certa dá **14 das 36** contas de rede sem `conta_dona` — e **8 dessas o MKT publica hoje**. Com as 6 novas, **20**. Errei para baixo por ter perguntado só das que não casavam. `public.v_ops_redes_sem_dono` passa a listar as 20, uma linha por pergunta.
+- Sobram **4** na lista de não-vinculadas: as lojas da Mello, esperando o dono dizer se têm página de Facebook própria. A prova falha se eu as tocar.
+
 ## 2026-10-09 — As duas renomeadas casadas, e a conta que o inventário não tem (200)
 
 - **O primeiro uso real da chave fazendo o que ela existe para fazer.** Duas contas minhas não casavam por nome porque **foram renomeadas**: `Óticas Sem Improviso` perdeu o "s" em julho (página 1079807541890310, hoje "Ótica Sem Improviso") e `Polá Petit` virou "Polá Petit - antiga Taty Mello Festas" (página 411169915680711). O MKT leu da API do Meta e deu os IDs. Se a junção fosse por nome, as duas estariam quebradas e ninguém saberia. **29 pares.**
