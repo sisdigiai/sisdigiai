@@ -25,6 +25,14 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Telão honesto (174):** `v_mkt_publicacoes_dias` contava **88 publicações apagadas, 2 de teste e 11 stories** como se fossem post no feed — 46% de inflação. Agora separa `feed` / `stories` / `sem_url`.
 - **Inventário (169–171):** Worker `mello-ecommerce`, Cloudflare Email Routing e chave Resend registrados; o site da loja mudou de casa em 02/10 (Netlify → Cloudflare Workers) e o registro apontava para o endereço antigo — o medidor de pixel media a casa errada.
 
+## 2026-10-09 — As duas renomeadas casadas, e a conta que o inventário não tem (200)
+
+- **O primeiro uso real da chave fazendo o que ela existe para fazer.** Duas contas minhas não casavam por nome porque **foram renomeadas**: `Óticas Sem Improviso` perdeu o "s" em julho (página 1079807541890310, hoje "Ótica Sem Improviso") e `Polá Petit` virou "Polá Petit - antiga Taty Mello Festas" (página 411169915680711). O MKT leu da API do Meta e deu os IDs. Se a junção fosse por nome, as duas estariam quebradas e ninguém saberia. **29 pares.**
+- **As 4 lojas da Mello não foram tocadas, e a prova falha se forem.** Elas estão como `facebook` aqui e o MKT cadastrou as lojas como `google_business`; os nomes correspondem 1:1 (nome antigo × novo). A API dele mostra que as nossas chaves do Meta gerenciam **uma** página da Mello — o que prova que *nós* não gerenciamos nenhuma por loja, **não que nenhuma exista**. Reclassificar 4 linhas com base nessa inferência seria decidir no escuro; a pergunta foi ao dono.
+- **O buraco do meu lado foi para a tela, não para uma mensagem:** `public.v_ops_redes_sem_inventario` lista **14 contas que o MKT publica e `ops.contas_servicos` não inventaria** — entre elas **4 números de WhatsApp e 3 canais de YouTube**, nenhuma com `conta_dona`, `navegador` ou `secret_ref` em lugar nenhum (R-042: se alguém precisar entrar, não há onde olhar). Os 3 marcadores do MKT ("sem conta — fora de escopo") ficam **fora** da lista: são declaração de ausência deliberada, e contá-los como buraco seria inventar trabalho.
+- **O controle positivo é o que me motivou a escrever a lista:** a prova falha se os 4 WhatsApp e os 3 YouTube não aparecerem nela — lista vazia por estar quebrada passaria por "nada a fazer".
+- **O ensaio recusou uma versão:** a prova não filtrava plataforma e morreu com "more than one row" — há **duas** linhas "Polá Petit" no inventário (facebook e google_business), e a do Google já casara na 199. O erro era da prova; o update sempre filtrou `platform = 'facebook'`.
+
 ## 2026-10-09 — `mkt_account_id`: a chave estável entre o inventário e o MKT (199)
 
 - Ordem do dono: *"a lista de redes do app digiai se atualiza sozinha, como a do MKT"*. Perguntei ao MKT qual era a chave; ele respondeu `v_mkt_accounts.id` (uuid), que **sobrevive a rename do perfil** — handle não. `account_ref` não serve: só 25 das 46 contas têm.
