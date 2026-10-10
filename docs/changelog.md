@@ -25,6 +25,19 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Telão honesto (174):** `v_mkt_publicacoes_dias` contava **88 publicações apagadas, 2 de teste e 11 stories** como se fossem post no feed — 46% de inflação. Agora separa `feed` / `stories` / `sem_url`.
 - **Inventário (169–171):** Worker `mello-ecommerce`, Cloudflare Email Routing e chave Resend registrados; o site da loja mudou de casa em 02/10 (Netlify → Cloudflare Workers) e o registro apontava para o endereço antigo — o medidor de pixel media a casa errada.
 
+## 2026-10-09 — "Temos esse controle?" Não — e onde havia valor, o valor estava errado (202)
+
+- **Pergunta do dono:** temos no digiai o controle de conta a pagar que trava app? **A resposta medida é não**, e é pior que campo vazio:
+  - os **10** projetos Supabase diziam `plano = 'free'`. Medi na API (`GET /v1/organizations` com o PAT do digiai): a org que o token alcança está em **`pro`** — e nela vive o banco do **próprio digiai**. Inventário que diz "free" é a razão pela qual ninguém espera fatura, e fatura não esperada foi o que pausou o `gj_pessoal` de 02 a 07/10.
+  - o **ElevenLabs não existia** no inventário nem no vocabulário de serviços — e a OSI e o Limelight usam a voz. O dono pagou US$ 22 hoje.
+  - o **`ecoax`** é um 11.º projeto Supabase, na org alcançável, **ausente do inventário**.
+  - a Netlify dizia `free · ativa` **cinco dias antes** de ser desligada por não pagamento.
+  - **zero** contas com `custo_mensal`; a única conta de IA tinha identificador `(a confirmar)`.
+- **O custo é da organização, não do projeto.** O Pro do Supabase se cobra por org; pôr US$ 25 em cada um dos 6 projetos faria o custo da casa aparecer **seis vezes** — o mesmo erro que eu recusei de manhã ao deixar a view de esforço sem coluna de venda. Entra **uma linha para a org** com o custo, e os projetos ficam com o plano e sem valor. A prova falha se um projeto carregar custo, e exige que a soma seja exatamente **47 USD** (25 + 22): se viesse 172, o custo por projeto teria entrado.
+- **O que eu não sei ficou dito, não preenchido.** 5 projetos estão em orgs que este token não alcança (Clearix, pulso ×2, niposchool-design, tgjphotos) — o inventário já registrava esse limite desde 16/08. O erro deles era só o `plano = 'free'`, que virou **nulo**: "não sei" é melhor que um "free" que ninguém conferiu. O plano real vai para "Pendente do dono".
+- **Saldo não é mensalidade:** o OpenAI tem saldo pré-pago (US$ 9,49), que foi para `ultimo_detalhe` e **não** para `custo_mensal` — a prova falha se eu puser mensalidade num saldo.
+- **Cada número com a fonte**, porque número sem fonte vira folclore: o `pro` é medição minha na API; os US$ 22 do ElevenLabs e o saldo do OpenAI são leitura da fatura pelo Geral em 09/10; a Netlify encerrada em 14/10 é decisão do dono mais os 37 hosts que eu medi na 197/198.
+
 ## 2026-10-09 — Eu anunciei um buraco que não existia, e a trava do banco me corrigiu (201)
 
 - **A correção primeiro:** a 200 anunciou "14 contas que o MKT publica e o inventário não tem", e eu disse ao dono e ao MKT que entre elas havia **4 números de WhatsApp sem dono em lugar nenhum**. Tentei inseri-los e a constraint `contas_servicos_servico_identificador_key` recusou: **já existiam** — como `categoria = 'telefonia'`, ativos, **com `conta_dona`**. Um número de WhatsApp é telefone e canal ao mesmo tempo, e quem cadastrou arquivou como telefonia, o que é defensável. O que faltava neles era só o **vínculo**.
