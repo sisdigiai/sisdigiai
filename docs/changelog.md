@@ -25,6 +25,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Telão honesto (174):** `v_mkt_publicacoes_dias` contava **88 publicações apagadas, 2 de teste e 11 stories** como se fossem post no feed — 46% de inflação. Agora separa `feed` / `stories` / `sem_url`.
 - **Inventário (169–171):** Worker `mello-ecommerce`, Cloudflare Email Routing e chave Resend registrados; o site da loja mudou de casa em 02/10 (Netlify → Cloudflare Workers) e o registro apontava para o endereço antigo — o medidor de pixel media a casa errada.
 
+## 2026-10-09 — `mkt_account_id`: a chave estável entre o inventário e o MKT (199)
+
+- Ordem do dono: *"a lista de redes do app digiai se atualiza sozinha, como a do MKT"*. Perguntei ao MKT qual era a chave; ele respondeu `v_mkt_accounts.id` (uuid), que **sobrevive a rename do perfil** — handle não. `account_ref` não serve: só 25 das 46 contas têm.
+- **Duas premissas do pedido estavam erradas, e medi antes de construir:** `company.digital_assets` tem **zero** linhas de categoria rede (não havia cópia para substituir), e o `MktCrescimento` **já lia** a view. O que existe é `ops.contas_servicos` com 36 contas `rede_social`, que **não é cópia**: 22 carregam `secret_ref`, `conta_dona` e `navegador` (R-042 — de quem a conta é, onde o segredo mora), que a view não tem nem deve ter. A view diz o que a rede **mostra**; o inventário diz de quem ela **é**.
+- **Resultado: 27 com par, 9 sem.** Os sem par não foram forçados: 6 são `facebook` aqui e o MKT cadastrou as lojas como `google_business` (ou são coisas diferentes — página por loja × ficha do Google — ou uma das classificações está errada, e casar por cima decidiria isso no escuro), 2 são contas que o MKT não conhece e 1 é pinterest sem par.
+- **O ensaio recusou duas versões, as duas por eu ter medido errado.** (1) Meu ensaio solto usava só a normalização do `identificador` e "descobriu" uma disputa: `Gilberto Junior` e `Gilberto Junior (2º perfil)` colapsavam no mesmo valor. Fui olhar: **o MKT tem os dois perfis separadamente**, e com casamento **exato antes** da normalização cada um casa com o seu. A disputa era artefato da minha consulta, não do dado. (2) A assertiva seguinte esperava 1 dos 2 perfis casados e falhou com 3 — o `ilike` pega as três redes, não só o Facebook. A prova agora afirma o que é verdade: três pares, três uuids distintos.
+- **A normalização continua condicional** (só vale quando o valor limpo é único do meu lado) — não porque houve colisão, mas porque é o que impede uma futura entrar calada. Mais um índice único: duas linhas daqui não podem apontar para a mesma conta lá.
+- **Achado de carona, e é furo meu:** **7 das 9 sem par não têm `conta_dona`** — conta de rede no inventário sem dono registrado. Se amanhã alguém precisar entrar nela, não há onde olhar.
+
 ## 2026-10-09 — Os dois hosts sem destino fechados, com prova do ar (198)
 
 - `pulsohub.netlify.app` → **`pulsohub.vercel.app`** e `limelight-studio.netlify.app` → **`limelight.digiai.app.br`**. Mapa completo: **37 hosts, zero `a_definir`** — 21 redirecionam, 12 migram, 3 aposentados, 1 já morto.
