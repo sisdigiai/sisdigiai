@@ -20,7 +20,7 @@ export type ModuleId =
   | 'marketplace' | 'ecossistemas' | 'mapa-vivo' | 'travas-marketing'
   | 'fluxo-osi' | 'guia'
   | 'marketing-engajamento' | 'inventario' | 'seo' | 'vendas' | 'mapa-calor' | 'prospeccao'
-  | 'mkt-crescimento' | 'mkt-calc' | 'comparativo' | 'controle';
+  | 'mkt-crescimento' | 'mkt-calc' | 'comparativo' | 'controle' | 'google';
 
 interface NavItem {
   id: ModuleId;
@@ -80,6 +80,7 @@ const produtos: NavItem[] = [
 ];
 
 const marketing: NavItem[] = [
+  { id: 'google',           label: 'Google',            icon: <MapPin className="w-4 h-4" /> },
   { id: 'comparativo',      label: 'Comparativo',       icon: <Rows3 className="w-4 h-4" /> },
   { id: 'marketing',        label: 'Espelho do MKT',    icon: <Radio className="w-4 h-4" /> },
   { id: 'mkt-crescimento',  label: 'Radar 360',         icon: <TrendingUp className="w-4 h-4" /> },
