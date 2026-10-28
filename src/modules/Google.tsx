@@ -43,6 +43,7 @@ interface Avaliacao {
 interface Post {
   id: number | string; ficha: string; status: string | null;
   estado_google: string | null; publicado_em: string | null; agendado_para: string | null;
+  erro: string | null;
 }
 interface Mencao {
   mes: string; marca: string; ficha: string; nome: string; confirmado: boolean;
@@ -79,7 +80,7 @@ export default function Google() {
         supabase.from('v_gbp_mencoes_cobertura_mes').select('*'),
         supabase.from('v_mkt_gbp_metricas_dia').select('*'),
         supabase.from('v_mkt_gbp_posts')
-          .select('id,ficha,status,estado_google,publicado_em,agendado_para'),
+          .select('id,ficha,status,estado_google,publicado_em,agendado_para,erro'),
       ]);
       if (a.error) { setErro(a.error.message); return; }
       setAvaliacoes((a.data ?? []) as Avaliacao[]);
@@ -158,6 +159,27 @@ export default function Google() {
     [semConfirmacao],
   );
   const cancelados = useMemo(() => posts.filter((p) => p.status === 'cancelado'), [posts]);
+
+  // Post cancelado agrupado pelo MOTIVO escrito. Cancelamento aqui é DECISÃO (o MKT cancelou 42 em 08/10
+  // com a palavra do dono, trocados pelo acervo do grupo), não defeito — contagem sem motivo faz o dono
+  // olhar 42 e procurar culpado onde houve escolha.
+  const motivos = useMemo(() => {
+    const mapa = new Map<string, number>();
+    for (const p of cancelados) {
+      const k = p.erro?.trim() || 'sem motivo escrito';
+      mapa.set(k, (mapa.get(k) ?? 0) + 1);
+    }
+    return [...mapa.entries()].sort((a, b) => b[1] - a[1]);
+  }, [cancelados]);
+
+  // A coluna da origem se chama `erro` e hoje carrega MOTIVO de cancelamento — está preenchida nos 42
+  // cancelados e em nenhum publicado ou agendado (medido 28/10). Decisão e defeito são coisas opostas, e a
+  // separação fica na estrutura: `erro` em post NÃO cancelado é falha de publicação de verdade. Hoje são
+  // zero, e esse zero é medido — ao contrário de `cliques_site`, que é ausência de coleta.
+  const falhas = useMemo(
+    () => posts.filter((p) => p.status !== 'cancelado' && (p.erro?.trim() ?? '') !== ''),
+    [posts],
+  );
 
   const mesAtual = useMemo(() => mencoes[0]?.mes ?? '', [mencoes]);
   const cobAtual = useMemo(
@@ -372,7 +394,29 @@ export default function Google() {
           <span className="text-on-surface">
             {cancelados.length}<span className="text-muted"> cancelados</span>
           </span>
+          <span className={falhas.length ? 'text-warning' : 'text-on-surface'}>
+            {falhas.length}
+            <span className={falhas.length ? '' : 'text-muted'}> falhas de publicação</span>
+          </span>
         </div>
+        {motivos.length > 0 && (
+          <div className="px-3 py-2 border-b border-outline/15 text-[12px] space-y-1">
+            <span className="font-mono text-[9px] uppercase tracking-wider text-muted">
+              Por que foram cancelados
+            </span>
+            {motivos.map(([motivo, n]) => (
+              <div key={motivo} className="flex gap-2">
+                <span className="text-on-surface tabular-nums w-7 text-right">{n}</span>
+                <span className={motivo === 'sem motivo escrito' ? 'text-warning' : 'text-muted'}>{motivo}</span>
+              </div>
+            ))}
+            <p className="text-muted pt-1">
+              Cancelamento aqui é <strong className="text-on-surface">decisão, não defeito</strong>: o
+              Marketing cancelou estes em 08/10 com a palavra do dono, e trocou pelo acervo do grupo. Falha
+              de publicação de verdade conta na linha de cima, separada — e hoje é zero medido.
+            </p>
+          </div>
+        )}
         <div className="overflow-x-auto">
           <table className="w-full text-[13px]">
             <thead>
