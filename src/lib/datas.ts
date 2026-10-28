@@ -38,3 +38,11 @@ export function semanasAnteriores(n: number, hoje = new Date()): string[] {
     return d.toISOString().slice(0, 10);
   });
 }
+
+// Carimbo de leitura em Brasilia. A origem grava `lido_em` em UTC; mostrar o horario cru faz o dono ler
+// "19:19" num dado lido as 16:19 e achar que veio do futuro.
+export function horaBrasilia(iso: string): string {
+  return new Date(iso).toLocaleString('pt-BR', {
+    timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
+  });
+}

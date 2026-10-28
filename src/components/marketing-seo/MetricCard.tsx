@@ -118,7 +118,7 @@ export function MetricCard({ title, icon, period, provider, site, externalUrl, e
   );
 }
 
-export function MetricStat({ label, value, hint }: { label: string; value: React.ReactNode; hint?: string }) {
+export function MetricStat({ label, value, hint }: { label: string; value: React.ReactNode; hint?: React.ReactNode }) {
   return (
     <div className="bg-surface-low p-3">
       <div className="text-[10px] font-mono uppercase tracking-widest text-muted">{label}</div>
