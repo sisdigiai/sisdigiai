@@ -22,16 +22,27 @@ import { diaBrasilia, hojeBrasilia } from '../lib/datas';
 //    (92%): começou uma campanha, e a atribuição só existe dentro dela. O corte está na view, não no jeito
 //    de olhar.
 //
-// E a regra de sempre: não mostrar zero onde a resposta é "não sei". O relatório do Google atrasa 2–3 dias,
-// então dia recém-lido vem 0 sem ser 0 — a tela escreve "ainda não fechou" (ver DIAS_PARA_FECHAR). O MKT
-// vai gravar `dia_fechado` e `estado_google` na origem; até lá a mesma regra é calculada aqui, com os
-// campos que a view já tem.
-
-const DIAS_PARA_FECHAR = 5;
+// E a regra de sempre: não mostrar zero onde a resposta é "não sei". O relatório do Google atrasa dias, e a
+// origem passou a dizer isso na própria coluna (`dia_fechado`, MKT 28/10): antes de fechar, `aparicoes`,
+// `ligacoes` e `rotas` vêm NULAS, não zero. A tela nunca faz `?? 0` nesses campos — era exatamente assim
+// que o zero de ontem ia virar número.
+//
+// POSTS GANHARAM TESTEMUNHA. Até 28/10 esta tela se recusava a mostrar publicação de post, porque o que a
+// nossa tabela chamava de "publicado" era declaração do nosso próprio escritor (`posts_no_dia` é
+// subconsulta em `mkt.gbp_posts`). Agora existe leitura de volta: `estado_google` vem da API do Google, e
+// `posts_no_ar_google` conta só `estado_google = 'LIVE'` — conferido na definição da view antes de usar,
+// porque comparar a nossa tabela com ela mesma é o erro que eu quase reportei ao dono.
+//
+// `estado_google` NULO não é falha: é "ainda não lido". Post publicado hoje nasce assim. O alarme é post
+// publicado há mais de um dia que o Google ainda não confirma — hoje, zero.
 
 interface Avaliacao {
   review_id: string; ficha: string; marca: string; estrelas: number;
   comentario: string | null; criada_em: string; status: string | null;
+}
+interface Post {
+  id: number | string; ficha: string; status: string | null;
+  estado_google: string | null; publicado_em: string | null; agendado_para: string | null;
 }
 interface Mencao {
   mes: string; marca: string; ficha: string; nome: string; confirmado: boolean;
@@ -43,14 +54,7 @@ interface Cobertura {
 interface MetricaDia {
   ficha: string; dia: string; aparicoes: number | null; ligacoes: number | null;
   cliques_site: number | null; rotas: number | null; lido_em: string | null;
-}
-
-/** Dia que o Google ainda pode preencher: lido menos de DIAS_PARA_FECHAR depois do dia medido. */
-function aindaPodeMudar(dia: string, lido_em: string | null) {
-  if (!lido_em) return true;
-  const limite = new Date(`${dia}T12:00:00Z`);
-  limite.setUTCDate(limite.getUTCDate() + DIAS_PARA_FECHAR);
-  return new Date(lido_em) < limite;
+  dia_fechado: boolean | null; posts_no_dia: number | null; posts_no_ar_google: number | null;
 }
 
 function diasAtras(iso: string) {
@@ -63,22 +67,26 @@ export default function Google() {
   const [mencoes, setMencoes] = useState<Mencao[]>([]);
   const [cobertura, setCobertura] = useState<Cobertura[]>([]);
   const [metricas, setMetricas] = useState<MetricaDia[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const [a, m, c, d] = await Promise.all([
+      const [a, m, c, d, p] = await Promise.all([
         supabase.from('v_mkt_gbp_avaliacoes')
           .select('review_id,ficha,marca,estrelas,comentario,criada_em,status'),
         supabase.from('v_gbp_mencoes_mes').select('*'),
         supabase.from('v_gbp_mencoes_cobertura_mes').select('*'),
         supabase.from('v_mkt_gbp_metricas_dia').select('*'),
+        supabase.from('v_mkt_gbp_posts')
+          .select('id,ficha,status,estado_google,publicado_em,agendado_para'),
       ]);
       if (a.error) { setErro(a.error.message); return; }
       setAvaliacoes((a.data ?? []) as Avaliacao[]);
       setMencoes((m.data ?? []) as Mencao[]);
       setCobertura((c.data ?? []) as Cobertura[]);
       setMetricas((d.data ?? []) as MetricaDia[]);
+      setPosts((p.data ?? []) as Post[]);
     })();
   }, []);
 
@@ -113,18 +121,43 @@ export default function Google() {
     return [...mapa.values()].sort((a, b) => b.noventa - a.noventa || b.total - a.total);
   }, [avaliacoes]);
 
+  // Soma só o que a origem declarou FECHADO. Se qualquer ficha do dia ainda não fechou, o dia inteiro
+  // aparece como "ainda não fechou": soma parcial com cara de número fechado é pior que dizer "espera".
   const dias = useMemo(() => {
-    const mapa = new Map<string, { dia: string; aparicoes: number; rotas: number; ligacoes: number; aberto: boolean }>();
+    const mapa = new Map<string, {
+      dia: string; aparicoes: number; rotas: number; ligacoes: number;
+      nossos: number; noArGoogle: number; aberto: boolean;
+    }>();
     for (const r of metricas) {
-      const e = mapa.get(r.dia) ?? { dia: r.dia, aparicoes: 0, rotas: 0, ligacoes: 0, aberto: false };
-      e.aparicoes += r.aparicoes ?? 0;
-      e.rotas += r.rotas ?? 0;
-      e.ligacoes += r.ligacoes ?? 0;
-      if (aindaPodeMudar(r.dia, r.lido_em)) e.aberto = true;
+      const e = mapa.get(r.dia) ?? {
+        dia: r.dia, aparicoes: 0, rotas: 0, ligacoes: 0, nossos: 0, noArGoogle: 0, aberto: false,
+      };
+      if (r.dia_fechado) {
+        e.aparicoes += r.aparicoes ?? 0;
+        e.rotas += r.rotas ?? 0;
+        e.ligacoes += r.ligacoes ?? 0;
+      } else {
+        e.aberto = true;
+      }
+      // post não depende do relatório de desempenho: `estado_google` é leitura própria e vale sempre.
+      e.nossos += r.posts_no_dia ?? 0;
+      e.noArGoogle += r.posts_no_ar_google ?? 0;
       mapa.set(r.dia, e);
     }
     return [...mapa.values()].sort((a, b) => b.dia.localeCompare(a.dia)).slice(0, 14);
   }, [metricas]);
+
+  // Post que a nossa tabela diz publicado e o Google não confirma. Publicado HOJE e sem leitura não é
+  // falha — é "ainda não lido"; o alarme é o que passou de um dia.
+  const semConfirmacao = useMemo(
+    () => posts.filter((p) => p.status === 'publicado' && p.estado_google === null),
+    [posts],
+  );
+  const alarmePosts = useMemo(
+    () => semConfirmacao.filter((p) => p.publicado_em && diasAtras(p.publicado_em) > 1),
+    [semConfirmacao],
+  );
+  const cancelados = useMemo(() => posts.filter((p) => p.status === 'cancelado'), [posts]);
 
   const mesAtual = useMemo(() => mencoes[0]?.mes ?? '', [mencoes]);
   const cobAtual = useMemo(
@@ -322,11 +355,31 @@ export default function Google() {
         <div className="px-3 py-2 border-b border-outline/15 font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
           O que o Google mede · últimos 14 dias
         </div>
+        <div className="px-3 py-2 border-b border-outline/15 text-[13px] flex flex-wrap gap-x-6 gap-y-1">
+          <span className="text-on-surface">
+            {posts.filter((p) => p.estado_google === 'LIVE').length}
+            <span className="text-muted"> posts confirmados no ar pelo Google</span>
+          </span>
+          <span className={alarmePosts.length ? 'text-warning' : 'text-on-surface'}>
+            {alarmePosts.length}
+            <span className={alarmePosts.length ? '' : 'text-muted'}> publicados sem confirmação há mais de 1 dia</span>
+          </span>
+          {semConfirmacao.length > alarmePosts.length && (
+            <span className="text-muted">
+              {semConfirmacao.length - alarmePosts.length} publicados hoje, ainda não lidos
+            </span>
+          )}
+          <span className="text-on-surface">
+            {cancelados.length}<span className="text-muted"> cancelados</span>
+          </span>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-[13px]">
             <thead>
               <tr className="font-mono text-[9px] uppercase tracking-wider text-muted">
                 <th className="text-left px-3 py-2">Dia</th>
+                <th className="text-right px-3 py-2">Posts nossos</th>
+                <th className="text-right px-3 py-2">No ar pelo Google</th>
                 <th className="text-right px-3 py-2">Aparições</th>
                 <th className="text-right px-3 py-2">Rotas</th>
                 <th className="text-right px-3 py-2">Ligações</th>
@@ -337,6 +390,10 @@ export default function Google() {
               {dias.map((d) => (
                 <tr key={d.dia} className="border-t border-outline/10">
                   <td className="px-3 py-2 text-on-surface">{d.dia.split('-').reverse().join('/')}</td>
+                  <td className="px-3 py-2 text-right text-on-surface">{d.nossos}</td>
+                  <td className={`px-3 py-2 text-right ${d.noArGoogle < d.nossos ? 'text-warning' : 'text-on-surface'}`}>
+                    {d.noArGoogle}
+                  </td>
                   {d.aberto ? (
                     <td colSpan={4} className="px-3 py-2">
                       <span className="font-mono text-[10px] uppercase tracking-wider text-muted">
@@ -348,7 +405,7 @@ export default function Google() {
                       <td className="px-3 py-2 text-right text-on-surface">{d.aparicoes}</td>
                       <td className="px-3 py-2 text-right text-on-surface">{d.rotas}</td>
                       <td className="px-3 py-2 text-right text-on-surface">{d.ligacoes}</td>
-                      <td className="px-3 py-2 text-right text-muted">não confiável</td>
+                      <td className="px-3 py-2 text-right text-muted">não coletado</td>
                     </>
                   )}
                 </tr>
@@ -356,11 +413,19 @@ export default function Google() {
             </tbody>
           </table>
         </div>
-        <div className="px-3 py-2 border-t border-outline/15 text-[12px] text-muted">
-          "Cliques no site" vem zero da própria origem nas 6 fichas há 18 dias, e todas têm site cadastrado
-          — então a coluna não é zero, é número em que não se confia; fica assim até alguém conferir um dia
-          no painel do Google. Publicação de post não aparece aqui de propósito: o que a nossa tabela chama
-          de "publicado" é declaração do nosso escritor, não leitura de volta do Google.
+        <div className="px-3 py-2 border-t border-outline/15 text-[12px] text-muted space-y-1">
+          <p>
+            <strong className="text-on-surface">"No ar pelo Google" é leitura de volta, não a nossa
+            tabela.</strong> A coluna conta só post que a API do Google devolve como publicado — é a
+            testemunha que faltava: até 28/10 esta tela não mostrava post nenhum, porque "publicado" era
+            declaração do nosso próprio escritor. Quando a coluna fica menor que "posts nossos", ela acende.
+          </p>
+          <p>
+            Aparições, rotas e ligações só aparecem no dia que a origem marcou <strong>fechado</strong>;
+            antes disso vêm nulas e a linha diz "ainda não fechou" em vez de somar zero. "Cliques no site"
+            vem nulo da origem nas 6 fichas, todas com site cadastrado — não é zero, é não coletado, e fica
+            assim até alguém conferir um dia no painel do Google.
+          </p>
         </div>
       </div>
     </div>
