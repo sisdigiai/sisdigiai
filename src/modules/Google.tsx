@@ -54,6 +54,37 @@ import { MetricStat } from '../components/marketing-seo/MetricCard';
 //    de 1.000 faria a tela dizer "1.000 avaliações desde 2017" e errar toda média e todo total sem um
 //    único erro na console. `lerTudo` pede a contagem exata, pagina até fechar, e se ainda faltar linha a
 //    tela avisa em vez de exibir número truncado.
+//
+// ═════ CORREÇÃO DE 29/10: QUATRO DAS SEIS FICHAS SÃO DE LOJA QUE FECHOU DE VEZ ═════
+// A versão de ontem somava as seis fichas num total só, e o rodapé da tabela chutava que as quatro paradas
+// eram "fechadas temporariamente no Google". Medido hoje em `mkt.gbp_fichas`: as quatro fichas da Mello
+// estão `fechada_definitivamente` com `posts_motor = false`, atualizadas em **28/10 às 22:32 BRT**, e os
+// 8 posts que cada uma tinha agendados até 03/11 foram cancelados com o motivo escrito *"loja física
+// fechou de vez; posts parados (dono 28/10)"*. Não é defeito nem bug de coleta: é decisão do dono, do dia
+// anterior, corretamente registrada pelo MKT — a mesma lição da coluna `erro`, que carrega MOTIVO.
+//
+// O que ERA defeito é a tela: com as seis somadas, **1.054 das 1.747 avaliações (60%)** e **116 dos 146
+// posts no ar (79%)** vinham de loja que não existe mais, misturados com a única que opera. A média
+// liderava com 4,96 das fechadas por cima dos 4,90 das abertas, e "ruins sem resposta" dizia 21 quando 8
+// delas estão em loja fechada — onde responder não traz ninguém de volta. Então o padrão da tela passou a
+// ser **só ficha aberta** (hoje 2: Lancaster-Suzano e Polá Petit), com um chip para incluir as fechadas e
+// a base escrita em cima. Escolher uma ficha fechada no seletor continua valendo: ato explícito do dono
+// vale mais que o padrão.
+//
+// `situacao` e `posts_motor` já existiam em `public.v_mkt_gbp_fichas` — a tela simplesmente não lia. Não
+// precisou de migration nenhuma; precisou de ler o que o banco já dizia.
+//
+// O QUE A TELA AINDA NÃO PODE AFIRMAR, e por isso não afirma: **frescor de avaliação por ficha**. A coluna
+// `sincronizada_em` existe em `mkt.gbp_avaliacoes` mas NÃO está no contrato (`v_mkt_gbp_avaliacoes`).
+// Medido pela base: a coleta rodou em 29/10 em duas fichas e parou em **06/10** nas outras quatro — 23
+// dias. Logo "última avaliação em 2024" nessas quatro é *o que era verdade em 06/10*, não hoje, e o rótulo
+// "parada" de ontem media a NOSSA coleta, não a ficha. Enquanto o contrato não trouxer o carimbo, a tela
+// escreve a situação da loja (que ela sabe) e não data de frescor (que ela não sabe). Pedido ao MKT.
+//
+// DÍVIDA DE R-049, dita em voz alta: estes KPIs somam linha no front, não nascem no banco com o filtro
+// dentro. A classificação por situação nasce no banco (vem da view); a soma não. O certo é uma RPC com
+// ficha/janela/base como parâmetro, e é a próxima passada desta tela — não dá para chamar de cumprido o
+// que não está.
 
 interface Avaliacao {
   review_id: string; ficha: string; marca: string; estrelas: number;
@@ -76,6 +107,12 @@ interface MetricaDia {
   cliques_site: number | null; rotas: number | null; lido_em: string | null;
   dia_fechado: boolean | null; posts_no_dia: number | null; posts_no_ar_google: number | null;
 }
+interface Ficha {
+  location_id: string; nome: string; marca: string; situacao: string | null;
+  posts_motor: boolean | null; posts_semana: number | null; ultimo_post_em: string | null;
+}
+
+const FECHADA = 'fechada_definitivamente';
 
 const JANELAS = [
   { dias: 7, rotulo: '7 dias' },
@@ -140,15 +177,17 @@ export default function Google() {
   const [cobertura, setCobertura] = useState<Cobertura[]>([]);
   const [metricas, setMetricas] = useState<MetricaDia[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [fichasInfo, setFichasInfo] = useState<Ficha[]>([]);
   const [erro, setErro] = useState<string | null>(null);
 
   const [ficha, setFicha] = useState<string>(TODAS);
   const [janela, setJanela] = useState<number>(14);
+  const [incluirFechadas, setIncluirFechadas] = useState(false);
 
   useEffect(() => {
     (async () => {
       try {
-        const [a, m, c, d, p] = await Promise.all([
+        const [a, m, c, d, p, f] = await Promise.all([
           lerTudo<Avaliacao>('v_mkt_gbp_avaliacoes',
             'review_id,ficha,marca,estrelas,comentario,criada_em,status', 'review_id'),
           lerTudo<Mencao>('v_gbp_mencoes_mes', '*', 'nome'),
@@ -156,6 +195,8 @@ export default function Google() {
           lerTudo<MetricaDia>('v_mkt_gbp_metricas_dia', '*', 'dia'),
           lerTudo<Post>('v_mkt_gbp_posts',
             'id,ficha,status,estado_google,publicado_em,agendado_para,erro', 'id'),
+          lerTudo<Ficha>('v_mkt_gbp_fichas',
+            'location_id,nome,marca,situacao,posts_motor,posts_semana,ultimo_post_em', 'location_id'),
         ]);
         setAvaliacoes(a.linhas);
         setTotalAvaliacoes(a.total);
@@ -163,11 +204,33 @@ export default function Google() {
         setCobertura(c.linhas);
         setMetricas(d.linhas);
         setPosts(p.linhas);
+        setFichasInfo(f.linhas);
       } catch (e) {
         setErro(e instanceof Error ? e.message : String(e));
       }
     })();
   }, []);
+
+  const infoFicha = useMemo(
+    () => new Map(fichasInfo.map((f) => [f.nome, f])),
+    [fichasInfo],
+  );
+  const fechadas = useMemo(
+    () => fichasInfo.filter((f) => f.situacao === FECHADA).map((f) => f.nome),
+    [fichasInfo],
+  );
+
+  // `dentro` decide a BASE de todo número desta tela, e é a correção de 29/10. Ficha de loja que fechou de
+  // vez sai do total por padrão: somar 1.054 avaliações de loja que não existe com as 693 de quem opera dá
+  // um número que não serve para decidir nada. Escolher a ficha fechada no seletor continua valendo — ato
+  // explícito do dono vale mais que o padrão, e a tela diria "vazio" sem explicar.
+  const dentro = useMemo(() => {
+    return (nome: string) => {
+      if (ficha !== TODAS) return nome === ficha;
+      if (incluirFechadas) return true;
+      return infoFicha.get(nome)?.situacao !== FECHADA;
+    };
+  }, [ficha, incluirFechadas, infoFicha]);
 
   const fichas = useMemo(() => {
     const s = new Set<string>();
@@ -180,17 +243,20 @@ export default function Google() {
   const hoje = hojeBrasilia();
   const inicioJanelaHoje = janela ? somaDias(hoje, -(janela - 1)) : '0000-01-01';
 
-  const metricasF = useMemo(
-    () => (ficha === TODAS ? metricas : metricas.filter((r) => r.ficha === ficha)),
-    [metricas, ficha],
-  );
-  const postsF = useMemo(
-    () => (ficha === TODAS ? posts : posts.filter((r) => r.ficha === ficha)),
-    [posts, ficha],
-  );
+  const metricasF = useMemo(() => metricas.filter((r) => dentro(r.ficha)), [metricas, dentro]);
+  const postsF = useMemo(() => posts.filter((r) => dentro(r.ficha)), [posts, dentro]);
   const avaliacoesF = useMemo(
-    () => (ficha === TODAS ? (avaliacoes ?? []) : (avaliacoes ?? []).filter((r) => r.ficha === ficha)),
-    [avaliacoes, ficha],
+    () => (avaliacoes ?? []).filter((r) => dentro(r.ficha)),
+    [avaliacoes, dentro],
+  );
+  // A fila que fica FORA da base: avaliação ruim sem resposta em loja fechada de vez. Não entra no KPI,
+  // mas o número aparece do lado dele — tirar sem dizer seria esconder, e o dono decide se responde.
+  const ruinsEmFechada = useMemo(
+    () => (avaliacoes ?? []).filter(
+      (r) => r.estrelas <= 3 && r.status !== 'publicada'
+        && infoFicha.get(r.ficha)?.situacao === FECHADA,
+    ).length,
+    [avaliacoes, infoFicha],
   );
 
   // Carimbo de atualização: o que a origem leu por último, e quanto do que ela leu já fechou.
@@ -343,13 +409,10 @@ export default function Google() {
     [postsF],
   );
 
-  const mencoesF = useMemo(
-    () => (ficha === TODAS ? mencoes : mencoes.filter((m) => m.ficha === ficha)),
-    [mencoes, ficha],
-  );
+  const mencoesF = useMemo(() => mencoes.filter((m) => dentro(m.ficha)), [mencoes, dentro]);
   const mesAtual = useMemo(() => mencoesF[0]?.mes ?? '', [mencoesF]);
   const cobAtual = useMemo(
-    () => (ficha === TODAS ? cobertura : cobertura.filter((c) => c.ficha === ficha))
+    () => cobertura.filter((c) => dentro(c.ficha))
       .filter((c) => c.mes === mesAtual)
       .reduce(
         (s, c) => ({
@@ -357,7 +420,7 @@ export default function Google() {
         }),
         { avaliacoes: 0, com: 0, sem: 0 },
       ),
-    [cobertura, mesAtual, ficha],
+    [cobertura, mesAtual, dentro],
   );
   const semConfirmar = mencoesF.some((m) => !m.confirmado);
   const truncado = totalAvaliacoes !== null && (avaliacoes?.length ?? 0) < totalAvaliacoes;
@@ -382,6 +445,13 @@ export default function Google() {
   }
 
   const janelaRotulo = janela ? `${janela} dias` : 'série inteira';
+  const abertas = fichas.filter((f) => infoFicha.get(f)?.situacao !== FECHADA).length;
+  const baseRotulo = ficha !== TODAS
+    ? `uma ficha (${infoFicha.get(ficha)?.situacao === FECHADA ? 'loja fechada de vez' : 'loja aberta'})`
+    : incluirFechadas
+      ? `todas as ${fichas.length} fichas, incluindo ${fechadas.length} de loja fechada de vez`
+      : `${abertas} ${abertas === 1 ? 'ficha aberta' : 'fichas abertas'}` +
+        (fechadas.length ? ` · ${fechadas.length} de loja fechada de vez fora do total` : '');
   const periodoPerf = perf
     ? `${brCurto(perf.ini)}–${brCurto(perf.fim)} · ${perf.atual.dias} ${perf.atual.dias === 1 ? 'dia' : 'dias'} fechados`
     : 'sem dia fechado';
@@ -393,8 +463,8 @@ export default function Google() {
         <div>
           <h1 className="text-lg text-on-surface">Google Meu Negócio</h1>
           <p className="text-[13px] text-muted mt-1">
-            {avaliacoes.length} avaliações desde 2017 nas {porFicha.length} fichas — mas o número que decide
-            é o de cima: avaliação ruim sem resposta.
+            {avaliacoesF.length} avaliações na base desta tela — {baseRotulo}. O número que decide é o de
+            cima: avaliação ruim sem resposta.
           </p>
         </div>
         <div className="font-mono text-[10px] uppercase tracking-wider text-muted text-right leading-relaxed">
@@ -432,10 +502,28 @@ export default function Google() {
             onChange={(e) => setFicha(e.target.value)}
             className="bg-surface-low border border-outline/20 px-2 py-1 text-[13px] text-on-surface"
           >
-            <option value={TODAS}>Todas as {fichas.length} fichas</option>
-            {fichas.map((f) => <option key={f} value={f}>{f}</option>)}
+            <option value={TODAS}>
+              {incluirFechadas ? `Todas as ${fichas.length} fichas` : `${abertas} fichas abertas`}
+            </option>
+            {fichas.map((f) => (
+              <option key={f} value={f}>
+                {f}{infoFicha.get(f)?.situacao === FECHADA ? ' · fechada de vez' : ''}
+              </option>
+            ))}
           </select>
         </label>
+        {fechadas.length > 0 && ficha === TODAS && (
+          <button
+            onClick={() => setIncluirFechadas((v) => !v)}
+            className={`px-2.5 py-1 text-[12px] border transition-colors ${
+              incluirFechadas
+                ? 'border-outline-strong bg-surface-highest text-on-surface'
+                : 'border-outline/20 text-muted hover:text-on-surface'
+            }`}
+          >
+            incluir {fechadas.length} de loja fechada
+          </button>
+        )}
         <div className="flex items-center gap-2">
           <span className="font-mono text-[9px] uppercase tracking-wider text-muted">Janela</span>
           <div className="flex">
@@ -455,7 +543,7 @@ export default function Google() {
           </div>
         </div>
         <span className="text-[12px] text-muted">
-          desempenho {periodoPerf} · avaliação e post {periodoHoje}
+          desempenho {periodoPerf} · avaliação e post {periodoHoje} · base: {baseRotulo}
         </span>
       </div>
 
@@ -502,7 +590,10 @@ export default function Google() {
         <MetricStat
           label="Ruins sem resposta"
           value={<span className={fila.length ? 'text-warning' : undefined}>{fila.length}</span>}
-          hint="fila inteira, sem corte de período — avaliação velha sem resposta custa igual"
+          hint={ficha === TODAS && !incluirFechadas && ruinsEmFechada > 0
+            ? <>fila inteira, sem corte de período<span className="text-muted">
+                {' '}· mais {ruinsEmFechada} em loja fechada de vez, fora deste número</span></>
+            : 'fila inteira, sem corte de período — avaliação velha sem resposta custa igual'}
         />
         <MetricStat
           label="Agendados"
@@ -561,6 +652,7 @@ export default function Google() {
             <thead>
               <tr className="font-mono text-[9px] uppercase tracking-wider text-muted">
                 <th className="text-left px-3 py-2">Ficha</th>
+                <th className="text-left px-3 py-2">Loja</th>
                 <th className="text-right px-3 py-2">Total</th>
                 <th className="text-right px-3 py-2">90 dias</th>
                 <th className="text-right px-3 py-2">Média</th>
@@ -581,10 +673,27 @@ export default function Google() {
                     onClick={() => setFicha(sel ? TODAS : f.ficha)}
                   >
                     <td className="px-3 py-2 text-on-surface">{f.ficha}</td>
+                    <td className="px-3 py-2">
+                      {(() => {
+                        const i = infoFicha.get(f.ficha);
+                        if (!i) return <span className="text-muted font-mono text-[10px]">não cadastrada</span>;
+                        if (i.situacao === FECHADA) {
+                          return <span className="text-muted font-mono text-[10px] uppercase">fechada de vez</span>;
+                        }
+                        return (
+                          <span className="font-mono text-[10px] uppercase text-success">
+                            aberta
+                            {i.posts_motor === false && (
+                              <span className="text-warning"> · motor off</span>
+                            )}
+                          </span>
+                        );
+                      })()}
+                    </td>
                     <td className="px-3 py-2 text-right text-on-surface">{f.total}</td>
                     <td className="px-3 py-2 text-right">
                       {f.noventa === 0
-                        ? <span className="text-warning font-mono text-[10px] uppercase">parada</span>
+                        ? <span className="text-muted font-mono text-[10px] uppercase">nenhuma</span>
                         : <span className="text-on-surface">{f.noventa}</span>}
                     </td>
                     <td className="px-3 py-2 text-right text-on-surface">{(f.soma / f.total).toFixed(2)}</td>
@@ -606,10 +715,18 @@ export default function Google() {
           </table>
         </div>
         <div className="px-3 py-2 border-t border-outline/15 text-[12px] text-muted">
-          Clicar na linha filtra a tela inteira por aquela ficha. Esta tabela fica sempre com as seis —
-          tirar as outras tiraria a comparação, que é a razão dela existir. Ficha "parada" não recebe
-          avaliação há mais de 90 dias: quatro pararam em 2024, o que casa com as lojas que aparecem
-          "fechadas temporariamente" no Google — isso é painel do dono, não do app.
+          Clicar na linha filtra a tela inteira por aquela ficha. Esta tabela fica sempre com as{' '}
+          {porFicha.length} — tirar as fechadas tiraria a comparação, que é a razão dela existir, e por isso
+          ela ignora o chip de base. <span className="text-on-surface">A coluna "Loja" vem de{' '}
+          <code>situacao</code> em <code>v_mkt_gbp_fichas</code>:</span> as quatro da Mello estão
+          `fechada_definitivamente` desde 28/10 às 22:32, com os posts até 03/11 cancelados pelo motivo
+          escrito "loja física fechou de vez; posts parados (dono 28/10)". É decisão registrada, não falha.
+          <br />
+          <span className="text-warning">O que esta tabela não sabe:</span> se "nenhuma avaliação em 90
+          dias" é a ficha calada ou a nossa coleta parada. O carimbo de sincronização existe na tabela de
+          origem e não no contrato que a tela lê — medido pela base, a coleta rodou em 29/10 em duas fichas
+          e parou em 06/10 nas outras quatro. Por isso a coluna diz "nenhuma", e não "parada": o rótulo de
+          ontem media a nossa coleta e parecia medir a loja. Pedido ao MKT: `sincronizada_em` no contrato.
         </div>
       </div>
 
