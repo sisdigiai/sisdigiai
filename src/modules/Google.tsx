@@ -74,12 +74,22 @@ import { MetricStat } from '../components/marketing-seo/MetricCard';
 // `situacao` e `posts_motor` já existiam em `public.v_mkt_gbp_fichas` — a tela simplesmente não lia. Não
 // precisou de migration nenhuma; precisou de ler o que o banco já dizia.
 //
-// O QUE A TELA AINDA NÃO PODE AFIRMAR, e por isso não afirma: **frescor de avaliação por ficha**. A coluna
-// `sincronizada_em` existe em `mkt.gbp_avaliacoes` mas NÃO está no contrato (`v_mkt_gbp_avaliacoes`).
-// Medido pela base: a coleta rodou em 29/10 em duas fichas e parou em **06/10** nas outras quatro — 23
-// dias. Logo "última avaliação em 2024" nessas quatro é *o que era verdade em 06/10*, não hoje, e o rótulo
-// "parada" de ontem media a NOSSA coleta, não a ficha. Enquanto o contrato não trouxer o carimbo, a tela
-// escreve a situação da loja (que ela sabe) e não data de frescor (que ela não sabe). Pedido ao MKT.
+// ═════ FRESCOR DE AVALIAÇÃO: EU PEDI O CARIMBO ERRADO, E O MKT RECUSOU COM RAZÃO (29/10) ═════
+// Eu li `max(sincronizada_em)` por ficha e concluí "a coleta parou em 06/10 em quatro fichas, 23 dias".
+// **Estava errado, e errado para o lado de inventar alarme.** `sincronizada_em` fica na LINHA da avaliação,
+// e a leitura diária só varre os últimos 90 dias: ficha sem avaliação nova nesse período não tem linha para
+// recarimbar, então o carimbo dela congela sem nada ter parado. Conferido contra o dado antes de aceitar a
+// correção: toda ficha com ao menos 1 avaliação dentro de 90 dias está em 29/10 (Lancaster 107 avaliações,
+// Mello-Suzano 1) e **toda** ficha com zero avaliações no período ficou em 06/10 — as quatro congeladas têm
+// `reviews_em_90d = 0`. A premissa casa nos seis casos; a coleta nunca parou.
+//
+// O MKT entregou dois campos em `v_mkt_gbp_fichas` (migration 20261029_01) que medem as coisas certas, e
+// esta tela passou a usar os dois porque são perguntas DIFERENTES:
+//   · `avaliacoes_lidas_em` → "quando NÓS lemos". Carimbado em TODAS as fichas quando a leitura termina sem
+//     erro, não na linha da avaliação. Hoje: as 6 em 29/10 às 17:39 BRT. É isto que responde "não lemos".
+//   · `ultima_avaliacao_em` → "quando ALGUÉM avaliou". Polá Petit: 04/08/2021. É isto que responde
+//     "ninguém avaliou" — e são 5 anos, o que é um fato sobre a ficha, não sobre o nosso coletor.
+// Confundir os dois foi exatamente o meu erro, e é por isso que os dois aparecem na tela separados.
 //
 // DÍVIDA DE R-049, dita em voz alta: estes KPIs somam linha no front, não nascem no banco com o filtro
 // dentro. A classificação por situação nasce no banco (vem da view); a soma não. O certo é uma RPC com
@@ -110,6 +120,7 @@ interface MetricaDia {
 interface Ficha {
   location_id: string; nome: string; marca: string; situacao: string | null;
   posts_motor: boolean | null; posts_semana: number | null; ultimo_post_em: string | null;
+  avaliacoes_lidas_em: string | null; ultima_avaliacao_em: string | null;
 }
 
 const FECHADA = 'fechada_definitivamente';
@@ -196,7 +207,8 @@ export default function Google() {
           lerTudo<Post>('v_mkt_gbp_posts',
             'id,ficha,status,estado_google,publicado_em,agendado_para,erro', 'id'),
           lerTudo<Ficha>('v_mkt_gbp_fichas',
-            'location_id,nome,marca,situacao,posts_motor,posts_semana,ultimo_post_em', 'location_id'),
+            'location_id,nome,marca,situacao,posts_motor,posts_semana,ultimo_post_em,'
+            + 'avaliacoes_lidas_em,ultima_avaliacao_em', 'location_id'),
         ]);
         setAvaliacoes(a.linhas);
         setTotalAvaliacoes(a.total);
@@ -249,6 +261,18 @@ export default function Google() {
     () => (avaliacoes ?? []).filter((r) => dentro(r.ficha)),
     [avaliacoes, dentro],
   );
+  // Frescor de avaliação, que é pergunta separada do relatório de desempenho: `avaliacoes_lidas_em` é
+  // carimbado em TODAS as fichas quando a leitura termina sem erro. Pego o MAIS VELHO das fichas da base —
+  // se uma estiver atrás, é ela que manda; dizer o mais novo esconderia justamente a que falhou.
+  const lidasEm = useMemo(() => {
+    const cs = fichasInfo
+      .filter((f) => dentro(f.nome))
+      .map((f) => f.avaliacoes_lidas_em)
+      .filter((x): x is string => !!x)
+      .sort();
+    return { maisVelho: cs[0] ?? null, todas: cs.length, iguais: cs.length > 0 && cs[0] === cs[cs.length - 1] };
+  }, [fichasInfo, dentro]);
+
   // A fila que fica FORA da base: avaliação ruim sem resposta em loja fechada de vez. Não entra no KPI,
   // mas o número aparece do lado dele — tirar sem dizer seria esconder, e o dono decide se responde.
   const ruinsEmFechada = useMemo(
@@ -482,6 +506,13 @@ export default function Google() {
               )}
             </>
           ) : <span className="text-warning">nenhum dia fechado nesta ficha</span>}
+          <br />
+          {lidasEm.maisVelho
+            ? <>
+                avaliações lidas em {horaBrasilia(lidasEm.maisVelho)}
+                {!lidasEm.iguais && <span className="text-warning"> · ficha atrasada na leitura</span>}
+              </>
+            : <span className="text-warning">sem carimbo de leitura de avaliação</span>}
         </div>
       </div>
 
@@ -722,11 +753,13 @@ export default function Google() {
           `fechada_definitivamente` desde 28/10 às 22:32, com os posts até 03/11 cancelados pelo motivo
           escrito "loja física fechou de vez; posts parados (dono 28/10)". É decisão registrada, não falha.
           <br />
-          <span className="text-warning">O que esta tabela não sabe:</span> se "nenhuma avaliação em 90
-          dias" é a ficha calada ou a nossa coleta parada. O carimbo de sincronização existe na tabela de
-          origem e não no contrato que a tela lê — medido pela base, a coleta rodou em 29/10 em duas fichas
-          e parou em 06/10 nas outras quatro. Por isso a coluna diz "nenhuma", e não "parada": o rótulo de
-          ontem media a nossa coleta e parecia medir a loja. Pedido ao MKT: `sincronizada_em` no contrato.
+          <span className="text-on-surface">"Nenhuma" na coluna de 90 dias é a ficha calada, não a nossa
+          coleta parada</span> — e os dois carimbos em cima separam as duas coisas:{' '}
+          <code>avaliacoes_lidas_em</code> diz quando <em>nós</em> lemos (hoje, as 6 fichas juntas) e a
+          coluna "Última avaliação" diz quando <em>alguém</em> avaliou. Pedi ao MKT o carimbo errado
+          (`sincronizada_em`, que fica na linha da avaliação e congela quando a varredura de 90 dias não
+          acha nada) e concluí que a coleta tinha parado; não tinha. O rótulo "parada" de ontem saiu porque
+          media uma coisa e parecia medir outra.
         </div>
       </div>
 
