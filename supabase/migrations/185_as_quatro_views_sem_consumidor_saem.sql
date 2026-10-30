@@ -2,6 +2,16 @@
 --
 -- ⏸ ESCRITA E ENSAIADA, **NÃO APLICADA**. Falta a palavra do dono no canal do agente do app.
 --
+-- ⚠ ATUALIZAÇÃO 30/10: **esta migration deixou de ser risco e passou a ser FAXINA.** O dono
+--   perguntou "por que apagar as views?" e a pergunta estava certa: apagar nunca foi o necessário.
+--   A **208** fechou o vazamento sem apagar nada — `v_vendas_leads` e `v_mkt_contas` passaram a
+--   `security_invoker`, e as duas do cofre perderam o `select` de `authenticated` (invoker nelas daria
+--   42501 para todos, porque `ops.empresas` tem RLS ligada e ZERO políticas — elas só funcionavam
+--   furando a RLS). Provado com JWT das duas identidades: fora da equipe 0 leads e 0 telefones, equipe
+--   inalterada.
+--   Logo: **não há mais pressa aqui.** Remover as quatro continua certo como limpeza (nenhuma tem
+--   consumidor), e pode ser feito quando o dono quiser, ou nunca. Não volto a cobrar isto como risco.
+--
 -- POR QUE NÃO APLIQUEI AINDA: o Geral relatou que o dono disse "ratifico, e pode remover as 4" no canal
 --   dele, em 05/10. Acredito nele — e ainda assim não aplico por relato. Remover objeto de produção é
 --   destrutivo, e palavra do dono repassada por par não é palavra do dono no meu canal; foi o que ficou
