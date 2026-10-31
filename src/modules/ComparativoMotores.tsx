@@ -6,6 +6,11 @@ import { semanasAnteriores, ultimaSemanaCompleta } from '../lib/datas';
 
 // Comparativo de motores por semana (migration 193; pedido do Geral em 07/10, aprovado pelo dono).
 //
+// 211 (31/10): a coluna Publicacoes passou a contar PUBLICACAO, nao medicao. Antes a view nascia de
+// mkt.content_performance, e a coleta cobre Instagram e quase nao cobre Facebook — a tela comparava
+// cobertura de coleta e chamava de esforco. `Medidas` diz sobre quantas publicacoes Engajamento e Views
+// foram somados; sem ela, 1 de engajamento sobre 34 publicacoes e 1 sobre 20 lidas viram a mesma celula.
+//
 // Abre o placar de segunda, e por isso tem uma regra acima de qualquer outra: NÃO MOSTRAR ZERO ONDE A
 // RESPOSTA É "NÃO SEI". Três casos diferentes caem na mesma célula vazia se ninguém separar, e levam a
 // decisões opostas:
@@ -23,8 +28,8 @@ import { semanasAnteriores, ultimaSemanaCompleta } from '../lib/datas';
 
 interface MotorSemana {
   motor: string; marca: string; marca_nome: string | null; semana: string;
-  publicacoes: number; dias_com_publicacao: number; engajamento: number;
-  views: number | null; views_medidas: number;
+  publicacoes: number; publicacoes_medidas: number; dias_com_publicacao: number; engajamento: number;
+  views: number | null; views_medidas: number; ultima_foto_d7: string | null;
 }
 interface ResultadoSemana {
   marca: string; semana: string; visitas: number; cliques: number; vendas: number;
@@ -107,7 +112,13 @@ export default function ComparativoMotores() {
 
   const doMkt = motores.filter((m) => m.semana === semana);
   const res = resultado.filter((r) => r.semana === semana);
-  const semViewMedida = doMkt.length > 0 && doMkt.every((m) => m.views_medidas === 0);
+  // Somas sobre as MESMAS linhas que a tabela desenha (R-049: o de cima tem de bater com o de baixo).
+  const totPub = doMkt.reduce((s, m) => s + m.publicacoes, 0);
+  const totMedidas = doMkt.reduce((s, m) => s + m.publicacoes_medidas, 0);
+  const totViewsMedidas = doMkt.reduce((s, m) => s + m.views_medidas, 0);
+  const ultimaFoto = doMkt.map((m) => m.ultima_foto_d7).filter(Boolean).sort().pop() ?? null;
+  const semViewMedida = doMkt.length > 0 && totViewsMedidas === 0;
+  const medicaoParcial = totMedidas < totPub;
 
   const rotulo = (s: string) => {
     const f = new Date(`${s}T12:00:00Z`); f.setUTCDate(f.getUTCDate() + 6);
@@ -154,6 +165,7 @@ export default function ComparativoMotores() {
                 <th className="text-left px-3 py-2">Motor</th>
                 <th className="text-left px-3 py-2">Marca ou canal</th>
                 <th className="text-right px-3 py-2">Publicações</th>
+                <th className="text-right px-3 py-2">Medidas</th>
                 <th className="text-right px-3 py-2">Dias com publicação</th>
                 <th className="text-right px-3 py-2">Views</th>
                 <th className="text-right px-3 py-2">Views/post</th>
@@ -166,6 +178,11 @@ export default function ComparativoMotores() {
                   <td className="px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-secondary">MKT</td>
                   <td className="px-3 py-2 text-on-surface">{m.marca_nome ?? m.marca}</td>
                   <td className="px-3 py-2 text-right text-on-surface">{m.publicacoes}</td>
+                  <td className="px-3 py-2 text-right">
+                    <span className={m.publicacoes_medidas < m.publicacoes ? 'text-warning' : 'text-on-surface'}>
+                      {m.publicacoes_medidas}
+                    </span>
+                  </td>
                   <td className="px-3 py-2 text-right text-on-surface">{m.dias_com_publicacao}</td>
                   <td className="px-3 py-2 text-right">
                     {m.views_medidas === 0
@@ -175,7 +192,7 @@ export default function ComparativoMotores() {
                   <td className="px-3 py-2 text-right">
                     {m.views_medidas === 0 || !m.views
                       ? <span className="text-muted">—</span>
-                      : <span className="text-on-surface">{(m.views / m.publicacoes).toFixed(1)}</span>}
+                      : <span className="text-on-surface">{(m.views / m.views_medidas).toFixed(1)}</span>}
                   </td>
                   <td className="px-3 py-2 text-right text-on-surface">{m.engajamento}</td>
                 </tr>
@@ -188,7 +205,7 @@ export default function ComparativoMotores() {
                   </td>
                   <td className="px-3 py-2 text-on-surface">{l.frente}</td>
                   {l.estado !== 'ok' ? (
-                    <td colSpan={5} className="px-3 py-2">
+                    <td colSpan={6} className="px-3 py-2">
                       <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-warning">
                         <KeyRound className="w-3 h-3" />
                         {l.estado === 'sem_credencial' ? 'falta credencial' : 'não li o espelho'}
@@ -198,6 +215,7 @@ export default function ComparativoMotores() {
                   ) : (
                     <>
                       <td className="px-3 py-2 text-right text-on-surface">{l.publicacoes || '—'}</td>
+                      <td className="px-3 py-2 text-right text-muted">—</td>
                       <td className="px-3 py-2 text-right text-on-surface">{l.dias || '—'}</td>
                       <td className="px-3 py-2 text-right text-on-surface">{l.views || '—'}</td>
                       <td className="px-3 py-2 text-right text-on-surface">
@@ -211,7 +229,7 @@ export default function ComparativoMotores() {
 
               {!espelhos && (
                 <tr className="border-t border-outline/10">
-                  <td colSpan={7} className="px-3 py-3 text-muted">
+                  <td colSpan={8} className="px-3 py-3 text-muted">
                     <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider">
                       <Loader2 className="w-3 h-3 animate-spin" /> lendo os espelhos dos outros projetos
                     </span>
@@ -262,17 +280,40 @@ export default function ComparativoMotores() {
         </div>
       </div>
 
-      {semViewMedida && (
+      {medicaoParcial && (
         <div className="flex items-start gap-2 border border-outline/20 bg-surface-container p-3 text-[12px] text-muted">
           <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-warning" />
           <span>
-            A coluna <strong className="text-on-surface font-normal">Views</strong> do MKT diz “ainda não” porque a
-            foto de 7 dias do post (<code className="text-[11px]">views_d7</code>) começou a ser coletada em 09/10 —
-            o primeiro número real aparece por volta de 16/10. Não é zero: é não medido. O engajamento ao lado está
-            medido e vale, com a ressalva do próprio MKT de que mistura posts de idades diferentes.
+            <strong className="text-on-surface font-normal">Publicações</strong> é o que saiu;{' '}
+            <strong className="text-on-surface font-normal">Medidas</strong> é sobre quantas a coleta leu —{' '}
+            {totMedidas} de {totPub} nesta semana. Engajamento e Views somam <em>só as medidas</em>. Publicação sem
+            medição não é publicação sem resultado: é resultado não lido, e hoje quase todo o Facebook é assim.
           </span>
         </div>
       )}
+
+      <div className="flex items-start gap-2 border border-outline/20 bg-surface-container p-3 text-[12px] text-muted">
+        <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-warning" />
+        <span>
+          {semViewMedida ? (
+            <>
+              A coluna <strong className="text-on-surface font-normal">Views</strong> do MKT diz “ainda não”: nenhuma
+              publicação desta semana tem a foto de 7 dias (<code className="text-[11px]">views_d7</code>). A coleta
+              começou em 09/10 — semana anterior a isso não tem essa foto e não vai ter. Não é zero: é não medido.
+            </>
+          ) : (
+            <>
+              <strong className="text-on-surface font-normal">Views</strong> soma as {totViewsMedidas} publicações
+              que têm a foto de 7 dias (<code className="text-[11px]">views_d7</code>), de {totPub} publicadas
+              {ultimaFoto ? <> · última foto em {ultimaFoto.slice(8, 10)}/{ultimaFoto.slice(5, 7)}</> : null}. E{' '}
+              <strong className="text-on-surface font-normal">Views/post</strong> divide por essas, não pelo total —
+              dividir pelo total faria a média parecer menor do que é.
+            </>
+          )}{' '}
+          O engajamento ao lado está medido e vale, com a ressalva do próprio MKT de que mistura posts de idades
+          diferentes.
+        </span>
+      </div>
     </div>
   );
 }
