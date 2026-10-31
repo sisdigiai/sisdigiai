@@ -2,6 +2,12 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-10-31 — "Por cliente" passa a separar quem PAGA de propriedade da casa (210)
+
+- **Eu recomendei uma coisa ao dono e a medição me desautorizou no mesmo dia; o Geral estava certo.** Eu sugeri `cliente_slug = digiai` para as nossas propriedades (`clearix-site` 536 eventos, `osi` 428, `clearix-calc` 63), argumentando que `ops.empresas` é registro de entidade legal e que produto ali corromperia o vocabulário. Fui medir o meu próprio argumento: os 7 do tipo `cliente` têm CNPJ e razão social, **mas `pulso` ("Projetos Pulso") já está lá como `tipo = propria` SEM CNPJ**, assim como `nipo` e `pessoal`, e a restrição só exige que CNPJ e razão social andem juntos. **O registro já guarda produto da casa** — o precedente é exatamente o que o Geral propunha (slugs `clearix` e `osi`). A decisão final é do dono (131 na lista dele).
+- **O que sobrava da minha objeção era real, e virou esta migration:** com `clearix`/`osi` dentro, a coluna passa a guardar **duas espécies** — empresa que paga e propriedade nossa — e somar as duas num total chamado "por cliente" seria o mesmo erro da tela do Google somando loja fechada com loja aberta. O separador já existia no schema (`ops.empresas.tipo`) e a view não o expunha. Agora expõe **`cliente_tipo`**, e serve aos dois caminhos: qualquer escolha do dono nasce com as populações separáveis, sem ninguém ter de lembrar de filtrar.
+- **Lido depois de aplicar:** cliente que paga **501** (mello), casa **182** (digiai), sem espécie/sem dono **1.027**. Controle negativo na prova: evento sem dono **não ganha espécie por padrão** — um `coalesce` distraído faria tudo virar "cliente" e inflaria justamente o número que esta migration protege.
+
 ## 2026-10-31 — O evento passa a dizer de qual cliente ele é (209)
 
 - **Pedido do dono: "pode a coluna de cliente no evento".** Veio da dúvida dele sobre `lojas.clearix.app.br` ser o lugar único das landings de todas as empresas que usarem o Clearix. `analytics.events_log` não tinha coluna de cliente — só `product`, texto livre. Com uma landing dá para contornar pela URL; com cinquenta não dá, e remendar depois é reprocessar histórico.
