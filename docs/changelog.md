@@ -2,6 +2,16 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-10-31 — O evento passa a dizer de qual cliente ele é (209)
+
+- **Pedido do dono: "pode a coluna de cliente no evento".** Veio da dúvida dele sobre `lojas.clearix.app.br` ser o lugar único das landings de todas as empresas que usarem o Clearix. `analytics.events_log` não tinha coluna de cliente — só `product`, texto livre. Com uma landing dá para contornar pela URL; com cinquenta não dá, e remendar depois é reprocessar histórico.
+- **O vocabulário já existia e eu não inventei chave:** `ops.empresas.slug` (12 empresas, 7 do tipo `cliente`). E a medição mostrou uma armadilha: a landing é `lancaster-suzano` e a empresa é `lancaster` — **os dois vocabulários não coincidem**, então a coluna guarda o nosso slug e quem envia faz o mapa. Assumir que são iguais criaria cliente fantasma no primeiro envio.
+- **Sem chave estrangeira, de propósito:** um FK recusaria o evento de um cliente ainda não cadastrado, e **perder o evento é pior que ter a chave desconhecida**. A view marca o slug que não existe em `ops.empresas`: a deriva fica **visível**, não proibida. Trava que descarta dado não é trava, é perda.
+- **As 1.719 linhas antigas ficaram NULAS.** Eu poderia inferir `mello-loja` → `mello` (os 501 eventos vêm todos de mellooticas.com.br, inferência sólida) e **não gravei**: inferência escrita em coluna de chave passa a ser lida como coleta. A view mostra o inferido **ao lado** do declarado, os dois rotulados.
+- **A prova (a) pagou a migration antes de ela ser aplicada.** `create or replace function` com número diferente de parâmetros **não substitui: cria sobrecarga** — e com a de 11 e a de 12 coexistindo, toda chamada de 11 argumentos vira `function is not unique`. Aplicar a 1.ê versão teria **parado a coleta de evento de todas as landings e sites no ar**, que é exatamente o dano que o parâmetro com default existia para evitar. Conserto: `drop` da assinatura de 11 na **mesma transação** do `create` da de 12, sem janela; e a prova (i) passou a exigir que exista **uma só** `fn_log_event`.
+- **Atribuição medida hoje, e o resto é decisão do dono:** 683 eventos **inferíveis** (`mello-loja`→mello 501, `digiai-site`→digiai 182) e **1.027 sem dono** (`clearix-site` 536, `osi` 428, `clearix-calc` 63) — porque nem `clearix` nem `osi` são slug em `ops.empresas`. **Não é buraco de cadastro:** são propriedades nossas, e a quem elas pertencem comercialmente quem diz é o dono.
+- Fora de escopo de propósito: **hierarquia de cliente** (`mello` é guarda-chuva de 5 lojas). Somar loja em grupo por prefixo de slug funcionaria hoje e quebraria no primeiro slug fora do padrão — pede coluna de pai em `ops.empresas`.
+
 ## 2026-10-30 — "Por que apagar as views?" — e a resposta é que não precisava (208)
 
 - **O dono perguntou e a pergunta derrubou a minha moldura: apagar nunca foi o necessário.** Eu passei **26 dias** cobrando dele a decisão **cara** (o `drop` da 185, destrutivo, que exige a palavra dele) quando existia esta, barata e reversível. As quatro views foram para a mesma migration porque nenhuma tem leitor — e "sem leitor" justifica **faxina**, não urgência. O que era urgente era o vazamento.
