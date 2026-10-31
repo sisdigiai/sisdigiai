@@ -2,6 +2,14 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-10-31 — A tela passa a dizer qual REDE não foi lida, em vez de eu afirmar isso numa frase (212)
+
+- **Pedido do Geral, vindo do MKT: o Facebook deve aparecer como "não medido" por marca e rede, nunca como zero.** Motivo: a Meta recusa a leitura de DIGIAI, OSI e Mello (erro #10, falta `pages_read_engagement` no app da Meta — acesso avançado é pedido do dono) e a Lancaster lê só engajamento, sem views. **Não vem antes do placar de segunda e não tem data**, logo não é espera: é estado que a tela precisa saber mostrar por tempo indefinido.
+- **Onde a 211 ficou curta, e o defeito era meu.** A 211 já impede o zero mentiroso (as 14 publicações de Facebook do Mello entram em `publicacoes` e ficam fora de `publicacoes_medidas`), mas agrupa por **marca** — e eu tapei esse buraco com uma **frase fixa** no rodapé: "hoje quase todo o Facebook é assim". Declaração minha dentro do código, que continuaria mentindo com cara de dado no dia em que a Meta liberasse. Mesma lição da 192 e da 193: distinção escondida em texto envelhece calada.
+- **São TRÊS estados, não dois, e todos já estavam nos dados** — tratá-los como um só jogaria no lixo a única leitura de Facebook que a casa tem: `publicacoes_medidas = 0` é **não medido** (FB de mello/digiai/osi, LinkedIn da pessoal); `publicacoes_medidas > 0` com `views_medidas = 0` é **só engajamento** (FB da lancaster: 2 publicadas, 2 lidas, 0 views); o resto é medido.
+- **Semana 19/10, rede por rede:** mello IG 20/20 e **FB 14/0**; lancaster IG 22/21 e **FB 2/2 com 0 views**; digiai IG 6/4 e **FB 3/0**; osi IG 6/4 e **FB 3/0**; pessoal LinkedIn **2/0**. Confere com o que o MKT descreveu, inclusive a exceção da Lancaster.
+- **Prova que importa:** a soma por rede tem de bater com a tabela de 211 na mesma semana (78 publicadas / 51 lidas) — rodapé que contradiz a tabela de cima é pior que rodapé nenhum. E controle negativo: rede sem leitura **não pode** aparecer com engajamento, views ou foto; um `coalesce` distraído traria de volta o erro da loja fechada contada como aberta.
+
 ## 2026-10-31 — O comparativo de motores contava medição e chamava de esforço (211)
 
 - **Pedido do Geral, vindo do MKT: a tela comparava cobertura de coleta, não trabalho.** `v_comparativo_motores_semana` (193) nascia de `public.v_mkt_performance`, que começa `FROM mkt.content_performance` e só então junta `mkt.publications` — logo **publicação sem linha de performance não existia para a tela**. E a perda não é aleatória: medido na semana 19/10, o Instagram é quase todo lido (mello 20/20, lancaster 21/22) e o **Facebook é quase todo cego** (mello 0 de 14, digiai 0 de 3, osi 0 de 3). O motor que publica em plataforma mal coletada aparecia preguiçoso — o avesso do propósito do painel.

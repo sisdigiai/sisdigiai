@@ -11,6 +11,11 @@ import { semanasAnteriores, ultimaSemanaCompleta } from '../lib/datas';
 // cobertura de coleta e chamava de esforco. `Medidas` diz sobre quantas publicacoes Engajamento e Views
 // foram somados; sem ela, 1 de engajamento sobre 34 publicacoes e 1 sobre 20 lidas viram a mesma celula.
 //
+// 212 (31/10): a cobertura passou a ser mostrada POR REDE, e sai do banco. A 211 agrupa por marca, e eu
+// havia tapado esse buraco com uma frase fixa no rodape ("quase todo o Facebook"). Frase fixa continuaria
+// mentindo no dia em que a Meta liberasse — a rede cega tem de se declarar sozinha. Sao TRES estados: nao
+// medido, so engajamento (Facebook da lancaster hoje) e medido.
+//
 // Abre o placar de segunda, e por isso tem uma regra acima de qualquer outra: NÃO MOSTRAR ZERO ONDE A
 // RESPOSTA É "NÃO SEI". Três casos diferentes caem na mesma célula vazia se ninguém separar, e levam a
 // decisões opostas:
@@ -30,6 +35,10 @@ interface MotorSemana {
   motor: string; marca: string; marca_nome: string | null; semana: string;
   publicacoes: number; publicacoes_medidas: number; dias_com_publicacao: number; engajamento: number;
   views: number | null; views_medidas: number; ultima_foto_d7: string | null;
+}
+interface CoberturaRede {
+  marca: string; marca_nome: string | null; rede: string; semana: string;
+  publicacoes: number; publicacoes_medidas: number; views_medidas: number;
 }
 interface ResultadoSemana {
   marca: string; semana: string; visitas: number; cliques: number; vendas: number;
@@ -63,18 +72,21 @@ export default function ComparativoMotores() {
   const [semana, setSemana] = useState(() => ultimaSemanaCompleta());
   const [motores, setMotores] = useState<MotorSemana[]>([]);
   const [resultado, setResultado] = useState<ResultadoSemana[]>([]);
+  const [cobertura, setCobertura] = useState<CoberturaRede[]>([]);
   const [espelhos, setEspelhos] = useState<Linha[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const [m, r] = await Promise.all([
+      const [m, r, c] = await Promise.all([
         supabase.from('v_comparativo_motores_semana').select('*'),
         supabase.from('v_comparativo_resultado_semana').select('*'),
+        supabase.from('v_comparativo_cobertura_rede_semana').select('*'),
       ]);
       if (m.error) { setErro(m.error.message); return; }
       setMotores((m.data ?? []) as MotorSemana[]);
       setResultado((r.data ?? []) as ResultadoSemana[]);
+      setCobertura((c.data ?? []) as CoberturaRede[]);
     })();
   }, []);
 
@@ -119,6 +131,9 @@ export default function ComparativoMotores() {
   const ultimaFoto = doMkt.map((m) => m.ultima_foto_d7).filter(Boolean).sort().pop() ?? null;
   const semViewMedida = doMkt.length > 0 && totViewsMedidas === 0;
   const medicaoParcial = totMedidas < totPub;
+  const redes = cobertura
+    .filter((c) => c.semana === semana)
+    .sort((a, b) => a.marca.localeCompare(b.marca) || b.publicacoes - a.publicacoes);
 
   const rotulo = (s: string) => {
     const f = new Date(`${s}T12:00:00Z`); f.setUTCDate(f.getUTCDate() + 6);
@@ -241,6 +256,57 @@ export default function ComparativoMotores() {
         </div>
       </div>
 
+      {redes.length > 0 && (
+        <div className="border border-outline/15 bg-surface-container">
+          <div className="px-3 py-2 border-b border-outline/15 font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+            Cobertura de leitura · por rede
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-[13px]">
+              <thead>
+                <tr className="font-mono text-[9px] uppercase tracking-wider text-muted">
+                  <th className="text-left px-3 py-2">Marca</th>
+                  <th className="text-left px-3 py-2">Rede</th>
+                  <th className="text-right px-3 py-2">Publicadas</th>
+                  <th className="text-right px-3 py-2">Lidas</th>
+                  <th className="text-left px-3 py-2">Estado da leitura</th>
+                </tr>
+              </thead>
+              <tbody>
+                {redes.map((c) => {
+                  const cega = c.publicacoes_medidas === 0;
+                  const soEng = !cega && c.views_medidas === 0;
+                  return (
+                    <tr key={`${c.marca}-${c.rede}`} className="border-t border-outline/10">
+                      <td className="px-3 py-2 text-on-surface">{c.marca_nome ?? c.marca}</td>
+                      <td className="px-3 py-2 text-muted">{c.rede}</td>
+                      <td className="px-3 py-2 text-right text-on-surface">{c.publicacoes}</td>
+                      <td className="px-3 py-2 text-right">
+                        <span className={cega ? 'text-warning' : 'text-on-surface'}>{c.publicacoes_medidas}</span>
+                      </td>
+                      <td className="px-3 py-2">
+                        <span className={`font-mono text-[10px] uppercase tracking-wider ${
+                          cega ? 'text-warning' : soEng ? 'text-secondary' : 'text-muted'}`}>
+                          {cega ? 'não medido' : soEng ? 'só engajamento' : 'medido'}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="px-3 py-2 border-t border-outline/15 text-[12px] text-muted">
+            <strong className="text-on-surface font-normal">Não medido</strong> é publicação que saiu e cuja
+            resposta ninguém leu — não é resultado zero. Hoje o Facebook de Mello, DIGIAI e OSI está assim: a
+            Meta recusa a leitura (erro #10, falta a permissão <code className="text-[11px]">pages_read_engagement</code>
+            no app da Meta, cujo acesso avançado é pedido do dono), e não há data para voltar.{' '}
+            <strong className="text-on-surface font-normal">Só engajamento</strong> é o Facebook da Lancaster:
+            a interação é lida, as views não.
+          </div>
+        </div>
+      )}
+
       <div className="border border-outline/15 bg-surface-container">
         <div className="px-3 py-2 border-b border-outline/15 font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
           Resultado · por marca, não por motor
@@ -287,7 +353,8 @@ export default function ComparativoMotores() {
             <strong className="text-on-surface font-normal">Publicações</strong> é o que saiu;{' '}
             <strong className="text-on-surface font-normal">Medidas</strong> é sobre quantas a coleta leu —{' '}
             {totMedidas} de {totPub} nesta semana. Engajamento e Views somam <em>só as medidas</em>. Publicação sem
-            medição não é publicação sem resultado: é resultado não lido, e hoje quase todo o Facebook é assim.
+            medição não é publicação sem resultado: é resultado não lido. Qual rede ficou sem leitura está na
+            tabela abaixo — vem do banco, não de uma frase escrita aqui.
           </span>
         </div>
       )}
