@@ -10,7 +10,12 @@
 // LIMITE HONESTO: achar o ID no bundle prova que o código está publicado, não que o evento chegou à Meta —
 // isso só o Events Manager responde. E site que injeta o pixel por tag manager remoto não aparece aqui.
 //
-// Uso:  node scripts/medir-pixel.mjs          → mede todos os sites ativos do inventário e grava
+// 04/11: o retrato passou a incluir as LANDINGS DE LOJA do Clearix (`lojas.clearix.app.br`), lidas do
+// sitemap público. São do ecossistema; a casa confere, não é dona. E o medidor passou a distinguir pixel
+// POR CONSENTIMENTO (presente, dispara após o aceite) de pixel ausente — tratar os dois como "sem meta"
+// foi erro meu em 31/10, e os dois pedem decisões opostas sobre gastar em anúncio.
+//
+// Uso:  node scripts/medir-pixel.mjs          → mede os sites ativos do inventário + as landings, e grava
 //       node scripts/medir-pixel.mjs --dry    → mede e só mostra
 import fs from 'node:fs';
 
@@ -53,16 +58,33 @@ async function medir(url) {
   // arquivo próprio (/digiai-pixel.js, /clearix-pixel.js), então o medidor dizia "sem meta" sobre dois
   // sites que TÊM pixel — e o painel ia chamar de vitrine cega quem estava medindo. Agora segue todo
   // <script src> do próprio site, que é o que o navegador faria.
-  const scripts = [...new Set([...todo.matchAll(/<script[^>]+src=["']([^"']+)["']/g)]
-    .map((m) => m[1]).filter((u) => !/^https?:/i.test(u)))].slice(0, 8);
+  // 04/11: a landing de loja tem 15 scripts de mesma origem e o pixel vive no 15.o — o chunk da PAGINA
+  // (`/_next/static/chunks/app/l/[slug]/page-*.js`). Com o corte em 8 o medidor diria "sem meta" sobre uma
+  // landing que TEM pixel: a mesma conclusao errada que eu dei a mao em 31/10, agora reproduzida pela
+  // ferramenta. Conserto: os chunks de `app/` (pagina e layout, onde mora codigo de medicao) vao PRIMEIRO,
+  // e o teto sobe a 12 — sem virar 15 requisicoes por landing no host do eco. O obs continua dizendo
+  // quantos de quantos foram lidos, para leitura parcial nunca passar por leitura completa.
+  const todosScripts = [...new Set([...todo.matchAll(/<script[^>]+src=["']([^"']+)["']/g)]
+    .map((m) => m[1]).filter((u) => !/^https?:/i.test(u)))];
+  const scripts = [...todosScripts.filter((u) => u.includes('/app/')),
+                   ...todosScripts.filter((u) => !u.includes('/app/'))].slice(0, 12);
   const falhas = [];
   for (const s of scripts) {
-    const r = await baixar(base + (s.startsWith('/') ? s : '/' + s), 25000);
+    // 04/11: era `base + caminho`, e com URL que tem caminho (as landings sao /<slug>) isso virava
+    // `lojas.clearix.app.br/lancaster-suzano/_next/...` — 404 nos 8 chunks. Nenhum site do inventario tem
+    // caminho, entao o defeito nunca apareceu. `new URL` resolve como o navegador: caminho absoluto vai
+    // para a RAIZ, relativo fica ao lado da pagina.
+    const r = await baixar(new URL(s, base + '/').href, 25000);
     if (r.erro) falhas.push(`${s}: ${r.erro}`); else todo += r.texto;
   }
   if (pagina.erro) falhas.push(`página: ${pagina.erro}`);
 
   const meta = /fbevents\.js|fbq\s*\(/.test(todo);
+  // 04/11: a landing de loja carrega o pixel SO DEPOIS DO ACEITE (injeta fbevents no clique). Sem esta
+  // deteccao o retrato diria "sem meta" sobre uma pagina que TEM pixel configurado — foi a conclusao
+  // errada que eu dei ao dono em 31/10 e tive de desdizer. Pixel presente e esperando aceite nao e
+  // vitrine cega: e medicao parcial, e a diferenca muda a decisao de gastar em anuncio.
+  const porConsentimento = /consent|consentimento/i.test(todo) && /fbevents|gtag\/js/.test(todo);
   // O ID pode vir de três lugares: a variável que o layout injeta, o init do fbq, ou solto no bundle.
   // Ler só "número começado em 1" era palpite meu: o pixel do site institucional começa em 3.
   const id = todo.match(/META_PIXEL_ID\s*=\s*["']([0-9]{14,17})["']/)?.[1]
@@ -74,9 +96,12 @@ async function medir(url) {
     http_code: pagina.code,
     meta_pixel_id: meta ? id : null,
     tiktok: /analytics\.tiktok\.com|ttq\.load/.test(todo),
-    ga_gtm: todo.match(/\b(G-[A-Z0-9]{8,12}|GTM-[A-Z0-9]{5,8})\b/)?.[1] ?? null,
+    // 04/11: faltava `AW-` (Google ADS). A landing de loja mede conversão por AW-18544661611, e o retrato
+    // dizia "sem google" sobre quem tem conversão configurada — cego no exato lugar onde o dinheiro entra.
+    ga_gtm: todo.match(/\b(G-[A-Z0-9]{8,12}|GTM-[A-Z0-9]{5,8}|AW-[0-9]{9,12})\b/)?.[1] ?? null,
     clarity: /clarity\.ms/.test(todo),
     obs: (falhas.length ? `NÃO LIDO: ${falhas.join('; ')} — ` : '') +
+         (porConsentimento ? 'PIXEL POR CONSENTIMENTO (só dispara depois do aceite) — ' : '') +
          (scripts.length ? `html + ${scripts.length - falhas.length} de ${scripts.length} script(s)` : 'só html'),
   };
 }
@@ -92,12 +117,44 @@ if (alvo) {
 const sites = await sql(`select valor url from company.digital_assets
   where deleted_at is null and categoria = 'site' and status = 'ativo' order by valor`);
 
+// 04/11 (pedido do dono): as LANDINGS DE LOJA entram no mesmo retrato. Elas sao do ecossistema Clearix e
+// moram em `lojas.clearix.app.br`; a lista sai do SITEMAP PUBLICO e nao de uma lista escrita aqui, por duas
+// razoes: lista no codigo envelhece calada na primeira landing nova, e ler o banco do Clearix seria cano
+// novo contra o ADR-0001. A casa precisa CONFERIR, nao ser dona: o eco publica, nos medimos.
+const SITEMAP_LANDINGS = 'https://lojas.clearix.app.br/sitemap.xml';
+async function landings() {
+  const r = await baixar(SITEMAP_LANDINGS, 20000);
+  if (r.erro) return { urls: [], erro: r.erro };
+  const urls = [...new Set([...r.texto.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/g)].map((m) => m[1]))]
+    .filter((u) => /\/[^/]+$/.test(new URL(u).pathname));
+  return { urls, erro: null };
+}
+
 const medidos = [];
 for (const s of sites) {
   const m = await medir(s.url);
   medidos.push(m);
   console.log(`${String(m.http_code).padEnd(3)} ${m.url}  meta:${m.meta_pixel_id ?? 'não'}  tiktok:${m.tiktok ? 'sim' : 'não'}  ga:${m.ga_gtm ?? 'não'}` +
     (m.obs.startsWith('NÃO LIDO') ? `  ⚠ ${m.obs}` : ''));
+}
+
+const lp = await landings();
+if (lp.erro) {
+  // Falha nomeada e gravada: "nao li o sitemap" nao pode virar "nao ha landing". Zero landing medida com o
+  // sitemap fora do ar e a mesma tela de zero landing publicada, e as duas pedem acoes opostas.
+  console.log(`
+⚠ sitemap das landings NÃO LIDO (${lp.erro}) — nenhuma landing neste retrato`);
+  medidos.push({ url: SITEMAP_LANDINGS, http_code: 0, meta_pixel_id: null, tiktok: false, ga_gtm: null,
+    clarity: false, fonte: 'sitemap lojas.clearix.app.br',
+    obs: `NÃO LIDO: sitemap ${lp.erro} — a lista de landings deste retrato está vazia por falha, não por ausência` });
+} else {
+  console.log(`
+landings de loja no sitemap: ${lp.urls.length}`);
+  for (const u of lp.urls) {
+    const m = { ...await medir(u), fonte: 'sitemap lojas.clearix.app.br' };
+    medidos.push(m);
+    console.log(`${String(m.http_code).padEnd(3)} ${m.url}  meta:${m.meta_pixel_id ?? 'não'}  ga:${m.ga_gtm ?? 'não'}  ${m.obs}`);
+  }
 }
 
 if (DRY) { console.log(`\n--dry: ${medidos.length} medidos, nada gravado.`); process.exit(0); }
