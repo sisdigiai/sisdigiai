@@ -57,15 +57,33 @@ export default function Inventario() {
     inventarioStore.vigiaSites().then(setVigia).catch(() => {});
   }, []);
 
-  // O 4º quadro NÃO é custo. `custo_mensal` está vazio em todas as linhas — o custo
-  // de infraestrutura vive em `finance.infra_costs`, e um quadro que nunca preenche
-  // é ruído, não informação. O que importa aqui é o tamanho da lacuna de verificação.
+  // 213 (03/11): o quadro de custo DECLARADO passou a existir, porque `custo_mensal` deixou de ser vazio —
+  // a Supabase agora e lançada por projeto (US$ 9,81 de compute cada) mais o plano por org (US$ 25) e uma
+  // linha negativa de crédito. O comentário que estava aqui dizia "está vazio em todas as linhas", e isso
+  // virou falso em 09/10 sem ninguém corrigir. O declarado é somado POR MOEDA: USD e BRL convivem na mesma
+  // coluna, e um total único misturaria dólar com real. O medido no extrato (BRL) segue no quadro ao lado:
+  // declarado é o que a casa espera pagar, medido é o que saiu da conta — não se misturam.
   const placar = useMemo(() => {
     const conferidos = itens.filter(foiConferido).length;
     // 'atencao' entra na conta: era o status dos 3 ativos da Polá Petit que pedem acao
     // do dono, e sem ele o placar dizia "0 com problema" com pendencia real na lista.
     const problema = itens.filter((i) => i.status === 'quebrado' || i.status === 'pausado' || i.status === 'atencao').length;
     return { total: itens.length, conferidos, problema, pendentes: itens.length - conferidos };
+  }, [itens]);
+
+  // Soma do DECLARADO, por moeda e só do que está ativo: linha encerrada fica na lista como história
+  // (é o caso do easy_idiomas, apagado pelo dono em 03/11) e não pode somar. O crédito de compute entra
+  // negativo de propósito — é o que faz a soma reproduzir a fatura em vez de ficar US$ 10 acima dela.
+  const declarado = useMemo(() => {
+    const porMoeda = new Map<string, number>();
+    for (const i of itens) {
+      if (i.custo_mensal == null || i.situacao === 'encerrada') continue;
+      const m = i.moeda ?? 'BRL';
+      porMoeda.set(m, (porMoeda.get(m) ?? 0) + Number(i.custo_mensal));
+    }
+    const partes = [...porMoeda.entries()].sort((a, b) => b[1] - a[1])
+      .map(([m, v]) => `${m === 'USD' ? 'US$' : 'R$'} ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+    return { texto: partes.length ? partes.join(' + ') : '—', porMoeda };
   }, [itens]);
 
   const visiveis = useMemo(() => {
@@ -126,6 +144,7 @@ export default function Inventario() {
               { rotulo: 'custo medido no mês', valor: custos.size
                   ? [...custos.values()].reduce((a, c) => a + c.brl, 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) + ` · ${custos.size} serviço(s)`
                   : '—' },
+              { rotulo: 'custo declarado · por moeda', valor: declarado.texto },
             ].map((c) => (
               <div key={c.rotulo} className="bg-surface-low p-4">
                 <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted mb-1">{c.rotulo}</div>

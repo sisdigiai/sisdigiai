@@ -2,6 +2,18 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-03 — O custo da Supabase é por PROJETO; só o plano é por org (213)
+
+- **O inventário dizia US$ 47/mês e a fatura de 01/11 foi US$ 73,87 — e o erro é meu, da 202.** Eu lancei o custo todo na linha da organização e escrevi a justificativa na própria `obs`: "o Pro se cobra por org, não por projeto". **Metade certa:** o **plano** é por org (lançar 25 em cada projeto contaria cinco vezes), mas o **compute é por projeto** — cada projeto roda a sua instância e é cobrado por hora. Generalizei de uma linha da fatura para a fatura inteira e não conferi o resto. Fatura não esperada **já pausou o gj_pessoal de 02 a 07/10**.
+- **Medido aqui, sem depender do que me contaram:** `GET /v1/projects/{ref}/billing/addons` devolve `ci_micro = US$ 0,01344/hora (~US$ 10/mês)` — × 730 h = **US$ 9,81**. E o modelo **reproduz a fatura**: com os 6 projetos de 01/11, `25 + 6 × 9,81 − 9,81 = US$ 73,86` contra **US$ 73,87 faturado**. Um centavo de diferença sobre fatura real é prova; "≈ 10 por projeto" sozinho era palpite.
+- **Como ficou lançado:** plano **US$ 25** na linha da org; **US$ 9,81** em cada um dos 5 projetos (digiai, nexus, lumina_box, gj_pessoal, ecoax); e uma **linha negativa de crédito (−US$ 9,81)**, porque o Pro inclui US$ 10 de compute e cobre 1 projeto. Sem essa linha a soma daria 74 e eu trocaria um erro de 28 dólares por outro de 10. Crédito como linha própria, e não descontado dos 25, porque número já abatido esconde dois fatos num só.
+- **Antes → depois:** Supabase **US$ 47 → US$ 64,24/mês**; total declarado da casa em USD **US$ 47 → US$ 86,24** (com os US$ 22 do ElevenLabs). O `nipo_score` soma ≈ US$ 9,81 ao nascer.
+- **easy_idiomas encerrado com data e motivo, sem apagar a linha** (decisão 133 do dono; conferido em `GET /v1/projects`: o ref não está mais na org). **Conserto meu na mesma entrega (213-b):** eu havia posto `ativo = false`, e isso **tira a linha da tela** — `v_ops_contas_servicos` filtra `ativo` — contradizendo o meu próprio motivo. O precedente da casa é `netlify:sis_digiai`: `encerrada` com `ativo = true`, visível como história. Quem tira da soma é o `custo_mensal` nulo, não o `ativo`.
+- **Achado de passagem:** a nota do `nexus` dizia INACTIVE desde 16/08 e a API diz **ACTIVE_HEALTHY** — por isso ele paga compute como qualquer outro. Nota corrigida.
+- **Dois alçapões de moeda, declarados onde quem lê vai tropeçar** (e não consertados neste turno, de propósito): `v_ops_cofre_resumo` faz `sum(custo_mensal)` **misturando USD e BRL** (passa batido só porque as linhas com valor são todas USD), e `v_ops_contas_custo` chama a coluna de `custo_declarado_brl` devolvendo a moeda **da linha** — US$ 25 rotulado como BRL. A tela não lê essa coluna; quem passar a ler tem de converter. As três ganharam `comment`.
+- **Na tela:** quadro novo de **custo declarado, somado por moeda** (`US$ 86,24`), ao lado do medido no extrato em BRL — declarado é o que a casa espera pagar, medido é o que saiu da conta, e misturar os dois foi o que deixou o número errado sobreviver 25 dias. O comentário do código dizia "`custo_mensal` está vazio em todas as linhas", falso desde 09/10.
+
+
 ## 2026-10-31 — A tela passa a dizer qual REDE não foi lida, em vez de eu afirmar isso numa frase (212)
 
 - **Pedido do Geral, vindo do MKT: o Facebook deve aparecer como "não medido" por marca e rede, nunca como zero.** Motivo: a Meta recusa a leitura de DIGIAI, OSI e Mello (erro #10, falta `pages_read_engagement` no app da Meta — acesso avançado é pedido do dono) e a Lancaster lê só engajamento, sem views. **Não vem antes do placar de segunda e não tem data**, logo não é espera: é estado que a tela precisa saber mostrar por tempo indefinido.
