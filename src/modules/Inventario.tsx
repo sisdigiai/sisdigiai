@@ -294,6 +294,9 @@ function BlocoPixels({ pixels, vigia }: { pixels: SitePixel[]; vigia: VigiaSite[
   };
   const vitrines = pixels.filter((p) => p.mede_visitante);
   const cegas = vitrines.filter((p) => p.veredito.startsWith('vitrine cega'));
+  // 216: rascunho conta separado. Somar com as cegas mandaria instalar pixel em página que não existe —
+  // foi o alarme falso que eu dei ao dono em 05/11, agora com nome próprio na contagem.
+  const rascunhos = vitrines.filter((p) => p.pagina_inexistente);
   const medido = pixels.find((p) => p.medido_em)?.medido_em ?? null;
 
   return (
@@ -302,14 +305,17 @@ function BlocoPixels({ pixels, vigia }: { pixels: SitePixel[]; vigia: VigiaSite[
         <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">Medição dos sites</span>
         <span className="h-px flex-1 bg-outline/15" />
         <span className="font-mono text-[9px] uppercase tracking-wider text-muted">
-          {vitrines.length} vitrines · {cegas.length} cegas · {pixels.length - vitrines.length} apps com login
+          {vitrines.length} vitrines · {cegas.length} cegas
+          {rascunhos.length > 0 && ` · ${rascunhos.length} rascunho`}
+          {' · '}{pixels.length - vitrines.length} apps com login
           {vigia.length > 0 && ` · ${vigia.filter((v) => v.ativo).length} vigiados`}
         </span>
       </div>
 
       <div className="border border-outline/15 bg-surface-container">
         {vitrines.map((p) => {
-          const ruim = p.veredito.startsWith('vitrine cega') || p.veredito.startsWith('site fora') || p.veredito.startsWith('pixel no ar');
+          const ruim = p.veredito.startsWith('vitrine cega') || p.veredito.startsWith('site fora')
+            || p.veredito.startsWith('pixel no ar') || p.pagina_inexistente || p.veredito.startsWith('lista de landings');
           return (
             <div key={p.url} className="flex items-center gap-3 px-3 py-2.5 border-b border-outline/10 last:border-b-0">
               <div className="flex-1 min-w-0">
@@ -319,6 +325,7 @@ function BlocoPixels({ pixels, vigia }: { pixels: SitePixel[]; vigia: VigiaSite[
                 <span className="font-mono text-[9px] uppercase tracking-wider text-muted truncate block">
                   {p.produto ?? '—'} · {p.meta_no_ar ? `meta ${p.meta_no_ar}` : 'sem meta'}
                   {p.tiktok_no_ar && ' · tiktok'}{p.ga_gtm && ` · ${p.ga_gtm}`}
+                  {p.fonte?.startsWith('sitemap') && ' · landing do eco'}
                 </span>
               </div>
               {(() => {
@@ -344,7 +351,9 @@ function BlocoPixels({ pixels, vigia }: { pixels: SitePixel[]; vigia: VigiaSite[
         Medido no HTML e nos bundles publicados{medido ? ` em ${new Date(medido).toLocaleDateString('pt-BR')}` : ''} por
         {' '}<code className="font-mono">scripts/medir-pixel.mjs</code>. Achar o ID prova que o código está no ar —
         se o evento chegou à Meta, só o Events Manager responde. O ID de cada pixel vive no inventário acima,
-        nunca no código do site.
+        nunca no código do site. Página que responde 200 mostrando "não encontrada" entra como
+        <span className="font-semibold"> rascunho</span>, não como vitrine cega: a medição pede ao mesmo host
+        um endereço inventado e compara — se as duas respostas são a mesma, a página não existe.
       </p>
     </section>
   );

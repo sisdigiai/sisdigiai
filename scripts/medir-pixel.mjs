@@ -10,6 +10,12 @@
 // LIMITE HONESTO: achar o ID no bundle prova que o código está publicado, não que o evento chegou à Meta —
 // isso só o Events Manager responde. E site que injeta o pixel por tag manager remoto não aparece aqui.
 //
+// 05/11: SOFT-404 — o medidor tratava HTTP 200 como "página viva". `visaoparasuzano` e
+// `lancaster-multifocal` devolvem 200 com o corpo "Página não encontrada": são rascunhos. Eu olhei o
+// CÓDIGO e não o CORPO, chamei de "landing no ar sem pixel" e tive de desdizer ao dono. Sem este
+// conserto, todo slug errado ou rascunho entra no retrato como vitrine cega — e "não existe" e "existe e
+// não mede" pedem ações opostas: uma é publicar, a outra é instalar pixel.
+//
 // 04/11: o retrato passou a incluir as LANDINGS DE LOJA do Clearix (`lojas.clearix.app.br`), lidas do
 // sitemap público. São do ecossistema; a casa confere, não é dona. E o medidor passou a distinguir pixel
 // POR CONSENTIMENTO (presente, dispara após o aceite) de pixel ausente — tratar os dois como "sem meta"
@@ -50,9 +56,56 @@ async function baixar(url, ms = 20000) {
   }
 }
 
+const titulo = (html) => html?.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1].replace(/\s+/g, ' ').trim() || null;
+
+// SONDA: pede ao MESMO host um irmão INVENTADO da página medida e compara. Decide soft-404 sem depender de
+// idioma nem de lista de frases minhas — quem diz o que é "não encontrada" naquele host é o host.
+//   sonda 404/410  → host honesto: o que respondeu 200 existe.
+//   sonda < 400 e <title> IGUAL ao da página medida → a página medida É a página de "não encontrada".
+//   sonda não lida → não sei dizer, e o retrato diz isso em vez de chutar.
+// Só vale para URL COM CAMINHO. Na raiz de um host a sonda não prova nada: SPA que serve a mesma casca
+// para qualquer caminho faria a própria home ser declarada inexistente — e é na raiz que moram os 31
+// sites do inventário. Uma sonda por pasta, não por página: 12 landings custam 1 requisição ao host do eco.
+// A SONDA TEM DE TER A MESMA FORMA DA PÁGINA MEDIDA, e isso eu aprendi errando na primeira corrida:
+// `/__sonda-inexistente-digiai` devolveu 404 de 23 bytes e `/sonda-inexistente-digiai` devolveu 200 com
+// "Página não encontrada" — no MESMO host, no mesmo minuto. Caminho com `_` na frente (ou com ponto) não
+// casa com a rota dinâmica e sai por outra porta. Com a sonda fora de forma, o conserto concluía "host
+// honesto, logo os rascunhos existem": o oposto da verdade. Por isso a sonda nasce do próprio último
+// pedaço da URL medida, preservando extensão quando houver — ela é irmã da página, não uma estranha.
+const SONDA = 'sonda-inexistente-digiai';
+const sondas = new Map();
+async function sonda(base, pagina) {
+  const alvo = new URL(base);
+  if (alvo.pathname === '/' || alvo.pathname === '') return null;
+  const ultimo = alvo.pathname.replace(/^.*\//, '');
+  const ponto = ultimo.lastIndexOf('.');
+  const inventado = ponto > 0 ? `${ultimo.slice(0, ponto)}-${SONDA}${ultimo.slice(ponto)}` : `${ultimo}-${SONDA}`;
+  const dir = alvo.origin + alvo.pathname.replace(/[^/]+$/, '');
+  const chave = dir + (ponto > 0 ? ultimo.slice(ponto) : '');  // a resposta de "não encontrada" é do host,
+  if (!sondas.has(chave)) {                                    // mas a forma do caminho muda a porta
+    const r = await baixar(dir + inventado, 20000);
+    sondas.set(chave, { url: dir + inventado, code: r.code, titulo: titulo(r.texto), erro: r.code === 0 ? r.erro : null });
+  }
+  const s = sondas.get(chave);
+  if (s.erro || s.code >= 400 || !s.titulo) return { ...s, inexistente: false };
+  const t = titulo(pagina.texto);
+  return { ...s, inexistente: !!(t && t === s.titulo) };
+}
+
 async function medir(url) {
   const base = url.replace(/\/$/, '');
   const pagina = await baixar(base);
+
+  // A sonda vem ANTES dos bundles: página que não existe não gasta 12 requisições no host do eco, e
+  // "não existe" não pode sair do mesmo lugar que "existe e não mede".
+  const s = await sonda(base, pagina);
+  if (s?.inexistente) {
+    return { url, http_code: pagina.code, pagina_inexistente: true,
+      meta_pixel_id: null, tiktok: false, ga_gtm: null, clarity: false,
+      obs: `PÁGINA NÃO EXISTE (soft-404): HTTP ${pagina.code} com o mesmo <title> ("${s.titulo}") que `
+         + `${s.url}, que eu inventei — é rascunho ou slug errado, não é vitrine sem pixel` };
+  }
+
   let todo = pagina.texto;
   // 01/10: buscava só /assets, /_next e /_astro. Os pixels de digiai.app.br e clearix.app.br vivem em
   // arquivo próprio (/digiai-pixel.js, /clearix-pixel.js), então o medidor dizia "sem meta" sobre dois
@@ -94,6 +147,7 @@ async function medir(url) {
   return {
     url,
     http_code: pagina.code,
+    pagina_inexistente: false,
     meta_pixel_id: meta ? id : null,
     tiktok: /analytics\.tiktok\.com|ttq\.load/.test(todo),
     // 04/11: faltava `AW-` (Google ADS). A landing de loja mede conversão por AW-18544661611, e o retrato
@@ -101,6 +155,12 @@ async function medir(url) {
     ga_gtm: todo.match(/\b(G-[A-Z0-9]{8,12}|GTM-[A-Z0-9]{5,8}|AW-[0-9]{9,12})\b/)?.[1] ?? null,
     clarity: /clarity\.ms/.test(todo),
     obs: (falhas.length ? `NÃO LIDO: ${falhas.join('; ')} — ` : '') +
+         // Sonda que não respondeu não pode virar "a página existe": sem ela, "sem pixel" aqui pode ser
+         // rascunho. Fica dito, para ninguém decidir anúncio em cima de um palpite meu.
+         (s?.erro ? `SONDA NÃO LIDA (${s.erro}) — não sei dizer se esta página existe — ` : '') +
+         // Quando a sonda volta 404 de verdade, a conclusão "esta página existe" fica ESCRITA com a
+         // evidência: foi assim que eu descobri a sonda fora de forma, e é assim que o próximo descobre.
+         (s && !s.erro && s.code >= 400 ? `sonda ${s.url} → HTTP ${s.code}, logo esta página existe — ` : '') +
          (porConsentimento ? 'PIXEL POR CONSENTIMENTO (só dispara depois do aceite) — ' : '') +
          (scripts.length ? `html + ${scripts.length - falhas.length} de ${scripts.length} script(s)` : 'só html'),
   };

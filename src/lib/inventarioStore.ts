@@ -96,6 +96,10 @@ export interface SitePixel {
   medido_em: string | null; http_code: number | null;
   meta_no_ar: string | null; tiktok_no_ar: boolean; ga_gtm: string | null; clarity: boolean;
   meta_declarado: string | null; tiktok_declarado: string | null; veredito: string;
+  // 215/216: `pagina_inexistente` é soft-404 (200 com a página de "não encontrada" do host) — rascunho,
+  // não vitrine cega: publicar e instalar pixel são ações opostas. `fonte` diz de onde veio a URL; as
+  // landings de loja do Clearix entram pelo sitemap público, e são do eco.
+  pagina_inexistente: boolean; fonte: string | null;
 }
 
 // 161: retrato da audiência dos blogs do Ecoax. `page_views` é bruto (inclui máquina); o único número
