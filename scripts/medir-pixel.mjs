@@ -10,6 +10,12 @@
 // LIMITE HONESTO: achar o ID no bundle prova que o código está publicado, não que o evento chegou à Meta —
 // isso só o Events Manager responde. E site que injeta o pixel por tag manager remoto não aparece aqui.
 //
+// 05/11: HOSTS MISTURADOS — o medidor seguia o 3xx e resolvia os scripts contra o host PEDIDO. Os apps de
+// login do Clearix mandam o visitante para `app.clearix.app.br/login`, e eu pedia os chunks dessa página ao
+// host de origem: 12 de 12 em 404, que eu reportei como "build quebrado" em dois apps do eco. Era o retrato.
+// Quem apontou foi o Orquestrador do eco, com medição. Mesma família do soft-404 abaixo: eu li o endereço e
+// o código, não o que de fato voltou.
+//
 // 05/11: SOFT-404 — o medidor tratava HTTP 200 como "página viva". `visaoparasuzano` e
 // `lancaster-multifocal` devolvem 200 com o corpo "Página não encontrada": são rascunhos. Eu olhei o
 // CÓDIGO e não o CORPO, chamei de "landing no ar sem pixel" e tive de desdizer ao dono. Sem este
@@ -50,9 +56,12 @@ async function baixar(url, ms = 20000) {
   try {
     const r = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(ms),
       headers: { 'User-Agent': 'digiai-medidor/1.0 (painel interno)' } });
-    return { code: r.status, texto: r.status < 400 ? await r.text() : '', erro: r.status >= 400 ? `HTTP ${r.status}` : null };
+    // 05/11: `r.url` é onde o corpo foi buscado DE FATO, depois dos 3xx. Eu seguia o redirect e jogava
+    // esse endereço fora — ver o comentário do laço de scripts, logo abaixo.
+    return { code: r.status, url_final: r.url || url,
+      texto: r.status < 400 ? await r.text() : '', erro: r.status >= 400 ? `HTTP ${r.status}` : null };
   } catch (e) {
-    return { code: 0, texto: '', erro: e?.name === 'TimeoutError' ? 'timeout' : (e?.cause?.code ?? e?.name ?? 'falhou') };
+    return { code: 0, url_final: url, texto: '', erro: e?.name === 'TimeoutError' ? 'timeout' : (e?.cause?.code ?? e?.name ?? 'falhou') };
   }
 }
 
@@ -96,9 +105,23 @@ async function medir(url) {
   const base = url.replace(/\/$/, '');
   const pagina = await baixar(base);
 
+  // 05/11, correção apontada pelo eco e medida por mim: o corpo que chega aqui é o do DESTINO depois dos
+  // 3xx, não o do endereço pedido. `sales.clearix.app.br` devolve 307 para `app.clearix.app.br/login`, e eu
+  // pedia os chunks `/_next/...` dessa página de login ao host de ORIGEM: 12 de 12 em 404. Chamei de "build
+  // quebrado" em dois apps do eco — era o meu retrato misturando hosts. Provado: o chunk
+  // `e2580f6a526a2d93.js` dá 404 em `sales` e 200 em `app`, mesmo minuto.
+  // Agora o endereço final manda, como no navegador. E quando o host final é OUTRO, isso fica escrito no
+  // obs: o que está medido é a página de destino, e atribuir o pixel dela ao host pedido sem dizer de onde
+  // veio seria a mesma mentira em outra direção.
+  const hostDe = (u) => { try { return new URL(u).host.replace(/^www\./, ''); } catch { return null; } };
+  const destino = (pagina.url_final || base).replace(/\/$/, '');
+  const outroHost = hostDe(destino) && hostDe(base) !== hostDe(destino) ? destino : null;
+
   // A sonda vem ANTES dos bundles: página que não existe não gasta 12 requisições no host do eco, e
   // "não existe" não pode sair do mesmo lugar que "existe e não mede".
-  const s = await sonda(base, pagina);
+  // Com redirect para outro host a sonda não entra: o host já respondeu "vai para lá" em vez de "não
+  // encontrei", e sondar o destino responderia uma pergunta que não é a desta linha do retrato.
+  const s = outroHost ? null : await sonda(destino, pagina);
   if (s?.inexistente) {
     return { url, http_code: pagina.code, pagina_inexistente: true,
       meta_pixel_id: null, tiktok: false, ga_gtm: null, clarity: false,
@@ -127,7 +150,7 @@ async function medir(url) {
     // `lojas.clearix.app.br/lancaster-suzano/_next/...` — 404 nos 8 chunks. Nenhum site do inventario tem
     // caminho, entao o defeito nunca apareceu. `new URL` resolve como o navegador: caminho absoluto vai
     // para a RAIZ, relativo fica ao lado da pagina.
-    const r = await baixar(new URL(s, base + '/').href, 25000);
+    const r = await baixar(new URL(s, destino + '/').href, 25000);
     if (r.erro) falhas.push(`${s}: ${r.erro}`); else todo += r.texto;
   }
   if (pagina.erro) falhas.push(`página: ${pagina.erro}`);
@@ -138,12 +161,30 @@ async function medir(url) {
   // errada que eu dei ao dono em 31/10 e tive de desdizer. Pixel presente e esperando aceite nao e
   // vitrine cega: e medicao parcial, e a diferenca muda a decisao de gastar em anuncio.
   const porConsentimento = /consent|consentimento/i.test(todo) && /fbevents|gtag\/js/.test(todo);
-  // O ID pode vir de três lugares: a variável que o layout injeta, o init do fbq, ou solto no bundle.
-  // Ler só "número começado em 1" era palpite meu: o pixel do site institucional começa em 3.
-  const id = todo.match(/META_PIXEL_ID\s*=\s*["']([0-9]{14,17})["']/)?.[1]
-          ?? todo.match(/const id\s*=\s*["']([0-9]{14,17})["']/)?.[1]
-          ?? todo.match(/fbq\s*\(\s*["']init["']\s*,\s*["']([0-9]{14,17})["']/)?.[1]
-          ?? todo.match(/\b([0-9]{15,16})\b/)?.[1] ?? null;
+  // O ID vem de um lugar que o NOMEIA como id de pixel — ou não vem. Ler só "número começado em 1" era
+  // palpite meu: o pixel do site institucional começa em 3.
+  //
+  // 05/11: a landing de loja declara o pixel no payload da própria página (`"meta_pixel_id":"…"`, com as
+  // aspas escapadas pelo RSC), e NENHUM dos padrões nomeados pegava isso — o número caía no último recurso,
+  // "qualquer número solto de 15-16 dígitos no bundle". Medi: o único candidato solto nos 15 scripts da
+  // landing hoje é `9007199254740991`, que é o MAX_SAFE_INTEGER do JavaScript. Ou seja, o último recurso
+  // estava a um deploy de distância de publicar uma constante da linguagem como "o pixel da loja".
+  // Por isso a procedência do número agora VIAJA COM ELE até o obs: número cuja origem não se sabe dizer
+  // não é número, é palpite, e palpite não decide gasto com anúncio.
+  const FONTES_ID = [
+    ['variável META_PIXEL_ID', /META_PIXEL_ID\s*=\s*["']([0-9]{14,17})["']/],
+    ['chave meta_pixel_id da página', /["']meta_pixel_id\\?["']\s*:\s*\\?["']([0-9]{14,17})\\?["']/],
+    ['const id', /const id\s*=\s*["']([0-9]{14,17})["']/],
+    ['fbq init', /fbq\s*\(\s*["']init["']\s*,\s*["']([0-9]{14,17})["']/],
+  ];
+  let id = null, idFonte = null;
+  for (const [nome, re] of FONTES_ID) {
+    const m = todo.match(re);
+    if (m) { id = m[1]; idFonte = nome; break; }
+  }
+  // Último recurso mantido só para não PERDER a presença do pixel em site que ainda não foi lido por padrão
+  // nomeado — mas marcado como palpite, em letra maiúscula, no retrato.
+  if (!id) { const m = todo.match(/\b([0-9]{15,16})\b/); if (m) { id = m[1]; idFonte = null; } }
   return {
     url,
     http_code: pagina.code,
@@ -154,7 +195,9 @@ async function medir(url) {
     // dizia "sem google" sobre quem tem conversão configurada — cego no exato lugar onde o dinheiro entra.
     ga_gtm: todo.match(/\b(G-[A-Z0-9]{8,12}|GTM-[A-Z0-9]{5,8}|AW-[0-9]{9,12})\b/)?.[1] ?? null,
     clarity: /clarity\.ms/.test(todo),
-    obs: (falhas.length ? `NÃO LIDO: ${falhas.join('; ')} — ` : '') +
+    obs: (outroHost ? `REDIRECIONOU para outro host: ${outroHost} — o que está medido abaixo é a página de `
+                    + `destino, não ${base}; pixel achado aqui é do destino — ` : '') +
+         (falhas.length ? `NÃO LIDO: ${falhas.join('; ')} — ` : '') +
          // Sonda que não respondeu não pode virar "a página existe": sem ela, "sem pixel" aqui pode ser
          // rascunho. Fica dito, para ninguém decidir anúncio em cima de um palpite meu.
          (s?.erro ? `SONDA NÃO LIDA (${s.erro}) — não sei dizer se esta página existe — ` : '') +
@@ -162,6 +205,11 @@ async function medir(url) {
          // evidência: foi assim que eu descobri a sonda fora de forma, e é assim que o próximo descobre.
          (s && !s.erro && s.code >= 400 ? `sonda ${s.url} → HTTP ${s.code}, logo esta página existe — ` : '') +
          (porConsentimento ? 'PIXEL POR CONSENTIMENTO (só dispara depois do aceite) — ' : '') +
+         // A procedência do id viaja com o id: quem lê a tela precisa saber se o número foi declarado pela
+         // página ou se foi eu que adivinhei num bundle.
+         (meta && id && idFonte ? `id pela ${idFonte} — ` : '') +
+         (meta && id && !idFonte ? `ID PALPITE: achei meta no código, mas o número (${id}) saiu de número `
+           + `solto no bundle, que não se chama id de pixel — conferir no Events Manager antes de usar — ` : '') +
          (scripts.length ? `html + ${scripts.length - falhas.length} de ${scripts.length} script(s)` : 'só html'),
   };
 }
