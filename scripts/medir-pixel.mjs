@@ -67,6 +67,42 @@ async function baixar(url, ms = 20000) {
 
 const titulo = (html) => html?.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1].replace(/\s+/g, ' ').trim() || null;
 
+// Corpo de cada script já baixado NESTA corrida, por URL absoluta. `null` = falhou, e falha também se
+// guarda: repetir um download que já deu timeout só atrasa o retrato sem mudar o que ele diz.
+// Por que cache: as landings de loja são o MESMO app Next e compartilham os chunks, então ler todos os
+// scripts (ver o laço abaixo) custa ~16 downloads no total e não 16 por landing. Hoje o sitemap do eco
+// publica 1 landing (lancaster-suzano) — o cache é o que deixa a retirada do teto continuar barata quando
+// forem 10.
+const BUNDLES = new Map();
+
+// O ID vem de um lugar que o NOMEIA como id de pixel — ou não vem. Ler só "número começado em 1" era
+// palpite meu: o pixel do site institucional começa em 3.
+//
+// 05/11: a landing de loja declara o pixel no payload da própria página (`"meta_pixel_id":"…"`, com as
+// aspas escapadas pelo RSC), e NENHUM dos padrões nomeados pegava isso — o número caía no último recurso,
+// "qualquer número solto de 15-16 dígitos no bundle". Medi: o único candidato solto nos 15 scripts da
+// landing hoje é `9007199254740991`, que é o MAX_SAFE_INTEGER do JavaScript. Ou seja, o último recurso
+// estava a um deploy de distância de publicar uma constante da linguagem como "o pixel da loja".
+// Por isso a procedência do número agora VIAJA COM ELE até o obs: número cuja origem não se sabe dizer
+// não é número, é palpite, e palpite não decide gasto com anúncio.
+const FONTES_ID = [
+  ['variável META_PIXEL_ID', /META_PIXEL_ID\s*=\s*["']([0-9]{14,17})["']/],
+  ['chave meta_pixel_id da página', /["']meta_pixel_id\\?["']\s*:\s*\\?["']([0-9]{14,17})\\?["']/],
+  ['const id', /const id\s*=\s*["']([0-9]{14,17})["']/],
+  ['fbq init', /fbq\s*\(\s*["']init["']\s*,\s*["']([0-9]{14,17})["']/],
+];
+function acharId(texto) {
+  for (const [nome, re] of FONTES_ID) {
+    const m = texto.match(re);
+    if (m) return { id: m[1], idFonte: nome };
+  }
+  // Último recurso mantido só para não PERDER a presença do pixel em site que ainda não foi lido por padrão
+  // nomeado — mas marcado como palpite, em letra maiúscula, no retrato. `idFonte` nulo é o que distingue
+  // palpite de leitura, e é por isso que a parada antecipada do laço exige `idFonte`.
+  const m = texto.match(/\b([0-9]{15,16})\b/);
+  return m ? { id: m[1], idFonte: null } : { id: null, idFonte: null };
+}
+
 // SONDA: pede ao MESMO host um irmão INVENTADO da página medida e compara. Decide soft-404 sem depender de
 // idioma nem de lista de frases minhas — quem diz o que é "não encontrada" naquele host é o host.
 //   sonda 404/410  → host honesto: o que respondeu 200 existe.
@@ -142,16 +178,40 @@ async function medir(url) {
   // quantos de quantos foram lidos, para leitura parcial nunca passar por leitura completa.
   const todosScripts = [...new Set([...todo.matchAll(/<script[^>]+src=["']([^"']+)["']/g)]
     .map((m) => m[1]).filter((u) => !/^https?:/i.test(u)))];
-  const scripts = [...todosScripts.filter((u) => u.includes('/app/')),
-                   ...todosScripts.filter((u) => !u.includes('/app/'))].slice(0, 12);
+  // 06/11: O TETO DE 12 CAIU, e ele era uma mentira esperando deploy. Medido hoje na landing da Lancaster:
+  // o html passou a trazer 16 scripts e o `fbevents.js` foi para o 16.o (`chunks/7342-*.js`). Com o teto, o
+  // retrato de hoje diria "vitrine cega — entra visitante e ninguém conta" sobre a landing que TEM pixel
+  // configurado e no ar: a mesma conclusão errada de 31/10, agora produzida pela ferramenta em vez de por
+  // mim. Teto em medição não economiza requisição, esconde resultado.
+  // O preço se paga de dois jeitos, e não com teto:
+  //   1. CACHE por URL absoluta nesta corrida. As 12 landings são o MESMO app Next e compartilham chunk:
+  //      ler todos custa ~16 downloads no total, não 16 por landing.
+  //   2. PARADA ANTECIPADA: quando a assinatura de disparo e um id NOMEADO já apareceram, não há o que
+  //      acrescentar — o resto dos scripts não muda a conclusão. A parada só vale com id nomeado; parar no
+  //      palpite seria trocar o teto por outro jeito de não olhar.
+  const ordem = [...todosScripts.filter((u) => u.includes('/app/')),
+                 ...todosScripts.filter((u) => !u.includes('/app/'))];
   const falhas = [];
-  for (const s of scripts) {
+  let lidos = 0, parouEm = null;
+  for (const s of ordem) {
     // 04/11: era `base + caminho`, e com URL que tem caminho (as landings sao /<slug>) isso virava
     // `lojas.clearix.app.br/lancaster-suzano/_next/...` — 404 nos 8 chunks. Nenhum site do inventario tem
     // caminho, entao o defeito nunca apareceu. `new URL` resolve como o navegador: caminho absoluto vai
     // para a RAIZ, relativo fica ao lado da pagina.
-    const r = await baixar(new URL(s, destino + '/').href, 25000);
-    if (r.erro) falhas.push(`${s}: ${r.erro}`); else todo += r.texto;
+    const abs = new URL(s, destino + '/').href;
+    let texto = BUNDLES.get(abs);
+    if (texto === undefined) {
+      const r = await baixar(abs, 25000);
+      texto = r.erro ? null : r.texto;
+      BUNDLES.set(abs, texto);
+      if (r.erro) { falhas.push(`${s}: ${r.erro}`); continue; }
+    } else if (texto === null) {
+      falhas.push(`${s}: não lido nesta corrida (falhou na primeira vez)`);
+      continue;
+    }
+    todo += texto;
+    lidos++;
+    if (/fbevents\.js|fbq\s*\(/.test(todo) && acharId(todo).idFonte) { parouEm = lidos; break; }
   }
   if (pagina.erro) falhas.push(`página: ${pagina.erro}`);
 
@@ -161,30 +221,7 @@ async function medir(url) {
   // errada que eu dei ao dono em 31/10 e tive de desdizer. Pixel presente e esperando aceite nao e
   // vitrine cega: e medicao parcial, e a diferenca muda a decisao de gastar em anuncio.
   const porConsentimento = /consent|consentimento/i.test(todo) && /fbevents|gtag\/js/.test(todo);
-  // O ID vem de um lugar que o NOMEIA como id de pixel — ou não vem. Ler só "número começado em 1" era
-  // palpite meu: o pixel do site institucional começa em 3.
-  //
-  // 05/11: a landing de loja declara o pixel no payload da própria página (`"meta_pixel_id":"…"`, com as
-  // aspas escapadas pelo RSC), e NENHUM dos padrões nomeados pegava isso — o número caía no último recurso,
-  // "qualquer número solto de 15-16 dígitos no bundle". Medi: o único candidato solto nos 15 scripts da
-  // landing hoje é `9007199254740991`, que é o MAX_SAFE_INTEGER do JavaScript. Ou seja, o último recurso
-  // estava a um deploy de distância de publicar uma constante da linguagem como "o pixel da loja".
-  // Por isso a procedência do número agora VIAJA COM ELE até o obs: número cuja origem não se sabe dizer
-  // não é número, é palpite, e palpite não decide gasto com anúncio.
-  const FONTES_ID = [
-    ['variável META_PIXEL_ID', /META_PIXEL_ID\s*=\s*["']([0-9]{14,17})["']/],
-    ['chave meta_pixel_id da página', /["']meta_pixel_id\\?["']\s*:\s*\\?["']([0-9]{14,17})\\?["']/],
-    ['const id', /const id\s*=\s*["']([0-9]{14,17})["']/],
-    ['fbq init', /fbq\s*\(\s*["']init["']\s*,\s*["']([0-9]{14,17})["']/],
-  ];
-  let id = null, idFonte = null;
-  for (const [nome, re] of FONTES_ID) {
-    const m = todo.match(re);
-    if (m) { id = m[1]; idFonte = nome; break; }
-  }
-  // Último recurso mantido só para não PERDER a presença do pixel em site que ainda não foi lido por padrão
-  // nomeado — mas marcado como palpite, em letra maiúscula, no retrato.
-  if (!id) { const m = todo.match(/\b([0-9]{15,16})\b/); if (m) { id = m[1]; idFonte = null; } }
+  const { id, idFonte } = acharId(todo);  // procedência em `acharId`, no topo do arquivo
   return {
     url,
     http_code: pagina.code,
@@ -210,7 +247,8 @@ async function medir(url) {
          (meta && id && idFonte ? `id pela ${idFonte} — ` : '') +
          (meta && id && !idFonte ? `ID PALPITE: achei meta no código, mas o número (${id}) saiu de número `
            + `solto no bundle, que não se chama id de pixel — conferir no Events Manager antes de usar — ` : '') +
-         (scripts.length ? `html + ${scripts.length - falhas.length} de ${scripts.length} script(s)` : 'só html'),
+         (ordem.length ? `html + ${lidos} de ${ordem.length} script(s)`
+            + (parouEm ? ` (parei no ${parouEm}: assinatura de disparo e id nomeado já achados)` : '') : 'só html'),
   };
 }
 
