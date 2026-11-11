@@ -2,6 +2,16 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-11 — A página Receita ganha dado, pela porta certa (220)
+
+- **O Agente de Receita não tem login de equipe**, então as RPCs da 219 o recusavam. A carga passou a sair dos arquivos que ele já escreve (`Cockpit/receita/placar.md` e `rotinas.md`) **pela mesma RPC**, com a identidade da carga (`postgres`) acrescentada ao portão. **Não é `insert` direto de propósito:** foi o `insert` direto que fez a tabela do Controle guardar prosa que a tela lê com cinco expressões regulares. Aqui as regras *são* o produto — estado obrigatório, alavanca encerrada sem veredito recusada, mês relido que não duplica — e carga que escreve direto só as respeita enquanto alguém lembrar.
+- **O portão novo não concede privilégio nenhum:** `postgres` já era dono de tudo e já podia escrever direto. O que mudou é que agora, ao passar pela RPC, a carga é obrigada a respeitar as mesmas regras.
+- **A prova 1 pegou um defeito meu antes de ele existir em produção:** ao acrescentar `p_obs`, a assinatura nova conviveu com a de ontem — **duas versões da mesma função, a velha com a tranca velha**. A prova recusou a migration até a antiga sair.
+- **Duas correções de modelo que o arquivo real mostrou:** `alavanca.inicio` deixou de ser obrigatório (três das seis estão "não iniciada", e inventar data para caber no schema seria gravar fato que não existe) e entrou `alavanca.obs`, que guarda o texto como o Receita escreveu — o número fica na coluna numérica, a frase fica com a frase.
+- **`Cockpit/scripts/receita-sync.mjs` lê TABELA, não prosa:** confere o cabeçalho e **para com mensagem** se alguma coluna mudar de nome, em vez de adivinhar. Três recusas escritas nele: data no futuro não é execução (`primeira em 16/11` não vira "já rodou"); **rotina NÃO LIGADA não tem execução** (o "manual, 10/11" do placar diário é trabalho à mão, e pela R-051 isso não é rotina); e o **piso não é subtraído** — no arquivo, "entrada bruta nova" já é o que entra acima dele, então `regua = 0` e o piso vai para o `obs`.
+- **Carregado hoje:** 3 leituras (linhas 1, 2 e 3, todas `medido` em R$ 0), 6 alavancas (4 em curso, 1 congelada, 1 encerrada com veredito) e 4 rotinas (2 ligadas). A tela saiu de **"sem leitura medida"** para **R$ 0 medido em 3 linhas** — e essa diferença é o ponto: antes ninguém tinha medido, agora mediu-se e o resultado é zero.
+- **Dois defeitos meus achados conferindo em produção, e consertados no mesmo turno:** a tela mostrava **a leitura de hoje como de ontem** (`new Date('2026-11-10')` é meia-noite UTC e, lida em São Paulo, volta um dia — dia escrito agora se formata como texto); e alavanca sem início mostrava `desde — ( dias)`, agora diz **NÃO INICIADA**.
+
 ## 2026-11-10 — A página Receita nasce com banco próprio (219)
 
 - **Decisão do dono, no canal do app:** um lugar só para a meta de mais R$ 100 mil por mês de dinheiro novo (R-051) — "monta a tela completa e faz todas as ligações". Página `#/receita`, primeira da seção Dinheiro, **restrita** como o Financeiro (é dinheiro na tela; fail-closed por R-037).
