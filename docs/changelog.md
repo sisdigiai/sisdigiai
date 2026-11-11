@@ -2,6 +2,14 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-11 (noite) — Os fatos da OSI revalidados na fonte, e um fato declarado deixa de vencer como medição (221)
+
+- **Por que corria prazo:** `osi_oferta`, `osi_aplicacao` e `osi_taty_anos_balcao` venciam em **15/11**, e a regra da OSI em `mkt.content_rules` diz com todas as letras que **preço, pacote e garantia vêm só do fato `osi_oferta`**. Com ele vencido e a trava fail-closed, as peças da aula de 24/11 e a grade da OSI sairiam **sem poder citar o preço do produto**. Não era hipótese: era o que a regra manda acontecer.
+- **Revalidado contra o artefato publicado, não contra a memória:** `academy.products` (slug `otica-sem-improviso`) devolve **price_brl 49.00**, e a landing no ar traz, inteira, a frase do fato — **"R$ 49, pagamento único. Garantia de 7 dias. Depois dos 30 dias, o Nexus continua por R$ 19,90/mês"**, mais "3 dias", "ritmo do plano", Hotmart e Kiwify. Os dois fatos de produto continuam verdadeiros palavra por palavra; só a data mudou.
+- **O que eu NÃO fiz, e é o ponto da migration: não carimbei o fato declarado.** "25 anos de balcão" é **declaração do dono**, não medição — não há artefato para reler, e mover a data de verificação seria eu dizer "verifiquei" sobre o que não verifiquei. O que mudou foi a **janela**: 60 → 365 dias, porque declaração não apodrece em dois meses, apodrece quando a pessoa faz mais um ano de balcão. A **prova 2 existe para me impedir** de, num dia apressado, revalidar em lote o que não tem como ser relido.
+- **A prova 3 trava a outra tentação:** revalidar é reler a fonte e mover a data. Se o texto do fato mudar na mesma migration, deixa de ser revalidação e vira fato novo — que é outra decisão.
+- **Varredura que originou isto:** **20 dos 26 fatos públicos ativos estão fora da validade** (o `pulso_youtube_crescimento` tem validade de 7 dias e 103 de idade). **Nada vazou para post**: o motor filtra `fresco` na `v_mkt_fatos`, comparando em BRT, e sem fato não cita número. Mas restam **6 fatos frescos** para a casa inteira — agora nenhum deles vencendo antes da aula.
+
 ## 2026-11-11 — A página Receita ganha dado, pela porta certa (220)
 
 - **O Agente de Receita não tem login de equipe**, então as RPCs da 219 o recusavam. A carga passou a sair dos arquivos que ele já escreve (`Cockpit/receita/placar.md` e `rotinas.md`) **pela mesma RPC**, com a identidade da carga (`postgres`) acrescentada ao portão. **Não é `insert` direto de propósito:** foi o `insert` direto que fez a tabela do Controle guardar prosa que a tela lê com cinco expressões regulares. Aqui as regras *são* o produto — estado obrigatório, alavanca encerrada sem veredito recusada, mês relido que não duplica — e carga que escreve direto só as respeita enquanto alguém lembrar.
