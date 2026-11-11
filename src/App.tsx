@@ -73,7 +73,9 @@ function moduleFromHash(): ModuleId {
   if (typeof window === 'undefined') return 'visao';
   // volta do consentimento do Google: o redirect_uri não leva hash, então a rota vem do state
   if (ehRetornoDoGoogle()) return 'seo';
-  const h = window.location.hash.replace(/^#\/?/, '');
+  // Só o primeiro trecho escolhe o módulo: `#/receita/ideias/<slug>` é a página Receita, e o resto do
+  // endereço é dela. Antes, qualquer coisa depois do nome do módulo caía em Visão sem dizer nada.
+  const h = window.location.hash.replace(/^#\/?/, '').split('/')[0];
   return (MODULES as string[]).includes(h) ? (h as ModuleId) : 'visao';
 }
 

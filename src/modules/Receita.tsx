@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, Target, Gauge, Rocket, History, Filter, Coins, Repeat, UserCheck, Scale } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import ReceitaIdeias, { useSubRotaReceita } from './ReceitaIdeias';
 
 // Página Receita (migration 219; decisão do dono em 10/11/2026, R-051).
 //
@@ -68,7 +69,7 @@ const dia = (d: string | null) => {
 const quando = (d: string | null) =>
   d ? new Date(d).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' }) : '—';
 
-export default function Receita() {
+function Placar() {
   const [meta, setMeta] = useState<Meta | null>(null);
   const [placar, setPlacar] = useState<Linha[] | null>(null);
   const [alavancas, setAlavancas] = useState<Alavanca[] | null>(null);
@@ -371,6 +372,25 @@ export default function Receita() {
           com a data. Até lá, esta seção fica vazia de propósito.
         </NaoMedido>
       </Secao>
+    </div>
+  );
+}
+
+// A página tem duas abas e a aba mora no endereço (`#/receita` e `#/receita/ideias[/<slug>]`): o dono
+// manda o link de uma ficha a um agente e o link abre na ficha, não no placar.
+export default function Receita() {
+  const sub = useSubRotaReceita();
+  const aba = (ativa: boolean) =>
+    `min-h-[44px] inline-flex items-center px-3 font-mono text-[10px] uppercase tracking-[0.2em] border-b-2 `
+    + `focus-visible:outline focus-visible:outline-2 focus-visible:outline-action `
+    + (ativa ? 'border-action text-on-surface' : 'border-transparent text-muted hover:text-on-surface');
+  return (
+    <div className="space-y-6">
+      <nav aria-label="Seções da Receita" className="flex gap-1 border-b border-outline/15">
+        <a href="#/receita" aria-current={sub.aba === 'placar' ? 'page' : undefined} className={aba(sub.aba === 'placar')}>Placar</a>
+        <a href="#/receita/ideias" aria-current={sub.aba === 'ideias' ? 'page' : undefined} className={aba(sub.aba === 'ideias')}>Ideias</a>
+      </nav>
+      {sub.aba === 'ideias' ? <ReceitaIdeias slug={sub.slug} /> : <Placar />}
     </div>
   );
 }

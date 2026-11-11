@@ -2,6 +2,16 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-11 — Aba Ideias na página Receita (221) — RAMO `receita/aba-ideias`, NÃO INTEGRADO
+
+- **Escrito pelo Agente de Receita em ramo próprio (R-051), a pedido do dono em 11/11.** Quem integra e publica é o agente do app. A migration 221 **não foi aplicada** e a tela **não foi vista no navegador** por quem escreveu.
+- **O que é:** a página Receita ganha duas abas no endereço (`#/receita` e `#/receita/ideias[/<slug>]`). A aba Ideias mostra um card por ideia do Receita, com filtro por grupo, veredito e escolha, e a ficha completa de cada uma com os botões de escolha do dono (foco, depois, descartar).
+- **Duas portas de escrita, de propósito:** a ficha entra pela carga (`Cockpit/scripts/receita-ideias-sync.mjs`, lendo `Cockpit/receita/ideias/*.md`); a escolha só entra por pessoa logada. A função de escolher **recusa a identidade da carga** (prova 5 da 221) e regravar a ficha **não apaga a escolha** (prova 4).
+- **Roteador:** `moduleFromHash` passou a olhar só o primeiro trecho do endereço. Antes, `#/receita/qualquer-coisa` caía em Visão calado.
+- **A conta de cada ideia é texto, não número:** é hipótese do Receita e a tela não soma nem formata como dinheiro do placar.
+- **Conferido:** `tsc --noEmit` e `vite build` passam; a carga leu 48 fichas em modo de conferência; a lista e as 48 fichas foram renderizadas fora do navegador com o código real do componente (48 cards, 432 seções). **Não conferido:** o SQL da 221 no banco, a leitura pela view com login real e a tela em produção.
+- **Dúvida deixada para quem integra:** o portão da escolha é `is_staff()`. Se o papel do dono em `iam.users` for `founder`, trocar por `is_founder()` deixa a escolha só com ele; não conferi porque não leio este banco.
+
 ## 2026-11-11 — A página Receita ganha dado, pela porta certa (220)
 
 - **O Agente de Receita não tem login de equipe**, então as RPCs da 219 o recusavam. A carga passou a sair dos arquivos que ele já escreve (`Cockpit/receita/placar.md` e `rotinas.md`) **pela mesma RPC**, com a identidade da carga (`postgres`) acrescentada ao portão. **Não é `insert` direto de propósito:** foi o `insert` direto que fez a tabela do Controle guardar prosa que a tela lê com cinco expressões regulares. Aqui as regras *são* o produto — estado obrigatório, alavanca encerrada sem veredito recusada, mês relido que não duplica — e carga que escreve direto só as respeita enquanto alguém lembrar.
