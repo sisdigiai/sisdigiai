@@ -18,7 +18,8 @@ import type { ModuleId } from '../components/Sidebar';
 //
 // Quem chama precisa distinguir CARREGANDO de SEM PAPEL: use `papelCarregando`
 // do AuthContext e não decida enquanto for true. Aqui, `null` = sem acesso.
-export const RESTRICTED_MODULES: ModuleId[] = ['financeiro', 'cadastro-empresa', 'clearix', 'cobranca'];
+//   receita          → meta, entrada bruta e custo. Mesmo motivo de `financeiro`: é dinheiro na tela.
+export const RESTRICTED_MODULES: ModuleId[] = ['financeiro', 'cadastro-empresa', 'clearix', 'cobranca', 'receita'];
 
 // Papéis do banco hoje (CHECK de iam.users.role): super_admin, admin, founder,
 // staff, vendas, viewer. Só os três abaixo abrem os módulos restritos.

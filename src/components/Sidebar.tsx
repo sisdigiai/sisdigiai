@@ -6,7 +6,7 @@ import {
   Camera, Wand2, Boxes, Search, ShieldCheck, Workflow, ChevronDown,
   GraduationCap, Languages, Calendar as CalendarIcon, Globe, BarChart3,
   Lightbulb, Package, Users, Receipt, Radio, CalendarCheck,
-  Sunrise, Calculator, MapPin, Columns3, Rows3, ListChecks } from 'lucide-react';
+  Sunrise, Calculator, MapPin, Columns3, Rows3, ListChecks, Target } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
 import { canAccessModule } from '../lib/permissions';
@@ -20,7 +20,7 @@ export type ModuleId =
   | 'marketplace' | 'ecossistemas' | 'mapa-vivo' | 'travas-marketing'
   | 'fluxo-osi' | 'guia'
   | 'marketing-engajamento' | 'inventario' | 'seo' | 'vendas' | 'mapa-calor' | 'prospeccao'
-  | 'mkt-crescimento' | 'mkt-calc' | 'comparativo' | 'controle' | 'google';
+  | 'mkt-crescimento' | 'mkt-calc' | 'comparativo' | 'controle' | 'google' | 'receita';
 
 interface NavItem {
   id: ModuleId;
@@ -51,6 +51,8 @@ const hoje: NavItem[] = [
 const SEM_CADEIRA: ModuleId[] = ['visao', 'semana', 'trilha', 'lista-mestra', 'backlog'];
 
 const dinheiro: NavItem[] = [
+  // Primeiro item da seção de propósito: é a meta da casa (R-051), e o dono pediu UM lugar para ela.
+  { id: 'receita',          label: 'Receita',           icon: <Target className="w-4 h-4" /> },
   { id: 'vendas',           label: 'Vendas',            icon: <TrendingUp className="w-4 h-4" /> },
   { id: 'financeiro',       label: 'Financeiro',        icon: <DollarSign className="w-4 h-4" /> },
   { id: 'cobranca',         label: 'Cobrança',          icon: <Receipt className="w-4 h-4" /> },

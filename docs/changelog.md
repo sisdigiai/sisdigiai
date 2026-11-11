@@ -2,6 +2,18 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-10 — A página Receita nasce com banco próprio (219)
+
+- **Decisão do dono, no canal do app:** um lugar só para a meta de mais R$ 100 mil por mês de dinheiro novo (R-051) — "monta a tela completa e faz todas as ligações". Página `#/receita`, primeira da seção Dinheiro, **restrita** como o Financeiro (é dinheiro na tela; fail-closed por R-037).
+- **A regra que governa a página inteira: seção sem dado diz "não medido", com o motivo — e nunca mostra R$ 0.** Zero e "ninguém mediu" pedem ações opostas: um manda correr atrás de venda, o outro manda ir medir.
+- **219 traz o contrato do placar que o Agente de Receita propôs, com as seis exigências que eu pus:** `estado` obrigatório (`proposta` | `medido`) e **a view só soma `medido`** — os R$ 73.330,62 da linha 1 entram como proposta e aparecem ao lado, fora do placar; uma leitura por (linha, mês, data, estado) e **a view pega a mais recente, nunca a soma**; `parte_relacionada` na própria linha, para a receita das lojas da casa não inflar a linha 1; `check` de não-negativo e moeda no nome das colunas `_brl`; `fonte` que dá para refazer; tabela em `receita`, `public` só com view `security_invoker` e RPC com portão (R-043/R-044).
+- **A meta é dado, não constante:** `receita.meta` guarda R$ 100.000 para nov e dez de 2026, com quem definiu e a fonte. Sem meta no mês, a tela não mostra "falta 0" — mostra que ninguém escreveu a meta.
+- **Escrita só por RPC com portão `is_staff()`:** `rpc_receita_gravar_leitura`, `_alavanca`, `_rotina` e `rpc_controle_foco_gravar` (a tabela tipada do foco da semana que o Geral pediu — nada de regex em prosa, que é como o bloco "urgente" do Controle funciona hoje). `authenticated` **não tem insert/update/delete** em nenhuma tabela nova, e a prova 6 trava isso.
+- **Seção 7 nasce com a ressalva escrita na tela: "disparou" não é "funcionou".** Medido: 30 rotinas ativas, 72.885 execuções e **zero falhas registradas** — e esse zero engana, porque o agendador marca sucesso quando o comando SQL rodou, mesmo que a função tenha devolvido 401. A coluna se chama `disparou_em`. Rotina que queira provar trabalho grava a própria execução.
+- **Seções 6 e 9 nascem vazias, com o motivo escrito:** custo de token do Agente de Receita não é gravado em lugar nenhum; só 7 de 102 contas de serviço têm custo declarado; e o resumo de custo da casa ainda soma dólar com real. Veredito por app é julgamento escrito, não conta automática.
+- **O funil (seção 5) saiu do último lote para o primeiro, porque já tem dado:** `v_receita_funil` lê `v_vendas_leads` **só em contagem** (a origem tem nome e telefone, e a prova 4 recusa se alguém acrescentar coluna de pessoa). Hoje: **946 leads, 928 sem nenhum toque, último toque em 29/09** — 42 dias.
+- **Seis provas, duas delas com dado de verdade criado e removido na mesma transação** (rascunho meu, R-004): proposta não entra no placar; reler o mês não dobra o placar; as seis views rodam como quem consulta; o funil não leva PII; o mês corrente tem meta; `authenticated` não escreve.
+
 ## 2026-11-06 (noite) — O pixel da Lancaster ganha número, o teto de 12 scripts cai (218)
 
 - **Pedido do dono: conferir o pixel do Marketing da marca Lancaster e trazer os dados completos.** Conferido, e o pixel **está certo e no ar**: `576159047194101` na landing `lojas.clearix.app.br/lancaster-suzano`, lido **hoje** na chave `meta_pixel_id` do payload da própria página — fonte que **nomeia** o número, não número solto em bundle. Junto dele, Google Ads `AW-18544661611` com a ação de conversão `AW-18544661611/24VnCKjX064dEOuo5IpF`.
