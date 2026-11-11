@@ -62,6 +62,11 @@ const MODULES: ModuleId[] = [
   'prospeccao',
   'comparativo',
   'controle',
+  'receita',
+  // 'google' faltava aqui desde que a tela existe: o item aparece no menu e o link direto
+  // `#/google` caía em Visão sem dizer nada. Lista escrita à mão é assim — entra no menu e
+  // esquece aqui. Achei ao ver `#/receita` cair em Visão pelo mesmo motivo.
+  'google',
 ];
 
 function moduleFromHash(): ModuleId {
