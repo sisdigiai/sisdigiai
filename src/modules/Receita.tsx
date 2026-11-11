@@ -27,7 +27,8 @@ interface Linha {
 interface Alavanca {
   id: number; nome: string; linha: number; executor: string; inicio: string; dias_em_curso: number;
   margem_prevista_pct: string | null; dias_ate_primeiro_real: number | null; resultado_brl: string;
-  estado: string; veredito: string | null; zero_ha_tres_semanas: boolean;
+  estado: string; veredito: string | null; obs: string | null;
+  nao_iniciada: boolean; zero_ha_tres_semanas: boolean;
 }
 interface Rotina {
   nome: string; descricao: string | null; hora: string | null; ligada: boolean;
@@ -57,7 +58,13 @@ const brl = (v: string | number | null | undefined) =>
   v === null || v === undefined ? '—'
     : Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
 
-const dia = (d: string | null) => (d ? new Date(d).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : '—');
+// Coluna `date` é dia, não instante. `new Date('2026-11-10')` vira meia-noite UTC e, lido em São Paulo,
+// volta 09/11 — a tela mostrava a leitura de hoje como de ontem. Dia escrito se formata como texto.
+const dia = (d: string | null) => {
+  if (!d) return '—';
+  const [a, m, j] = d.slice(0, 10).split('-');
+  return `${j}/${m}/${a}`;
+};
 const quando = (d: string | null) =>
   d ? new Date(d).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' }) : '—';
 
@@ -204,10 +211,12 @@ export default function Receita() {
                   </span>
                 </div>
                 <div className="font-mono text-[9px] uppercase tracking-wider text-muted mt-1">
-                  linha {a.linha} · {a.executor} · desde {dia(a.inicio)} ({a.dias_em_curso} dias)
+                  linha {a.linha} · {a.executor}
+                  {a.nao_iniciada ? ' · NÃO INICIADA' : ` · desde ${dia(a.inicio)} (${a.dias_em_curso} dias)`}
                   {a.margem_prevista_pct && ` · margem prevista ${a.margem_prevista_pct}%`}
                   {a.dias_ate_primeiro_real !== null && ` · 1.º real em ${a.dias_ate_primeiro_real} dias`}
                 </div>
+                {a.obs && <div className="text-[12px] text-muted mt-1">{a.obs}</div>}
                 {a.zero_ha_tres_semanas && (
                   <div className="text-[12px] text-warning mt-1">
                     Três semanas em curso e R$ 0 — é a trava do mandato. Decisão do dono: continuar, mudar ou encerrar.
