@@ -2,6 +2,14 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-11 (noite) — A validade dos fatos passa a avisar sozinha (222)
+
+- **Revalidação que depende de alguém lembrar não é controle, é sorte.** Foi por acaso que eu achei os 20 fatos vencidos, e um deles era fonte única de preço de uma marca. Agora um job diário às **07h05 BRT** confere e escreve em `ops.controle_itens` como `agente='fatos'` — a porta que já leva à tela Controle. **Sem tabela nova e sem tela nova** (decisão do Geral, pela prioridade de receita).
+- **Prova de que rodou, sem tabela de execução: o próprio job grava uma linha de batimento por dia** ("Fatos conferidos: 6 frescos, 0 vencendo, 20 vencidos"). **Dia sem essa linha é dia em que não rodou** — e isso aparece, em vez de virar silêncio. Mesma ideia que separou "não medido" de "zero" na página Receita: ausência tem de ser visível.
+- **Risco é só o que trava trabalho.** Fato **vencido que alguma regra de marca nomeia como fonte única** sai um por um, em nível 1 — é o caso que faz a peça sair sem poder citar número. Fato que vence em 7 dias sai um por um, em nível 2. **Fato vencido que ninguém usa sai em UMA linha agregada**, com a lista dentro: vinte linhas iguais numa tela que a casa está tentando desentupir seria eu criando o problema que passei a semana apontando. Alarme que toca por tudo ensina a ignorar alarme.
+- **O banco pegou um defeito meu na primeira tentativa:** `ops.controle_itens` tem chave única em (data, agente, tipo, hash do texto), e eu havia posto a chave do fato só no título — dois fatos com a mesma validade geravam texto idêntico e o segundo aviso **sumia como se fosse repetição**. Agora quem é o fato faz parte do que o aviso diz.
+- **Quatro provas:** a rotina roda e escreve exatamente **um** batimento; rodar duas vezes no mesmo dia **não duplica** nada; **não há risco de fato hoje** (porque `osi_oferta` foi revalidado na 221 — e no dia em que essa prova falhar, é o alarme funcionando); e o job está ativo, no horário, chamando a função certa.
+
 ## 2026-11-11 (noite) — Os fatos da OSI revalidados na fonte, e um fato declarado deixa de vencer como medição (221)
 
 - **Por que corria prazo:** `osi_oferta`, `osi_aplicacao` e `osi_taty_anos_balcao` venciam em **15/11**, e a regra da OSI em `mkt.content_rules` diz com todas as letras que **preço, pacote e garantia vêm só do fato `osi_oferta`**. Com ele vencido e a trava fail-closed, as peças da aula de 24/11 e a grade da OSI sairiam **sem poder citar o preço do produto**. Não era hipótese: era o que a regra manda acontecer.
