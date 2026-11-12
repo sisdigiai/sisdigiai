@@ -181,7 +181,10 @@ export default function ReceitaPlacar() {
 }
 
 function CartaoFrente({ a }: { a: Alavanca }) {
-  const texto = a.estado === 'em_curso' ? a.obs : a.veredito ?? a.obs;
+  // O texto vem de uma tabela em markdown do Cockpit: sai a marcação (asterisco, crase) e o prefixo que a
+  // carga escreve. No cartão cabe a frase, não a sintaxe.
+  const bruto = a.estado === 'em_curso' ? a.obs : a.veredito ?? a.obs;
+  const texto = bruto?.replace(/\*\*|`/g, '').replace(/^estado escrito:\s*/i, '').replace(/\s*·\s*margem.*$/i, '').trim() || null;
   return (
     <li className="px-3 py-2.5">
       <div className="flex items-start justify-between gap-2">
