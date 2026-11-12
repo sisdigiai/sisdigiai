@@ -47,11 +47,12 @@ export const quando = (iso: string) =>
   new Date(iso).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' });
 
 // `doc` só existe na aba Pacotes: `#/receita/pacotes/<pacote>/<arquivo>`.
-export function subRotaReceita(): { aba: 'placar' | 'lista' | 'ideias' | 'pacotes'; slug: string | null; doc: string | null } {
+type AbaReceita = 'placar' | 'lista' | 'prospeccao' | 'aula' | 'ideias' | 'pacotes';
+export function subRotaReceita(): { aba: AbaReceita; slug: string | null; doc: string | null } {
   if (typeof window === 'undefined') return { aba: 'placar', slug: null, doc: null };
   const partes = window.location.hash.replace(/^#\/?/, '').split('/');
   if (partes[0] !== 'receita') return { aba: 'placar', slug: null, doc: null };
-  if (partes[1] === 'lista') return { aba: 'lista', slug: null, doc: null };
+  if (partes[1] === 'lista' || partes[1] === 'prospeccao' || partes[1] === 'aula') return { aba: partes[1], slug: null, doc: null };
   if (partes[1] !== 'ideias' && partes[1] !== 'pacotes') return { aba: 'placar', slug: null, doc: null };
   return {
     aba: partes[1],

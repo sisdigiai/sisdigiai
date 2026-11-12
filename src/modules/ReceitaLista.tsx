@@ -20,6 +20,7 @@ interface Item {
   resultado: Resultado | null; resultado_nota: string | null; resultado_por: string | null; resultado_em: string | null;
   otica: string | null; contato: string | null; telefone: string | null;
   cidade: string | null; uf: string | null; porte: string | null; etapa: string | null;
+  produto: string | null;
 }
 
 // Classe escrita inteira, não montada: o Tailwind só gera o que encontra literal no código.
@@ -29,6 +30,18 @@ const FAIXA: Record<string, { rotulo: string; classe: string }> = {
   abordada:  { rotulo: 'recebeu WhatsApp',  classe: 'bg-surface-high text-on-surface-variant border-outline/30' },
   captada:   { rotulo: 'nunca tocada',      classe: 'bg-surface-high text-muted border-outline/30' },
 };
+// Em qual produto foi o toque do marketing (dono, 12/11: "temos 2 produtos sendo oferecidos; em qual se
+// interessou?"). A esteira oferece UM produto a cada ótica. Quem liga precisa saber qual antes de discar:
+// quem mostrou interesse na OSI não ouviu falar do sistema, e o contrário.
+const PRODUTO: Record<string, { rotulo: string; frase: string; classe: string }> = {
+  osi:     { rotulo: 'OSI',     frase: 'a OSI (Ótica Sem Improviso)', classe: 'bg-info-bg text-info border-info-bd' },
+  clearix: { rotulo: 'Clearix', frase: 'o Clearix (o sistema)',       classe: 'bg-warning-bg text-warning border-warning-bd' },
+  digiai:  { rotulo: 'DIGIAI',  frase: 'a DIGIAI',                    classe: 'bg-surface-high text-on-surface-variant border-outline/30' },
+};
+const oQueFoi: Record<string, string> = {
+  interesse: 'Mostrou interesse por', respondeu: 'Respondeu a mensagem sobre', abordada: 'Recebeu mensagem sobre',
+};
+
 const RESULTADO: Record<Resultado, string> = {
   falou: 'falei com a ótica', nao_atendeu: 'não atendeu', nao_ligar: 'pediu para não ligar mais',
 };
@@ -85,6 +98,7 @@ export default function ReceitaLista() {
   const faladas = itens.filter((i) => i.resultado === 'falou').length;
   const semResposta = itens.filter((i) => i.resultado === 'nao_atendeu').length;
   const faltam = itens.filter((i) => i.resultado === null).length;
+  const porProduto = (p: string) => itens.filter((i) => i.produto === p).length;
 
   return (
     <div className="space-y-4">
@@ -97,6 +111,12 @@ export default function ReceitaLista() {
         <p className="mt-2 font-mono text-[11px] uppercase tracking-wider text-on-surface-variant tabular-nums">
           {diaEscrito(dia)} · {itens.length} na lista · {faladas} faladas · {semResposta} não atenderam · {faltam} por ligar
         </p>
+        {itens.length > 0 && (
+          <p className="mt-1 font-mono text-[11px] uppercase tracking-wider text-on-surface-variant tabular-nums">
+            produto oferecido pelo marketing: {porProduto('osi')} OSI · {porProduto('clearix')} Clearix
+            {itens.some((i) => !i.produto) && ` · ${itens.filter((i) => !i.produto).length} nunca abordadas`}
+          </p>
+        )}
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
@@ -106,6 +126,8 @@ export default function ReceitaLista() {
       </div>
 
       <Aviso tom="warning">
+        Cada ótica recebeu a oferta de UM produto, e está escrito em qual. O roteiro abaixo é o do convite
+        para a aula, que é um terceiro assunto: quem atender vai lembrar da OSI ou do Clearix, não da aula.
         O telefone é o que a loja publica no Google: quem atende pode não ser o dono. Se pedirem para não
         ligar mais, clica em “Não ligar mais” e a ótica nunca volta para a lista.
       </Aviso>
@@ -155,6 +177,11 @@ function Linha({ item: i, aoMudar }: { item: Item; aoMudar: () => PromiseLike<un
         <span className={`border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider ${FAIXA[i.faixa]?.classe ?? 'border-outline/30 text-muted'}`}>
           {FAIXA[i.faixa]?.rotulo ?? i.faixa}
         </span>
+        {i.produto && (
+          <span className={`border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider ${PRODUTO[i.produto]?.classe ?? 'border-outline/30 text-muted'}`}>
+            produto: {PRODUTO[i.produto]?.rotulo ?? i.produto}
+          </span>
+        )}
         {i.porte && <span className="font-mono text-[9px] uppercase tracking-wider text-muted">porte {i.porte}</span>}
         {(i.cidade || i.uf) && (
           <span className="font-mono text-[9px] uppercase tracking-wider text-muted">{i.cidade ?? '—'}{i.uf ? `/${i.uf}` : ''}</span>
@@ -173,6 +200,9 @@ function Linha({ item: i, aoMudar }: { item: Item; aoMudar: () => PromiseLike<un
       </div>
 
       <p className="text-[13px] text-on-surface-variant">
+        {i.produto
+          ? <><strong className="font-semibold text-on-surface">{oQueFoi[i.faixa] ?? 'Foi abordada sobre'} {PRODUTO[i.produto]?.frase ?? i.produto}.</strong>{' '}</>
+          : <><strong className="font-semibold text-on-surface">Nunca recebeu oferta de produto nenhum.</strong>{' '}</>}
         {i.motivo}{i.contato ? ` · contato no cadastro: ${i.contato}` : ''}
       </p>
 

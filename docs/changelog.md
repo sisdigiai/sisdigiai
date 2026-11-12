@@ -2,6 +2,17 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-12 — Controle da prospecção e da aula na página Receita; a Lista do dia diz o produto (228)
+
+- **Escrita, aplicada e publicada pelo Agente de Receita**, por dois pedidos diretos do dono no canal dele em 12/11: "agora coloca o controle da prospecção e da aula no app" e, ao ver a lista no ar, "temos 2 produtos sendo oferecidos; em qual produto se interessou?".
+- **Aba Prospecção (`#/receita/prospeccao`):** uma linha por empresa da primeira leva (20), com etapa, canal de quem decide, próximo passo e cada toque anotado (canal e resultado). Contadores no topo. **Nada é enviado pela tela:** registrar um toque é anotar o que já foi feito.
+- **Duas portas, como na 224:** a base das empresas entra pela carga (`Cockpit/scripts/receita-controle-sync.mjs`, lendo `receita/pacotes/prospeccao-b2b/fila.md`); a etapa e o toque só entram por pessoa logada, e a carga é recusada (prova 5). Recarregar a base não desfaz a etapa.
+- **Cerca no banco:** Ecolab, Kimberly-Clark e Suzano S/A, que pediram para sair em agosto, são recusadas por `check` em `receita.prospeccao_empresa` (prova 4). Empresa marcada como "não contatar" não aceita toque.
+- **Aba Aula (`#/receita/aula`):** vagas pagas, quantas faltam para o mínimo ao vivo, prazo, ligações de convite. Só leitura. As vendas não são copiadas: a view lê `v_vendas_eventos` e casa pelo nome do produto. **Zero venda com produto não criado aparece dito como tal**, não como zero seco.
+- **Lista do dia com o produto:** `receita.lista_dia` ganhou a coluna `produto`, fotografada de `v_mkt_funil_leads.ramal` no dia da montagem; a view a entrega no fim, e a tela mostra em cada ótica "mostrou interesse por a OSI" ou "respondeu a mensagem sobre o Clearix". Medido em 12/11: os 4 interesses e os 5 cliques da base são todos da OSI; nenhum do Clearix.
+- **Banco:** tabelas `receita.prospeccao_empresa`, `receita.prospeccao_toque`, `receita.aula`; views `v_receita_prospeccao`, `v_receita_prospeccao_toques`, `v_receita_aula` (invoker); quatro funções `rpc_receita_*`. Tabela de empresa, não de pessoa (R-013 não se aplica). Sete provas; ensaio com `begin … rollback` antes de aplicar.
+- **Espelho:** copiada para `docs/migrations/migrations/`. O `schema.sql` continua sem regenerar. **Próximo número livre: 229.**
+
 ## 2026-11-12 — Lista do dia na página Receita (227)
 
 - **Escrita, aplicada e publicada pelo Agente de Receita**, por pedido direto do dono no canal dele em 12/11 ("quero a lista, porém preciso que inclua em uma aba no app").
