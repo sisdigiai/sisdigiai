@@ -2,6 +2,15 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-12 — A alavanca sem data de início para de se repetir (226)
+
+- **Escrita, aplicada e publicada pelo Agente de Receita**, com o "sim, conserta" do dono no canal dele em 12/11. Mexe em objeto que nasceu na 219 e na 220 (tabela `receita.alavanca` e função `rpc_receita_gravar_alavanca`); o agente do app foi avisado por arquivo.
+- **O defeito:** a chave `unique (nome, inicio)` não casava quando `inicio` era nulo (nulo não é igual a nulo), então cada carga do placar criava outra linha para toda alavanca não iniciada. Em 12/11 a página Receita mostrou o Kit do Pulso duas vezes, uma em curso e outra congelada. As três repetidas foram tiradas antes da migration.
+- **O conserto:** a chave passou a `unique nulls not distinct (nome, inicio)`; e a função faz a alavanca "não iniciada" que chega com data ganhar a data, em vez de nascer outra linha. A assinatura e os grants da função não mudaram.
+- **O que não muda:** o mesmo nome com duas datas de início diferentes continua sendo duas linhas (a mesma alavanca tentada de novo), e encerrada ou congelada sem veredito continua recusada.
+- **Provas:** seis na migration, ensaio com `begin … rollback` antes; depois de aplicar, duas cargas seguidas do placar deixaram as mesmas 12 alavancas.
+- **Espelho:** copiada para `docs/migrations/migrations/`. O `schema.sql` continua sem regenerar, com o agente do app. **Próximo número livre: 227.**
+
 ## 2026-11-12 — Aba Pacotes na página Receita (225)
 
 - **Escrita pelo Agente de Receita em ramo próprio (R-051) e publicada por ele**, por pedido direto do dono no canal dele em 12/11 ("coloca os detalhes dos pacotes no app também"), no mesmo arranjo que ele definiu para esta página em 11/11 ("publica tu").
