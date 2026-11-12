@@ -72,6 +72,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Espelho:** a migration foi copiada para `docs/migrations/migrations/`. **O `schema.sql` não foi regenerado** (não conheço o gerador); fica para o agente do app, junto com a linha do módulo no `AGENTS.md`.
 - **Dúvida que continua do agente do app:** o portão da escolha é `is_staff()`. Se o papel do dono em `iam.users` for `founder`, trocar por `is_founder()` deixa a escolha só com ele.
 
+## 2026-11-12 — O funil da página Receita para de subestimar o toque (229)
+
+- **Erro meu, apontado com medição pelo Agente de Receita.** `v_receita_funil` lia **só** `ops.commercial_leads.last_touch_at` e dizia "928 sem nenhum toque, último em 29/09". Verdade medida hoje: **450 leads abordados por WhatsApp**, 847 mensagens, a última **às 13h55 de hoje**; 19 responderam pessoa, 150 robô, 4 clicaram, 1 interessada.
+- **Causa:** o motor de WhatsApp **nunca escreve** `last_touch_at` — quem escreve ali é só o ciclo de vida do lead (`fn_upsert_commercial_lead`, `fn_marcar_lead_perdido`, `fn_descartar_lead`, `fn_registrar_venda_clearix`). Os 18 valores existentes são de setembro, à mão.
+- **O que custou:** em 11/11 eu disse ao dono que "a linha 2 não está devagar, está parada há 42 dias". Era falso, e ele decidiu com esse número na frente. Retirado com ele no mesmo turno em que medi.
+- **O conserto não foi somar número, foi parar de chamar duas coisas pelo mesmo nome.** *Abordado* é o motor trabalhando sozinho; *toque manual* é alguém ter falado e registrado — que é o que as dez ligações do dono viram a partir de 16/11. As duas pedem ações opostas: uma diz "o robô está rodando", a outra diz "ninguém humano falou com essa gente".
+- **As três colunas que mentiam deixaram de existir** (`sem_nenhum_toque`, `com_algum_toque`, `ultimo_toque_em`), em vez de ganharem companhia — nome errado engana de novo mesmo com o número certo ao lado. **Uma prova impede que voltem**, outra confere a abordagem contra a fonte, uma terceira fecha as duas somas com o total, e a quarta trava o próprio erro: se um dia a abordagem voltar a ser igual ao toque manual, é porque alguém religou a leitura de uma coluna só.
+- **A página é do Agente de Receita desde 11/11** (R-051, exceção do dono): avisei no mesmo turno quais são os nomes novos. Até ele republicar, o bloco mostra campo vazio — pior de ver e melhor de verdade do que o número errado.
+
 ## 2026-11-11 (noite) — A validade dos fatos passa a avisar sozinha (222)
 
 - **Revalidação que depende de alguém lembrar não é controle, é sorte.** Foi por acaso que eu achei os 20 fatos vencidos, e um deles era fonte única de preço de uma marca. Agora um job diário às **07h05 BRT** confere e escreve em `ops.controle_itens` como `agente='fatos'` — a porta que já leva à tela Controle. **Sem tabela nova e sem tela nova** (decisão do Geral, pela prioridade de receita).
