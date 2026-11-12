@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AlertTriangle, Target, Gauge, Rocket, History, Filter, Coins, Repeat, UserCheck, Scale } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import ReceitaIdeias, { useSubRotaReceita } from './ReceitaIdeias';
+import ReceitaPacotes from './ReceitaPacotes';
 
 // Página Receita (migration 219; decisão do dono em 10/11/2026, R-051).
 //
@@ -376,7 +377,8 @@ function Placar() {
   );
 }
 
-// A página tem duas abas e a aba mora no endereço (`#/receita` e `#/receita/ideias[/<slug>]`): o dono
+// A página tem três abas e a aba mora no endereço (`#/receita`, `#/receita/ideias[/<slug>]` e
+// `#/receita/pacotes[/<pacote>[/<arquivo>]]`): o dono
 // manda o link de uma ficha a um agente e o link abre na ficha, não no placar.
 export default function Receita() {
   const sub = useSubRotaReceita();
@@ -389,8 +391,11 @@ export default function Receita() {
       <nav aria-label="Seções da Receita" className="flex gap-1 border-b border-outline/15">
         <a href="#/receita" aria-current={sub.aba === 'placar' ? 'page' : undefined} className={aba(sub.aba === 'placar')}>Placar</a>
         <a href="#/receita/ideias" aria-current={sub.aba === 'ideias' ? 'page' : undefined} className={aba(sub.aba === 'ideias')}>Ideias</a>
+        <a href="#/receita/pacotes" aria-current={sub.aba === 'pacotes' ? 'page' : undefined} className={aba(sub.aba === 'pacotes')}>Pacotes</a>
       </nav>
-      {sub.aba === 'ideias' ? <ReceitaIdeias slug={sub.slug} /> : <Placar />}
+      {sub.aba === 'ideias' ? <ReceitaIdeias slug={sub.slug} />
+        : sub.aba === 'pacotes' ? <ReceitaPacotes slug={sub.slug} doc={sub.doc} />
+        : <Placar />}
     </div>
   );
 }

@@ -2,6 +2,18 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-12 — Aba Pacotes na página Receita (225)
+
+- **Escrita pelo Agente de Receita em ramo próprio (R-051) e publicada por ele**, por pedido direto do dono no canal dele em 12/11 ("coloca os detalhes dos pacotes no app também"), no mesmo arranjo que ele definiu para esta página em 11/11 ("publica tu").
+- **O que é:** terceira aba da página Receita (`#/receita/pacotes[/<pacote>[/<arquivo>]]`). Um card por pacote do Receita, com o risco que abre o documento principal, e a página de cada pacote com todos os documentos dele (plano, peças, listas, testes). **Só leitura:** nada na tela envia, aprova ou muda estado.
+- **Dois lados ligados:** a ficha de ideia ganhou a linha "o detalhe desta ideia está no pacote …", e a página do pacote lista as ideias que o citam. Quem calcula a ligação é a carga, na coluna `ideias`.
+- **Banco:** tabela `receita.pacote` (uma linha por pacote, documentos em `docs` jsonb), view `public.v_receita_pacotes` (`security_invoker`), função `public.rpc_receita_gravar_pacote` (staff ou a carga). Cinco provas na migration; ensaio com `begin … rollback` antes de aplicar.
+- **O texto chega em blocos, não em HTML:** a carga (`Cockpit/scripts/receita-pacotes-sync.mjs`, lendo `Cockpit/receita/pacotes/<pacote>/*.md`) parte cada documento em título, parágrafo, citação, lista e tabela. A tela desenha bloco por bloco e lê negrito, código e riscado à mão. Nada que vem do arquivo vira marcação executável.
+- **O que não entra:** planilha e CSV ficam no Cockpit; a tela só diz o nome e o tamanho. A carga para se achar texto com formato de CPF.
+- **Quem lê:** `is_staff()`, hoje uma pessoa (o dono). Um dos pacotes traz um dossiê de risco jurídico; quem der papel de equipe a mais alguém passa a mostrar esse texto a essa pessoa. Está escrito no cabeçalho da migration.
+- **Sem dependência nova:** o app não tinha leitor de markdown e continua sem; o leitor é pequeno e mora no próprio módulo (`src/modules/ReceitaPacotes.tsx`).
+- **Espelho:** a migration foi copiada para `docs/migrations/migrations/`. **O `schema.sql` não foi regenerado**; continua com o agente do app, junto com a linha do módulo no `AGENTS.md`.
+
 ## 2026-11-11 — Aba Ideias na página Receita (224)
 
 - **Escrita pelo Agente de Receita em ramo próprio (R-051) e publicada por ele mesmo, por ordem direta do dono no canal dele em 11/11 à noite ("publica tu").** O pedido de integração ao agente do app ficou sem resposta e o dono preferiu não esperar.

@@ -43,14 +43,19 @@ const ESCOLHA: Record<Escolha, { rotulo: string; botao: string; classe: string }
 // Passou disto, a tela avisa. Não é trava: quem decide quantas frentes abre é o dono.
 const FOCO_DEMAIS = 3;
 
-const quando = (iso: string) =>
+export const quando = (iso: string) =>
   new Date(iso).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' });
 
-export function subRotaReceita(): { aba: 'placar' | 'ideias'; slug: string | null } {
-  if (typeof window === 'undefined') return { aba: 'placar', slug: null };
+// `doc` só existe na aba Pacotes: `#/receita/pacotes/<pacote>/<arquivo>`.
+export function subRotaReceita(): { aba: 'placar' | 'ideias' | 'pacotes'; slug: string | null; doc: string | null } {
+  if (typeof window === 'undefined') return { aba: 'placar', slug: null, doc: null };
   const partes = window.location.hash.replace(/^#\/?/, '').split('/');
-  if (partes[0] !== 'receita' || partes[1] !== 'ideias') return { aba: 'placar', slug: null };
-  return { aba: 'ideias', slug: partes[2] ? decodeURIComponent(partes[2]) : null };
+  if (partes[0] !== 'receita' || (partes[1] !== 'ideias' && partes[1] !== 'pacotes')) return { aba: 'placar', slug: null, doc: null };
+  return {
+    aba: partes[1],
+    slug: partes[2] ? decodeURIComponent(partes[2]) : null,
+    doc: partes[1] === 'pacotes' && partes[3] ? decodeURIComponent(partes[3]) : null,
+  };
 }
 
 export function useSubRotaReceita() {
@@ -214,6 +219,7 @@ function Ficha({ ideia, emFoco, aoGravar }: { ideia: Ideia; emFoco: number; aoGr
   const [nota, setNota] = useState(ideia.escolha_nota ?? '');
   const [gravando, setGravando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [pacotes, setPacotes] = useState<{ slug: string; titulo: string }[]>([]);
   const topo = useRef<HTMLDivElement>(null);
 
   // Abrir a ficha a partir de um card lá embaixo deixaria a tela no meio do texto.
@@ -221,6 +227,16 @@ function Ficha({ ideia, emFoco, aoGravar }: { ideia: Ideia; emFoco: number; aoGr
     topo.current?.scrollIntoView({ block: 'start' });
     setNota(ideia.escolha_nota ?? '');
     setErro(null);
+  }, [ideia.slug]);
+
+  // Pacotes que detalham esta ideia (225). Quem liga os dois é a carga dos pacotes, na coluna `ideias`.
+  // Se a consulta falhar, a ficha continua inteira: só não aparece o atalho.
+  useEffect(() => {
+    let vivo = true;
+    setPacotes([]);
+    supabase.from('v_receita_pacotes').select('slug, titulo').contains('ideias', JSON.stringify([{ slug: ideia.slug }]))
+      .order('ordem').then(({ data }) => { if (vivo) setPacotes((data ?? []) as { slug: string; titulo: string }[]); });
+    return () => { vivo = false; };
   }, [ideia.slug]);
 
   const escolher = async (valor: Escolha | null) => {
@@ -257,6 +273,21 @@ function Ficha({ ideia, emFoco, aoGravar }: { ideia: Ideia; emFoco: number; aoGr
         <Fato rotulo="Prova">{ideia.prova ?? 'sem prova registrada'}</Fato>
         <Fato rotulo="Onde está escrito">{ideia.origem ?? 'sem origem registrada'}</Fato>
       </dl>
+
+      {pacotes.length > 0 && (
+        <p className="text-[13px] text-on-surface-variant">
+          O detalhe desta ideia está {pacotes.length === 1 ? 'no pacote' : 'nos pacotes'}:{' '}
+          {pacotes.map((p, k) => (
+            <span key={p.slug}>
+              {k > 0 && ' · '}
+              <a href={`#/receita/pacotes/${encodeURIComponent(p.slug)}`}
+                 className="underline hover:text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-action">
+                {p.titulo}
+              </a>
+            </span>
+          ))}
+        </p>
+      )}
 
       <section aria-labelledby="titulo-escolha" className="border border-outline/30 bg-surface-container p-4 space-y-3">
         <div className="flex items-center gap-2">
@@ -378,7 +409,7 @@ function Fato({ rotulo, children }: { rotulo: string; children: React.ReactNode 
   );
 }
 
-function Aviso({ tom, children }: { tom: 'warning' | 'danger'; children: React.ReactNode }) {
+export function Aviso({ tom, children }: { tom: 'warning' | 'danger'; children: React.ReactNode }) {
   const classe = tom === 'danger' ? 'border-danger/30 bg-danger/5 text-danger' : 'border-outline/20 bg-surface-container text-muted';
   return (
     <div className={`flex items-start gap-2 border p-3 text-[13px] ${classe}`}>
@@ -388,6 +419,6 @@ function Aviso({ tom, children }: { tom: 'warning' | 'danger'; children: React.R
   );
 }
 
-function Carregando() {
+export function Carregando() {
   return <div className="border border-outline/15 bg-surface-container p-3 font-mono text-[10px] uppercase tracking-wider text-muted">lendo…</div>;
 }
