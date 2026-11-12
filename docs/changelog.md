@@ -2,6 +2,19 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-12 — Lista do dia na página Receita (227)
+
+- **Escrita, aplicada e publicada pelo Agente de Receita**, por pedido direto do dono no canal dele em 12/11 ("quero a lista, porém preciso que inclua em uma aba no app").
+- **O que é:** quarta aba da página Receita (`#/receita/lista`), com as dez óticas para o dono ligar no dia. Cada linha traz a ótica, a cidade, o porte, o motivo de estar na lista, o telefone (toque para ligar) e três resultados: falei, não atendeu, não ligar mais.
+- **A rotina é do banco:** `pg_cron` `receita-lista-do-dia`, às 11h UTC (08h de Brasília), de segunda a sábado. Roda com o aplicativo fechado e grava a própria execução, ou a falha, em `receita.rotina`. Domingo não monta.
+- **Quem entra, em ordem:** quem mostrou interesse ou clicou; quem respondeu como pessoa; quem recebeu WhatsApp e não respondeu; quem nunca foi tocada. **Quem nunca entra:** sem telefone, saiu do WhatsApp, perdida, cliente, já comprou, com WhatsApp da esteira agendado para o mesmo dia, já falada, ou que pediu para não ligar. Quem não atendeu volta depois de dois dias, no máximo três vezes.
+- **Sem cópia de contato:** `receita.lista_dia` guarda só o `lead_id`. Nome e telefone são lidos na hora das views de contrato (`v_vendas_leads`, `v_mkt_funil_leads`, `v_mkt_esteira_itens`), que continuam aplicando as políticas delas.
+- **"Falei" usa a porta que já existia:** o componente `ToqueVenda` (`fn_registrar_toque`) registra a ligação; a tela só marca a linha depois. O resultado só entra por pessoa logada: a carga é recusada (prova 5).
+- **Contrato novo para o app de marketing:** `public.v_receita_nao_ligar` (lead_id e data), para o WhatsApp poder respeitar quem pediu ao dono para não ligar mais.
+- **Achado ao medir:** `v_receita_funil` lê `ops.commercial_leads.last_touch_at` e mostra "928 sem toque, último toque em 29/09". O funil do marketing (`v_mkt_funil_leads`) mostra 449 óticas abordadas por WhatsApp, 32 com resposta de pessoa, 5 cliques e toque em 12/11. **A seção "Funil da venda do Clearix" da página Receita está subestimando**; o conserto é do agente do app.
+- **Provas:** seis na migration (portas, regra rodada em dia de prova, quem volta e quem não volta, carga recusada, cron ativo), ensaio com `begin … rollback` antes de aplicar.
+- **Espelho:** copiada para `docs/migrations/migrations/`. O `schema.sql` continua sem regenerar. **Próximo número livre: 228.**
+
 ## 2026-11-12 — A alavanca sem data de início para de se repetir (226)
 
 - **Escrita, aplicada e publicada pelo Agente de Receita**, com o "sim, conserta" do dono no canal dele em 12/11. Mexe em objeto que nasceu na 219 e na 220 (tabela `receita.alavanca` e função `rpc_receita_gravar_alavanca`); o agente do app foi avisado por arquivo.

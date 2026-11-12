@@ -3,6 +3,7 @@ import { AlertTriangle, Target, Gauge, Rocket, History, Filter, Coins, Repeat, U
 import { supabase } from '../lib/supabase';
 import ReceitaIdeias, { useSubRotaReceita } from './ReceitaIdeias';
 import ReceitaPacotes from './ReceitaPacotes';
+import ReceitaLista from './ReceitaLista';
 
 // Página Receita (migration 219; decisão do dono em 10/11/2026, R-051).
 //
@@ -377,8 +378,8 @@ function Placar() {
   );
 }
 
-// A página tem três abas e a aba mora no endereço (`#/receita`, `#/receita/ideias[/<slug>]` e
-// `#/receita/pacotes[/<pacote>[/<arquivo>]]`): o dono
+// A página tem quatro abas e a aba mora no endereço (`#/receita`, `#/receita/lista`,
+// `#/receita/ideias[/<slug>]` e `#/receita/pacotes[/<pacote>[/<arquivo>]]`): o dono
 // manda o link de uma ficha a um agente e o link abre na ficha, não no placar.
 export default function Receita() {
   const sub = useSubRotaReceita();
@@ -388,13 +389,15 @@ export default function Receita() {
     + (ativa ? 'border-action text-on-surface' : 'border-transparent text-muted hover:text-on-surface');
   return (
     <div className="space-y-6">
-      <nav aria-label="Seções da Receita" className="flex gap-1 border-b border-outline/15">
+      <nav aria-label="Seções da Receita" className="flex flex-wrap gap-1 border-b border-outline/15">
         <a href="#/receita" aria-current={sub.aba === 'placar' ? 'page' : undefined} className={aba(sub.aba === 'placar')}>Placar</a>
+        <a href="#/receita/lista" aria-current={sub.aba === 'lista' ? 'page' : undefined} className={aba(sub.aba === 'lista')}>Lista do dia</a>
         <a href="#/receita/ideias" aria-current={sub.aba === 'ideias' ? 'page' : undefined} className={aba(sub.aba === 'ideias')}>Ideias</a>
         <a href="#/receita/pacotes" aria-current={sub.aba === 'pacotes' ? 'page' : undefined} className={aba(sub.aba === 'pacotes')}>Pacotes</a>
       </nav>
       {sub.aba === 'ideias' ? <ReceitaIdeias slug={sub.slug} />
         : sub.aba === 'pacotes' ? <ReceitaPacotes slug={sub.slug} doc={sub.doc} />
+        : sub.aba === 'lista' ? <ReceitaLista />
         : <Placar />}
     </div>
   );
