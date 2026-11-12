@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { AlertTriangle, ArrowLeft, Crosshair, Lightbulb } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
-// Aba Ideias da página Receita (migration 221; pedido do dono em 11/11/2026).
+// Aba Ideias da página Receita (migration 224; pedido do dono em 11/11/2026).
 //
 // Um lugar só para as ideias do Agente de Receita: cards para comparar, a ficha completa de cada uma e a
 // ESCOLHA do dono (foco, depois, não). A escolha é o que esta aba produz — o resto é leitura.
@@ -82,7 +82,7 @@ export default function ReceitaIdeias({ slug }: { slug: string | null }) {
     return (
       <Aviso tom="danger">
         {semBanco
-          ? 'A aba Ideias ainda não está ligada ao banco: falta aplicar a migration 221 e rodar a carga das fichas.'
+          ? 'A aba Ideias ainda não está ligada ao banco: falta aplicar a migration 224 e rodar a carga das fichas.'
           : 'As ideias não carregaram.'}{' '}
         <span className="font-mono text-[11px]">({erro})</span>
       </Aviso>

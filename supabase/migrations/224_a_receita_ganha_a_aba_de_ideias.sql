@@ -1,4 +1,4 @@
--- 221 — A página Receita ganha a aba Ideias, e a escolha de foco do dono vira dado (11/11/2026).
+-- 224 — A página Receita ganha a aba Ideias, e a escolha de foco do dono vira dado (11/11/2026).
 --
 -- QUEM ESCREVEU: o Agente de Receita, em ramo próprio (`receita/aba-ideias`), por pedido do dono no canal
 -- dele em 11/11/2026. Pela R-051 quem integra e publica é o agente do app: ESTA MIGRATION NÃO FOI APLICADA
@@ -147,7 +147,7 @@ begin
     select 1 from pg_class c join pg_namespace n on n.oid = c.relnamespace
      where n.nspname = 'public' and c.relname = 'v_receita_ideias'
        and c.reloptions @> array['security_invoker=true']) then
-    raise exception 'PROVA_221_FALHOU: v_receita_ideias ausente ou sem security_invoker';
+    raise exception 'PROVA_224_FALHOU: v_receita_ideias ausente ou sem security_invoker';
   end if;
 end $$;
 
@@ -165,7 +165,7 @@ begin
   reset role;
 exception when others then
   reset role;
-  raise exception 'PROVA_221_FALHOU: authenticated nao le a view com todas as colunas: %', sqlerrm;
+  raise exception 'PROVA_224_FALHOU: authenticated nao le a view com todas as colunas: %', sqlerrm;
 end $$;
 
 -- PROVA 3 — escrita fechada: `authenticated` não tem insert/update/delete direto na tabela nova.
@@ -177,7 +177,7 @@ begin
    where grantee = 'authenticated' and table_schema = 'receita' and table_name = 'ideia'
      and privilege_type in ('INSERT', 'UPDATE', 'DELETE', 'TRUNCATE');
   if v is not null then
-    raise exception 'PROVA_221_FALHOU: authenticated tem escrita direta em receita.ideia: %', v;
+    raise exception 'PROVA_224_FALHOU: authenticated tem escrita direta em receita.ideia: %', v;
   end if;
 end $$;
 
@@ -187,18 +187,18 @@ end $$;
 do $$
 declare v record;
 begin
-  perform public.rpc_receita_gravar_ideia('prova-221', 'P221', 9999, 'Prova da 221', 'prova', 'fraca',
+  perform public.rpc_receita_gravar_ideia('prova-224', 'P224', 9999, 'Prova da 224', 'prova', 'fraca',
     'linha de prova', 'c1', 'd1', 'p1', 'o1', '[{"titulo":"t","itens":[{"tipo":"p","texto":"x"}]}]'::jsonb);
-  update receita.ideia set escolha = 'foco', escolha_por = 'prova', escolha_em = now() where slug = 'prova-221';
-  perform public.rpc_receita_gravar_ideia('prova-221', 'P221', 9999, 'Prova da 221 regravada', 'prova', 'media',
+  update receita.ideia set escolha = 'foco', escolha_por = 'prova', escolha_em = now() where slug = 'prova-224';
+  perform public.rpc_receita_gravar_ideia('prova-224', 'P224', 9999, 'Prova da 224 regravada', 'prova', 'media',
     'linha de prova', 'c2', 'd2', 'p2', 'o2', '[]'::jsonb);
-  select titulo, veredito, conta, escolha, escolha_por into v from receita.ideia where slug = 'prova-221';
-  delete from receita.ideia where slug = 'prova-221';
-  if v.titulo <> 'Prova da 221 regravada' or v.veredito <> 'media' or v.conta <> 'c2' then
-    raise exception 'PROVA_221_FALHOU: regravar nao atualizou a ficha (%, %, %)', v.titulo, v.veredito, v.conta;
+  select titulo, veredito, conta, escolha, escolha_por into v from receita.ideia where slug = 'prova-224';
+  delete from receita.ideia where slug = 'prova-224';
+  if v.titulo <> 'Prova da 224 regravada' or v.veredito <> 'media' or v.conta <> 'c2' then
+    raise exception 'PROVA_224_FALHOU: regravar nao atualizou a ficha (%, %, %)', v.titulo, v.veredito, v.conta;
   end if;
   if v.escolha is distinct from 'foco' or v.escolha_por is distinct from 'prova' then
-    raise exception 'PROVA_221_FALHOU: regravar a ficha apagou a escolha (ficou %, %)', v.escolha, v.escolha_por;
+    raise exception 'PROVA_224_FALHOU: regravar a ficha apagou a escolha (ficou %, %)', v.escolha, v.escolha_por;
   end if;
 end $$;
 
@@ -206,16 +206,16 @@ end $$;
 do $$
 declare passou boolean := false;
 begin
-  perform public.rpc_receita_gravar_ideia('prova-221b', 'P221B', 9998, 'Prova da 221 b', 'prova', 'fraca',
+  perform public.rpc_receita_gravar_ideia('prova-224b', 'P224B', 9998, 'Prova da 224 b', 'prova', 'fraca',
     'linha de prova', null, null, null, null, '[]'::jsonb);
   begin
-    perform public.rpc_receita_escolher_ideia('prova-221b', 'foco', 'a carga tentando escolher');
+    perform public.rpc_receita_escolher_ideia('prova-224b', 'foco', 'a carga tentando escolher');
     passou := true;
   exception when insufficient_privilege then
     passou := false;
   end;
-  delete from receita.ideia where slug = 'prova-221b';
+  delete from receita.ideia where slug = 'prova-224b';
   if passou then
-    raise exception 'PROVA_221_FALHOU: a carga conseguiu escolher o foco — a porta da escolha esta aberta para agente';
+    raise exception 'PROVA_224_FALHOU: a carga conseguiu escolher o foco — a porta da escolha esta aberta para agente';
   end if;
 end $$;

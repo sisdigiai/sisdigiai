@@ -2,15 +2,31 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
-## 2026-11-11 — Aba Ideias na página Receita (221) — RAMO `receita/aba-ideias`, NÃO INTEGRADO
+## 2026-11-11 — Aba Ideias na página Receita (224) — RAMO `receita/aba-ideias`, NÃO INTEGRADO
 
-- **Escrito pelo Agente de Receita em ramo próprio (R-051), a pedido do dono em 11/11.** Quem integra e publica é o agente do app. A migration 221 **não foi aplicada** e a tela **não foi vista no navegador** por quem escreveu.
+- **Escrito pelo Agente de Receita em ramo próprio (R-051), a pedido do dono em 11/11.** Quem integra e publica é o agente do app. A migration 224 **não foi aplicada** e a tela **não foi vista no navegador** por quem escreveu.
 - **O que é:** a página Receita ganha duas abas no endereço (`#/receita` e `#/receita/ideias[/<slug>]`). A aba Ideias mostra um card por ideia do Receita, com filtro por grupo, veredito e escolha, e a ficha completa de cada uma com os botões de escolha do dono (foco, depois, descartar).
-- **Duas portas de escrita, de propósito:** a ficha entra pela carga (`Cockpit/scripts/receita-ideias-sync.mjs`, lendo `Cockpit/receita/ideias/*.md`); a escolha só entra por pessoa logada. A função de escolher **recusa a identidade da carga** (prova 5 da 221) e regravar a ficha **não apaga a escolha** (prova 4).
+- **Duas portas de escrita, de propósito:** a ficha entra pela carga (`Cockpit/scripts/receita-ideias-sync.mjs`, lendo `Cockpit/receita/ideias/*.md`); a escolha só entra por pessoa logada. A função de escolher **recusa a identidade da carga** (prova 5 da 224) e regravar a ficha **não apaga a escolha** (prova 4).
 - **Roteador:** `moduleFromHash` passou a olhar só o primeiro trecho do endereço. Antes, `#/receita/qualquer-coisa` caía em Visão calado.
 - **A conta de cada ideia é texto, não número:** é hipótese do Receita e a tela não soma nem formata como dinheiro do placar.
-- **Conferido:** `tsc --noEmit` e `vite build` passam; a carga leu 48 fichas em modo de conferência; a lista e as 48 fichas foram renderizadas fora do navegador com o código real do componente (48 cards, 432 seções). **Não conferido:** o SQL da 221 no banco, a leitura pela view com login real e a tela em produção.
+- **Conferido:** `tsc --noEmit` e `vite build` passam; a carga leu 48 fichas em modo de conferência; a lista e as 48 fichas foram renderizadas fora do navegador com o código real do componente (48 cards, 432 seções). **Não conferido:** o SQL da 224 no banco, a leitura pela view com login real e a tela em produção.
+- **Renumerada de 221 para 224 em 11/11 à noite:** o app publicou as migrations 221 a 223 depois de este ramo nascer. O ramo recebeu o `main` por merge (sem reescrever história) e nada mais mudou.
 - **Dúvida deixada para quem integra:** o portão da escolha é `is_staff()`. Se o papel do dono em `iam.users` for `founder`, trocar por `is_founder()` deixa a escolha só com ele; não conferi porque não leio este banco.
+## 2026-11-11 (noite) — A validade dos fatos passa a avisar sozinha (222)
+
+- **Revalidação que depende de alguém lembrar não é controle, é sorte.** Foi por acaso que eu achei os 20 fatos vencidos, e um deles era fonte única de preço de uma marca. Agora um job diário às **07h05 BRT** confere e escreve em `ops.controle_itens` como `agente='fatos'` — a porta que já leva à tela Controle. **Sem tabela nova e sem tela nova** (decisão do Geral, pela prioridade de receita).
+- **Prova de que rodou, sem tabela de execução: o próprio job grava uma linha de batimento por dia** ("Fatos conferidos: 6 frescos, 0 vencendo, 20 vencidos"). **Dia sem essa linha é dia em que não rodou** — e isso aparece, em vez de virar silêncio. Mesma ideia que separou "não medido" de "zero" na página Receita: ausência tem de ser visível.
+- **Risco é só o que trava trabalho.** Fato **vencido que alguma regra de marca nomeia como fonte única** sai um por um, em nível 1 — é o caso que faz a peça sair sem poder citar número. Fato que vence em 7 dias sai um por um, em nível 2. **Fato vencido que ninguém usa sai em UMA linha agregada**, com a lista dentro: vinte linhas iguais numa tela que a casa está tentando desentupir seria eu criando o problema que passei a semana apontando. Alarme que toca por tudo ensina a ignorar alarme.
+- **O banco pegou um defeito meu na primeira tentativa:** `ops.controle_itens` tem chave única em (data, agente, tipo, hash do texto), e eu havia posto a chave do fato só no título — dois fatos com a mesma validade geravam texto idêntico e o segundo aviso **sumia como se fosse repetição**. Agora quem é o fato faz parte do que o aviso diz.
+- **Quatro provas:** a rotina roda e escreve exatamente **um** batimento; rodar duas vezes no mesmo dia **não duplica** nada; **não há risco de fato hoje** (porque `osi_oferta` foi revalidado na 221 — e no dia em que essa prova falhar, é o alarme funcionando); e o job está ativo, no horário, chamando a função certa.
+
+## 2026-11-11 (noite) — Os fatos da OSI revalidados na fonte, e um fato declarado deixa de vencer como medição (221)
+
+- **Por que corria prazo:** `osi_oferta`, `osi_aplicacao` e `osi_taty_anos_balcao` venciam em **15/11**, e a regra da OSI em `mkt.content_rules` diz com todas as letras que **preço, pacote e garantia vêm só do fato `osi_oferta`**. Com ele vencido e a trava fail-closed, as peças da aula de 24/11 e a grade da OSI sairiam **sem poder citar o preço do produto**. Não era hipótese: era o que a regra manda acontecer.
+- **Revalidado contra o artefato publicado, não contra a memória:** `academy.products` (slug `otica-sem-improviso`) devolve **price_brl 49.00**, e a landing no ar traz, inteira, a frase do fato — **"R$ 49, pagamento único. Garantia de 7 dias. Depois dos 30 dias, o Nexus continua por R$ 19,90/mês"**, mais "3 dias", "ritmo do plano", Hotmart e Kiwify. Os dois fatos de produto continuam verdadeiros palavra por palavra; só a data mudou.
+- **O que eu NÃO fiz, e é o ponto da migration: não carimbei o fato declarado.** "25 anos de balcão" é **declaração do dono**, não medição — não há artefato para reler, e mover a data de verificação seria eu dizer "verifiquei" sobre o que não verifiquei. O que mudou foi a **janela**: 60 → 365 dias, porque declaração não apodrece em dois meses, apodrece quando a pessoa faz mais um ano de balcão. A **prova 2 existe para me impedir** de, num dia apressado, revalidar em lote o que não tem como ser relido.
+- **A prova 3 trava a outra tentação:** revalidar é reler a fonte e mover a data. Se o texto do fato mudar na mesma migration, deixa de ser revalidação e vira fato novo — que é outra decisão.
+- **Varredura que originou isto:** **20 dos 26 fatos públicos ativos estão fora da validade** (o `pulso_youtube_crescimento` tem validade de 7 dias e 103 de idade). **Nada vazou para post**: o motor filtra `fresco` na `v_mkt_fatos`, comparando em BRT, e sem fato não cita número. Mas restam **6 fatos frescos** para a casa inteira — agora nenhum deles vencendo antes da aula.
 
 ## 2026-11-11 — A página Receita ganha dado, pela porta certa (220)
 
