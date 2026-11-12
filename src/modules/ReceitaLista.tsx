@@ -33,14 +33,18 @@ const FAIXA: Record<string, { rotulo: string; classe: string }> = {
 // Em qual produto foi o toque do marketing (dono, 12/11: "temos 2 produtos sendo oferecidos; em qual se
 // interessou?"). A esteira oferece UM produto a cada ótica. Quem liga precisa saber qual antes de discar:
 // quem mostrou interesse na OSI não ouviu falar do sistema, e o contrário.
-const PRODUTO: Record<string, { rotulo: string; frase: string; classe: string }> = {
-  osi:     { rotulo: 'OSI',     frase: 'a OSI (Ótica Sem Improviso)', classe: 'bg-info-bg text-info border-info-bd' },
-  clearix: { rotulo: 'Clearix', frase: 'o Clearix (o sistema)',       classe: 'bg-warning-bg text-warning border-warning-bd' },
-  digiai:  { rotulo: 'DIGIAI',  frase: 'a DIGIAI',                    classe: 'bg-surface-high text-on-surface-variant border-outline/30' },
+// `em` e `sobre` vêm escritos por produto: "na OSI" e "no Clearix" não saem de uma regra só.
+const PRODUTO: Record<string, { rotulo: string; em: string; sobre: string; classe: string }> = {
+  osi:     { rotulo: 'OSI',     em: 'na OSI (Ótica Sem Improviso)', sobre: 'sobre a OSI (Ótica Sem Improviso)', classe: 'bg-info-bg text-info border-info-bd' },
+  clearix: { rotulo: 'Clearix', em: 'no Clearix (o sistema)',       sobre: 'sobre o Clearix (o sistema)',       classe: 'bg-warning-bg text-warning border-warning-bd' },
+  digiai:  { rotulo: 'DIGIAI',  em: 'na DIGIAI',                    sobre: 'sobre a DIGIAI',                    classe: 'bg-surface-high text-on-surface-variant border-outline/30' },
 };
-const oQueFoi: Record<string, string> = {
-  interesse: 'Mostrou interesse por', respondeu: 'Respondeu a mensagem sobre', abordada: 'Recebeu mensagem sobre',
-};
+function oQueFoi(faixa: string, produto: string) {
+  const p = PRODUTO[produto];
+  if (faixa === 'interesse') return `Mostrou interesse ${p?.em ?? `em ${produto}`}.`;
+  if (faixa === 'respondeu') return `Respondeu a mensagem ${p?.sobre ?? `sobre ${produto}`}.`;
+  return `Recebeu mensagem ${p?.sobre ?? `sobre ${produto}`}.`;
+}
 
 const RESULTADO: Record<Resultado, string> = {
   falou: 'falei com a ótica', nao_atendeu: 'não atendeu', nao_ligar: 'pediu para não ligar mais',
@@ -201,7 +205,7 @@ function Linha({ item: i, aoMudar }: { item: Item; aoMudar: () => PromiseLike<un
 
       <p className="text-[13px] text-on-surface-variant">
         {i.produto
-          ? <><strong className="font-semibold text-on-surface">{oQueFoi[i.faixa] ?? 'Foi abordada sobre'} {PRODUTO[i.produto]?.frase ?? i.produto}.</strong>{' '}</>
+          ? <><strong className="font-semibold text-on-surface">{oQueFoi(i.faixa, i.produto)}</strong>{' '}</>
           : <><strong className="font-semibold text-on-surface">Nunca recebeu oferta de produto nenhum.</strong>{' '}</>}
         {i.motivo}{i.contato ? ` · contato no cadastro: ${i.contato}` : ''}
       </p>

@@ -70,7 +70,7 @@ function Edicao({ aula: a }: { aula: Aula }) {
   const faltamVagas = Math.max(0, a.minimo_ao_vivo - a.vendas);
   const ligadas = a.ligacoes_faladas + a.ligacoes_nao_atenderam + a.ligacoes_nao_ligar;
 
-  const prazo = (n: number) => (n > 0 ? `faltam ${n} ${n === 1 ? 'dia' : 'dias'}` : n === 0 ? 'é hoje' : `passou há ${-n} ${n === -1 ? 'dia' : 'dias'}`);
+  const prazo = (n: number) => (n > 1 ? `faltam ${n} dias` : n === 1 ? 'falta 1 dia' : n === 0 ? 'é hoje' : `passou há ${-n} ${n === -1 ? 'dia' : 'dias'}`);
 
   return (
     <section aria-labelledby={`aula-${a.slug}`} className="space-y-4">
