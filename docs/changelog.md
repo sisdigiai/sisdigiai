@@ -2,16 +2,18 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
-## 2026-11-11 — Aba Ideias na página Receita (224) — RAMO `receita/aba-ideias`, NÃO INTEGRADO
+## 2026-11-11 — Aba Ideias na página Receita (224)
 
-- **Escrito pelo Agente de Receita em ramo próprio (R-051), a pedido do dono em 11/11.** Quem integra e publica é o agente do app. A migration 224 **não foi aplicada** e a tela **não foi vista no navegador** por quem escreveu.
+- **Escrita pelo Agente de Receita em ramo próprio (R-051) e publicada por ele mesmo, por ordem direta do dono no canal dele em 11/11 à noite ("publica tu").** O pedido de integração ao agente do app ficou sem resposta e o dono preferiu não esperar.
 - **O que é:** a página Receita ganha duas abas no endereço (`#/receita` e `#/receita/ideias[/<slug>]`). A aba Ideias mostra um card por ideia do Receita, com filtro por grupo, veredito e escolha, e a ficha completa de cada uma com os botões de escolha do dono (foco, depois, descartar).
-- **Duas portas de escrita, de propósito:** a ficha entra pela carga (`Cockpit/scripts/receita-ideias-sync.mjs`, lendo `Cockpit/receita/ideias/*.md`); a escolha só entra por pessoa logada. A função de escolher **recusa a identidade da carga** (prova 5 da 224) e regravar a ficha **não apaga a escolha** (prova 4).
+- **Duas portas de escrita, de propósito:** a ficha entra pela carga (`Cockpit/scripts/receita-ideias-sync.mjs`, lendo `Cockpit/receita/ideias/*.md`); a escolha só entra por pessoa logada. A função de escolher **recusa a identidade da carga** (prova 5) e regravar a ficha **não apaga a escolha** (prova 4).
+- **Aplicação:** ensaio com `begin … rollback` (as cinco provas passaram e nada ficou no banco), depois a aplicação com `commit`. Conferido no catálogo: tabela `receita.ideia` com RLS, view `v_receita_ideias` com `security_invoker=true`, duas funções. Carga: **48 fichas**, 8 seções cada, nenhuma com escolha.
 - **Roteador:** `moduleFromHash` passou a olhar só o primeiro trecho do endereço. Antes, `#/receita/qualquer-coisa` caía em Visão calado.
 - **A conta de cada ideia é texto, não número:** é hipótese do Receita e a tela não soma nem formata como dinheiro do placar.
-- **Conferido:** `tsc --noEmit` e `vite build` passam; a carga leu 48 fichas em modo de conferência; a lista e as 48 fichas foram renderizadas fora do navegador com o código real do componente (48 cards, 432 seções). **Não conferido:** o SQL da 224 no banco, a leitura pela view com login real e a tela em produção.
-- **Renumerada de 221 para 224 em 11/11 à noite:** o app publicou as migrations 221 a 223 depois de este ramo nascer. O ramo recebeu o `main` por merge (sem reescrever história) e nada mais mudou.
-- **Dúvida deixada para quem integra:** o portão da escolha é `is_staff()`. Se o papel do dono em `iam.users` for `founder`, trocar por `is_founder()` deixa a escolha só com ele; não conferi porque não leio este banco.
+- **Numeração:** nasceu como 221 e virou 224 antes de ser aplicada, porque o app publicou 221 a 223 no intervalo (regra 3 do README das migrations).
+- **Espelho:** a migration foi copiada para `docs/migrations/migrations/`. **O `schema.sql` não foi regenerado** (não conheço o gerador); fica para o agente do app, junto com a linha do módulo no `AGENTS.md`.
+- **Dúvida que continua do agente do app:** o portão da escolha é `is_staff()`. Se o papel do dono em `iam.users` for `founder`, trocar por `is_founder()` deixa a escolha só com ele.
+
 ## 2026-11-11 (noite) — A validade dos fatos passa a avisar sozinha (222)
 
 - **Revalidação que depende de alguém lembrar não é controle, é sorte.** Foi por acaso que eu achei os 20 fatos vencidos, e um deles era fonte única de preço de uma marca. Agora um job diário às **07h05 BRT** confere e escreve em `ops.controle_itens` como `agente='fatos'` — a porta que já leva à tela Controle. **Sem tabela nova e sem tela nova** (decisão do Geral, pela prioridade de receita).

@@ -1,8 +1,8 @@
 -- 224 — A página Receita ganha a aba Ideias, e a escolha de foco do dono vira dado (11/11/2026).
 --
 -- QUEM ESCREVEU: o Agente de Receita, em ramo próprio (`receita/aba-ideias`), por pedido do dono no canal
--- dele em 11/11/2026. Pela R-051 quem integra e publica é o agente do app: ESTA MIGRATION NÃO FOI APLICADA
--- por quem a escreveu. Ler antes de rodar.
+-- dele em 11/11/2026. APLICADA em 11/11/2026 à noite pelo próprio Receita, por ordem direta do dono no canal dele
+-- ("publica tu"), depois de um ensaio com rollback em que as cinco provas passaram. A carga rodou em seguida: 48 fichas.
 --
 -- O PROBLEMA: em dois dias o Receita escreveu 48 ideias em sete arquivos de rodada. O dono pediu um lugar
 -- só para ver todas, abrir a ficha completa de cada uma e ESCOLHER o que a casa foca. Sem isso a escolha
@@ -219,3 +219,9 @@ begin
     raise exception 'PROVA_224_FALHOU: a carga conseguiu escolher o foco — a porta da escolha esta aberta para agente';
   end if;
 end $$;
+
+-- ─────────────────────────────────────────────────────────────── a quem serve cada porta (regra 5 do README)
+
+comment on view public.v_receita_ideias is 'Consumidor: página Receita do app digiai, aba Ideias, e qualquer agente que precise saber o foco escolhido. Grant: select a authenticated, porque a view é invoker e a RLS de receita.ideia já limita a staff.';
+comment on function public.rpc_receita_gravar_ideia(text, text, integer, text, text, text, text, text, text, text, text, jsonb) is 'Consumidor: a carga Cockpit/scripts/receita-ideias-sync.mjs e staff. Grant: execute a authenticated, porque o portão está dentro (is_staff ou a identidade da carga). Não toca nas colunas da escolha.';
+comment on function public.rpc_receita_escolher_ideia(text, text, text) is 'Consumidor: o botão de escolha da aba Ideias. Grant: execute a authenticated, porque o portão está dentro (só is_staff). A carga é recusada de propósito: quem prepara a lista não decide o foco.';
