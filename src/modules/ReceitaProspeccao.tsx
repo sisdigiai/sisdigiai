@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AlertTriangle, Phone } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Aviso, Carregando, quando } from './ReceitaIdeias';
+import { Coluna, ComoLer, Quadro, Tile, TituloSecao } from './ReceitaUI';
 
 // Aba Prospecção da página Receita (migration 228; pedido do dono em 12/11/2026).
 //
@@ -10,6 +11,9 @@ import { Aviso, Carregando, quando } from './ReceitaIdeias';
 // ETAPA e o TOQUE só entram por pessoa logada, aqui. Agente não diz que alguém ligou.
 //
 // Nada nesta tela ENVIA nada: registrar um toque é anotar o que já foi feito por telefone, e-mail ou visita.
+//
+// 12/11, redesenho: as 20 empresas viraram um QUADRO por etapa (onde cada uma está agora). Tocar numa
+// empresa abre a ficha dela embaixo, com os dois formulários. A lista de vinte cartões escritos saiu.
 
 type Etapa = 'nao_iniciada' | 'ligada' | 'canal_obtido' | 'em_sequencia' | 'respondeu'
   | 'conversa_marcada' | 'dia_marcado' | 'recusou' | 'nao_contatar';
@@ -49,6 +53,7 @@ export default function ReceitaProspeccao() {
   const [empresas, setEmpresas] = useState<Empresa[] | null>(null);
   const [toques, setToques] = useState<Toque[]>([]);
   const [erro, setErro] = useState<string | null>(null);
+  const [aberta, setAberta] = useState<string | null>(null);
 
   const carregar = async () => {
     const [e, t] = await Promise.all([
@@ -84,55 +89,78 @@ export default function ReceitaProspeccao() {
   }
 
   const conta = (f: (e: Empresa) => boolean) => empresas.filter(f).length;
-  const numeros: [string, number][] = [
-    ['Empresas na leva', empresas.length],
-    ['Com algum toque', conta((e) => e.toques > 0)],
-    ['Com canal de quem decide', conta((e) => !!e.canal_decisor)],
-    ['Houve contato', conta((e) => e.contatos > 0)],
-    ['Conversa ou dia marcado', conta((e) => e.etapa === 'conversa_marcada' || e.etapa === 'dia_marcado')],
-    ['Recusaram ou não contatar', conta((e) => e.etapa === 'recusou' || e.etapa === 'nao_contatar')],
+  const total = empresas.length;
+  const escolhida = empresas.find((e) => e.slug === aberta) ?? null;
+  // Onde cada empresa está AGORA. Uma empresa vive em uma coluna só.
+  const colunas: { titulo: string; etapas: Etapa[]; tom?: 'bom' | 'ruim' | 'atencao' }[] = [
+    { titulo: 'Não iniciada', etapas: ['nao_iniciada'] },
+    { titulo: 'Ligada, sem canal', etapas: ['ligada'], tom: 'atencao' },
+    { titulo: 'Canal de quem decide', etapas: ['canal_obtido'] },
+    { titulo: 'Recebendo os toques', etapas: ['em_sequencia'] },
+    { titulo: 'Respondeu', etapas: ['respondeu'], tom: 'bom' },
+    { titulo: 'Conversa ou dia marcado', etapas: ['conversa_marcada', 'dia_marcado'], tom: 'bom' },
+    { titulo: 'Fora', etapas: ['recusou', 'nao_contatar'], tom: 'ruim' },
   ];
 
   return (
-    <div className="space-y-4">
-      <p className="text-[13px] text-muted max-w-3xl">
-        A primeira leva da prospecção a empresas: quem já foi tocada, por qual canal, quem respondeu e qual é
-        o próximo passo. Aqui se anota o que foi feito; nada é enviado por esta tela.
-      </p>
-
-      <dl className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2">
-        {numeros.map(([r, n]) => (
-          <div key={r} className="border border-outline/15 bg-surface-container p-3">
-            <dt className="font-mono text-[9px] uppercase tracking-wider text-muted">{r}</dt>
-            <dd className="mt-1 font-serif text-2xl text-on-surface tabular-nums">{n}</dd>
-          </div>
-        ))}
+    <div className="space-y-5">
+      <dl className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <Tile rotulo="Empresas tocadas" valor={`${conta((e) => e.toques > 0)} de ${total}`} de={{ feito: conta((e) => e.toques > 0), total }} />
+        <Tile rotulo="Com canal de quem decide" valor={`${conta((e) => !!e.canal_decisor)} de ${total}`} de={{ feito: conta((e) => !!e.canal_decisor), total }} />
+        <Tile rotulo="Houve contato" valor={`${conta((e) => e.contatos > 0)} de ${total}`} de={{ feito: conta((e) => e.contatos > 0), total }} />
+        <Tile rotulo="Conversa ou dia marcado" valor={String(conta((e) => e.etapa === 'conversa_marcada' || e.etapa === 'dia_marcado'))}
+              tom={conta((e) => e.etapa === 'conversa_marcada' || e.etapa === 'dia_marcado') > 0 ? 'bom' : 'neutro'}
+              nota="é o que vira venda" />
       </dl>
 
-      <Aviso tom="warning">
-        Nenhuma destas empresas publica e-mail de RH, benefícios ou segurança: o primeiro toque de cada uma é uma
-        ligação para perguntar quem cuida disso e qual é o e-mail. O e-mail e o WhatsApp automáticos ainda não
-        estão ligados. Ecolab, Kimberly-Clark e Suzano S/A não entram em leva nenhuma, e o banco recusa as três.
-      </Aviso>
+      {erro && <Aviso tom="danger">Parte da tela não carregou ({erro}).</Aviso>}
+
+      <div>
+        <TituloSecao>Onde cada empresa está</TituloSecao>
+        <Quadro rotulo="Empresas da prospecção, por etapa">
+          {colunas.map((c) => {
+            const lista = empresas.filter((e) => c.etapas.includes(e.etapa));
+            return (
+              <Coluna key={c.titulo} titulo={c.titulo} n={lista.length} tom={c.tom ?? 'neutro'} vazio="nenhuma" largura="w-[210px] min-w-[210px]">
+                {lista.map((e) => (
+                  <li key={e.slug}>
+                    <button type="button" aria-pressed={aberta === e.slug} onClick={() => setAberta(aberta === e.slug ? null : e.slug)}
+                            className={`min-h-[44px] w-full px-3 py-2 text-left hover:bg-surface-high ${foco} ${aberta === e.slug ? 'bg-surface-high' : ''}`}>
+                      <span className="block text-[13px] leading-snug text-on-surface">{e.empresa}</span>
+                      <span className="block font-mono text-[9px] uppercase tracking-wider text-muted tabular-nums">
+                        {e.cidade ?? '—'} · {e.toques} {e.toques === 1 ? 'toque' : 'toques'}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </Coluna>
+            );
+          })}
+        </Quadro>
+      </div>
+
+      {escolhida
+        ? <Linha key={escolhida.slug} empresa={escolhida} toques={toques.filter((t) => t.empresa_slug === escolhida.slug)} aoMudar={carregar} aoFechar={() => setAberta(null)} />
+        : <p className="border border-dashed border-outline/30 p-4 text-[13px] text-muted">Toca numa empresa do quadro para ver o telefone, anotar um toque ou mudar a etapa.</p>}
 
       <div className="flex flex-wrap gap-2">
         <a href="#/receita/pacotes/prospeccao-b2b" className={`${botao} border-outline/30 text-on-surface hover:bg-surface-highest`}>O pacote</a>
         <a href="#/receita/pacotes/prospeccao-b2b/toques.md" className={`${botao} border-outline/30 text-on-surface hover:bg-surface-highest`}>Os textos dos toques</a>
       </div>
 
-      {erro && <Aviso tom="danger">Parte da tela não carregou ({erro}).</Aviso>}
-
-      <ol className="space-y-3">
-        {empresas.map((e) => (
-          <Linha key={e.slug} empresa={e} toques={toques.filter((t) => t.empresa_slug === e.slug)} aoMudar={carregar} />
-        ))}
-      </ol>
+      <ComoLer>
+        <p>Aqui se anota o que já foi feito por telefone, e-mail ou visita. <strong className="font-semibold text-on-surface">Nada é enviado por esta tela.</strong></p>
+        <p>Nenhuma destas empresas publica e-mail de RH, benefícios ou segurança: o primeiro toque de cada uma é uma ligação para perguntar quem cuida disso e qual é o e-mail.</p>
+        <p>O e-mail e o WhatsApp automáticos ainda não estão ligados. Quando estiverem, os envios de e-mail ficam em outro banco e não aparecem aqui.</p>
+        <p>Ecolab, Kimberly-Clark e Suzano S/A pediram para sair e não entram em leva nenhuma: o banco recusa as três.</p>
+      </ComoLer>
     </div>
   );
 }
 
-function Linha({ empresa: e, toques, aoMudar }: { empresa: Empresa; toques: Toque[]; aoMudar: () => Promise<void> }) {
-  const [aberta, setAberta] = useState(false);
+function Linha({ empresa: e, toques, aoMudar, aoFechar }: { empresa: Empresa; toques: Toque[]; aoMudar: () => Promise<void>; aoFechar: () => void }) {
+  // A ficha já nasce aberta: quem tocou no quadro quer agir.
+  const aberta = true;
   const [etapa, setEtapa] = useState<Etapa>(e.etapa);
   const [canalDecisor, setCanalDecisor] = useState(e.canal_decisor ?? '');
   const [proximo, setProximo] = useState(e.proximo_passo ?? '');
@@ -167,7 +195,7 @@ function Linha({ empresa: e, toques, aoMudar }: { empresa: Empresa; toques: Toqu
   const bloqueada = e.etapa === 'nao_contatar';
 
   return (
-    <li className="border border-outline/15 bg-surface-container p-4 space-y-3">
+    <section aria-label={`Ficha de ${e.empresa}`} className="border border-action/40 bg-surface-container p-4 space-y-3">
       <div className="flex flex-wrap items-center gap-2">
         <span className="font-mono text-[10px] uppercase tracking-wider text-muted tabular-nums">{String(e.ordem).padStart(2, '0')}</span>
         <span className={`border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider ${ETAPA[e.etapa]?.classe ?? 'border-outline/30 text-muted'}`}>
@@ -200,9 +228,8 @@ function Linha({ empresa: e, toques, aoMudar }: { empresa: Empresa; toques: Toqu
         {e.etapa_em && <Par r="Etapa marcada por">{e.etapa_por} em {quando(e.etapa_em)}{e.etapa_nota ? ` · “${e.etapa_nota}”` : ''}</Par>}
       </dl>
 
-      <button type="button" aria-expanded={aberta} onClick={() => setAberta((v) => !v)}
-              className={`${botao} ${aberta ? 'border-action bg-action text-on-action' : 'border-outline/30 text-on-surface hover:bg-surface-highest'}`}>
-        {aberta ? 'Fechar' : 'Anotar toque ou mudar etapa'}
+      <button type="button" onClick={aoFechar} className={`${botao} border-outline/30 text-on-surface hover:bg-surface-highest`}>
+        Fechar a ficha
       </button>
 
       {aberta && (
@@ -274,7 +301,7 @@ function Linha({ empresa: e, toques, aoMudar }: { empresa: Empresa; toques: Toqu
           )}
         </div>
       )}
-    </li>
+    </section>
   );
 }
 

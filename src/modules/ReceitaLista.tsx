@@ -3,6 +3,7 @@ import { AlertTriangle, Check, Phone, PhoneMissed, PhoneOff } from 'lucide-react
 import { supabase } from '../lib/supabase';
 import ToqueVenda from '../components/ToqueVenda';
 import { Aviso, Carregando, quando } from './ReceitaIdeias';
+import { Barra, ComoLer, Tile } from './ReceitaUI';
 
 // Aba Lista do dia da página Receita (migration 227; pedido do dono em 12/11/2026).
 //
@@ -106,22 +107,19 @@ export default function ReceitaLista() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <p className="text-[13px] text-muted max-w-3xl">
-          As óticas para ligares hoje, das 9h às 11h. A lista sai sozinha às 08h, de segunda a sábado: primeiro
-          quem mostrou interesse, depois quem respondeu, depois quem recebeu WhatsApp e não respondeu. Quem
-          a esteira do marketing vai tocar hoje fica de fora.
-        </p>
-        <p className="mt-2 font-mono text-[11px] uppercase tracking-wider text-on-surface-variant tabular-nums">
-          {diaEscrito(dia)} · {itens.length} na lista · {faladas} faladas · {semResposta} não atenderam · {faltam} por ligar
-        </p>
-        {itens.length > 0 && (
-          <p className="mt-1 font-mono text-[11px] uppercase tracking-wider text-on-surface-variant tabular-nums">
-            produto oferecido pelo marketing: {porProduto('osi')} OSI · {porProduto('clearix')} Clearix
-            {itens.some((i) => !i.produto) && ` · ${itens.filter((i) => !i.produto).length} nunca abordadas`}
-          </p>
-        )}
-      </div>
+      <dl className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <Tile rotulo={`Para ligar hoje, ${diaEscrito(dia).slice(0, 5)}`} valor={`${itens.length - faltam} de ${itens.length}`}
+              de={{ feito: itens.length - faltam, total: Math.max(1, itens.length) }} nota="das 9h às 11h" />
+        <Tile rotulo="Faladas" valor={String(faladas)} tom={faladas > 0 ? 'bom' : 'neutro'} />
+        <Tile rotulo="Não atenderam" valor={String(semResposta)} nota="voltam em dois dias" />
+        <div className="border border-outline/15 bg-surface-container p-3">
+          <dt className="font-mono text-[9px] uppercase tracking-wider text-muted">Produto oferecido a cada uma</dt>
+          <dd>
+            <Barra feito={porProduto('osi')} total={Math.max(1, itens.length)} rotulo="OSI" />
+            <Barra feito={porProduto('clearix')} total={Math.max(1, itens.length)} rotulo="Clearix" tom="atencao" />
+          </dd>
+        </div>
+      </dl>
 
       <div className="flex flex-wrap items-center gap-2">
         <a href="#/receita/pacotes/aula-paga/pecas.md" className={`${botao} border-outline/30 text-on-surface hover:bg-surface-highest`}>
@@ -129,12 +127,12 @@ export default function ReceitaLista() {
         </a>
       </div>
 
-      <Aviso tom="warning">
-        Cada ótica recebeu a oferta de UM produto, e está escrito em qual. O roteiro abaixo é o do convite
-        para a aula, que é um terceiro assunto: quem atender vai lembrar da OSI ou do Clearix, não da aula.
-        O telefone é o que a loja publica no Google: quem atende pode não ser o dono. Se pedirem para não
-        ligar mais, clica em “Não ligar mais” e a ótica nunca volta para a lista.
-      </Aviso>
+      <ComoLer titulo="Antes de ligar (como a lista funciona)">
+        <p>A lista sai sozinha às 08h, de segunda a sábado: primeiro quem mostrou interesse, depois quem respondeu, depois quem recebeu WhatsApp e não respondeu. Quem o marketing vai tocar por WhatsApp hoje fica de fora.</p>
+        <p><strong className="font-semibold text-on-surface">Cada ótica recebeu a oferta de um produto só</strong>, e está escrito em qual. O roteiro é o do convite para a aula, um terceiro assunto: quem atender vai lembrar da OSI ou do Clearix, não da aula.</p>
+        <p>O telefone é o que a loja publica no Google: quem atende pode não ser o dono.</p>
+        <p>“Não atendeu” volta depois de dois dias, no máximo três vezes. “Não ligar mais” tira a ótica da lista para sempre. O que não ligares hoje volta amanhã.</p>
+      </ComoLer>
 
       {itens.length === 0 ? (
         <div className="space-y-3">
@@ -207,7 +205,7 @@ function Linha({ item: i, aoMudar }: { item: Item; aoMudar: () => PromiseLike<un
         {i.produto
           ? <><strong className="font-semibold text-on-surface">{oQueFoi(i.faixa, i.produto)}</strong>{' '}</>
           : <><strong className="font-semibold text-on-surface">Nunca recebeu oferta de produto nenhum.</strong>{' '}</>}
-        {i.motivo}{i.contato ? ` · contato no cadastro: ${i.contato}` : ''}
+        {i.produto ? i.motivo.split('; ').slice(1).join('; ') : i.motivo}{i.contato ? ` · contato no cadastro: ${i.contato}` : ''}
       </p>
 
       {i.resultado && i.resultado_em ? (

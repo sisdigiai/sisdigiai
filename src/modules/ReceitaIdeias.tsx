@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AlertTriangle, ArrowLeft, Crosshair, Lightbulb } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { ComoLer, Tile } from './ReceitaUI';
 
 // Aba Ideias da página Receita (migration 224; pedido do dono em 11/11/2026).
 //
@@ -143,15 +144,16 @@ function Lista({ ideias }: { ideias: Ideia[] }) {
 
   return (
     <div className="space-y-4">
-      <div>
-        <p className="text-[13px] text-muted max-w-3xl">
-          Todas as ideias do Agente de Receita, com a ficha completa de cada uma. A conta de cada card é
-          hipótese, salvo quando diz “medido”. Abre a ficha para escolher o que a casa foca.
-        </p>
-        <p className="mt-2 font-mono text-[11px] uppercase tracking-wider text-on-surface-variant tabular-nums">
-          {ideias.length} ideias · {emFoco} em foco · {semEscolha} sem escolha
-        </p>
-      </div>
+      <dl className="grid grid-cols-3 gap-2 max-w-2xl">
+        <Tile rotulo="Ideias" valor={String(ideias.length)} />
+        <Tile rotulo="Em foco" valor={String(emFoco)} tom={emFoco > FOCO_DEMAIS ? 'atencao' : emFoco > 0 ? 'bom' : 'neutro'} nota="escolha tua" />
+        <Tile rotulo="Sem escolha" valor={String(semEscolha)} de={{ feito: ideias.length - semEscolha, total: ideias.length }} nota="abre a ficha para escolher" />
+      </dl>
+
+      <ComoLer>
+        <p>Todas as ideias do Agente de Receita, com a ficha completa de cada uma. Abre a ficha para escolher o que a casa foca, deixa para depois ou descarta.</p>
+        <p><strong className="font-semibold text-on-surface">A conta de cada card é hipótese</strong>, salvo quando o texto diz “medido”. Por isso ela aparece como texto e nunca é somada.</p>
+      </ComoLer>
 
       {emFoco > FOCO_DEMAIS && (
         <Aviso tom="warning">

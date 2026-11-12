@@ -2,6 +2,18 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-12 — A página Receita deixa de ser texto: quadro, barra, funil e linha do tempo (229)
+
+- **Escrita, aplicada e publicada pelo Agente de Receita**, por pedido direto do dono no canal dele em 12/11: "vamos focar na aula, o que falta?" e "ficou feio o que estamos fazendo, muita coisa escrita, é complicado para entender; tu ou o agente do digiai tem que resolver isso".
+- **A regra nova da página:** o número e o estado aparecem como forma (tile, barra, quadro, funil, linha do tempo); a explicação fica num "como ler", fechado por padrão. Peças em `src/modules/ReceitaUI.tsx`, só HTML e CSS com os tokens do app, sem biblioteca de gráfico. Nenhuma forma informa só por cor: toda barra tem o número escrito.
+- **Aula:** quadro de passos em três colunas (só tu fazes · dos outros ou travado · pronto), faixa "para hoje ou amanhã", linha do tempo e funil do convite à vaga. Os passos vêm da coluna nova `receita.aula.passos` (migration 229), carregada da tabela "Passos até a aula" do pacote por `rpc_receita_gravar_aula_passos`.
+- **Placar:** as nove seções escritas viraram a meta em quatro números, as três linhas, as frentes em quadro (em curso · congeladas · encerradas), o funil das óticas **por produto** (OSI e Clearix lado a lado, lido de `v_mkt_funil_leads`) e as rotinas com estado. O módulo saiu de `Receita.tsx` para `ReceitaPlacar.tsx`. A seção de funil antiga (`v_receita_funil`, que subestimava) deixou de ser usada pela tela.
+- **Prospecção:** as vinte fichas escritas viraram um quadro por etapa; tocar numa empresa abre a ficha dela embaixo.
+- **Lista do dia e Ideias:** o parágrafo do topo virou tiles; na lista, uma barra mostra quantas óticas são da OSI e quantas do Clearix.
+- **Abas:** nova ordem pelo uso (Placar, Aula, Lista do dia, Prospecção, Ideias, Pacotes), com ícone.
+- **O que não mudou:** nenhuma regra de dado. "Não medido" continua não sendo zero; produto da aula não criado continua dito como tal; etapa, toque, escolha e resultado continuam só por pessoa logada.
+- **Espelho:** migration copiada para `docs/migrations/migrations/`. **Próximo número livre: 230.**
+
 ## 2026-11-12 — Controle da prospecção e da aula na página Receita; a Lista do dia diz o produto (228)
 
 - **Escrita, aplicada e publicada pelo Agente de Receita**, por dois pedidos diretos do dono no canal dele em 12/11: "agora coloca o controle da prospecção e da aula no app" e, ao ver a lista no ar, "temos 2 produtos sendo oferecidos; em qual produto se interessou?".
