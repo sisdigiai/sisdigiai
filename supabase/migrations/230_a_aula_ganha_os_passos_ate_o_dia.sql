@@ -1,9 +1,11 @@
--- 229 — A aula ganha os passos até o dia, para a aba Aula virar quadro em vez de texto (12/11/2026).
+-- 230 — A aula ganha os passos até o dia, para a aba Aula virar quadro em vez de texto (12/11/2026).
 --
 -- QUEM ESCREVEU: o Agente de Receita, em ramo próprio (`receita/pagina-visual`), por pedido do dono no canal
 -- dele em 12/11/2026 ("vamos focar na aula, o que falta?" e "ficou feio o que estamos fazendo, muita coisa
 -- escrita, é complicado para entender").
 -- APLICADA em 12/11/2026 pelo próprio Receita, depois de ensaio com rollback em que as duas provas passaram.
+-- NUMERAÇÃO: nasceu como 229 e virou 230 antes de ir ao repositório, porque o agente do app publicou a 229
+-- dele (o funil da página) no intervalo. O banco não guarda o número; o conteúdo aplicado é este.
 --
 -- O PROBLEMA: "o que falta para a aula" estava espalhado em três tabelas de um arquivo do Cockpit e em
 -- parágrafos da tela. O dono precisa ver de relance o que é dele, o que é dos outros e o que está pronto.
@@ -89,14 +91,14 @@ declare v integer;
 begin
   if not exists (select 1 from pg_class c join pg_namespace s on s.oid = c.relnamespace
                   where s.nspname = 'public' and c.relname = 'v_receita_aula' and c.reloptions @> array['security_invoker=true']) then
-    raise exception 'PROVA_229_FALHOU: v_receita_aula perdeu o security_invoker';
+    raise exception 'PROVA_230_FALHOU: v_receita_aula perdeu o security_invoker';
   end if;
   set local role authenticated;
   select count(slug || passos::text || vendas::text) into v from public.v_receita_aula;
   reset role;
 exception when others then
   reset role;
-  raise exception 'PROVA_229_FALHOU: authenticated nao le passos na view: %', sqlerrm;
+  raise exception 'PROVA_230_FALHOU: authenticated nao le passos na view: %', sqlerrm;
 end $$;
 
 -- PROVA 2 — anon não executa; passo com estado inventado é recusado; passo certo entra e volta pela view.
@@ -104,27 +106,27 @@ do $$
 declare recusou boolean := false; v record;
 begin
   if has_function_privilege('anon', 'public.rpc_receita_gravar_aula_passos(text, jsonb)', 'execute') then
-    raise exception 'PROVA_229_FALHOU: anon executa a gravacao dos passos';
+    raise exception 'PROVA_230_FALHOU: anon executa a gravacao dos passos';
   end if;
-  perform public.rpc_receita_gravar_aula('prova-229', 'Aula de prova', now() + interval '10 days', 97, 3,
-    current_date + 8, current_date + 1, 'produto que nao existe 229', false, null, false);
+  perform public.rpc_receita_gravar_aula('prova-230', 'Aula de prova', now() + interval '10 days', 97, 3,
+    current_date + 8, current_date + 1, 'produto que nao existe 230', false, null, false);
   begin
-    perform public.rpc_receita_gravar_aula_passos('prova-229', '[{"ordem":1,"passo":"x","quem":"dono","estado":"quase"}]'::jsonb);
+    perform public.rpc_receita_gravar_aula_passos('prova-230', '[{"ordem":1,"passo":"x","quem":"dono","estado":"quase"}]'::jsonb);
   exception when others then recusou := true;
   end;
-  perform public.rpc_receita_gravar_aula_passos('prova-229',
+  perform public.rpc_receita_gravar_aula_passos('prova-230',
     '[{"ordem":1,"passo":"criar o produto","quem":"dono","ate":"2026-11-13","estado":"falta","nota":null},
       {"ordem":2,"passo":"agendar os posts","quem":"MKT","ate":null,"estado":"travado","nota":"espera o link"}]'::jsonb);
-  select jsonb_array_length(passos) as n, passos #>> '{1,estado}' as segundo into v from public.v_receita_aula where slug = 'prova-229';
-  delete from receita.aula where slug = 'prova-229';
+  select jsonb_array_length(passos) as n, passos #>> '{1,estado}' as segundo into v from public.v_receita_aula where slug = 'prova-230';
+  delete from receita.aula where slug = 'prova-230';
   if not recusou then
-    raise exception 'PROVA_229_FALHOU: passo com estado inventado foi aceito';
+    raise exception 'PROVA_230_FALHOU: passo com estado inventado foi aceito';
   end if;
   if v.n <> 2 or v.segundo <> 'travado' then
-    raise exception 'PROVA_229_FALHOU: os passos nao voltaram pela view (%, %)', v.n, v.segundo;
+    raise exception 'PROVA_230_FALHOU: os passos nao voltaram pela view (%, %)', v.n, v.segundo;
   end if;
-  if exists (select 1 from receita.aula where slug like 'prova-229%') then
-    raise exception 'PROVA_229_FALHOU: sobrou linha de prova';
+  if exists (select 1 from receita.aula where slug like 'prova-230%') then
+    raise exception 'PROVA_230_FALHOU: sobrou linha de prova';
   end if;
 end $$;
 

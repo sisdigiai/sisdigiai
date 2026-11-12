@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { Aviso, Carregando, quando } from './ReceitaIdeias';
 import { botao, brl, Coluna, ComoLer, diaCurto, diaEscrito, diasAte, emDias, foco, Funil, hojeBrt, Quadro, Tile, TituloSecao } from './ReceitaUI';
 
-// Aba Aula da página Receita (migrations 228 e 229).
+// Aba Aula da página Receita (migrations 228 e 230).
 //
 // Uma pergunta só: O QUE FALTA PARA A AULA ACONTECER, E DE QUEM É. Por isso a tela é um quadro de passos
 // (o que é teu, o que é dos outros, o que está pronto), uma linha do tempo e um funil — e o texto ficou
@@ -41,7 +41,7 @@ export default function ReceitaAula() {
     const semBanco = /v_receita_aula|does not exist|schema cache/i.test(erro);
     return (
       <Aviso tom="danger">
-        {semBanco ? 'A aba Aula ainda não está ligada ao banco: falta aplicar as migrations 228 e 229 e rodar a carga do controle.' : 'A aula não carregou.'}{' '}
+        {semBanco ? 'A aba Aula ainda não está ligada ao banco: falta aplicar as migrations 228 e 230 e rodar a carga do controle.' : 'A aula não carregou.'}{' '}
         <span className="font-mono text-[11px]">({erro})</span>
       </Aviso>
     );
