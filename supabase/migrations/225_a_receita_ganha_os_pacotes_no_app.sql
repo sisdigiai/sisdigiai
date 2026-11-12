@@ -2,6 +2,8 @@
 --
 -- QUEM ESCREVEU: o Agente de Receita, em ramo próprio (`receita/pacotes-no-app`), por pedido do dono no
 -- canal dele em 12/11/2026 ("coloca os detalhes dos pacotes no app também").
+-- APLICADA em 12/11/2026 pelo próprio Receita, depois de dois ensaios com rollback em que as cinco provas
+-- passaram. A carga rodou em seguida: 8 pacotes, 17 documentos.
 --
 -- O PROBLEMA: a ficha de ideia (224) diz "o detalhe está em `receita/pacotes/<nome>/`", e o dono não abre
 -- pasta do Cockpit: lê o app. Os textos de cada pacote (o plano, as peças, as listas, os testes) ficavam
