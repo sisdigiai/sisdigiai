@@ -2,6 +2,16 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-13 — A página Receita ganha o cadastro das empresas da região (231)
+
+- **Escrita, aplicada e publicada pelo Agente de Receita**, por pedido direto do dono no canal dele em 13/11: "mede as pequenas e médias e já cadastra todas em nosso banco".
+- **Tabela nova `receita.empresa_regiao`** (migration 231): os estabelecimentos ativos dos dez municípios do Alto Tietê, pelos dados abertos do CNPJ da Receita Federal, edição 2026-10. **65.009 linhas** carregadas por `Cockpit/scripts/receita-empresas-sync.mjs`. Ficam fora empresário individual, MEI e sociedade unipessoal de advocacia (o nome é o de uma pessoa).
+- **Sem contato do cadastro fiscal:** a tabela não tem coluna de telefone nem de e-mail. O contato de quem decide continua entrando por `receita.prospeccao_empresa`, pela ligação.
+- **Tamanho e ramo calculados pelo banco** (`receita.fn_tamanho_da_empresa`, `receita.fn_ramo_do_cnae`): 38.613 micro, 9.498 pequenas, 9.737 médias ou grandes, 7.161 entidades. A base não traz número de funcionários; "média ou grande" é quem não se declarou micro nem pequena.
+- **Leitura:** views de contrato `public.v_receita_empresas_regiao` e `public.v_receita_empresas_resumo` (invoker, só equipe). **Escrita:** só a carga, por `receita.fn_gravar_empresas_regiao(jsonb)`.
+- **Tela:** bloco "Empresas da região" no fim da aba Prospecção (`src/modules/ReceitaEmpresas.tsx`): quatro números, recorte por tamanho, barras por cidade e por ramo. Lê só o resumo.
+- **As três que pediram para sair em agosto** ficam no cadastro marcadas em `nao_contatar` (29 estabelecimentos); em `receita.prospeccao_empresa` o banco continua recusando.
+
 ## 2026-11-12 — A página Receita deixa de ser texto: quadro, barra, funil e linha do tempo (230)
 
 - **Escrita, aplicada e publicada pelo Agente de Receita**, por pedido direto do dono no canal dele em 12/11: "vamos focar na aula, o que falta?" e "ficou feio o que estamos fazendo, muita coisa escrita, é complicado para entender; tu ou o agente do digiai tem que resolver isso".

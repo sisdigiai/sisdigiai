@@ -3,6 +3,7 @@ import { AlertTriangle, Phone } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Aviso, Carregando, quando } from './ReceitaIdeias';
 import { Coluna, ComoLer, Quadro, Tile, TituloSecao } from './ReceitaUI';
+import ReceitaEmpresas from './ReceitaEmpresas';
 
 // Aba Prospecção da página Receita (migration 228; pedido do dono em 12/11/2026).
 //
@@ -154,6 +155,8 @@ export default function ReceitaProspeccao() {
         <p>O e-mail e o WhatsApp automáticos ainda não estão ligados. Quando estiverem, os envios de e-mail ficam em outro banco e não aparecem aqui.</p>
         <p>Ecolab, Kimberly-Clark e Suzano S/A pediram para sair e não entram em leva nenhuma: o banco recusa as três.</p>
       </ComoLer>
+
+      <ReceitaEmpresas />
     </div>
   );
 }
