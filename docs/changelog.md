@@ -82,6 +82,16 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Espelho:** a migration foi copiada para `docs/migrations/migrations/`. **O `schema.sql` não foi regenerado** (não conheço o gerador); fica para o agente do app, junto com a linha do módulo no `AGENTS.md`.
 - **Dúvida que continua do agente do app:** o portão da escolha é `is_staff()`. Se o papel do dono em `iam.users` for `founder`, trocar por `is_founder()` deixa a escolha só com ele.
 
+## 2026-11-14 (noite) — Dossiê e pitch por lead: a base no banco (232)
+
+- **Modelo B, e recusei o A.** A ordem dava a opção de guardar o dossiê no `notes` do lead. `notes` é texto livre — exatamente o que esta casa passou a semana desentupindo: bloco de prosa que a tela lê com expressão regular, que ninguém compara entre dois leads e que não tem onde marcar fonte. O dono está abrindo campanha dirigida; isto vai repetir, e o que repete merece forma.
+- **A trava de LGPD virou coisa do banco, não do comentário.** As chaves de primeiro nível do dossiê são **lista fechada**: `religiao`, `familia` ou `cpf` **não entram — o insert falha**. Campo novo exige migration, e quem escreve uma migration pensa. A **prova 1** recusa a migration se a trava parar de travar.
+- **E o limite dela fica escrito, para ninguém se enganar:** o banco controla a **forma**, não a prosa. Nada impede alguém de escrever algo pessoal dentro de `observacao`. A trava evita o acidente de criar um campo para isso; não substitui a regra nem a revisão. Dizer o contrário seria conforto falso.
+- **O app não envia, e agora isso é verificável:** nenhuma das três funções fala com a rede, e a **prova 4** recusa a migration se alguém acrescentar um `net.http_post` a elas. O status `enviado_pelo_dono` é o dono dizendo que mandou — a máquina não tem como saber, e fingir que sabe seria inventar envio.
+- **Um tropeço meu virou prova.** Eu havia escrito a prova 2 chamando a RPC para testar ida e volta; a migration recusou, porque ela roda como `postgres` e `is_staff()` é falso ali. A tentação era alargar o portão para o teste passar. **Não alarguei** — portão que cede para caber num teste deixa de ser portão. A prova 2 passou a verificar justamente a **recusa**, e a ida e volta foi testada por outro caminho.
+- **`fontes` é obrigatório na leitura da tela:** a view marca `sem_fonte`. Dossiê sem fonte não é pesquisa, é lembrança.
+- **Falta a tela** (aba Dossiê + botão de gerar pitch no módulo Comercial) e portar o caso Capobianco como exemplo. A base está de pé e provada.
+
 ## 2026-11-14 (tarde) — A proposta gerada passa a oferecer o que a casa faz
 
 - **Risco achado pelo Orquestrador Geral, antes de o dono mandar um pitch pronto.** `proposalGen.ts` montava o corpo com **"Teste de 90 dias"**, **"30% OFF nos 3 primeiros meses"**, "implantação isenta no teste" e um **"acesso de demonstração" autosserviço**. A casa **não faz nada disso desde 24/09/2026**.
