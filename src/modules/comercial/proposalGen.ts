@@ -13,9 +13,11 @@ import type { Proposal } from '../../lib/proposalStore';
 //
 // Desconto deixou de ser padrão: só entra no corpo se alguém escrever um na proposta.
 //
-// ⚠ NÚMERO SEM FONTE NA FOLHA: os planos abaixo são constante do app desde 18/06 e 899 e 1499 NÃO estão na
-// folha única — o que a folha sustenta publicamente é "a partir de R$ 349/mês". Enquanto não entrarem lá,
-// proposta que sair com 899 ou 1499 publica número que a casa não ratificou. Avisado ao Geral em 14/11.
+// Preços: folha única, seção "Preços dos planos" (registrada em 14/11/2026). Eu havia marcado 899 e 1499
+// como número sem fonte; o Geral mediu a landing e o achado era lacuna DA FOLHA, não do app — os três
+// estão públicos em clearix.app.br desde 01/06/2026. Ficaram registrados lá como estão no ar, e a
+// **ratificação do dono ainda falta** (item 139 da lista dele). Proposta cita os três sempre com o nome do
+// plano; desconto e período grátis continuam fora. Se um valor mudar, muda na folha primeiro e aqui depois.
 export const PLAN_PRICE: Record<string, number> = { Essencial: 349, Controle: 899, Crescimento: 1499 };
 export const CONSULTOR = { nome: 'Gilberto (Junior)', whatsapp: '(11) 98602-7415' };
 
