@@ -82,6 +82,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Espelho:** a migration foi copiada para `docs/migrations/migrations/`. **O `schema.sql` não foi regenerado** (não conheço o gerador); fica para o agente do app, junto com a linha do módulo no `AGENTS.md`.
 - **Dúvida que continua do agente do app:** o portão da escolha é `is_staff()`. Se o papel do dono em `iam.users` for `founder`, trocar por `is_founder()` deixa a escolha só com ele.
 
+## 2026-11-14 (tarde) — A proposta gerada passa a oferecer o que a casa faz
+
+- **Risco achado pelo Orquestrador Geral, antes de o dono mandar um pitch pronto.** `proposalGen.ts` montava o corpo com **"Teste de 90 dias"**, **"30% OFF nos 3 primeiros meses"**, "implantação isenta no teste" e um **"acesso de demonstração" autosserviço**. A casa **não faz nada disso desde 24/09/2026**.
+- **A folha única manda, e é de lá que veio o texto novo:** "sem período grátis e sem demo automática; a demonstração é ao vivo, em 20 minutos, com os números de uma ótica de verdade (dados desfocados); piloto pago e assistido, **a partir de R$ 349/mês**, um piloto por vez" — mais o diagnóstico pago de R$ 349 por Pix, que vira a primeira mensalidade se o piloto for assinado em 30 dias e **não abate a implantação**.
+- **Oferta que a casa não cumpre não é erro de texto: é promessa falsa com o nome do dono embaixo.** Por isso a correção não foi "ajustar a redação" — foi tirar a oferta inteira e pôr a que existe, com as frases autorizadas.
+- **Desconto deixou de ser padrão.** Antes, toda proposta nascia com 30%; agora só aparece se alguém escrever um na proposta. E a lista de propostas parou de imprimir `null% off · nulld teste` quando não há nenhum.
+- **Ficou escrito no arquivo um número que ninguém tinha notado:** os planos de **R$ 899 e R$ 1.499 não estão na folha única**. O que a folha sustenta publicamente é "a partir de R$ 349/mês". Enquanto não entrarem lá, proposta que sair com 899 ou 1499 publica número que a casa não ratificou — avisado ao Geral.
+- **Provado no ar por conteúdo:** o pacote publicado contém "Piloto pago e assistido, a partir de R$ 349/mês" e **não contém mais** "OFF nos 3 primeiros meses". E **nenhuma proposta foi afetada**: `ops.proposals` tem **0 linhas** — o conserto chegou antes da primeira.
+
 ## 2026-11-12 — O funil da página Receita para de subestimar o toque (229)
 
 - **Erro meu, apontado com medição pelo Agente de Receita.** `v_receita_funil` lia **só** `ops.commercial_leads.last_touch_at` e dizia "928 sem nenhum toque, último em 29/09". Verdade medida hoje: **450 leads abordados por WhatsApp**, 847 mensagens, a última **às 13h55 de hoje**; 19 responderam pessoa, 150 robô, 4 clicaram, 1 interessada.
