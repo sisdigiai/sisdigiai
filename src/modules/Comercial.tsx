@@ -690,7 +690,7 @@ export default function Comercial() {
               <div className="min-w-0 flex-1">
                 <span className="text-sm font-medium text-on-surface">{pr.title}</span>
                 <span className="text-[11px] text-muted ml-2">{pr.lead_company ?? '—'}</span>
-                <div className="text-xs text-on-surface-variant mt-0.5">{pr.plan} · R$ {pr.monthly_price?.toLocaleString('pt-BR')}/mês · {pr.discount_pct}% off · {pr.trial_days}d teste</div>
+                <div className="text-xs text-on-surface-variant mt-0.5">{pr.plan} · R$ {pr.monthly_price?.toLocaleString('pt-BR')}/mês{pr.discount_pct ? ` · ${pr.discount_pct}% off` : ''}{pr.trial_days ? ` · ${pr.trial_days}d teste` : ''}</div>
               </div>
               <span className={`text-[9px] font-mono uppercase px-1.5 py-0.5 ${pr.status === 'enviada' ? 'bg-success/15 text-success' : 'bg-surface-high text-muted'}`}>{pr.status}{pr.sent_via ? ` · ${pr.sent_via}` : ''}</span>
               <button onClick={() => setProposalEditor({ proposal: pr, lead: leads.find((l) => l.id === pr.lead_id) ?? null })} title="Abrir" className="text-muted hover:text-on-surface"><FileText className="w-3.5 h-3.5" /></button>
