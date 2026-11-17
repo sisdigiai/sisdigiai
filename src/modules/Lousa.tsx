@@ -33,6 +33,10 @@ interface Peca {
 const DIAS = ['segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado', 'domingo'];
 
 // Estado conhecido ganha tom; o que não conheço fica neutro E aparece escrito como veio.
+// O que a tela escreve, quando o nome cru não é o nome que a casa usa. Estado que não estiver aqui sai
+// como veio — continua valendo a regra de não engolir o que eu não conheço.
+const ROTULO: Record<string, string> = { no_planner: 'no Planner' };
+
 const TOM: Record<string, string> = {
   publicado: 'text-success',
   agendado: 'text-secondary',
@@ -69,6 +73,9 @@ export default function Lousa() {
   const [semana, setSemana] = useState(() => segundaDaSemana(new Date()));
   const [marca, setMarca] = useState('todas');
   const [rede, setRede] = useState('todas');
+  // Cancelado fica escondido por padrão (pedido do dono em 17/11): a fila do motor acumula cancelamento
+  // antigo, e 330 peças canceladas empurram para fora da vista o que ainda vai sair.
+  const [verCancelados, setVerCancelados] = useState(false);
 
   useEffect(() => {
     supabase.from('v_mkt_lousa').select('*').then(({ data, error }) => {
@@ -88,17 +95,20 @@ export default function Lousa() {
   );
   const casa = (p: Peca, f: { m?: string; r?: string }) =>
     ((f.m ?? marca) === 'todas' || p.marca === (f.m ?? marca))
-    && ((f.r ?? rede) === 'todas' || p.rede === (f.r ?? rede));
+    && ((f.r ?? rede) === 'todas' || p.rede === (f.r ?? rede))
+    && (verCancelados || p.estado !== 'cancelado');
 
   const contar = (lista: Peca[], k: (p: Peca) => string) => {
     const m = new Map<string, number>();
     for (const p of lista) m.set(k(p), (m.get(k(p)) ?? 0) + 1);
     return [...m.entries()].sort((a, b) => b[1] - a[1]);
   };
-  const marcas = useMemo(() => contar(naSemana.filter((p) => casa(p, { m: 'todas' })), (p) => p.marca), [naSemana, rede]);
-  const redes = useMemo(() => contar(naSemana.filter((p) => casa(p, { r: 'todas' })), (p) => p.rede), [naSemana, marca]);
+  const marcas = useMemo(() => contar(naSemana.filter((p) => casa(p, { m: 'todas' })), (p) => p.marca), [naSemana, rede, verCancelados]);
+  const redes = useMemo(() => contar(naSemana.filter((p) => casa(p, { r: 'todas' })), (p) => p.rede), [naSemana, marca, verCancelados]);
 
-  const visiveis = useMemo(() => naSemana.filter((p) => casa(p, {})), [naSemana, marca, rede]);
+  const visiveis = useMemo(() => naSemana.filter((p) => casa(p, {})), [naSemana, marca, rede, verCancelados]);
+  const cancelados = naSemana.filter((p) => p.estado === 'cancelado'
+    && (marca === 'todas' || p.marca === marca) && (rede === 'todas' || p.rede === rede)).length;
   const semData = visiveis.filter((p) => !p.quando);
   const porDia = useMemo(() => {
     const m = new Map<string, Peca[]>();
@@ -154,6 +164,14 @@ export default function Lousa() {
           {visiveis.length} peça(s) · {conta('publicado')} publicadas · {conta('agendado')} agendadas
           {conta('falhou') > 0 && <span className="text-danger"> · {conta('falhou')} falhou</span>}
         </span>
+        {cancelados > 0 && (
+          <button onClick={() => setVerCancelados(!verCancelados)}
+            className={`font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 border transition-colors ${
+              verCancelados ? 'border-secondary bg-secondary/15 text-on-surface'
+                            : 'border-outline/20 text-muted hover:text-on-surface hover:border-outline/40'}`}>
+            {verCancelados ? 'escondendo' : 'mostrar'} {cancelados} cancelada(s)
+          </button>
+        )}
       </div>
 
       <Filtro rotulo="marca" valor={marca} aoTrocar={setMarca}
@@ -208,18 +226,24 @@ export default function Lousa() {
 
 function Cartao({ p }: { p: Peca }) {
   const tom = TOM[p.estado] ?? 'text-on-surface';
+  const rotulado = ROTULO[p.estado] ?? p.estado;
+  // Conta que é só número é id de Página (Facebook) ou de empresa (LinkedIn) — um número na tela não diz
+  // nada a quem lê. Nesse caso vale o nome de exibição; nas outras, o arroba continua sendo o nome real.
+  const conta = /^\d+$/.test(p.conta) ? (p.conta_nome ?? p.conta) : p.conta;
   return (
     <div className="px-2 py-1.5 flex gap-1.5" title={p.erro ?? undefined}>
       {/* cor da marca: dado da view, não valor escrito na tela */}
       <span className="w-0.5 shrink-0 rounded-sm" style={{ backgroundColor: p.accent_hex ?? 'transparent' }} />
       <div className="min-w-0 flex-1">
         <div className="font-mono text-[9px] uppercase tracking-wider text-muted truncate">
-          {p.quando ? horaBRT(p.quando) : 'sem hora'} · {p.conta} · {p.rede}
+          {p.quando ? horaBRT(p.quando) : 'sem hora'} · {conta} · {p.rede}
         </div>
         <div className="text-[12px] text-on-surface leading-snug line-clamp-2">{p.titulo ?? p.tipo}</div>
-        <div className={`font-mono text-[9px] uppercase tracking-wider ${tom}`}>
-          {p.estado}{p.publicador !== p.origem && ` · ${p.origem}→${p.publicador}`}
-          {p.erro && <span className="text-danger"> · erro</span>}
+        <div className={`font-mono text-[9px] tracking-wider ${rotulado === p.estado ? 'uppercase' : 'normal-case'} ${tom}`}>
+          {rotulado}{p.publicador !== p.origem && ` · ${p.origem}→${p.publicador}`}
+          {/* Cancelado não leva marca de erro: a fila guarda o motivo do cancelamento no mesmo campo, e
+              "cancelado · erro" faz parecer que algo quebrou quando alguém só desmarcou a peça. */}
+          {p.erro && p.estado !== 'cancelado' && <span className="text-danger"> · erro</span>}
         </div>
       </div>
     </div>
