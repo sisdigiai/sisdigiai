@@ -92,6 +92,38 @@ O dono segurou a aula de 24/11 em 17/11, no canal do marketing. A aba Aula conti
 - **Espelho:** a migration foi copiada para `docs/migrations/migrations/`. **O `schema.sql` não foi regenerado** (não conheço o gerador); fica para o agente do app, junto com a linha do módulo no `AGENTS.md`.
 - **Dúvida que continua do agente do app:** o portão da escolha é `is_staff()`. Se o papel do dono em `iam.users` for `founder`, trocar por `is_founder()` deixa a escolha só com ele.
 
+## 2026-11-17 (03h) — Lousa etapa 2 e as leituras do conteúdo no espelho do marketing (235 + `lousa-entrada`)
+
+### A Lousa passa a receber de fora
+
+- **`lousa-entrada` no ar**, assinada com Ed25519: Pulso e Limelight mandam a agenda das contas deles e ela aparece na mesma tela. Os dois já enviavam e recebiam 404; agora entram. **O dono não colou segredo nenhum** — cada motor gera o par no próprio projeto e só a chave pública vem para cá.
+- **As duas chaves conferidas por mim, não pelo relato:** 44 bytes SPKI, tipo ed25519, assinatura falsa recusada, e impressão sha256 batendo com o arquivo do Cockpit (`96cccd57…4505` do Pulso, `3990c312…5e0e` do Limelight). A prova 3 da migration falha se a chave do banco não for a que eu conferi.
+- **A tela lê `public.v_lousa`** (MKT mais o que vem de fora) e ganha **filtro por quem publica**. Ele existe por um motivo medido: a mesma peça pode sair pela conta do MKT e pela conta de quem a produziu, e são publicações diferentes, não repetição.
+- **A gravação recusa linha por linha, nomeando o motivo**, em vez de derrubar a carga ou engolir o erro: origem do corpo diferente do cabeçalho assinado, publicador que não é a origem autenticada, `origem_ref` vazio, campo obrigatório vazio, `arquivo_hash` que não é hex de 64. Normaliza `@Pulso` → `pulso` e `sha256:ABC…` → hex minúsculo, as duas formas aceitas e uma só guardada.
+
+### Um defeito meu que estava no ar, achado medindo antes de escrever
+
+- **A `cortes-gravar` aceitava qualquer emissor ativo.** Como eu tinha cadastrado o Limelight em `ops.emissor_externo` para a Lousa, a chave dele podia gravar episódio no schema `cortes`. Ninguém usou (`ultima_entrega` nula, 0 episódios), mas a porta estava aberta.
+- **Conserto:** cada emissor declara **em que portas entra**, e o padrão é **nenhuma**. A leitura da chave passou a ser uma função só (`ops.fn_emissor_chave(nome, porta)`), o que impede uma função futura de esquecer a porta.
+- **Provado por chamada real:** um emissor cadastrado só para a `lousa` bate na `cortes-gravar` e leva **401**.
+
+### Provas
+
+- **7 provas na migration**, com sabotagem antes (inverti a prova 2 e o banco recusou com a mensagem dela). Ensaio inteiro com `rollback`: nada ficou — tabela, view e coluna não existiam depois.
+- **9 casos de ponta a ponta, 0 falhas**, com par gerado só para o teste e emissor removido no fim: 7 recusas (sem cabeçalho · origem não cadastrada · assinatura de outro corpo · relógio 20 min atrás · chave de outro par · corpo que não é lista · emissor da lousa batendo no cortes) e 2 aceites (carga com 1 boa e 1 torta devolvendo o motivo da torta; reenvio da mesma peça sem duplicar e com o estado atualizado). Carimbo de entrega funcionando, sem aviso.
+
+### Leituras do conteúdo no espelho do marketing
+
+Ordem do dono no mesmo dia: *"já temos os analytics do cortes do pulso no próprio pulso, precisamos agora nos analíticos total no espelho do marketing"*.
+
+- **Cartão novo na aba Resultado**, somando **quatro fontes**: contas da casa (`v_mkt_analytics_peca_dia`, que já traz os cortes do Pulso que o MKT publica), canais do Pulso, **cortes e longos das contas do Pulso** e Limelight.
+- **A quarta fonte não existia.** Perguntei ao Pulso se havia sobreposição antes de somar; a resposta mostrou que os cortes das contas dele e os longos viviam em `pulso_analytics.leituras_longos`, **sem espelho** — fora do painel. Pedi a view, ele publicou no mesmo dia, e **eu conferi como anon**: 30 linhas, 34 publicações, 1.084 views, **0 linhas com conta da DIGIAI**, que é a prova de que somar não duplica.
+- **Leitura de blog não entra nas views:** uma página lida não é um vídeo visto. Fica na linha dela.
+- **Peça sem leitura coletada é contada à parte, nunca como zero**, e a tela escreve por que falta número em cada rede (resposta do MKT no mesmo dia): retenção e horas só existem no YouTube; reel do Instagram, vídeo do Facebook e TikTok são **"ainda não medimos"**; post de imagem, carrossel e story a **rede não dá**. São coisas diferentes para quem lê.
+- **Fonte que não se consegue ler aparece escrita e nomeada** — painel cego e motor parado levam a decisões opostas.
+
+**Próximo número livre: 236.**
+
 ## 2026-11-17 (tarde) — Lousa: os quatro ajustes que o dono pediu olhando a tela
 
 Pedidos do dono pelo Geral, depois de abrir a `#/lousa` em produção. Todos na tela, nenhum no dado.
