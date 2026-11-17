@@ -82,6 +82,16 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Espelho:** a migration foi copiada para `docs/migrations/migrations/`. **O `schema.sql` não foi regenerado** (não conheço o gerador); fica para o agente do app, junto com a linha do módulo no `AGENTS.md`.
 - **Dúvida que continua do agente do app:** o portão da escolha é `is_staff()`. Se o papel do dono em `iam.users` for `founder`, trocar por `is_founder()` deixa a escolha só com ele.
 
+## 2026-11-17 — Quem escreve de fora assina, e o dono não cola segredo (233 + `cortes-gravar`)
+
+- **O desenho que estava em pé pedia a chave de serviço no `.env` de um motor local.** Essa chave passa por cima da RLS do banco **inteiro**, não só do schema de quem a usa. O dono estranhou e não colou — e estava certo. Havia **3 segredos esperando a mão dele**; este desenho derruba dois.
+- **Medido antes de desenhar:** publiquei uma sonda no runtime das edge functions e apaguei em seguida. `supabase-edge-runtime-1.79.1 (Deno 2.1.4)` **gera, assina, exporta, importa e verifica Ed25519 no WebCrypto nativo**, sem biblioteca. Sem isso eu estaria prometendo o que não sei.
+- **233: `ops.emissor_externo`.** Quem pode escrever vindo de fora, e com que chave pública. A chave **pública mora no banco**, não em constante na função: autorização vem do banco (R-037) e desligar um emissor é uma linha, sem deploy. Uma `check` faz portaria na forma da chave (prefixo SPKI de Ed25519 e tamanho), para ninguém cadastrar "depois eu pego a chave" no lugar dela.
+- **`cortes-gravar` no ar**, com o que ela **nunca** vai ter: nenhum "roda este SQL", nenhum apagar, nenhuma leitura de outro schema. Se a chave privada do motor vazar, o estrago é o caminho de escrita do `cortes` — não o banco.
+- **Fecha no erro em todos os caminhos:** sem cabeçalho, origem desconhecida ou inativa, relógio fora de ±5 min, assinatura inválida, **tabela de emissores ilegível** → 401. E o corpo é assinado como **texto cru**: reserializar antes de conferir faria a assinatura valer para um texto que o emissor nunca mandou.
+- **Provado de ponta a ponta, com par gerado só para o teste e emissor removido no fim:** 6 recusas (sem cabeçalho · origem desconhecida · assinatura errada · relógio 20 min atrás · assinatura de outro corpo · caminho `ECO01/corte 3.exe`) e 2 aceites (link de envio assinado; e `gravar` com carga incompleta devolvendo a mensagem da própria RPC, o que prova o caminho inteiro). **0 episódios criados.**
+- **Um defeito meu que só o teste de ponta a ponta mostrou:** a primeira versão carimbava `ultima_entrega` e **ignorava o erro** — e o carimbo falhava calado, porque `service_role` tinha `select` mas não `update` na tabela nova. Consertado nos dois lados: o grant mínimo (`select, update`, nunca `insert`/`delete`) e a função que **avisa na resposta** quando o carimbo falha, sem derrubar a entrega que já aconteceu.
+
 ## 2026-11-14 (noite) — Dossiê e pitch por lead: a base no banco (232)
 
 - **Modelo B, e recusei o A.** A ordem dava a opção de guardar o dossiê no `notes` do lead. `notes` é texto livre — exatamente o que esta casa passou a semana desentupindo: bloco de prosa que a tela lê com expressão regular, que ninguém compara entre dois leads e que não tem onde marcar fonte. O dono está abrindo campanha dirigida; isto vai repetir, e o que repete merece forma.
