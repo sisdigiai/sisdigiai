@@ -6,7 +6,7 @@ import {
   Camera, Wand2, Boxes, Search, ShieldCheck, Workflow, ChevronDown,
   GraduationCap, Languages, Calendar as CalendarIcon, Globe, BarChart3,
   Lightbulb, Package, Users, Receipt, Radio, CalendarCheck,
-  Sunrise, Calculator, MapPin, Columns3, Rows3, ListChecks, Target } from 'lucide-react';
+  Sunrise, Calculator, MapPin, Columns3, Rows3, ListChecks, Target, CalendarRange } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
 import { canAccessModule } from '../lib/permissions';
@@ -20,7 +20,7 @@ export type ModuleId =
   | 'marketplace' | 'ecossistemas' | 'mapa-vivo' | 'travas-marketing'
   | 'fluxo-osi' | 'guia'
   | 'marketing-engajamento' | 'inventario' | 'seo' | 'vendas' | 'mapa-calor' | 'prospeccao'
-  | 'mkt-crescimento' | 'mkt-calc' | 'comparativo' | 'controle' | 'google' | 'receita';
+  | 'mkt-crescimento' | 'mkt-calc' | 'comparativo' | 'controle' | 'google' | 'receita' | 'lousa';
 
 interface NavItem {
   id: ModuleId;
@@ -45,6 +45,9 @@ interface NavItem {
 const hoje: NavItem[] = [
   { id: 'hoje', label: 'Ordem do dia', icon: <Sunrise className="w-4 h-4" /> },
   { id: 'controle', label: 'Controle', icon: <ListChecks className="w-4 h-4" /> },
+  // Ao lado de Controle por ordem do dono (17/11): as duas respondem "o que esta acontecendo",
+  // uma dos agentes e outra do que sai para fora.
+  { id: 'lousa', label: 'Lousa', icon: <CalendarRange className="w-4 h-4" /> },
 ];
 
 // Roteaveis sem cadeira no menu — alcancadas pelos links da tela Hoje.

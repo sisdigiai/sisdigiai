@@ -24,6 +24,7 @@ import ComparativoMotores from './modules/ComparativoMotores';
 import Google from './modules/Google';
 import Controle from './modules/Controle';
 import Receita from './modules/Receita';
+import Lousa from './modules/Lousa';
 import MktCrescimento from './modules/MktCrescimento';
 import MktCalc from './modules/MktCalc';
 import Marketplace from './modules/Marketplace';
@@ -63,6 +64,7 @@ const MODULES: ModuleId[] = [
   'comparativo',
   'controle',
   'receita',
+  'lousa',
   // 'google' faltava aqui desde que a tela existe: o item aparece no menu e o link direto
   // `#/google` caía em Visão sem dizer nada. Lista escrita à mão é assim — entra no menu e
   // esquece aqui. Achei ao ver `#/receita` cair em Visão pelo mesmo motivo.
@@ -84,7 +86,7 @@ const MODULE_LABEL: Record<ModuleId, string> = {
   backlog: 'Backlog Executivo', comercial: 'Comercial', 'cadastro-empresa': 'Cadastro Empresa',
   financeiro: 'Financeiro', academy: 'Academy', 'fluxo-osi': 'OSI',
   marketing: 'Marketing', 'marketing-engajamento': 'Engajamento',
-  'mkt-crescimento': 'Radar 360', 'mkt-calc': 'Calc', comparativo: 'Comparativo de motores', controle: 'Controle', receita: 'Receita',
+  'mkt-crescimento': 'Radar 360', 'mkt-calc': 'Calc', comparativo: 'Comparativo de motores', controle: 'Controle', receita: 'Receita', lousa: 'Lousa',
   google: 'Google Meu Negócio',
   marketplace: 'Marketplace', clearix: 'Central Clearix', cobranca: 'Cobrança',
   ecossistemas: 'Ecossistemas', 'mapa-vivo': 'Mapa Vivo', decisoes: 'Decisões', biblioteca: 'Biblioteca', brand: 'Brand Guidelines',
@@ -98,7 +100,7 @@ const MODULE_LABEL: Record<ModuleId, string> = {
 
 // Seção da navegação a que cada módulo pertence — usado como breadcrumb no header.
 const MODULE_SECTION: Record<ModuleId, string> = {
-  hoje: 'Hoje', visao: 'Hoje', semana: 'Hoje', trilha: 'Hoje', 'lista-mestra': 'Hoje', backlog: 'Hoje',
+  hoje: 'Hoje', visao: 'Hoje', semana: 'Hoje', trilha: 'Hoje', 'lista-mestra': 'Hoje', backlog: 'Hoje', lousa: 'Hoje',
   receita: 'Dinheiro', vendas: 'Dinheiro', financeiro: 'Dinheiro', cobranca: 'Dinheiro', marketplace: 'Dinheiro',
   comercial: 'Mercado', 'fluxo-osi': 'Mercado', 'marketing-engajamento': 'Mercado', 'mapa-calor': 'Mercado', prospeccao: 'Mercado',
   portfolio: 'Produtos', ecossistemas: 'Produtos', 'mapa-vivo': 'Produtos', clearix: 'Produtos', academy: 'Produtos', seo: 'Produtos',
@@ -197,6 +199,7 @@ export default function App() {
       case 'google': return <Google />;
       case 'controle': return <Controle />;
       case 'receita': return <Receita />;
+      case 'lousa': return <Lousa />;
       case 'mkt-crescimento': return <MktCrescimento />;
       case 'mkt-calc': return <MktCalc />;
       case 'marketing-engajamento': return <Marketing view="engajamento" />;
