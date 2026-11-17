@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, CalendarClock, Check, Lock, Phone, Ticket, Wallet } from 'lucide-react';
+import { AlertTriangle, CalendarClock, Check, Lock, PauseCircle, Phone, Ticket, Wallet } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Aviso, Carregando, quando } from './ReceitaIdeias';
 import { botao, brl, Coluna, ComoLer, diaCurto, diaEscrito, diasAte, emDias, foco, Funil, hojeBrt, Quadro, Tile, TituloSecao } from './ReceitaUI';
 
-// Aba Aula da página Receita (migrations 228 e 230).
+// Aba Aula da página Receita (migrations 228, 230 e 234).
 //
 // Uma pergunta só: O QUE FALTA PARA A AULA ACONTECER, E DE QUEM É. Por isso a tela é um quadro de passos
 // (o que é teu, o que é dos outros, o que está pronto), uma linha do tempo e um funil — e o texto ficou
@@ -15,6 +15,9 @@ import { botao, brl, Coluna, ComoLer, diaCurto, diaEscrito, diasAte, emDias, foc
 //
 // A regra que não mudou: ZERO VENDA COM PRODUTO NÃO CRIADO NÃO É "NINGUÉM QUIS". O tile de vagas diz
 // "não dá para comprar ainda" em vez de mostrar um zero seco.
+//
+// AULA SEGURADA (234): quando o dono segura a edição, a data e o prazo de venda caem. A tela NÃO conta dias,
+// NÃO cobra mínimo e NÃO pinta passo de vencido: mostra quem segurou, quando, e o que falta estruturar.
 
 interface Passo { ordem: number; passo: string; quem: string; ate: string | null; estado: 'feito' | 'falta' | 'travado'; nota: string | null }
 interface Aula {
@@ -24,6 +27,7 @@ interface Aula {
   vendas: number; vendas_brl: string; ultima_venda: string | null;
   ligacoes_na_lista: number; ligacoes_faladas: number; ligacoes_nao_atenderam: number; ligacoes_nao_ligar: number;
   passos: Passo[] | null;
+  segurada_em: string | null; segurada_nota: string | null;
 }
 
 export default function ReceitaAula() {
@@ -55,9 +59,12 @@ export default function ReceitaAula() {
 
 function Edicao({ aula: a }: { aula: Aula }) {
   const hoje = hojeBrt();
+  const segurada = !!a.segurada_em;
   const diaDaAula = new Date(a.quando).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
   const faltamAula = diasAte(diaDaAula, hoje);
-  const passos = [...(a.passos ?? [])].sort((x, y) => x.ordem - y.ordem);
+  // Segurada: os prazos dos passos caíram junto com a data; o quadro fica, sem data.
+  const passos = [...(a.passos ?? [])].sort((x, y) => x.ordem - y.ordem)
+    .map((p) => (segurada && p.estado !== 'feito' ? { ...p, ate: null } : p));
   const ehDoDono = (p: Passo) => /dono/i.test(p.quem);
   const teus = passos.filter((p) => p.estado === 'falta' && ehDoDono(p));
   const outros = passos.filter((p) => p.estado !== 'feito' && !(p.estado === 'falta' && ehDoDono(p)));
@@ -71,16 +78,29 @@ function Edicao({ aula: a }: { aula: Aula }) {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 id={`aula-${a.slug}`} className="font-serif text-2xl text-on-surface">{a.titulo}</h2>
-          <p className="mt-1 text-[13px] text-on-surface-variant tabular-nums">{quando(a.quando)} · {brl(a.preco_brl)} por vaga</p>
+          <p className="mt-1 text-[13px] text-on-surface-variant tabular-nums">
+            {segurada ? `segurada em ${diaEscrito(a.segurada_em!)} · sem data` : quando(a.quando)} · {brl(a.preco_brl)} por vaga
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <a href="#/receita/lista" className={`${botao} border-action bg-action text-on-action`}><Phone className="w-3.5 h-3.5" aria-hidden="true" /> Lista do dia</a>
+          {!segurada && <a href="#/receita/lista" className={`${botao} border-action bg-action text-on-action`}><Phone className="w-3.5 h-3.5" aria-hidden="true" /> Lista do dia</a>}
           <a href="#/receita/pacotes/aula-paga/pecas.md" className={`${botao} border-outline/30 text-on-surface hover:bg-surface-highest`}>Roteiro e convites</a>
           <a href="#/receita/pacotes/aula-paga" className={`${botao} border-outline/30 text-on-surface hover:bg-surface-highest`}>O pacote</a>
         </div>
       </div>
 
-      {paraHoje.length > 0 && (
+      {segurada && (
+        <div className="flex items-start gap-3 border border-warning-bd bg-warning-bg p-3">
+          <PauseCircle className="w-5 h-5 shrink-0 text-warning" aria-hidden="true" />
+          <div className="text-[14px] text-on-surface">
+            <strong className="font-semibold">Aula segurada por ti em {diaEscrito(a.segurada_em!)}. Não tem data.</strong>
+            <p className="mt-1">A data de {diaEscrito(diaDaAula)} e o prazo de venda de {diaEscrito(a.prazo_vendas)} não valem mais. Ninguém está sendo convidado.</p>
+            {a.segurada_nota && <p className="mt-1 text-on-surface-variant">{a.segurada_nota}</p>}
+          </div>
+        </div>
+      )}
+
+      {!segurada && paraHoje.length > 0 && (
         <div className="flex items-start gap-3 border border-warning-bd bg-warning-bg p-3">
           <AlertTriangle className="w-5 h-5 shrink-0 text-warning" aria-hidden="true" />
           <div className="text-[14px] text-on-surface">
@@ -91,13 +111,20 @@ function Edicao({ aula: a }: { aula: Aula }) {
       )}
 
       <dl className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        <Tile rotulo="Dias até a aula" valor={String(Math.max(0, faltamAula))} nota={`${diaEscrito(diaDaAula)} · ${emDias(faltamAula)}`}
-              icone={<CalendarClock className="w-3 h-3" aria-hidden="true" />} />
-        <Tile rotulo="Vagas pagas" valor={`${a.vendas} de ${a.minimo_ao_vivo}`}
-              tom={a.vendas >= a.minimo_ao_vivo ? 'bom' : a.produto_criado ? 'neutro' : 'ruim'}
-              de={{ feito: a.vendas, total: a.minimo_ao_vivo }}
-              nota={a.produto_criado ? `mínimo para acontecer ao vivo, até ${diaCurto(a.prazo_vendas)}` : 'não dá para comprar ainda: o produto não foi criado'}
-              icone={<Ticket className="w-3 h-3" aria-hidden="true" />} />
+        {segurada
+          ? <Tile rotulo="Data da aula" valor="sem data" tom="atencao" nota={`era ${diaEscrito(diaDaAula)}; a nova é tua`}
+                  icone={<CalendarClock className="w-3 h-3" aria-hidden="true" />} />
+          : <Tile rotulo="Dias até a aula" valor={String(Math.max(0, faltamAula))} nota={`${diaEscrito(diaDaAula)} · ${emDias(faltamAula)}`}
+                  icone={<CalendarClock className="w-3 h-3" aria-hidden="true" />} />}
+        {segurada
+          ? <Tile rotulo="Vagas pagas" valor={String(a.vendas)} tom={a.vendas > 0 ? 'atencao' : 'neutro'}
+                  nota={a.vendas > 0 ? 'quem pagou precisa de resposta: devolver ou guardar a vaga' : 'nenhuma vendida; não há prazo de venda aberto'}
+                  icone={<Ticket className="w-3 h-3" aria-hidden="true" />} />
+          : <Tile rotulo="Vagas pagas" valor={`${a.vendas} de ${a.minimo_ao_vivo}`}
+                  tom={a.vendas >= a.minimo_ao_vivo ? 'bom' : a.produto_criado ? 'neutro' : 'ruim'}
+                  de={{ feito: a.vendas, total: a.minimo_ao_vivo }}
+                  nota={a.produto_criado ? `mínimo para acontecer ao vivo, até ${diaCurto(a.prazo_vendas)}` : 'não dá para comprar ainda: o produto não foi criado'}
+                  icone={<Ticket className="w-3 h-3" aria-hidden="true" />} />}
         <Tile rotulo="Recebido" valor={brl(a.vendas_brl)} nota={a.ultima_venda ? `última venda em ${diaCurto(a.ultima_venda)}` : 'nenhuma venda'}
               icone={<Wallet className="w-3 h-3" aria-hidden="true" />} />
         <Tile rotulo="Teus passos em aberto" valor={String(teus.length)} tom={atrasados > 0 ? 'ruim' : teus.length ? 'atencao' : 'bom'}
@@ -106,7 +133,7 @@ function Edicao({ aula: a }: { aula: Aula }) {
       </dl>
 
       <div>
-        <TituloSecao>O que falta, e de quem é</TituloSecao>
+        <TituloSecao>{segurada ? 'O que falta estruturar antes de dar data' : 'O que falta, e de quem é'}</TituloSecao>
         {passos.length === 0
           ? <Aviso tom="warning">Os passos desta aula ainda não foram carregados.</Aviso>
           : (
@@ -125,10 +152,12 @@ function Edicao({ aula: a }: { aula: Aula }) {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-4">
-        <div>
-          <TituloSecao>Linha do tempo</TituloSecao>
-          <LinhaDoTempo passos={passos} hoje={hoje} diaDaAula={diaDaAula} />
-        </div>
+        {!segurada && (
+          <div>
+            <TituloSecao>Linha do tempo</TituloSecao>
+            <LinhaDoTempo passos={passos} hoje={hoje} diaDaAula={diaDaAula} />
+          </div>
+        )}
         <div>
           <TituloSecao>Do convite à vaga</TituloSecao>
           <Funil degraus={[
@@ -144,10 +173,17 @@ function Edicao({ aula: a }: { aula: Aula }) {
       </div>
 
       <ComoLer>
-        <p>
-          <strong className="font-semibold text-on-surface">A regra desta edição:</strong> com {a.minimo_ao_vivo} ou mais vagas pagas até {diaEscrito(a.prazo_vendas)},
-          a aula acontece ao vivo. Com uma ou duas, vira conversa individual com quem comprou. Com zero, não acontece nesta data.
-        </p>
+        {segurada ? (
+          <p>
+            <strong className="font-semibold text-on-surface">Esta edição está segurada.</strong> A regra de {a.minimo_ao_vivo} vagas até {diaEscrito(a.prazo_vendas)} caiu
+            junto com a data. Quando disseres a data nova, o Receita escreve aqui a regra da nova edição e o marketing reagenda os convites.
+          </p>
+        ) : (
+          <p>
+            <strong className="font-semibold text-on-surface">A regra desta edição:</strong> com {a.minimo_ao_vivo} ou mais vagas pagas até {diaEscrito(a.prazo_vendas)},
+            a aula acontece ao vivo. Com uma ou duas, vira conversa individual com quem comprou. Com zero, não acontece nesta data.
+          </p>
+        )}
         <p>
           As vagas são as vendas da plataforma de pagamento cujo produto tem “{a.produto_filtro}” no nome. Enquanto o produto não existir,
           ninguém consegue comprar, e o zero não quer dizer que ninguém quis.

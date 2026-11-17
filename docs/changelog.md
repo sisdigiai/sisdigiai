@@ -2,6 +2,16 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-17 — A aula pode ficar segurada, sem data (234) · Agente de Receita
+
+O dono segurou a aula de 24/11 em 17/11, no canal do marketing. A aba Aula continuava contando dias, cobrando o mínimo de 3 vagas até 22/11 e pintando passo de vencido.
+
+- **Migration 234** (aplicada em 17/11 pelo Receita, depois de ensaio com rollback): `receita.aula` ganha `segurada_em` e `segurada_nota`; `v_receita_aula` entrega as duas no fim (continua `security_invoker`); porta nova `rpc_receita_segurar_aula(slug, data, nota)`, definer com o portão dentro (staff ou a carga), sem execução para anon. Data nula solta a edição.
+- **Aba Aula:** edição segurada mostra a faixa "Aula segurada por ti em…, não tem data", troca "Dias até a aula" por "sem data", tira o mínimo e o prazo do tile de vagas, esconde a linha do tempo e mostra os passos sem data, com o título "O que falta estruturar antes de dar data".
+- **Aba Lista do dia:** enquanto a aula estiver segurada, o "antes de ligar" diz para não convidar ninguém e o botão do roteiro avisa que é o convite antigo.
+- **Carga:** `Cockpit/scripts/receita-controle-sync.mjs` lê "segurada em" e "nota da segurada" do pacote da aula. **Próximo número livre: 235.**
+- **Não conferido:** a tela com os olhos (o navegador do agente não está logado no app). Conferidos o banco, os tipos e o pacote publicado.
+
 ## 2026-11-13 — A página Receita ganha o cadastro das empresas da região (231)
 
 - **Escrita, aplicada e publicada pelo Agente de Receita**, por pedido direto do dono no canal dele em 13/11: "mede as pequenas e médias e já cadastra todas em nosso banco".

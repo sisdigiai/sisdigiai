@@ -70,6 +70,8 @@ export default function ReceitaLista() {
   const [itens, setItens] = useState<Item[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [montando, setMontando] = useState(false);
+  // Dia em que o dono segurou a aula (migration 234). Enquanto houver, a tela não manda convidar ninguém.
+  const [aulaSegurada, setAulaSegurada] = useState<string | null>(null);
 
   const carregar = () =>
     supabase.from('v_receita_lista_dia').select('*').eq('dia', dia).order('ordem').then(({ data, error }) => {
@@ -79,6 +81,10 @@ export default function ReceitaLista() {
     });
 
   useEffect(() => { carregar(); }, [dia]);
+  useEffect(() => {
+    supabase.from('v_receita_aula').select('segurada_em').order('quando', { ascending: false }).limit(1)
+      .then(({ data }) => setAulaSegurada((data?.[0]?.segurada_em as string | null) ?? null));
+  }, []);
 
   const montar = async () => {
     setMontando(true);
@@ -123,13 +129,15 @@ export default function ReceitaLista() {
 
       <div className="flex flex-wrap items-center gap-2">
         <a href="#/receita/pacotes/aula-paga/pecas.md" className={`${botao} border-outline/30 text-on-surface hover:bg-surface-highest`}>
-          Roteiro da ligação
+          {aulaSegurada ? 'Roteiro antigo (convite da aula, segurada)' : 'Roteiro da ligação'}
         </a>
       </div>
 
       <ComoLer titulo="Antes de ligar (como a lista funciona)">
         <p>A lista sai sozinha às 08h, de segunda a sábado: primeiro quem mostrou interesse, depois quem respondeu, depois quem recebeu WhatsApp e não respondeu. Quem o marketing vai tocar por WhatsApp hoje fica de fora.</p>
-        <p><strong className="font-semibold text-on-surface">Cada ótica recebeu a oferta de um produto só</strong>, e está escrito em qual. O roteiro é o do convite para a aula, um terceiro assunto: quem atender vai lembrar da OSI ou do Clearix, não da aula.</p>
+        <p><strong className="font-semibold text-on-surface">Cada ótica recebeu a oferta de um produto só</strong>, e está escrito em qual. {aulaSegurada
+          ? <>A aula foi segurada em {diaEscrito(aulaSegurada)} e está sem data: <strong className="font-semibold text-on-surface">não convides ninguém para ela</strong>. O roteiro guardado é o do convite antigo; sem oferta nova, ligar ou não fica a teu critério.</>
+          : <>O roteiro é o do convite para a aula, um terceiro assunto: quem atender vai lembrar da OSI ou do Clearix, não da aula.</>}</p>
         <p>O telefone é o que a loja publica no Google: quem atende pode não ser o dono.</p>
         <p>“Não atendeu” volta depois de dois dias, no máximo três vezes. “Não ligar mais” tira a ótica da lista para sempre. O que não ligares hoje volta amanhã.</p>
       </ComoLer>
