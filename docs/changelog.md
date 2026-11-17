@@ -92,6 +92,18 @@ O dono segurou a aula de 24/11 em 17/11, no canal do marketing. A aba Aula conti
 - **Espelho:** a migration foi copiada para `docs/migrations/migrations/`. **O `schema.sql` não foi regenerado** (não conheço o gerador); fica para o agente do app, junto com a linha do módulo no `AGENTS.md`.
 - **Dúvida que continua do agente do app:** o portão da escolha é `is_staff()`. Se o papel do dono em `iam.users` for `founder`, trocar por `is_founder()` deixa a escolha só com ele.
 
+## 2026-11-17 (04h03) — A Lousa mostrava mil de 1.186: o teto silencioso da leitura
+
+Achado pelo Orquestrador **abrindo a tela no Chrome do dono** — não lendo código nem conferindo pacote.
+
+- **O defeito:** `select('*')` sem recorte traz **as primeiras mil linhas** (teto da API). A `v_lousa` já passava disso, e Pulso e Limelight entram **no fim da união** — então ficavam inteiramente de fora.
+- **Medido antes de consertar:** nas primeiras mil linhas cabem **95** peças desta semana e **zero** de fora; a semana real tem **182**, e as **130** linhas de fora nunca chegavam.
+- **E não nasceu com a etapa 2: nasceu na etapa 1, às 02h51.** A `v_mkt_lousa` sozinha já tinha 1.056 linhas. O "99 peças na semana" que eu escrevi no changelog da madrugada era o que coube, não o que havia.
+- **O que torna este defeito traiçoeiro:** mil linhas é uma resposta de **sucesso**. Sem erro, sem aviso, sem sintoma — a tela não tinha como saber que estava cega.
+- **Conserto:** a leitura pede **a janela da semana** (e refaz ao trocar de semana), pede **a parte sem data separada** — peça sem data não entra em recorte por data, e sumir da tela é o mesmo que não existir — e **avisa quando a resposta vem no teto**.
+- **Conferido abrindo a tela**, logado como o dono: **152 peças** (eram 95) e o filtro **quem publica — MKT 89 · Pulso 63** apareceu sozinho, como desenhado.
+- **A lição, escrita porque me custou três vezes hoje:** conferir o pacote publicado prova que o deploy saiu. Só **abrir a tela** prova que ela diz a verdade. Eu dei esta entrega por boa três vezes pelo pacote, e ela estava errada nas três.
+
 ## 2026-11-17 (03h40) — Lousa 1b: a projeção, por mediana e com o tamanho da base junto (236)
 
 - **`public.v_lousa_base`**: história de 28 dias por conta/rede/tipo, **mediana e faixa p25–p75, nunca média**. O critério mora na view, não na tela, porque eu e o Orquestrador medimos o mesmo número hoje e demos **28 e 31** — era a janela andando com a hora, e dois números para a mesma coisa é pior que nenhum.
