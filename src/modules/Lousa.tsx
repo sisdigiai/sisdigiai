@@ -141,7 +141,10 @@ export default function Lousa() {
   // Só peça que ainda vai sair recebe projeção: prever o que já foi publicado é enfeite, e ainda por
   // cima competiria com o número medido ao lado.
   const AINDA_VAI_SAIR = ['agendado', 'planejado', 'no_planner', 'rascunho'];
-  const futuras = visiveis.filter((p) => p.quando && diaBRT(p.quando) >= hoje && AINDA_VAI_SAIR.includes(p.estado));
+  // Dia de hoje calculado aqui, e não o `hoje` declarado mais abaixo: `const` não existe antes da linha
+  // em que é declarado, e usá-lo aqui derruba a tela inteira em branco. Derrubou, em 17/11, 03h33.
+  const hojeProj = chave(new Date());
+  const futuras = visiveis.filter((p) => p.quando && diaBRT(p.quando) >= hojeProj && AINDA_VAI_SAIR.includes(p.estado));
   const futurasComBase = futuras.map((p) => base?.get(chaveBase(p))).filter((b): b is Base => !!b?.serve_de_base);
   const previsto = futurasComBase.reduce((a, b) => a + b.mediana, 0);
   // A quarta trava, minha: "esta conta é nova" e "os dois lados não falam a mesma língua" pedem ações
