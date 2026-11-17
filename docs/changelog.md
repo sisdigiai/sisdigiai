@@ -92,6 +92,16 @@ O dono segurou a aula de 24/11 em 17/11, no canal do marketing. A aba Aula conti
 - **Espelho:** a migration foi copiada para `docs/migrations/migrations/`. **O `schema.sql` não foi regenerado** (não conheço o gerador); fica para o agente do app, junto com a linha do módulo no `AGENTS.md`.
 - **Dúvida que continua do agente do app:** o portão da escolha é `is_staff()`. Se o papel do dono em `iam.users` for `founder`, trocar por `is_founder()` deixa a escolha só com ele.
 
+## 2026-11-17 (17h12) — A porta de leitura do motor do Cortes, e o rótulo de quem publica (239)
+
+- **239:** `public.cortes_ler_episodio(codigo)` e a ação `ler` na `cortes-gravar`. O dono aprova na tela publicada, a decisão fica no banco — e **nada chegava à máquina**, porque a chave de serviço não mora lá (R-042) e é assim que tem de ser. Agora a leitura vem pela mesma porta assinada por onde o motor já escreve: mesma chave, mesma porta `cortes`, só leitura, só o episódio pedido.
+- **`decidido_por` fica de fora.** É uuid de pessoa; o motor não pediu e não precisa. Porta de leitura entrega o mínimo que serve, e o resto é vazamento com boa intenção. A prova 4 falha se o campo voltar — testada invertida.
+- **Episódio que não existe é resposta, não erro:** `encontrado: false` com listas vazias. "Não existe" e "existe sem aprovação nenhuma" levam a ações diferentes.
+- **Provado contra o ECO01 real:** 1 aprovação, 85 peças, sem expor quem decidiu, e **um emissor da Lousa levou 401** ao tentar ler o cortes. Nada alterado: 1 episódio e 85 peças antes e depois.
+- **Lousa:** `fora_do_mkt` passou a aparecer como **"fora do MKT (app da rede)"** — publicador que não estiver no mapa continua saindo como veio. Conferido abrindo a tela: *todos 169 · MKT 104 · Pulso 63 · fora do MKT (app da rede) 2*.
+
+**Próximo número livre: 240.**
+
 ## 2026-11-17 (17h10) — O Cortes entra: chave cadastrada, links de leitura assinados, substituição declarada (237 + 238)
 
 - **237:** a chave pública do motor do Cortes, porta `{cortes}` só. Conferida por mim do arquivo do Cockpit — 44 bytes SPKI, ed25519, assinatura falsa recusada, impressão `0f9b170a…629c` — e a prova 2 falha se o banco não tiver essa chave. O motor estava parado desde as 12h30 e o primeiro corte é 23/11.

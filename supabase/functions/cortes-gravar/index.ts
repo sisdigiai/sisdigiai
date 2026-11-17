@@ -194,6 +194,18 @@ Deno.serve(async (req) => {
                   aviso: await carimbar(sb, origem) });
   }
 
+  if (acao === "ler") {
+    // Porta de LEITURA do motor: o dono aprova na tela publicada e a decisão fica no banco; sem isto
+    // nada chega à máquina, porque a chave de serviço não mora lá (R-042) e é assim que tem de ser.
+    // Só o episódio pedido, só o que é dele, e sem `decidido_por` — quem decidiu é dado de pessoa, o
+    // motor não pediu e não precisa. Não carimba `ultima_entrega`: ler não é entregar.
+    const codigo = String(carga.codigo ?? "");
+    if (!codigo) return json({ erro: "a ação 'ler' precisa de 'codigo'" }, 400);
+    const { data, error } = await sb.rpc("cortes_ler_episodio", { p_codigo: codigo });
+    if (error) return json({ erro: error.message }, 400);
+    return json({ acao: "ler", ...(data as Record<string, unknown>) });
+  }
+
   if (acao === "links") {
     // Renova os links de leitura. Com `episodio`, só os daquele; sem nada, tudo que vence em 48h.
     const r = await assinarLinks(sb, {
