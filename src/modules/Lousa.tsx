@@ -58,6 +58,12 @@ const TETO = 3000;
 // como veio — continua valendo a regra de não engolir o que eu não conheço.
 const ROTULO: Record<string, string> = { no_planner: 'no Planner' };
 
+// Quem publica, no nome que a casa usa. `fora_do_mkt` é o que saiu direto pelo app da rede, sem passar
+// por robô nenhum — e dizer isso importa: é a diferença entre "o motor não publicou" e "alguém publicou
+// à mão". Publicador que não estiver aqui sai como veio, pela mesma regra de não engolir o desconhecido.
+const ROTULO_PUBLICADOR: Record<string, string> = { fora_do_mkt: 'fora do MKT (app da rede)' };
+const quemPublica = (p: string) => ROTULO_PUBLICADOR[p] ?? p;
+
 const TOM: Record<string, string> = {
   publicado: 'text-success',
   agendado: 'text-secondary',
@@ -269,7 +275,7 @@ export default function Lousa() {
       {publicadores.length > 1 && (
         <Filtro rotulo="quem publica" valor={publicador} aoTrocar={setPublicador}
           opcoes={[{ id: 'todos', label: 'todos', n: naSemana.filter((p) => casa(p, { p: 'todos' })).length },
-                   ...publicadores.map(([id, n]) => ({ id, label: id, n }))]} />
+                   ...publicadores.map(([id, n]) => ({ id, label: quemPublica(id), n }))]} />
       )}
 
       {pecas === null ? (
@@ -332,7 +338,7 @@ function Cartao({ p, base, futura }: { p: Peca; base?: Base; futura?: boolean })
         </div>
         <div className="text-[12px] text-on-surface leading-snug line-clamp-2">{p.titulo ?? p.tipo}</div>
         <div className={`font-mono text-[9px] tracking-wider ${rotulado === p.estado ? 'uppercase' : 'normal-case'} ${tom}`}>
-          {rotulado}{p.publicador !== p.origem && ` · ${p.origem}→${p.publicador}`}
+          {rotulado}{p.publicador !== p.origem && ` · ${p.origem}→${quemPublica(p.publicador)}`}
           {/* Cancelado não leva marca de erro: a fila guarda o motivo do cancelamento no mesmo campo, e
               "cancelado · erro" faz parecer que algo quebrou quando alguém só desmarcou a peça. */}
           {p.erro && p.estado !== 'cancelado' && <span className="text-danger"> · erro</span>}
