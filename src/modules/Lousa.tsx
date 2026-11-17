@@ -49,6 +49,10 @@ const chaveBase = (x: { conta: string; rede: string; tipo: string }) => `${x.con
 
 const DIAS = ['segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado', 'domingo'];
 
+// Teto que EU peço. O da API é mil e é silencioso; este é alto o bastante para a semana e serve de
+// sinal: se a resposta vier exatamente neste tamanho, a tela avisa que pode estar cortada.
+const TETO = 3000;
+
 // Estado conhecido ganha tom; o que não conheço fica neutro E aparece escrito como veio.
 // O que a tela escreve, quando o nome cru não é o nome que a casa usa. Estado que não estiver aqui sai
 // como veio — continua valendo a regra de não engolir o que eu não conheço.
@@ -92,21 +96,43 @@ export default function Lousa() {
   const [rede, setRede] = useState('todas');
   const [publicador, setPublicador] = useState('todos');
   const [base, setBase] = useState<Map<string, Base> | null>(null);
+  const [noTeto, setNoTeto] = useState(false);
   // Cancelado fica escondido por padrão (pedido do dono em 17/11): a fila do motor acumula cancelamento
   // antigo, e 330 peças canceladas empurram para fora da vista o que ainda vai sair.
   const [verCancelados, setVerCancelados] = useState(false);
 
   useEffect(() => {
-    supabase.from('v_lousa').select('*').then(({ data, error }) => {
-      if (error) { setErro(error.message); setPecas([]); return; }
-      setPecas((data ?? []) as Peca[]);
+    // A LEITURA PEDE A SEMANA, NÃO A VIEW INTEIRA — e isto é o conserto de um defeito meu que ficou no
+    // ar das 02h51 às 04h de 17/11. Pedir `select('*')` sem recorte traz **as primeiras mil linhas** (o
+    // teto da API), e a v_lousa já passava de mil: das 182 peças desta semana a tela mostrava 95, e
+    // **nenhuma** das 130 que vêm do Pulso e do Limelight chegava, porque entram no fim da união.
+    // O pior dele: a tela não tinha como saber. Mil linhas é uma resposta de sucesso.
+    //
+    // Fuso fixo -03:00 porque o Brasil não tem mais horário de verão, e o dia do negócio é BRT.
+    setPecas(null);
+    setNoTeto(false);
+    const ini = `${chave(semana)}T00:00:00-03:00`;
+    const fim = `${chave(maisDias(semana, 7))}T00:00:00-03:00`;
+    Promise.all([
+      supabase.from('v_lousa').select('*').gte('quando', ini).lt('quando', fim).limit(TETO),
+      // Peça sem data não tem como entrar no recorte por data, e sumir da tela é o mesmo que não existir.
+      supabase.from('v_lousa').select('*').is('quando', null).limit(TETO),
+    ]).then(([naSemana, semData]) => {
+      const erroQualquer = naSemana.error ?? semData.error;
+      if (erroQualquer) { setErro(erroQualquer.message); setPecas([]); return; }
+      const linhas = [...(naSemana.data ?? []), ...(semData.data ?? [])] as Peca[];
+      // Resposta que vem exatamente no teto pode estar cortada. A tela diz isso em vez de mostrar uma
+      // semana incompleta com cara de semana inteira.
+      setNoTeto((naSemana.data?.length ?? 0) >= TETO || (semData.data?.length ?? 0) >= TETO);
+      setErro(null);
+      setPecas(linhas);
     });
     // A base não derruba a Lousa se falhar: a agenda é o que a tela existe para mostrar, e a projeção é
     // o acréscimo. Mas também não fica em silêncio — sem base, o cartão diz "sem base", não some.
     supabase.from('v_lousa_base').select('*').then(({ data }) => {
       setBase(new Map(((data ?? []) as Base[]).map((b) => [chaveBase(b), b])));
     });
-  }, []);
+  }, [semana]);
 
   const dias = useMemo(() => Array.from({ length: 7 }, (_, i) => maisDias(semana, i)), [semana]);
   const chavesDaSemana = useMemo(() => new Set(dias.map(chave)), [dias]);
@@ -207,6 +233,11 @@ export default function Lousa() {
           {visiveis.length} peça(s) · {conta('publicado')} publicadas · {conta('agendado')} agendadas
           {conta('falhou') > 0 && <span className="text-danger"> · {conta('falhou')} falhou</span>}
         </span>
+        {noTeto && (
+          <span className="font-mono text-[9px] uppercase tracking-wider text-warning">
+            a resposta veio no teto — pode haver peça fora desta tela
+          </span>
+        )}
         {base != null && futuras.length > 0 && (
           <span className="font-mono text-[9px] uppercase tracking-wider text-muted">
             {nenhumaCasa ? (
