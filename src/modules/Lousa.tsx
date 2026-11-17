@@ -34,6 +34,19 @@ interface Peca {
   titulo: string | null;
 }
 
+// Projeção (etapa 1b). A base vem de `public.v_lousa_base`, onde o critério mora escrito — e mora lá,
+// e não aqui, porque eu e o Orquestrador medimos o mesmo número hoje e demos valores diferentes (28 e
+// 31), por causa da janela de 28 dias andando com a hora. Dois números para a mesma coisa é pior que
+// nenhum.
+//
+// O que a tela NUNCA faz com o previsto: somar com o medido, e pintar com a cor de resultado. Previsto
+// é hipótese; se ele usar o verde do publicado, vira promessa.
+interface Base {
+  conta: string; rede: string; tipo: string;
+  pecas: number; mediana: number; p25: number; p75: number; maior: number; serve_de_base: boolean;
+}
+const chaveBase = (x: { conta: string; rede: string; tipo: string }) => `${x.conta}|${x.rede}|${x.tipo}`;
+
 const DIAS = ['segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado', 'domingo'];
 
 // Estado conhecido ganha tom; o que não conheço fica neutro E aparece escrito como veio.
@@ -78,6 +91,7 @@ export default function Lousa() {
   const [marca, setMarca] = useState('todas');
   const [rede, setRede] = useState('todas');
   const [publicador, setPublicador] = useState('todos');
+  const [base, setBase] = useState<Map<string, Base> | null>(null);
   // Cancelado fica escondido por padrão (pedido do dono em 17/11): a fila do motor acumula cancelamento
   // antigo, e 330 peças canceladas empurram para fora da vista o que ainda vai sair.
   const [verCancelados, setVerCancelados] = useState(false);
@@ -86,6 +100,11 @@ export default function Lousa() {
     supabase.from('v_lousa').select('*').then(({ data, error }) => {
       if (error) { setErro(error.message); setPecas([]); return; }
       setPecas((data ?? []) as Peca[]);
+    });
+    // A base não derruba a Lousa se falhar: a agenda é o que a tela existe para mostrar, e a projeção é
+    // o acréscimo. Mas também não fica em silêncio — sem base, o cartão diz "sem base", não some.
+    supabase.from('v_lousa_base').select('*').then(({ data }) => {
+      setBase(new Map(((data ?? []) as Base[]).map((b) => [chaveBase(b), b])));
     });
   }, []);
 
@@ -118,6 +137,17 @@ export default function Lousa() {
     && (marca === 'todas' || p.marca === marca) && (rede === 'todas' || p.rede === rede)
     && (publicador === 'todos' || p.publicador === publicador)).length;
   const semData = visiveis.filter((p) => !p.quando);
+
+  // Só peça que ainda vai sair recebe projeção: prever o que já foi publicado é enfeite, e ainda por
+  // cima competiria com o número medido ao lado.
+  const AINDA_VAI_SAIR = ['agendado', 'planejado', 'no_planner', 'rascunho'];
+  const futuras = visiveis.filter((p) => p.quando && diaBRT(p.quando) >= hoje && AINDA_VAI_SAIR.includes(p.estado));
+  const futurasComBase = futuras.map((p) => base?.get(chaveBase(p))).filter((b): b is Base => !!b?.serve_de_base);
+  const previsto = futurasComBase.reduce((a, b) => a + b.mediana, 0);
+  // A quarta trava, minha: "esta conta é nova" e "os dois lados não falam a mesma língua" pedem ações
+  // opostas. Se NENHUMA peça futura encontra grupo e a base existe, isso não é falta de história.
+  const nenhumaCasa = base != null && base.size > 0 && futuras.length > 0
+    && futuras.every((p) => !base.get(chaveBase(p)));
   const porDia = useMemo(() => {
     const m = new Map<string, Peca[]>();
     for (const p of visiveis) {
@@ -174,6 +204,18 @@ export default function Lousa() {
           {visiveis.length} peça(s) · {conta('publicado')} publicadas · {conta('agendado')} agendadas
           {conta('falhou') > 0 && <span className="text-danger"> · {conta('falhou')} falhou</span>}
         </span>
+        {base != null && futuras.length > 0 && (
+          <span className="font-mono text-[9px] uppercase tracking-wider text-muted">
+            {nenhumaCasa ? (
+              <span className="text-warning">
+                nenhuma das {futuras.length} peças futuras encontra história — não é conta nova, é a
+                agenda e a medição falando línguas diferentes
+              </span>
+            ) : (
+              <>previsto ~{previsto.toLocaleString('pt-BR')} views em {futurasComBase.length} de {futuras.length} que ainda vão sair</>
+            )}
+          </span>
+        )}
         {cancelados > 0 && (
           <button onClick={() => setVerCancelados(!verCancelados)}
             className={`font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 border transition-colors ${
@@ -212,7 +254,8 @@ export default function Lousa() {
                   {lista.length > 0 && <span className="font-mono text-[9px] text-muted">{lista.length}</span>}
                 </div>
                 <div className="divide-y divide-outline/10">
-                  {lista.map((p) => <Cartao key={`${p.origem}-${p.publicador}-${p.origem_ref}`} p={p} />)}
+                  {lista.map((p) => <Cartao key={`${p.origem}-${p.publicador}-${p.origem_ref}`} p={p}
+                    base={base?.get(chaveBase(p))} futura={p.quando != null && diaBRT(p.quando) >= hoje && AINDA_VAI_SAIR.includes(p.estado)} />)}
                 </div>
               </div>
             );
@@ -239,7 +282,7 @@ export default function Lousa() {
   );
 }
 
-function Cartao({ p }: { p: Peca }) {
+function Cartao({ p, base, futura }: { p: Peca; base?: Base; futura?: boolean }) {
   const tom = TOM[p.estado] ?? 'text-on-surface';
   const rotulado = ROTULO[p.estado] ?? p.estado;
   // Conta que é só número é id de Página (Facebook) ou de empresa (LinkedIn) — um número na tela não diz
@@ -260,6 +303,19 @@ function Cartao({ p }: { p: Peca }) {
               "cancelado · erro" faz parecer que algo quebrou quando alguém só desmarcou a peça. */}
           {p.erro && p.estado !== 'cancelado' && <span className="text-danger"> · erro</span>}
         </div>
+        {/* Previsto: cor neutra sempre, e o tamanho da base junto. Número sem denominador é palpite
+            com cara de medição. */}
+        {futura && (
+          <div className="font-mono text-[9px] tracking-wider text-muted normal-case">
+            {base?.serve_de_base
+              ? `~${base.mediana} views · ${base.p25}–${base.p75} · base ${base.pecas}`
+              : base
+                ? (base.maior === 0
+                    ? 'sem leitura nesta conta'
+                    : `base curta (${base.pecas} de 4)`)
+                : 'sem base'}
+          </div>
+        )}
       </div>
     </div>
   );
