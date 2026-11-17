@@ -90,6 +90,10 @@ export default function LeiturasCard() {
   const porPeca = new Map<string, Linha[]>();
   for (const l of linhas ?? []) porPeca.set(l.peca_ref, [...(porPeca.get(l.peca_ref) ?? []), l]);
   const naoMedidas = [...porPeca.values()].filter((ls) => ls.every((l) => l.views == null));
+  // Curtida e comentário têm cobertura MUITO menor que view (68 de 647 linhas em 30 dias, medido em
+  // 17/11). Somar os nulos como zero faria a tela dizer "8 curtidas em 602 peças", que é um juízo sobre
+  // o conteúdo — quando a verdade é que 534 peças nunca tiveram curtida coletada.
+  const comEngajamento = [...porPeca.values()].filter((ls) => ls.some((l) => l.curtidas != null)).length;
 
   const casaViews = soma(linhas ?? [], 'views');
   const pulsoViews = pulso ? noPeriodo(pulso.linhas).reduce((a, x) => a + (x.views ?? 0), 0) : 0;
@@ -158,8 +162,10 @@ export default function LeiturasCard() {
               sub={`${kilo(casaViews)} contas da casa · ${kilo(pulsoViews + longosViews)} Pulso · ${kilo(limeViews)} Limelight`} />
             <Numero valor={n(porPeca.size)} rotulo="peças nas contas da casa"
               sub={naoMedidas.length > 0 ? `${naoMedidas.length} sem leitura coletada` : 'todas com leitura'} />
-            <Numero valor={n(soma(linhas, 'curtidas'))} rotulo="curtidas"
-              sub={`${n(soma(linhas, 'comentarios'))} comentários · ${n(soma(linhas, 'compartilhamentos'))} compart.`} />
+            <Numero valor={comEngajamento === 0 ? '—' : n(soma(linhas, 'curtidas'))} rotulo="curtidas"
+              sub={comEngajamento === 0
+                ? 'nenhuma peça com curtida coletada'
+                : `só ${comEngajamento} de ${porPeca.size} peças medidas · ${n(soma(linhas, 'comentarios'))} coment. · ${n(soma(linhas, 'compartilhamentos'))} compart.`} />
             <Numero valor={blogLeituras > 0 ? kilo(blogLeituras) : '—'} rotulo="leituras de blog"
               sub="unidade diferente: não entra nas views" />
           </div>
