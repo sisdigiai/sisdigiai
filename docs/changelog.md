@@ -82,6 +82,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplifica
 - **Espelho:** a migration foi copiada para `docs/migrations/migrations/`. **O `schema.sql` não foi regenerado** (não conheço o gerador); fica para o agente do app, junto com a linha do módulo no `AGENTS.md`.
 - **Dúvida que continua do agente do app:** o portão da escolha é `is_staff()`. Se o papel do dono em `iam.users` for `founder`, trocar por `is_founder()` deixa a escolha só com ele.
 
+## 2026-11-17 (madrugada) — Lousa de publicação, etapa 1: a semana inteira num lugar só
+
+- **O dono perguntou "não era para ficar dentro do digiai?"** — estava olhando um protótipo parado, fora do app. A página `#/lousa` entrou ao lado de Controle, às **02h51 BRT**, lendo `public.v_mkt_lousa`.
+- **O que ela mostra:** coluna por dia da semana (em BRT), cartão com hora, conta, rede, título e estado; faixa com a cor da marca; filtro por marca e por rede, com contadores que **respeitam um ao outro** — botão cujo número não muda quando o vizinho muda faz a pessoa clicar e achar que a tela quebrou. Hoje: 99 peças na semana, 10 publicadas, 23 agendadas.
+- **Duas recusas, as duas medidas antes de escrever uma linha:** estado que a tela não conhece aparece **com o nome dele** (a view devolve 7 estados e o ADR-0066 lista 5 — `no_planner` e `rascunho` vêm do motor, não daqui); e peça **sem data ganha bloco próprio** (4 de 1.056 hoje, todas `planejado`), porque numa grade por dia elas não teriam onde cair, e cair fora da tela é o mesmo que não existir.
+- **A cor da marca vem do dado** (`accent_hex`, da view), não de valor escrito na tela: é identidade guardada no banco. O resto é token do design system (R-014).
+- **Achado antes de existir:** medindo a view, vi que ela já traz 135 linhas com `origem = 'pulso'` e `publicador = 'mkt'`. Quando o Pulso enviar as contas dele com a mesma origem e o mesmo ref, a chave `(origem, origem_ref)` casaria peças diferentes e **a segunda apagaria a primeira em silêncio**. A chave da etapa 2 passou a ser **(origem, publicador, origem_ref)** — com 0 colisões hoje, o conserto custou uma linha de contrato.
+- **Conferido em produção:** a marcação de "hoje" caiu na coluna certa (ter 17/11, com a página aberta às 02h52), que é a prova de que o dia é calculado em BRT e não em UTC.
+
 ## 2026-11-17 — Quem escreve de fora assina, e o dono não cola segredo (233 + `cortes-gravar`)
 
 - **O desenho que estava em pé pedia a chave de serviço no `.env` de um motor local.** Essa chave passa por cima da RLS do banco **inteiro**, não só do schema de quem a usa. O dono estranhou e não colou — e estava certo. Havia **3 segredos esperando a mão dele**; este desenho derruba dois.
