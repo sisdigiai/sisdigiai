@@ -92,6 +92,17 @@ O dono segurou a aula de 24/11 em 17/11, no canal do marketing. A aba Aula conti
 - **Espelho:** a migration foi copiada para `docs/migrations/migrations/`. **O `schema.sql` não foi regenerado** (não conheço o gerador); fica para o agente do app, junto com a linha do módulo no `AGENTS.md`.
 - **Dúvida que continua do agente do app:** o portão da escolha é `is_staff()`. Se o papel do dono em `iam.users` for `founder`, trocar por `is_founder()` deixa a escolha só com ele.
 
+## 2026-11-17 (18h14) — A casa renova os links do Cortes sozinha (240 + 241)
+
+- **O risco, com data:** os 85 links do ECO01 vencem 24/11 e o robô do MKT agendou peça até 08/12. Sem renovação, tudo de 24/11 em diante sairia **sem mídia** — e não como erro, mas como vídeo que não abre.
+- **Rodada diária** `cortes-renova-links-diario`, 09h BRT, janela de 72h, renovando toda peça não publicada que vence em menos de três dias. Chave lida do Vault, como o resto da casa: **ninguém digita segredo**. O motor continua podendo chamar `links` quando rodar.
+- **Erro meu que isto conserta:** eu escrevi na própria função que link vencendo sem ninguém ver "não dá erro, dá um vídeo que não abre" — **e deixei a renovação dependendo de alguém chamar**. Renovação é do servidor, não de máquina ligada.
+- **Erro que a prova achou:** a primeira versão comparava a chave de serviço com a da env e levou **401** — a env tem o formato novo (`sb_secret_…`), o Vault tem a legada, as duas válidas. Pior que o 401: comparação de chave **quebraria calada a cada rotação de 90 dias** (R-021), num caminho que roda uma vez por dia e ninguém olha. **241** faz a borda perguntar ao banco quem está chamando, em vez de guardar cópia de chave.
+- **Provado pelo comando do job tal como está gravado:** 85 de 85 renovados, `url_expira` de 24/11 18:09:12 para 18:13:56, e a `ultima_entrega` do motor **não mudou** — nenhuma rodada dele.
+- **Teto da fila (500) passou a vir dito** na resposta. Mesma classe do teto de mil linhas que cegou a Lousa de manhã: resposta de sucesso que esconde o resto.
+
+**Próximo número livre: 242.**
+
 ## 2026-11-17 (17h12) — A porta de leitura do motor do Cortes, e o rótulo de quem publica (239)
 
 - **239:** `public.cortes_ler_episodio(codigo)` e a ação `ler` na `cortes-gravar`. O dono aprova na tela publicada, a decisão fica no banco — e **nada chegava à máquina**, porque a chave de serviço não mora lá (R-042) e é assim que tem de ser. Agora a leitura vem pela mesma porta assinada por onde o motor já escreve: mesma chave, mesma porta `cortes`, só leitura, só o episódio pedido.
