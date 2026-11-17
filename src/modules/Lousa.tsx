@@ -8,9 +8,13 @@ import { supabase } from '../lib/supabase';
 // motores publicavam em ~30 contas e ninguém via o conjunto — em 12/11 a Meta bloqueou um Instagram da casa
 // e só se soube depois.
 //
-// ETAPA 1: só o que vem de `public.v_mkt_lousa` (MKT, e os cortes do Pulso que o MKT publica). Pulso e
-// Limelight entram na etapa 2, pela função de entrada assinada, com a mesma chave (origem, publicador,
-// origem_ref).
+// ETAPA 2 (17/11, 03h): a tela lê `public.v_lousa` — o que o MKT publica MAIS o que Pulso e Limelight
+// enviam pela `lousa-entrada`, assinado com Ed25519. A chave é (origem, publicador, origem_ref): o
+// publicador entrou nela depois de eu medir que a v_mkt_lousa já traz 135 linhas com origem='pulso'
+// publicadas pelo MKT — sem ele, o envio do Pulso apagaria essas linhas em silêncio.
+//
+// O FILTRO POR PUBLICADOR existe por causa disso: a mesma peça pode sair pela conta do MKT e pela conta
+// de quem a produziu, e são publicações diferentes, não repetição.
 //
 // DUAS RECUSAS DE PROPÓSITO, as duas medidas antes de escrever:
 //   · **Estado que eu não conheço aparece com o nome dele**, nunca engolido. A view devolve 7 estados e o
@@ -73,12 +77,13 @@ export default function Lousa() {
   const [semana, setSemana] = useState(() => segundaDaSemana(new Date()));
   const [marca, setMarca] = useState('todas');
   const [rede, setRede] = useState('todas');
+  const [publicador, setPublicador] = useState('todos');
   // Cancelado fica escondido por padrão (pedido do dono em 17/11): a fila do motor acumula cancelamento
   // antigo, e 330 peças canceladas empurram para fora da vista o que ainda vai sair.
   const [verCancelados, setVerCancelados] = useState(false);
 
   useEffect(() => {
-    supabase.from('v_mkt_lousa').select('*').then(({ data, error }) => {
+    supabase.from('v_lousa').select('*').then(({ data, error }) => {
       if (error) { setErro(error.message); setPecas([]); return; }
       setPecas((data ?? []) as Peca[]);
     });
@@ -93,9 +98,10 @@ export default function Lousa() {
     () => (pecas ?? []).filter((p) => !p.quando || chavesDaSemana.has(diaBRT(p.quando))),
     [pecas, chavesDaSemana],
   );
-  const casa = (p: Peca, f: { m?: string; r?: string }) =>
+  const casa = (p: Peca, f: { m?: string; r?: string; p?: string }) =>
     ((f.m ?? marca) === 'todas' || p.marca === (f.m ?? marca))
     && ((f.r ?? rede) === 'todas' || p.rede === (f.r ?? rede))
+    && ((f.p ?? publicador) === 'todos' || p.publicador === (f.p ?? publicador))
     && (verCancelados || p.estado !== 'cancelado');
 
   const contar = (lista: Peca[], k: (p: Peca) => string) => {
@@ -103,12 +109,14 @@ export default function Lousa() {
     for (const p of lista) m.set(k(p), (m.get(k(p)) ?? 0) + 1);
     return [...m.entries()].sort((a, b) => b[1] - a[1]);
   };
-  const marcas = useMemo(() => contar(naSemana.filter((p) => casa(p, { m: 'todas' })), (p) => p.marca), [naSemana, rede, verCancelados]);
-  const redes = useMemo(() => contar(naSemana.filter((p) => casa(p, { r: 'todas' })), (p) => p.rede), [naSemana, marca, verCancelados]);
+  const marcas = useMemo(() => contar(naSemana.filter((p) => casa(p, { m: 'todas' })), (p) => p.marca), [naSemana, rede, publicador, verCancelados]);
+  const redes = useMemo(() => contar(naSemana.filter((p) => casa(p, { r: 'todas' })), (p) => p.rede), [naSemana, marca, publicador, verCancelados]);
+  const publicadores = useMemo(() => contar(naSemana.filter((p) => casa(p, { p: 'todos' })), (p) => p.publicador), [naSemana, marca, rede, verCancelados]);
 
-  const visiveis = useMemo(() => naSemana.filter((p) => casa(p, {})), [naSemana, marca, rede, verCancelados]);
+  const visiveis = useMemo(() => naSemana.filter((p) => casa(p, {})), [naSemana, marca, rede, publicador, verCancelados]);
   const cancelados = naSemana.filter((p) => p.estado === 'cancelado'
-    && (marca === 'todas' || p.marca === marca) && (rede === 'todas' || p.rede === rede)).length;
+    && (marca === 'todas' || p.marca === marca) && (rede === 'todas' || p.rede === rede)
+    && (publicador === 'todos' || p.publicador === publicador)).length;
   const semData = visiveis.filter((p) => !p.quando);
   const porDia = useMemo(() => {
     const m = new Map<string, Peca[]>();
@@ -180,6 +188,11 @@ export default function Lousa() {
       <Filtro rotulo="rede" valor={rede} aoTrocar={setRede}
         opcoes={[{ id: 'todas', label: 'todas', n: naSemana.filter((p) => casa(p, { r: 'todas' })).length },
                  ...redes.map(([id, n]) => ({ id, label: id, n }))]} />
+      {publicadores.length > 1 && (
+        <Filtro rotulo="quem publica" valor={publicador} aoTrocar={setPublicador}
+          opcoes={[{ id: 'todos', label: 'todos', n: naSemana.filter((p) => casa(p, { p: 'todos' })).length },
+                   ...publicadores.map(([id, n]) => ({ id, label: id, n }))]} />
+      )}
 
       {pecas === null ? (
         <div className="border border-outline/15 bg-surface-container p-3 font-mono text-[10px] uppercase tracking-wider text-muted">lendo…</div>

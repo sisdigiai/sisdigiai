@@ -67,10 +67,15 @@ Deno.serve(async (req) => {
   const sb = createClient(url, chaveServico);
 
   // Quem é o emissor, lido do BANCO (R-037). Erro de leitura não abre a porta.
-  const { data: emissor, error: eLeitura } = await sb.schema("ops")
-    .from("emissor_externo").select("chave_publica, ativo").eq("nome", origem).maybeSingle();
+  //
+  // A consulta pede a chave PARA ESTA PORTA. Antes ela lia a tabela inteira e aceitava qualquer emissor
+  // ativo — e como a mesma tabela guarda os emissores da Lousa, a chave do Limelight podia gravar
+  // episódio aqui (achado por mim em 17/11, ninguém usou: `ultima_entrega` nula e 0 episódios).
+  // Agora quem decide é o banco, numa função só, e emissor sem a porta `cortes` não recebe chave nenhuma.
+  const { data: chavePublica, error: eLeitura } = await sb.schema("ops")
+    .rpc("fn_emissor_chave", { p_nome: origem, p_porta: "cortes" });
   if (eLeitura) return json({ erro: "não consegui conferir o emissor" }, 401);
-  if (!emissor || !emissor.ativo) return json({ erro: `origem '${origem}' desconhecida ou inativa` }, 401);
+  if (!chavePublica) return json({ erro: `origem '${origem}' desconhecida, inativa ou sem esta porta` }, 401);
 
   const resumo = hex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(corpoTexto)));
   const mensagem = new TextEncoder().encode(`${origem}.${ts}.${resumo}`);
@@ -78,7 +83,7 @@ Deno.serve(async (req) => {
   let valida = false;
   try {
     const publica = await crypto.subtle.importKey(
-      "spki", base64ParaBytes(emissor.chave_publica), { name: "Ed25519" }, false, ["verify"]);
+      "spki", base64ParaBytes(chavePublica as string), { name: "Ed25519" }, false, ["verify"]);
     valida = await crypto.subtle.verify({ name: "Ed25519" }, publica, base64ParaBytes(assinatura), mensagem);
   } catch {
     valida = false;   // chave torta ou assinatura torta é assinatura inválida, não exceção para o chamador
