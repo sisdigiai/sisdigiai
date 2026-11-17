@@ -92,6 +92,16 @@ O dono segurou a aula de 24/11 em 17/11, no canal do marketing. A aba Aula conti
 - **Espelho:** a migration foi copiada para `docs/migrations/migrations/`. **O `schema.sql` não foi regenerado** (não conheço o gerador); fica para o agente do app, junto com a linha do módulo no `AGENTS.md`.
 - **Dúvida que continua do agente do app:** o portão da escolha é `is_staff()`. Se o papel do dono em `iam.users` for `founder`, trocar por `is_founder()` deixa a escolha só com ele.
 
+## 2026-11-17 (tarde) — Lousa: os quatro ajustes que o dono pediu olhando a tela
+
+Pedidos do dono pelo Geral, depois de abrir a `#/lousa` em produção. Todos na tela, nenhum no dado.
+
+- **Conta que é só número mostra o nome.** `1316648551541152` não diz nada a quem lê; a tela passa a escrever `digiaibr` (o `conta_nome` da view) quando o identificador é numérico — id de Página do Facebook ou de empresa do LinkedIn. Onde a conta é arroba, o arroba continua sendo o nome real.
+- **"no Planner" em vez de `NO_PLANNER`.** Um mapa de rótulo com uma entrada só; estado que não estiver nele **continua saindo como veio**, que é a recusa da etapa 1 (estado desconhecido aparece com o nome dele, não vira "outro").
+- **Cancelado sai da vista por padrão, com botão para ver.** A fila do motor acumula cancelamento antigo: das 99 peças da semana, **32 estavam canceladas** e empurravam para fora da vista o que ainda vai sair. O filtro entrou **dentro do `casa()`**, junto com marca e rede, para os contadores e os botões continuarem contando a mesma coisa que a grade mostra — contador que discorda da tela é o defeito que a etapa 1 já tinha evitado.
+- **Cancelado não leva mais a marca de "· erro".** A fila guarda o motivo do cancelamento no mesmo campo do erro; "cancelado · erro" fazia parecer que algo quebrou quando alguém só desmarcou a peça.
+- **Conferido em produção** (`app.digiai.app.br/#/lousa`, bundle `index-CioVYhLH.js`): contador lendo "67 peça(s) · 10 publicadas · 23 agendadas · mostrar 32 cancelada(s)", `no Planner` em caixa mista e `digiaibr` no lugar do id.
+
 ## 2026-11-17 (madrugada) — Lousa de publicação, etapa 1: a semana inteira num lugar só
 
 - **O dono perguntou "não era para ficar dentro do digiai?"** — estava olhando um protótipo parado, fora do app. A página `#/lousa` entrou ao lado de Controle, às **02h51 BRT**, lendo `public.v_mkt_lousa`.
