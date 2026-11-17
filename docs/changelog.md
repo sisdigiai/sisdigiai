@@ -92,6 +92,17 @@ O dono segurou a aula de 24/11 em 17/11, no canal do marketing. A aba Aula conti
 - **Espelho:** a migration foi copiada para `docs/migrations/migrations/`. **O `schema.sql` não foi regenerado** (não conheço o gerador); fica para o agente do app, junto com a linha do módulo no `AGENTS.md`.
 - **Dúvida que continua do agente do app:** o portão da escolha é `is_staff()`. Se o papel do dono em `iam.users` for `founder`, trocar por `is_founder()` deixa a escolha só com ele.
 
+## 2026-11-17 (17h10) — O Cortes entra: chave cadastrada, links de leitura assinados, substituição declarada (237 + 238)
+
+- **237:** a chave pública do motor do Cortes, porta `{cortes}` só. Conferida por mim do arquivo do Cockpit — 44 bytes SPKI, ed25519, assinatura falsa recusada, impressão `0f9b170a…629c` — e a prova 2 falha se o banco não tiver essa chave. O motor estava parado desde as 12h30 e o primeiro corte é 23/11.
+- **Gravar por cima: medido, não deduzido.** O link de envio recusava o mesmo caminho (`The resource already exists`) — o que travava o vídeo corrigido, que tem o mesmo nome. Agora aceita com `"substituir": true`, e **nunca por padrão**: substituição silenciosa apagaria um arquivo bom por engano do motor, sem rastro.
+- **238:** as duas portas que deixam a borda assinar os links de leitura que o robô do MKT consome. `url_assinada` vinha da carga, e o motor **não pode** preenchê-la: não segura credencial do depósito. Agora assina quem guarda a credencial — ao gravar, e pela ação `links` (validade 7 dias, renova o que vence em 48h, porque link que expira no sábado e só seria renovado na segunda deixa o robô sem vídeo sem nenhum erro aparecer).
+- **O defeito que só o teste de ponta a ponta achou:** a primeira versão lia `cortes.pecas` direto e devolvia **`Invalid schema: cortes`** — a API REST não expõe esse schema. Entregue pelo que o código parecia fazer, as 85 peças já gravadas chegariam ao MKT **sem vídeo**, e isso só apareceria no dia da publicação.
+- **A primeira sabotagem da 238 passou, e isso ensinou mais que uma falha:** eu tinha atacado uma cláusula redundante. Sabotagem que passa não prova que a prova é boa — prova que ataquei o lugar errado. Refeita contra as duas guardas, a prova falhou como devia.
+- **Um arquivo meu ficou no depósito** (`cortes/provaappdigiai/upsert.srt`, 14 bytes, do teste). O banco bloqueia exclusão direta e a `cortes-gravar` não tem ação de apagar — **mantida a promessa em vez de abrir uma porta de exclusão para limpar o próprio lixo.** Declarado ao Cortes.
+
+**Próximo número livre: 239.**
+
 ## 2026-11-17 (04h03) — A Lousa mostrava mil de 1.186: o teto silencioso da leitura
 
 Achado pelo Orquestrador **abrindo a tela no Chrome do dono** — não lendo código nem conferindo pacote.
