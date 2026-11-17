@@ -173,9 +173,21 @@ const POLA_URL = import.meta.env.VITE_POLA_SUPABASE_URL as string | undefined;
 const POLA_ANON = import.meta.env.VITE_POLA_SUPABASE_ANON_KEY as string | undefined;
 export interface PolaDia { dia: string; plataforma: string; publicacoes: number; views: number }
 
+// Cortes e longos do Pulso, nas contas DELE (2026-11-17, pedido meu ao Pulso no mesmo dia). Ficavam em
+// `pulso_analytics.leituras_longos`, sem espelho, e por isso não entravam no total do painel do dono.
+// As contas da DIGIAI ficam FORA desta view de propósito: elas já estão na v_mkt_analytics_peca_dia, e
+// somar as duas contaria a mesma peça duas vezes. Conferido por mim como anon em 17/11: 30 linhas,
+// 1.084 views, 0 linhas com conta da DIGIAI.
+export interface PulsoLongoDia {
+  dia: string; plataforma: string; conta: string; tipo: 'corte' | 'longo';
+  publicacoes: number; views: number; likes: number; comentarios: number; shares: number;
+  horas_exibicao: number | null; retencao_media_pct: number | null;
+}
+
 // Leitores com motivo, para a tela do comparativo. Os sem estado continuam para as telas antigas.
 export const espelhoMotoresEstado = {
   pulsoDias: () => lerLinhasEstado<PulsoDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_dias'),
+  pulsoLongosDias: () => lerLinhasEstado<PulsoLongoDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_longos_dias'),
   limelightPubDias: () => lerLinhasEstado<LimePubDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_pub_dias'),
   blogsDias: () => lerLinhasEstado<BlogDia>(BLOGS_URL, BLOGS_ANON, 'v_espelho_blogs_dias'),
   polaDias: () => lerLinhasEstado<PolaDia>(POLA_URL, POLA_ANON, 'v_pola_redes_metricas_dia'),

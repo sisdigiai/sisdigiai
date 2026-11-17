@@ -3,6 +3,7 @@ import { ExternalLink, RefreshCw, Info, Radio, DollarSign, Send, Target, Calenda
 import PageHeader from '../components/PageHeader';
 import { TravasBanner } from './TravasMarketing';
 import ResultadoConteudoCard from './marketing/ResultadoConteudoCard';
+import LeiturasCard from './marketing/LeiturasCard';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia } from '../lib/datas';
 import { espelhoMotores, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
@@ -164,6 +165,7 @@ export default function MarketingEspelho() {
           ))}
         </div>
 
+        {aba === 'resultado' && <LeiturasCard />}
         {aba === 'resultado' && <ResultadoConteudoCard />}
 
         {loading ? (
