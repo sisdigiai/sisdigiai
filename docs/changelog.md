@@ -92,6 +92,22 @@ O dono segurou a aula de 24/11 em 17/11, no canal do marketing. A aba Aula conti
 - **Espelho:** a migration foi copiada para `docs/migrations/migrations/`. **O `schema.sql` não foi regenerado** (não conheço o gerador); fica para o agente do app, junto com a linha do módulo no `AGENTS.md`.
 - **Dúvida que continua do agente do app:** o portão da escolha é `is_staff()`. Se o papel do dono em `iam.users` for `founder`, trocar por `is_founder()` deixa a escolha só com ele.
 
+## 2026-11-17 (03h40) — Lousa 1b: a projeção, por mediana e com o tamanho da base junto (236)
+
+- **`public.v_lousa_base`**: história de 28 dias por conta/rede/tipo, **mediana e faixa p25–p75, nunca média**. O critério mora na view, não na tela, porque eu e o Orquestrador medimos o mesmo número hoje e demos **28 e 31** — era a janela andando com a hora, e dois números para a mesma coisa é pior que nenhum.
+- **Por que mediana:** medido, o grupo `instagram/post` tem mediana **119** e melhor post **3.279**. A média prometeria à próxima peça um número que quase nenhuma peça alcançou.
+- **Grupo todo em zero não é base, e isso nasceu de medição:** `facebook/reel` tem **37 peças, 37 com o campo `views` preenchido, todas em zero**, e nenhuma com compartilhamento. É coleta vazia, não peça que não rendeu. Sem essa trava a tela diria "previsto 0 views" para o Facebook — que o dono leria como "vai fracassar". O cartão dessas peças diz **"sem leitura nesta conta"**.
+- **Conta nula fica fora:** são **199 linhas** da analytics, justamente as de história mais rica (`instagram/post` com 111 peças). Elas não se ligam a agenda nenhuma. Avisado ao MKT no mesmo dia; quando ele consertar, a base passa a valer sozinha.
+- **No cartão:** `~{mediana} views · {p25}–{p75} · base {n}` para quem tem base; **"base curta (2 de 4)"**, **"sem leitura nesta conta"** ou **"sem base"** para quem não tem — nomes diferentes porque pedem ações diferentes. **Só peça que ainda vai sair** recebe projeção.
+- **Previsto nunca soma com medido nem usa a cor de resultado.** No cabeçalho: *"previsto ~45 views em 8 de 47 que ainda vão sair"*, em tom neutro.
+- **A quarta trava, minha:** se **nenhuma** peça futura encontrar história e a base existir, a tela diz que **a agenda e a medição falam línguas diferentes** — não diz "sem base" peça por peça. "Conta nova" pede paciência; "os dois lados não se ligam" pede conserto.
+- **6 provas na migration**, com sabotagem antes (tirei a condição da prova 3 e o banco recusou, apontando 12 grupos). A prova 5 lê a **definição** da view e falha se ela calcular média.
+
+### Um erro meu, e o que ele custou
+
+- **Publiquei a 1b com a Lousa em branco.** Usei `hoje` numa linha acima da que declara `hoje`: `const` não existe antes da sua declaração, e a tela inteira caiu. **O build passou** — isto só aparece ao rodar. **Das 03h33 às 03h38 a Lousa ficou em branco em produção.**
+- **O que achou foi abrir a tela, não ler o bundle.** O bundle publicado tinha todas as marcas que eu procurava e estava quebrado assim mesmo. Conferir conteúdo publicado prova que o deploy saiu; só abrir prova que funciona.
+
 ## 2026-11-17 (03h) — Lousa etapa 2 e as leituras do conteúdo no espelho do marketing (235 + `lousa-entrada`)
 
 ### A Lousa passa a receber de fora
