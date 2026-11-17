@@ -73,6 +73,12 @@ async function assinarLinks(
   if (error) return { pecas: 0, links: 0, avisos: [`não consegui listar as peças: ${error.message}`] };
 
   const pecas = (fila ?? []) as Array<{ id: string; caminhos: string[] }>;
+  // A fila vem com teto de 500 na RPC. Resposta que chega EXATAMENTE no teto pode estar cortada, e um
+  // teto silencioso é como a Lousa mostrou mil de 1.186 linhas hoje de manhã sem nenhum erro aparecer:
+  // uma resposta de sucesso que esconde o resto. Aqui ele vai dito.
+  if (pecas.length >= 500) {
+    avisos.push("a fila veio no teto de 500 peças: pode haver peça por renovar nesta passagem");
+  }
   const gravar: Array<Record<string, unknown>> = [];
   let links = 0;
 
@@ -126,6 +132,41 @@ Deno.serve(async (req) => {
   // Corpo lido como TEXTO: o que se assina é o byte que veio, não o objeto que eu reconstruí. Reserializar
   // antes de conferir faria a assinatura valer para um texto que o emissor nunca mandou.
   const corpoTexto = await req.text();
+
+  // UMA SEGUNDA PORTA, SÓ PARA A RENOVAÇÃO DE LINKS, e só para a casa.
+  //
+  // Por quê: os links valem 7 dias e o robô do MKT agendou peça até 08/12. Quem chamaria a renovação
+  // era o motor — que roda na máquina do dono, com a rodada desligada. Renovação é do servidor, não de
+  // máquina ligada. O cron diário chama aqui com a chave de serviço lida do Vault.
+  //
+  // COMO A FUNÇÃO SABE QUE É A CASA: perguntando ao BANCO, não comparando chave. A primeira versão
+  // comparava com `SUPABASE_SERVICE_ROLE_KEY` da env e levou 401 na prova — a env tem o formato novo
+  // (`sb_secret_…`) e o Vault tem a legada, as duas válidas. E comparação de chave quebraria calada a
+  // cada rotação (R-021, 90 dias), num caminho que roda uma vez por dia e ninguém olha. Quem valida a
+  // chave é quem a emitiu: a borda abre um cliente com a chave recebida e pergunta o papel dela.
+  //
+  // Isto não alarga poder: quem tem a chave de serviço já escreve no banco inteiro. E vale **só para
+  // `links`**, que não tem entrada nenhuma do chamador — sem caminho, sem carga, sem episódio alheio.
+  const urlCasa = Deno.env.get("SUPABASE_URL");
+  const portador = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
+  if (!origem && !assinatura && portador && urlCasa) {
+    let cargaCasa: Record<string, unknown>;
+    try { cargaCasa = JSON.parse(corpoTexto || "{}"); } catch { return json({ erro: "corpo não é JSON" }, 400); }
+    if (String(cargaCasa.acao ?? "") !== "links") {
+      return json({ erro: "a chave da casa só vale para a ação 'links'" }, 401);
+    }
+    const sbCasa = createClient(urlCasa, portador);
+    const { data: papel, error: ePapel } = await sbCasa.rpc("cortes_quem_sou");
+    if (ePapel || papel !== "service_role") {
+      return json({ erro: "esta chave não é a da casa" }, 401);
+    }
+    const r = await assinarLinks(sbCasa, {
+      codigo: cargaCasa.episodio ? String(cargaCasa.episodio) : undefined,
+      horas: typeof cargaCasa.horas === "number" ? cargaCasa.horas : undefined,
+    });
+    console.log(`[cortes-gravar] renovação da casa: ${JSON.stringify(r)}`);
+    return json({ acao: "links", por: "a casa", ...r });
+  }
 
   if (!origem || !ts || !assinatura) return json({ erro: "faltam x-origem, x-ts ou x-assinatura" }, 401);
 
