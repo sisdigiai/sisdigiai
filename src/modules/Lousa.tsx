@@ -137,8 +137,10 @@ export default function Lousa() {
       <div>
         <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">Lousa</div>
         <p className="mt-1 text-[13px] text-muted max-w-3xl">
-          O que sai esta semana, de todas as marcas e contas, num lugar só. Etapa 1: o que vem do motor de
-          marketing (inclui os cortes do Pulso que ele publica). Pulso e Limelight entram na etapa 2.
+          O que sai esta semana, de todas as marcas e contas, num lugar só: o que o motor de marketing
+          publica (inclui os cortes do Pulso que ele publica) e o que Pulso e Limelight enviam assinado,
+          das contas deles. Quando as duas origens publicarem na mesma semana, aparece o filtro de quem
+          publica — a mesma peça pode sair por duas contas, e são publicações diferentes, não repetição.
         </p>
       </div>
 
