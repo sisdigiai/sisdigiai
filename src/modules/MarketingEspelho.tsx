@@ -3,7 +3,8 @@ import { ExternalLink, RefreshCw, Info, Radio, DollarSign, Send, Target, Calenda
 import PageHeader from '../components/PageHeader';
 import { TravasBanner } from './TravasMarketing';
 import ResultadoConteudoCard from './marketing/ResultadoConteudoCard';
-import LeiturasCard, { type Periodo } from './marketing/LeiturasCard';
+import LeiturasCard from './marketing/LeiturasCard';
+import Central, { PERIODOS, type Periodo } from './marketing/Central';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia } from '../lib/datas';
 import { espelhoMotores, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
@@ -87,8 +88,18 @@ export default function MarketingEspelho() {
   // Página longa esconde o que importa: o dono rolava seis seções para chegar à cadeia de resultados.
   // Cada aba responde UMA pergunta; a primeira é sempre "está dando resultado?".
   const [aba, setAba] = useState<'resultado' | 'marcas' | 'publicacoes' | 'motores' | 'fatos' | 'fontes'>('resultado');
-  // Um período para a aba inteira. Antes cada cartão tinha o seu, e o de baixo era sempre 30 dias.
-  const [periodo, setPeriodo] = useState<Periodo>('30');
+  // Um período para a página inteira, guardado no ENDEREÇO — o dono manda o link de uma leitura.
+  // Vai no segundo trecho (`#/marketing/7`) e não como `?p=7`: o roteador do app escolhe o módulo pelo
+  // primeiro trecho, então uma interrogação no hash cairia em Visão sem dizer nada.
+  const [periodo, setPeriodo] = useState<Periodo>(() => {
+    const t = (typeof window !== 'undefined' ? window.location.hash : '').replace(/^#\/?/, '').split('/')[1];
+    return (PERIODOS.some(([id]) => id === t) ? t : '30') as Periodo;
+  });
+
+  const trocarPeriodo = (p: Periodo) => {
+    setPeriodo(p);
+    if (typeof window !== 'undefined') window.location.hash = `#/marketing/${p}`;
+  };
 
   const load = async () => {
     setLoading(true);
@@ -180,7 +191,23 @@ export default function MarketingEspelho() {
           ))}
         </div>
 
-        {aba === 'resultado' && <LeiturasCard periodo={periodo} aoTrocarPeriodo={setPeriodo} />}
+        {/* O filtro único vale para a página inteira; cada bloco diz quando não consegue obedecê-lo. */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="font-mono text-[9px] uppercase tracking-widest text-muted">período</span>
+          <div className="flex items-center gap-0.5 border border-outline/15 p-0.5">
+            {PERIODOS.map(([id, rotulo]) => (
+              <button key={id} onClick={() => trocarPeriodo(id)}
+                className={`font-mono text-[10px] uppercase tracking-widest px-3 py-1 transition-colors ${
+                  periodo === id ? 'bg-secondary text-on-action' : 'text-muted hover:text-on-surface'}`}>
+                {rotulo}
+              </button>
+            ))}
+          </div>
+          <span className="font-mono text-[9px] text-muted">vale para a página · o endereço guarda a escolha</span>
+        </div>
+
+        {aba === 'resultado' && <Central periodo={periodo} />}
+        {aba === 'resultado' && <LeiturasCard periodo={periodo} />}
         {aba === 'resultado' && <ResultadoConteudoCard periodo={periodo} />}
 
         {loading ? (

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Eye, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { type Periodo } from './Central';
 import { espelhoMotoresEstado, type PulsoDia, type PulsoLongoDia, type LimePubDia, type BlogDia, type EstadoEspelho } from '../../lib/espelhoMotores';
 
 // Leituras do conteúdo — ordem do dono em 17/11/2026: "já temos os analytics do cortes do pulso no
@@ -41,8 +42,6 @@ type Linha = {
   comentarios: number | null; compartilhamentos: number | null; retencao_media_pct: number | null;
 };
 
-export const PERIODOS = [['7', '7 dias'], ['30', '30 dias'], ['tudo', 'tudo']] as const;
-export type Periodo = (typeof PERIODOS)[number][0];
 
 const n = (v: number) => v.toLocaleString('pt-BR');
 const kilo = (v: number) => (v >= 10000 ? `${(v / 1000).toFixed(0)}k` : n(v));
@@ -54,7 +53,7 @@ const diaBRT = (d: Date) =>
 // O período é do PAI, não deste cartão. Antes ele vivia aqui e o "Resultado do conteúdo" ao lado era
 // sempre 30 dias: um filtro que vale para metade da tela é pior que nenhum, porque quem lê acredita
 // que mudou tudo. (Erro apontado pelo Geral em 18/11, item 3.)
-export default function LeiturasCard({ periodo, aoTrocarPeriodo }: { periodo: Periodo; aoTrocarPeriodo: (p: Periodo) => void }) {
+export default function LeiturasCard({ periodo }: { periodo: Periodo }) {
   const [linhas, setLinhas] = useState<Linha[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [pulso, setPulso] = useState<{ linhas: PulsoDia[]; estado: EstadoEspelho; detalhe?: string } | null>(null);
@@ -139,15 +138,9 @@ export default function LeiturasCard({ periodo, aoTrocarPeriodo }: { periodo: Pe
         <Eye className="w-4 h-4 text-secondary" />
         <span className="text-sm font-semibold text-on-surface">Leituras do conteúdo</span>
         <span className="font-mono text-[10px] text-muted">todas as fontes que hoje se podem somar</span>
-        <div className="ml-auto flex items-center gap-0.5 border border-outline/15 p-0.5">
-          {PERIODOS.map(([id, rotulo]) => (
-            <button key={id} onClick={() => aoTrocarPeriodo(id)}
-              className={`font-mono text-[9px] uppercase tracking-widest px-2 py-1 transition-colors ${
-                periodo === id ? 'bg-secondary text-on-action' : 'text-muted hover:text-on-surface'}`}>
-              {rotulo}
-            </button>
-          ))}
-        </div>
+        <span className="ml-auto font-mono text-[9px] uppercase tracking-wider text-muted">
+          {periodo === 'tudo' ? 'desde o início' : `últimos ${periodo} dias`}
+        </span>
       </div>
 
       {erro ? (
