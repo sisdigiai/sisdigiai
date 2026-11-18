@@ -137,8 +137,11 @@ export default function MarketingEspelho() {
       supabase.from('v_mkt_fatos').select('*'),
       supabase.from('v_marketing_cadeia').select('*').maybeSingle(),
       supabase.from('v_mkt_fila_saude').select('atrasados, com_erro, ultima_publicacao').maybeSingle(),
-      supabase.from('v_mkt_estoque_marca').select('marca, publicadas_7d, na_fila, artes_prontas, ultima_marcada, tem_movimento'),
       supabase.from('v_seo_estado').select('cliques, impressoes, medido_em'),
+      // POSIÇÃO IMPORTA: esta consulta é lida no fim do destructuring. Eu a tinha inserido no meio do
+      // array e lido no fim — o resultado é que os números de SEO passaram a ser os do estoque e os do
+      // estoque, os de SEO. Nenhum erro, nenhum aviso: só dois blocos trocados em silêncio.
+      supabase.from('v_mkt_estoque_marca').select('marca, publicadas_7d, na_fila, artes_prontas, ultima_marcada, tem_movimento'),
     ]);
     setCadeia((cad ?? null) as Cadeia | null);
     setFila((fs ?? null) as { atrasados: number; com_erro: number; ultima_publicacao: string | null } | null);
