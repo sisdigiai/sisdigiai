@@ -8,6 +8,7 @@ import Central, { PERIODOS, type Periodo } from './marketing/Central';
 import HojeSai from './marketing/HojeSai';
 import EstoquePorMarca from './marketing/EstoquePorMarca';
 import Leituras from './marketing/Leituras';
+import ControlePorMarca from './marketing/ControlePorMarca';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia } from '../lib/datas';
 import { espelhoMotores, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
@@ -359,8 +360,12 @@ export default function MarketingEspelho() {
             )}
 
             {/* Publicações recentes */}
+            {/* O controle por marca vem ANTES da lista: a lista diz o que saiu, o cartão diz o que
+                fazer. O dono abre esta aba para decidir, não para conferir item a item. */}
+            {aba === 'publicacoes' && <ControlePorMarca />}
+
             {aba === 'publicacoes' && (
-            <div className="border border-outline/15 bg-surface-container">
+            <div className="border border-outline/15 bg-surface-container mt-6">
               <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2">
                 <Send className="w-3.5 h-3.5 text-secondary" />
                 <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Publicações recentes</span>
