@@ -56,6 +56,18 @@ export default function QuatroMotores() {
 
   const corte = diaBRT(new Date(Date.now() - 7 * 86400000));
   const janela = <T extends { dia: string }>(l: T[] | undefined) => (l ?? []).filter((x) => x.dia >= corte);
+
+  // ESPELHO PARADO NÃO É MOTOR PARADO. O espelho do Limelight é legível e tem 153 dias de história,
+  // mas o dia mais novo é 06/11 — doze dias atrás. Somar a janela de 7 dias dá ZERO, e zero aqui diria
+  // "não publicou nada" quando a verdade é "ninguém mediu desde 06/11". As duas coisas pedem ações
+  // opostas: uma é falar com o motor, a outra é consertar a coleta.
+  const parado = (l: Array<{ dia: string }> | undefined) => {
+    const novo = (l ?? []).map((x) => x.dia).sort().at(-1);
+    return !novo || novo < corte ? novo ?? null : null;
+  };
+  const limeParado = lime ? parado(lime.linhas) : null;
+  const pulsoParado = pulso ? parado([...(pulso.linhas ?? []), ...(longos?.linhas ?? [])]) : null;
+  const dataCurta = (d: string) => d.slice(8, 10) + '/' + d.slice(5, 7);
   const somar = <T extends { views?: number; publicacoes?: number }>(l: T[], c: 'views' | 'publicacoes') =>
     l.reduce((a, x) => a + Number(x[c] ?? 0), 0);
 
@@ -75,10 +87,17 @@ export default function QuatroMotores() {
     { motor: 'DIGIAI Cortes', pecas: cortes?.pecas ?? null, pecasNota: 'entregues, não publicadas',
       views: null, viewsNota: 'não publica direto: sai pelo MKT',
       custo: cortes?.custo ?? null, custoNota: cortes && cortes.custo == null ? 'sem custo medido' : undefined },
-    { motor: 'Limelight', pecas: lime ? somar(limePub, 'publicacoes') : null,
-      views: lime ? somar(limePub, 'views') : null, custo: null, custoNota: 'não vem no espelho' },
-    { motor: 'Pulso', pecas: pulso ? somar(pulsoCanais, 'publicacoes') + somar(pulsoLongos, 'publicacoes') : null,
-      views: pulso ? somar(pulsoCanais, 'views') + somar(pulsoLongos, 'views') : null,
+    { motor: 'Limelight',
+      pecas: limeParado ? null : (lime ? somar(limePub, 'publicacoes') : null),
+      pecasNota: limeParado ? `espelho parado em ${dataCurta(limeParado)}` : undefined,
+      views: limeParado ? null : (lime ? somar(limePub, 'views') : null),
+      viewsNota: limeParado ? 'sem medição no período' : undefined,
+      custo: null, custoNota: 'não vem no espelho' },
+    { motor: 'Pulso',
+      pecas: pulsoParado ? null : (pulso ? somar(pulsoCanais, 'publicacoes') + somar(pulsoLongos, 'publicacoes') : null),
+      pecasNota: pulsoParado ? `espelho parado em ${dataCurta(pulsoParado)}` : undefined,
+      views: pulsoParado ? null : (pulso ? somar(pulsoCanais, 'views') + somar(pulsoLongos, 'views') : null),
+      viewsNota: pulsoParado ? 'sem medição no período' : undefined,
       custo: null, custoNota: 'não vem no espelho' },
   ];
 
@@ -130,7 +149,7 @@ export default function QuatroMotores() {
         </table>
       </div>
       <div className="px-4 py-2 border-t border-outline/10 font-mono text-[9px] text-muted">
-        célula vazia diz o que falta: "sem custo medido" não é custo zero, e "não publica direto" não é zero views
+        célula vazia diz o que falta: "sem custo medido" não é custo zero, "não publica direto" não é zero views e "espelho parado" não é motor parado
       </div>
     </section>
   );
