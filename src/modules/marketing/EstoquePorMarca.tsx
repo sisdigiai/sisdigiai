@@ -5,8 +5,11 @@ import { supabase } from '../../lib/supabase';
 // O "coração da empresa" — palavra do dono em 18/11: por marca, o que está pronto e quanto tempo dura,
 // "e já apareceria a parte fila baixa".
 //
-// Fôlego = pronto ÷ ritmo. O ritmo é o MEDIDO (o que saiu nos últimos 7 dias), e a conta aparece ao
-// lado para quem ler poder conferi-la.
+// Fôlego = o que está MARCADO para o futuro ÷ ritmo medido. A primeira versão disto media a
+// biblioteca de artes do MKT e inverteu a leitura: dizia "Bastidores, 0 dias, produzir antes das
+// outras" quando os Bastidores tinham 157 peças na fila, e dava 30 dias de conforto ao Lancaster, que
+// tem 1. Biblioteca é matéria-prima; fila é o que vai sair. A biblioteca continua à vista, com o nome
+// dela, porque serve para outra decisão.
 //
 // DUAS RECUSAS:
 //  · **marca sem ritmo não tem fôlego infinito, tem fôlego desconhecido.** Dividir por zero daria a
@@ -17,8 +20,8 @@ import { supabase } from '../../lib/supabase';
 
 type Linha = {
   marca: string; marca_nome: string; accent_hex: string | null;
-  prontos: number; publicadas_7d: number; ritmo_medido: number;
-  ritmo_de: string | null; dias_de_estoque: number | null;
+  na_fila: number; artes_prontas: number; publicadas_7d: number; ritmo_medido: number;
+  ritmo_de: string | null; dias_de_estoque: number | null; ultima_marcada: string | null;
 };
 
 const dias = (v: number | null) => (v == null ? '—' : v.toLocaleString('pt-BR', { maximumFractionDigits: 1 }));
@@ -48,7 +51,7 @@ export default function EstoquePorMarca() {
       <div className="flex items-center gap-2 flex-wrap px-4 py-2.5 border-b border-outline/10">
         <Package className="w-4 h-4 text-secondary" />
         <span className="text-sm font-semibold text-on-surface">O que está pronto para publicar</span>
-        <span className="font-mono text-[10px] text-muted">estoque ÷ ritmo dos últimos 7 dias = dias de fôlego</span>
+        <span className="font-mono text-[10px] text-muted">peças marcadas ÷ ritmo dos últimos 7 dias = dias de fôlego</span>
       </div>
 
       {erro ? (
@@ -75,7 +78,8 @@ export default function EstoquePorMarca() {
                   {baixa(l) && <span className="font-mono text-[9px] uppercase tracking-wider text-danger">fila baixa</span>}
                 </div>
                 <div className="font-mono text-[9px] text-muted mt-0.5">
-                  {l.prontos} pronta(s) · saíram {l.publicadas_7d} em 7 dias
+                  {l.na_fila} na fila · saíram {l.publicadas_7d} em 7 dias
+                  {l.artes_prontas > 0 && ` · ${l.artes_prontas} arte(s) na biblioteca, sem agenda`}
                 </div>
                 {l.dias_de_estoque == null && (
                   <div className="font-mono text-[9px] text-muted">
@@ -89,7 +93,7 @@ export default function EstoquePorMarca() {
       )}
 
       <div className="px-4 py-2 border-t border-outline/10 font-mono text-[9px] text-muted">
-        o estoque é da marca, não da rede: a arte só ganha rede quando é agendada — repartir entre as redes seria inventar
+        fôlego é o que já está marcado para sair, lido da Lousa · arte pronta sem agenda aparece à parte: é matéria-prima, não fila
       </div>
     </section>
   );

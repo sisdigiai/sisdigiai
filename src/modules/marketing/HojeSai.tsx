@@ -26,7 +26,10 @@ const horaBRT = (iso: string) =>
   new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
 
 const JA_SAIU = ['publicado'];
-const AINDA_SAI = ['agendado', 'planejado', 'no_planner', 'rascunho'];
+// Rascunho NÃO é peça que vai sair sozinha: é peça entregue para alguém publicar à mão. Contá-la em
+// "passou da hora" acusa o motor de um atraso que não é dele, e esconde o que é da pessoa.
+const AINDA_SAI = ['agendado', 'planejado', 'no_planner'];
+const RASCUNHO = ['rascunho'];
 
 export default function HojeSai({ periodo }: { periodo: Periodo }) {
   const [pecas, setPecas] = useState<Peca[] | null>(null);
@@ -58,6 +61,7 @@ export default function HojeSai({ periodo }: { periodo: Periodo }) {
       saiu: l.filter((p) => JA_SAIU.includes(p.estado)),
       porSair: l.filter((p) => AINDA_SAI.includes(p.estado) && !passou(p)),
       passouDaHora: l.filter((p) => AINDA_SAI.includes(p.estado) && passou(p)),
+      rascunho: l.filter((p) => RASCUNHO.includes(p.estado)),
       falhou: l.filter((p) => p.estado === 'falhou'),
       cancelado: l.filter((p) => p.estado === 'cancelado'),
     };
@@ -85,7 +89,8 @@ export default function HojeSai({ periodo }: { periodo: Periodo }) {
         {lista.slice(0, 4).map((p, i) => (
           <div key={i} className="text-[11px] text-on-surface-variant leading-tight truncate">
             <span className="font-mono text-muted">{p.quando ? horaBRT(p.quando) : '--:--'}</span>{' '}
-            {(/^\d+$/.test(p.conta) ? p.conta_nome ?? p.conta : p.conta)} · {p.rede}
+            {/* Marca primeiro: "oticalancastersuzano" é o endereço da conta, não o nome que a casa usa. */}
+            {p.marca} · {p.rede}
             {p.saiu_por === 'mao' && <span className="text-secondary"> · à mão</span>}
           </div>
         ))}
@@ -116,13 +121,14 @@ export default function HojeSai({ periodo }: { periodo: Periodo }) {
       ) : pecas.length === 0 ? (
         <div className="px-4 py-3 text-sm text-on-surface-variant">Nada marcado para hoje.</div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-outline/10">
+        <div className="grid grid-cols-2 md:grid-cols-5 divide-x divide-y md:divide-y-0 divide-outline/10">
           <Coluna titulo="já saiu" lista={grupos.saiu} tom="text-success" />
+          <Coluna titulo="falhou" lista={grupos.falhou} tom="text-danger" nota="não saiu" />
           <Coluna titulo="por sair" lista={grupos.porSair} tom="text-secondary" />
           {/* Passou da hora e falhou são colunas diferentes de propósito: a primeira ainda pode sair
               hoje, a segunda precisa de alguém agora. Somá-las esconderia qual é qual. */}
           <Coluna titulo="passou da hora" lista={grupos.passouDaHora} tom="text-warning" nota="ainda pode sair" />
-          <Coluna titulo="falhou" lista={grupos.falhou} tom="text-danger" nota="não saiu" />
+          <Coluna titulo="à mão" lista={grupos.rascunho} tom="text-secondary" nota="entregue para publicar" />
         </div>
       )}
 

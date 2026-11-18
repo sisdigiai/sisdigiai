@@ -23,7 +23,7 @@ type Leitura = {
   fato: string; base: string; escolha: string | null; comQuem: string; peso: number;
 };
 
-type Estoque = { marca_nome: string; prontos: number; publicadas_7d: number; dias_de_estoque: number | null };
+type Estoque = { marca_nome: string; na_fila: number; artes_prontas: number; publicadas_7d: number; dias_de_estoque: number | null };
 type Pont = { marca: string; rede: string; pontualidade: string; dia: string };
 type Dia = { dia: string; elo: string; medida: string; n: number };
 
@@ -37,7 +37,7 @@ export default function Leituras({ periodo }: { periodo: Periodo }) {
   const [cadeia, setCadeia] = useState<Dia[] | null>(null);
 
   useEffect(() => {
-    supabase.from('v_mkt_estoque_marca').select('marca_nome, prontos, publicadas_7d, dias_de_estoque')
+    supabase.from('v_mkt_estoque_marca').select('marca_nome, na_fila, artes_prontas, publicadas_7d, dias_de_estoque')
       .then(({ data }) => setEstoque((data ?? []) as Estoque[]));
     supabase.from('v_marketing_cadeia_dia').select('dia, elo, medida, n').limit(5000)
       .then(({ data }) => setCadeia((data ?? []) as Dia[]));
@@ -59,10 +59,12 @@ export default function Leituras({ periodo }: { periodo: Periodo }) {
     const pior = [...comRitmo].sort((a, b) => a.dias_de_estoque! - b.dias_de_estoque!)[0];
     if (pior) {
       leituras.push({
-        fato: `${pior.marca_nome} tem ${pior.dias_de_estoque!.toLocaleString('pt-BR')} dia(s) de fôlego: ${pior.prontos} peça(s) pronta(s) para um ritmo de ${pior.publicadas_7d} por semana.`,
+        fato: `${pior.marca_nome} tem ${pior.dias_de_estoque!.toLocaleString('pt-BR')} dia(s) de fôlego: ${pior.na_fila} peça(s) marcada(s) para um ritmo de ${pior.publicadas_7d} por semana.`,
         base: `${pior.publicadas_7d} publicações nos últimos 7 dias`,
         escolha: pior.dias_de_estoque! < 7
-          ? 'Produzir para esta marca antes das outras, ou baixar o ritmo dela de propósito.'
+          ? (pior.artes_prontas > 0
+              ? `Agendar: há ${pior.artes_prontas} arte(s) pronta(s) na biblioteca desta marca esperando data.`
+              : 'Produzir para esta marca antes das outras, ou baixar o ritmo dela de propósito.')
           : null,
         comQuem: 'MKT (produção)',
         peso: pior.dias_de_estoque! < 7 ? 100 : 40,

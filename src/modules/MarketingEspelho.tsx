@@ -220,49 +220,11 @@ export default function MarketingEspelho() {
           <div className="text-sm text-muted py-6">Carregando espelho…</div>
         ) : (
           <>
-            {/* Cadeia de resultados — o funil real, cada elo com carimbo de frescor */}
-            {aba === 'resultado' && cadeia && (() => {
-              const diasDe = (iso: string | null) => iso ? Math.floor((Date.now() - new Date(iso).getTime()) / 86400000) : null;
-              const carimbo = (iso: string | null, limite: number) => {
-                const d = diasDe(iso);
-                if (d === null) return { txt: 'nunca', ruim: true };
-                return { txt: d === 0 ? 'hoje' : `há ${d}d`, ruim: d > limite };
-              };
-              const elos: { rotulo: string; valor: string; sub: string; stamp: { txt: string; ruim: boolean }; zero?: boolean }[] = [
-                { rotulo: 'produzir', valor: String(cadeia.posts_7d), sub: 'posts 7d (MKT)', stamp: carimbo(cadeia.ultima_publicacao, 2) },
-                // DESDE O INÍCIO, escrito: este número e o do cartão de Leituras acima vivem na mesma tela e têm
-                // períodos diferentes. Sem o rótulo, quem lê acha que um contradiz o outro (erro 4, Geral 18/11).
-                { rotulo: 'alcançar', valor: (cadeia.seguidores + (pulso?.views_total ?? 0) + (limelight?.views_total ?? 0) + (blogs?.leituras_total ?? 0)).toLocaleString('pt-BR'), sub: `desde o início · ${cadeia.seguidores.toLocaleString('pt-BR')} seg · views: Pulso ${Math.round((pulso?.views_total ?? 0) / 1000)}k + Limelight ${Math.round((limelight?.views_total ?? 0) / 1000)}k · blogs ${blogs?.leituras_total ?? 0}`, stamp: carimbo(cadeia.ultimo_censo ? cadeia.ultimo_censo + 'T12:00:00' : null, 2) },
-                { rotulo: 'captar', valor: String(cadeia.leads_30d), sub: 'leads 30d', stamp: carimbo(cadeia.ultimo_lead, 14), zero: cadeia.leads_30d === 0 },
-                { rotulo: 'prospectar', valor: String(cadeia.disparos_30d), sub: 'disparos OSI 30d', stamp: carimbo(cadeia.ultimo_disparo, 7), zero: cadeia.disparos_30d === 0 },
-                { rotulo: 'vender', valor: cadeia.vendas_30d > 0 ? `${cadeia.vendas_30d} · ${brl(cadeia.receita_30d_brl)}` : '0', sub: 'vendas 30d', stamp: carimbo(cadeia.ultima_venda, 30), zero: cadeia.vendas_30d === 0 },
-                { rotulo: 'provar', valor: '—', sub: 'uso do Clearix mora no banco dele (ADR-0001): ver na Central Clearix', stamp: { txt: 'outra porta', ruim: false } },
-              ];
-              return (
-                <div className="border border-outline/15 bg-surface-container">
-                  <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2 flex-wrap">
-                    <Target className="w-3.5 h-3.5 text-secondary" />
-                    <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Cadeia de resultados</span>
-                    <span className="ml-auto font-mono text-[10px] text-muted">elo sem data fresca é elo quebrado</span>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-outline/10">
-                    {elos.map((e2, i) => (
-                      <div key={e2.rotulo} className="p-4 relative">
-                        {i > 0 && <span className="hidden lg:block absolute -left-1.5 top-1/2 -translate-y-1/2 text-muted text-xs">→</span>}
-                        <div className="font-mono text-[9px] uppercase tracking-widest text-muted mb-1">{e2.rotulo}</div>
-                        <div className={'text-xl font-semibold font-mono tabular-nums ' + (e2.zero ? 'text-danger' : 'text-on-surface')}>{e2.valor}</div>
-                        <div className="text-[10px] text-muted mt-0.5">{e2.sub}</div>
-                        <div className={'font-mono text-[9px] uppercase tracking-wider mt-1 ' + (e2.stamp.ruim ? 'text-danger' : 'text-secondary')}>{e2.stamp.txt}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="px-4 py-2 border-t border-outline/10 font-mono text-[10px] text-muted flex flex-wrap gap-x-4 gap-y-1">
-                    <span>motores: MKT{limelight ? ` · Limelight (${limelight.publicacoes} pubs)` : ''}{pulso ? ` · Pulso (${pulso.publicacoes} pubs)` : ''}{blogs ? ` · Blogs (${blogs.posts_no_ar} posts)` : ''}</span>
-                    <span className="ml-auto">Clearix = prova interna; pra fora, só o agregado dos fatos (trava por marca)</span>
-                  </div>
-                </div>
-              );
-            })()}
+            {/* A CADEIA ANTIGA SAIU DAQUI. Ela lia janelas fixas (7 e 30 dias) e ficava na mesma
+                página que a cadeia nova, com o filtro de período em cima: 453 contra 150 e 426 contra
+                452, dois números para a mesma coisa na mesma tela. Dois números iguais em nome e
+                diferentes em valor não informam — fazem desconfiar dos dois. O bloco "Estamos indo
+                bem?" responde isto, obedecendo ao filtro. (Achado pelo Orquestrador em 18/11, 14h29.) */}
 
             {/* Placar do motor */}
             {aba === 'resultado' && esp && (
