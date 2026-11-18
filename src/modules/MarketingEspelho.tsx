@@ -9,6 +9,7 @@ import HojeSai from './marketing/HojeSai';
 import EstoquePorMarca from './marketing/EstoquePorMarca';
 import Leituras from './marketing/Leituras';
 import ControlePorMarca from './marketing/ControlePorMarca';
+import QuatroMotores from './marketing/QuatroMotores';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia } from '../lib/datas';
 import { espelhoMotores, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
@@ -415,6 +416,9 @@ export default function MarketingEspelho() {
         )}
 
         {/* Outros motores de conteúdo — espelhos vivos dos bancos próprios (2026-07-30) */}
+        {/* Os quatro na mesma régua, antes dos cartões: o dono perguntou por que apareciam dois. */}
+        {aba === 'motores' && <QuatroMotores />}
+
         {aba === 'motores' && (
         <div className="border border-outline/15 bg-surface-container">
           <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2">
