@@ -126,13 +126,18 @@ export default function Central({ periodo }: { periodo: Periodo }) {
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.from('v_marketing_cadeia_dia').select('*').limit(5000).then(({ data, error }) => {
+    // Pede só a janela que a tela usa (o período e o anterior, com folga), não a série inteira: a
+    // view é `security_invoker`, então do lado do app ela passa pela RLS das tabelas de baixo e o
+    // custo aparece. Em "tudo" não há como recortar — e aí a espera é honesta, porque é tudo mesmo.
+    const corteDias = periodo === 'tudo' ? null : Number(periodo) * 2 + 2;
+    const base = supabase.from('v_marketing_cadeia_dia').select('*').limit(5000);
+    (corteDias ? base.gte('dia', diaBRT(maisDias(new Date(), -corteDias))) : base).then(({ data, error }) => {
       if (error) { setErro(error.message); setLinhas([]); return; }
       setLinhas((data ?? []) as Dia[]);
     });
     supabase.from('v_receita_meta').select('*').maybeSingle()
       .then(({ data, error }) => setMeta(error || !data ? 'sem_acesso' : (data as Meta)));
-  }, []);
+  }, [periodo]);
 
   const leituras = useMemo(
     () => ELOS.map((e) => ({ ...e, m: linhas ? medir(linhas, e.elo, e.medida, periodo) : null })),

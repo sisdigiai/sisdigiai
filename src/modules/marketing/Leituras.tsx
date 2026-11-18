@@ -59,12 +59,15 @@ export default function Leituras({ periodo }: { periodo: Periodo }) {
     const pior = [...comRitmo].sort((a, b) => a.dias_de_estoque! - b.dias_de_estoque!)[0];
     if (pior) {
       leituras.push({
-        fato: `${pior.marca_nome} tem ${pior.dias_de_estoque!.toLocaleString('pt-BR')} dia(s) de fôlego: ${pior.dias_marcados} já marcado(s) e ${(pior.dias_biblioteca ?? 0).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} de biblioteca, para um ritmo de ${pior.publicadas_7d} por semana.`,
+        fato: `${pior.marca_nome} tem ${pior.dias_de_estoque!.toLocaleString('pt-BR')} dias de fôlego: ${pior.dias_marcados} já na agenda e ${(pior.dias_biblioteca ?? 0).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} de biblioteca, para um ritmo de ${pior.publicadas_7d} por semana.`,
         base: `${pior.publicadas_7d} publicações nos últimos 7 dias`,
+        // "Agendar" só resolve se a biblioteca AGUENTAR. A OSI tinha 5 artes — que no ritmo dela são
+        // 2,7 dias: agendar as cinco adia o problema por dois dias e meio e chama isso de solução.
+        // Biblioteca curta pede produzir, mesmo havendo arte pronta.
         escolha: pior.dias_de_estoque! < 7
-          ? (pior.artes_prontas > 0
-              ? `Agendar: há ${pior.artes_prontas} arte(s) pronta(s) na biblioteca desta marca esperando data.`
-              : 'Produzir para esta marca antes das outras, ou baixar o ritmo dela de propósito.')
+          ? ((pior.dias_biblioteca ?? 0) >= 7
+              ? `Agendar: a biblioteca desta marca tem ${pior.artes_prontas} artes, que dão ${(pior.dias_biblioteca ?? 0).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} dias no ritmo dela.`
+              : `Produzir para esta marca antes das outras: a biblioteca tem ${pior.artes_prontas} arte${pior.artes_prontas === 1 ? '' : 's'}, que dão só ${(pior.dias_biblioteca ?? 0).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} dias.`)
           : null,
         comQuem: 'MKT (produção)',
         peso: pior.dias_de_estoque! < 7 ? 100 : 40,

@@ -104,6 +104,18 @@ export default function MarketingEspelho() {
     if (typeof window !== 'undefined') window.location.hash = `#/marketing/${p}`;
   };
 
+  // O endereço manda na tela, e não só a tela no endereço. Sem isto, trocar o período pela URL com a
+  // página aberta não mudava nada até recarregar — e era o que quebrava as duas coisas que o filtro
+  // existe para servir: o link de leitura que o dono manda a alguém, e o botão voltar do navegador.
+  useEffect(() => {
+    const ouvir = () => {
+      const t = window.location.hash.replace(/^#\/?/, '').split('/')[1];
+      if (PERIODOS.some(([id]) => id === t)) setPeriodo(t as Periodo);
+    };
+    window.addEventListener('hashchange', ouvir);
+    return () => window.removeEventListener('hashchange', ouvir);
+  }, []);
+
   const load = async () => {
     setLoading(true);
     const [{ data: e }, { data: m }, { data: p }, ll, pu, bl, { data: f }, { data: cad }, { data: fs }, { data: se }] = await Promise.all([
@@ -160,7 +172,7 @@ export default function MarketingEspelho() {
       <PageHeader
         eyebrow="Distribuição & conteúdo"
         title="Marketing"
-        subtitle="Espelho do motor DIGIAI MKT — marcas, pipeline e publicações, somente leitura."
+        subtitle="Central de comando do marketing: resultado, agenda do dia e o que decidir. Leitura apenas — a produção acontece no DIGIAI MKT."
         actions={
           <div className="flex items-center gap-2">
             <a

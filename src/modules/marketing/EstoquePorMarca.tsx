@@ -84,10 +84,10 @@ export default function EstoquePorMarca() {
                   {baixa(l) && <span className="font-mono text-[9px] uppercase tracking-wider text-danger">fila baixa</span>}
                 </div>
                 <div className="font-mono text-[9px] text-muted mt-0.5">
-                  {l.dias_marcados} dia(s) já marcados + {(l.dias_biblioteca ?? 0).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} de biblioteca
+                  {l.dias_marcados} {l.dias_marcados === 1 ? 'dia' : 'dias'} já na agenda + {(l.dias_biblioteca ?? 0).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} de biblioteca
                 </div>
                 <div className="font-mono text-[9px] text-muted">
-                  {l.na_fila} na fila · {l.artes_prontas} arte(s) pronta(s) · saíram {l.publicadas_7d} em 7 dias
+                  {l.na_fila} na fila · {l.artes_prontas} {l.artes_prontas === 1 ? 'arte pronta' : 'artes prontas'} · saíram {l.publicadas_7d} em 7 dias
                 </div>
                 {l.dias_de_estoque == null && (
                   <div className="font-mono text-[9px] text-muted">

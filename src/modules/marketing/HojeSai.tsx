@@ -14,7 +14,7 @@ import type { Periodo } from './Central';
 //  · **cancelada não é falha.**
 
 type Peca = {
-  conta: string; conta_nome: string | null; marca: string; rede: string; tipo: string;
+  conta: string; conta_nome: string | null; marca: string; marca_nome: string | null; rede: string; tipo: string;
   quando: string | null; estado: string; titulo: string | null; publicador: string;
   saiu_em: string | null; saiu_por: string | null; erro: string | null;
 };
@@ -89,8 +89,9 @@ export default function HojeSai({ periodo }: { periodo: Periodo }) {
         {lista.slice(0, 4).map((p, i) => (
           <div key={i} className="text-[11px] text-on-surface-variant leading-tight truncate">
             <span className="font-mono text-muted">{p.quando ? horaBRT(p.quando) : '--:--'}</span>{' '}
-            {/* Marca primeiro: "oticalancastersuzano" é o endereço da conta, não o nome que a casa usa. */}
-            {p.marca} · {p.rede}
+            {/* Nome da marca, não o código: "bastidores2" é como o banco a chama, não como a casa fala.
+                E o tipo da peça junto, porque "reel" e "story" pedem atenção diferente na mesma hora. */}
+            {p.marca_nome ?? p.marca} · {p.rede} · {p.tipo}
             {p.saiu_por === 'mao' && <span className="text-secondary"> · à mão</span>}
           </div>
         ))}
@@ -105,10 +106,10 @@ export default function HojeSai({ periodo }: { periodo: Periodo }) {
         <Clock className="w-4 h-4 text-secondary" />
         <span className="text-sm font-semibold text-on-surface">Hoje sai</span>
         <span className="font-mono text-[10px] text-muted">
-          {pecas == null ? 'lendo…' : `${pecas.length} peça(s) marcadas para hoje`}
+          {pecas == null ? 'lendo…' : `${pecas.length} ${pecas.length === 1 ? 'peça marcada' : 'peças marcadas'} para hoje`}
         </span>
         {grupos.cancelado.length > 0 && (
-          <span className="font-mono text-[10px] text-muted">· {grupos.cancelado.length} cancelada(s), fora da conta</span>
+          <span className="font-mono text-[10px] text-muted">· {grupos.cancelado.length} {grupos.cancelado.length === 1 ? 'cancelada' : 'canceladas'}, fora da conta</span>
         )}
       </div>
 
@@ -145,9 +146,9 @@ export default function HojeSai({ periodo }: { periodo: Periodo }) {
           <>
             <span><strong className="text-on-surface tabular-nums">{Math.round((resumo.noHorario / resumo.total) * 100)}%</strong> no horário</span>
             <span className="text-on-surface-variant">{resumo.noHorario} de {resumo.total} peças</span>
-            {resumo.atrasadas > 0 && <span className="text-danger">{resumo.atrasadas} atrasada(s)</span>}
+            {resumo.atrasadas > 0 && <span className="text-danger">{resumo.atrasadas} {resumo.atrasadas === 1 ? 'atrasada' : 'atrasadas'}</span>}
             {/* Adiantada tem nome próprio: sair um dia antes não é cumprir a agenda. */}
-            {resumo.adiantadas > 0 && <span className="text-warning">{resumo.adiantadas} adiantada(s)</span>}
+            {resumo.adiantadas > 0 && <span className="text-warning">{resumo.adiantadas} {resumo.adiantadas === 1 ? 'adiantada' : 'adiantadas'}</span>}
             {resumo.pior && <span className="text-muted">onde mais atrasa: {resumo.pior[0]} ({resumo.pior[1]})</span>}
             <span className="text-muted">tolerância de 15 min, para os dois lados</span>
           </>
