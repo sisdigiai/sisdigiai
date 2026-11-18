@@ -3,7 +3,7 @@ import { ExternalLink, RefreshCw, Info, Radio, DollarSign, Send, Target, Calenda
 import PageHeader from '../components/PageHeader';
 import { TravasBanner } from './TravasMarketing';
 import ResultadoConteudoCard from './marketing/ResultadoConteudoCard';
-import LeiturasCard from './marketing/LeiturasCard';
+import LeiturasCard, { type Periodo } from './marketing/LeiturasCard';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia } from '../lib/datas';
 import { espelhoMotores, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
@@ -87,6 +87,8 @@ export default function MarketingEspelho() {
   // Página longa esconde o que importa: o dono rolava seis seções para chegar à cadeia de resultados.
   // Cada aba responde UMA pergunta; a primeira é sempre "está dando resultado?".
   const [aba, setAba] = useState<'resultado' | 'marcas' | 'publicacoes' | 'motores' | 'fatos' | 'fontes'>('resultado');
+  // Um período para a aba inteira. Antes cada cartão tinha o seu, e o de baixo era sempre 30 dias.
+  const [periodo, setPeriodo] = useState<Periodo>('30');
 
   const load = async () => {
     setLoading(true);
@@ -125,6 +127,19 @@ export default function MarketingEspelho() {
   const diasDesde = (d: string | null | undefined) =>
     d ? Math.floor((Date.now() - new Date(d + 'T12:00:00').getTime()) / 86400000) : null;
   const pulsoUltimaPubDias = diasDesde(pulso?.ultima_publicacao);
+
+  // Publicado é o que já saiu. O resto é agenda, e vai dito à parte em vez de sumir.
+  const agora = Date.now();
+  const pubsPublicadas = pubs.filter((p) => !p.published_at || new Date(p.published_at).getTime() <= agora);
+  const pubsAgendadas = pubs
+    .filter((p) => p.published_at && new Date(p.published_at).getTime() > agora)
+    .sort((a, b) => (a.published_at ?? '').localeCompare(b.published_at ?? ''));
+
+  // Marca que não publica pelo MKT mas tem motor próprio: o número vem do espelho do motor.
+  const noMotorProprio = (code: string): number | null =>
+    code === 'pulso' ? (pulso?.publicacoes ?? null)
+    : code === 'limelight' ? (limelight?.publicacoes ?? null)
+    : null;
 
   return (
     <div>
@@ -165,8 +180,8 @@ export default function MarketingEspelho() {
           ))}
         </div>
 
-        {aba === 'resultado' && <LeiturasCard />}
-        {aba === 'resultado' && <ResultadoConteudoCard />}
+        {aba === 'resultado' && <LeiturasCard periodo={periodo} aoTrocarPeriodo={setPeriodo} />}
+        {aba === 'resultado' && <ResultadoConteudoCard periodo={periodo} />}
 
         {loading ? (
           <div className="text-sm text-muted py-6">Carregando espelho…</div>
@@ -182,7 +197,9 @@ export default function MarketingEspelho() {
               };
               const elos: { rotulo: string; valor: string; sub: string; stamp: { txt: string; ruim: boolean }; zero?: boolean }[] = [
                 { rotulo: 'produzir', valor: String(cadeia.posts_7d), sub: 'posts 7d (MKT)', stamp: carimbo(cadeia.ultima_publicacao, 2) },
-                { rotulo: 'alcançar', valor: (cadeia.seguidores + (pulso?.views_total ?? 0) + (limelight?.views_total ?? 0) + (blogs?.leituras_total ?? 0)).toLocaleString('pt-BR'), sub: `${cadeia.seguidores.toLocaleString('pt-BR')} seg · views: Pulso ${Math.round((pulso?.views_total ?? 0) / 1000)}k + Limelight ${Math.round((limelight?.views_total ?? 0) / 1000)}k · blogs ${blogs?.leituras_total ?? 0}`, stamp: carimbo(cadeia.ultimo_censo ? cadeia.ultimo_censo + 'T12:00:00' : null, 2) },
+                // DESDE O INÍCIO, escrito: este número e o do cartão de Leituras acima vivem na mesma tela e têm
+                // períodos diferentes. Sem o rótulo, quem lê acha que um contradiz o outro (erro 4, Geral 18/11).
+                { rotulo: 'alcançar', valor: (cadeia.seguidores + (pulso?.views_total ?? 0) + (limelight?.views_total ?? 0) + (blogs?.leituras_total ?? 0)).toLocaleString('pt-BR'), sub: `desde o início · ${cadeia.seguidores.toLocaleString('pt-BR')} seg · views: Pulso ${Math.round((pulso?.views_total ?? 0) / 1000)}k + Limelight ${Math.round((limelight?.views_total ?? 0) / 1000)}k · blogs ${blogs?.leituras_total ?? 0}`, stamp: carimbo(cadeia.ultimo_censo ? cadeia.ultimo_censo + 'T12:00:00' : null, 2) },
                 { rotulo: 'captar', valor: String(cadeia.leads_30d), sub: 'leads 30d', stamp: carimbo(cadeia.ultimo_lead, 14), zero: cadeia.leads_30d === 0 },
                 { rotulo: 'prospectar', valor: String(cadeia.disparos_30d), sub: 'disparos OSI 30d', stamp: carimbo(cadeia.ultimo_disparo, 7), zero: cadeia.disparos_30d === 0 },
                 { rotulo: 'vender', valor: cadeia.vendas_30d > 0 ? `${cadeia.vendas_30d} · ${brl(cadeia.receita_30d_brl)}` : '0', sub: 'vendas 30d', stamp: carimbo(cadeia.ultima_venda, 30), zero: cadeia.vendas_30d === 0 },
@@ -317,7 +334,14 @@ export default function MarketingEspelho() {
                         {(m.plataformas ?? []).map((p) => (
                           <span key={p} className="font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 bg-surface-high text-on-surface-variant">{p}</span>
                         ))}
-                        {(m.plataformas ?? []).length === 0 && <span className="font-mono text-[9px] text-muted">nenhuma publicação ainda</span>}
+                        {/* "nenhuma publicação ainda" só vale se a marca não publica em lugar nenhum. O Pulso
+                            publica no motor dele (1.288 publicações na aba Motores), e o cartão dizia o contrário
+                            da outra aba da mesma tela — erro 7, Geral 18/11. */}
+                        {(m.plataformas ?? []).length === 0 && (
+                          noMotorProprio(m.code) != null
+                            ? <span className="font-mono text-[9px] text-on-surface-variant">{noMotorProprio(m.code)!.toLocaleString('pt-BR')} no motor próprio · nada pelo MKT</span>
+                            : <span className="font-mono text-[9px] text-muted">nenhuma publicação ainda</span>
+                        )}
                         <span className="ml-auto font-mono text-[9px] text-muted">{relativo(m.ultima_publicacao)}</span>
                       </div>
                     </div>
@@ -335,11 +359,22 @@ export default function MarketingEspelho() {
                 <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Publicações recentes</span>
                 <span className="ml-auto font-mono text-[10px] text-muted">fonte: v_mkt_publicacoes_recentes</span>
               </div>
-              {pubs.length === 0 ? (
+              {/* AGENDADO NÃO É PUBLICADO. `mkt.publications` guarda os agendados do Facebook com
+                  `published_at` no futuro — 61 linhas em 18/11, até 12/12 —, e esta lista mostrava
+                  "recentes" com data de 27/11 a 11/12. Aqui as linhas vêm uma a uma, então eu filtro;
+                  os agregados da tela (posts 7d, última publicação) são somados dentro das views do
+                  MKT e só lá podem ser consertados. */}
+              {pubsAgendadas.length > 0 && (
+                <div className="px-4 py-2 border-b border-outline/10 font-mono text-[10px] text-warning">
+                  {pubsAgendadas.length} agendada(s) fora desta lista — ainda não saíram
+                  {pubsAgendadas[0]?.published_at && ` (a mais distante em ${new Date(pubsAgendadas[pubsAgendadas.length - 1].published_at!).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })})`}
+                </div>
+              )}
+              {pubsPublicadas.length === 0 ? (
                 <div className="p-4 text-sm text-muted italic">Nenhuma publicação registrada ainda.</div>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-outline/10">
-                  {pubs.map((p) => (
+                  {pubsPublicadas.map((p) => (
                     <div key={p.id} className="bg-surface-container flex items-center gap-3 px-4 py-2">
                       <span className="w-2.5 h-2.5 shrink-0" style={{ background: p.accent_hex || 'var(--color-muted)' }} />
                       <span className="text-sm text-on-surface truncate flex-1">{p.brand_name || '—'}</span>

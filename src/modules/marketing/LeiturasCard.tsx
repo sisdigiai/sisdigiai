@@ -41,8 +41,8 @@ type Linha = {
   comentarios: number | null; compartilhamentos: number | null; retencao_media_pct: number | null;
 };
 
-const PERIODOS = [['7', '7 dias'], ['30', '30 dias'], ['tudo', 'tudo']] as const;
-type Periodo = (typeof PERIODOS)[number][0];
+export const PERIODOS = [['7', '7 dias'], ['30', '30 dias'], ['tudo', 'tudo']] as const;
+export type Periodo = (typeof PERIODOS)[number][0];
 
 const n = (v: number) => v.toLocaleString('pt-BR');
 const kilo = (v: number) => (v >= 10000 ? `${(v / 1000).toFixed(0)}k` : n(v));
@@ -51,8 +51,10 @@ const kilo = (v: number) => (v >= 10000 ? `${(v / 1000).toFixed(0)}k` : n(v));
 const diaBRT = (d: Date) =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
 
-export default function LeiturasCard() {
-  const [periodo, setPeriodo] = useState<Periodo>('30');
+// O período é do PAI, não deste cartão. Antes ele vivia aqui e o "Resultado do conteúdo" ao lado era
+// sempre 30 dias: um filtro que vale para metade da tela é pior que nenhum, porque quem lê acredita
+// que mudou tudo. (Erro apontado pelo Geral em 18/11, item 3.)
+export default function LeiturasCard({ periodo, aoTrocarPeriodo }: { periodo: Periodo; aoTrocarPeriodo: (p: Periodo) => void }) {
   const [linhas, setLinhas] = useState<Linha[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [pulso, setPulso] = useState<{ linhas: PulsoDia[]; estado: EstadoEspelho; detalhe?: string } | null>(null);
@@ -139,7 +141,7 @@ export default function LeiturasCard() {
         <span className="font-mono text-[10px] text-muted">todas as fontes que hoje se podem somar</span>
         <div className="ml-auto flex items-center gap-0.5 border border-outline/15 p-0.5">
           {PERIODOS.map(([id, rotulo]) => (
-            <button key={id} onClick={() => setPeriodo(id)}
+            <button key={id} onClick={() => aoTrocarPeriodo(id)}
               className={`font-mono text-[9px] uppercase tracking-widest px-2 py-1 transition-colors ${
                 periodo === id ? 'bg-secondary text-on-action' : 'text-muted hover:text-on-surface'}`}>
               {rotulo}

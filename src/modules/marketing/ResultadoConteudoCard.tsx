@@ -11,21 +11,35 @@ type Post = { brand_code: string; brand_name: string; platform: string; publishe
 type Ia = { teto_mensal: number | null; teto_diario: number | null; pausado: boolean | null; gasto_mes: number; gasto_dia: number };
 type Marca = { code: string; nome: string; posts: number; medidos: number; media: number | null; max: number | null };
 
-const DIAS = 30;
+// Quantos dias cada período pede. Vem do pai, junto com o cartão de Leituras: os dois mostram a mesma
+// janela ou a tela mente para quem clica.
+const DIAS_POR_PERIODO: Record<string, number | null> = { '7': 7, '30': 30, tudo: null };
 const usd = (v: number | null) => (v == null ? '—' : `US$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
 
-export default function ResultadoConteudoCard() {
+export default function ResultadoConteudoCard({ periodo = '30' }: { periodo?: string }) {
   const [marcas, setMarcas] = useState<Marca[] | null>(null);
   const [coletado, setColetado] = useState<string | null>(null);
+  const [agendados, setAgendados] = useState(0);
   const [ia, setIa] = useState<Ia | null | 'sem_acesso'>(null);
   const [erro, setErro] = useState<string | null>(null);
 
+  const dias = DIAS_POR_PERIODO[periodo] ?? null;
+
   useEffect(() => {
-    const desde = new Date(Date.now() - DIAS * 86400000).toISOString();
-    supabase.from('v_mkt_performance').select('brand_code, brand_name, platform, published_at, engajamento, coletado_em').gte('published_at', desde)
-      .then(({ data, error }) => {
+    setMarcas(null);
+    let q = supabase.from('v_mkt_performance')
+      .select('brand_code, brand_name, platform, published_at, engajamento, coletado_em');
+    if (dias) q = q.gte('published_at', new Date(Date.now() - dias * 86400000).toISOString());
+    q.then(({ data, error }) => {
         if (error) { setErro(error.message); setMarcas([]); return; }
-        const posts = (data ?? []) as Post[];
+        const todos = (data ?? []) as Post[];
+        // POST AGENDADO NÃO ENTRA NA MÉDIA. `mkt.publications` guarda os agendados do Facebook com
+        // `published_at` no futuro — 31 dos 404 de 30 dias, medido em 18/11. Média de desempenho com
+        // peça que ainda não saiu não é média de nada: ela só puxa o número para baixo, e a tela não
+        // dava sinal disso. Enquanto o dado não separar agendado de publicado, o corte é aqui.
+        const agora = Date.now();
+        const posts = todos.filter((p) => !p.published_at || new Date(p.published_at).getTime() <= agora);
+        setAgendados(todos.length - posts.length);
         const por = new Map<string, Post[]>();
         for (const p of posts) por.set(p.brand_code, [...(por.get(p.brand_code) ?? []), p]);
         const lista: Marca[] = [...por.entries()].map(([code, ps]) => {
@@ -48,7 +62,10 @@ export default function ResultadoConteudoCard() {
       <div className="flex items-center gap-2 flex-wrap px-4 py-2.5 border-b border-outline/10">
         <BarChart3 className="w-4 h-4 text-secondary" />
         <span className="text-sm font-semibold text-on-surface">Resultado do conteúdo</span>
-        <span className="font-mono text-[10px] text-muted">posts publicados nos últimos {DIAS} dias</span>
+        <span className="font-mono text-[10px] text-muted">
+          posts publicados {dias ? `nos últimos ${dias} dias` : 'desde o início'}
+          {agendados > 0 && <span className="text-warning"> · {agendados} agendada(s) fora da conta</span>}
+        </span>
         {coletado && (
           <span className="ml-auto font-mono text-[10px] text-muted tabular-nums">
             engajamento coletado em {new Date(coletado).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}
@@ -63,13 +80,16 @@ export default function ResultadoConteudoCard() {
       ) : marcas == null ? (
         <div className="px-4 py-3 text-sm text-muted">Carregando…</div>
       ) : marcas.length === 0 ? (
-        <div className="px-4 py-3 text-sm text-on-surface-variant">Nenhum post publicado nos últimos {DIAS} dias.</div>
+        <div className="px-4 py-3 text-sm text-on-surface-variant">
+          Nenhum post publicado {dias ? `nos últimos ${dias} dias` : 'até agora'}.
+          {agendados > 0 && ` Há ${agendados} agendada(s), que não contam como publicadas.`}
+        </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-outline/10">
-                {['Marca', 'Posts', 'Engajamento médio', 'Melhor post'].map((h, i) => (
+                {['Marca', 'Posts medidos', 'Engajamento médio', 'Melhor post'].map((h, i) => (
                   <th key={h} className={`font-mono text-[9px] uppercase tracking-widest text-muted px-4 py-2 ${i ? 'text-right' : 'text-left'}`}>{h}</th>
                 ))}
               </tr>
