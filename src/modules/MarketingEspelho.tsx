@@ -88,6 +88,13 @@ export default function MarketingEspelho() {
   const [fatos, setFatos] = useState<FatoMkt[]>([]);
   const [cadeia, setCadeia] = useState<Cadeia | null>(null);
   const [fila, setFila] = useState<{ atrasados: number; com_erro: number; ultima_publicacao: string | null } | null>(null);
+  // O que a Lousa e os espelhos sabem de cada marca. A aba Marcas lê só o MKT, e por isso dizia do
+  // Pulso "sem post 7d · nunca" — ele tem 42 em 7 dias e 97 na fila, só não passa pelo MKT. Marca que
+  // publica noutro motor não é marca parada, e a tela dizia o contrário da aba ao lado.
+  const [estoque, setEstoque] = useState<Array<{
+    marca: string; publicadas_7d: number; na_fila: number; artes_prontas: number;
+    ultima_marcada: string | null; tem_movimento: boolean;
+  }> | null>(null);
   const [seo, setSeo] = useState<{ cliques: number; impressoes: number; sites: number; medido_em: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
   // Página longa esconde o que importa: o dono rolava seis seções para chegar à cadeia de resultados.
@@ -120,7 +127,7 @@ export default function MarketingEspelho() {
 
   const load = async () => {
     setLoading(true);
-    const [{ data: e }, { data: m }, { data: p }, ll, pu, bl, { data: f }, { data: cad }, { data: fs }, { data: se }] = await Promise.all([
+    const [{ data: e }, { data: m }, { data: p }, ll, pu, bl, { data: f }, { data: cad }, { data: fs }, { data: se }, est] = await Promise.all([
       supabase.from('v_mkt_espelho').select('*').maybeSingle(),
       supabase.from('v_mkt_marcas').select('*'),
       supabase.from('v_mkt_publicacoes_recentes').select('*'),
@@ -130,10 +137,12 @@ export default function MarketingEspelho() {
       supabase.from('v_mkt_fatos').select('*'),
       supabase.from('v_marketing_cadeia').select('*').maybeSingle(),
       supabase.from('v_mkt_fila_saude').select('atrasados, com_erro, ultima_publicacao').maybeSingle(),
+      supabase.from('v_mkt_estoque_marca').select('marca, publicadas_7d, na_fila, artes_prontas, ultima_marcada, tem_movimento'),
       supabase.from('v_seo_estado').select('cliques, impressoes, medido_em'),
     ]);
     setCadeia((cad ?? null) as Cadeia | null);
     setFila((fs ?? null) as { atrasados: number; com_erro: number; ultima_publicacao: string | null } | null);
+    setEstoque((est.data ?? []) as never);
     const seoRows = (se ?? []) as { cliques: number | null; impressoes: number | null; medido_em: string | null }[];
     setSeo(seoRows.length ? {
       cliques: seoRows.reduce((a, r) => a + (r.cliques ?? 0), 0),
@@ -284,7 +293,11 @@ export default function MarketingEspelho() {
                   const diasStr = cad?.dias_semana?.length
                     ? (cad.dias_semana.length >= 6 ? 'seg–sáb' : cad.dias_semana.map((d) => DIAS[d] ?? d).join('/'))
                     : null;
-                  const ativa7d = m.publicadas_7d > 0;
+                  const fora = (estoque ?? []).find((e) => e.marca === m.code);
+                  // 7 dias da casa inteira: o que o MKT publicou e o que a Lousa viu de outros motores.
+                  const sete = Math.max(m.publicadas_7d, fora?.publicadas_7d ?? 0);
+                  const ativa7d = sete > 0;
+                  const semNada = fora ? !fora.tem_movimento : false;
                   return (
                     <div key={m.id} className="relative border border-outline/15 bg-surface-container p-5 pt-6">
                       {/* brackets — gramática Geometric Precision */}
@@ -303,7 +316,7 @@ export default function MarketingEspelho() {
                           {m.norte?.objetivo && <div className="text-[11px] text-muted leading-snug line-clamp-2 mt-0.5">{m.norte.objetivo}</div>}
                         </div>
                         <span className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border shrink-0 ${ativa7d ? 'text-success border-success/40 bg-success/10' : 'text-muted border-outline/20'}`}>
-                          {ativa7d ? `${m.publicadas_7d} em 7d` : 'sem post 7d'}
+                          {ativa7d ? `${sete} em 7d` : semNada ? 'ainda não publica' : 'sem post 7d'}
                         </span>
                       </div>
 
@@ -313,7 +326,7 @@ export default function MarketingEspelho() {
                           { label: 'ideias', v: m.ideias },
                           { label: 'roteiros', v: m.roteiros },
                           { label: 'artes', v: m.assets },
-                          { label: 'no ar', v: m.publicacoes },
+                          { label: 'no ar', v: m.publicacoes > 0 ? m.publicacoes : (fora?.na_fila ? `${fora.na_fila} na fila` : m.publicacoes) },
                         ].map((k) => (
                           <div key={k.label} className="py-2 text-center">
                             <div className="font-serif text-base font-semibold tabular-nums text-on-surface">{k.v}</div>
@@ -351,7 +364,12 @@ export default function MarketingEspelho() {
                             ? <span className="font-mono text-[9px] text-on-surface-variant">{noMotorProprio(m.code)!.toLocaleString('pt-BR')} no motor próprio · nada pelo MKT</span>
                             : <span className="font-mono text-[9px] text-muted">nenhuma publicação ainda</span>
                         )}
-                        <span className="ml-auto font-mono text-[9px] text-muted">{relativo(m.ultima_publicacao)}</span>
+                        <span className="ml-auto font-mono text-[9px] text-muted">
+                          {m.ultima_publicacao ? relativo(m.ultima_publicacao)
+                            : semNada ? 'nenhum dado chega'
+                            : fora && fora.publicadas_7d > 0 ? `${fora.publicadas_7d} em 7d fora do MKT`
+                            : 'nunca'}
+                        </span>
                       </div>
                     </div>
                   );

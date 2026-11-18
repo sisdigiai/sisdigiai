@@ -38,6 +38,7 @@ type Marca = {
   marca: string; marca_nome: string; accent_hex: string | null; logo_url: string | null;
   dias_de_estoque: number | null; dias_marcados: number; dias_biblioteca: number | null;
   artes_prontas: number; publicadas_7d: number; na_fila: number; ultima_marcada: string | null;
+  tem_movimento: boolean;
 };
 
 const PARADA_DESDE = 3;
@@ -58,9 +59,17 @@ function relativo(iso: string | null): string {
   return `há ${Math.floor(h / 24)}d`;
 }
 
-type Nivel = { nome: 'crítico' | 'atenção' | 'ok'; motivo: string; ordem: number; tom: string };
+type Nivel = { nome: 'crítico' | 'atenção' | 'ok' | 'sem dado'; motivo: string; ordem: number; tom: string };
 
 function nivelDa(m: Marca, redes: Rede[]): Nivel {
+  // Marca que não publica pela casa não é "atenção" nem "ok": não há o que medir. Dizer qualquer um
+  // dos dois seria inventar um estado. O dono contou os cartões e viu 8 onde há 9 — a que faltava
+  // tinha sido filtrada por mim justamente por não ter dado, e **sumir é pior que aparecer vazia**.
+  if (!m.tem_movimento) {
+    return { nome: 'sem dado', motivo: 'ainda não publica pela casa; nenhum dado chega', ordem: 3,
+             tom: 'text-muted border-outline/30' };
+  }
+
   const motivos: string[] = [];
   const falhas = redes.reduce((a, r) => a + r.falhou_hoje, 0);
   // Rede ATIVA parada. Rede sem sair há mais de 30 dias é rede que a casa não usa, e tratá-la como
@@ -156,10 +165,11 @@ export default function ControlePorMarca() {
 
               {/* as quatro caixas, no lugar do pipeline da marca */}
               <div className="mt-4 grid grid-cols-4 divide-x divide-outline/10 border border-outline/10 bg-surface-lowest">
+                {/* Sem movimento, travessão em todas: zero aqui fingiria medição. */}
                 {[
-                  { label: 'hoje', v: String(hoje) },
-                  { label: '7 dias', v: String(m.publicadas_7d) },
-                  { label: 'na fila', v: String(m.na_fila) },
+                  { label: 'hoje', v: m.tem_movimento ? String(hoje) : '—' },
+                  { label: '7 dias', v: m.tem_movimento ? String(m.publicadas_7d) : '—' },
+                  { label: 'na fila', v: m.tem_movimento ? String(m.na_fila) : '—' },
                   { label: 'fôlego', v: m.dias_de_estoque == null ? '—' : n1(m.dias_de_estoque) },
                 ].map((k) => (
                   <div key={k.label} className="py-2 text-center">
@@ -173,7 +183,7 @@ export default function ControlePorMarca() {
               <div className="mt-3 space-y-1.5">
                 <div className="flex items-center gap-1.5 font-mono text-[10px] text-on-surface-variant">
                   <CalendarClock className="w-3 h-3 text-muted shrink-0" />
-                  {m.ultima_marcada ? `agenda até ${dia(m.ultima_marcada)}` : 'sem agenda marcada'}
+                  {!m.tem_movimento ? 'nenhuma agenda nem biblioteca' : m.ultima_marcada ? `agenda até ${dia(m.ultima_marcada)}` : 'sem agenda marcada'}
                   {' · '}biblioteca: {m.artes_prontas} {m.artes_prontas === 1 ? 'arte' : 'artes'}
                   {m.dias_biblioteca != null && ` (${n1(m.dias_biblioteca)}d)`}
                 </div>

@@ -9,7 +9,7 @@ import { supabase } from '../../lib/supabase';
 
 type Post = { brand_code: string; brand_name: string; platform: string; published_at: string; engajamento: number | null; coletado_em: string | null };
 type Ia = { teto_mensal: number | null; teto_diario: number | null; pausado: boolean | null; gasto_mes: number; gasto_dia: number };
-type Marca = { code: string; nome: string; posts: number; medidos: number; media: number | null; max: number | null };
+type Marca = { code: string; nome: string; posts: number; medidos: number; media: number | null; max: number | null; motivo?: string };
 
 // Quantos dias cada período pede. Vem do pai, junto com o cartão de Leituras: os dois mostram a mesma
 // janela ou a tela mente para quem clica.
@@ -20,10 +20,18 @@ export default function ResultadoConteudoCard({ periodo = '30' }: { periodo?: st
   const [marcas, setMarcas] = useState<Marca[] | null>(null);
   const [coletado, setColetado] = useState<string | null>(null);
   const [agendados, setAgendados] = useState(0);
+  // A lista canónica das marcas da casa. Sem ela, só aparecem as que têm post medido — e o dono
+  // contou os cartões: 9 numa aba, 8 noutra, 7 aqui. Marca sem medição fica, com o motivo escrito.
+  const [todas, setTodas] = useState<Array<{ marca: string; marca_nome: string; tem_movimento: boolean }> | null>(null);
   const [ia, setIa] = useState<Ia | null | 'sem_acesso'>(null);
   const [erro, setErro] = useState<string | null>(null);
 
   const dias = DIAS_POR_PERIODO[periodo] ?? null;
+
+  useEffect(() => {
+    supabase.from('v_mkt_estoque_marca').select('marca, marca_nome, tem_movimento')
+      .then(({ data }) => setTodas((data ?? []) as never));
+  }, []);
 
   useEffect(() => {
     setMarcas(null);
@@ -95,12 +103,24 @@ export default function ResultadoConteudoCard({ periodo = '30' }: { periodo?: st
               </tr>
             </thead>
             <tbody>
-              {marcas.map((m) => (
+              {/* As marcas sem post medido entram no fim, com o motivo — nunca somem, e nunca
+                  aparecem com zero fingindo medição. */}
+              {[...marcas, ...((todas ?? [])
+                  .filter((t) => !marcas.some((m) => m.code === t.marca))
+                  .map((t) => ({
+                    code: t.marca, nome: t.marca_nome, posts: 0, medidos: 0, media: null, max: null,
+                    motivo: t.tem_movimento
+                      ? 'publica fora do MKT — engajamento não medido aqui'
+                      : 'ainda não publica pela casa; nenhum dado chega',
+                  } as Marca)))].map((m) => (
                 <tr key={m.code} className="border-b border-outline/5 last:border-b-0">
-                  <td className="px-4 py-1.5 text-on-surface">{m.nome}</td>
+                  <td className="px-4 py-1.5 text-on-surface">
+                    {m.nome}
+                    {m.motivo && <div className="font-mono text-[9px] text-muted leading-tight">{m.motivo}</div>}
+                  </td>
                   <td className="px-4 py-1.5 text-right tabular-nums text-on-surface-variant"
                     title={m.medidos < m.posts ? `${m.posts - m.medidos} sem engajamento coletado` : undefined}>
-                    {m.posts}{m.medidos < m.posts && <span className="text-muted"> ({m.medidos} medidos)</span>}
+                    {m.motivo ? '—' : m.posts}{!m.motivo && m.medidos < m.posts && <span className="text-muted"> ({m.medidos} medidos)</span>}
                   </td>
                   <td className="px-4 py-1.5 text-right tabular-nums text-on-surface">{m.media == null ? '—' : m.media.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
                   <td className="px-4 py-1.5 text-right tabular-nums text-on-surface-variant">{m.max ?? '—'}</td>
