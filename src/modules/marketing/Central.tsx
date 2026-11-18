@@ -57,6 +57,9 @@ type Leitura = {
   natureza: 'fluxo' | 'estoque';
   diasMedidosAntes: number;
   nuncaHouve: boolean;
+  /** Para o censo: quantas contas entraram na medição de cada ponta. Cesta diferente não se compara. */
+  cestaAgora?: number | null;
+  cestaAntes?: number | null;
 };
 
 function medir(linhas: Dia[], elo: string, medida: string, periodo: Periodo): Leitura | null {
@@ -80,12 +83,24 @@ function medir(linhas: Dia[], elo: string, medida: string, periodo: Periodo): Le
   const agoraLs = dias ? janela(maisDias(hoje, -dias), hoje) : alvo;
   const antesLs = dias ? janela(maisDias(hoje, -dias * 2), maisDias(hoje, -dias)) : [];
 
+  // Para o estoque, a COBERTURA de cada ponta: o censo cobria 8 contas em 03/11 e cobre 22 hoje, e
+  // comparar totais de cestas diferentes transforma crescimento da medição em crescimento de
+  // audiência. Vi isso na tela como "subiu 74%" quinze minutos depois de publicar.
+  const cesta = (ls: Dia[]) => {
+    const c = linhas.filter((l) => l.elo === elo && l.medida === 'contas');
+    const diasDaPonta = new Set(ls.map((l) => l.dia));
+    const ult = [...c].filter((l) => diasDaPonta.has(l.dia)).sort((a, b) => a.dia.localeCompare(b.dia)).at(-1);
+    return ult ? Number(ult.n) : null;
+  };
+
   return {
     rotulo: '', agora: dias ? valor(agoraLs) ?? 0 : valor(alvo),
     antes: dias ? valor(antesLs) : null,
     natureza,
     diasMedidosAntes: antesLs.length,
     nuncaHouve: alvo.length === 0 || alvo.every((l) => Number(l.n) === 0),
+    cestaAgora: natureza === 'estoque' ? cesta(agoraLs) : null,
+    cestaAntes: natureza === 'estoque' ? cesta(antesLs) : null,
   };
 }
 
@@ -185,6 +200,11 @@ export default function Central({ periodo }: { periodo: Periodo }) {
                   <span className="font-mono text-[10px] text-muted">nunca houve registro</span>
                 ) : periodo === 'tudo' ? (
                   <span className="font-mono text-[10px] text-muted">sem período anterior</span>
+                ) : m.natureza === 'estoque' && m.cestaAgora != null && m.cestaAntes != null && m.cestaAgora !== m.cestaAntes ? (
+                  /* Cesta diferente não se compara: a diferença seria da régua, não do resultado. */
+                  <span className="font-mono text-[10px] text-warning">
+                    sem base: a medição mudou de tamanho ({m.cestaAntes} → {m.cestaAgora} contas)
+                  </span>
                 ) : m.antes == null || m.diasMedidosAntes < 4 ? (
                   <span className="font-mono text-[10px] text-muted">
                     sem base{m.diasMedidosAntes > 0 && ` (${m.diasMedidosAntes} dia(s) antes)`}
