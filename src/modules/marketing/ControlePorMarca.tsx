@@ -1,78 +1,94 @@
 import { useEffect, useMemo, useState } from 'react';
-import { LayoutGrid, AlertTriangle } from 'lucide-react';
+import { CalendarClock, Target, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
-// O controle por marca — pedido do dono em 18/11, 15h37, olhando a aba Publicações: "não temos os
-// card com a ideia que passei: publicado, pronto e em nível crítico, que seria ideal controlar tudo
-// nesta aba".
+// Controle por marca — ordem do dono em 18/11: primeiro o conteúdo (15h37, "publicado, pronto e em
+// nível crítico"), depois a forma (16h31, "pode deixar os modelos de cards iguais? olha os cards das
+// marcas e traz para o nosso publicações, com todas as informações, não é mudança de dados somente
+// visual para ficar iguais").
 //
-// Cada marca tem três partes: **PUBLICADO** (o que já saiu), **PRONTO** (o que vai sair e por quanto
-// tempo) e **NÍVEL** (ok, atenção, crítico). Dentro, uma linha por rede: última, próxima e na fila.
+// ELE PAROU A OBRA PARA DIZER ISSO, e tinha razão: eu tinha entregue linhas e tabela onde a casa usa
+// cartão. Este componente usa **o cartão da aba Marcas** — as mesmas classes, a mesma grade de 340px,
+// os mesmos brackets, a mesma faixa de quatro caixas —, e só troca o que vai dentro de cada parte:
 //
-// O CRITÉRIO DO NÍVEL FICA NA TELA, NÃO NO BANCO — e escrito ao lado do estado, não só na cor:
-//   · **crítico**: fôlego abaixo de 3 dias · peça que falhou hoje · **rede ativa parada** (saiu nos
-//     últimos 14 dias e está há 3 ou mais sem sair);
-//   · **atenção**: fôlego abaixo de 7 dias, ou marca sem ritmo para medir;
-//   · **ok**: o resto. Rede sem saída há mais de 30 dias é **inativa**: não alarma, aparece dita.
+//   logo e nome em serifa      → iguais
+//   linha debaixo do nome      → o motivo do nível, por extenso
+//   selo do canto              → o nível (ok · atenção · crítico)
+//   as quatro caixas           → hoje · 7 dias · na fila · fôlego
+//   linha do calendário        → agenda até <data> · biblioteca: N artes
+//   linha do alvo              → última saída
+//   etiquetas das redes        → as redes, cada uma com o seu estado
+//   canto de baixo             → há quanto tempo saiu a última
 //
-// A PRIMEIRA VERSÃO DESTE CRITÉRIO ERA "rede sem próxima marcada" E ESTAVA ERRADA — pelo mesmo motivo
-// que o fôlego errou de manhã: **marca agendada no próprio dia nunca tem próxima**. Ela punha 4 de 8
-// marcas em crítico, incluindo a Lancaster com 30 dias de fôlego e a Pessoal por um LinkedIn que saiu
-// hoje. Alarme que dispara para o funcionamento normal ensina a ignorar alarme.
+// O CRITÉRIO DO NÍVEL FICA AQUI, NÃO NO BANCO, e o motivo vai escrito ao lado — alarme sem motivo é
+// alarme que ninguém sabe desligar. Crítico: fôlego abaixo de 3 dias · peça que falhou hoje · rede
+// **ativa** parada (saiu nos últimos 14 dias e está há 3 ou mais sem sair). Atenção: fôlego abaixo de
+// 7 dias, ou marca sem ritmo para medir.
 //
-// Critério guardado no banco é critério que muda sem ninguém ver. Aqui está à vista, e o motivo
-// aparece por extenso — "crítico" sem motivo é um alarme que ninguém sabe como desligar.
+// Duas versões anteriores deste critério alarmaram o funcionamento normal — "rede sem próxima
+// marcada" punha 4 de 8 marcas em crítico, porque marca agendada no próprio dia nunca tem próxima.
+// Alarme que dispara para o normal ensina a ignorar alarme.
 
 type Rede = {
   marca: string; rede: string; publicadas_7d: number; publicadas_hoje: number;
   ultima_saida: string | null; na_fila: number; proxima_saida: string | null;
   ultima_marcada: string | null; falhou_hoje: number; dias_sem_sair: number | null;
 };
-
-const PARADA_DESDE = 3;    // dias sem sair que acendem o alarme
-const INATIVA_DEPOIS = 30; // dias sem sair que deixam de ser alarme e passam a ser estado
 type Marca = {
-  marca: string; marca_nome: string; accent_hex: string | null;
+  marca: string; marca_nome: string; accent_hex: string | null; logo_url: string | null;
   dias_de_estoque: number | null; dias_marcados: number; dias_biblioteca: number | null;
-  artes_prontas: number; publicadas_7d: number; na_fila: number;
+  artes_prontas: number; publicadas_7d: number; na_fila: number; ultima_marcada: string | null;
 };
+
+const PARADA_DESDE = 3;
+const INATIVA_DEPOIS = 30;
 
 const dma = (iso: string | null) =>
   iso ? new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date(iso)) : '—';
+const dia = (iso: string | null) =>
+  iso ? new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit' }).format(new Date(iso)) : '—';
 const n1 = (v: number | null) => (v == null ? '—' : v.toLocaleString('pt-BR', { maximumFractionDigits: 1 }));
 
-type Nivel = { nome: 'crítico' | 'atenção' | 'ok'; motivos: string[]; ordem: number };
+/** "há 4h" do canto do cartão, igual ao da aba Marcas. */
+function relativo(iso: string | null): string {
+  if (!iso) return 'nunca';
+  const h = Math.floor((Date.now() - new Date(iso).getTime()) / 3600000);
+  if (h < 1) return 'agora há pouco';
+  if (h < 24) return `há ${h}h`;
+  return `há ${Math.floor(h / 24)}d`;
+}
+
+type Nivel = { nome: 'crítico' | 'atenção' | 'ok'; motivo: string; ordem: number; tom: string };
 
 function nivelDa(m: Marca, redes: Rede[]): Nivel {
   const motivos: string[] = [];
   const falhas = redes.reduce((a, r) => a + r.falhou_hoje, 0);
-  // Rede ATIVA parada: saiu há pouco e deixou de sair. Rede que não sai há mais de 30 dias não é
-  // alarme — é uma rede que a casa não usa, e tratá-la como urgência todo dia ensina a ignorar.
+  // Rede ATIVA parada. Rede sem sair há mais de 30 dias é rede que a casa não usa, e tratá-la como
+  // urgência todo dia ensina a ignorar o alarme.
   const paradas = redes.filter((r) => r.dias_sem_sair != null
     && r.dias_sem_sair >= PARADA_DESDE && r.dias_sem_sair <= INATIVA_DEPOIS);
 
   if (falhas > 0) motivos.push(`${falhas} ${falhas === 1 ? 'peça falhou' : 'peças falharam'} hoje`);
-  if (m.dias_de_estoque != null && m.dias_de_estoque < 3) motivos.push(`${n1(m.dias_de_estoque)} dias de fôlego`);
-  if (paradas.length > 0) {
-    motivos.push(paradas.map((r) => `${r.rede} parado há ${r.dias_sem_sair} dias`).join(' · '));
-  }
-  if (motivos.length > 0) return { nome: 'crítico', motivos, ordem: 0 };
+  if (m.dias_de_estoque != null && m.dias_de_estoque < 3) motivos.push(`fôlego de ${n1(m.dias_de_estoque)} dias`);
+  if (paradas.length > 0) motivos.push(paradas.map((r) => `${r.rede} parado há ${r.dias_sem_sair} dias`).join(' · '));
+  if (motivos.length > 0) return { nome: 'crítico', motivo: motivos.join(' · '), ordem: 0, tom: 'text-danger border-danger/40 bg-danger/10' };
 
   if (m.dias_de_estoque != null && m.dias_de_estoque < 7) {
-    return { nome: 'atenção', motivos: [`${n1(m.dias_de_estoque)} dias de fôlego`], ordem: 1 };
+    return { nome: 'atenção', motivo: `fôlego de ${n1(m.dias_de_estoque)} dias`, ordem: 1, tom: 'text-warning border-warning/40 bg-warning/10' };
   }
   // Marca sem ritmo não é "ok": é marca de que não se sabe nada. Dizer ok seria aprovar o escuro.
   if (m.dias_de_estoque == null) {
-    return { nome: 'atenção', motivos: ['não publicou nesta semana — sem ritmo, não dá para medir o fôlego'], ordem: 1 };
+    return { nome: 'atenção', motivo: 'não publicou nesta semana — sem ritmo, não dá para medir o fôlego', ordem: 1, tom: 'text-warning border-warning/40 bg-warning/10' };
   }
-  return { nome: 'ok', motivos: [], ordem: 2 };
+  return { nome: 'ok', motivo: 'em dia', ordem: 2, tom: 'text-success border-success/40 bg-success/10' };
 }
 
-const TOM: Record<string, string> = {
-  'crítico': 'text-danger border-danger/40 bg-danger/10',
-  'atenção': 'text-warning border-warning/40 bg-warning/10',
-  ok: 'text-success border-success/40 bg-success/10',
-};
+function estadoDaRede(r: Rede) {
+  if (r.dias_sem_sair == null) return { txt: 'nunca saiu', tom: 'text-muted' };
+  if (r.dias_sem_sair > INATIVA_DEPOIS) return { txt: `inativa há ${r.dias_sem_sair}d`, tom: 'text-muted' };
+  if (r.dias_sem_sair >= PARADA_DESDE) return { txt: `parada há ${r.dias_sem_sair}d`, tom: 'text-danger' };
+  return { txt: 'em dia', tom: 'text-success' };
+}
 
 export default function ControlePorMarca() {
   const [redes, setRedes] = useState<Rede[] | null>(null);
@@ -90,107 +106,132 @@ export default function ControlePorMarca() {
   const cartoes = useMemo(() => {
     if (!redes || !marcas) return null;
     return marcas
-      .map((m) => {
-        const r = redes.filter((x) => x.marca === m.marca);
-        return { m, redes: r, nivel: nivelDa(m, r) };
-      })
-      .sort((a, b) => a.nivel.ordem - b.nivel.ordem
-        || (a.m.dias_de_estoque ?? 1e9) - (b.m.dias_de_estoque ?? 1e9));
+      .map((m) => ({ m, redes: redes.filter((x) => x.marca === m.marca), nivel: nivelDa(m, redes.filter((x) => x.marca === m.marca)) }))
+      .sort((a, b) => a.nivel.ordem - b.nivel.ordem || (a.m.dias_de_estoque ?? 1e9) - (b.m.dias_de_estoque ?? 1e9));
   }, [redes, marcas]);
 
-  return (
-    <section className="border border-outline/15 bg-surface-container">
-      <div className="flex items-center gap-2 flex-wrap px-4 py-2.5 border-b border-outline/10">
-        <LayoutGrid className="w-4 h-4 text-secondary" />
-        <span className="text-sm font-semibold text-on-surface">Controle por marca</span>
-        <span className="font-mono text-[10px] text-muted">publicado · pronto · nível, e por rede dentro de cada marca</span>
+  if (erro) {
+    return (
+      <div className="border border-outline/15 bg-surface-container px-4 py-3 text-sm text-danger flex items-start gap-2">
+        <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" /><span>Não consegui ler o controle: {erro}.</span>
       </div>
+    );
+  }
+  if (cartoes == null) return <div className="text-sm text-muted py-6">Carregando o controle…</div>;
 
-      {erro ? (
-        <div className="px-4 py-3 text-sm text-danger flex items-start gap-2">
-          <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" /><span>Não consegui ler o controle: {erro}.</span>
-        </div>
-      ) : cartoes == null ? (
-        <div className="px-4 py-3 text-sm text-muted">Carregando…</div>
-      ) : (
-        <div className="divide-y divide-outline/10">
-          {cartoes.map(({ m, redes: rs, nivel }) => (
-            <div key={m.marca} className="px-4 py-3">
-              <div className="flex items-start gap-3 flex-wrap">
-                <span className="w-1 self-stretch shrink-0" style={{ background: m.accent_hex || 'var(--color-outline)' }} />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-semibold text-on-surface">{m.marca_nome}</span>
-                    {/* O nível vem escrito, e o motivo junto: alarme sem motivo ninguém sabe desligar. */}
-                    <span className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border ${TOM[nivel.nome]}`}>
-                      {nivel.nome}
-                    </span>
-                    {nivel.motivos.length > 0 && (
-                      <span className="font-mono text-[9px] text-muted">{nivel.motivos.join(' · ')}</span>
-                    )}
-                  </div>
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-4">
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">Controle por marca ({cartoes.length})</span>
+        <span className="h-px flex-1 bg-outline/15" />
+      </div>
+      {/* A MESMA grade do cartão da aba Marcas: 340px mínimo, preenchendo a linha. */}
+      <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))' }}>
+        {cartoes.map(({ m, redes: rs, nivel }) => {
+          const cor = m.accent_hex || 'var(--color-secondary)';
+          const ultima = rs.map((r) => r.ultima_saida).filter(Boolean).sort().at(-1) ?? null;
+          const hoje = rs.reduce((a, r) => a + r.publicadas_hoje, 0);
+          return (
+            <div key={m.marca} className="relative border border-outline/15 bg-surface-container p-5 pt-6">
+              {/* brackets — gramática Geometric Precision, iguais aos da aba Marcas */}
+              <span className="absolute -top-px -left-px w-3 h-3 border-t-2 border-l-2" style={{ borderColor: cor }} />
+              <span className="absolute -top-px -right-px w-3 h-3 border-t-2 border-r-2 border-outline/40" />
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 mt-1.5">
-                    <div>
-                      <div className="font-mono text-[9px] uppercase tracking-widest text-muted">publicado</div>
-                      <div className="text-[12px] text-on-surface-variant">
-                        {m.publicadas_7d} em 7 dias
-                        {rs.some((r) => r.publicadas_hoje > 0) && ` · ${rs.reduce((a, r) => a + r.publicadas_hoje, 0)} hoje`}
-                        {' · última '}
-                        {dma(rs.map((r) => r.ultima_saida).filter(Boolean).sort().at(-1) ?? null)}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="font-mono text-[9px] uppercase tracking-widest text-muted">pronto</div>
-                      <div className="text-[12px] text-on-surface-variant">
-                        {m.na_fila} marcada(s) · {n1(m.dias_de_estoque)} dias de fôlego
-                        <span className="text-muted"> ({m.dias_marcados} na agenda + {n1(m.dias_biblioteca)} de biblioteca)</span>
-                      </div>
-                    </div>
-                  </div>
+              {/* identidade */}
+              <div className="flex items-start gap-3">
+                <div className="w-12 h-12 flex items-center justify-center overflow-hidden shrink-0 font-mono font-bold text-sm" style={{ background: `color-mix(in srgb, ${cor} 18%, transparent)`, color: cor }}>
+                  {m.logo_url
+                    ? <img src={m.logo_url} alt="" className="w-12 h-12 object-cover" />
+                    : m.marca_nome.slice(0, 2).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-serif text-lg font-semibold text-on-surface leading-tight truncate">{m.marca_nome}</div>
+                  {/* onde a aba Marcas põe o objetivo, aqui vai o motivo do nível, por extenso */}
+                  <div className="text-[11px] text-muted leading-snug line-clamp-2 mt-0.5">{nivel.motivo}</div>
+                </div>
+                <span className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border shrink-0 ${nivel.tom}`}>
+                  {nivel.nome}
+                </span>
+              </div>
 
-                  <div className="mt-2 overflow-x-auto">
-                    <table className="w-full text-[11px]">
-                      <thead>
-                        <tr className="text-left">
-                          {['rede', 'última saída', 'próxima', 'na fila', '7 dias', 'estado'].map((h, i) => (
-                            <th key={h} className={`font-mono text-[9px] uppercase tracking-widest text-muted pb-0.5 ${i ? 'text-right' : ''}`}>{h}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {rs.sort((a, b) => b.publicadas_7d - a.publicadas_7d).map((r) => (
-                          <tr key={r.rede} className="border-t border-outline/5">
-                            <td className="py-0.5 text-on-surface">{r.rede}</td>
-                            <td className="py-0.5 text-right text-on-surface-variant tabular-nums">{dma(r.ultima_saida)}</td>
-                            {/* "Sem próxima" é informação, não alarme: há marcas agendadas no próprio
-                                dia, e para elas isso é o normal. O vermelho fica para a rede parada. */}
-                            <td className="py-0.5 text-right tabular-nums text-on-surface-variant">
-                              {r.proxima_saida ? dma(r.proxima_saida) : 'sem próxima'}
-                            </td>
-                            <td className="py-0.5 text-right tabular-nums text-on-surface-variant">{r.na_fila}</td>
-                            <td className="py-0.5 text-right tabular-nums text-on-surface-variant">{r.publicadas_7d}</td>
-                            <td className="py-0.5 text-right">
-                              {r.dias_sem_sair == null ? <span className="font-mono text-[9px] text-muted">nunca saiu</span>
-                                : r.dias_sem_sair > INATIVA_DEPOIS ? <span className="font-mono text-[9px] text-muted">inativa há {r.dias_sem_sair} dias</span>
-                                : r.dias_sem_sair >= PARADA_DESDE ? <span className="font-mono text-[9px] text-danger">parada há {r.dias_sem_sair} dias</span>
-                                : <span className="font-mono text-[9px] text-success">em dia</span>}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+              {/* as quatro caixas, no lugar do pipeline da marca */}
+              <div className="mt-4 grid grid-cols-4 divide-x divide-outline/10 border border-outline/10 bg-surface-lowest">
+                {[
+                  { label: 'hoje', v: String(hoje) },
+                  { label: '7 dias', v: String(m.publicadas_7d) },
+                  { label: 'na fila', v: String(m.na_fila) },
+                  { label: 'fôlego', v: m.dias_de_estoque == null ? '—' : n1(m.dias_de_estoque) },
+                ].map((k) => (
+                  <div key={k.label} className="py-2 text-center">
+                    <div className="font-serif text-base font-semibold tabular-nums text-on-surface">{k.v}</div>
+                    <div className="font-mono text-[8px] uppercase tracking-widest text-muted">{k.label}</div>
                   </div>
+                ))}
+              </div>
+
+              {/* pronto e publicado, nas duas linhas de ícone da aba Marcas */}
+              <div className="mt-3 space-y-1.5">
+                <div className="flex items-center gap-1.5 font-mono text-[10px] text-on-surface-variant">
+                  <CalendarClock className="w-3 h-3 text-muted shrink-0" />
+                  {m.ultima_marcada ? `agenda até ${dia(m.ultima_marcada)}` : 'sem agenda marcada'}
+                  {' · '}biblioteca: {m.artes_prontas} {m.artes_prontas === 1 ? 'arte' : 'artes'}
+                  {m.dias_biblioteca != null && ` (${n1(m.dias_biblioteca)}d)`}
+                </div>
+                <div className="flex items-start gap-1.5 text-[10px] text-muted">
+                  <Target className="w-3 h-3 shrink-0 mt-px" />
+                  <span className="truncate">última saída {dma(ultima)}</span>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
 
-      <div className="px-4 py-2 border-t border-outline/10 font-mono text-[9px] text-muted">
-crítico: menos de 3 dias de fôlego · peça que falhou hoje · rede ativa parada (saiu nos últimos 14 dias e está há 3 ou mais sem sair) — atenção: menos de 7 dias de fôlego, ou sem ritmo para medir — rede sem sair há mais de 30 dias é inativa, não alarme
+              {/* etiquetas das redes, cada uma com o seu estado dito por palavra */}
+              <div className="mt-3 pt-3 border-t border-outline/10 flex items-center gap-1.5 flex-wrap">
+                {rs.map((r) => {
+                  const e = estadoDaRede(r);
+                  return (
+                    <span key={r.rede} className="font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 bg-surface-high text-on-surface-variant">
+                      {r.rede} <span className={e.tom}>· {e.txt}</span>
+                    </span>
+                  );
+                })}
+                {rs.length === 0 && <span className="font-mono text-[9px] text-muted">nenhuma rede com movimento</span>}
+                <span className="ml-auto font-mono text-[9px] text-muted">{relativo(ultima)}</span>
+              </div>
+
+              {/* o detalhe por rede continua, dentro do cartão e na letra pequena dele */}
+              {rs.length > 0 && (
+                <div className="mt-2 overflow-x-auto">
+                  <table className="w-full text-[10px]">
+                    <thead>
+                      <tr>
+                        {['rede', 'última', 'próxima', 'fila', '7d'].map((h, i) => (
+                          <th key={h} className={`font-mono text-[8px] uppercase tracking-widest text-muted pb-0.5 ${i ? 'text-right' : 'text-left'}`}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...rs].sort((a, b) => b.publicadas_7d - a.publicadas_7d).map((r) => (
+                        <tr key={r.rede} className="border-t border-outline/5">
+                          <td className="py-0.5 text-on-surface-variant">{r.rede}</td>
+                          <td className="py-0.5 text-right tabular-nums text-muted">{dma(r.ultima_saida)}</td>
+                          {/* "sem próxima" é informação, não alarme: há marcas agendadas no próprio dia. */}
+                          <td className="py-0.5 text-right tabular-nums text-muted">{r.proxima_saida ? dma(r.proxima_saida) : 'sem próxima'}</td>
+                          <td className="py-0.5 text-right tabular-nums text-muted">{r.na_fila}</td>
+                          <td className="py-0.5 text-right tabular-nums text-muted">{r.publicadas_7d}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
-    </section>
+
+      <div className="mt-3 font-mono text-[9px] text-muted leading-relaxed">
+        crítico: menos de 3 dias de fôlego · peça que falhou hoje · rede ativa parada (saiu nos últimos 14 dias e está há 3 ou mais sem sair)<br />
+        atenção: menos de 7 dias de fôlego, ou sem ritmo para medir · rede sem sair há mais de 30 dias é inativa, não alarme
+      </div>
+    </div>
   );
 }
