@@ -371,7 +371,15 @@ export default function MarketingEspelho() {
                 </div>
               )}
               {pubsPublicadas.length === 0 ? (
-                <div className="p-4 text-sm text-muted italic">Nenhuma publicação registrada ainda.</div>
+                /* "Nenhuma registrada" seria mentira: há mais de mil publicadas. O que acontece é que a
+                   view tem `limit 20` DENTRO, ordenada por data, então as 20 que chegam aqui são todas
+                   agendadas e nenhuma publicada alcança o app. Dizer o motivo é a diferença entre "não
+                   há" e "não chega". */
+                <div className="p-4 text-sm text-on-surface-variant">
+                  {pubsAgendadas.length > 0
+                    ? <>A fonte entrega as <strong>20 mais recentes por data</strong> e, hoje, as 20 são agendadas — nenhuma publicada chega até aqui. <span className="text-muted">Não é falta de publicação: é a view <code className="font-mono text-[11px]">v_mkt_publicacoes_recentes</code> cortando antes de separar agendado de publicado. Pedido ao MKT em 18/11.</span></>
+                    : 'Nenhuma publicação registrada ainda.'}
+                </div>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-outline/10">
                   {pubsPublicadas.map((p) => (
