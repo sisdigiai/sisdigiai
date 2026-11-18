@@ -2,6 +2,18 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-18 (fim do dia) — O padrão da casa de volta, as nove marcas pareadas e a Polá ligada antes de existir
+
+Por ordem do dono às 16h20 (*"além de mudar padrão visual, que estamos perdendo"*), 16h33, 16h54 e 20h03.
+
+- **As duas abas voltaram ao cartão que o app já tem.** `Publicações` (`src/modules/marketing/ControlePorMarca.tsx`) e `Motores` (`MotoresDeConteudo.tsx`) deixaram de ter desenho próprio e usam o **cartão da aba Marcas**, com as mesmas caixas e o mesmo selo. A tabela nova de motores saiu; os quatro motores voltaram para o cartão da seção que já existia.
+- **As nove marcas nas três abas** (migrations 257–259): `v_mkt_estoque_marca` ancora em `mkt.brands` em vez de só no que tem movimento, ganhou `logo_url`, e `tem_movimento` saiu de subconsulta por linha (que dava **HTTP 500** sob RLS, invisível porque leitura falha devolve lista vazia) para o CTE. Marca que não publica pela casa **ocupa lugar na tela dizendo o que é**.
+- **Critério de alarme refeito:** "rede sem próxima saída" punha 4 de 8 marcas em crítico — operação normal com cara de incêndio. Agora é **rede ativa parada** (publicou nos últimos 14 dias e está 3+ dias calada): 1 crítico, 7 ok.
+- **A Polá, pronta antes de existir** (`src/lib/espelhoMotores.ts`): o tipo `PolaDia` era um palpite (`plataforma, publicacoes, views`) e a view real entrega `rede, posts_no_dia, alcance, impressoes, interacoes, seguidores…` — **sem "views"**. Lido como estava, daria **zero em tudo sem erro nenhum**. Tipo corrigido; `EstadoEspelho` ganhou **`bloqueado`** para o **HTTP 402** do Supabase (projeto restrito por cota), que não é "não consegui ler"; `resumoPola()` entrega uma frase só para as três abas, com **seguidores como censo** (último dia de cada rede, nunca a soma). Quando a leitura entrar, o número aparece sozinho.
+- **Em produção a tela diz** "falta a credencial da Polá no ambiente — não é falta de publicação", porque o Cloudflare não tem as duas `VITE_POLA_*` (deixadas sem salvar de propósito, o banco dela está restrito). São **dois bloqueios distintos** e a tela mostra o que vale onde está.
+- **Dois erros meus, consertados no mesmo dia:** troca silenciosa entre SEO e estoque (consulta inserida no meio de um `Promise.all`, lida no fim) e o 500 acima.
+- Commits `d4e3d7e` → `3beec68`. Conferido em produção com os olhos, navegador próprio.
+
 ## 2026-11-17 — A aula pode ficar segurada, sem data (234) · Agente de Receita
 
 O dono segurou a aula de 24/11 em 17/11, no canal do marketing. A aba Aula continuava contando dias, cobrando o mínimo de 3 vagas até 22/11 e pintando passo de vencido.
