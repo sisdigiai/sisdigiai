@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BarChart3, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { resumoPola } from '../../lib/espelhoMotores';
 
 // Resultado do conteúdo e teto de IA — ordem do dono (15/09/2026): "não temos analytics ou resultado
 // no mkt, sempre no digiai". Contratos do MKT: v_mkt_performance (engajamento por post publicado,
@@ -23,6 +24,7 @@ export default function ResultadoConteudoCard({ periodo = '30' }: { periodo?: st
   // A lista canónica das marcas da casa. Sem ela, só aparecem as que têm post medido — e o dono
   // contou os cartões: 9 numa aba, 8 noutra, 7 aqui. Marca sem medição fica, com o motivo escrito.
   const [todas, setTodas] = useState<Array<{ marca: string; marca_nome: string; tem_movimento: boolean }> | null>(null);
+  const [pola, setPola] = useState<Awaited<ReturnType<typeof resumoPola>> | null>(null);
   const [ia, setIa] = useState<Ia | null | 'sem_acesso'>(null);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -31,6 +33,7 @@ export default function ResultadoConteudoCard({ periodo = '30' }: { periodo?: st
   useEffect(() => {
     supabase.from('v_mkt_estoque_marca').select('marca, marca_nome, tem_movimento')
       .then(({ data }) => setTodas((data ?? []) as never));
+    resumoPola().then(setPola);
   }, []);
 
   useEffect(() => {
@@ -109,9 +112,13 @@ export default function ResultadoConteudoCard({ periodo = '30' }: { periodo?: st
                   .filter((t) => !marcas.some((m) => m.code === t.marca))
                   .map((t) => ({
                     code: t.marca, nome: t.marca_nome, posts: 0, medidos: 0, media: null, max: null,
-                    motivo: t.tem_movimento
-                      ? 'publica fora do MKT — engajamento não medido aqui'
-                      : 'ainda não publica pela casa; nenhum dado chega',
+                    // A Polá tem fonte própria: a frase dela vem do espelho do app dela, e diz se o
+                    // que falta é credencial, se o banco está bloqueado, ou se já há leitura.
+                    motivo: t.marca === 'polapetit'
+                      ? (pola?.frase ?? 'lendo o espelho da Polá…')
+                      : t.tem_movimento
+                        ? 'publica fora do MKT — engajamento não medido aqui'
+                        : 'ainda não publica pela casa; nenhum dado chega',
                   } as Marca)))].map((m) => (
                 <tr key={m.code} className="border-b border-outline/5 last:border-b-0">
                   <td className="px-4 py-1.5 text-on-surface">

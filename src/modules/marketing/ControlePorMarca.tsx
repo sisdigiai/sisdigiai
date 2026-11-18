@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CalendarClock, Target, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { resumoPola } from '../../lib/espelhoMotores';
 
 // Controle por marca — ordem do dono em 18/11: primeiro o conteúdo (15h37, "publicado, pronto e em
 // nível crítico"), depois a forma (16h31, "pode deixar os modelos de cards iguais? olha os cards das
@@ -41,6 +42,8 @@ type Marca = {
   tem_movimento: boolean;
 };
 
+type Resumo = Awaited<ReturnType<typeof resumoPola>>;
+
 const PARADA_DESDE = 3;
 const INATIVA_DEPOIS = 30;
 
@@ -61,7 +64,16 @@ function relativo(iso: string | null): string {
 
 type Nivel = { nome: 'crítico' | 'atenção' | 'ok' | 'sem dado'; motivo: string; ordem: number; tom: string };
 
-function nivelDa(m: Marca, redes: Rede[]): Nivel {
+function nivelDa(m: Marca, redes: Rede[], pola?: Resumo | null): Nivel {
+  // A Polá não passa pelo MKT nem pela Lousa: o que se sabe dela vem do espelho do app dela. Enquanto
+  // o banco dela estiver bloqueado, a tela diz ISSO — e não "não publicou", que seria outra coisa.
+  if (m.marca === 'polapetit' && pola) {
+    if (pola.estado === 'ok') {
+      return { nome: 'ok', motivo: pola.frase, ordem: 2, tom: 'text-success border-success/40 bg-success/10' };
+    }
+    return { nome: 'sem dado', motivo: pola.frase, ordem: 3, tom: 'text-muted border-outline/30' };
+  }
+
   // Marca que não publica pela casa não é "atenção" nem "ok": não há o que medir. Dizer qualquer um
   // dos dois seria inventar um estado. O dono contou os cartões e viu 8 onde há 9 — a que faltava
   // tinha sido filtrada por mim justamente por não ter dado, e **sumir é pior que aparecer vazia**.
@@ -103,6 +115,9 @@ export default function ControlePorMarca() {
   const [redes, setRedes] = useState<Rede[] | null>(null);
   const [marcas, setMarcas] = useState<Marca[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const [pola, setPola] = useState<Resumo | null>(null);
+
+  useEffect(() => { resumoPola().then(setPola); }, []);
 
   useEffect(() => {
     supabase.from('v_mkt_controle_marca_rede').select('*').then(({ data, error }) => {
@@ -115,9 +130,9 @@ export default function ControlePorMarca() {
   const cartoes = useMemo(() => {
     if (!redes || !marcas) return null;
     return marcas
-      .map((m) => ({ m, redes: redes.filter((x) => x.marca === m.marca), nivel: nivelDa(m, redes.filter((x) => x.marca === m.marca)) }))
+      .map((m) => ({ m, redes: redes.filter((x) => x.marca === m.marca), nivel: nivelDa(m, redes.filter((x) => x.marca === m.marca), pola) }))
       .sort((a, b) => a.nivel.ordem - b.nivel.ordem || (a.m.dias_de_estoque ?? 1e9) - (b.m.dias_de_estoque ?? 1e9));
-  }, [redes, marcas]);
+  }, [redes, marcas, pola]);
 
   if (erro) {
     return (

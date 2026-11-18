@@ -12,7 +12,7 @@ import ControlePorMarca from './marketing/ControlePorMarca';
 import MotoresDeConteudo from './marketing/MotoresDeConteudo';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia } from '../lib/datas';
-import { espelhoMotores, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
+import { espelhoMotores, resumoPola, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
 
 // Cadeia de resultados (v_marketing_cadeia + espelhos + uso vivo Clearix).
 // Decisão do dono 2026-08-25: tudo que fazemos tem que aparecer LIGADO — produzir →
@@ -95,6 +95,7 @@ export default function MarketingEspelho() {
     marca: string; publicadas_7d: number; na_fila: number; artes_prontas: number;
     ultima_marcada: string | null; tem_movimento: boolean;
   }> | null>(null);
+  const [pola, setPola] = useState<Awaited<ReturnType<typeof resumoPola>> | null>(null);
   const [seo, setSeo] = useState<{ cliques: number; impressoes: number; sites: number; medido_em: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
   // Página longa esconde o que importa: o dono rolava seis seções para chegar à cadeia de resultados.
@@ -163,6 +164,9 @@ export default function MarketingEspelho() {
     setLoading(false);
   };
   useEffect(() => { load(); }, []);
+  // A Polá vem do espelho do app dela, não do MKT: leitura própria, e o estado dela é escrito na tela
+  // (sem credencial · banco bloqueado · com dado). Nunca zero por não ter conseguido ler.
+  useEffect(() => { resumoPola().then(setPola); }, []);
 
   const diasDesde = (d: string | null | undefined) =>
     d ? Math.floor((Date.now() - new Date(d + 'T12:00:00').getTime()) / 86400000) : null;
@@ -301,6 +305,7 @@ export default function MarketingEspelho() {
                   const sete = Math.max(m.publicadas_7d, fora?.publicadas_7d ?? 0);
                   const ativa7d = sete > 0;
                   const semNada = fora ? !fora.tem_movimento : false;
+                  const ehPola = m.code === 'polapetit';
                   return (
                     <div key={m.id} className="relative border border-outline/15 bg-surface-container p-5 pt-6">
                       {/* brackets — gramática Geometric Precision */}
@@ -319,7 +324,9 @@ export default function MarketingEspelho() {
                           {m.norte?.objetivo && <div className="text-[11px] text-muted leading-snug line-clamp-2 mt-0.5">{m.norte.objetivo}</div>}
                         </div>
                         <span className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border shrink-0 ${ativa7d ? 'text-success border-success/40 bg-success/10' : 'text-muted border-outline/20'}`}>
-                          {ativa7d ? `${sete} em 7d` : semNada ? 'ainda não publica' : 'sem post 7d'}
+                          {ativa7d ? `${sete} em 7d`
+                            : ehPola ? (pola?.estado === 'ok' ? `${pola.dias} dias medidos` : 'fonte própria')
+                            : semNada ? 'ainda não publica' : 'sem post 7d'}
                         </span>
                       </div>
 
@@ -369,6 +376,7 @@ export default function MarketingEspelho() {
                         )}
                         <span className="ml-auto font-mono text-[9px] text-muted">
                           {m.ultima_publicacao ? relativo(m.ultima_publicacao)
+                            : ehPola ? (pola?.frase ?? 'lendo o espelho da Polá…')
                             : semNada ? 'nenhum dado chega'
                             : fora && fora.publicadas_7d > 0 ? `${fora.publicadas_7d} em 7d fora do MKT`
                             : 'nunca'}

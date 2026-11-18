@@ -94,7 +94,10 @@ export interface BlogDia { dia: string; blog_slug: string; leituras: number; ses
 // e "não consegui ler o espelho" levam a decisões opostas — o primeiro é o motor parado, o segundo é o
 // painel cego. Então o leitor passa a devolver o MOTIVO junto das linhas, e a tela escreve qual é.
 // `lerLinhas` continua existindo com a assinatura antiga porque as outras telas dependem dela.
-export type EstadoEspelho = 'ok' | 'sem_credencial' | 'erro';
+// `bloqueado` existe à parte porque o Supabase devolve **402** quando o projeto está restrito (cota
+// estourada), e isso não é "não consegui ler": é "o banco daquele app está fora do ar". Quem lê a tela
+// precisa saber qual das duas, porque uma se resolve com credencial e a outra com plano ou espaço.
+export type EstadoEspelho = 'ok' | 'sem_credencial' | 'erro' | 'bloqueado';
 
 async function lerLinhasEstado<T>(base: string | undefined, anon: string | undefined, view: string):
   Promise<{ linhas: T[]; estado: EstadoEspelho; detalhe?: string }> {
@@ -107,6 +110,10 @@ async function lerLinhasEstado<T>(base: string | undefined, anon: string | undef
       headers: { apikey: anon, Authorization: `Bearer ${anon}` },
       signal: AbortSignal.timeout(12000),
     });
+    if (r.status === 402) {
+      console.error('[espelho] %s: projeto restrito pelo Supabase (402)', view);
+      return { linhas: [], estado: 'bloqueado', detalhe: 'banco do app está restrito pelo Supabase' };
+    }
     if (!r.ok) {
       console.error('[espelho] %s: HTTP %s', view, r.status);
       return { linhas: [], estado: 'erro', detalhe: `HTTP ${r.status}` };
@@ -171,7 +178,18 @@ async function lerPulsoGateado(): Promise<EspelhoPulso | null> {
 // dizer "falta credencial", não "0 publicações".
 const POLA_URL = import.meta.env.VITE_POLA_SUPABASE_URL as string | undefined;
 const POLA_ANON = import.meta.env.VITE_POLA_SUPABASE_ANON_KEY as string | undefined;
-export interface PolaDia { dia: string; plataforma: string; publicacoes: number; views: number }
+// As colunas REAIS da view da Polá, conferidas no painel dela em 18/11. O tipo anterior
+// (`plataforma, publicacoes, views`) era um palpite de quando o leitor foi escrito: a view entrega
+// `rede` e `posts_no_dia`, e não tem "views" — tem alcance, impressões e interações, que são coisas
+// diferentes. Ler uma pela outra daria zero em tudo sem erro nenhum.
+export interface PolaDia {
+  dia: string; rede: string;
+  posts_no_dia: number | null;
+  alcance: number | null; impressoes: number | null; interacoes: number | null;
+  seguidores: number | null; aparicoes: number | null; ligacoes: number | null;
+  cliques_site: number | null; rotas: number | null;
+  hora_do_post: string | null; lido_em: string | null;
+}
 
 // Cortes e longos do Pulso, nas contas DELE (2026-11-17, pedido meu ao Pulso no mesmo dia). Ficavam em
 // `pulso_analytics.leituras_longos`, sem espelho, e por isso não entravam no total do painel do dono.
@@ -202,3 +220,43 @@ export const espelhoMotores = {
   limelightPubDias: () => lerLinhas<LimePubDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_pub_dias'),
   blogsDias: () => lerLinhas<BlogDia>(BLOGS_URL, BLOGS_ANON, 'v_espelho_blogs_dias'),
 };
+
+/**
+ * A Polá em uma linha, para as três abas dizerem a mesma coisa sem repetir regra.
+ *
+ * Três estados escritos, e eles pedem ações diferentes:
+ *   · `sem_credencial` — falta a variável no ambiente (hoje, em produção);
+ *   · `bloqueado` — o banco dela está restrito pelo Supabase por cota estourada (HTTP 402);
+ *   · `ok` — há leitura; aí o número entra sozinho, sem ninguém mexer na tela.
+ *
+ * Nenhum deles é "não publicou": a tela nunca mostra zero por não ter conseguido ler.
+ */
+export async function resumoPola(): Promise<{
+  estado: EstadoEspelho; frase: string;
+  dias: number; redes: string[]; seguidores: number | null; ultimoDia: string | null;
+}> {
+  const { linhas, estado } = await espelhoMotoresEstado.polaDias();
+  if (estado !== 'ok') {
+    return {
+      estado, dias: 0, redes: [], seguidores: null, ultimoDia: null,
+      frase: estado === 'bloqueado'
+        ? 'o banco da Polá está bloqueado pelo Supabase (cota estourada) — não é falta de publicação'
+        : estado === 'sem_credencial'
+          ? 'falta a credencial da Polá no ambiente — não é falta de publicação'
+          : 'não consegui ler o espelho da Polá — painel cego, não motor parado',
+    };
+  }
+  const dias = new Set(linhas.map((l) => l.dia)).size;
+  const redes = [...new Set(linhas.map((l) => l.rede).filter(Boolean))];
+  // Seguidores é censo: vale o último dia de cada rede, nunca a soma dos dias.
+  const porRede = new Map<string, number>();
+  for (const l of [...linhas].sort((a, b) => a.dia.localeCompare(b.dia))) {
+    if (l.seguidores != null) porRede.set(l.rede, Number(l.seguidores));
+  }
+  const seguidores = porRede.size ? [...porRede.values()].reduce((a, b) => a + b, 0) : null;
+  const ultimoDia = linhas.length ? [...linhas].map((l) => l.dia).sort().at(-1)! : null;
+  return {
+    estado, dias, redes, seguidores, ultimoDia,
+    frase: `${dias} dia(s) medidos em ${redes.join(', ')}${seguidores != null ? ` · ${seguidores.toLocaleString('pt-BR')} seguidores` : ''}`,
+  };
+}
