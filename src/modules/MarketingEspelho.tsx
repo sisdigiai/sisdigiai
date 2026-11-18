@@ -9,7 +9,7 @@ import HojeSai from './marketing/HojeSai';
 import EstoquePorMarca from './marketing/EstoquePorMarca';
 import Leituras from './marketing/Leituras';
 import ControlePorMarca from './marketing/ControlePorMarca';
-import QuatroMotores from './marketing/QuatroMotores';
+import MotoresDeConteudo from './marketing/MotoresDeConteudo';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia } from '../lib/datas';
 import { espelhoMotores, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
@@ -416,101 +416,19 @@ export default function MarketingEspelho() {
         )}
 
         {/* Outros motores de conteúdo — espelhos vivos dos bancos próprios (2026-07-30) */}
-        {/* Os quatro na mesma régua, antes dos cartões: o dono perguntou por que apareciam dois. */}
-        {aba === 'motores' && <QuatroMotores periodo={periodo} />}
-
+        {/* OS QUATRO MOTORES, no cartão que esta seção já usava. Antes eu tinha criado uma tabela
+            nova ao lado dela, e a aba ficou com duas listas de motores — "criamos uma sessão sem
+            precisar", disse o dono em 18/11. A tabela saiu e tudo o que ela mostrava entrou aqui. */}
         {aba === 'motores' && (
-        <div className="border border-outline/15 bg-surface-container">
-          <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2">
-            <Radio className="w-3.5 h-3.5 text-secondary" />
-            <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Outros motores de conteúdo</span>
-            <span className="ml-auto font-mono text-[10px] text-muted">fonte: v_espelho_* (bancos Limelight e Pulso)</span>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-outline/10">
-            <div className="bg-surface-container p-4 space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 shrink-0" style={{ background: 'var(--color-eco-app)' }} />
-                <span className="text-sm font-semibold text-on-surface">Limelight Studio · Mello</span>
-                <span className="ml-auto font-mono text-[10px] text-muted">série "Transforme Sua Visão"</span>
-              </div>
-              {limelight ? (
-                <>
-                  <div className="grid grid-cols-4 gap-2 text-center">
-                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{limelight.episodios}</div><div className="text-[10px] font-mono uppercase text-muted">episódios</div></div>
-                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{limelight.publicacoes}</div><div className="text-[10px] font-mono uppercase text-muted">publicações</div></div>
-                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{((limelight.views_total ?? 0) / 1000).toFixed(1)}k</div><div className="text-[10px] font-mono uppercase text-muted">views</div></div>
-                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{limelight.fila}</div><div className="text-[10px] font-mono uppercase text-muted">na fila</div></div>
-                  </div>
-                  <div className="text-[11px] text-muted">
-                    Views: {limelight.views_por_plataforma ? Object.entries(limelight.views_por_plataforma).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v >= 1000 ? (v / 1000).toFixed(1) + 'k' : v}`).join(' · ') : '—'}
-                    {' · '}custo IA ${limelight.custo_ia_usd}
-                  </div>
-                  <div className="text-[11px] text-muted">
-                    Seguidores: {Object.entries(limelight.seguidores).filter(([, v]) => v > 0).map(([k, v]) => `${k} ${v}`).join(' · ') || '—'}
-                    {' · '}coleta {limelight.ultima_coleta === hojeBrasilia() ? <span className="text-success">hoje ✓</span> : limelight.ultima_coleta ?? '—'}
-                  </div>
-                </>
-              ) : <div className="text-sm text-muted italic">Espelho indisponível.</div>}
-            </div>
-            <div className="bg-surface-container p-4 space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 shrink-0" style={{ background: 'var(--color-eco-pulso)' }} />
-                <span className="text-sm font-semibold text-on-surface">Pulso Control · canais faceless</span>
-                <span className="ml-auto font-mono text-[10px] text-muted">{pulso?.canais ?? '—'} canais</span>
-              </div>
-              {pulso ? (
-                <>
-                  <div className="grid grid-cols-4 gap-2 text-center">
-                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{pulso.publicacoes}</div><div className="text-[10px] font-mono uppercase text-muted">publicações</div></div>
-                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{(pulso.views_total / 1000).toFixed(0)}k</div><div className="text-[10px] font-mono uppercase text-muted">views</div></div>
-                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{(pulso.pipeline['PRONTO_PUBLICACAO'] ?? 0) + (pulso.pipeline['EM_EDICAO'] ?? 0) + (pulso.pipeline['ROTEIRO_PRONTO'] ?? 0)}</div><div className="text-[10px] font-mono uppercase text-muted">no pipeline</div></div>
-                    <div><div className="text-lg font-bold tabular-nums text-on-surface">{pulso.ideias}</div><div className="text-[10px] font-mono uppercase text-muted">ideias</div></div>
-                  </div>
-                  <div className="text-[11px] text-muted">
-                    Views: {Object.entries(pulso.views_por_plataforma).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${(v / 1000).toFixed(0)}k`).join(' · ')}
-                  </div>
-                  <div className="text-[11px] text-muted">
-                    {pulsoUltimaPubDias != null && pulsoUltimaPubDias <= 2
-                      ? <span className="text-success">esteira automática viva — última publicação {pulsoUltimaPubDias === 0 ? 'hoje ✓' : `há ${pulsoUltimaPubDias}d`}</span>
-                      : <span className="text-warning">última publicação {pulso.ultima_publicacao ?? '—'}</span>}
-                    {' · '}coleta diária 11h (Vercel Crons)
-                  </div>
-
-                  {/* Financeiro do Pulso. Caixa e consumo aparecem SEPARADOS e nunca
-                      somados: o topup e dinheiro saindo, o consumo e uso do credito ja
-                      comprado. Somar os dois da R$ 9.873 e infla o burn em ~3,8x — o
-                      mesmo erro que este painel ja cometeu com o aporte intelectual. */}
-                  {pulso.custo_caixa_total_brl != null && (
-                    <div className="border-t border-outline pt-2 mt-1 space-y-1">
-                      <div className="grid grid-cols-3 gap-2">
-                        <div>
-                          <div className="text-sm font-bold tabular-nums text-on-surface">{brl(pulso.custo_caixa_total_brl)}</div>
-                          <div className="text-[10px] font-mono uppercase text-muted leading-tight">custo de caixa<br /><span className="text-[9px]">dinheiro que saiu</span></div>
-                        </div>
-                        <div>
-                          <div className="text-sm font-bold tabular-nums text-on-surface-variant">{brl(pulso.custo_consumo_total_brl)}</div>
-                          <div className="text-[10px] font-mono uppercase text-muted leading-tight">crédito consumido<br /><span className="text-[9px]">gerencial, não é despesa</span></div>
-                        </div>
-                        <div>
-                          <div className="text-sm font-bold tabular-nums text-on-surface">{brl(pulso.custo_caixa_por_video_brl)}</div>
-                          <div className="text-[10px] font-mono uppercase text-muted leading-tight">por vídeo<br /><span className="text-[9px]">caixa ÷ publicações</span></div>
-                        </div>
-                      </div>
-                      <div className="text-[11px] text-muted">
-                        Receita: {brl(pulso.receita_total_brl)} · recebido {brl(pulso.receita_recebida_brl)}
-                        {(pulso.receita_total_brl ?? 0) === 0 && <span className="text-warning"> — nenhum gate de monetização aberto ainda</span>}
-                      </div>
-                      <div className="text-[10px] text-muted leading-snug">
-                        Os dois custos <strong>não se somam</strong>: o crédito consumido é uso do
-                        topup já pago. Somar inflaria o burn em ~3,8×.
-                      </div>
-                    </div>
-                  )}
-                </>
-              ) : <div className="text-sm text-muted italic">Espelho indisponível.</div>}
-            </div>
-          </div>
-        </div>
+          <MotoresDeConteudo
+            periodo={periodo}
+            limelight={limelight}
+            pulso={pulso}
+            espMkt={esp}
+            hoje={hojeBrasilia()}
+            brl={brl}
+            pulsoUltimaPubDias={pulsoUltimaPubDias}
+          />
         )}
 
         {/* FATOS publicáveis — o que a IA do MKT PODE citar (fonte: mkt.fatos, com validade) */}
