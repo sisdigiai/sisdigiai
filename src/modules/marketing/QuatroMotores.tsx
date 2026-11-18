@@ -1,111 +1,113 @@
 import { useEffect, useState } from 'react';
 import { Cpu } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import { espelhoMotoresEstado, type PulsoDia, type PulsoLongoDia, type LimePubDia, type EstadoEspelho } from '../../lib/espelhoMotores';
+import {
+  espelhoMotores, espelhoMotoresEstado,
+  type PulsoDia, type PulsoLongoDia, type LimePubDia, type EstadoEspelho,
+  type EspelhoLimelight, type EspelhoPulso,
+} from '../../lib/espelhoMotores';
+import type { Periodo } from './Central';
 
 // Os quatro motores na mesma régua — pedido do dono em 18/11, 15h37: "4 motores, aparece 2 somente e
 // deveria aparecer 4, correto?". Correto: o MKT e o DIGIAI Cortes faltavam.
 //
-// A RÉGUA É A MESMA PARA OS QUATRO, e por isso cada célula vazia tem de dizer o que é:
-//   · **"sem custo medido"** não é custo zero. O Cortes ainda não manda o custo em reais (a coluna
-//     existe desde hoje, migration 243, e espera o número dele).
-//   · **"não publica direto"** não é zero views. O Cortes entrega ao MKT, e as views das peças dele
-//     aparecem no motor que publicou — contá-las aqui também seria contar duas vezes.
-//   · **"só para admin do MKT"** não é custo zero: é falta de acesso.
+// DUAS COISAS QUE EU ERREI AQUI E CORRIGI NO MESMO DIA, as duas sobre o significado de um número:
 //
-// Custo por mil views só aparece quando as DUAS pontas existem. Dividir um custo conhecido por views
-// que não existem dá um número grande e falso, e é o tipo de número que decide errado uma comparação.
+//  1. **"Espelho parado em 06/11"** — era falso. A view do Limelight agrupa pelo dia em que a PEÇA foi
+//     publicada, não pelo dia da medição; o "dia mais novo" dela é a última peça que saiu, e a coleta
+//     dele rodou hoje (408 leituras). Eu li a data como se fosse de medição e acusei de parada uma
+//     coleta viva. Ele próprio me corrigiu.
+//  2. **Peças do MKT vinham da analytics filtrada por `data`**, que é o dia da MEDIÇÃO: dava 222 peças
+//     em 7 dias enquanto a cadeia dizia 150 publicadas. Dois números com o mesmo nome na mesma página.
+//     Agora as peças de todos os motores saem da mesma fonte da Lousa: publicadas no período.
+//
+// E A ARMADILHA QUE FICA, dita na tela em vez de escondida: **"views no período" não quer dizer a mesma
+// coisa nos quatro**. Nos espelhos é "views das peças publicadas no período" — motor que não publicou
+// esta semana aparece com zero mesmo ganhando audiência. A medida comparável (views GANHAS por dia de
+// leitura) foi pedida ao Limelight em 18/11; enquanto não existir, a coluna diz o que é.
 
 type Linha = {
   motor: string;
   pecas: number | null; pecasNota?: string;
   views: number | null; viewsNota?: string;
-  custo: number | null; custoNota?: string;
+  custo: string | null; custoNota?: string;
 };
 
 const n = (v: number) => v.toLocaleString('pt-BR', { maximumFractionDigits: 0 });
-const brl = (v: number) => `R$ ${v.toLocaleString('pt-BR', { maximumFractionDigits: 2 })}`;
 const diaBRT = (d: Date) =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
 
-export default function QuatroMotores() {
-  const [analytics, setAnalytics] = useState<Array<{ origem: string; peca_ref: string; views: number | null }> | null>(null);
+export default function QuatroMotores({ periodo }: { periodo: Periodo }) {
+  const dias = periodo === 'tudo' ? null : Number(periodo);
+  const [pecasPorMarca, setPecas] = useState<Array<{ origem: string; publicador: string }> | null>(null);
+  const [viewsMkt, setViewsMkt] = useState<number | null>(null);
   const [cortes, setCortes] = useState<{ pecas: number; custo: number | null } | null>(null);
-  const [pulso, setPulso] = useState<{ linhas: PulsoDia[]; estado: EstadoEspelho } | null>(null);
+  const [pulsoDias, setPulsoDias] = useState<{ linhas: PulsoDia[]; estado: EstadoEspelho } | null>(null);
   const [longos, setLongos] = useState<{ linhas: PulsoLongoDia[]; estado: EstadoEspelho } | null>(null);
-  const [lime, setLime] = useState<{ linhas: LimePubDia[]; estado: EstadoEspelho } | null>(null);
+  const [limeDias, setLimeDias] = useState<{ linhas: LimePubDia[]; estado: EstadoEspelho } | null>(null);
+  const [lime, setLime] = useState<EspelhoLimelight | null>(null);
+  const [pulso, setPulso] = useState<EspelhoPulso | null>(null);
 
   useEffect(() => {
-    const desde = diaBRT(new Date(Date.now() - 7 * 86400000));
-    supabase.from('v_mkt_analytics_peca_dia').select('origem, peca_ref, views').gte('data', desde)
-      .then(({ data }) => setAnalytics((data ?? []) as never));
-    supabase.from('v_cortes_pecas').select('id').then(({ data, error }) => {
-      if (error) { setCortes(null); return; }
+    const corte = dias ? diaBRT(new Date(Date.now() - dias * 86400000)) : '0000-01-01';
+    // Peças publicadas no período, da MESMA fonte para todos: a Lousa. Antes o MKT vinha da analytics
+    // por dia de medição e dava 222 contra as 150 da cadeia, na mesma página.
+    supabase.from('v_lousa').select('origem, publicador').eq('estado', 'publicado')
+      .gte('quando', `${corte}T00:00:00-03:00`).limit(5000)
+      .then(({ data }) => setPecas((data ?? []) as never));
+    supabase.from('v_mkt_analytics_peca_dia').select('views').gte('data', corte).limit(5000)
+      .then(({ data }) => setViewsMkt((data ?? []).reduce((a: number, x: { views: number | null }) => a + Number(x.views ?? 0), 0)));
+    supabase.from('v_cortes_pecas').select('id').then(({ data }) => {
       supabase.from('v_cortes_episodios').select('custo_brl').then(({ data: eps }) => {
         const medidos = (eps ?? []).filter((e: { custo_brl: number | null }) => e.custo_brl != null);
-        setCortes({
-          pecas: (data ?? []).length,
-          custo: medidos.length ? medidos.reduce((a: number, e: { custo_brl: number | null }) => a + Number(e.custo_brl), 0) : null,
-        });
+        setCortes({ pecas: (data ?? []).length,
+          custo: medidos.length ? medidos.reduce((a: number, e: { custo_brl: number | null }) => a + Number(e.custo_brl), 0) : null });
       });
     });
-    espelhoMotoresEstado.pulsoDias().then(setPulso);
+    espelhoMotoresEstado.pulsoDias().then(setPulsoDias);
     espelhoMotoresEstado.pulsoLongosDias().then(setLongos);
-    espelhoMotoresEstado.limelightPubDias().then(setLime);
-  }, []);
+    espelhoMotoresEstado.limelightPubDias().then(setLimeDias);
+    espelhoMotores.limelight().then(setLime);
+    espelhoMotores.pulso().then(setPulso);
+  }, [periodo]);
 
-  const corte = diaBRT(new Date(Date.now() - 7 * 86400000));
+  const corte = dias ? diaBRT(new Date(Date.now() - dias * 86400000)) : '0000-01-01';
   const janela = <T extends { dia: string }>(l: T[] | undefined) => (l ?? []).filter((x) => x.dia >= corte);
+  const somar = <T extends Record<string, unknown>>(l: T[], c: string) =>
+    l.reduce((a, x) => a + Number((x[c] as number) ?? 0), 0);
+  const daLousa = (origem: string) => (pecasPorMarca ?? []).filter((p) => p.origem === origem).length;
 
-  // ESPELHO PARADO NÃO É MOTOR PARADO. O espelho do Limelight é legível e tem 153 dias de história,
-  // mas o dia mais novo é 06/11 — doze dias atrás. Somar a janela de 7 dias dá ZERO, e zero aqui diria
-  // "não publicou nada" quando a verdade é "ninguém mediu desde 06/11". As duas coisas pedem ações
-  // opostas: uma é falar com o motor, a outra é consertar a coleta.
-  const parado = (l: Array<{ dia: string }> | undefined) => {
-    const novo = (l ?? []).map((x) => x.dia).sort().at(-1);
-    return !novo || novo < corte ? novo ?? null : null;
-  };
-  const limeParado = lime ? parado(lime.linhas) : null;
-  const pulsoParado = pulso ? parado([...(pulso.linhas ?? []), ...(longos?.linhas ?? [])]) : null;
-  const dataCurta = (d: string) => d.slice(8, 10) + '/' + d.slice(5, 7);
-  const somar = <T extends { views?: number; publicacoes?: number }>(l: T[], c: 'views' | 'publicacoes') =>
-    l.reduce((a, x) => a + Number(x[c] ?? 0), 0);
-
-  const porOrigem = (o: string) => {
-    const l = (analytics ?? []).filter((x) => x.origem === o);
-    return { pecas: new Set(l.map((x) => x.peca_ref)).size, views: l.reduce((a, x) => a + Number(x.views ?? 0), 0) };
-  };
-
-  const pulsoCanais = janela(pulso?.linhas);
-  const pulsoLongos = janela(longos?.linhas);
-  const limePub = janela(lime?.linhas);
-  const mkt = porOrigem('mkt');
+  const limeJanela = janela(limeDias?.linhas);
+  const pulsoJanela = [...janela(pulsoDias?.linhas), ...janela(longos?.linhas)];
 
   const linhas: Linha[] = [
-    { motor: 'DIGIAI MKT', pecas: analytics ? mkt.pecas : null, views: analytics ? mkt.views : null,
+    { motor: 'DIGIAI MKT',
+      pecas: pecasPorMarca ? daLousa('mkt') : null,
+      views: viewsMkt,
       custo: null, custoNota: 'só para admin do MKT' },
-    { motor: 'DIGIAI Cortes', pecas: cortes?.pecas ?? null, pecasNota: 'entregues, não publicadas',
+    { motor: 'DIGIAI Cortes',
+      pecas: cortes?.pecas ?? null, pecasNota: 'entregues, não publicadas',
       views: null, viewsNota: 'não publica direto: sai pelo MKT',
-      custo: cortes?.custo ?? null, custoNota: cortes && cortes.custo == null ? 'sem custo medido' : undefined },
+      custo: cortes?.custo != null ? `R$ ${n(cortes.custo)}` : null,
+      custoNota: cortes && cortes.custo == null ? 'sem custo medido' : undefined },
     { motor: 'Limelight',
-      pecas: limeParado ? null : (lime ? somar(limePub, 'publicacoes') : null),
-      pecasNota: limeParado ? `espelho parado em ${dataCurta(limeParado)}` : undefined,
-      views: limeParado ? null : (lime ? somar(limePub, 'views') : null),
-      viewsNota: limeParado ? 'sem medição no período' : undefined,
-      custo: null, custoNota: 'não vem no espelho' },
+      pecas: limeDias ? somar(limeJanela, 'publicacoes') : null,
+      views: limeDias ? somar(limeJanela, 'views') : null,
+      viewsNota: limeDias && somar(limeJanela, 'publicacoes') === 0 ? 'não publicou no período' : undefined,
+      custo: lime?.custo_ia_usd != null ? `US$ ${lime.custo_ia_usd.toLocaleString('pt-BR', { maximumFractionDigits: 2 })}` : null,
+      custoNota: lime?.custo_ia_usd != null ? 'total, desde o início' : 'não vem no espelho' },
     { motor: 'Pulso',
-      pecas: pulsoParado ? null : (pulso ? somar(pulsoCanais, 'publicacoes') + somar(pulsoLongos, 'publicacoes') : null),
-      pecasNota: pulsoParado ? `espelho parado em ${dataCurta(pulsoParado)}` : undefined,
-      views: pulsoParado ? null : (pulso ? somar(pulsoCanais, 'views') + somar(pulsoLongos, 'views') : null),
-      viewsNota: pulsoParado ? 'sem medição no período' : undefined,
-      custo: null, custoNota: 'não vem no espelho' },
+      pecas: pulsoDias ? somar(pulsoJanela, 'publicacoes') : null,
+      views: pulsoDias ? somar(pulsoJanela, 'views') : null,
+      custo: pulso?.custo_caixa_total_brl != null ? `R$ ${n(pulso.custo_caixa_total_brl)}` : null,
+      custoNota: pulso?.custo_caixa_total_brl != null ? 'caixa, total desde o início' : 'não vem no espelho' },
   ];
 
-  const Celula = ({ v, nota, fmt }: { v: number | null; nota?: string; fmt?: (x: number) => string }) => (
+  const Celula = ({ v, nota }: { v: number | null; nota?: string }) => (
     <td className="px-4 py-1.5 text-right">
       {v == null
         ? <span className="font-mono text-[10px] text-muted">{nota ?? 'sem dado'}</span>
-        : <span className="tabular-nums text-on-surface">{(fmt ?? n)(v)}{nota && <span className="font-mono text-[9px] text-muted"> {nota}</span>}</span>}
+        : <span className="tabular-nums text-on-surface">{n(v)}{nota && <span className="font-mono text-[9px] text-muted"> {nota}</span>}</span>}
     </td>
   );
 
@@ -114,13 +116,15 @@ export default function QuatroMotores() {
       <div className="flex items-center gap-2 flex-wrap px-4 py-2.5 border-b border-outline/10">
         <Cpu className="w-4 h-4 text-secondary" />
         <span className="text-sm font-semibold text-on-surface">Os quatro motores, na mesma régua</span>
-        <span className="font-mono text-[10px] text-muted">últimos 7 dias</span>
+        <span className="font-mono text-[10px] text-muted">
+          peças e views: {periodo === 'tudo' ? 'desde o início' : `últimos ${periodo} dias`} · custo: total
+        </span>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-outline/10">
-              {['Motor', 'Peças', 'Views', 'Custo', 'Custo / mil views'].map((h, i) => (
+              {['Motor', 'Peças publicadas', 'Views', 'Custo'].map((h, i) => (
                 <th key={h} className={`font-mono text-[9px] uppercase tracking-widest text-muted px-4 py-2 ${i ? 'text-right' : 'text-left'}`}>{h}</th>
               ))}
             </tr>
@@ -131,25 +135,21 @@ export default function QuatroMotores() {
                 <td className="px-4 py-1.5 text-on-surface">{l.motor}</td>
                 <Celula v={l.pecas} nota={l.pecasNota} />
                 <Celula v={l.views} nota={l.viewsNota} />
-                <Celula v={l.custo} nota={l.custoNota} fmt={brl} />
-                {/* Só com as duas pontas. Custo conhecido dividido por views que não existem dá um
-                    número grande e falso — e é exatamente o número que decidiria errado a comparação. */}
                 <td className="px-4 py-1.5 text-right">
-                  {l.custo != null && l.views ? (
-                    <span className="tabular-nums text-on-surface">{brl((l.custo / l.views) * 1000)}</span>
-                  ) : (
-                    <span className="font-mono text-[10px] text-muted">
-                      {l.custo == null ? 'falta o custo' : 'faltam as views'}
-                    </span>
-                  )}
+                  {l.custo == null
+                    ? <span className="font-mono text-[10px] text-muted">{l.custoNota ?? 'sem dado'}</span>
+                    : <span className="tabular-nums text-on-surface">{l.custo}<span className="font-mono text-[9px] text-muted"> {l.custoNota}</span></span>}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <div className="px-4 py-2 border-t border-outline/10 font-mono text-[9px] text-muted">
-        célula vazia diz o que falta: "sem custo medido" não é custo zero, "não publica direto" não é zero views e "espelho parado" não é motor parado
+      {/* Custo por mil views NÃO aparece: o custo é total e as views são do período. Dividir um pelo
+          outro daria um número com cara de eficiência e nenhuma. Entra quando houver custo por período. */}
+      <div className="px-4 py-2 border-t border-outline/10 font-mono text-[9px] text-muted leading-relaxed">
+        "views" não quer dizer o mesmo nos quatro: nos espelhos são as views das peças <strong>publicadas no período</strong>, então motor que não publicou aparece com zero mesmo ganhando audiência (pedida ao Limelight a medida comparável, views ganhas por dia).<br />
+        custo por mil views não aparece porque o custo é total e as views são do período — dividir um pelo outro daria eficiência inventada.
       </div>
     </section>
   );
