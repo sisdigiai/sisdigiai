@@ -6,6 +6,7 @@ import ResultadoConteudoCard from './marketing/ResultadoConteudoCard';
 import LeiturasCard from './marketing/LeiturasCard';
 import Central, { PERIODOS, type Periodo } from './marketing/Central';
 import HojeSai from './marketing/HojeSai';
+import EstoquePorMarca from './marketing/EstoquePorMarca';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia } from '../lib/datas';
 import { espelhoMotores, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
@@ -209,6 +210,7 @@ export default function MarketingEspelho() {
 
         {aba === 'resultado' && <Central periodo={periodo} />}
         {aba === 'resultado' && <HojeSai periodo={periodo} />}
+        {aba === 'resultado' && <EstoquePorMarca />}
         {aba === 'resultado' && <LeiturasCard periodo={periodo} />}
         {aba === 'resultado' && <ResultadoConteudoCard periodo={periodo} />}
 
