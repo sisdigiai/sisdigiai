@@ -92,6 +92,34 @@ O dono segurou a aula de 24/11 em 17/11, no canal do marketing. A aba Aula conti
 - **Espelho:** a migration foi copiada para `docs/migrations/migrations/`. **O `schema.sql` não foi regenerado** (não conheço o gerador); fica para o agente do app, junto com a linha do módulo no `AGENTS.md`.
 - **Dúvida que continua do agente do app:** o portão da escolha é `is_staff()`. Se o papel do dono em `iam.users` for `founder`, trocar por `is_founder()` deixa a escolha só com ele.
 
+## 2026-11-18 — A página Marketing vira a central de comando (247 a 255)
+
+Ordem do dono às 14h07: *"ter a central de comando do marketing, leitura e resultados, e insights, fazer as melhores escolhas"*. Entregue em fatias, de cima para baixo, cada uma conferida na tela com a conta dele.
+
+- **Filtro único** no topo, valendo para a página e guardado no endereço (`#/marketing/<período>`, no segundo trecho — `?p=` cairia em Visão, porque o roteador escolhe o módulo pelo primeiro).
+- **"Estamos indo bem?"** — placar da Receita e a cadeia com o período anterior ao lado (247: cadeia por dia, com `natureza` separando fluxo de estoque — somar sete dias de censo daria sete vezes a audiência).
+- **"Hoje sai"** e a **pontualidade das duas fontes num lugar só** (248). Janela de **dois lados**: a regra de um lado dava "no horário" a qualquer adiantamento, e havia 9 peças do MKT que saíram antes.
+- **"O que está pronto para publicar"** (250 → 253): fôlego = dias já marcados + biblioteca ÷ ritmo.
+- **"Leituras para escolher"** — insights calculados do dado, sem IA, cada um com fato, base, escolha e dono. Base curta mostra o fato e não sugere nada.
+- **Publicações vira controle por marca** (254, 255) e **os quatro motores na mesma régua**.
+
+### Quatro números falsos que não chegaram ao dono
+
+1. **"Alcançar subiu 74%"** — o censo cobria 8 contas em 03/11 e cobre 22 hoje. Era a régua, não a audiência (249).
+2. **"Bastidores, 0 dias de fôlego"** com 157 peças na fila, e **"Lancaster, 30 dias"** com 1 — a leitura estava **invertida**, porque eu media a biblioteca e chamava de fila.
+3. **"Lancaster, 0,2 dia, fila baixa"** — fila curta nela é o motor agendando **3,5 h antes de sair**. O alarme certo é **rede ativa parada**, não "sem próxima marcada": de 4 marcas em crítico passou a 1.
+4. **"MKT, 222 peças em 7 dias"** contra as 150 da cadeia, na mesma página: eu contava por dia de **medição**.
+
+### Uma acusação minha que retirei
+
+Escrevi na tela **"espelho do Limelight parado em 06/11"** e disse ao Orquestrador que a coleta dele estava parada há 12 dias. **Era falso:** a view agrupa pelo dia em que a **peça** foi publicada, não pelo da medição — a coleta rodou naquele dia, com 408 leituras. Ele corrigiu-me, e a observação dele era maior que o meu erro: a coluna "views dos últimos 7 dias" lia, na verdade, *views das peças publicadas nos últimos 7 dias* — motor que não publica aparece com zero mesmo ganhando audiência. A tela passou a dizer o que o número é, e ele publicou a medida certa.
+
+### Parado às 16h20, por ordem do dono
+
+*"perai vamos entender o que você está fazendo, além de mudar padrão visual, que estamos perdendo"*. **Ele tem razão: pediu cartões como os da aba Marcas e recebeu linhas e tabela.** Número certo em tela errada é entrega pela metade. Nada mais na aba Publicações nem no visual das outras até a ordem dele.
+
+**Próximo número livre: 256.**
+
 ## 2026-11-17 (18h14) — A casa renova os links do Cortes sozinha (240 + 241)
 
 - **O risco, com data:** os 85 links do ECO01 vencem 24/11 e o robô do MKT agendou peça até 08/12. Sem renovação, tudo de 24/11 em diante sairia **sem mídia** — e não como erro, mas como vídeo que não abre.
