@@ -636,8 +636,14 @@ export default function MktCrescimento() {
                 </div>
               </div>
               <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <Kpi icon={<Newspaper className="w-4 h-4" />} label="posts nas redes" value={nf(linhas.length)} sub={`no recorte · ${medidos.length} medidos`} glow={COR_SEC} />
-                <Kpi icon={<Sparkles className="w-4 h-4" />} label="engajamento redes" value={nf(engTotal)} sub={`média ${nf(Math.round(engMed))}/post`} glow={COR_OK} />
+                {/* "medidos" aqui é só engajamento: ele vem da `content_performance`, que não tem número
+                    de TikTok nem de YouTube. Ao lado de "16 de 16 peças com leitura", um "0 medidos" sem
+                    sobrenome parecia contradição na mesma tela — visto no ar em 19/11, logo após o
+                    conserto das views. E **zero é medição**: rede sem coleta de engajamento mostra traço,
+                    nunca 0, senão o TikTok aparece como conteúdo que ninguém curtiu. */}
+                <Kpi icon={<Newspaper className="w-4 h-4" />} label="posts nas redes" value={nf(linhas.length)} sub={`no recorte · ${medidos.length} com engajamento medido`} glow={COR_SEC} />
+                <Kpi icon={<Sparkles className="w-4 h-4" />} label="engajamento redes" value={medidos.length === 0 ? '—' : nf(engTotal)}
+                  sub={medidos.length === 0 ? 'engajamento não coletado nesta rede' : `média ${nf(Math.round(engMed))}/post`} glow={COR_OK} />
                 <Kpi icon={<Film className="w-4 h-4" />} label="views motores" value={temMotor ? nf(viewsRecorte) : '—'} sub={temMotor ? `${nf(pubsRecorte)} pubs · ${nf(engRecorte)} interações` : fMarca ? 'sem motor nesta marca' : 'sem views no recorte'} glow={COR_WARN} />
                 <Kpi icon={<Eye className="w-4 h-4" />} label="views das peças da casa" value={viewsCasa > 0 ? nf(viewsCasa) : '—'}
                   sub={viewsCasa > 0 ? `${pecasComViews} de ${pecasF.length} peças com leitura · postagens e cortes` : 'a coletar — despacho no MKT (sync-metricas)'} glow={COR_SEC} />
