@@ -2,6 +2,29 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-18 (21h25) — O pedido de capítulo guarda a sequência em que o dono escolheu (261)
+
+Dono, canal do Geral, 21h10: *"cuidado que temos que ter storytelling, e para isso a sequencia de ideias tem que vir
+cravada na sequencia"*. Achado pelo Geral na revisão da 260, aplicada 20 minutos antes — **o defeito era meu**.
+
+- **`array_agg(distinct x)` devolve os ids em ordem alfabética.** O capítulo nasceria com as histórias fora da ordem
+  escolhida, e ordem errada, em storytelling, é outra história. Agora a duplicata sai pela **primeira aparição** e a
+  ordem de chegada fica (`unnest … with ordinality`, `min(ord)`).
+- **Um segundo defeito no mesmo trecho, que só apareceu ao consertar o primeiro:** tirando o `distinct` sairia também
+  o `coalesce` que protegia o `if` de baixo. Sem ele, lista vazia faz `array_agg` devolver **NULL**,
+  `cardinality(null)` é NULL, o `if … < 1` não dispara (NULL não é falso nem verdadeiro) e a função seguiria com uma
+  lista nula. O coalesce ficou, dentro da subconsulta.
+- **Três sabotagens, todas mordendo no lugar certo:** voltar ao `distinct` (a prova da sequência pega), tirar o
+  `coalesce` (a prova da lista vazia pega) e trocar a primeira aparição pela última.
+- **A sabotagem do `coalesce` mostrou por que "recusou" não basta:** sem ele a lista vazia *ainda* era recusada — mas
+  pelo `not null` da coluna, com mensagem de banco, e só porque a coluna é `not null`. A prova exige a frase
+  "escolha de 1 a 12", então ela pegou. É a mesma lição da prova 3-i, aplicada antes de doer.
+- **As recusas da 260 foram reprovadas aqui** (portão do dono com história boa na mão, história travada, história já
+  usada, lista com uma ruim não gravando meio pedido) e o `create or replace` foi conferido para não ter devolvido
+  execução a `anon`. Consertar a ordem não pode abrir o portão.
+- **A ordem também volta certa pela porta do motor**, não só na tabela: a prova lê `cortes_ler_pedidos()` e compara
+  a lista inteira.
+
 ## 2026-11-18 (noite) — A base de histórias e o pedido de capítulo do Cortes no banco (260)
 
 O DIGIAI Cortes pediu, com risco na primeira linha: o botão "Pedir capítulo" dele já estava no ar chamando uma função
