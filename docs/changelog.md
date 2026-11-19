@@ -2,6 +2,40 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-18 (noite) — A base de histórias e o pedido de capítulo do Cortes no banco (260)
+
+O DIGIAI Cortes pediu, com risco na primeira linha: o botão "Pedir capítulo" dele já estava no ar chamando uma função
+que não existia, e as telas diziam "as ideias ainda não chegaram ao banco". O rascunho era dele; o banco é meu.
+
+- **Migration 260** (`260_cortes_historias_e_pedidos.sql`): tabelas `cortes.historias` e `cortes.pedidos`, views de
+  contrato `public.v_cortes_historias` e `v_cortes_pedidos` (as duas `security_invoker=true`, sem nada para `anon`),
+  e seis funções — `cortes_gravar_historias`, `cortes_pedir_capitulo`, `cortes_cancelar_pedido`, `cortes_ler_pedidos`,
+  `cortes_gravar_pedido`. Escrita só pela chave de serviço; pedir e cancelar só com `current_role_code() = 'super_admin'`.
+- **Ensaio com rollback antes de aplicar, e quatro sabotagens** para ver se as provas mordem: função sem conferir
+  `liberada`, portão do dono caído, motor lendo pedido cancelado, e a prova 3-d frouxa. As três primeiras morreram no
+  lugar certo.
+- **A quarta achou um defeito na prova, não no código:** a prova 3-d só olhava o código `insufficient_privilege`. Com o
+  portão do dono removido, quem reclamava era a conferência da história ("a história x não existe") — a migration
+  morria, mas por outro motivo, e o buraco não aparecia. **Prova 3-i nova:** exige o código `42501` **e** a frase do
+  portão, com uma história boa na mão para que nada mais tenha do que reclamar. Sabotada de novo, agora morde.
+- **Provas 3-f a 3-i** (o caminho do dono) são minhas: `current_role_code()` e `is_staff()` leem só `auth.uid()` em
+  `iam.users` — nenhuma das duas olha `session_user` —, então dá para ensaiar com o uid dele dentro de uma transação
+  que termina em rollback. Aceita a história boa; recusa a travada, a já usada e a que está em outro pedido aberto; e
+  **não grava meio pedido** quando uma da lista é ruim.
+- **Três ações novas na `cortes-gravar`** (versão 10, `verify_jwt` segue falso: a porta é Ed25519): `historias`,
+  `pedidos` e `pedido`. Provadas **pela porta de verdade**, com um emissor de prova criado e apagado na mesma execução
+  e a chave privada nascendo e morrendo na memória: assinatura torta recusada, base vazia recusada, gravar repetido
+  não duplica, estado inválido recusado, `virou_episodio` sem código recusado, e o caminho inteiro do pedido gravando.
+- **Duas decisões minhas no caminho, as duas contra "zero com cara de sucesso":** lista de histórias vazia é **400**
+  (uma carga vazia volta 200 com zero e desaparece do log como se tivesse dado certo, e aí a tela diz "as ideias não
+  chegaram" sem ninguém saber por quê), e `gravado: false` passa a vir com o motivo escrito, porque 200 com `false`
+  não se lê em log nenhum.
+- **Um emissor de prova meu não entrou de primeira e eu quase tomei a falha por sucesso:** `ops.emissor_externo` tem
+  `registrado_por` obrigatório, e o meu script de SQL imprimia o erro mas saía com código 0. O script passou a falhar
+  alto; a porta estava certa desde o começo, recusando origem que não existe.
+- **Fora do meu alcance:** o MCP do Supabase perdeu a permissão neste banco no meio da sessão (só enxerga o
+  `crm_erp` agora). Fui pela API de gestão com o PAT do `.env` do app. **Quem cuida do MCP precisa saber.**
+
 ## 2026-11-18 (fim do dia) — O padrão da casa de volta, as nove marcas pareadas e a Polá ligada antes de existir
 
 Por ordem do dono às 16h20 (*"além de mudar padrão visual, que estamos perdendo"*), 16h33, 16h54 e 20h03.

@@ -256,6 +256,44 @@ Deno.serve(async (req) => {
     return json({ acao: "links", ...r, aviso: await carimbar(sb, origem) });
   }
 
+  if (acao === "historias") {
+    // A base de histórias dos bastidores, copiada dos arquivos do Cockpit pelo motor. A verdade é o arquivo;
+    // isto é o índice que a tela lê. Repetir não duplica: a RPC casa por id.
+    if (!Array.isArray(carga.historias)) return json({ erro: "a ação 'historias' precisa de 'historias' (lista)" }, 400);
+    // Lista vazia é recusada de propósito. Uma carga vazia volta 200 com zero e some no log como se tivesse
+    // dado certo — e aí a tela diz "as ideias ainda não chegaram" sem ninguém saber por quê. Nunca é intenção.
+    if (carga.historias.length === 0) return json({ erro: "a base chegou vazia; isto é defeito do motor, não base sem história" }, 400);
+    const { data, error } = await sb.rpc("cortes_gravar_historias", { p: { historias: carga.historias } });
+    if (error) return json({ erro: error.message }, 400);
+    return json({ acao: "historias", ...(data as Record<string, unknown>), aviso: await carimbar(sb, origem) });
+  }
+
+  if (acao === "pedidos") {
+    // Porta de LEITURA: os pedidos de capítulo que o dono fez na tela e ainda estão abertos. Sem `pedido_por`,
+    // que é dado de pessoa e o motor não precisa. Não carimba `ultima_entrega`: ler não é entregar.
+    const { data, error } = await sb.rpc("cortes_ler_pedidos");
+    if (error) return json({ erro: error.message }, 400);
+    return json({ acao: "pedidos", ...(data as Record<string, unknown>) });
+  }
+
+  if (acao === "pedido") {
+    // O andamento de UM pedido: "em_roteiro" ou "virou_episodio" (com o código). Cancelar é só do dono, na tela.
+    const id = String(carga.id ?? "");
+    const estado = String(carga.estado ?? "");
+    if (!id || !estado) return json({ erro: "a ação 'pedido' precisa de 'id' e 'estado'" }, 400);
+    const { data, error } = await sb.rpc("cortes_gravar_pedido", {
+      p: { id, estado, episodio: carga.episodio ? String(carga.episodio) : null },
+    });
+    if (error) return json({ erro: error.message }, 400);
+    const r = data as Record<string, unknown>;
+    // `gravado: false` é 200 e passa batido no log. Diz por que não gravou, senão o motor acha que gravou.
+    const nada = r?.gravado === false
+      ? "nenhum pedido aberto com este id: pode ter sido cancelado pelo dono ou já ter virado episódio"
+      : undefined;
+    return json({ acao: "pedido", ...r,
+                  aviso: [nada, await carimbar(sb, origem)].filter(Boolean).join(" · ") || undefined });
+  }
+
   if (acao !== "gravar") return json({ erro: `ação '${acao}' não existe aqui` }, 400);
 
   const { data, error } = await sb.rpc("cortes_gravar_episodio", { p: carga.episodio ?? carga });
