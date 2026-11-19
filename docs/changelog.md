@@ -2,6 +2,44 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-19 (11h07) — Os números do E02 do Pulso carimbados em mkt.fatos, e carimbados fechados (266)
+
+Pedido do Geral às 10h56, depois de ele pôr os números na folha única às 10h55 (Cockpit `e7adc724`). A palavra do
+dono está no canal do Pulso ("trocar pelo número real", "R$ 559 (bruto)"), registrada na folha — e é a folha que
+autoriza número público nesta casa. Conferi os seis números na folha e no arquivo do Pulso antes de escrever: batem,
+com fonte e data cada um.
+
+**O problema que o carimbo tinha de resolver.** A folha escreve *"Uso: episódio 2 dos Bastidores do Pulso. Fora disso,
+pedir"*, e em `mkt.fatos` não havia onde guardar isso. O gerador do MKT lê `fresco and publico` e manda a lista para a
+IA: carimbar "R$ 559 num dia" como público jogaria o número em **qualquer** peça da marca pulso — exatamente o que a
+folha proíbe. Carimbar sem registrar a restrição seria pior, porque o próximo a reverificar o fato não teria como
+saber que ele é preso a um episódio.
+
+- **Coluna `mkt.fatos.uso_restrito`** (nula = sem restrição) e uma **trava de banco**: fato com uso restrito não pode
+  ser público. Para liberar é preciso apagar a restrição — ato deliberado, não um update distraído.
+- **Seis fatos novos** em `brand_slug = 'pulso'`, todos `publico = false`: R$ 559 num dia (bruto, 12/06, com os R$ 425
+  líquidos dentro da frase), a projeção de R$ 16.770 dita como projeção, a estimativa de junho de R$ 93,80 → R$ 11,18
+  (sem a frase proibida "conferido no extrato"), 179 de 257 até 18/11 com validade de 30 dias porque envelhece, os 81%
+  e 5,6× de junho, e o **"R$ 1.710" como trava**: não é dinheiro, era a tela contando crédito a R$ 1,00.
+- **Cada frase sai com a ressalva dentro** ("num dia", "projeção", "estimativa de junho", "até 18 de novembro", "no
+  bruto"). Ressalva que vive fora da frase é ressalva que não viaja com o número. Há prova que recusa a migration se
+  alguma delas cair do texto, e outra que recusa se "conferido no extrato" voltar.
+- **`v_mkt_fatos` mostra `uso_restrito`** (coluna no fim; as dez de antes intactas, `security_invoker` mantido, anon
+  continua fora). O card de fatos do Marketing vai de 28 para 34 linhas.
+- **Efeito zero no gerador, de propósito:** a prova central repete a consulta exata do motor do MKT
+  (`_shared/fatos.ts`) e exige que **nenhum** dos seis apareça. O E02 é escrito à mão pelo Pulso; o que o banco tem de
+  garantir é que o número não escape para o resto.
+- **Duas sabotagens, as duas mordendo no lugar certo:** tirar a trava e publicar um fato → a prova da consulta do
+  motor acusa; tirar "estimativa de junho" da frase → a prova do texto acusa.
+
+**Achado ao medir, que ninguém tinha pedido:** a marca pulso **não tem nenhum fato fresco e público**. Os dois antigos
+(436 mil views do canal e 223 inscritos no YouTube) venceram em **01/09/2026**. Para qualquer peça do Pulso fora do
+E02, a IA está proibida de citar número — fail-closed, como deve ser, mas é silêncio por vencimento, não por escolha.
+Avisado ao Geral; reverificar é do Pulso.
+
+**O que este carimbo não faz:** não mexe em `mkt.content_rules`, a outra porta por onde o "R$ 1.710" poderia voltar.
+Fica dito, não resolvido.
+
 ## 2026-11-18 (22h30) — O espelho do marketing passa a dizer o que funciona (263, 264)
 
 Dono, 18/11: *"precisamos melhorar o espelho do marketing… nossos resultados estão complexos e misturados, temos
