@@ -51,7 +51,10 @@ const n = (v: number | null | undefined) => (v == null ? '—' : v.toLocaleStrin
 const mil = (v: number | null | undefined) => (v == null ? '—' : v >= 1000 ? `${(v / 1000).toFixed(1)}k` : String(v));
 
 function Etiqueta({ quando }: { quando: string | null }) {
-  if (!quando) return <span className="font-mono text-[9px] uppercase tracking-wider text-muted border border-outline/25 px-1 py-px">sem data</span>;
+  // Fonte que não tem leitura datada não ganha etiqueta nenhuma. A primeira versão pendurava
+  // "sem data" em cinco azulejos (placar da semana, Calc, uso vivo, fatos, cobertura) — rótulo
+  // repetido que não informa nada vira ruído, e ruído é o que esta aba veio consertar.
+  if (!quando) return null;
   const dias = Math.floor((Date.now() - new Date(quando.length > 10 ? quando : quando + 'T12:00:00').getTime()) / 864e5);
   const txt = dias <= 0 ? 'hoje' : dias === 1 ? 'ontem' : `há ${dias}d`;
   const tom = dias <= 1 ? 'text-success border-success/40 bg-success/10'
