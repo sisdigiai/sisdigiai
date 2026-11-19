@@ -300,6 +300,32 @@ Se não → pause e questione. Em caso de dúvida ou ambiguidade, **pause e perg
 
 ---
 
+## Histórias dos Bastidores (ponte do Cockpit → DIGIAI Cortes)
+
+Ao fechar um conserto, a história vai para `Cockpit/bastidores/geral/historias/`, e o arquivo é a verdade — o banco
+é cópia feita pelo motor do Cortes. O que este app precisa saber, e que não se descobre lendo código:
+
+- **O id nasce com o código do app e NUNCA muda** (regra do Geral, 18/11/2026, 21h52): `geral-AAAA-MM-DD-digiai-NN`.
+  O motivo é concreto: a pasta `geral/historias/` é compartilhada por todos os agentes, cada um escolhe o próprio
+  `NN`, e `digiai_cortes/motor/travas.py` indexa por id (`todas[h["id"]] = h`) — **dois arquivos com o mesmo id e o
+  segundo apaga o primeiro**, antes do banco e sem aviso. Id com o código do app não pode colidir.
+  Id trocado exige `id_anterior:` no cabeçalho (o motor fecha o antigo no banco como "virou …"), e **cada troca é um
+  redirecionamento a mais**: não se desfaz uma troca com outra.
+- **Obrigatório para a história ser completa:** as três datas (`data_do_problema`, `data_da_descoberta`,
+  `data_do_conserto`), `relevancia` (alta/media/baixa) com `relevancia_porque`, `**Fonte:**` e o bloco
+  `**O que não vai para a tela, e por quê:**` — o título exato, porque o motor lê por ele. Conserto que ainda não
+  aconteceu: data vazia, e a história entra como "aguarda o conserto".
+- **As datas são medidas no git ou no banco, nunca de memória.** Em 18/11 isto mudou duas das minhas três histórias:
+  o painel de contato **nunca teve um dia correto** (nasceu 10/11 lendo uma fonte, a esteira abordava desde 11/06) e
+  uma pendência de 06/11 **já nascia falsa**. A data não enfeita o relato; ela muda o relato.
+- **O motor só lê a primeira linha** depois de cada `**Rótulo:**` (regex sem `re.S`): o que importa vai na mesma linha.
+- **Quem libera é o Geral** (domínio `geral`), não o agente do app; quem numera na série é o Geral, em `SEQUENCIA.md`.
+- Verificar antes de entregar: `python digiai_cortes/motor/historias.py` lista o que falta em cada arquivo.
+- Colunas no banco: `cortes.historias` (migrations 260/262). **`ordem` é "ausente mantém, nulo explícito apaga"**;
+  **`relevancia` ausente apaga**, porque vem do arquivo. Desenho: `Cockpit/bastidores/PONTE-das-historias-2026-11-18.md`.
+
+---
+
 ## Notas para quem mantém este arquivo
 
 - **Última atualização:** 2026-05-28 (auditoria completa: 18 módulos verificados no navegador logado, banco lido via Management API, drift reconciliado, fixes A/B/C/D aplicados)
