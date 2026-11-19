@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Lightbulb } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { lerTudo } from '../../lib/paginar';
 import type { Periodo } from './Central';
 
 // "Leituras para escolher" — o bloco de insights que o dono pediu em 18/11: "e insights, fazer as
@@ -39,15 +40,17 @@ export default function Leituras({ periodo }: { periodo: Periodo }) {
   useEffect(() => {
     supabase.from('v_mkt_estoque_marca').select('marca_nome, na_fila, artes_prontas, publicadas_7d, dias_de_estoque, dias_marcados, dias_biblioteca')
       .then(({ data }) => setEstoque((data ?? []) as Estoque[]));
-    supabase.from('v_marketing_cadeia_dia').select('dia, elo, medida, n').limit(5000)
-      .then(({ data }) => setCadeia((data ?? []) as Dia[]));
+    lerTudo<Dia>((de, ate) => supabase.from('v_marketing_cadeia_dia')
+      .select('dia, elo, medida, n').range(de, ate)).then(setCadeia);
   }, []);
 
   useEffect(() => {
     const dias = DIAS_DE(periodo);
-    let q = supabase.from('v_pontualidade').select('marca, rede, pontualidade, dia').limit(5000);
-    if (dias) q = q.gte('dia', diaBRT(new Date(Date.now() - dias * 86400000)));
-    q.then(({ data }) => setPont((data ?? []) as Pont[]));
+    const corte = dias ? diaBRT(new Date(Date.now() - dias * 86400000)) : null;
+    lerTudo<Pont>((de, ate) => {
+      const q = supabase.from('v_pontualidade').select('marca, rede, pontualidade, dia').range(de, ate);
+      return corte ? q.gte('dia', corte) : q;
+    }).then(setPont);
   }, [periodo]);
 
   const pronto = estoque != null && pont != null && cadeia != null;

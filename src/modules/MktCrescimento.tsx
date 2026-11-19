@@ -127,6 +127,14 @@ export default function MktCrescimento() {
   // data de publicação e entrarem no recorte de 30 dias pela primeira leitura: **15.264 views a
   // mais**, que foi a diferença entre o que a tela mostrou e o que o banco diz. Teto silencioso é pior
   // que erro: a tela continua bonita e o número fica errado.
+  //
+  // AS OUTRAS DUAS LEITURAS, paginadas em 19/11 ÀS 20h, antes de quebrarem: o Geral contou as linhas e
+  // avisou. `content_performance` tem 946; `audiencia_diaria` tem 951 e cresce 24 por dia (169 nos
+  // últimos 7, 29 só hoje) — passa de mil **no fim de semana, 21 ou 22/11**. E essa é a pior das três,
+  // porque vem em ordem CRESCENTE de dia: o corte come os dias mais NOVOS. O que ia acontecer, sem
+  // conserto: `segAtual` congelaria os seguidores no último dia que sobrou, `ultimoCenso` ficaria
+  // velho, e o aviso "contas sem censo nos últimos 3 dias" acusaria contas que estão sendo medidas
+  // todo dia. Erro falso é pior que número errado: manda consertar o que não está quebrado.
   async function load() {
     setLoading(true);
     const [b, p, cp, ad, pd, ld, bd, lp, be, { data: cad }, { data: fs }, { data: ac }, cr, { data: cfu }, { data: nv }, ldia] = await Promise.all([
@@ -134,8 +142,10 @@ export default function MktCrescimento() {
       lerTudo<Pub>((de, ate) => supabase.schema('mkt').from('publications')
         .select('id, brand_id, platform, url, published_at, metadata')
         .order('published_at', { ascending: false }).range(de, ate)),
-      supabase.schema('mkt').from('content_performance').select('publication_id, brand_id, gatilho, formato, engajamento, alcance, salvamentos, compartilhamentos, views'),
-      supabase.schema('mkt').from('audiencia_diaria').select('brand_id, platform, seguidores, dia').order('dia'),
+      lerTudo<Perf>((de, ate) => supabase.schema('mkt').from('content_performance')
+        .select('publication_id, brand_id, gatilho, formato, engajamento, alcance, salvamentos, compartilhamentos, views').range(de, ate)),
+      lerTudo<Aud>((de, ate) => supabase.schema('mkt').from('audiencia_diaria')
+        .select('brand_id, platform, seguidores, dia').order('dia').range(de, ate)),
       espelhoMotores.pulsoDias(),
       espelhoMotores.limelightDias(),
       espelhoMotores.blogsDias(),
@@ -152,8 +162,8 @@ export default function MktCrescimento() {
     ]);
     setBrands((b.data ?? []) as Brand[]);
     setPubs(p);
-    setPerf((cp.data ?? []) as Perf[]);
-    setAud((ad.data ?? []) as Aud[]);
+    setPerf(cp);
+    setAud(ad);
     setPulsoDias(pd); setLimeDias(ld); setBlogDias(bd); setLimePub(lp); setBlogsEsp(be);
     setCadeia((cad ?? null) as Cadeia | null);
     setFila((fs ?? null) as Fila | null);

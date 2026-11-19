@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { lerTudo } from './paginar';
 
 // Vendas dos produtos DIGIAI — leitura de `public.v_vendas_eventos` e `v_vendas_canais`.
 //
@@ -110,19 +111,18 @@ export function porProduto(eventos: VendaEvento[]) {
 
 export const vendasStore = {
   async carregar(): Promise<{ eventos: VendaEvento[]; canais: Canal[] }> {
+    // Paginado em 19/11: a view está vazia hoje (zero eventos), mas é a de VENDAS — o dia em que
+    // encher, o `.limit(2000)` devolveria as mil mais novas como se fossem todas.
     const [ev, ca] = await Promise.all([
-      supabase.from('v_vendas_eventos').select('*').order('dia', { ascending: false }).limit(2000),
+      lerTudo<Record<string, unknown>>((de, ate) => supabase.from('v_vendas_eventos')
+        .select('*').order('dia', { ascending: false }).range(de, ate)),
       supabase.from('v_vendas_canais').select('*'),
     ]);
-    if (ev.error) {
-      console.error('[vendasStore] eventos', ev.error);
-      throw new Error(`Não foi possível ler as vendas: ${ev.error.message}`);
-    }
     if (ca.error) {
       console.error('[vendasStore] canais', ca.error);
       throw new Error(`Não foi possível ler o estado dos canais: ${ca.error.message}`);
     }
-    const eventos = (ev.data ?? []).map((e) => ({
+    const eventos = ev.map((e) => ({
       ...e,
       valor: e.valor != null ? Number(e.valor) : null,
     })) as VendaEvento[];

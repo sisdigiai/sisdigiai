@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Clock, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { lerTudo } from '../../lib/paginar';
 import type { Periodo } from './Central';
 
 // "Hoje sai" e a pontualidade — ordem do dono em 17 e 18/11: "saiu no horário o vídeo, saiu o rascunho
@@ -48,9 +49,14 @@ export default function HojeSai({ periodo }: { periodo: Periodo }) {
 
   useEffect(() => {
     const dias = periodo === 'tudo' ? null : Number(periodo);
-    let q = supabase.from('v_pontualidade').select('origem, marca, rede, dia, minutos, pontualidade, saiu_por').limit(5000);
-    if (dias) q = q.gte('dia', diaBRT(new Date(Date.now() - dias * 86400000)));
-    q.then(({ data }) => setPont((data ?? []) as Pont[]));
+    const corte = dias ? diaBRT(new Date(Date.now() - dias * 86400000)) : null;
+    // Paginado em 19/11: 810 linhas hoje, 17 por dia — o teto de mil da API chega em dezembro, e no
+    // recorte "tudo" chegaria calado.
+    lerTudo<Pont>((de, ate) => {
+      const q = supabase.from('v_pontualidade')
+        .select('origem, marca, rede, dia, minutos, pontualidade, saiu_por').range(de, ate);
+      return corte ? q.gte('dia', corte) : q;
+    }).then(setPont);
   }, [periodo]);
 
   const agora = Date.now();

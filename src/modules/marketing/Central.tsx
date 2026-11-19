@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Target, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { lerTudo } from '../../lib/paginar';
 
 // Central de comando do marketing — ordem do dono em 18/11/2026, 14h07: "ter a central de comando do
 // marketing, leitura e resultados, e insights, fazer as melhores escolhas".
@@ -130,11 +131,14 @@ export default function Central({ periodo }: { periodo: Periodo }) {
     // view é `security_invoker`, então do lado do app ela passa pela RLS das tabelas de baixo e o
     // custo aparece. Em "tudo" não há como recortar — e aí a espera é honesta, porque é tudo mesmo.
     const corteDias = periodo === 'tudo' ? null : Number(periodo) * 2 + 2;
-    const base = supabase.from('v_marketing_cadeia_dia').select('*').limit(5000);
-    (corteDias ? base.gte('dia', diaBRT(maisDias(new Date(), -corteDias))) : base).then(({ data, error }) => {
-      if (error) { setErro(error.message); setLinhas([]); return; }
-      setLinhas((data ?? []) as Dia[]);
-    });
+    const corte = corteDias ? diaBRT(maisDias(new Date(), -corteDias)) : null;
+    // Paginado em 19/11: o `.limit(5000)` era fantasia — a API devolve no máximo mil linhas e chama
+    // isso de sucesso. Hoje a view tem 588 linhas, longe do teto, mas "tudo" não tem recorte: o dia
+    // em que passar, a série perderia a ponta sem avisar.
+    lerTudo<Dia>((de, ate) => {
+      const q = supabase.from('v_marketing_cadeia_dia').select('*').range(de, ate);
+      return corte ? q.gte('dia', corte) : q;
+    }).then(setLinhas).catch((e) => { setErro(String(e?.message ?? e)); setLinhas([]); });
     supabase.from('v_receita_meta').select('*').maybeSingle()
       .then(({ data, error }) => setMeta(error || !data ? 'sem_acesso' : (data as Meta)));
   }, [periodo]);

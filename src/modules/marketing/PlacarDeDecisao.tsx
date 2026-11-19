@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { lerTudo } from '../../lib/paginar';
 
 // O placar de decisão — a faixa de quatro números que abre a aba Resultado.
 //
@@ -43,9 +44,14 @@ export default function PlacarDeDecisao({ pecas7d }: { pecas7d: number | null })
       .then(({ data }) => setSem((data ?? []) as Semana[]));
     // a mediana de interação sai das peças com leitura confiável: engajamento zero só conta quando
     // outra métrica provou que a peça foi lida (o coletor sempre escreve número, mesmo sem ler nada).
-    supabase.from('v_mkt_resultado_peca').select('engajamento, engajamento_confiavel').limit(3000)
-      .then(({ data }) => {
-        const l = (data ?? []) as Peca[];
+    //
+    // PAGINADO EM 19/11 ÀS 20h, e aqui já era defeito no ar, não prevenção: o `.limit(3000)` pedia
+    // três mil, mas a API corta QUALQUER resposta em 1.000 linhas e devolve isso como sucesso. A view
+    // tem **1.025 linhas** (medido 19/11, 20h12) — 25 peças nunca chegavam, e a base confiável de
+    // verdade é **742**. O número que estava na tela não era errado por sorte: era certo por sorte.
+    lerTudo<Peca>((de, ate) => supabase.from('v_mkt_resultado_peca')
+      .select('engajamento, engajamento_confiavel').range(de, ate))
+      .then((l) => {
         const vs = l.filter((p) => p.engajamento_confiavel && p.engajamento != null).map((p) => Number(p.engajamento));
         setInteracao({ v: mediana(vs), base: vs.length });
       });

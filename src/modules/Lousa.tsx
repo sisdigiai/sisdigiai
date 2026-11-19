@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, CalendarRange, ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { lerTudo } from '../lib/paginar';
 
 // Lousa de publicação (ADR-0066; ordem do dono em 17/11/2026, pela curadoria do Geral).
 //
@@ -49,9 +50,12 @@ const chaveBase = (x: { conta: string; rede: string; tipo: string }) => `${x.con
 
 const DIAS = ['segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado', 'domingo'];
 
-// Teto que EU peço. O da API é mil e é silencioso; este é alto o bastante para a semana e serve de
-// sinal: se a resposta vier exatamente neste tamanho, a tela avisa que pode estar cortada.
-const TETO = 3000;
+// O AVISO DE TETO QUE NASCEU MORTO, e por que ele saiu em 19/11. Em 17/11 eu pedi 3.000 linhas para
+// servir de sinal: "se vier exatamente neste tamanho, a tela avisa que pode estar cortada". Não podia
+// funcionar nunca. A API corta em 1.000 ANTES do meu teto, então o tamanho recebido era no máximo mil
+// e a comparação com 3.000 nunca era verdadeira. Eu tinha escrito o teto da API no comentário logo
+// abaixo e mesmo assim calibrei o aviso acima dele. Agora a leitura vai em páginas de mil (lerTudo) e
+// não há teto nenhum para avisar: a semana vem inteira ou a leitura falha com erro na cara.
 
 // Estado conhecido ganha tom; o que não conheço fica neutro E aparece escrito como veio.
 // O que a tela escreve, quando o nome cru não é o nome que a casa usa. Estado que não estiver aqui sai
@@ -102,7 +106,6 @@ export default function Lousa() {
   const [rede, setRede] = useState('todas');
   const [publicador, setPublicador] = useState('todos');
   const [base, setBase] = useState<Map<string, Base> | null>(null);
-  const [noTeto, setNoTeto] = useState(false);
   // Cancelado fica escondido por padrão (pedido do dono em 17/11): a fila do motor acumula cancelamento
   // antigo, e 330 peças canceladas empurram para fora da vista o que ainda vai sair.
   const [verCancelados, setVerCancelados] = useState(false);
@@ -116,23 +119,17 @@ export default function Lousa() {
     //
     // Fuso fixo -03:00 porque o Brasil não tem mais horário de verão, e o dia do negócio é BRT.
     setPecas(null);
-    setNoTeto(false);
     const ini = `${chave(semana)}T00:00:00-03:00`;
     const fim = `${chave(maisDias(semana, 7))}T00:00:00-03:00`;
     Promise.all([
-      supabase.from('v_lousa').select('*').gte('quando', ini).lt('quando', fim).limit(TETO),
+      lerTudo<Peca>((de, ate) => supabase.from('v_lousa').select('*')
+        .gte('quando', ini).lt('quando', fim).range(de, ate)),
       // Peça sem data não tem como entrar no recorte por data, e sumir da tela é o mesmo que não existir.
-      supabase.from('v_lousa').select('*').is('quando', null).limit(TETO),
+      lerTudo<Peca>((de, ate) => supabase.from('v_lousa').select('*').is('quando', null).range(de, ate)),
     ]).then(([naSemana, semData]) => {
-      const erroQualquer = naSemana.error ?? semData.error;
-      if (erroQualquer) { setErro(erroQualquer.message); setPecas([]); return; }
-      const linhas = [...(naSemana.data ?? []), ...(semData.data ?? [])] as Peca[];
-      // Resposta que vem exatamente no teto pode estar cortada. A tela diz isso em vez de mostrar uma
-      // semana incompleta com cara de semana inteira.
-      setNoTeto((naSemana.data?.length ?? 0) >= TETO || (semData.data?.length ?? 0) >= TETO);
       setErro(null);
-      setPecas(linhas);
-    });
+      setPecas([...naSemana, ...semData]);
+    }).catch((e) => { setErro(String(e?.message ?? e)); setPecas([]); });
     // A base não derruba a Lousa se falhar: a agenda é o que a tela existe para mostrar, e a projeção é
     // o acréscimo. Mas também não fica em silêncio — sem base, o cartão diz "sem base", não some.
     supabase.from('v_lousa_base').select('*').then(({ data }) => {
@@ -239,11 +236,6 @@ export default function Lousa() {
           {visiveis.length} peça(s) · {conta('publicado')} publicadas · {conta('agendado')} agendadas
           {conta('falhou') > 0 && <span className="text-danger"> · {conta('falhou')} falhou</span>}
         </span>
-        {noTeto && (
-          <span className="font-mono text-[9px] uppercase tracking-wider text-warning">
-            a resposta veio no teto — pode haver peça fora desta tela
-          </span>
-        )}
         {base != null && futuras.length > 0 && (
           <span className="font-mono text-[9px] uppercase tracking-wider text-muted">
             {nenhumaCasa ? (

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Trophy, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { lerTudo } from '../../lib/paginar';
 
 // "O que funciona" — o bloco que faltava. O dono, 18/11: "mostra o que saiu e bem pouco o que funciona".
 //
@@ -46,19 +47,18 @@ export default function OQueFunciona() {
   const [recorte, setRecorte] = useState<string>('tipo');
 
   useEffect(() => {
-    supabase.from('v_mkt_resultado_recorte')
+    lerTudo<Linha>((de, ate) => supabase.from('v_mkt_resultado_recorte')
       .select('recorte, valor, rede_recorte, pecas, redes, lidas, com_views, views_mediana, views_p90, views_melhor, com_alcance, alcance_mediana, engaj_confiaveis, engaj_mediana, engaj_melhor, serve_de_base, mistura_redes')
-      .limit(2000)
-      .then(({ data, error }) => {
-        if (error) { setErro(error.message); setLinhas([]); return; }
-        const todas = (data ?? []) as Linha[];
+      .range(de, ate))
+      .then((todas) => {
         setLinhas(todas);
         // a rede que abre é a que tem mais leitura, não a primeira do alfabeto: abrir numa rede sem
         // dado faz o bloco parecer vazio quando o vazio é só daquela rede.
         const porRede = new Map<string, number>();
         for (const l of todas) if (l.rede_recorte) porRede.set(l.rede_recorte, (porRede.get(l.rede_recorte) ?? 0) + l.com_views);
         setRede([...porRede.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null);
-      });
+      })
+      .catch((e) => { setErro(String(e?.message ?? e)); setLinhas([]); });
   }, []);
 
   const redes = [...new Set((linhas ?? []).map((l) => l.rede_recorte).filter((r): r is string => !!r))].sort();
