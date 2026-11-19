@@ -38,6 +38,20 @@ peça casa com uma publicação (o `peca_ref` é o id dela, ou o `corte_peca_id`
 publicação; quando não casa — corte que saiu em conta do Pulso, sem registro aqui: 14 de 43 hoje — vale a
 **primeira** leitura. É aproximação, não medição, e está escrita na tela.
 
+**O defeito que só apareceu depois de publicar, e que era o mais grave dos quatro:** com o conserto no ar,
+a tela mostrou **39.755** views das contas da casa onde o banco dizia **24.491**. A diferença, 15.264, batia
+exatamente com um conjunto: as peças cuja publicação **não chegava à tela**. A API corta qualquer resposta
+em **1.000 linhas** e devolve isso como sucesso — são 1.130 publicações, e as 130 mais antigas nunca eram
+lidas; 99 peças perdiam a data de publicação e entravam no recorte de 30 dias pela primeira leitura. O teto
+já tinha mordido esta casa em 17/11, na Lousa, e eu mesmo tinha escrito o aviso lá — e repeti o erro aqui.
+Agora a leitura vai em páginas de mil (`src/lib/paginar.ts`), no Radar, no cartão Leituras e nos Motores.
+Conferido no ar: 39.755 → **24.495**, com Pulso 110.170 e Limelight 839 ao lado, somando 135.504.
+
+**E duas verdades que a tela passou a contar depois de eu olhar para ela no ar:** em rede sem coleta de
+engajamento, o KPI dizia **0** — que é uma medição, e falsa: agora mostra traço e "engajamento não coletado
+nesta rede". E "0 medidos" ao lado de "16 de 16 peças com leitura" parecia contradição na mesma tela; virou
+"0 **com engajamento medido**". Conferido no TikTok, onde os dois apareciam juntos.
+
 **Dois erros meus apanhados pela própria medição, antes de chegarem ao dono:** (a) ao simular em SQL o que a
 tela mostraria, juntei as peças por `conta` com `join using` e o Postgres descartou toda peça com conta
 nula — 254 peças e 38 mil views "desapareceram", e eu quase fui atrás de um defeito que não existia; o
