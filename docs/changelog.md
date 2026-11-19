@@ -49,8 +49,10 @@ dentro do conserto do teto. Agora `lerTudo` levanta o erro, e a Central e o "O q
 mostrar erro na tela em vez de vazio.
 
 **Fora deste conserto, de propósito:** `src/modules/ReceitaEmpresas.tsx` tem `.limit(1000)` exato em
-`v_receita_empresas_resumo` (625 linhas hoje). A página Receita é do Agente de Receita (R-051) —
-avisado, não mexido.
+`v_receita_empresas_resumo` (625 linhas hoje). A página Receita é do Agente de Receita (R-051), então
+não mexi. **Tentei avisar às 20h40 e a mensagem expirou sem ser entregue** — a sessão dele está em
+modo de permissão diferente e não teve como aprovar. Ele NÃO sabe. Fica como pendência do dono: ou ele
+chama o Agente de Receita, ou me autoriza a corrigir em ramo próprio.
 
 **Verificado no ar** (build `ef1bab7`), em app.digiai.app.br: Placar 717 → **742**; Lousa com as 264
 peças da semana e duas chamadas paginadas (`offset=0&limit=1000`, página curta, para); Radar com
