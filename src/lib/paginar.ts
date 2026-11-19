@@ -17,6 +17,17 @@
 // mostrava "nenhuma peça" com cara de verdade medida. Era o mesmo pecado do teto — falha silenciosa
 // com aspecto de sucesso — escrito dentro do conserto do teto. Agora ela **levanta** o erro, e quem
 // chama decide: mostrar o erro na tela ou deixar estourar.
+// DESEMPATE OBRIGATÓRIO (19/11, 20h50 — aviso do Lumina pelo Geral). Cada página é uma CONSULTA
+// NOVA. Se a ordem não for total, o banco pode devolver as linhas empatadas em ordem diferente entre
+// uma página e outra: linha repetida numa, sumida na outra, sem erro nenhum. Não é teoria — medido
+// em 19/11 no próprio banco: `v_mkt_analytics_peca_dia` tem 1.128 linhas e **1.124 empatam** na data
+// (52 valores distintos para mil e cem linhas), e a `v_lousa` tem 1.112 de 1.467 empatadas no
+// `quando` (muita peça marcada para as 09:30).
+//
+// Então toda chamada ordena pela ordem que a tela quer E **termina numa chave única**: `id` quando
+// existe, e nas views o conjunto de colunas que identifica a linha. Se a view não tiver chave única
+// nenhuma — caso da `v_pontualidade`, onde um par de linhas é idêntico em TODAS as colunas — ordenar
+// por quase todas basta: trocar uma linha por outra idêntica não muda resultado nenhum.
 export const PAGINA = 1000;
 
 export async function lerTudo<T>(

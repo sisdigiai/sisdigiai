@@ -123,9 +123,11 @@ export default function Lousa() {
     const fim = `${chave(maisDias(semana, 7))}T00:00:00-03:00`;
     Promise.all([
       lerTudo<Peca>((de, ate) => supabase.from('v_lousa').select('*')
-        .gte('quando', ini).lt('quando', fim).range(de, ate)),
+        .gte('quando', ini).lt('quando', fim)
+        .order('quando').order('origem').order('origem_ref').range(de, ate)),
       // Peça sem data não tem como entrar no recorte por data, e sumir da tela é o mesmo que não existir.
-      lerTudo<Peca>((de, ate) => supabase.from('v_lousa').select('*').is('quando', null).range(de, ate)),
+      lerTudo<Peca>((de, ate) => supabase.from('v_lousa').select('*').is('quando', null)
+        .order('origem').order('origem_ref').range(de, ate)),
     ]).then(([naSemana, semData]) => {
       setErro(null);
       setPecas([...naSemana, ...semData]);

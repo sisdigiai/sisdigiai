@@ -141,11 +141,12 @@ export default function MktCrescimento() {
       supabase.schema('mkt').from('brands').select('id, code, name, accent_hex, logo_url').order('name'),
       lerTudo<Pub>((de, ate) => supabase.schema('mkt').from('publications')
         .select('id, brand_id, platform, url, published_at, metadata')
-        .order('published_at', { ascending: false }).range(de, ate)),
+        .order('published_at', { ascending: false }).order('id').range(de, ate)),
       lerTudo<Perf>((de, ate) => supabase.schema('mkt').from('content_performance')
-        .select('publication_id, brand_id, gatilho, formato, engajamento, alcance, salvamentos, compartilhamentos, views').range(de, ate)),
+        .select('publication_id, brand_id, gatilho, formato, engajamento, alcance, salvamentos, compartilhamentos, views')
+        .order('id').range(de, ate)),
       lerTudo<Aud>((de, ate) => supabase.schema('mkt').from('audiencia_diaria')
-        .select('brand_id, platform, seguidores, dia').order('dia').range(de, ate)),
+        .select('brand_id, platform, seguidores, dia').order('dia').order('id').range(de, ate)),
       espelhoMotores.pulsoDias(),
       espelhoMotores.limelightDias(),
       espelhoMotores.blogsDias(),
@@ -158,7 +159,8 @@ export default function MktCrescimento() {
       supabase.from('v_mkt_calc_funil').select('dia, usos, sessoes, leads').limit(400),
       supabase.from('v_mkt_nivel_crescimento').select('*'),
       lerTudo<Leitura>((de, ate) => supabase.from('v_mkt_analytics_peca_dia')
-        .select('origem, marca, conta, rede, tipo, peca_ref, data, views').order('data').range(de, ate)),
+        .select('origem, marca, conta, rede, tipo, peca_ref, data, views')
+        .order('data').order('origem').order('conta').order('rede').order('peca_ref').range(de, ate)),
     ]);
     setBrands((b.data ?? []) as Brand[]);
     setPubs(p);

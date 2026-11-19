@@ -115,7 +115,8 @@ export const vendasStore = {
     // encher, o `.limit(2000)` devolveria as mil mais novas como se fossem todas.
     const [ev, ca] = await Promise.all([
       lerTudo<Record<string, unknown>>((de, ate) => supabase.from('v_vendas_eventos')
-        .select('*').order('dia', { ascending: false }).range(de, ate)),
+        .select('*').order('dia', { ascending: false })
+        .order('cliente').order('produto').order('tipo').range(de, ate)),
       supabase.from('v_vendas_canais').select('*'),
     ]);
     if (ca.error) {

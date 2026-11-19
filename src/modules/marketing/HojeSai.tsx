@@ -54,7 +54,8 @@ export default function HojeSai({ periodo }: { periodo: Periodo }) {
     // recorte "tudo" chegaria calado.
     lerTudo<Pont>((de, ate) => {
       const q = supabase.from('v_pontualidade')
-        .select('origem, marca, rede, dia, minutos, pontualidade, saiu_por').range(de, ate);
+        .select('origem, marca, rede, dia, minutos, pontualidade, saiu_por')
+        .order('dia').order('marca').order('rede').order('saiu_em').order('minutos').range(de, ate);
       return corte ? q.gte('dia', corte) : q;
     }).then(setPont);
   }, [periodo]);

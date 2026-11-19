@@ -49,7 +49,7 @@ export default function OQueFunciona() {
   useEffect(() => {
     lerTudo<Linha>((de, ate) => supabase.from('v_mkt_resultado_recorte')
       .select('recorte, valor, rede_recorte, pecas, redes, lidas, com_views, views_mediana, views_p90, views_melhor, com_alcance, alcance_mediana, engaj_confiaveis, engaj_mediana, engaj_melhor, serve_de_base, mistura_redes')
-      .range(de, ate))
+      .order('recorte').order('valor').order('rede_recorte').range(de, ate))
       .then((todas) => {
         setLinhas(todas);
         // a rede que abre é a que tem mais leitura, não a primeira do alfabeto: abrir numa rede sem

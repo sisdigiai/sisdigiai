@@ -50,7 +50,8 @@ export default function PlacarDeDecisao({ pecas7d }: { pecas7d: number | null })
     // tem **1.025 linhas** (medido 19/11, 20h12) — 25 peças nunca chegavam, e a base confiável de
     // verdade é **742**. O número que estava na tela não era errado por sorte: era certo por sorte.
     lerTudo<Peca>((de, ate) => supabase.from('v_mkt_resultado_peca')
-      .select('engajamento, engajamento_confiavel').range(de, ate))
+      .select('engajamento, engajamento_confiavel')
+      .order('fonte').order('peca').order('rede').range(de, ate))
       .then((l) => {
         const vs = l.filter((p) => p.engajamento_confiavel && p.engajamento != null).map((p) => Number(p.engajamento));
         setInteracao({ v: mediana(vs), base: vs.length });

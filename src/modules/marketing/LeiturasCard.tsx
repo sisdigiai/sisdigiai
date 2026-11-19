@@ -72,7 +72,7 @@ export default function LeiturasCard({ periodo }: { periodo: Periodo }) {
       let q = supabase.from('v_mkt_analytics_peca_dia')
         .select('origem, marca, conta, rede, tipo, peca_ref, data, views, curtidas, comentarios, compartilhamentos, retencao_media_pct');
       if (corte) q = q.gte('data', corte);
-      return q.order('data').range(de, ate);
+      return q.order('data').order('origem').order('conta').order('rede').order('peca_ref').range(de, ate);
     }).then((l) => { setErro(null); setLinhas(l); });
   }, [periodo]);
 

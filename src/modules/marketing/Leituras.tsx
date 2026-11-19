@@ -41,14 +41,15 @@ export default function Leituras({ periodo }: { periodo: Periodo }) {
     supabase.from('v_mkt_estoque_marca').select('marca_nome, na_fila, artes_prontas, publicadas_7d, dias_de_estoque, dias_marcados, dias_biblioteca')
       .then(({ data }) => setEstoque((data ?? []) as Estoque[]));
     lerTudo<Dia>((de, ate) => supabase.from('v_marketing_cadeia_dia')
-      .select('dia, elo, medida, n').range(de, ate)).then(setCadeia);
+      .select('dia, elo, medida, n').order('dia').order('elo').order('medida').range(de, ate)).then(setCadeia);
   }, []);
 
   useEffect(() => {
     const dias = DIAS_DE(periodo);
     const corte = dias ? diaBRT(new Date(Date.now() - dias * 86400000)) : null;
     lerTudo<Pont>((de, ate) => {
-      const q = supabase.from('v_pontualidade').select('marca, rede, pontualidade, dia').range(de, ate);
+      const q = supabase.from('v_pontualidade').select('marca, rede, pontualidade, dia')
+        .order('dia').order('marca').order('rede').order('saiu_em').order('minutos').range(de, ate);
       return corte ? q.gte('dia', corte) : q;
     }).then(setPont);
   }, [periodo]);

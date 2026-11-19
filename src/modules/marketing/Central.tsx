@@ -136,7 +136,8 @@ export default function Central({ periodo }: { periodo: Periodo }) {
     // isso de sucesso. Hoje a view tem 588 linhas, longe do teto, mas "tudo" não tem recorte: o dia
     // em que passar, a série perderia a ponta sem avisar.
     lerTudo<Dia>((de, ate) => {
-      const q = supabase.from('v_marketing_cadeia_dia').select('*').range(de, ate);
+      const q = supabase.from('v_marketing_cadeia_dia').select('*')
+        .order('dia').order('elo').order('medida').range(de, ate);
       return corte ? q.gte('dia', corte) : q;
     }).then(setLinhas).catch((e) => { setErro(String(e?.message ?? e)); setLinhas([]); });
     supabase.from('v_receita_meta').select('*').maybeSingle()
