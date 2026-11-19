@@ -10,6 +10,8 @@ import EstoquePorMarca from './marketing/EstoquePorMarca';
 import Leituras from './marketing/Leituras';
 import ControlePorMarca from './marketing/ControlePorMarca';
 import MotoresDeConteudo from './marketing/MotoresDeConteudo';
+import OQueFunciona from './marketing/OQueFunciona';
+import ResultadoDeNegocio from './marketing/ResultadoDeNegocio';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia } from '../lib/datas';
 import { espelhoMotores, resumoPola, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
@@ -241,10 +243,15 @@ export default function MarketingEspelho() {
 
         {aba === 'resultado' && <Central periodo={periodo} />}
         {aba === 'resultado' && <Leituras periodo={periodo} />}
+        {/* O dado de decisão vem antes do operacional: ordem do dono em 18/11 ("nada de dados sérios
+            para tomada de decisão"). Rota e ligação primeiro, porque é o que está perto de dinheiro;
+            depois o que funciona por recorte. O que saiu e o que vai sair fica abaixo. */}
+        {aba === 'resultado' && <ResultadoDeNegocio />}
+        {aba === 'resultado' && <OQueFunciona />}
         {aba === 'resultado' && <HojeSai periodo={periodo} />}
         {aba === 'resultado' && <EstoquePorMarca />}
         {aba === 'resultado' && <LeiturasCard periodo={periodo} />}
-        {aba === 'resultado' && <ResultadoConteudoCard periodo={periodo} />}
+        {aba === 'resultado' && <ResultadoConteudoCard />}
 
         {loading ? (
           <div className="text-sm text-muted py-6">Carregando espelho…</div>
