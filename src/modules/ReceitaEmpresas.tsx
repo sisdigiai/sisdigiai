@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Building2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { lerTudo } from '../lib/paginar';
 import { Aviso } from './ReceitaIdeias';
 import { ComoLer, Tile, TituloSecao, botao } from './ReceitaUI';
 
@@ -29,9 +30,20 @@ export default function ReceitaEmpresas() {
   const [recorte, setRecorte] = useState('pm');
 
   useEffect(() => {
-    void supabase.from('v_receita_empresas_resumo').select('*').limit(1000).then(({ data, error }) => {
-      if (error) setErro(error.message); else setLinhas((data ?? []) as Linha[]);
-    });
+    // Lido em páginas de mil (19/11/2026, a pedido do dono; feito pelo agente do app digiai em ramo
+    // próprio). A API corta QUALQUER resposta em 1.000 linhas e devolve isso como sucesso — o
+    // `.limit(1000)` daqui era igual ao teto, então o aviso vermelho abaixo FUNCIONAVA: a tela parava
+    // de mostrar em vez de mostrar errado, que é a escolha certa. Só que parar é pior que continuar:
+    // o resumo tem 625 linhas hoje e a próxima edição do cadastro pode passar de mil.
+    //
+    // `lerTudo` pede página por página até vir uma curta, e **levanta** o erro em vez de devolver lista
+    // vazia. A ordem termina em (municipio, tamanho, ramo), que é chave única da view (conferido no
+    // banco em 19/11): sem desempate, cada página é uma consulta nova e linha empatada pode repetir
+    // numa e sumir na outra, sem erro nenhum.
+    void lerTudo<Linha>((de, ate) => supabase.from('v_receita_empresas_resumo').select('*')
+      .order('municipio').order('tamanho').order('ramo').range(de, ate))
+      .then(setLinhas)
+      .catch((e) => setErro(String(e?.message ?? e)));
   }, []);
 
   const soma = (ls: Linha[]) => ls.reduce((s, l) => s + l.estabelecimentos, 0);
@@ -54,9 +66,6 @@ export default function ReceitaEmpresas() {
   if (!linhas) return null;
   if (linhas.length === 0) {
     return <Aviso tom="warning">O cadastro das empresas da região está vazio: a carga ainda não rodou.</Aviso>;
-  }
-  if (linhas.length >= 1000) {
-    return <Aviso tom="danger">O resumo das empresas passou do limite de leitura; os números abaixo estariam incompletos. Avisar o Agente de Receita.</Aviso>;
   }
 
   const por = (t: Tamanho) => soma(linhas.filter((l) => l.tamanho === t));
