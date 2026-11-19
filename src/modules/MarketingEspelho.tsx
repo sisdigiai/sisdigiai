@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ExternalLink, RefreshCw, Info, Radio, DollarSign, Send, Target, CalendarClock } from 'lucide-react';
+import { ExternalLink, RefreshCw, Info, Send, Target, CalendarClock } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { TravasBanner } from './TravasMarketing';
 import ResultadoConteudoCard from './marketing/ResultadoConteudoCard';
@@ -12,6 +12,7 @@ import ControlePorMarca from './marketing/ControlePorMarca';
 import MotoresDeConteudo from './marketing/MotoresDeConteudo';
 import OQueFunciona from './marketing/OQueFunciona';
 import ResultadoDeNegocio from './marketing/ResultadoDeNegocio';
+import PlacarDeDecisao from './marketing/PlacarDeDecisao';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia } from '../lib/datas';
 import { espelhoMotores, resumoPola, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
@@ -102,7 +103,12 @@ export default function MarketingEspelho() {
   const [loading, setLoading] = useState(true);
   // Página longa esconde o que importa: o dono rolava seis seções para chegar à cadeia de resultados.
   // Cada aba responde UMA pergunta; a primeira é sempre "está dando resultado?".
-  const [aba, setAba] = useState<'resultado' | 'marcas' | 'publicacoes' | 'motores' | 'fatos' | 'fontes'>('resultado');
+  // Oito abas desde 19/11, por ordem do dono: "a parte de resultado tem que trazer todas as
+  // informações... se quiser dividir em mais abas, fique à vontade". Nada saiu da página; o que estava
+  // empilhado em nove faixas numa aba só virou três abas, cada uma com UMA pergunta:
+  //   Resultado → está dando resultado?   Audiência → quantos leram, e quanto disso medimos?
+  //   Dia → sai hoje, e dá para continuar saindo?
+  const [aba, setAba] = useState<'resultado' | 'audiencia' | 'dia' | 'marcas' | 'publicacoes' | 'motores' | 'fatos' | 'fontes'>('resultado');
   // Um período para a página inteira, guardado no ENDEREÇO — o dono manda o link de uma leitura.
   // Vai no segundo trecho (`#/marketing/7`) e não como `?p=7`: o roteador do app escolhe o módulo pelo
   // primeiro trecho, então uma interrogação no hash cairia em Visão sem dizer nada.
@@ -215,7 +221,8 @@ export default function MarketingEspelho() {
 
         <div className="flex items-center gap-1 border border-outline/15 w-fit p-0.5 overflow-x-auto">
           {([
-            ['resultado', 'Resultado'], ['marcas', 'Marcas'], ['publicacoes', 'Publicações'],
+            ['resultado', 'Resultado'], ['audiencia', 'Audiência'], ['dia', 'Dia'],
+            ['marcas', 'Marcas'], ['publicacoes', 'Publicações'],
             ['motores', 'Motores'], ['fatos', 'Fatos'], ['fontes', 'Fontes'],
           ] as const).map(([id, rotulo]) => (
             <button key={id} onClick={() => setAba(id)}
@@ -241,17 +248,37 @@ export default function MarketingEspelho() {
           <span className="font-mono text-[9px] text-muted">vale para a página · o endereço guarda a escolha</span>
         </div>
 
-        {aba === 'resultado' && <Central periodo={periodo} />}
-        {aba === 'resultado' && <Leituras periodo={periodo} />}
-        {/* O dado de decisão vem antes do operacional: ordem do dono em 18/11 ("nada de dados sérios
-            para tomada de decisão"). Rota e ligação primeiro, porque é o que está perto de dinheiro;
-            depois o que funciona por recorte. O que saiu e o que vai sair fica abaixo. */}
-        {aba === 'resultado' && <ResultadoDeNegocio />}
-        {aba === 'resultado' && <OQueFunciona />}
-        {aba === 'resultado' && <HojeSai periodo={periodo} />}
-        {aba === 'resultado' && <EstoquePorMarca />}
-        {aba === 'resultado' && <LeiturasCard periodo={periodo} />}
-        {aba === 'resultado' && <ResultadoConteudoCard />}
+        {/* RESULTADO — "está dando resultado?". Quatro números de decisão na primeira linha, depois os
+            dois cartões que respondem com dado: o que o Google registra de gente indo à loja e o que
+            funciona por recorte. A cadeia e as leituras ficam abaixo, como contexto da leitura. */}
+        {aba === 'resultado' && (
+          <div className="space-y-6">
+            <PlacarDeDecisao pecas7d={esp?.publicadas_7d ?? null} />
+            <div className="grid grid-cols-1 2xl:grid-cols-2 gap-6 items-start">
+              <ResultadoDeNegocio />
+              <OQueFunciona />
+            </div>
+            <Central periodo={periodo} />
+            <Leituras periodo={periodo} />
+          </div>
+        )}
+
+        {/* AUDIÊNCIA — "quantos leram, e quanto disso a casa mede?". */}
+        {aba === 'audiencia' && (
+          <div className="space-y-6">
+            <LeiturasCard periodo={periodo} />
+            <ResultadoConteudoCard />
+          </div>
+        )}
+
+        {/* DIA — "sai hoje, e dá para continuar saindo?". Pontualidade e fôlego lado a lado: um diz se
+            saiu na hora, o outro até quando ainda sai se ninguém fizer nada. */}
+        {aba === 'dia' && (
+          <div className="space-y-6">
+            <HojeSai periodo={periodo} />
+            <EstoquePorMarca />
+          </div>
+        )}
 
         {loading ? (
           <div className="text-sm text-muted py-6">Carregando espelho…</div>
@@ -263,35 +290,10 @@ export default function MarketingEspelho() {
                 diferentes em valor não informam — fazem desconfiar dos dois. O bloco "Estamos indo
                 bem?" responde isto, obedecendo ao filtro. (Achado pelo Orquestrador em 18/11, 14h29.) */}
 
-            {/* Placar do motor */}
-            {aba === 'resultado' && esp && (
-              <div className="border border-outline/15 bg-surface-container">
-                <div className="px-4 py-2.5 border-b border-outline/10 flex items-center gap-2 flex-wrap">
-                  <Radio className="w-3.5 h-3.5 text-secondary" />
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Motor no ar</span>
-                  <span className="ml-auto font-mono text-[10px] text-muted">
-                    fila aberta {esp.fila_aberta} · última publicação {relativo(esp.ultima_publicacao)}
-                  </span>
-                </div>
-                <div className="grid grid-cols-3 md:grid-cols-6 divide-x divide-outline/10">
-                  {[
-                    { label: 'Ideias', v: esp.ideias },
-                    { label: 'Roteiros', v: esp.roteiros },
-                    { label: 'Artes', v: esp.assets },
-                    { label: 'Publicações', v: esp.publicacoes },
-                    { label: 'Últimos 7d', v: esp.publicadas_7d, destaque: true },
-                    { label: 'IA no mês', v: esp.custo_ia_usd_mes != null ? `$${esp.custo_ia_usd_mes}` : '—', icon: true },
-                  ].map((k) => (
-                    <div key={k.label} className="p-4 text-center">
-                      <div className="font-mono text-[9px] uppercase tracking-widest text-muted flex items-center justify-center gap-1">
-                        {k.icon && <DollarSign className="w-3 h-3" />}{k.label}
-                      </div>
-                      <div className={`font-serif text-2xl font-semibold tabular-nums mt-1 ${k.destaque ? 'text-success' : 'text-on-surface'}`}>{k.v}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* O "Motor no ar" SAIU DAQUI em 19/11 e não se perdeu: ideias, roteiros, artes, publicações,
+                7 dias, custo de IA, fila e última publicação já estavam, um por um, no cartão do DIGIAI
+                MKT na aba Motores. Eram duas faixas com os mesmos seis números em duas abas da mesma
+                tela — a mesma queixa que o dono fez em 18/11 sobre a tabela de motores duplicada. */}
 
             {/* Cards por marca */}
             {aba === 'marcas' && (
@@ -464,6 +466,7 @@ export default function MarketingEspelho() {
             hoje={hojeBrasilia()}
             brl={brl}
             pulsoUltimaPubDias={pulsoUltimaPubDias}
+            mktUltimaPub={relativo(esp?.ultima_publicacao ?? null)}
           />
         )}
 

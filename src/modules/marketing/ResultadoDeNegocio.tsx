@@ -41,8 +41,14 @@ export default function ResultadoDeNegocio() {
 
   const semanas = [...new Set((linhas ?? []).map((l) => l.semana))].sort().reverse().slice(0, 8);
   const marcas = [...new Set((linhas ?? []).map((l) => l.marca))];
-  const total = (campo: 'rotas' | 'ligacoes' | 'aparicoes' | 'cliques_site') =>
-    (linhas ?? []).reduce((a, l) => a + (l[campo] ?? 0), 0);
+  // Os totais saíram daqui em 19/11: eles agora abrem a aba, no placar de decisão. Tinha-os nos dois
+  // lugares e o mesmo número em dois lugares com nomes diferentes faz desconfiar dos dois.
+  const porSemana = semanas.map((s) => ({
+    semana: s,
+    rotas: (linhas ?? []).filter((l) => l.semana === s).reduce((a, l) => a + (l.rotas ?? 0), 0),
+    completa: !(linhas ?? []).some((l) => l.semana === s && !l.semana_completa),
+  })).reverse();
+  const pico = Math.max(1, ...porSemana.map((p) => p.rotas));
 
   return (
     <section className="border border-outline/15 bg-surface-container">
@@ -66,13 +72,22 @@ export default function ResultadoDeNegocio() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-outline/10">
-            {([['rotas', 'pedidos de rota'], ['ligacoes', 'ligações'], ['aparicoes', 'aparições'], ['cliques_site', 'cliques no site']] as const).map(([campo, rotulo]) => (
-              <div key={campo} className="bg-surface-container px-4 py-3">
-                <div className="font-mono text-[10px] uppercase tracking-wider text-muted">{rotulo}</div>
-                <div className="font-mono text-xl tabular-nums text-on-surface">{total(campo).toLocaleString('pt-BR')}</div>
-              </div>
-            ))}
+          {/* Rotas por semana, da mais antiga à atual. A barra da semana em curso é amarela: ela está
+              baixa porque ainda está acontecendo, não porque o movimento caiu. */}
+          <div className="px-4 pt-3 pb-2">
+            <div className="flex items-end gap-1 h-14">
+              {porSemana.map((p) => (
+                <div key={p.semana} className="flex-1 relative group" title={`${dia(p.semana)} · ${p.rotas} rotas${p.completa ? '' : ' (semana incompleta)'}`}>
+                  <div className={`w-full ${p.completa ? 'bg-secondary/75' : 'bg-warning/80'}`}
+                       style={{ height: `${Math.max(3, (p.rotas / pico) * 56)}px` }} />
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-between font-mono text-[9px] text-muted mt-1">
+              <span>{porSemana[0] ? dia(porSemana[0].semana) : ''}</span>
+              <span>pedidos de rota por semana · amarelo = semana em curso</span>
+              <span>{porSemana[porSemana.length - 1] ? dia(porSemana[porSemana.length - 1].semana) : ''}</span>
+            </div>
           </div>
 
           <div className="px-4 py-2 border-y border-outline/10 flex items-start gap-2">
@@ -131,8 +146,8 @@ export default function ResultadoDeNegocio() {
 
           <div className="px-4 py-2 border-t border-outline/10">
             <span className="font-mono text-[10px] text-muted">
-              ligação e clique no site aparecem nos números do topo: no detalhe por semana eles ainda são pequenos
-              demais para linha própria (40 ligações em 8 semanas) · "incompleta" = faltou dia de alguma ficha
+              ligação, aparição e clique no site estão no placar que abre a aba: no detalhe por semana ainda são
+              pequenos demais para linha própria · "incompleta" = faltou dia de alguma ficha
             </span>
           </div>
         </>

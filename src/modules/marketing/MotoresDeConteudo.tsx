@@ -33,6 +33,7 @@ type Props = {
   hoje: string;
   brl: (v: number | null | undefined) => string;
   pulsoUltimaPubDias: number | null;
+  mktUltimaPub: string;
 };
 
 const n = (v: number) => v.toLocaleString('pt-BR', { maximumFractionDigits: 0 });
@@ -40,33 +41,79 @@ const mil = (v: number) => (v >= 1000 ? `${(v / 1000).toFixed(1)}k` : String(v))
 const diaBRT = (d: Date) =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
 
+// ───────────────────────────────────────────────────────────────────────────────────────────────
+// O CARTÃO DA ABA MARCAS, aplicado aqui. Ordem do dono em 19/11: "a aba marcas e publicações está bem
+// organizada, temos que melhorar motor e levar o padrão das outras 2 com os cards".
+//
+// É o mesmo desenho, peça por peça: cantoneira na cor, sigla, nome em serifa, motivo por extenso
+// embaixo, selo de estado no canto, faixa de quatro números com moldura, linhas curtas e o pé.
+//
+// O QUE ISSO CONSERTOU, e não era só visual: cada motor despejava três a quatro parágrafos de
+// ressalva no meio dos números, e o do Pulso trazia um bloco financeiro inteiro. A ressalva não sumiu
+// — foi para o pé do cartão, uma linha, onde se lê depois do número e não por cima dele.
+
 function Caixas({ itens }: { itens: Array<{ v: string; label: string }> }) {
   return (
-    <div className="grid grid-cols-4 gap-2 text-center">
+    <div className="mt-4 grid grid-cols-4 divide-x divide-outline/10 border border-outline/10 bg-surface-lowest">
       {itens.map((k) => (
-        <div key={k.label}>
-          <div className="text-lg font-bold tabular-nums text-on-surface">{k.v}</div>
-          <div className="text-[10px] font-mono uppercase text-muted">{k.label}</div>
+        <div key={k.label} className="py-2 text-center">
+          <div className="font-serif text-base font-semibold tabular-nums text-on-surface">{k.v}</div>
+          <div className="font-mono text-[8px] uppercase tracking-widest text-muted leading-tight">{k.label}</div>
         </div>
       ))}
     </div>
   );
 }
 
-function Cartao({ cor, titulo, direita, children }: { cor: string; titulo: string; direita: string; children: React.ReactNode }) {
+function Linha({ k, children }: { k: string; children: React.ReactNode }) {
   return (
-    <div className="bg-surface-container p-4 space-y-2">
-      <div className="flex items-center gap-2">
-        <span className="w-2.5 h-2.5 shrink-0" style={{ background: cor }} />
-        <span className="text-sm font-semibold text-on-surface">{titulo}</span>
-        <span className="ml-auto font-mono text-[10px] text-muted">{direita}</span>
+    <div className="flex items-start gap-2 font-mono text-[10px] text-on-surface-variant leading-snug">
+      <span className="text-muted shrink-0 w-[72px]">{k}</span>
+      <span className="min-w-0">{children}</span>
+    </div>
+  );
+}
+
+// O selo diz o ESTADO do motor, não o volume: é o que o dono lê primeiro no cartão de marca.
+const TONS = {
+  ok: 'text-success border-success/40 bg-success/10',
+  atencao: 'text-warning border-warning/40 bg-warning/10',
+  neutro: 'text-muted border-outline/20',
+} as const;
+
+function Cartao({ cor, sigla, titulo, sub, selo, tom = 'neutro', children }: {
+  cor: string; sigla: string; titulo: string; sub: string;
+  selo: string; tom?: keyof typeof TONS; children: React.ReactNode;
+}) {
+  return (
+    <div className="relative bg-surface-container p-5 pt-6">
+      <span className="absolute -top-px -left-px w-3 h-3 border-t-2 border-l-2" style={{ borderColor: cor }} />
+      <span className="absolute -top-px -right-px w-3 h-3 border-t-2 border-r-2 border-outline/40" />
+      <div className="flex items-start gap-3">
+        <div className="w-12 h-12 flex items-center justify-center shrink-0 font-mono font-bold text-sm"
+             style={{ background: `color-mix(in srgb, ${cor} 18%, transparent)`, color: cor }}>
+          {sigla}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="font-serif text-lg font-semibold text-on-surface leading-tight truncate">{titulo}</div>
+          <div className="text-[11px] text-muted leading-snug mt-0.5">{sub}</div>
+        </div>
+        <span className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border shrink-0 ${TONS[tom]}`}>{selo}</span>
       </div>
       {children}
     </div>
   );
 }
 
-export default function MotoresDeConteudo({ periodo, limelight, pulso, espMkt, hoje, brl, pulsoUltimaPubDias }: Props) {
+function Pe({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mt-3 pt-2 border-t border-outline/10 font-mono text-[9.5px] text-muted leading-relaxed">
+      {children}
+    </div>
+  );
+}
+
+export default function MotoresDeConteudo({ periodo, limelight, pulso, espMkt, hoje, brl, pulsoUltimaPubDias, mktUltimaPub }: Props) {
   const dias = periodo === 'tudo' ? null : Number(periodo);
   const rotuloPeriodo = periodo === 'tudo' ? 'desde o início' : `${periodo} dias`;
 
@@ -122,132 +169,146 @@ export default function MotoresDeConteudo({ periodo, limelight, pulso, espMkt, h
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-outline/10">
         {/* ------------------------------------------------------------------ DIGIAI MKT */}
-        <Cartao cor="var(--color-secondary)" titulo="DIGIAI MKT · publica a casa" direita={espMkt ? `fila ${espMkt.fila_aberta}` : '—'}>
+        <Cartao cor="var(--color-secondary)" sigla="MK" titulo="DIGIAI MKT" sub="publica a casa"
+                selo={espMkt ? `publicou ${mktUltimaPub}` : 'sem espelho'} tom={espMkt ? 'ok' : 'neutro'}>
           {espMkt ? (
             <>
               <Caixas itens={[
                 { v: pecasLousa ? n(daLousa('mkt')) : '—', label: `peças ${rotuloPeriodo}` },
                 { v: viewsMkt != null ? mil(viewsMkt) : '—', label: 'views' },
-                { v: n(espMkt.assets), label: 'artes' },
-                { v: n(espMkt.ideias), label: 'ideias' },
+                { v: n(espMkt.publicacoes), label: 'no ar' },
+                { v: n(espMkt.fila_aberta), label: 'fila' },
               ]} />
-              <div className="text-[11px] text-muted">
-                Pipeline: {n(espMkt.ideias)} ideias · {n(espMkt.roteiros)} roteiros · {n(espMkt.assets)} artes · {n(espMkt.publicacoes)} no ar
-              </div>
-              <div className="text-[11px] text-muted">
+              <div className="mt-3 space-y-1.5">
+                <Linha k="pipeline">{n(espMkt.ideias)} ideias · {n(espMkt.roteiros)} roteiros · {n(espMkt.assets)} artes</Linha>
                 {/* custo zero e custo sem acesso não são a mesma coisa */}
-                Custo de IA no mês: {espMkt.custo_ia_usd_mes != null
-                  ? `US$ ${espMkt.custo_ia_usd_mes.toLocaleString('pt-BR', { maximumFractionDigits: 2 })}`
-                  : <span className="text-muted">só para admin do MKT — não é custo zero</span>}
+                <Linha k="custo IA mês">
+                  {espMkt.custo_ia_usd_mes != null
+                    ? `US$ ${espMkt.custo_ia_usd_mes.toLocaleString('pt-BR', { maximumFractionDigits: 2 })}`
+                    : <span className="text-muted">só para admin do MKT — não é custo zero</span>}
+                </Linha>
               </div>
+              <Pe>fila é fila ABERTA, não atraso: inclui o que já está agendado para as próximas semanas</Pe>
             </>
-          ) : <div className="text-sm text-muted italic">Espelho indisponível.</div>}
+          ) : <div className="text-sm text-muted italic mt-4">Espelho indisponível.</div>}
         </Cartao>
 
         {/* ------------------------------------------------------------------ DIGIAI Cortes */}
-        <Cartao cor="var(--color-eco-cortes, var(--color-warning))" titulo="DIGIAI Cortes · fábrica de cortes" direita={cortes ? `${cortes.episodios} episódio(s)` : '—'}>
+        <Cartao cor="var(--color-warning)" sigla="CO" titulo="DIGIAI Cortes" sub="fábrica de cortes"
+                selo={cortes?.custo == null ? 'sem custo medido' : 'custo medido'}
+                tom={cortes?.custo == null ? 'atencao' : 'ok'}>
           {cortes ? (
             <>
               <Caixas itens={[
                 { v: n(cortes.episodios), label: 'episódios' },
-                { v: n(cortes.pecas), label: 'peças entregues' },
+                { v: n(cortes.pecas), label: 'peças' },
                 { v: '—', label: 'views' },
                 { v: cortes.custo != null ? brl(cortes.custo) : '—', label: 'custo' },
               ]} />
-              <div className="text-[11px] text-muted">
-                As peças dele saem pelo MKT — <strong>as views aparecem no motor que publicou</strong>, e contá-las aqui também seria contar duas vezes.
+              <div className="mt-3 space-y-1.5">
+                <Linha k="views">saem no motor que publicou (MKT) — contar aqui também seria contar duas vezes</Linha>
+                <Linha k="custo">
+                  {cortes.custo == null
+                    ? <><span className="text-warning">sem custo em reais medido</span> — a coluna existe desde 18/11 e espera o número do motor</>
+                    : <>medido: {brl(cortes.custo)}</>}
+                </Linha>
               </div>
-              <div className="text-[11px] text-muted">
-                {cortes.custo == null
-                  ? <>Custo: <span className="text-warning">sem custo em reais medido</span> — a coluna existe desde 18/11 e espera o número do motor. Não é custo zero.</>
-                  : <>Custo medido: {brl(cortes.custo)}</>}
-              </div>
+              <Pe>traço nesta faixa quer dizer "não medido"; zero medido aparece como 0 — <strong>não é custo zero</strong></Pe>
             </>
-          ) : <div className="text-sm text-muted italic">Espelho indisponível.</div>}
+          ) : <div className="text-sm text-muted italic mt-4">Espelho indisponível.</div>}
         </Cartao>
 
         {/* ------------------------------------------------------------------ Limelight */}
-        <Cartao cor="var(--color-eco-app)" titulo="Limelight Studio · Mello" direita='série "Transforme Sua Visão"'>
+        {/* A view de publicações agrupa pelo dia em que a PEÇA saiu, não pelo da medição: motor que não
+            publicou no período aparece com zero mesmo ganhando audiência. Já me levou a acusar esta
+            coleta de parada quando ela rodava todo dia — por isso o selo fala de publicação, e a coleta
+            aparece na linha de baixo. */}
+        <Cartao cor="var(--color-eco-app)" sigla="LI" titulo="Limelight Studio" sub='série da Mello · "Transforme Sua Visão"'
+                selo={limeDias && somar(limeJanela, 'publicacoes') === 0 ? 'não publicou no período' : `publicando · ${rotuloPeriodo}`}
+                tom={limeDias && somar(limeJanela, 'publicacoes') === 0 ? 'atencao' : 'ok'}>
           {limelight ? (
             <>
               <Caixas itens={[
                 { v: n(limelight.episodios), label: 'episódios' },
                 { v: limeDias ? n(somar(limeJanela, 'publicacoes')) : '—', label: `peças ${rotuloPeriodo}` },
-                { v: mil(limelight.views_total ?? 0), label: 'views (total)' },
+                { v: mil(limelight.views_total ?? 0), label: 'views acervo' },
                 { v: n(limelight.fila), label: 'na fila' },
               ]} />
-              <div className="text-[11px] text-muted">
-                Views: {limelight.views_por_plataforma
-                  ? Object.entries(limelight.views_por_plataforma).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${mil(v)}`).join(' · ')
-                  : '—'}
-                {' · '}custo IA US$ {limelight.custo_ia_usd} <span className="text-muted">(total)</span>
+              <div className="mt-3 space-y-1.5">
+                <Linha k="views">
+                  {limelight.views_por_plataforma
+                    ? Object.entries(limelight.views_por_plataforma).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${mil(v)}`).join(' · ')
+                    : '—'}
+                  {' · '}custo IA US$ {limelight.custo_ia_usd} (total)
+                </Linha>
+                <Linha k="seguidores">
+                  {Object.entries(limelight.seguidores).filter(([, v]) => v > 0).map(([k, v]) => `${k} ${v}`).join(' · ') || '—'}
+                  {' · '}coleta {limelight.ultima_coleta === hoje ? <span className="text-success">hoje ✓</span> : limelight.ultima_coleta ?? '—'}
+                </Linha>
               </div>
-              <div className="text-[11px] text-muted">
-                Seguidores: {Object.entries(limelight.seguidores).filter(([, v]) => v > 0).map(([k, v]) => `${k} ${v}`).join(' · ') || '—'}
-                {' · '}coleta {limelight.ultima_coleta === hoje ? <span className="text-success">hoje ✓</span> : limelight.ultima_coleta ?? '—'}
-              </div>
-              {/* A view de publicações agrupa pelo dia em que a PEÇA saiu, não pelo da medição: motor
-                  que não publicou no período aparece com zero mesmo ganhando audiência. Já me levou a
-                  acusar esta coleta de parada quando ela rodava todo dia. */}
-              {limeDias && somar(limeJanela, 'publicacoes') === 0 && (
-                <div className="text-[11px] text-warning">
-                  Não publicou no período — as views acima são do acervo, não da semana.
-                </div>
-              )}
+              <Pe>
+                {limeDias && somar(limeJanela, 'publicacoes') === 0
+                  ? 'as views acima são do acervo, não da semana — motor que não publicou aparece com zero mesmo ganhando audiência'
+                  : 'views do acervo inteiro; as peças do período estão na segunda caixa'}
+              </Pe>
             </>
-          ) : <div className="text-sm text-muted italic">Espelho indisponível.</div>}
+          ) : <div className="text-sm text-muted italic mt-4">Espelho indisponível.</div>}
         </Cartao>
 
         {/* ------------------------------------------------------------------ Pulso */}
-        <Cartao cor="var(--color-eco-pulso)" titulo="Pulso Control · canais faceless" direita={`${pulso?.canais ?? '—'} canais`}>
+        <Cartao cor="var(--color-eco-pulso)" sigla="PU" titulo="Pulso Control"
+                sub={`canais faceless · ${pulso?.canais ?? '—'} canais`}
+                selo={pulsoUltimaPubDias != null && pulsoUltimaPubDias <= 2 ? 'esteira viva' : 'esteira parada'}
+                tom={pulsoUltimaPubDias != null && pulsoUltimaPubDias <= 2 ? 'ok' : 'atencao'}>
           {pulso ? (
             <>
               <Caixas itens={[
                 { v: pulsoDias ? n(somar(pulsoJanela, 'publicacoes')) : '—', label: `peças ${rotuloPeriodo}` },
-                { v: pulsoDias ? mil(somar(pulsoJanela, 'views')) : '—', label: 'views' },
-                { v: n((pulso.pipeline['PRONTO_PUBLICACAO'] ?? 0) + (pulso.pipeline['EM_EDICAO'] ?? 0) + (pulso.pipeline['ROTEIRO_PRONTO'] ?? 0)), label: 'no pipeline' },
-                { v: n(pulso.ideias), label: 'ideias' },
+                { v: pulsoDias ? mil(somar(pulsoJanela, 'views')) : '—', label: 'views período' },
+                { v: n(pulso.publicacoes), label: 'no ar (total)' },
+                { v: mil(pulso.views_total), label: 'views acervo' },
               ]} />
-              <div className="text-[11px] text-muted">
-                Total: {n(pulso.publicacoes)} publicações · {mil(pulso.views_total)} views ·{' '}
-                {Object.entries(pulso.views_por_plataforma).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${mil(v)}`).join(' · ')}
-              </div>
-              <div className="text-[11px] text-muted">
-                {pulsoUltimaPubDias != null && pulsoUltimaPubDias <= 2
-                  ? <span className="text-success">esteira automática viva — última publicação {pulsoUltimaPubDias === 0 ? 'hoje ✓' : `há ${pulsoUltimaPubDias}d`}</span>
-                  : <span className="text-warning">última publicação {pulso.ultima_publicacao ?? '—'}</span>}
-                {' · '}coleta diária 11h (Vercel Crons)
-              </div>
 
-              {/* Financeiro do Pulso. Caixa e consumo aparecem SEPARADOS e nunca somados: o topup é
+              {/* Financeiro do Pulso, na mesma moldura dos números de cima — era um bloco solto com
+                  três colunas de texto. Caixa e consumo continuam SEPARADOS e nunca somados: o topup é
                   dinheiro saindo, o consumo é uso do crédito já comprado. Somar infla o burn ~3,8×. */}
               {pulso.custo_caixa_total_brl != null && (
-                <div className="border-t border-outline pt-2 mt-1 space-y-1">
-                  <div className="grid grid-cols-3 gap-2">
-                    <div>
-                      <div className="text-sm font-bold tabular-nums text-on-surface">{brl(pulso.custo_caixa_total_brl)}</div>
-                      <div className="text-[10px] font-mono uppercase text-muted leading-tight">custo de caixa<br /><span className="text-[9px]">dinheiro que saiu</span></div>
-                    </div>
-                    <div>
-                      <div className="text-sm font-bold tabular-nums text-on-surface-variant">{brl(pulso.custo_consumo_total_brl)}</div>
-                      <div className="text-[10px] font-mono uppercase text-muted leading-tight">crédito consumido<br /><span className="text-[9px]">gerencial, não é despesa</span></div>
-                    </div>
-                    <div>
-                      <div className="text-sm font-bold tabular-nums text-on-surface">{brl(pulso.custo_caixa_por_video_brl)}</div>
-                      <div className="text-[10px] font-mono uppercase text-muted leading-tight">por vídeo<br /><span className="text-[9px]">caixa ÷ publicações</span></div>
-                    </div>
+                <div className="mt-2 grid grid-cols-3 divide-x divide-outline/10 border border-outline/10 bg-surface-lowest">
+                  <div className="py-2 text-center">
+                    <div className="font-serif text-base font-semibold tabular-nums text-on-surface">{brl(pulso.custo_caixa_total_brl)}</div>
+                    <div className="font-mono text-[8px] uppercase tracking-widest text-muted leading-tight">caixa · dinheiro que saiu</div>
                   </div>
-                  <div className="text-[11px] text-muted">
-                    Receita: {brl(pulso.receita_total_brl)} · recebido {brl(pulso.receita_recebida_brl)}
-                    {(pulso.receita_total_brl ?? 0) === 0 && <span className="text-warning"> — nenhum gate de monetização aberto ainda</span>}
+                  <div className="py-2 text-center">
+                    <div className="font-serif text-base font-semibold tabular-nums text-on-surface-variant">{brl(pulso.custo_consumo_total_brl)}</div>
+                    <div className="font-mono text-[8px] uppercase tracking-widest text-muted leading-tight">crédito consumido · gerencial</div>
                   </div>
-                  <div className="text-[10px] text-muted leading-snug">
-                    Os dois custos <strong>não se somam</strong>: o crédito consumido é uso do topup já pago. Somar inflaria o burn em ~3,8×.
+                  <div className="py-2 text-center">
+                    <div className="font-serif text-base font-semibold tabular-nums text-on-surface">{brl(pulso.custo_caixa_por_video_brl)}</div>
+                    <div className="font-mono text-[8px] uppercase tracking-widest text-muted leading-tight">por vídeo · caixa ÷ peças</div>
                   </div>
                 </div>
               )}
+
+              <div className="mt-3 space-y-1.5">
+                <Linha k="views">
+                  {Object.entries(pulso.views_por_plataforma).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${mil(v)}`).join(' · ')}
+                </Linha>
+                <Linha k="última peça">
+                  {pulsoUltimaPubDias != null && pulsoUltimaPubDias <= 2
+                    ? <span className="text-success">{pulsoUltimaPubDias === 0 ? 'hoje ✓' : `há ${pulsoUltimaPubDias}d`}</span>
+                    : <span className="text-warning">{pulso.ultima_publicacao ?? '—'}</span>}
+                  {' · '}coleta diária 11h
+                </Linha>
+                {pulso.custo_caixa_total_brl != null && (
+                  <Linha k="receita">
+                    {brl(pulso.receita_total_brl)} · recebido {brl(pulso.receita_recebida_brl)}
+                    {(pulso.receita_total_brl ?? 0) === 0 && <span className="text-warning"> — nenhum gate de monetização aberto</span>}
+                  </Linha>
+                )}
+              </div>
+              <Pe>caixa e crédito consumido <strong>não se somam</strong>: o crédito é uso do topup já pago, e somar inflaria o burn ~3,8×</Pe>
             </>
-          ) : <div className="text-sm text-muted italic">Espelho indisponível.</div>}
+          ) : <div className="text-sm text-muted italic mt-4">Espelho indisponível.</div>}
         </Cartao>
       </div>
 
