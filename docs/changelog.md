@@ -2,6 +2,48 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-19 (12h05) — O espelho do marketing deixa de ser uma pilha: oito abas no padrão de cartão
+
+Dono, 19/11: *"muita informação embolada… a aba marcas e publicações está bem organizada, temos que
+melhorar motor e levar o padrão das outras 2 com os cards… fontes eu padronizaria também"*. Montei o mock
+(`docs/mocks/marketing-espelho-2026-11-19.html`), ele aprovou — *"pode, implementa nessa ordem mesmo"* — e
+acrescentou o que muda tudo: *"a ideia é que a parte de resultado traga todas as informações, neste mock
+diminuiu, mas se quiser dividir em mais abas, fique à vontade"*.
+
+**Nada saiu da página.** As nove faixas de largura inteira empilhadas numa aba só viraram **três abas**,
+cada uma com uma pergunta: **Resultado** (está dando resultado?), **Audiência** (quantos leram, e quanto
+disso medimos?) e **Dia** (sai hoje, e dá para continuar saindo?).
+
+- **Placar de decisão** abre o Resultado: rotas, ligações, peças em 7 dias e interação mediana. O cartão do
+  Google **perdeu a linha de totais** no mesmo movimento — o mesmo número em dois lugares da mesma tela faz
+  desconfiar dos dois, que foi o defeito achado em 18/11 com a cadeia antiga.
+- **"Motor no ar" saiu do Resultado** sem perder um número: os seis que ele mostrava já estavam, um a um, no
+  cartão do DIGIAI MKT na aba Motores. Eram duas faixas iguais em duas abas da mesma tela.
+- **Motores no cartão da aba Marcas:** cantoneira na cor, sigla, nome em serifa, selo de estado, faixa de
+  quatro números com moldura, linhas curtas. As ressalvas saíram do meio dos números e foram para o pé do
+  cartão — continuam lá, uma linha, onde se lê depois do número e não por cima dele.
+- **Fontes, um número por azulejo:** eram doze azulejos com gramática diferente cada um e metade dos títulos
+  sem acento ("publicaveis", "prospeccao", "ha 3d"). Agora nome, um número, a unidade, o frescor e o destino,
+  agrupados em quatro famílias. **Traço quer dizer não medido, nunca zero** — zero é uma medição.
+- **Fatos mostram o que a IA pode citar**, não quantos existem. A faixa diz **citáveis hoje** (fresco E
+  público), porque é essa a conta que o motor do MKT faz. E **trava aparece como trava**: fato preso a um uso
+  tem cadeado e diz a que está preso.
+
+**O que a tela passou a confessar, e ninguém tinha pedido:** dos **34** fatos, a IA pode citar **6**. Vinte
+estão públicos e **vencidos desde outubro** (verificados em 14–16/09, com 30 dias de validade). A Mello não
+tem nenhum; o Pulso também não. Não quebra nada — fato vencido é silêncio por construção — mas quer dizer
+que há um mês o gerador trabalha quase sem número, e isso não aparecia em lugar nenhum.
+
+**Dois números meus corrigidos pela medição antes de chegarem ao dono:** no mock eu tinha escrito 12.480
+seguidores (são **2.737**) e 530 cliques de SEO (são **106**, em três sites). Também estavam errados o
+Facebook (0 de 207 lidas, não 171), as peças do Cortes (85, não 14) e os disparos da OSI (406 em 30 dias,
+não zero). Conferi tudo contra o banco antes de publicar o mock.
+
+**Verificado no ar**, aba por aba, em app.digiai.app.br (builds `6275f7f`, `21418d9` e `f6a4296`): Resultado,
+Audiência, Dia, Motores, Fontes e Fatos. Ao abrir a aba Fontes vi "sem data" pendurado em cinco azulejos que
+não têm leitura datada — rótulo repetido que não informa é ruído, e ruído é o que esta aba veio consertar.
+Corrigido e publicado de novo.
+
 ## 2026-11-19 (11h07) — Os números do E02 do Pulso carimbados em mkt.fatos, e carimbados fechados (266)
 
 Pedido do Geral às 10h56, depois de ele pôr os números na folha única às 10h55 (Cockpit `e7adc724`). A palavra do
