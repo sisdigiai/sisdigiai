@@ -33,6 +33,12 @@ type Linha = {
 const RECORTES = ['tipo', 'formato', 'hora', 'dia da semana', 'marca'] as const;
 const num = (n: number | null) => (n == null ? '—' : Number(n).toLocaleString('pt-BR'));
 
+// Grupo "(sem tipo registrado)" e companhia APARECE na tabela — a peça não pode desaparecer da conta —
+// mas não disputa posição nem a frase de destaque. Na primeira versão publicada ele venceu o ranking e a
+// tela anunciou "(sem tipo registrado) rende 3,6× a mediana de vídeo": uma frase sem sentido nenhum, e eu
+// só vi ao abrir a tela. Falta de rótulo não é característica da peça; é falta nossa.
+const semRotulo = (valor: string) => valor.startsWith('(sem ');
+
 export default function OQueFunciona() {
   const [linhas, setLinhas] = useState<Linha[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
@@ -59,7 +65,7 @@ export default function OQueFunciona() {
   const mostradas = (linhas ?? [])
     .filter((l) => l.recorte === recorte && (rede === '__todas' ? l.rede_recorte === null : l.rede_recorte === rede))
     .sort((a, b) => (b.views_mediana ?? -1) - (a.views_mediana ?? -1));
-  const comBase = mostradas.filter((l) => l.serve_de_base);
+  const comBase = mostradas.filter((l) => l.serve_de_base && !semRotulo(l.valor));
   const melhor = comBase[0];
   const pior = comBase.length > 1 ? comBase[comBase.length - 1] : null;
 
@@ -145,15 +151,19 @@ export default function OQueFunciona() {
                     </tr>
                   </thead>
                   <tbody>
-                    {mostradas.map((l, i) => {
+                    {mostradas.map((l) => {
                       const fraca = !l.serve_de_base;
+                      const posicao = comBase.indexOf(l);
                       return (
-                        <tr key={`${l.recorte}|${l.valor}`} className={`border-b border-outline/5 ${fraca ? 'opacity-50' : ''}`}>
+                        <tr key={`${l.recorte}|${l.valor}`} className={`border-b border-outline/5 ${fraca || semRotulo(l.valor) ? 'opacity-50' : ''}`}>
                           <td className="px-4 py-2">
                             <span className="font-mono text-[10px] text-muted tabular-nums mr-2">
-                              {fraca ? '—' : `${comBase.indexOf(l) + 1}º`}
+                              {posicao < 0 ? '—' : `${posicao + 1}º`}
                             </span>
-                            <span className={i === 0 && !fraca ? 'font-semibold text-on-surface' : 'text-on-surface-variant'}>{l.valor}</span>
+                            <span className={posicao === 0 ? 'font-semibold text-on-surface' : 'text-on-surface-variant'}>{l.valor}</span>
+                            {semRotulo(l.valor) && (
+                              <div className="font-mono text-[9px] text-muted leading-tight">não entra na comparação: falta de rótulo não é característica da peça</div>
+                            )}
                           </td>
                           <td className="px-3 py-2 text-right font-mono tabular-nums text-on-surface">{num(l.views_mediana)}</td>
                           <td className="px-3 py-2 text-right font-mono tabular-nums text-muted">{num(l.views_p90)}</td>
