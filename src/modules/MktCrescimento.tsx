@@ -120,11 +120,30 @@ export default function MktCrescimento() {
   const [fConteudo, setFConteudo] = useState('');
   const [metrica, setMetrica] = useState<MetricaK>('seguidores');
 
+  // A API corta QUALQUER resposta em 1.000 linhas, por mais que o `.limit()` peça mais. Medido em
+  // 19/11/2026: são 1.130 publicações, e as 130 mais antigas nunca chegavam à tela. Isso envenenava
+  // tudo que esta tela conta no recorte 'tudo' — e, no conserto de hoje, fazia 99 peças perderem a
+  // data de publicação e entrarem no recorte de 30 dias pela primeira leitura: **15.264 views a
+  // mais**, que foi a diferença entre o que a tela mostrou e o que o banco diz. Teto silencioso é pior
+  // que erro: a tela continua bonita e o número fica errado.
+  async function todasAsPublicacoes(): Promise<Pub[]> {
+    const todas: Pub[] = [];
+    for (let de = 0; de < 20000; de += 1000) {
+      const { data } = await supabase.schema('mkt').from('publications')
+        .select('id, brand_id, platform, url, published_at, metadata')
+        .order('published_at', { ascending: false }).range(de, de + 999);
+      const lote = (data ?? []) as Pub[];
+      todas.push(...lote);
+      if (lote.length < 1000) break;
+    }
+    return todas;
+  }
+
   async function load() {
     setLoading(true);
     const [b, p, cp, ad, pd, ld, bd, lp, be, { data: cad }, { data: fs }, { data: ac }, cr, { data: cfu }, { data: nv }, { data: ldia }] = await Promise.all([
       supabase.schema('mkt').from('brands').select('id, code, name, accent_hex, logo_url').order('name'),
-      supabase.schema('mkt').from('publications').select('id, brand_id, platform, url, published_at, metadata').order('published_at', { ascending: false }).limit(2000),
+      todasAsPublicacoes(),
       supabase.schema('mkt').from('content_performance').select('publication_id, brand_id, gatilho, formato, engajamento, alcance, salvamentos, compartilhamentos, views'),
       supabase.schema('mkt').from('audiencia_diaria').select('brand_id, platform, seguidores, dia').order('dia'),
       espelhoMotores.pulsoDias(),
@@ -142,7 +161,7 @@ export default function MktCrescimento() {
         .select('origem, marca, conta, rede, tipo, peca_ref, data, views').limit(5000),
     ]);
     setBrands((b.data ?? []) as Brand[]);
-    setPubs((p.data ?? []) as Pub[]);
+    setPubs(p);
     setPerf((cp.data ?? []) as Perf[]);
     setAud((ad.data ?? []) as Aud[]);
     setPulsoDias(pd); setLimeDias(ld); setBlogDias(bd); setLimePub(lp); setBlogsEsp(be);
