@@ -2,6 +2,32 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-18 (21h45) — As histórias dos Bastidores ganham ordem na série e relevância (262)
+
+Pedido do Geral repassando o dono (21h23): cada app alimenta o Cockpit com datas e relevância, o Cockpit controla a
+sequência, o Cortes sobe ao banco. Desenho em `Cockpit/bastidores/PONTE-das-historias-2026-11-18.md`.
+
+- **`cortes.historias` ganha `ordem`** (inteiro, pode ser nulo, **único mas `deferrable`**) **e `relevancia`**
+  (`alta`, `media`, `baixa` ou vazio, com `check`). A view de contrato expõe as duas.
+- **`ordem` é "ausente mantém, nulo explícito apaga"**, como o `saiu_em` da 242 — e o motivo é concreto: a ordem
+  **não mora no arquivo da história**, quem numera e trava é o Geral. O motor do Cortes manda a base inteira a cada
+  rodada; se "sem ordem no corpo" apagasse a coluna, a primeira rodada depois da trava zeraria a numeração do Geral
+  **em silêncio**, e a tela mostraria a série sem ordem sem ninguém ligar isso à sincronização.
+- **`relevancia` é o contrário: ausente apaga.** Ela vem do arquivo, e o banco não pode continuar afirmando uma
+  relevância que o arquivo já não diz. As duas colunas são novas no mesmo dia e têm regras opostas **porque a fonte
+  de cada uma é diferente** — a regra segue a fonte, não o gosto.
+- **`relevancia` é normalizada antes de gravar** (`"  Média "` → `media`) e valor fora das três **recusa a
+  gravação**, com a frase que o agente do Cockpit precisa ler. Texto livre em coluna de classificação é pior que
+  coluna vazia: `"Alta "` e `"alta"` viram duas gavetas e o filtro mostra metade dizendo que mostra tudo.
+- **`ordem` única, mas `deferrable initially deferred`:** trocar o 3 pelo 4 na mesma rodada passa pelo estado em que
+  os dois existem, e a conferência fica para o fim da transação. Série com dois números 3 recusa a rodada inteira, e
+  alto — é o defeito que a 261 acabou de consertar; não vale guardá-lo de outra forma.
+- **Cinco sabotagens, todas mordendo:** ausente apagando a ordem, nulo explícito não apagando, relevância aceitando
+  texto livre, ordem repetida passando, e relevância sumindo do arquivo com o banco mantendo a antiga. **Honestidade
+  sobre uma:** a da relevância morre no `check` da coluna, não na prova — são duas guardas, e eu não digo que foi a
+  prova que pegou. O que a prova mostra pelo lado positivo é a normalização e que a recusa do valor inventado vem da
+  função (ela exige a frase, não o código do check).
+
 ## 2026-11-18 (21h25) — O pedido de capítulo guarda a sequência em que o dono escolheu (261)
 
 Dono, canal do Geral, 21h10: *"cuidado que temos que ter storytelling, e para isso a sequencia de ideias tem que vir
