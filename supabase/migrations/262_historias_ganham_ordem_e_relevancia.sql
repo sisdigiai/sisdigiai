@@ -14,6 +14,15 @@
 --    trava zeraria a numeração do Geral **em silêncio** — a tela mostraria a série sem ordem e ninguém saberia
 --    que foi a sincronização. Mandar `"ordem": null` de propósito continua apagando.
 --
+-- 1-b) CORREÇÃO MEDIDA DEPOIS DE APLICAR (18/11, 22h): eu justifiquei a regra de cima dizendo que, sem ela, a
+--    primeira rodada do motor zeraria a numeração do Geral. **Fui ler o motor e isso não acontece.**
+--    `digiai_cortes/motor/historias.py` manda `ordem` SEMPRE, com `null` quando a linha do `SEQUENCIA.md` não está
+--    travada — então "ausente mantém" nunca dispara por ele, e `null` explícito apaga, que é o certo: a ordem
+--    pertence ao `SEQUENCIA.md`, e ordem apagada significa "o Geral destravou", não "a sincronização comeu".
+--    A regra fica, como defesa para QUALQUER outro escritor (uma versão antiga do motor, uma correção à mão, um
+--    segundo motor amanhã), mas o risco que eu descrevi ao Geral era maior do que o medido, e isso está corrigido
+--    por escrito com ele. Afirmei sobre um motor que eu não tinha lido.
+--
 -- 2) `relevancia` é o contrário: vem do arquivo, então ausente APAGA.
 --    Se alguém tira a relevância do arquivo, o banco não pode continuar afirmando uma que já não existe.
 --

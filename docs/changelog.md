@@ -9,10 +9,13 @@ sequência, o Cortes sobe ao banco. Desenho em `Cockpit/bastidores/PONTE-das-his
 
 - **`cortes.historias` ganha `ordem`** (inteiro, pode ser nulo, **único mas `deferrable`**) **e `relevancia`**
   (`alta`, `media`, `baixa` ou vazio, com `check`). A view de contrato expõe as duas.
-- **`ordem` é "ausente mantém, nulo explícito apaga"**, como o `saiu_em` da 242 — e o motivo é concreto: a ordem
-  **não mora no arquivo da história**, quem numera e trava é o Geral. O motor do Cortes manda a base inteira a cada
-  rodada; se "sem ordem no corpo" apagasse a coluna, a primeira rodada depois da trava zeraria a numeração do Geral
-  **em silêncio**, e a tela mostraria a série sem ordem sem ninguém ligar isso à sincronização.
+- **`ordem` é "ausente mantém, nulo explícito apaga"**, como o `saiu_em` da 242, porque a ordem **não mora no
+  arquivo da história**: quem numera e trava é o Geral.
+  **Correção medida às 22h, depois de aplicar:** eu justifiquei a regra dizendo que, sem ela, a primeira rodada do
+  motor zeraria a numeração do Geral em silêncio. **Fui ler o motor e não zera:** `motor/historias.py` manda `ordem`
+  sempre, com `null` quando a linha do `SEQUENCIA.md` não está travada — e aí apagar é o certo, porque a ordem
+  pertence ao `SEQUENCIA.md` e vazio quer dizer "destravado". A regra fica como defesa para qualquer outro escritor,
+  mas **eu afirmei um risco sobre um motor que não tinha lido**, e isso foi corrigido por escrito com o Geral.
 - **`relevancia` é o contrário: ausente apaga.** Ela vem do arquivo, e o banco não pode continuar afirmando uma
   relevância que o arquivo já não diz. As duas colunas são novas no mesmo dia e têm regras opostas **porque a fonte
   de cada uma é diferente** — a regra segue a fonte, não o gosto.
