@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock · Marketing organizado</title>
+<style>
+  :root{
+    --surface:#0d131f; --surface-lowest:#080e1a; --surface-container:#1a202c; --surface-high:#242a36;
+    --surface-highest:#2f3542; --on-surface:#dde2f3; --on-surface-variant:#c7c6cd; --muted:#909097;
+    --outline:#2f3542; --secondary:#adcebd; --on-action:#0a0f1e;
+    --success:#6ee7b7; --warning:#fcd34d; --danger:#fca5a5;
+    --mono:ui-monospace,"Cascadia Mono","Consolas",monospace;
+    --serif:"Iowan Old Style",Georgia,serif;
+    --sans:-apple-system,"Segoe UI",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--surface);color:var(--on-surface);font-family:var(--sans);font-size:14px;line-height:1.45}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 16px 64px}
+  a{color:var(--secondary)}
+  .eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--secondary)}
+  h1{font-family:var(--serif);font-size:26px;margin:4px 0 2px;font-weight:600}
+  .sub{color:var(--muted);font-size:12.5px;max-width:78ch}
+  .aviso{border:1px solid rgba(252,211,77,.35);background:rgba(69,26,3,.5);padding:10px 12px;margin:16px 0 20px;font-size:12.5px;color:var(--on-surface-variant)}
+  .aviso b{color:var(--warning)}
+  .tabs{display:flex;gap:2px;border:1px solid var(--outline);padding:2px;width:fit-content;margin:18px 0 6px;flex-wrap:wrap}
+  .tabs button{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;padding:7px 13px;background:none;border:0;color:var(--muted);cursor:pointer}
+  .tabs button[aria-selected=true]{background:var(--secondary);color:var(--on-action)}
+  .tabs button.novo::after{content:"•";color:var(--warning);margin-left:6px}
+  .nota{font-family:var(--mono);font-size:10px;color:var(--muted);margin:0 0 16px}
+  section[hidden]{display:none}
+  .muda{border-left:2px solid var(--secondary);background:rgba(173,206,189,.06);padding:9px 12px;margin:0 0 16px;font-size:12.5px;color:var(--on-surface-variant)}
+  .muda b{color:var(--on-surface)}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(420px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .card{position:relative;border:1px solid var(--outline);background:var(--surface-container)}
+  .card>.hd{display:flex;align-items:center;gap:8px;padding:9px 13px;border-bottom:1px solid rgba(47,53,66,.6);flex-wrap:wrap}
+  .hd .t{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--secondary)}
+  .hd .r{margin-left:auto;font-family:var(--mono);font-size:9.5px;color:var(--muted)}
+  .bd{padding:13px}
+  .br{position:absolute;width:11px;height:11px;top:-1px;left:-1px;border-top:2px solid var(--secondary);border-left:2px solid var(--secondary)}
+  .br.d{left:auto;right:-1px;border-left:0;border-right:2px solid rgba(47,53,66,1)}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--outline);border:1px solid var(--outline)}
+  .kpi{background:var(--surface-container);padding:13px}
+  .kpi .l{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .kpi .v{font-family:var(--serif);font-size:27px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:3px}
+  .kpi .v.ok{color:var(--success)} .kpi .v.at{color:var(--warning)}
+  .kpi .c{font-family:var(--mono);font-size:9.5px;color:var(--muted);margin-top:2px}
+  .faixa{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid rgba(47,53,66,.8);background:var(--surface-lowest)}
+  .faixa>div{padding:8px 4px;text-align:center;border-left:1px solid rgba(47,53,66,.8)}
+  .faixa>div:first-child{border-left:0}
+  .faixa .n{font-family:var(--serif);font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
+  .faixa .l{font-family:var(--mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .ident{display:flex;align-items:flex-start;gap:11px}
+  .sel{width:44px;height:44px;flex:0 0 44px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:13px}
+  .nome{font-family:var(--serif);font-size:16.5px;font-weight:600;line-height:1.2}
+  .obj{font-size:11px;color:var(--muted);margin-top:2px}
+  .chip{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border:1px solid var(--outline);color:var(--muted);white-space:nowrap}
+  .chip.ok{color:var(--success);border-color:rgba(110,231,183,.4);background:rgba(2,44,34,.6)}
+  .chip.at{color:var(--warning);border-color:rgba(252,211,77,.4);background:rgba(69,26,3,.6)}
+  .chip.no{color:var(--danger);border-color:rgba(252,165,165,.4);background:rgba(69,10,10,.6)}
+  .linhas{margin-top:11px;display:flex;flex-direction:column;gap:5px}
+  .linha{font-family:var(--mono);font-size:10.5px;color:var(--on-surface-variant);display:flex;gap:7px}
+  .linha .k{color:var(--muted);min-width:78px}
+  .pe{border-top:1px solid rgba(47,53,66,.6);margin-top:11px;padding-top:8px;font-family:var(--mono);font-size:9.5px;color:var(--muted);line-height:1.5}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-align:right;padding:7px 9px;border-bottom:1px solid rgba(47,53,66,.7)}
+  th:first-child{text-align:left}
+  td{padding:6px 9px;border-bottom:1px solid rgba(47,53,66,.35);text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+  td:first-child{text-align:left;font-family:var(--sans)}
+  tr.fraca td{opacity:.45}
+  .pos{font-family:var(--mono);font-size:9.5px;color:var(--muted);margin-right:7px}
+  .frase{padding:11px 13px;border-bottom:1px solid rgba(47,53,66,.6);font-size:13.5px}
+  .frase b{color:var(--success)}
+  .barra{height:5px;background:var(--surface-highest);position:relative;margin-top:5px}
+  .barra i{position:absolute;inset:0 auto 0 0;background:var(--secondary)}
+  .mini{display:flex;align-items:flex-end;gap:3px;height:42px;margin-top:8px}
+  .mini i{flex:1;background:var(--secondary);opacity:.75;min-height:2px}
+  .mini i.hoje{background:var(--warning);opacity:.9}
+  .fonte-tile{background:var(--surface-container);padding:11px 12px;display:block;text-decoration:none;color:inherit;border:0}
+  .fonte-tile:hover{background:rgba(47,53,66,.45)}
+  .ft-top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+  .ft-nome{font-size:12.5px}
+  .ft-dest{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+  .ft-num{font-family:var(--serif);font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:6px}
+  .ft-uni{font-family:var(--mono);font-size:9.5px;color:var(--muted)}
+  .grupo{display:flex;align-items:center;gap:10px;margin:18px 0 9px}
+  .grupo span:first-child{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--secondary)}
+  .grupo .rule{flex:1;height:1px;background:rgba(47,53,66,.9)}
+  .tilegrid{display:grid;gap:1px;background:var(--outline);border:1px solid var(--outline);grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .fato{display:flex;gap:11px;padding:10px 13px;border-bottom:1px solid rgba(47,53,66,.35);align-items:flex-start}
+  .fato .txt{font-size:12.5px;line-height:1.4}
+  .fato .meta{font-family:var(--mono);font-size:9.5px;color:var(--muted);margin-top:3px}
+  .lock{color:var(--warning)}
+  .lista{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--outline)}
+  .lista div{background:var(--surface-container);display:flex;gap:9px;align-items:center;padding:6px 12px;font-size:12.5px}
+  .lista .q{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--muted)}
+  @media (max-width:760px){.g2,.g3{grid-template-columns:1fr}.lista{grid-template-columns:1fr}.faixa{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Mock de layout · não é a página no ar</div>
+  <h1>Marketing, organizado em cartões</h1>
+  <p class="sub">Proposta de arrumação das seis abas, feita depois do teu recado de 19/11: “muita informação embolada; a aba Marcas e Publicações está bem organizada, levar o padrão das outras 2 com os cards”. O padrão sai daquelas duas e é aplicado em Resultado, Motores, Fatos e Fontes.</p>
+
+  <div class="aviso">
+    <b>Os números aqui são reais</b>, medidos no banco da casa hoje, 19/11/2026, às 11h. Nada foi inventado para a imagem ficar bonita — se um número parece estranho no mock, ele está estranho na vida. O que é só exemplo de layout está dito na própria linha — e, ao conferir, dois números que eu tinha posto de cabeça (seguidores e cliques de SEO) estavam errados: a medição corrigiu os dois.
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-t="resultado" class="novo">Resultado</button>
+    <button role="tab" aria-selected="false" data-t="marcas">Marcas</button>
+    <button role="tab" aria-selected="false" data-t="publicacoes">Publicações</button>
+    <button role="tab" aria-selected="false" data-t="motores" class="novo">Motores</button>
+    <button role="tab" aria-selected="false" data-t="fatos" class="novo">Fatos</button>
+    <button role="tab" aria-selected="false" data-t="fontes" class="novo">Fontes</button>
+  </div>
+  <p class="nota">• = aba redesenhada neste mock · Marcas e Publicações aparecem como estão hoje, porque são a régua</p>
+
+  <!-- ───────────────────────────────────────────────── RESULTADO -->
+  <section id="resultado">
+    <div class="muda">
+      <b>O que muda:</b> eram <b>nove blocos de largura inteira, um embaixo do outro</b> — para ver “o que funciona” era preciso rolar quatro telas. Agora: uma faixa de quatro números de decisão no topo, e tudo o mais em cartões de meia largura, dois por linha. Cada cartão responde uma pergunta e cabe na tela sem rolar. O detalhe fica atrás de “abrir”, não à frente.
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="l">pedidos de rota · 8 semanas</div><div class="v ok">473</div><div class="c">gente pedindo o caminho da loja</div></div>
+      <div class="kpi"><div class="l">ligações · 8 semanas</div><div class="v">32</div><div class="c">o mais perto de dinheiro nesta página</div></div>
+      <div class="kpi"><div class="l">peças publicadas · 7 dias</div><div class="v">165</div><div class="c">esforço, não resultado</div></div>
+      <div class="kpi"><div class="l">interação mediana</div><div class="v at">0</div><div class="c">verdade desconfortável do volume atual</div></div>
+    </div>
+
+    <div class="grid g2" style="margin-top:14px">
+
+      <div class="card"><span class="br"></span><span class="br d"></span>
+        <div class="hd"><span class="t">O que funciona</span><span class="r">instagram · peça de 7 a 90 dias</span></div>
+        <div class="frase">Por tipo, <b>imagem</b> rende <b>3,6×</b> a mediana de <b>vídeo</b> — 18 contra 5 views, base de 237 e 28 peças lidas.</div>
+        <table>
+          <thead><tr><th>tipo</th><th>mediana</th><th>p90</th><th>base</th></tr></thead>
+          <tbody>
+            <tr><td><span class="pos">1º</span>imagem</td><td>18</td><td>33</td><td>237 de 241</td></tr>
+            <tr><td><span class="pos">2º</span>video</td><td>5</td><td>10</td><td>28 de 28</td></tr>
+            <tr class="fraca"><td><span class="pos">—</span>(sem tipo registrado)</td><td>19</td><td>347</td><td>81 de 94</td></tr>
+          </tbody>
+        </table>
+        <div class="pe">o grupo sem rótulo fica na conta e fora da comparação · mediana só sobre a leitura que existe, nunca sobre peça não medida · <a href="#">abrir recorte completo</a> (formato, hora, dia, marca)</div>
+      </div>
+
+      <div class="card"><span class="br"></span><span class="br d"></span>
+        <div class="hd"><span class="t">Resultado de negócio</span><span class="r">ficha do Google · por semana</span></div>
+        <div class="bd">
+          <div class="faixa">
+            <div><div class="n">473</div><div class="l">rotas</div></div>
+            <div><div class="n">32</div><div class="l">ligações</div></div>
+            <div><div class="n">438</div><div class="l">publicou</div></div>
+            <div><div class="n">8</div><div class="l">semanas</div></div>
+          </div>
+          <div class="mini" title="rotas por semana, da mais antiga à atual">
+            <i style="height:84%"></i><i style="height:78%"></i><i style="height:68%"></i><i style="height:50%"></i>
+            <i style="height:73%"></i><i style="height:75%"></i><i style="height:100%"></i><i class="hoje" style="height:9%"></i>
+          </div>
+          <div class="linhas">
+            <div class="linha"><span class="k">última cheia</span><span>09/11 · 88 rotas · 68 peças publicadas</span></div>
+            <div class="linha"><span class="k">correndo</span><span>16/11 · 8 rotas até agora — semana incompleta, em amarelo</span></div>
+          </div>
+          <div class="pe">o Google mede por <b>ficha e por dia</b>, não por post: isto <b>não atribui</b> rota nem ligação a peça nenhuma</div>
+        </div>
+      </div>
+
+      <div class="card"><span class="br"></span><span class="br d"></span>
+        <div class="hd"><span class="t">Hoje sai</span><span class="r">agenda do dia</span></div>
+        <div class="bd">
+          <div class="linhas">
+            <div class="linha"><span class="k">exemplo</span><span>o cartão de hoje continua igual — entra aqui em meia largura</span></div>
+          </div>
+          <div class="pe">exemplo de encaixe: o conteúdo deste cartão é o que já existe hoje, só muda a largura e o lugar</div>
+        </div>
+      </div>
+
+      <div class="card"><span class="br"></span><span class="br d"></span>
+        <div class="hd"><span class="t">Cobertura da leitura</span><span class="r">o tamanho do buraco · placar com o MKT</span></div>
+        <div class="bd">
+          <div class="linhas">
+            <div class="linha"><span class="k">lancaster ig</span><span>229 de 232 lidas · alcance 214 · <b>causa 146</b> · 2ª leitura 15</span></div>
+            <div class="linha"><span class="k">mello ig</span><span>148 de 148 lidas · alcance 143 · causa 138 · 2ª leitura 74</span></div>
+            <div class="linha"><span class="k">facebook</span><span>alcance <b>0 de 207</b> lidas — a Meta não fornece, medido em 17/08</span></div>
+          </div>
+          <div class="pe">“por que funcionou” segue sem resposta enquanto a causa estiver vazia · MKT entrega formato, tema e 2ª leitura até sex 20/11</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="nota" style="margin-top:14px">Abaixo, na mesma arrumação de dois por linha: <b>Estoque por marca</b>, <b>Leituras do período</b> e <b>Resultado do conteúdo</b> — os três cartões que hoje são faixas de largura inteira.</div>
+  </section>
+
+  <!-- ───────────────────────────────────────────────── MARCAS (régua) -->
+  <section id="marcas" hidden>
+    <div class="muda"><b>Esta aba não muda.</b> Ela é a régua: cartão com cantoneira na cor da marca, identidade em cima, faixa de quatro números no meio, linhas curtas embaixo. É este desenho que as outras quatro abas passam a seguir.</div>
+    <div class="grupo"><span>Marcas operadas (9)</span><span class="rule"></span></div>
+    <div class="grid g3">
+
+      <div class="card"><span class="br" style="border-color:#0895A4"></span><span class="br d"></span>
+        <div class="bd">
+          <div class="ident">
+            <div class="sel" style="background:rgba(8,149,164,.18);color:#0895A4">LA</div>
+            <div style="flex:1;min-width:0"><div class="nome">Lancaster</div><div class="obj">autoridade local em Suzano</div></div>
+            <span class="chip ok">33 em 7d</span>
+          </div>
+          <div class="faixa" style="margin-top:12px">
+            <div><div class="n">0</div><div class="l">ideias</div></div>
+            <div><div class="n">0</div><div class="l">roteiros</div></div>
+            <div><div class="n">230</div><div class="l">artes</div></div>
+            <div><div class="n">399</div><div class="l">no ar</div></div>
+          </div>
+          <div class="linhas">
+            <div class="linha"><span class="k">cadência</span><span>seg–sáb · 1 por dia</span></div>
+            <div class="linha"><span class="k">plataformas</span><span>instagram · facebook</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card"><span class="br" style="border-color:#DEA742"></span><span class="br d"></span>
+        <div class="bd">
+          <div class="ident">
+            <div class="sel" style="background:rgba(222,167,66,.18);color:#DEA742">ME</div>
+            <div style="flex:1;min-width:0"><div class="nome">Mello Óticas</div><div class="obj">loja que vende todo dia</div></div>
+            <span class="chip ok">23 em 7d</span>
+          </div>
+          <div class="faixa" style="margin-top:12px">
+            <div><div class="n">0</div><div class="l">ideias</div></div>
+            <div><div class="n">0</div><div class="l">roteiros</div></div>
+            <div><div class="n">204</div><div class="l">artes</div></div>
+            <div><div class="n">266</div><div class="l">no ar</div></div>
+          </div>
+          <div class="linhas">
+            <div class="linha"><span class="k">cadência</span><span>seg–sáb · 1 por dia</span></div>
+            <div class="linha"><span class="k">série</span><span>Transforme Sua Visão (Limelight)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card"><span class="br" style="border-color:#DEA142"></span><span class="br d"></span>
+        <div class="bd">
+          <div class="ident">
+            <div class="sel" style="background:rgba(222,161,66,.18);color:#DEA142">PO</div>
+            <div style="flex:1;min-width:0"><div class="nome">Polá Petit</div><div class="obj">fonte própria, fora do MKT</div></div>
+            <span class="chip">fonte própria</span>
+          </div>
+          <div class="faixa" style="margin-top:12px">
+            <div><div class="n">0</div><div class="l">ideias</div></div>
+            <div><div class="n">0</div><div class="l">roteiros</div></div>
+            <div><div class="n">0</div><div class="l">artes</div></div>
+            <div><div class="n">0</div><div class="l">no ar</div></div>
+          </div>
+          <div class="linhas">
+            <div class="linha"><span class="k">por quê</span><span>zero aqui é “não passa pelo MKT”, não é marca parada</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ───────────────────────────────────────────────── PUBLICAÇÕES (régua) -->
+  <section id="publicacoes" hidden>
+    <div class="muda"><b>Esta aba também não muda.</b> O cartão de decisão vem antes da lista, e a lista é linha curta, duas colunas. Mesma gramática.</div>
+    <div class="card" style="margin-bottom:14px"><span class="br"></span><span class="br d"></span>
+      <div class="hd"><span class="t">Controle por marca</span><span class="r">o que fazer, não o que saiu</span></div>
+      <div class="bd"><div class="linhas"><div class="linha"><span class="k">exemplo</span><span>cartão como está hoje</span></div></div></div>
+    </div>
+    <div class="card"><span class="br"></span><span class="br d"></span>
+      <div class="hd"><span class="t">Publicações recentes</span><span class="r">fonte: v_mkt_publicacoes_recentes</span></div>
+      <div class="lista">
+        <div><span style="width:9px;height:9px;background:#0895A4"></span>Lancaster<span class="q">instagram · 19/11 10:00</span></div>
+        <div><span style="width:9px;height:9px;background:#DEA742"></span>Mello Óticas<span class="q">facebook · 19/11 09:30</span></div>
+        <div><span style="width:9px;height:9px;background:#2D4B3E"></span>Bastidores DIGIAI<span class="q">youtube · 18/11 12:00</span></div>
+        <div><span style="width:9px;height:9px;background:#406863"></span>Ótica Sem Improviso<span class="q">instagram · 18/11 11:00</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────────────────────────────────────────── MOTORES -->
+  <section id="motores" hidden>
+    <div class="muda">
+      <b>O que muda:</b> os quatro cartões existem, mas cada um despeja <b>quatro números soltos e três a quatro parágrafos</b> de ressalva — o do Pulso tem um bloco financeiro inteiro dentro. Agora cada motor é um cartão igual ao de marca: cantoneira na cor, identidade com <b>estado</b> à direita, faixa de quatro números com moldura, duas linhas curtas, e <b>a ressalva numa só linha no pé</b>. O que é detalhe financeiro ganha faixa própria, rotulada.
+    </div>
+    <div class="grid g2">
+
+      <div class="card"><span class="br"></span><span class="br d"></span>
+        <div class="bd">
+          <div class="ident">
+            <div class="sel" style="background:rgba(173,206,189,.18);color:var(--secondary)">MK</div>
+            <div style="flex:1;min-width:0"><div class="nome">DIGIAI MKT</div><div class="obj">publica a casa</div></div>
+            <span class="chip ok">publicou hoje</span>
+          </div>
+          <div class="faixa" style="margin-top:12px">
+            <div><div class="n">165</div><div class="l">peças 7d</div></div>
+            <div><div class="n">1.070</div><div class="l">no ar</div></div>
+            <div><div class="n">646</div><div class="l">artes</div></div>
+            <div><div class="n">460</div><div class="l">fila</div></div>
+          </div>
+          <div class="linhas">
+            <div class="linha"><span class="k">pipeline</span><span>110 ideias · 64 roteiros · 646 artes</span></div>
+            <div class="linha"><span class="k">custo IA mês</span><span>US$ 0,01</span></div>
+          </div>
+          <div class="pe">fila de 460 é fila aberta, não atraso: inclui o que está agendado para dezembro</div>
+        </div>
+      </div>
+
+      <div class="card"><span class="br" style="border-color:var(--warning)"></span><span class="br d"></span>
+        <div class="bd">
+          <div class="ident">
+            <div class="sel" style="background:rgba(252,211,77,.16);color:var(--warning)">CO</div>
+            <div style="flex:1;min-width:0"><div class="nome">DIGIAI Cortes</div><div class="obj">fábrica de cortes</div></div>
+            <span class="chip at">sem custo medido</span>
+          </div>
+          <div class="faixa" style="margin-top:12px">
+            <div><div class="n">2</div><div class="l">episódios</div></div>
+            <div><div class="n">85</div><div class="l">peças</div></div>
+            <div><div class="n">—</div><div class="l">views</div></div>
+            <div><div class="n">—</div><div class="l">custo</div></div>
+          </div>
+          <div class="linhas">
+            <div class="linha"><span class="k">views</span><span>saem no motor que publicou (MKT) — contar aqui seria contar duas vezes</span></div>
+            <div class="linha"><span class="k">custo</span><span>coluna existe desde 18/11 e espera o número · <b>não é custo zero</b></span></div>
+          </div>
+          <div class="pe">traço nesta faixa quer dizer “não medido”; zero medido aparece como 0</div>
+        </div>
+      </div>
+
+      <div class="card"><span class="br" style="border-color:#94a3b8"></span><span class="br d"></span>
+        <div class="bd">
+          <div class="ident">
+            <div class="sel" style="background:rgba(148,163,184,.18);color:#94a3b8">LI</div>
+            <div style="flex:1;min-width:0"><div class="nome">Limelight Studio</div><div class="obj">série da Mello · Transforme Sua Visão</div></div>
+            <span class="chip at">não publicou no período</span>
+          </div>
+          <div class="faixa" style="margin-top:12px">
+            <div><div class="n">12</div><div class="l">episódios</div></div>
+            <div><div class="n">0</div><div class="l">peças 7d</div></div>
+            <div><div class="n">38,4k</div><div class="l">views acervo</div></div>
+            <div><div class="n">3</div><div class="l">na fila</div></div>
+          </div>
+          <div class="linhas">
+            <div class="linha"><span class="k">coleta</span><span>hoje ✓ · roda todo dia</span></div>
+            <div class="linha"><span class="k">exemplo</span><span>números deste cartão são exemplo de encaixe (o espelho vive no banco do Limelight)</span></div>
+          </div>
+          <div class="pe">as views acima são do acervo, não da semana — motor que não publicou aparece com zero mesmo ganhando audiência</div>
+        </div>
+      </div>
+
+      <div class="card"><span class="br" style="border-color:#991b1b"></span><span class="br d"></span>
+        <div class="bd">
+          <div class="ident">
+            <div class="sel" style="background:rgba(153,27,27,.22);color:#fca5a5">PU</div>
+            <div style="flex:1;min-width:0"><div class="nome">Pulso Control</div><div class="obj">canais faceless · esteira automática</div></div>
+            <span class="chip ok">esteira viva</span>
+          </div>
+          <div class="faixa" style="margin-top:12px">
+            <div><div class="n">257</div><div class="l">publicações</div></div>
+            <div><div class="n">436k</div><div class="l">views · leitura 25/08</div></div>
+            <div><div class="n">5</div><div class="l">canais</div></div>
+            <div><div class="n">0</div><div class="l">receita</div></div>
+          </div>
+          <div class="faixa" style="margin-top:9px;grid-template-columns:repeat(3,1fr)">
+            <div><div class="n">R$ 559</div><div class="l">maior dia (12/06)</div></div>
+            <div><div class="n">R$ 11,18</div><div class="l">por vídeo · estimativa jun</div></div>
+            <div><div class="n">179/257</div><div class="l">sem cena paga</div></div>
+          </div>
+          <div class="linhas">
+            <div class="linha"><span class="k">dinheiro</span><span>caixa e crédito consumido <b>nunca somados</b>: somar inflaria o burn ~3,8×</span></div>
+          </div>
+          <div class="pe">os três números da faixa de baixo são os do episódio 2, presos a ele na folha única · nenhum fato do Pulso está fresco e público desde 01/09</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="nota" style="margin-top:14px">Rodapé único da aba, como hoje: “views” não quer dizer o mesmo nos quatro motores · custo por mil views não aparece porque o custo é total e as views são do período.</div>
+  </section>
+
+  <!-- ───────────────────────────────────────────────── FATOS -->
+  <section id="fatos" hidden>
+    <div class="muda">
+      <b>O que muda:</b> era uma lista de 34 linhas iguais, misturando marca, validade e trava. Agora: faixa de estado em cima, <b>agrupado por marca</b>, e a trava aparece como <b>trava</b> — fato preso a um uso tem cadeado e diz a que está preso. Marca sem nenhum fato fresco ganha aviso, porque hoje isso é silêncio invisível.
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="l">fatos ativos</div><div class="v">34</div><div class="c">o que existe na tabela</div></div>
+      <div class="kpi"><div class="l">citáveis hoje</div><div class="v no" style="color:var(--danger)">6</div><div class="c">fresco <b>e</b> público · 3 DIGIAI, 3 OSI</div></div>
+      <div class="kpi"><div class="l">públicos mas vencidos</div><div class="v at">20</div><div class="c">venceram em outubro · a IA silencia</div></div>
+      <div class="kpi"><div class="l">presos a um uso</div><div class="v">6</div><div class="c">entraram hoje, 11h07</div></div>
+    </div>
+
+    <div class="aviso" style="margin:14px 0 0"><b>Medido hoje, e é o estado de verdade:</b> dos 34 fatos, a IA do MKT pode citar <b>6</b>. Vinte estão públicos e <b>vencidos desde outubro</b> (foram verificados em 14–16/09, com 30 dias de validade), seis são os novos do Pulso, presos ao episódio 2, e a Mello não tem nenhum. Não é defeito de tela: é curadoria atrasada, e é minha. Entra na fila como assunto próprio.</div><div class="grupo"><span>PULSO · 8 fatos</span><span class="rule"></span><span class="chip no">0 citáveis · os 6 novos são presos, os 2 antigos venceram em 01/09</span></div>
+    <div class="card">
+      <div class="fato">
+        <span class="chip at">preso</span>
+        <div><div class="txt">Em 12 de junho de 2026, num único dia, o PULSO gastou R$ 559 na ferramenta de vídeo: 2.070 créditos a R$ 0,27 cada. É o gasto bruto do extrato…</div>
+          <div class="meta"><span class="lock">🔒 só no episódio 2 dos Bastidores do Pulso · fora disso, pedir ao dono</span> · verificado 18/11 · vale até 18/11/2027</div></div>
+      </div>
+      <div class="fato">
+        <span class="chip no">trava</span>
+        <div><div class="txt">O “R$ 1.710 num dia” não é dinheiro: era a tela do app contando crédito a R$ 1,00. O valor real é R$ 559.</div>
+          <div class="meta"><span class="lock">🔒 não se diz como dinheiro em lugar nenhum</span> · a IA não recebe este número, por construção</div></div>
+      </div>
+      <div class="fato">
+        <span class="chip no">vencido</span>
+        <div><div class="txt">O canal PULSO acumula 436 mil visualizações em 739 publicações.</div>
+          <div class="meta">venceu em 01/09/2026 · a IA silencia o número · reverificar é do Pulso</div></div>
+      </div>
+    </div>
+
+    <div class="grupo"><span>DIGIAI · 22 fatos</span><span class="rule"></span><span class="chip at">só 3 citáveis · 19 venceram em outubro</span></div>
+    <div class="card">
+      <div class="fato"><span class="chip ok">fresco</span>
+        <div><div class="txt">exemplo de encaixe — os fatos da DIGIAI seguem como hoje, só agrupados e com a validade à direita</div>
+          <div class="meta">verificado 14/09 · vale até 14/10</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────────────────────────────────────────── FONTES -->
+  <section id="fontes" hidden>
+    <div class="muda">
+      <b>O que muda:</b> eram 12 azulejos com gramática diferente cada um — um dizia “530 cliques · 12k impressões”, outro “usos, sessões e leads”, outro nada —, <b>sem acento em metade dos títulos</b> (“publicaveis”, “prospeccao”, “ha 3d”). Agora todos têm a mesma forma: nome, <b>um</b> número grande, a unidade embaixo, o frescor como etiqueta e o destino à direita. E ficam <b>agrupados por família</b>, para a aba virar um índice e não uma parede.
+    </div>
+
+    <div class="grupo"><span>Alcance e audiência</span><span class="rule"></span></div>
+    <div class="tilegrid">
+      <a class="fonte-tile" href="#"><div class="ft-top"><span class="ft-nome">Redes sociais · censo diário</span><span class="ft-dest">Crescimento</span></div><div class="ft-num">2.737</div><div class="ft-uni">seguidores · <span class="chip ok">censo de hoje</span></div></a>
+      <a class="fonte-tile" href="#"><div class="ft-top"><span class="ft-nome">SEO · Search Console</span><span class="ft-dest">SEO</span></div><div class="ft-num">106</div><div class="ft-uni">cliques em 90d · 3 sites · <span class="chip ok">hoje</span></div></a>
+      <a class="fonte-tile" href="#"><div class="ft-top"><span class="ft-nome">Blogs regionais</span><span class="ft-dest">acima</span></div><div class="ft-num">—</div><div class="ft-uni">não consultado neste mock · <span class="chip">a conferir</span></div></a>
+    </div>
+
+    <div class="grupo"><span>Motores de conteúdo</span><span class="rule"></span></div>
+    <div class="tilegrid">
+      <a class="fonte-tile" href="#"><div class="ft-top"><span class="ft-nome">Fila do motor MKT</span><span class="ft-dest">DIGIAI MKT ↗</span></div><div class="ft-num" style="color:var(--danger)">42</div><div class="ft-uni">atrasados · <b style="color:var(--danger)">4 com erro</b></div></a>
+      <a class="fonte-tile" href="#"><div class="ft-top"><span class="ft-nome">Pulso · canais faceless</span><span class="ft-dest">Motores</span></div><div class="ft-num">436k</div><div class="ft-uni">views · 257 peças · <span class="chip at">leitura de 25/08</span></div></a>
+      <a class="fonte-tile" href="#"><div class="ft-top"><span class="ft-nome">Limelight · fábrica Mello</span><span class="ft-dest">Motores</span></div><div class="ft-num">38,4k</div><div class="ft-uni">views · 12 episódios · <span class="chip">exemplo de encaixe</span></div></a>
+    </div>
+
+    <div class="grupo"><span>Dinheiro e funil</span><span class="rule"></span></div>
+    <div class="tilegrid">
+      <a class="fonte-tile" href="#"><div class="ft-top"><span class="ft-nome">Vendas · Hotmart, Kiwify, MP</span><span class="ft-dest">Vendas</span></div><div class="ft-num" style="color:var(--danger)">0</div><div class="ft-uni">vendas em 30 dias · <span class="chip no">parado</span></div></a>
+      <a class="fonte-tile" href="#"><div class="ft-top"><span class="ft-nome">OSI · funil e prospecção</span><span class="ft-dest">OSI</span></div><div class="ft-num">408</div><div class="ft-uni">disparos em 30d · 1 lead · <span class="chip ok">hoje</span></div></a>
+      <a class="fonte-tile" href="#"><div class="ft-top"><span class="ft-nome">Clearix Calc · isca</span><span class="ft-dest">Calc</span></div><div class="ft-num">—</div><div class="ft-uni">usos, sessões e leads · <span class="chip">não medido</span></div></a>
+    </div>
+
+    <div class="grupo"><span>Travas e placar</span><span class="rule"></span></div>
+    <div class="tilegrid">
+      <a class="fonte-tile" href="#"><div class="ft-top"><span class="ft-nome">Fatos publicáveis · trava por marca</span><span class="ft-dest">aba Fatos</span></div><div class="ft-num">12<span style="font-size:12px;color:var(--muted)">/34</span></div><div class="ft-uni">frescos · 6 presos a um uso</div></a>
+      <a class="fonte-tile" href="#"><div class="ft-top"><span class="ft-nome">Cobertura da leitura</span><span class="ft-dest">Resultado</span></div><div class="ft-num">749</div><div class="ft-uni">peças lidas de 797 · <span class="chip ok">hoje</span></div></a>
+      <a class="fonte-tile" href="#"><div class="ft-top"><span class="ft-nome">Scorecard da semana</span><span class="ft-dest">Semana</span></div><div class="ft-num">—</div><div class="ft-uni">metas e preenchimento · <span class="chip">não medido</span></div></a>
+      <a class="fonte-tile" href="#"><div class="ft-top"><span class="ft-nome">Uso vivo Clearix · prova interna</span><span class="ft-dest">Central Clearix</span></div><div class="ft-num">↗</div><div class="ft-uni">lido lá, com o login dela</div></a>
+    </div>
+
+    <p class="nota" style="margin-top:16px">Regra da aba: <b>um número por azulejo</b>. Fonte sem medição mostra traço e a etiqueta “não medido” — nunca zero, porque zero é uma medição e traço é a falta dela.</p>
+  </section>
+
+  <p class="nota" style="margin-top:28px">Mock estático · <b>D:\projetos\digiai\docs\mocks\marketing-espelho-2026-11-19.html</b> · nada aqui está no ar; a implementação só começa com o teu “pode”.</p>
+</div>
+
+<script>
+  const bts = [...document.querySelectorAll('.tabs button')];
+  const secs = ['resultado','marcas','publicacoes','motores','fatos','fontes'];
+  bts.forEach(b => b.addEventListener('click', () => {
+    bts.forEach(x => x.setAttribute('aria-selected', String(x === b)));
+    secs.forEach(s => { document.getElementById(s).hidden = (s !== b.dataset.t); });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }));
+</script>
+</body>
+</html>
