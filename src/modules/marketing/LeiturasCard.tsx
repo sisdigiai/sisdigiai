@@ -3,6 +3,7 @@ import { Eye, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { type Periodo } from './Central';
 import { ultimaLeituraPorPeca, somarCampo, pecasMedidas } from '../../lib/leituraPorPeca';
+import { lerTudo } from '../../lib/paginar';
 import { espelhoMotoresEstado, type PulsoDia, type PulsoLongoDia, type LimePubDia, type BlogDia, type EstadoEspelho } from '../../lib/espelhoMotores';
 
 // Leituras do conteúdo — ordem do dono em 17/11/2026: "já temos os analytics do cortes do pulso no
@@ -65,14 +66,14 @@ export default function LeiturasCard({ periodo }: { periodo: Periodo }) {
   useEffect(() => {
     setLinhas(null);
     const corte = periodo === 'tudo' ? null : diaBRT(new Date(Date.now() - Number(periodo) * 86400000));
-    let q = supabase.from('v_mkt_analytics_peca_dia')
-      .select('origem, marca, conta, rede, tipo, peca_ref, data, views, curtidas, comentarios, compartilhamentos, retencao_media_pct');
-    if (corte) q = q.gte('data', corte);
-    q.then(({ data, error }) => {
-      if (error) { setErro(error.message); setLinhas([]); return; }
-      setErro(null);
-      setLinhas((data ?? []) as Linha[]);
-    });
+    // Em páginas de mil: a API corta a resposta nas primeiras mil linhas e devolve isso como sucesso.
+    // Hoje são 921 leituras e a conta ainda fecha; na semana que vier, não fecharia — e ninguém veria.
+    lerTudo<Linha>((de, ate) => {
+      let q = supabase.from('v_mkt_analytics_peca_dia')
+        .select('origem, marca, conta, rede, tipo, peca_ref, data, views, curtidas, comentarios, compartilhamentos, retencao_media_pct');
+      if (corte) q = q.gte('data', corte);
+      return q.order('data').range(de, ate);
+    }).then((l) => { setErro(null); setLinhas(l); });
   }, [periodo]);
 
   useEffect(() => {

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Radio } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { lerTudo } from '../../lib/paginar';
+import { ultimaLeituraPorPeca, somarCampo, type LeituraDeDia } from '../../lib/leituraPorPeca';
 import {
   espelhoMotoresEstado,
   type PulsoDia, type PulsoLongoDia, type LimePubDia, type EstadoEspelho,
@@ -128,11 +130,15 @@ export default function MotoresDeConteudo({ periodo, limelight, pulso, espMkt, h
     const corte = dias ? diaBRT(new Date(Date.now() - dias * 86400000)) : '0000-01-01';
     // Peças do período, da MESMA fonte para todos: a Lousa. Antes o MKT vinha da analytics por dia de
     // MEDIÇÃO e dava 222 contra as 150 da cadeia, na mesma página.
-    supabase.from('v_lousa').select('origem').eq('estado', 'publicado')
-      .gte('quando', `${corte}T00:00:00-03:00`).limit(5000)
-      .then(({ data }) => setPecas((data ?? []) as never));
-    supabase.from('v_mkt_analytics_peca_dia').select('views').gte('data', corte).limit(5000)
-      .then(({ data }) => setViewsMkt((data ?? []).reduce((a: number, x: { views: number | null }) => a + Number(x.views ?? 0), 0)));
+    lerTudo<{ origem: string }>((de, ate) => supabase.from('v_lousa').select('origem')
+      .eq('estado', 'publicado').gte('quando', `${corte}T00:00:00-03:00`).order('quando').range(de, ate))
+      .then((l) => setPecas(l as never));
+    // Views do MKT: ÚLTIMA leitura de cada peça, não a soma das leituras diárias — `leitura_dia`
+    // guarda acumulado (19/11/2026: somar tudo dava 48.204 contra 45.885 reais). Em páginas de mil,
+    // porque a API corta qualquer resposta aí e devolve isso como sucesso.
+    lerTudo<LeituraDeDia>((de, ate) => supabase.from('v_mkt_analytics_peca_dia')
+      .select('origem, conta, rede, peca_ref, data, views').gte('data', corte).order('data').range(de, ate))
+      .then((l) => setViewsMkt(somarCampo(ultimaLeituraPorPeca(l), 'views')));
     supabase.from('v_cortes_pecas').select('id').then(({ data: pecas }) => {
       supabase.from('v_cortes_episodios').select('custo_brl').then(({ data: eps }) => {
         const medidos = (eps ?? []).filter((e: { custo_brl: number | null }) => e.custo_brl != null);
