@@ -2,6 +2,65 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-18 (22h30) — O espelho do marketing passa a dizer o que funciona (263, 264)
+
+Dono, 18/11: *"precisamos melhorar o espelho do marketing… nossos resultados estão complexos e misturados, temos
+postagens, porém nada de dados sérios para tomada de decisão, mostra o que saiu e bem pouco o que funciona, onde
+melhorar isso?"*; apresentei seis pontos medidos e ele respondeu *"de 1 a 6 todos"* e *"já chama quem for te ajudar"*.
+
+**O diagnóstico, medido antes de escrever uma linha de tela:** a tela mostrava o que saiu porque o que saiu era o
+único dado inteiro. Havia **770 peças com resultado próprio desde 16/07**, e a view que a tela lia entregava **só
+`engajamento`** — a coluna com menos dado (290 de 770 com valor). `views` (562) e `alcance` (469) estavam coletados e
+invisíveis desde julho. E a tela calculava **média**, com uma peça de 11.333 views no meio de medianas de 14.
+
+- **`v_mkt_resultado_peca`** (263): uma linha por peça publicada, das **duas** fontes — a coleta do MKT (instagram e
+  facebook) e a leitura diária do Pulso e do Cortes (que cobre **também tiktok e youtube**, e é a única com
+  retenção). Uma view de uma fonte só deixaria metade das redes fora.
+- **Nulo deixou de ser zero, e eu mesmo tinha misturado os dois na primeira leitura.** Medido: no Facebook o
+  `alcance` é nulo nas 239 peças (a Meta não fornece — o MKT testou em 17/08 na v23) e `views` tem 39 nulos contra
+  **118 zeros medidos**. Agora cada métrica tem três estados na tela: não coletado, medido zero, medido com valor.
+- **`engajamento` nunca é nulo nas 770 peças** — coletor que sempre escreve número nunca admite falha. Medido: em
+  **287** peças o zero é confiável (a peça foi lida por outra métrica) e em **71** não há prova. A coluna
+  `engajamento_confiavel` carrega a diferença, e a mediana só usa as confiáveis.
+- **`v_mkt_resultado_recorte`** (263, refeita na 264): o que funciona por marca, rede, tipo, tema, formato, faixa de
+  hora e dia da semana, **em dois níveis** — dentro de uma rede e todas juntas. A 263 saiu com um nível só e a
+  leitura veio misturada: a faixa "12h–15h" somava Instagram, Facebook, TikTok e YouTube na mesma mediana. View de
+  TikTok não é view de Instagram, e entregar isso repetiria a queixa que abriu o trabalho.
+- **Duas recusas escritas na view:** só peça com **7 a 90 dias** de vida (peça de ontem não performou, peça de julho
+  acumulou meses) e mediana **só sobre a métrica não nula**, nunca `coalesce(metrica, 0)` — foi o coalesce que me deu
+  mediana 12 na primeira passada e quase me fez concluir que nada funciona. Grupo com menos de 4 leituras não recebe
+  posição.
+- **`v_mkt_cobertura_leitura`** (263): quantas peças têm leitura, alcance, causa e segunda leitura, por marca e rede.
+  Serve ao dono para saber o tamanho do buraco e ao MKT e a mim para medirmos o avanço da coleta sem conversar.
+- **`v_mkt_negocio_semana`** (263): o painel do Google por semana — **530 pedidos de rota e 40 ligações desde
+  22/09**, que é o número mais perto de dinheiro desta página e não estava na tela. Com o aviso de que o Google mede
+  por **ficha e por dia, não por post**: não atribui rota a peça nenhuma.
+- **Dez sabotagens nas duas migrations, todas mordendo**, e uma delas foi a minha própria guarda: a prova da leitura
+  cumulativa escolheu uma peça em que soma e último valor dão o mesmo número, e abortou dizendo "a prova é cega".
+- **O portão de marca não é provável por esta porta, e eu digo isso em vez de dizer que provei.**
+  `mkt.contexto_privilegiado()` olha **`session_user`**, e a API de gestão entra como `postgres`; `set role` muda o
+  `current_user`, não o `session_user`. A primeira versão da prova afirmava "logado sem marca lê zero" e **falhou com
+  792** — não era a view aberta, era a prova impossível. Tentei `set session authorization` e levei permissão negada.
+- **O que só apareceu ao abrir a tela:** a frase de destaque anunciou *"(sem tipo registrado) rende 3,6× a mediana de
+  vídeo"*. O grupo sem rótulo tinha ganhado o ranking. Ele continua na tabela — a peça não pode sair da conta — mas
+  sem posição e sem entrar na frase. Com ele fora, a leitura verdadeira é **imagem 18 contra vídeo 5 no Instagram**.
+
+**As primeiras respostas honestas da tela** (Instagram, peças de 7 a 90 dias): **imagem rende 3,6× o vídeo** (mediana
+18 contra 5); **story 22, png 9, jpg 7, mp4 5**; e a faixa de hora mais usada, **09h–12h com 106 peças, rende 14**,
+contra **20 das 12h–15h**. A interação mediana é **0** em quase todo grupo — é a verdade desconfortável do volume
+atual, e por isso rota e ligação estão na tela acima das views.
+
+- **265, achada na tela depois de publicar:** toda semana do resultado de negócio aparecia como "incompleta",
+  inclusive as cheias. A conta comparava `count(distinct dia)` com `7 × fichas` — a Mello tem quatro fichas, então
+  pedia 28 dias numa semana de 7. **E a prova da 263 passou cega:** ela só verificava "semana completa mentindo
+  sobre estar completa", e com nada nunca completo não havia o que mentir. A prova nova exige as duas coisas ao
+  mesmo tempo — ao menos uma semana passada completa **e** ao menos uma incompleta (a corrente) — mais o rótulo
+  batendo linha a linha com a contagem. Agora só a semana que ainda está correndo aparece incompleta.
+
+**Com o MKT** (chamado no mesmo turno, por ordem do dono): ele confirmou o limite da Meta no alcance, vai copiar
+formato e tema do asset na coleta e rodar a segunda leitura diária às 6h30 até **sex 20/11**; o gancho entra quando a
+fábrica passar a escrevê-lo no job. As views zero do Facebook ele ainda não dá por provadas como limite de API.
+
 ## 2026-11-18 (21h45) — As histórias dos Bastidores ganham ordem na série e relevância (262)
 
 Pedido do Geral repassando o dono (21h23): cada app alimenta o Cockpit com datas e relevância, o Cockpit controla a
