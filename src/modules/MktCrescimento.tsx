@@ -6,6 +6,7 @@ import OsiDiasCard from '../components/OsiDiasCard';
 import MapaCobertura from '../components/MapaCobertura';
 import PageHeader from '../components/PageHeader';
 import { espelhoMotores, type PulsoDia, type LimelightDia, type LimePubDia, type BlogDia, type EspelhoBlogs } from '../lib/espelhoMotores';
+import { ultimaLeituraPorPeca, somarCampo, pecasMedidas } from '../lib/leituraPorPeca';
 
 // RADAR 360 (2026-08-25) — o analytics social completo do grupo, aprovado em mock.
 // Decisão do dono: TODAS as redes, canais e marcas presentes na estrutura desde já;
@@ -35,6 +36,8 @@ type Fila = { atrasados: number; com_erro: number; ultima_publicacao: string | n
 type Conta = { brand_name: string | null; platform: string; handle: string | null; status: string | null };
 type Cred = { platform: string; marca: string | null; status: string | null; expires_at: string | null };
 type CalcFunil = { dia: string; usos: number; sessoes: number; leads: number };
+type Leitura = { origem: string; marca: string | null; conta: string | null; rede: string;
+  tipo: string; peca_ref: string; data: string; views: number | null };
 
 const ABAS = [
   { k: 'visao', label: 'Visão', Icon: Eye },
@@ -106,6 +109,7 @@ export default function MktCrescimento() {
   const [regua, setRegua] = useState<Nivel[]>([]);
   const [creds, setCreds] = useState<Cred[]>([]);
   const [calcDias, setCalcDias] = useState<CalcFunil[]>([]);
+  const [leituras, setLeituras] = useState<Leitura[]>([]);
   const [loading, setLoading] = useState(true);
   const [sincronizando, setSincronizando] = useState(false);
   const [fMarca, setFMarca] = useState('');
@@ -118,7 +122,7 @@ export default function MktCrescimento() {
 
   async function load() {
     setLoading(true);
-    const [b, p, cp, ad, pd, ld, bd, lp, be, { data: cad }, { data: fs }, { data: ac }, cr, { data: cfu }, { data: nv }] = await Promise.all([
+    const [b, p, cp, ad, pd, ld, bd, lp, be, { data: cad }, { data: fs }, { data: ac }, cr, { data: cfu }, { data: nv }, { data: ldia }] = await Promise.all([
       supabase.schema('mkt').from('brands').select('id, code, name, accent_hex, logo_url').order('name'),
       supabase.schema('mkt').from('publications').select('id, brand_id, platform, url, published_at, metadata').order('published_at', { ascending: false }).limit(2000),
       supabase.schema('mkt').from('content_performance').select('publication_id, brand_id, gatilho, formato, engajamento, alcance, salvamentos, compartilhamentos, views'),
@@ -134,6 +138,8 @@ export default function MktCrescimento() {
       supabase.from('v_mkt_credenciais_saude').select('platform, marca, status, expires_at'),
       supabase.from('v_mkt_calc_funil').select('dia, usos, sessoes, leads').limit(400),
       supabase.from('v_mkt_nivel_crescimento').select('*'),
+      supabase.from('v_mkt_analytics_peca_dia')
+        .select('origem, marca, conta, rede, tipo, peca_ref, data, views').limit(5000),
     ]);
     setBrands((b.data ?? []) as Brand[]);
     setPubs((p.data ?? []) as Pub[]);
@@ -146,6 +152,7 @@ export default function MktCrescimento() {
     setCreds(((cr.data ?? []) as Cred[]));
     setCalcDias((cfu ?? []) as CalcFunil[]);
     setRegua((nv ?? []) as Nivel[]);
+    setLeituras((ldia ?? []) as Leitura[]);
     setLoading(false);
   }
   useEffect(() => { load(); }, []);
@@ -180,6 +187,75 @@ export default function MktCrescimento() {
     return m.excluido_em == null && m.teste_de_conexao !== true;
   }), [pubs]);
 
+  // ---- VIEWS DAS PEÇAS DA CASA: fonte trocada em 19/11/2026 ----
+  //
+  // O dono somou marca a marca e não bateu, e o Geral mediu o porquê. Esta tela lia só
+  // `mkt.content_performance`, que **não tem view de TikTok nem de YouTube**: medido hoje, Instagram
+  // 31.457 e Facebook 13.272 — TikTok 0, YouTube 0. Por isso o Bastidores aparecia com 46 views (que
+  // é a soma do Instagram das duas marcas dele) quando as peças tinham **1.069 no TikTok**: 759 em
+  // cortes.da.digiai e 310 em bastidores.digiai. A tela não errava a conta — lia a fonte que não tem
+  // o número. Total das postagens: **44.729 → 45.885**.
+  //
+  // A leitura por peça vive na `v_mkt_analytics_peca_dia`, a mesma que o Espelho do marketing usa, e a
+  // consolidação (última leitura de cada peça, porque `leitura_dia` guarda acumulado) mora em
+  // lib/leituraPorPeca.ts — um lugar só, para as duas telas não divergirem.
+  //
+  // A DATA DA PEÇA, e por que não é a da leitura: o recorte aqui é por data de PUBLICAÇÃO. Quando a
+  // peça casa com uma publicação — o `peca_ref` é o id dela, ou o `corte_peca_id` do metadata — vale
+  // a data de publicação. Quando não casa (corte que saiu em conta do Pulso, sem registro aqui: 14 de
+  // 43 em 19/11), vale a PRIMEIRA leitura dela. É aproximação, não medição, e está escrita no pé.
+  //
+  // Publicação apagada da rede continua fora, como no resto da tela.
+  const pubPorPeca = useMemo(() => {
+    const m = new Map<string, { publicada_em: string; apagada: boolean }>();
+    for (const p of pubs) {
+      const meta = (p.metadata ?? {}) as Record<string, unknown>;
+      const reg = { publicada_em: p.published_at, apagada: meta.excluido_em != null || meta.teste_de_conexao === true };
+      m.set(p.id, reg);
+      const corte = typeof meta.corte_peca_id === 'string' ? meta.corte_peca_id : '';
+      if (corte) m.set(corte, reg);
+    }
+    return m;
+  }, [pubs]);
+  const pecasLidas = useMemo(() => ultimaLeituraPorPeca(leituras), [leituras]);
+  const pecasF = useMemo(() => pecasLidas.filter((pc) => {
+    const pub = pubPorPeca.get(pc.peca_ref);
+    if (pub?.apagada) return false;
+    const dia = (pub?.publicada_em ?? pc.primeira_data).slice(0, 10);
+    return dia >= corteDia && dia <= fimDia && (!fMarca || pc.marca === fMarca) && (!fRede || pc.rede === fRede);
+  }), [pecasLidas, pubPorPeca, corteDia, fimDia, fMarca, fRede]);
+  const viewsCasa = useMemo(() => somarCampo(pecasF, 'views'), [pecasF]);
+  const pecasComViews = useMemo(() => pecasMedidas(pecasF, 'views'), [pecasF]);
+  const viewsCasaPorRede = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const pc of pecasF) if (pc.views != null) m.set(pc.rede, (m.get(pc.rede) ?? 0) + pc.views);
+    return m;
+  }, [pecasF]);
+  // Views por publicação para a lista do Conteúdo: só quando o par (peça, rede) tem UMA peça. O mesmo
+  // corte sai em várias contas e a publicação aqui não guarda a conta da leitura — repartir seria
+  // inventar. Sem casamento único, a linha segue com o que a `content_performance` tiver.
+  const viewsPorPecaRede = useMemo(() => {
+    const m = new Map<string, { views: number; n: number }>();
+    for (const pc of pecasF) {
+      if (pc.views == null) continue;
+      const k = `${pc.peca_ref}|${pc.rede}`;
+      const a = m.get(k) ?? { views: 0, n: 0 };
+      a.views += pc.views; a.n += 1;
+      m.set(k, a);
+    }
+    return m;
+  }, [pecasF]);
+  const viewsDaPub = (pub: Pub) => {
+    const meta = (pub.metadata ?? {}) as Record<string, unknown>;
+    const corte = typeof meta.corte_peca_id === 'string' ? meta.corte_peca_id : '';
+    for (const ref of [pub.id, corte]) {
+      if (!ref) continue;
+      const a = viewsPorPecaRede.get(`${ref}|${pub.platform}`);
+      if (a && a.n === 1) return a.views;
+    }
+    return null;
+  };
+
   const pubsF = useMemo(() => pubsVivas.filter((p) =>
     p.published_at >= corteISO && p.published_at <= fimISO &&
     (!fMarca || brandOf(p.brand_id)?.code === fMarca) &&
@@ -194,8 +270,6 @@ export default function MktCrescimento() {
   const savesTotal = medidos.reduce((s, l) => s + (l.m!.salvamentos || 0), 0);
   const sharesTotal = medidos.reduce((s, l) => s + (l.m!.compartilhamentos || 0), 0);
   const temAlcance = medidos.some((l) => l.m!.alcance != null);
-  const temViewsPosts = medidos.some((l) => l.m!.views != null);
-  const viewsPosts = medidos.reduce((s2, l) => s2 + (l.m!.views || 0), 0);
   const taxaEng = temAlcance && alcanceTotal > 0 ? (engTotal / alcanceTotal * 100) : null;
   const engMed = medidos.length ? engTotal / medidos.length : 0;
 
@@ -471,9 +545,17 @@ export default function MktCrescimento() {
             // A Visão se ADAPTA à marca: quem tem motor de vídeo mostra views;
             // quem só tem redes mostra posts/engajamento — 0 gigante era falha
             // de desenho (marca sem motor parecia marca morta).
+            //
+            // O NÚMERO GRANDE SOMA, desde 19/11/2026. Antes ele ESCOLHIA: havendo motor, mostrava só
+            // os motores e descartava as views das peças da casa — o dono somou marca a marca e não
+            // bateu, com razão. Em 'todas' faltavam as postagens; na Mello, as 1.212 do MKT ao lado
+            // das 26.502 do Limelight. Somar não duplica, e isso foi medido, não suposto: o espelho do
+            // Pulso lê só as contas dele e a `leitura_dia` só as da DIGIAI (conferido em 17/11, zero
+            // linhas cruzadas). As parcelas ficam escritas embaixo, para a soma ser conferível.
             const temMotor = viewsRecorte > 0;
-            const heroPosts = temViewsPosts ? viewsPosts : engTotal;
-            const heroPostsRotulo = temViewsPosts ? 'views das postagens no período' : 'engajamento nas redes no período';
+            const viewsTotais = viewsRecorte + viewsCasa;
+            const temViews = viewsTotais > 0;
+            const heroPostsRotulo = temViews ? 'views no período (motores + contas da casa)' : 'engajamento nas redes no período';
             // share das redes das marcas: engajamento por plataforma (mkt real do recorte)
             const engPorRede = (() => {
               const m = new Map<string, number>();
@@ -481,18 +563,32 @@ export default function MktCrescimento() {
               return [...m.entries()].sort((a, b) => b[1] - a[1]);
             })();
             const engRedeTot = Math.max(1, engPorRede.reduce((a, [, v]) => a + v, 0));
-            const share = temMotor ? sharePlats : engPorRede;
-            const shTot = temMotor ? shareTot : engRedeTot;
+            // A participação por plataforma soma as mesmas parcelas do número grande. Barra que divide
+            // um total diferente do número de cima é a mesma mentira em outro formato.
+            const shareViews = (() => {
+              const m = new Map<string, number>();
+              for (const [plat, v] of sharePlats) m.set(plat, (m.get(plat) ?? 0) + v);
+              for (const [rede, v] of viewsCasaPorRede) m.set(rede, (m.get(rede) ?? 0) + v);
+              return [...m.entries()].filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+            })();
+            const share = temViews ? shareViews : engPorRede;
+            const shTot = temViews ? Math.max(1, shareViews.reduce((a, [, v]) => a + v, 0)) : engRedeTot;
             return (
             <>
               <Decide texto={<><b>O que se decide aqui:</b> o tamanho real do alcance e da atenção no recorte — e onde estão concentrados.</>} />
               <div className="grid gap-3 mb-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
                 <div className="border border-outline/15 bg-surface-container p-5" style={{ gridColumn: 'span 2' }}>
-                  <div className={lbl}>{temMotor ? 'views no período (motores de vídeo)' : heroPostsRotulo} · {rotuloRecorte}</div>
-                  <div className="font-mono tabular-nums font-semibold text-on-surface" style={{ fontSize: 'clamp(30px,4.5vw,44px)', lineHeight: 1.1 }}>{nf(temMotor ? viewsRecorte : heroPosts)}</div>
+                  <div className={lbl}>{heroPostsRotulo} · {rotuloRecorte}</div>
+                  <div className="font-mono tabular-nums font-semibold text-on-surface" style={{ fontSize: 'clamp(30px,4.5vw,44px)', lineHeight: 1.1 }}>{nf(temViews ? viewsTotais : engTotal)}</div>
                   <div className="text-[12px] text-muted mt-1 mb-3">
-                    {temMotor
-                      ? <>{mostrarPulso && `Pulso ${nf(pulsoTot.views)}`}{mostrarPulso && mostrarLime && ' · '}{mostrarLime && `Limelight ${nf(limeTot.views)}`} · por data de publicação</>
+                    {temViews
+                      ? <>
+                          {mostrarPulso && pulsoTot.views > 0 && <>Pulso {nf(pulsoTot.views)} · </>}
+                          {mostrarLime && limeTot.views > 0 && <>Limelight {nf(limeTot.views)} · </>}
+                          {viewsCasa > 0
+                            ? <>contas da casa {nf(viewsCasa)} ({pecasComViews} de {pecasF.length} peças lidas)</>
+                            : <>contas da casa sem leitura no recorte</>}
+                        </>
                       : <>{linhas.length} publicações · {medidos.length} medidas{fMarca ? ' · esta marca não tem motor de vídeo — o dado dela vive nas redes' : ''}</>}
                   </div>
                   {share.length > 0 ? (
@@ -508,7 +604,7 @@ export default function MktCrescimento() {
                           <span key={p}><span className="inline-block w-2.5 h-2.5 mr-1.5 align-[-1px]" style={{ background: PLAT_COR[p] ?? COR_SEC }} />{platName(p)} {nf(v)}</span>
                         ))}
                       </div>
-                      <div className={lbl + ' mt-2'}>{temMotor ? 'participação de views por plataforma' : 'participação de engajamento por rede'}</div>
+                      <div className={lbl + ' mt-2'}>{temViews ? 'participação de views por plataforma · motores + contas da casa' : 'participação de engajamento por rede'}</div>
                     </>
                   ) : <div className="text-sm text-muted py-3">sem publicações medidas neste recorte — se a marca é nova no censo, a curva nasce com os próximos dias.</div>}
                 </div>
@@ -524,7 +620,8 @@ export default function MktCrescimento() {
                 <Kpi icon={<Newspaper className="w-4 h-4" />} label="posts nas redes" value={nf(linhas.length)} sub={`no recorte · ${medidos.length} medidos`} glow={COR_SEC} />
                 <Kpi icon={<Sparkles className="w-4 h-4" />} label="engajamento redes" value={nf(engTotal)} sub={`média ${nf(Math.round(engMed))}/post`} glow={COR_OK} />
                 <Kpi icon={<Film className="w-4 h-4" />} label="views motores" value={temMotor ? nf(viewsRecorte) : '—'} sub={temMotor ? `${nf(pubsRecorte)} pubs · ${nf(engRecorte)} interações` : fMarca ? 'sem motor nesta marca' : 'sem views no recorte'} glow={COR_WARN} />
-                <Kpi icon={<Eye className="w-4 h-4" />} label="views das postagens" value={temViewsPosts ? nf(viewsPosts) : '—'} sub={temViewsPosts ? `${medidos.filter((l) => l.m!.views != null).length} posts com views` : 'a coletar — despacho no MKT (sync-metricas)'} glow={COR_SEC} />
+                <Kpi icon={<Eye className="w-4 h-4" />} label="views das peças da casa" value={viewsCasa > 0 ? nf(viewsCasa) : '—'}
+                  sub={viewsCasa > 0 ? `${pecasComViews} de ${pecasF.length} peças com leitura · postagens e cortes` : 'a coletar — despacho no MKT (sync-metricas)'} glow={COR_SEC} />
               </section>
             </>
             );
@@ -665,7 +762,7 @@ export default function MktCrescimento() {
                     <span className="w-6 h-6 flex items-center justify-center font-mono text-[9px] uppercase" style={{ background: `color-mix(in srgb, ${accent(p.brand_id)} 13%, transparent)`, color: accent(p.brand_id) }}>{platName(p.platform).slice(0, 2)}</span>
                     <span className="min-w-0 truncate text-on-surface">{brandOf(p.brand_id)?.name ?? '—'} <span className="text-muted text-xs">· {fmtDM(p.published_at)} · {platName(p.platform)}{m?.gatilho ? ' · ' + m.gatilho.slice(0, 22) : ''}</span></span>
                     <span className="text-right font-mono tabular-nums" style={{ color: COR_OK }}>{m ? m.engajamento : '—'}</span>
-                    <span className="hidden sm:block text-right font-mono tabular-nums text-on-surface-variant">{m?.views ?? '—'}</span>
+                    <span className="hidden sm:block text-right font-mono tabular-nums text-on-surface-variant">{viewsDaPub(p) ?? m?.views ?? '—'}</span>
                     <span className="hidden sm:block text-right font-mono tabular-nums text-on-surface-variant">{m?.alcance ?? '—'}</span>
                     {p.url ? <a href={p.url} target="_blank" rel="noreferrer" className="text-muted hover:text-secondary"><ExternalLink className="w-3.5 h-3.5" /></a> : <span />}
                   </div>
@@ -813,7 +910,10 @@ export default function MktCrescimento() {
                 <Health cor={COR_OK} titulo="Limelight" sub="coleta própria da fábrica" />
                 <Health cor={COR_OK} titulo="Blogs" sub={blogsEsp ? `últ. leitura ${blogsEsp.ultima_leitura ? fmtDM(blogsEsp.ultima_leitura) : '—'}` : 'espelho indisponível'} />
                 {fila && <Health cor={fila.atrasados > 50 || fila.com_erro > 0 ? COR_DANGER : COR_OK} titulo="Fila do motor MKT" sub={`${fila.atrasados} atrasados · ${fila.com_erro} com erro`} />}
-                <Health cor={temViewsPosts ? COR_OK : COR_WARN} titulo="Views das postagens" sub={temViewsPosts ? `${medidos.filter((l) => l.m!.views != null).length} posts com views` : 'coluna pronta · coleta a ligar (MKT)'} />
+                <Health cor={pecasComViews > 0 ? COR_OK : COR_WARN} titulo="Views das peças da casa"
+                  sub={pecasComViews > 0
+                    ? `${pecasComViews} de ${pecasF.length} peças com leitura · ${[...viewsCasaPorRede.entries()].sort((a, b) => b[1] - a[1]).map(([r, v]) => `${platName(r)} ${nf(v)}`).join(' · ') || 'sem view'}`
+                    : 'coluna pronta · coleta a ligar (MKT)'} />
                 {credsVencendo.map((c) => (
                   <Health key={c.platform + (c.marca ?? '')} cor={c.dias <= 0 ? COR_DANGER : c.dias <= 3 && c.platform !== 'tiktok' ? COR_WARN : COR_OK}
                     titulo={`OAuth ${platName(c.platform)} · ${c.marca ?? '?'}`}

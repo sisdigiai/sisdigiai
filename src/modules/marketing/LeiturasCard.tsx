@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Eye, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { type Periodo } from './Central';
+import { ultimaLeituraPorPeca, somarCampo, pecasMedidas } from '../../lib/leituraPorPeca';
 import { espelhoMotoresEstado, type PulsoDia, type PulsoLongoDia, type LimePubDia, type BlogDia, type EstadoEspelho } from '../../lib/espelhoMotores';
 
 // Leituras do conteúdo — ordem do dono em 17/11/2026: "já temos os analytics do cortes do pulso no
@@ -84,19 +85,19 @@ export default function LeiturasCard({ periodo }: { periodo: Periodo }) {
   const corte = periodo === 'tudo' ? '0000-01-01' : diaBRT(new Date(Date.now() - Number(periodo) * 86400000));
   const noPeriodo = <T extends { dia: string }>(l: T[]) => l.filter((x) => x.dia >= corte);
 
-  const soma = (l: Linha[], campo: keyof Linha) =>
-    l.reduce((a, x) => a + (typeof x[campo] === 'number' ? (x[campo] as number) : 0), 0);
-
-  // Peça é medida quando ALGUMA leitura dela tem número. Peça sem nenhuma fica contada à parte.
-  const porPeca = new Map<string, Linha[]>();
-  for (const l of linhas ?? []) porPeca.set(l.peca_ref, [...(porPeca.get(l.peca_ref) ?? []), l]);
-  const naoMedidas = [...porPeca.values()].filter((ls) => ls.every((l) => l.views == null));
+  // UMA PEÇA, UMA LEITURA — consertado em 19/11/2026, ao medir os dois defeitos que o dono apontou no
+  // Radar 360. Isto somava TODAS as leituras diárias da mesma peça, e `mkt.leitura_dia` guarda
+  // acumulado, não diferença: a mesma peça lida 95 views e depois 103 entrava como 198. A conta velha
+  // dava 48.204 views contra 45.885 reais — **2.319 a mais, 5%**. A regra agora mora em
+  // lib/leituraPorPeca.ts, para esta tela e o Radar 360 nunca divergirem.
+  const pecas = ultimaLeituraPorPeca(linhas ?? []);
+  const naoMedidas = pecas.filter((p) => p.views == null);
   // Curtida e comentário têm cobertura MUITO menor que view (68 de 647 linhas em 30 dias, medido em
   // 17/11). Somar os nulos como zero faria a tela dizer "8 curtidas em 602 peças", que é um juízo sobre
   // o conteúdo — quando a verdade é que 534 peças nunca tiveram curtida coletada.
-  const comEngajamento = [...porPeca.values()].filter((ls) => ls.some((l) => l.curtidas != null)).length;
+  const comEngajamento = pecasMedidas(pecas, 'curtidas');
 
-  const casaViews = soma(linhas ?? [], 'views');
+  const casaViews = somarCampo(pecas, 'views');
   const pulsoViews = pulso ? noPeriodo(pulso.linhas).reduce((a, x) => a + (x.views ?? 0), 0) : 0;
   const longosViews = longos ? noPeriodo(longos.linhas).reduce((a, x) => a + (x.views ?? 0), 0) : 0;
   const limeViews = lime ? noPeriodo(lime.linhas).reduce((a, x) => a + (x.views ?? 0), 0) : 0;
@@ -113,7 +114,7 @@ export default function LeiturasCard({ periodo }: { periodo: Periodo }) {
 
   const agrupar = (chave: (l: Linha) => string) => {
     const m = new Map<string, { pecas: Set<string>; views: number; medidas: number }>();
-    for (const l of linhas ?? []) {
+    for (const l of pecas) {
       const k = chave(l);
       const a = m.get(k) ?? { pecas: new Set<string>(), views: 0, medidas: 0 };
       a.pecas.add(l.peca_ref);
@@ -155,12 +156,12 @@ export default function LeiturasCard({ periodo }: { periodo: Periodo }) {
           <div className="px-4 py-3 grid grid-cols-2 sm:grid-cols-4 gap-4 border-b border-outline/10">
             <Numero valor={kilo(totalViews)} rotulo="views somadas"
               sub={`${kilo(casaViews)} contas da casa · ${kilo(pulsoViews + longosViews)} Pulso · ${kilo(limeViews)} Limelight`} />
-            <Numero valor={n(porPeca.size)} rotulo="peças nas contas da casa"
+            <Numero valor={n(pecas.length)} rotulo="peças nas contas da casa"
               sub={naoMedidas.length > 0 ? `${naoMedidas.length} sem leitura coletada` : 'todas com leitura'} />
-            <Numero valor={comEngajamento === 0 ? '—' : n(soma(linhas, 'curtidas'))} rotulo="curtidas"
+            <Numero valor={comEngajamento === 0 ? '—' : n(somarCampo(pecas, 'curtidas'))} rotulo="curtidas"
               sub={comEngajamento === 0
                 ? 'nenhuma peça com curtida coletada'
-                : `só ${comEngajamento} de ${porPeca.size} peças medidas · ${n(soma(linhas, 'comentarios'))} coment. · ${n(soma(linhas, 'compartilhamentos'))} compart.`} />
+                : `só ${comEngajamento} de ${pecas.length} peças medidas · ${n(somarCampo(pecas, 'comentarios'))} coment. · ${n(somarCampo(pecas, 'compartilhamentos'))} compart.`} />
             <Numero valor={blogLeituras > 0 ? kilo(blogLeituras) : '—'} rotulo="leituras de blog"
               sub="unidade diferente: não entra nas views" />
           </div>
@@ -174,7 +175,7 @@ export default function LeiturasCard({ periodo }: { periodo: Periodo }) {
             {cego.length > 0 && <> Hoje não consegui ler: <strong className="text-danger">{cego.join(' · ')}</strong> — isso é painel cego, não motor parado.</>}
           </div>
 
-          {porPeca.size === 0 ? (
+          {pecas.length === 0 ? (
             <div className="px-4 py-3 text-sm text-on-surface-variant">Nenhuma leitura coletada neste período.</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-outline/10">

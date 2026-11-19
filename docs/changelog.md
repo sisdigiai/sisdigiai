@@ -2,6 +2,48 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-19 (15h) — O número grande do Radar 360 passa a somar, e as views de TikTok e YouTube aparecem
+
+Dois defeitos apontados pelo dono no canal do MKT e medidos pelo Geral; um terceiro, meu, que apareceu ao
+medir os dois primeiros. Todos na mesma família: **ler metade da fonte e chamar de tudo**.
+
+**1. O número grande escolhia em vez de somar.** Com motor de vídeo no recorte, a Visão mostrava só os
+motores (Pulso + Limelight) e **descartava** as views das peças da casa. O dono somou marca a marca e não
+bateu — com razão: na Mello, as 1.212 views das peças do MKT ficavam fora das 26.502 do Limelight. Agora o
+número soma as parcelas e **escreve cada uma embaixo**, para a soma ser conferível. Somar não duplica, e
+isso foi medido em 17/11, não suposto: o espelho do Pulso lê só as contas dele, a `leitura_dia` só as da
+DIGIAI, zero linhas cruzadas. A barra de participação por plataforma passou a somar as mesmas parcelas —
+barra que divide um total diferente do número de cima é a mesma mentira em outro formato.
+
+**2. A tela lia a fonte que não tem o número.** Ela usava `mkt.content_performance`, que **não tem view de
+TikTok nem de YouTube**: medido hoje, Instagram 31.457 e Facebook 13.272, TikTok **0**, YouTube **0**. Por
+isso o Bastidores aparecia com 46 views — que é a soma do Instagram das duas marcas dele — quando as peças
+tinham **1.069 no TikTok** (759 em `cortes.da.digiai`, 310 em `bastidores.digiai`, exatamente o que o Geral
+mediu). A tela não errava a conta: lia o lugar errado. Fonte trocada para a leitura por peça da
+`v_mkt_analytics_peca_dia`, a mesma do Espelho do marketing. **Antes → depois:** no recorte de 30 dias,
+23.753 → **24.491** views, com TikTok 1.070 e YouTube 80 saindo da invisibilidade; no total, 44.252 →
+45.409. A fonte velha foi **removida**, não mantida ao lado: duas fontes de views na mesma tela é o defeito
+que o dono apontou em 18/11 na tabela de motores.
+
+**3. O defeito que eu mesmo tinha, e ninguém pediu para olhar:** o cartão "Leituras do conteúdo" somava
+**todas as leituras diárias** da mesma peça, e `mkt.leitura_dia` guarda **acumulado, não diferença**.
+Provado no banco: a peça `001b54de` no TikTok tem 95 views em 18/11 e 103 em 19/11; outra tem 12 e depois
+74. São 51 peças com mais de uma leitura. A conta velha dava **48.204** views contra **45.885** reais —
+**2.319 a mais, 5%**, desde 17/11. A regra agora vive num lugar só, `src/lib/leituraPorPeca.ts`, usada pelas
+duas telas: *o valor de uma peça é a leitura mais recente dela*. Campo não medido na última leitura não
+vira zero nem apaga medição boa — vale o valor mais recente que existe.
+
+**A data da peça, e por que não é a da leitura:** o recorte do Radar é por data de **publicação**. Quando a
+peça casa com uma publicação (o `peca_ref` é o id dela, ou o `corte_peca_id` do metadata), vale a data de
+publicação; quando não casa — corte que saiu em conta do Pulso, sem registro aqui: 14 de 43 hoje — vale a
+**primeira** leitura. É aproximação, não medição, e está escrita na tela.
+
+**Dois erros meus apanhados pela própria medição, antes de chegarem ao dono:** (a) ao simular em SQL o que a
+tela mostraria, juntei as peças por `conta` com `join using` e o Postgres descartou toda peça com conta
+nula — 254 peças e 38 mil views "desapareceram", e eu quase fui atrás de um defeito que não existia; o
+código sempre agrupou com `conta ?? ''`. (b) publicação apagada da rede continua fora da conta, como no
+resto da tela: 44 peças e 476 views, que é o motivo de o total "tudo" ser 45.409 e não 45.885.
+
 ## 2026-11-19 (12h05) — O espelho do marketing deixa de ser uma pilha: oito abas no padrão de cartão
 
 Dono, 19/11: *"muita informação embolada… a aba marcas e publicações está bem organizada, temos que
