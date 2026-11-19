@@ -2,6 +2,62 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-19 (20h) — O teto de mil linhas sai do app inteiro, e uma tela já estava mentindo por causa dele
+
+O Geral contou as linhas das duas leituras que sobraram no Radar 360 e avisou **antes** de quebrarem.
+Medi as outras sete do app e achei uma que **já estava cortada no ar**.
+
+**A regra, de novo porque hoje ela mordeu três vezes:** a API corta QUALQUER resposta em 1.000 linhas
+e devolve isso como sucesso. `.limit(5000)` não ajuda, `.limit(3000)` não ajuda; só pedir em páginas.
+
+**Medido em 19/11, 20h12:**
+
+| fonte | linhas | cresce | situação |
+|---|---|---|---|
+| `v_mkt_resultado_peca` | **1.025** | — | **já cortada** |
+| `mkt.publications` | 1.130 | — | já cortada (consertada às 15h) |
+| `mkt.audiencia_diaria` | 951 | **24/dia** | passa de mil em 21–22/11 |
+| `mkt.content_performance` | 946 | ~17/dia | passa de mil em ~23/11 |
+| `v_pontualidade` | 810 | 17/dia | dezembro |
+| `v_marketing_cadeia_dia` | 588 | ~5/dia | longe |
+| `v_lousa` | 1.468 (semana: 636) | — | o aviso de teto estava morto |
+| `v_mkt_resultado_recorte` | 159 | — | longe |
+| `v_vendas_eventos` | 0 | — | vazia, mas é a de vendas |
+
+**O defeito que estava no ar, com antes e depois na tela:** o Placar de Decisão — a faixa que ABRE a aba
+Resultado — pedia 3.000 linhas de `v_mkt_resultado_peca` e recebia 1.000. A tela dizia **"base de 717
+peças com leitura confiável"**; a verdade é **742**. A diferença é 25, que é exatamente quanto a view
+tem acima de mil. Depois do conserto a tela diz **742**. A mediana não mudou (1), e isso é sorte, não
+desenho: o número certo estava na tela por coincidência.
+
+**O pior que não aconteceu, porque o Geral contou antes:** `audiencia_diaria` vem em ordem CRESCENTE de
+dia. O corte comeria os dias mais NOVOS. Os seguidores congelariam no último dia que sobrou, o
+`ultimoCenso` ficaria velho, e o aviso "contas sem censo nos últimos 3 dias" passaria a acusar contas
+que estão sendo medidas todo dia. **Erro falso é pior que número errado**: manda consertar o que não
+está quebrado.
+
+**O aviso que nasceu morto, e por que ele saiu:** em 17/11, na Lousa, eu pedi 3.000 linhas "para servir
+de sinal — se a resposta vier exatamente neste tamanho, a tela avisa que pode estar cortada". Não podia
+funcionar nunca: a API corta em 1.000 antes do meu teto, então o tamanho recebido era no máximo mil e a
+comparação com 3.000 nunca era verdadeira. Eu tinha escrito o teto da API no comentário logo abaixo e
+mesmo assim calibrei o aviso acima dele. O aviso saiu; a leitura vai em páginas.
+
+**E um defeito meu dentro do próprio conserto:** a primeira versão do `lerTudo` lia `{ data }` e
+ignorava `{ error }`. Leitura que falhasse devolveria lista vazia, e a tela mostraria "nenhuma peça"
+com cara de medição. Era o mesmo pecado do teto — falha silenciosa com aparência de sucesso — escrito
+dentro do conserto do teto. Agora `lerTudo` levanta o erro, e a Central e o "O que funciona" voltaram a
+mostrar erro na tela em vez de vazio.
+
+**Fora deste conserto, de propósito:** `src/modules/ReceitaEmpresas.tsx` tem `.limit(1000)` exato em
+`v_receita_empresas_resumo` (625 linhas hoje). A página Receita é do Agente de Receita (R-051) —
+avisado, não mexido.
+
+**Verificado no ar** (build `ef1bab7`), em app.digiai.app.br: Placar 717 → **742**; Lousa com as 264
+peças da semana e duas chamadas paginadas (`offset=0&limit=1000`, página curta, para); Radar com
+seguidores 8.983 (+603) e views 152.888 = Pulso 110.191 + Limelight 839 + casa 41.858. Conferi o
+41.858 no banco com a mesma regra da tela: **469 peças, 439 com views, 41.858** — bate ao número. O
+salto desde as 17h (24.495 em 395 peças) é leitura que chegou à noite: 284 linhas datadas de hoje.
+
 ## 2026-11-19 (15h) — O número grande do Radar 360 passa a somar, e as views de TikTok e YouTube aparecem
 
 Dois defeitos apontados pelo dono no canal do MKT e medidos pelo Geral; um terceiro, meu, que apareceu ao
