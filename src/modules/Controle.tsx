@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, Check, CircleHelp, Inbox, Lightbulb, RotateCcw, UserCheck } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { lerTudo } from '../lib/paginar';
 
 // Página Controle (migration 194; pedido do Geral em 09/10, aprovado pelo dono).
 //
@@ -85,12 +86,21 @@ export default function Controle() {
   const [erroAcao, setErroAcao] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.from('v_controle_itens').select('*')
-      .order('nivel').order('ordem_tipo').order('data', { ascending: false }).order('agente')
-      .then(({ data, error }) => {
-        if (error) { setErro(error.message); return; }
-        setItens((data ?? []) as Item[]);
-      });
+    // EM PÁGINAS DE MIL, e aqui não era prevenção: a tela estava cortada. A API devolve no máximo
+    // 1.000 linhas e chama isso de sucesso — mesmo sem `.limit()`, que era o caso aqui. A view tem
+    // **5.106 itens** (medido 19/11/2026, 22h), e a ordem começa pelo nível: chegavam os 245 do
+    // nível 1, 755 dos 839 do nível 2, e **nenhum dos 4.022 do nível 3**. Quatro em cada cinco itens
+    // da página que o dono lê nunca apareciam, e os contadores dos filtros contavam só o que chegou —
+    // o chip "nível 3" mostrava zero e parecia resposta, não ausência.
+    //
+    // Termina em `id` (único, conferido no banco) porque cada página é uma consulta nova: sem ordem
+    // total, linha empatada em (nivel, ordem_tipo, data, agente) pode repetir numa página e sumir na
+    // outra, sem erro nenhum.
+    lerTudo<Item>((de, ate) => supabase.from('v_controle_itens').select('*')
+      .order('nivel').order('ordem_tipo').order('data', { ascending: false }).order('agente').order('id')
+      .range(de, ate))
+      .then(setItens)
+      .catch((e) => setErro(String(e?.message ?? e)));
   }, []);
 
   // A lista de decisões do dono vem de VÁRIOS arquivos (30/09, 01/10, 05/10) e a mesma decisão pode estar em
