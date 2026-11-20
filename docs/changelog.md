@@ -2,6 +2,51 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-20 — O corte entre o Espelho do MKT e o Radar 360, e o rótulo que mentia nos dois
+
+Dono: *"porque temos espelho do MKT e radar 360, qual a diferença?"* — e, depois da medição,
+*"pode fazer o corte agora"*.
+
+**O que a medição achou:** as duas telas leem **três views em comum** (`v_marketing_cadeia`,
+`v_mkt_analytics_peca_dia`, `v_mkt_fila_saude`) e quatro blocos apareciam nas duas.
+
+**O corte que eu propus primeiro estava errado** — mover os totais para o Radar. Isso desfaria ordem
+dele: em **17/11** pediu os analytics TOTAIS no Espelho, e em **18/11** reclamou que o número grande do
+Radar não somava os posts do MKT. Ele quer o total **nas duas**. Disse isso antes de executar, e o
+corte passou a ser por **profundidade**:
+
+- **Espelho do MKT** = o TOTAL e a DECISÃO. Resultado, o que funciona, o dia, o fôlego, as
+  publicações, os fatos, as fontes. Onde se decide o que fazer.
+- **Radar 360** = o DETALHE e a SAÚDE. Marca × rede × conta, seguidores dia a dia, régua,
+  território, saúde da coleta. Onde se descobre DE ONDE o total veio.
+
+**O que saiu:** a aba **Funil** do Radar, duplicação inteira. A cadeia produzir→vender é a mesma
+`v_marketing_cadeia` da Central do Espelho, e o bloco do Clearix Calc era a mesma `v_mkt_calc_funil` da
+página própria do Calc — mesmos quatro números, mesma fonte, **três lugares**. Saíram duas leituras
+do banco e 81 linhas junto.
+
+**O que NÃO era duplicação e ficou:** "Motores" no Espelho é ESTADO e custo de cada motor;
+"Vídeo & motores" no Radar é DESEMPENHO por plataforma. Mesmas marcas, perguntas diferentes.
+
+### E então a tela me desmentiu, dez minutos depois de eu escrever nela
+
+Conferindo o corte no ar: o Espelho mostrava **168k views em 961 peças** nos últimos 30 dias; o Radar,
+**41,8k em 469**, na **mesma janela**. Quatro vezes de diferença, com o mesmo rótulo "contas da casa".
+
+Eu tinha acabado de escrever na tela que, se os números não batessem, era a **janela**. Estava errado,
+e a frase teria mandado o leitor comparar períodos que já estavam iguais. A causa é a **data**:
+
+- **Espelho** filtra `data` da **LEITURA** — peça publicada em julho e lida ontem entra, com todas as
+  views que acumulou;
+- **Radar** filtra `published_at` da **PUBLICAÇÃO** — só o que saiu no período.
+
+As duas contas estão certas e respondem a perguntas diferentes: *"quanto a casa já somou do que foi
+medido agora"* contra *"quanto rendeu o que a casa publicou neste período"*. O que estava errado era o
+rótulo, **igual nos dois lugares**. Agora cada tela diz qual data usa e que a outra usa a outra.
+
+**Verificado no ar** (builds `3435f26` e `7772020`): Radar com 7 abas e o subtítulo novo; Espelho com
+"PEÇAS LIDAS NOS ÚLTIMOS 30 DIAS" e a explicação das duas datas no pé das parcelas.
+
 ## 2026-11-19 (22h) — "Estamos lendo tudo já?" Não: a página Controle mostrava 1.000 de 5.106
 
 Pergunta do dono às 22h. A resposta honesta exigia varrer o que eu **não** tinha coberto: hoje às 20h
