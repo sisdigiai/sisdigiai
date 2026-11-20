@@ -141,7 +141,7 @@ export default function LeiturasCard({ periodo }: { periodo: Periodo }) {
         <span className="text-sm font-semibold text-on-surface">Leituras do conteúdo</span>
         <span className="font-mono text-[10px] text-muted">todas as fontes que hoje se podem somar</span>
         <span className="ml-auto font-mono text-[9px] uppercase tracking-wider text-muted">
-          {periodo === 'tudo' ? 'desde o início' : `últimos ${periodo} dias`}
+          {periodo === 'tudo' ? 'tudo que já foi lido' : `peças LIDAS nos últimos ${periodo} dias`}
         </span>
       </div>
 
@@ -173,10 +173,11 @@ export default function LeiturasCard({ periodo }: { periodo: Periodo }) {
             contas da casa (MKT e os cortes do Pulso que o MKT publica) · canais do Pulso ·
             cortes e longos das contas do Pulso · Limelight. Nenhuma peça entra duas vezes: as contas da
             DIGIAI ficam fora dos espelhos do Pulso, conferido por mim em 17/11.{' '}
-            <strong className="text-on-surface">Este mesmo total aparece no Radar 360</strong>, com o
-            recorte DELE — se os dois números não baterem, compare as duas janelas antes de desconfiar
-            da conta: a fonte é a mesma e a regra de consolidação também. Lá está a repartição por
-            marca, rede e conta; aqui está o total da casa.
+            <strong className="text-on-surface">O recorte aqui é por data de LEITURA</strong>: uma peça
+            publicada em julho e lida ontem entra, com todas as views que acumulou. O Radar 360 conta a
+            mesma fonte por data de PUBLICAÇÃO, e por isso dá um número menor — as duas contas estão
+            certas e respondem a perguntas diferentes: aqui, "quanto a casa já somou do que foi medido
+            agora"; lá, "quanto rendeu o que a casa publicou neste período".
             {cego.length > 0 && <> Hoje não consegui ler: <strong className="text-danger">{cego.join(' · ')}</strong> — isso é painel cego, não motor parado.</>}
           </div>
 

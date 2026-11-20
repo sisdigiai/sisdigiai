@@ -580,7 +580,7 @@ export default function MktCrescimento() {
             const temMotor = viewsRecorte > 0;
             const viewsTotais = viewsRecorte + viewsCasa;
             const temViews = viewsTotais > 0;
-            const heroPostsRotulo = temViews ? 'views no período (motores + contas da casa)' : 'engajamento nas redes no período';
+            const heroPostsRotulo = temViews ? 'views do que foi PUBLICADO no período (motores + contas da casa)' : 'engajamento nas redes no período';
             // share das redes das marcas: engajamento por plataforma (mkt real do recorte)
             const engPorRede = (() => {
               const m = new Map<string, number>();
@@ -651,8 +651,8 @@ export default function MktCrescimento() {
                 <Kpi icon={<Sparkles className="w-4 h-4" />} label="engajamento redes" value={medidos.length === 0 ? '—' : nf(engTotal)}
                   sub={medidos.length === 0 ? 'engajamento não coletado nesta rede' : `média ${nf(Math.round(engMed))}/post`} glow={COR_OK} />
                 <Kpi icon={<Film className="w-4 h-4" />} label="views motores" value={temMotor ? nf(viewsRecorte) : '—'} sub={temMotor ? `${nf(pubsRecorte)} pubs · ${nf(engRecorte)} interações` : fMarca ? 'sem motor nesta marca' : 'sem views no recorte'} glow={COR_WARN} />
-                <Kpi icon={<Eye className="w-4 h-4" />} label="views das peças da casa" value={viewsCasa > 0 ? nf(viewsCasa) : '—'}
-                  sub={viewsCasa > 0 ? `${pecasComViews} de ${pecasF.length} peças com leitura · postagens e cortes` : 'a coletar — despacho no MKT (sync-metricas)'} glow={COR_SEC} />
+                <Kpi icon={<Eye className="w-4 h-4" />} label="views das peças publicadas no período" value={viewsCasa > 0 ? nf(viewsCasa) : '—'}
+                  sub={viewsCasa > 0 ? `${pecasComViews} de ${pecasF.length} peças com leitura · o Espelho conta por data de LEITURA e dá mais` : 'a coletar — despacho no MKT (sync-metricas)'} glow={COR_SEC} />
               </section>
             </>
             );
