@@ -2,6 +2,49 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-19 (22h) — "Estamos lendo tudo já?" Não: a página Controle mostrava 1.000 de 5.106
+
+Pergunta do dono às 22h. A resposta honesta exigia varrer o que eu **não** tinha coberto: hoje às 20h
+eu consertei as leituras que **pediam mais de mil**. Mas o teto é do **servidor**, não do pedido —
+leitura **sem limite nenhum** também volta cortada em 1.000. Varri as 133 leituras do app e contei as
+linhas de cada fonte no banco.
+
+**Sete fontes já passaram de mil. Seis estavam bem; uma não:**
+
+| fonte | linhas | como era lida | veredito |
+|---|---|---|---|
+| **`v_controle_itens`** | **5.106** | **sem limite, sem página** | **cortada — consertada agora** |
+| `mkt.publications` | 3.042 | pagina | ok (consertada às 15h) |
+| `v_mkt_gbp_avaliacoes` | 1.775 | filtrada (estrelas≤3, não publicada) | ok — devolve **2** linhas |
+| `v_ops_ordem_do_dia` | 1.659 | filtrada por dia | ok — no máximo **19** por dia |
+| `v_lousa` | 1.552 | pagina | ok |
+| `v_mkt_analytics_peca_dia` | 1.133 | pagina (3 telas) | ok |
+| `v_audit_logs` | 1.000 | `.limit(100)` de propósito | ok |
+
+**O que o dono não via na própria página dele.** A ordem da Controle começa pelo nível, então o corte
+em mil entregava:
+
+- nível 1: **245 de 245** — completo, e é por isso que o defeito passou despercebido: o que mais
+  importa chegava inteiro;
+- nível 2: **755 de 839** — faltavam 84;
+- nível 3: **0 de 4.022** — nenhum.
+
+Quatro em cada cinco itens nunca apareciam. E o pior não é a falta: **os contadores dos chips contam o
+que chegou**, então o chip "Nível 3" mostrava zero com cara de resposta medida. Tela que responde "não
+há" quando o certo seria "não li" é a mesma família de defeito do dia inteiro.
+
+Marcar como resolvido não ajudaria: **1 item de 5.106** está marcado.
+
+**Depois do conserto, lido no ar** (build `29aac7e`, seis páginas de mil, offsets 0–5000, todas 200):
+todos **5.105** · nível 1 **244** · nível 2 **839** · nível 3 **4.022** · riscos **728** · pendentes do
+dono **1.112** · 36 agentes com estado. Os números de risco e pendência não subiram hoje — eles já
+estavam lá, só não chegavam à tela.
+
+Termina em `id` (único, conferido no banco), pela regra do desempate das 20h50.
+
+**Observação que não é minha para resolver:** dos 5.105 não resolvidos, **1.913 são do tipo "feito"** e
+377 são "ideia". A página acumula tudo que todo agente já escreveu, e quem carrega é o Geral.
+
 ## 2026-11-19 (20h) — O teto de mil linhas sai do app inteiro, e uma tela já estava mentindo por causa dele
 
 O Geral contou as linhas das duas leituras que sobraram no Radar 360 e avisou **antes** de quebrarem.
