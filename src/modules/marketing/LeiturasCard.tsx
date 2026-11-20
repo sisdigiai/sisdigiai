@@ -172,7 +172,11 @@ export default function LeiturasCard({ periodo }: { periodo: Periodo }) {
             <span className="font-mono text-[9px] uppercase tracking-widest text-muted">fontes somadas</span>{' '}
             contas da casa (MKT e os cortes do Pulso que o MKT publica) · canais do Pulso ·
             cortes e longos das contas do Pulso · Limelight. Nenhuma peça entra duas vezes: as contas da
-            DIGIAI ficam fora dos espelhos do Pulso, conferido por mim em 17/11.
+            DIGIAI ficam fora dos espelhos do Pulso, conferido por mim em 17/11.{' '}
+            <strong className="text-on-surface">Este mesmo total aparece no Radar 360</strong>, com o
+            recorte DELE — se os dois números não baterem, compare as duas janelas antes de desconfiar
+            da conta: a fonte é a mesma e a regra de consolidação também. Lá está a repartição por
+            marca, rede e conta; aqui está o total da casa.
             {cego.length > 0 && <> Hoje não consegui ler: <strong className="text-danger">{cego.join(' · ')}</strong> — isso é painel cego, não motor parado.</>}
           </div>
 

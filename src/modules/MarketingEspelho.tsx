@@ -190,7 +190,7 @@ export default function MarketingEspelho() {
       <PageHeader
         eyebrow="Distribuição & conteúdo"
         title="Marketing"
-        subtitle="Central de comando do marketing: resultado, agenda do dia e o que decidir. Leitura apenas — a produção acontece no DIGIAI MKT."
+        subtitle="Central de comando do marketing: o TOTAL da casa e o que decidir hoje. O detalhe por marca, rede e conta — e a saúde da coleta — vive no Radar 360. Leitura apenas: a produção acontece no DIGIAI MKT."
         actions={
           <div className="flex items-center gap-2">
             <a

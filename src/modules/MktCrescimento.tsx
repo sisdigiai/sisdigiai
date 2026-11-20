@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { BarChart3, TrendingUp, Users, Eye, Bookmark, Share2, RefreshCw, Loader2, ExternalLink, Sparkles, Target, HeartPulse, Film, Newspaper, MapPin, Gauge, ArrowUp, ArrowDown, Minus } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, Eye, Bookmark, Share2, RefreshCw, Loader2, ExternalLink, Sparkles, HeartPulse, Film, Newspaper, MapPin, Gauge, ArrowUp, ArrowDown, Minus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia, diaBrasilia } from '../lib/datas';
 import OsiDiasCard from '../components/OsiDiasCard';
@@ -26,26 +26,36 @@ type Perf = {
 };
 type Aud = { brand_id: string; platform: string; seguidores: number; dia: string };
 type Serie = { id: string; label: string; color: string; logo: string | null; pts: number[]; atual: number };
-type Cadeia = {
-  posts_7d: number; ultima_publicacao: string | null;
-  seguidores: number; ultimo_censo: string | null;
-  leads_30d: number; ultimo_lead: string | null;
-  disparos_30d: number; ultimo_disparo: string | null;
-  vendas_30d: number; receita_30d_brl: number; ultima_venda: string | null;
-};
 type Fila = { atrasados: number; com_erro: number; ultima_publicacao: string | null; ultima_audiencia: string | null };
 type Conta = { brand_name: string | null; platform: string; handle: string | null; status: string | null };
 type Cred = { platform: string; marca: string | null; status: string | null; expires_at: string | null };
-type CalcFunil = { dia: string; usos: number; sessoes: number; leads: number };
 type Leitura = { origem: string; marca: string | null; conta: string | null; rede: string;
   tipo: string; peca_ref: string; data: string; views: number | null };
 
+// A FRONTEIRA COM O ESPELHO DO MKT, escrita em 20/11/2026 por ordem do dono ("pode fazer o corte
+// agora"), depois de ele perguntar por que existem as duas telas.
+//
+// O corte NÃO é por assunto — seria desfazer ordem dele. Em 17/11 pediu os analytics TOTAIS no
+// Espelho; em 18/11 reclamou que o número grande DAQUI não somava os posts do MKT. Ele quer o total
+// nas duas. O corte é por **profundidade**:
+//
+//   · **Espelho do MKT** = o TOTAL e a DECISÃO. Resultado de negócio, o que funciona, o dia, o
+//     fôlego, as publicações, os fatos, as fontes. É onde se decide o que fazer.
+//   · **Radar 360** (aqui) = o DETALHE e a SAÚDE. Marca × rede × conta, seguidores dia a dia, régua,
+//     território, e se dá para confiar na coleta. É onde se descobre ONDE o total veio.
+//
+// O QUE SAIU DAQUI em 20/11, e por quê: a aba **Funil** era duplicação inteira. A cadeia
+// produzir→alcançar→captar→prospectar→vender é a mesma `v_marketing_cadeia` da Central do Espelho,
+// e o bloco do Clearix Calc era a mesma `v_mkt_calc_funil` da página própria do Calc (#/mkt-calc) —
+// mesmos quatro números, mesma fonte, três lugares. Saíram duas leituras do banco junto.
+//
+// O QUE NÃO É duplicação, e por isso ficou: "Motores" lá é ESTADO e custo de cada motor; "Vídeo &
+// motores" aqui é DESEMPENHO por plataforma. Mesmas marcas, perguntas diferentes.
 const ABAS = [
   { k: 'visao', label: 'Visão', Icon: Eye },
   { k: 'audiencia', label: 'Audiência', Icon: Users },
   { k: 'conteudo', label: 'Conteúdo', Icon: Newspaper },
   { k: 'video', label: 'Vídeo & motores', Icon: Film },
-  { k: 'funil', label: 'Funil', Icon: Target },
   { k: 'regua', label: 'Régua por marca', Icon: Gauge },
   { k: 'territorio', label: 'Território', Icon: MapPin },
   { k: 'saude', label: 'Saúde da coleta', Icon: HeartPulse },
@@ -103,13 +113,11 @@ export default function MktCrescimento() {
   const [limePub, setLimePub] = useState<LimePubDia[]>([]);
   const [blogDias, setBlogDias] = useState<BlogDia[]>([]);
   const [blogsEsp, setBlogsEsp] = useState<EspelhoBlogs | null>(null);
-  const [cadeia, setCadeia] = useState<Cadeia | null>(null);
   const [fila, setFila] = useState<Fila | null>(null);
   const [contas, setContas] = useState<Conta[]>([]);
   // Régua de crescimento por marca (MKT 20261005_01). Só leitura: quem calcula é o MKT, toda segunda 6h15.
   const [regua, setRegua] = useState<Nivel[]>([]);
   const [creds, setCreds] = useState<Cred[]>([]);
-  const [calcDias, setCalcDias] = useState<CalcFunil[]>([]);
   const [leituras, setLeituras] = useState<Leitura[]>([]);
   const [loading, setLoading] = useState(true);
   const [sincronizando, setSincronizando] = useState(false);
@@ -137,7 +145,7 @@ export default function MktCrescimento() {
   // todo dia. Erro falso é pior que número errado: manda consertar o que não está quebrado.
   async function load() {
     setLoading(true);
-    const [b, p, cp, ad, pd, ld, bd, lp, be, { data: cad }, { data: fs }, { data: ac }, cr, { data: cfu }, { data: nv }, ldia] = await Promise.all([
+    const [b, p, cp, ad, pd, ld, bd, lp, be, { data: fs }, { data: ac }, cr, { data: nv }, ldia] = await Promise.all([
       supabase.schema('mkt').from('brands').select('id, code, name, accent_hex, logo_url').order('name'),
       lerTudo<Pub>((de, ate) => supabase.schema('mkt').from('publications')
         .select('id, brand_id, platform, url, published_at, metadata')
@@ -152,11 +160,9 @@ export default function MktCrescimento() {
       espelhoMotores.blogsDias(),
       espelhoMotores.limelightPubDias(),
       espelhoMotores.blogs(),
-      supabase.from('v_marketing_cadeia').select('*').maybeSingle(),
       supabase.from('v_mkt_fila_saude').select('atrasados, com_erro, ultima_publicacao, ultima_audiencia').maybeSingle(),
       supabase.from('v_mkt_accounts').select('brand_name, platform, handle, status'),
       supabase.from('v_mkt_credenciais_saude').select('platform, marca, status, expires_at'),
-      supabase.from('v_mkt_calc_funil').select('dia, usos, sessoes, leads').limit(400),
       supabase.from('v_mkt_nivel_crescimento').select('*'),
       lerTudo<Leitura>((de, ate) => supabase.from('v_mkt_analytics_peca_dia')
         .select('origem, marca, conta, rede, tipo, peca_ref, data, views')
@@ -167,11 +173,9 @@ export default function MktCrescimento() {
     setPerf(cp);
     setAud(ad);
     setPulsoDias(pd); setLimeDias(ld); setBlogDias(bd); setLimePub(lp); setBlogsEsp(be);
-    setCadeia((cad ?? null) as Cadeia | null);
     setFila((fs ?? null) as Fila | null);
     setContas((ac ?? []) as Conta[]);
     setCreds(((cr.data ?? []) as Cred[]));
-    setCalcDias((cfu ?? []) as CalcFunil[]);
     setRegua((nv ?? []) as Nivel[]);
     setLeituras(ldia);
     setLoading(false);
@@ -497,7 +501,7 @@ export default function MktCrescimento() {
       <PageHeader
         eyebrow="Analytics social · todas as redes, canais e marcas"
         title="Radar 360"
-        subtitle={'Estrutura completa desde já: o que ainda não tem coleta aparece como "a ligar" — nunca some. Motor de postagem vive no MKT; a leitura vive aqui.'}
+        subtitle={'O DETALHE da medição: por marca, por rede e por conta, mais a saúde de quem coleta. O total da casa e a decisão do dia vivem no Espelho do MKT. Estrutura completa desde já: o que ainda não tem coleta aparece como "a ligar" — nunca some.'}
         actions={
           <button onClick={sincronizar} disabled={sincronizando}
             className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-outline/30 text-on-surface-variant hover:bg-surface-highest disabled:opacity-50">
@@ -833,72 +837,6 @@ export default function MktCrescimento() {
           )}
 
           {/* ═══ FUNIL ═══ */}
-          {aba === 'funil' && cadeia && (
-            <>
-              <Decide texto={<><b>O que se decide aqui:</b> onde o funil quebra — e para onde vai o esforço da semana. Snapshot real de 30 dias.</>} />
-              <section className="border border-outline/15 bg-surface-container p-5 mb-4">
-                <div className={lbl + ' mb-3'}>cadeia de resultados · 30 dias · carimbo por elo</div>
-                <div className="space-y-2">
-                  {([
-                    { rot: 'produzir', v: `${cadeia.posts_7d} posts/7d`, w: 100, cor: COR_SEC, stamp: cadeia.ultima_publicacao, lim: 2 },
-                    { rot: 'alcançar', v: `${nf(cadeia.seguidores)} seg + views dos motores`, w: 88, cor: COR_SEC, stamp: cadeia.ultimo_censo ? cadeia.ultimo_censo + 'T12:00:00' : null, lim: 2 },
-                    { rot: 'captar', v: `${cadeia.leads_30d} lead(s)`, w: Math.min(100, cadeia.leads_30d * 4), cor: COR_DANGER, stamp: cadeia.ultimo_lead, lim: 14 },
-                    { rot: 'prospectar', v: `${cadeia.disparos_30d} disparos OSI`, w: Math.min(100, cadeia.disparos_30d), cor: COR_WARN, stamp: cadeia.ultimo_disparo, lim: 7 },
-                    { rot: 'vender', v: cadeia.vendas_30d > 0 ? `${cadeia.vendas_30d} vendas · R$ ${nf(Math.round(cadeia.receita_30d_brl))}` : '0 vendas', w: Math.min(100, cadeia.vendas_30d * 10), cor: COR_DANGER, stamp: cadeia.ultima_venda, lim: 30 },
-                  ] as { rot: string; v: string; w: number; cor: string; stamp: string | null; lim: number }[]).map((e) => {
-                    const dias = e.stamp ? Math.floor((Date.now() - new Date(e.stamp).getTime()) / 864e5) : null;
-                    const ruim = dias === null || dias > e.lim;
-                    return (
-                      <div key={e.rot} className="grid items-center gap-3" style={{ gridTemplateColumns: '96px 1fr 220px' }}>
-                        <span className={lbl}>{e.rot}</span>
-                        <span className="h-7 bg-surface-highest relative"><span className="absolute inset-y-0 left-0" style={{ width: `${e.w}%`, background: e.cor, opacity: 0.8 }} /></span>
-                        <span className="text-[12.5px] font-mono tabular-nums text-on-surface-variant">{e.v} · <span style={{ color: ruim ? COR_DANGER : COR_OK }}>{dias === null ? 'nunca' : dias === 0 ? 'hoje' : `há ${dias}d`}</span></span>
-                      </div>
-                    );
-                  })}
-                  <div className="grid items-center gap-3" style={{ gridTemplateColumns: '96px 1fr 220px' }}>
-                    <span className={lbl}>provar</span>
-                    <span className="h-7 bg-surface-highest relative"><span className="absolute inset-y-0 left-0" style={{ width: '60%', background: COR_OK, opacity: 0.8 }} /></span>
-                    <span className="text-[12.5px] font-mono tabular-nums text-on-surface-variant"><span style={{ color: COR_OK }}>uso vivo do Clearix</span> · só interno</span>
-                  </div>
-                </div>
-              </section>
-              {(() => {
-                const cf = calcDias.filter((d) => noRecorte(d.dia));
-                const usos = cf.reduce((a, d) => a + (d.usos || 0), 0);
-                const sess = cf.reduce((a, d) => a + (d.sessoes || 0), 0);
-                const leads = cf.reduce((a, d) => a + (d.leads || 0), 0);
-                const serie = [...cf].sort((a, b) => a.dia.localeCompare(b.dia));
-                const maxU = Math.max(1, ...serie.map((d) => d.usos));
-                return (
-                  <section className="border border-outline/15 bg-surface-container p-5 mb-4">
-                    <div className={lbl + ' mb-3'}>isca · clearix calc · {rotuloRecorte} · telemetria first-party</div>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-                      <div><div className={lbl}>usos</div><div className="font-mono tabular-nums text-xl font-semibold text-on-surface">{nf(usos)}</div></div>
-                      <div><div className={lbl}>sessões</div><div className="font-mono tabular-nums text-xl font-semibold" style={{ color: COR_SEC }}>{nf(sess)}</div></div>
-                      <div><div className={lbl}>leads</div><div className="font-mono tabular-nums text-xl font-semibold" style={{ color: leads > 0 ? COR_OK : COR_DANGER }}>{nf(leads)}</div></div>
-                      <div><div className={lbl}>conversão sessão→lead</div><div className="font-mono tabular-nums text-xl font-semibold" style={{ color: COR_WARN }}>{sess > 0 ? `${(leads / sess * 100).toFixed(1)}%` : '—'}</div></div>
-                    </div>
-                    {serie.length >= 2 ? (
-                      <>
-                        <div className="flex items-end gap-[3px] h-16">
-                          {serie.slice(-60).map((d) => (
-                            <div key={d.dia} title={`${fmtDM(d.dia)}: ${d.usos} usos · ${d.leads} leads`} className="flex-1 min-h-[2px]"
-                              style={{ height: `${Math.max(3, (d.usos / maxU) * 100)}%`, background: d.leads > 0 ? COR_OK : COR_SEC, opacity: d.usos === 0 ? 0.15 : 0.85 }} />
-                          ))}
-                        </div>
-                        <div className={lbl + ' mt-1.5'}>usos/dia · barra verde = dia com lead</div>
-                      </>
-                    ) : <div className="text-[12px] text-muted">sem uso do calc neste recorte.</div>}
-                  </section>
-                );
-              })()}
-              <div className="text-[13px] text-on-surface-variant">
-                Aprofundar: <a href="#/mkt-calc" className="text-secondary hover:underline">Calc (isca)</a> · <a href="#/vendas" className="text-secondary hover:underline">Vendas</a> · <a href="#/fluxo-osi" className="text-secondary hover:underline">OSI</a> · <a href="#/semana" className="text-secondary hover:underline">Semana (metas)</a>
-              </div>
-            </>
-          )}
-
           {/* ═══ RÉGUA POR MARCA ═══ */}
           {aba === 'regua' && (
             <>
