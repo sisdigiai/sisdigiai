@@ -23,9 +23,47 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
+// ---- SEIS DE CADA VEZ (21/11/2026) ----
+//
+// Medido no ar, duas vezes: as telas de marketing disparavam ~20 pedidos no mesmo instante e TODOS
+// voltavam juntos, tarde. E não era o banco — `v_mkt_fila_saude` roda em **3,8 ms** no servidor e
+// demorava **9,8 s** para aparecer; `v_mkt_peca_consolidada`, **108 ms** no servidor contra **3,7 s**
+// na tela. Pedido demais ao mesmo tempo não fica mais rápido: o pool do banco atende em série e a
+// fila inteira espera o pior.
+//
+// Então a fila passa a ser NOSSA, com seis vagas. Seis porque é o que o navegador já abre por host
+// em HTTP/1.1 e porque, acima disso, o ganho vira espera do outro lado. Nada é descartado — só
+// entra em ordem, e quem chega depois começa quando uma vaga abre.
+//
+// Fica no `fetch` do cliente de propósito: assim vale para TODA tela do app, hoje e amanhã, sem
+// depender de cada componente lembrar de se comportar.
+const VAGAS = 6;
+let emVoo = 0;
+const esperando: Array<() => void> = [];
+
+function vaga(): Promise<void> {
+  if (emVoo < VAGAS) { emVoo += 1; return Promise.resolve(); }
+  return new Promise((libera) => esperando.push(() => { emVoo += 1; libera(); }));
+}
+function devolve() {
+  emVoo -= 1;
+  const proximo = esperando.shift();
+  if (proximo) proximo();
+}
+
+const fetchEmFila: typeof fetch = async (entrada, init) => {
+  await vaga();
+  try {
+    return await fetch(entrada, init);
+  } finally {
+    devolve();
+  }
+};
+
 export const supabase = createClient(
   supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder-key'
+  supabaseAnonKey || 'placeholder-key',
+  { global: { fetch: fetchEmFila } },
 );
 
 export type CompanyIdentity = {
