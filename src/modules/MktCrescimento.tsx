@@ -282,7 +282,9 @@ export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: F
     video: ['marcas', 'pulso', 'lime', 'blogs'],
     regua: ['regua'],
     territorio: [],
-    saude: ['marcas', 'audiencia', 'saude', 'pecas', 'pulso'],
+    // 'blogs' entra porque o cartao de saude dos blogs dizia "espelho indisponivel" quando a fonte
+    // apenas nao tinha sido lida ainda -- visto no ar em 21/11. Fonte nao lida nao e fonte quebrada.
+    saude: ['marcas', 'audiencia', 'saude', 'pecas', 'pulso', 'blogs'],
   };
 
   const chaveDaFonte = (f: string) => (DA_JANELA.has(f) ? `${f}|${corteDia}|${fimDia}` : f);
