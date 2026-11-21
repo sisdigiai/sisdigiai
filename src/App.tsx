@@ -25,7 +25,6 @@ import Google from './modules/Google';
 import Controle from './modules/Controle';
 import Receita from './modules/Receita';
 import Lousa from './modules/Lousa';
-import MktCrescimento from './modules/MktCrescimento';
 import MktCalc from './modules/MktCalc';
 import Marketplace from './modules/Marketplace';
 import Ecossistemas from './modules/Ecossistemas';
@@ -200,7 +199,10 @@ export default function App() {
       case 'controle': return <Controle />;
       case 'receita': return <Receita />;
       case 'lousa': return <Lousa />;
-      case 'mkt-crescimento': return <MktCrescimento />;
+      // O Radar 360 virou metade da pagina de Marketing (21/11/2026). O endereco antigo continua
+      // vivo e abre a mesma pagina na primeira aba de CONFERIR -- link salvo e link mandado nao se
+      // perdem so porque a casa reorganizou a tela.
+      case 'mkt-crescimento': return <MarketingEspelho abaInicial="marca-rede" />;
       case 'mkt-calc': return <MktCalc />;
       case 'marketing-engajamento': return <Marketing view="engajamento" />;
       case 'marketplace': return <Marketplace />;

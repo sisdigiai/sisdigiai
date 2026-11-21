@@ -15,6 +15,11 @@ import ResultadoDeNegocio from './marketing/ResultadoDeNegocio';
 import PlacarDeDecisao from './marketing/PlacarDeDecisao';
 import CentralDeFontes from './marketing/CentralDeFontes';
 import FatosPublicaveis, { type FatoMkt } from './marketing/FatosPublicaveis';
+import MktCrescimento, {
+  Chip, RANGES, REDES, ORIGENS, origemDaMarca, rotuloOrigem,
+  type AbaRadar, type FiltrosMkt, type OrigemK,
+} from './MktCrescimento';
+import { espelhoMotores as motores } from '../lib/espelhoMotores';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia } from '../lib/datas';
 import { espelhoMotores, resumoPola, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
@@ -73,7 +78,35 @@ function relativo(iso: string | null): string {
   return `há ${d}d`;
 }
 
-export default function MarketingEspelho() {
+// UMA PÁGINA SÓ (21/11/2026, ordem do dono: "eu montaria uma página só, que nos traz nas abas todas
+// as informações"). O Espelho do MKT e o Radar 360 viraram esta página. Não foi só juntar: o motivo
+// de verdade era que **cada tela tinha a sua barra de filtro e a sua régua de data**, e foi daí que
+// nasceu o 168k × 41,8k "na mesma janela" de 20/11. Uma barra, uma régua, um rótulo.
+//
+// Duas fileiras de aba, porque são duas perguntas diferentes:
+//   · DECIDIR  — o que fazer hoje, e se está dando resultado;
+//   · CONFERIR — de onde o número veio, e se dá para confiar nele.
+//
+// E a leitura carrega POR ABA: ver `GRUPOS_DA_ABA` abaixo e o mesmo desenho dentro do Radar.
+const DECIDIR = [
+  ['hoje', 'Hoje'], ['resultado', 'Resultado'], ['funciona', 'O que funciona'],
+  ['folego', 'Fôlego'], ['publicacoes', 'Publicações'],
+] as const;
+const CONFERIR = [
+  ['marca-rede', 'Marca × rede'], ['leitura', 'Leitura das peças'], ['motores', 'Vídeo & motores'],
+  ['regua', 'Régua'], ['territorio', 'Território'], ['saude', 'Saúde'],
+] as const;
+export type AbaMkt = typeof DECIDIR[number][0] | typeof CONFERIR[number][0];
+const TODAS_ABAS: AbaMkt[] = [...DECIDIR.map((x) => x[0]), ...CONFERIR.map((x) => x[0])];
+
+// Qual aba do Radar cada aba da página desenha. O que não está aqui é desenhado pelos cartões do
+// Espelho, que leem sozinhos.
+const RADAR_DA_ABA: Partial<Record<AbaMkt, AbaRadar>> = {
+  hoje: 'visao', funciona: 'conteudo', 'marca-rede': 'audiencia',
+  motores: 'video', regua: 'regua', territorio: 'territorio', saude: 'saude',
+};
+
+export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?: AbaMkt } = {}) {
   const [esp, setEsp] = useState<Espelho | null>(null);
   const [marcas, setMarcas] = useState<Marca[]>([]);
   const [pubs, setPubs] = useState<Publicacao[]>([]);
@@ -100,30 +133,72 @@ export default function MarketingEspelho() {
   // empilhado em nove faixas numa aba só virou três abas, cada uma com UMA pergunta:
   //   Resultado → está dando resultado?   Audiência → quantos leram, e quanto disso medimos?
   //   Dia → sai hoje, e dá para continuar saindo?
-  const [aba, setAba] = useState<'resultado' | 'audiencia' | 'dia' | 'marcas' | 'publicacoes' | 'motores' | 'fatos' | 'fontes'>('resultado');
-  // Um período para a página inteira, guardado no ENDEREÇO — o dono manda o link de uma leitura.
-  // Vai no segundo trecho (`#/marketing/7`) e não como `?p=7`: o roteador do app escolhe o módulo pelo
-  // primeiro trecho, então uma interrogação no hash cairia em Visão sem dizer nada.
-  const [periodo, setPeriodo] = useState<Periodo>(() => {
-    const t = (typeof window !== 'undefined' ? window.location.hash : '').replace(/^#\/?/, '').split('/')[1];
-    return (PERIODOS.some(([id]) => id === t) ? t : '30') as Periodo;
-  });
+  const [aba, setAba] = useState<AbaMkt>(abaInicial);
+  // O RECORTE DA PÁGINA INTEIRA — uma barra só para as onze abas.
+  //
+  // `data` é a linha que faltava: uma peça publicada em julho e lida ontem entra numa régua e não na
+  // outra. Antes o Espelho recortava por LEITURA e o Radar por PUBLICAÇÃO, cada um com o mesmo
+  // rótulo "no período" — e os dois números discordavam sem que a tela dissesse por quê.
+  const [fDias, setFDias] = useState(30);
+  const [fDe, setFDe] = useState('');
+  const [fAte, setFAte] = useState('');
+  const [fOrigem, setFOrigem] = useState<OrigemK>('');
+  const [fRede, setFRede] = useState('');
+  const [fMarca, setFMarca] = useState('');
+  const [fData, setFData] = useState<'publicacao' | 'leitura'>('publicacao');
+  const filtros: FiltrosMkt = { dias: fDias, de: fDe, ate: fAte, origem: fOrigem, rede: fRede, marca: fMarca, data: fData };
 
-  const trocarPeriodo = (p: Periodo) => {
-    setPeriodo(p);
-    if (typeof window !== 'undefined') window.location.hash = `#/marketing/${p}`;
-  };
-
-  // O endereço manda na tela, e não só a tela no endereço. Sem isto, trocar o período pela URL com a
-  // página aberta não mudava nada até recarregar — e era o que quebrava as duas coisas que o filtro
-  // existe para servir: o link de leitura que o dono manda a alguém, e o botão voltar do navegador.
+  // As marcas que entram nos chips: as da casa vêm do MKT; as do Pulso, do espelho dele (são três
+  // canais, não uma marca só). 13 linhas, leitura barata, uma vez.
+  const [marcasChip, setMarcasChip] = useState<Array<{ code: string; nome: string; cor: string | null; origem: OrigemK }>>([]);
   useEffect(() => {
-    const ouvir = () => {
-      const t = window.location.hash.replace(/^#\/?/, '').split('/')[1];
-      if (PERIODOS.some(([id]) => id === t)) setPeriodo(t as Periodo);
+    let vivo = true;
+    (async () => {
+      const [{ data: bs }, contasPulso] = await Promise.all([
+        supabase.schema('mkt').from('brands').select('code, name, accent_hex').order('name'),
+        motores.pulsoContas(),
+      ]);
+      if (!vivo) return;
+      const daCasa = ((bs ?? []) as Array<{ code: string; name: string; accent_hex: string | null }>)
+        .filter((b) => b.code !== 'pulso')
+        .map((b) => ({ code: b.code, nome: b.name, cor: b.accent_hex, origem: origemDaMarca(b.code) }));
+      const doPulso = [...new Set(contasPulso.map((x) => x.marca))].sort()
+        .map((m) => ({ code: m, nome: m, cor: null, origem: 'pulso' as OrigemK }));
+      setMarcasChip([...daCasa, ...doPulso]);
+    })();
+    return () => { vivo = false; };
+  }, []);
+
+  const trocarOrigem = (k: OrigemK) => { setFOrigem(k); setFMarca(''); };
+  const cls = 'font-mono text-[10px] uppercase tracking-widest text-muted';
+  const custom = fDe !== '' && fAte !== '' && fDe <= fAte;
+  // As abas do Espelho leem em janelas de 7, 30 ou tudo — é o que as views delas aceitam. A barra
+  // oferece mais; quando não dá para obedecer exatamente, a aba DIZ em que janela leu.
+  const periodoEspelho: Periodo = fDias === 0 ? 'tudo' : fDias <= 7 ? '7' : '30';
+  const periodoExato = fDias === 0 || fDias === 7 || fDias === 30;
+
+  // O ENDEREÇO GUARDA A ABA E O PERÍODO — o dono manda o link de uma leitura, e o botão voltar
+  // funciona. Vai nos trechos do hash (`#/marketing/saude/30`) e não como `?p=30`: o roteador do app
+  // escolhe o módulo pelo primeiro trecho, então uma interrogação cairia em Visão sem dizer nada.
+  // Links antigos (`#/marketing/7`) continuam valendo: o trecho que for número é lido como período.
+  const escreverHash = (a: AbaMkt, dias: number) => {
+    if (typeof window !== 'undefined') window.location.hash = `#/marketing/${a}/${dias}`;
+  };
+  const trocarAba = (a: AbaMkt) => { setAba(a); escreverHash(a, fDias); };
+  const trocarPeriodo = (dias: number) => { setFDias(dias); setFDe(''); setFAte(''); escreverHash(aba, dias); };
+
+  useEffect(() => {
+    const ler = () => {
+      const partes = window.location.hash.replace(/^#\/?/, '').split('/');
+      for (const t of partes.slice(1)) {
+        if (TODAS_ABAS.includes(t as AbaMkt)) setAba(t as AbaMkt);
+        else if (/^\d+$/.test(t)) setFDias(Number(t));
+        else if (t === 'tudo') setFDias(0);
+      }
     };
-    window.addEventListener('hashchange', ouvir);
-    return () => window.removeEventListener('hashchange', ouvir);
+    ler();
+    window.addEventListener('hashchange', ler);
+    return () => window.removeEventListener('hashchange', ler);
   }, []);
 
   // ---- CADA ABA LÊ O QUE ELA MOSTRA, E SÓ NA PRIMEIRA VEZ (21/11/2026) ----
@@ -189,15 +264,18 @@ export default function MarketingEspelho() {
   };
 
   // Quem cada aba precisa. Aba que não aparece aqui tem filhas que leem sozinhas.
-  const GRUPOS_DA_ABA: Record<string, string[]> = {
+  const GRUPOS_DA_ABA: Record<AbaMkt, string[]> = {
+    hoje: [],
     resultado: ['base'],
-    audiencia: [],
-    dia: [],
-    marcas: ['marcas', 'motores'],
-    publicacoes: ['publicacoes'],
+    funciona: [],
+    folego: ['marcas', 'motores'],
+    publicacoes: ['publicacoes', 'fatos'],
+    'marca-rede': [],
+    leitura: [],
     motores: ['base', 'motores'],
-    fatos: ['fatos'],
-    fontes: ['fontes', 'fatos', 'motores'],
+    regua: [],
+    territorio: [],
+    saude: ['fontes', 'fatos', 'motores'],
   };
 
   useEffect(() => {
@@ -240,7 +318,7 @@ export default function MarketingEspelho() {
       <PageHeader
         eyebrow="Distribuição & conteúdo"
         title="Marketing"
-        subtitle="Central de comando do marketing: o TOTAL da casa e o que decidir hoje. O detalhe por marca, rede e conta — e a saúde da coleta — vive no Radar 360. Leitura apenas: a produção acontece no DIGIAI MKT."
+        subtitle="Uma página só: em cima se decide, embaixo se confere de onde o número veio. Uma barra de filtro para as onze abas — inclusive a régua de DATA, que é o que fazia as duas telas antigas discordarem com o mesmo rótulo. Leitura apenas: a produção acontece no DIGIAI MKT."
         actions={
           <div className="flex items-center gap-2">
             <a
@@ -261,66 +339,133 @@ export default function MarketingEspelho() {
       <div className="space-y-6">
         <TravasBanner />
 
-        <div className="flex items-center gap-1 border border-outline/15 w-fit p-0.5 overflow-x-auto">
-          {([
-            ['resultado', 'Resultado'], ['audiencia', 'Audiência'], ['dia', 'Dia'],
-            ['marcas', 'Marcas'], ['publicacoes', 'Publicações'],
-            ['motores', 'Motores'], ['fatos', 'Fatos'], ['fontes', 'Fontes'],
-          ] as const).map(([id, rotulo]) => (
-            <button key={id} onClick={() => setAba(id)}
-              className={`font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 whitespace-nowrap transition-colors ${
-                aba === id ? 'bg-secondary text-on-action' : 'text-muted hover:text-on-surface'}`}>
-              {rotulo}
-            </button>
+        {/* DUAS FILEIRAS DE ABA. A de cima decide, a de baixo confere — e quem não sabe qual quer
+            começa em Hoje, que é a pergunta de todo dia. */}
+        <div className="space-y-1.5">
+          {([['decidir', DECIDIR], ['conferir', CONFERIR]] as const).map(([grupo, lista]) => (
+            <div key={grupo} className="flex items-center gap-2 flex-wrap">
+              <span className="font-mono text-[9px] uppercase tracking-widest text-muted w-16 shrink-0">{grupo}</span>
+              <div className="flex items-center gap-1 border border-outline/15 w-fit p-0.5 overflow-x-auto">
+                {lista.map(([id, rotulo]) => (
+                  <button key={id} onClick={() => trocarAba(id)}
+                    className={`font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 whitespace-nowrap transition-colors ${
+                      aba === id ? 'bg-secondary text-on-action' : 'text-muted hover:text-on-surface'}`}>
+                    {rotulo}
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
 
-        {/* O filtro único vale para a página inteira; cada bloco diz quando não consegue obedecê-lo. */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-mono text-[9px] uppercase tracking-widest text-muted">período</span>
-          <div className="flex items-center gap-0.5 border border-outline/15 p-0.5">
-            {PERIODOS.map(([id, rotulo]) => (
-              <button key={id} onClick={() => trocarPeriodo(id)}
-                className={`font-mono text-[10px] uppercase tracking-widest px-3 py-1 transition-colors ${
-                  periodo === id ? 'bg-secondary text-on-action' : 'text-muted hover:text-on-surface'}`}>
-                {rotulo}
-              </button>
+        {/* UMA BARRA DE FILTRO PARA AS ONZE ABAS. Cada bloco diz quando não consegue obedecê-la. */}
+        <div className="border border-outline/15 bg-surface-container px-3.5 py-3 space-y-2.5">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className={cls + ' mr-1 shrink-0'}>período</span>
+            {RANGES.map((r) => (
+              <Chip key={r.k} on={!custom && fDias === r.k} onClick={() => trocarPeriodo(r.k)}>{r.label}</Chip>
             ))}
+            <input type="date" value={fDe} onChange={(e) => setFDe(e.target.value)} aria-label="de"
+              className="bg-surface border border-outline/30 text-on-surface font-mono text-[11px] px-1.5 py-1" />
+            <span className="text-muted text-xs">→</span>
+            <input type="date" value={fAte} onChange={(e) => setFAte(e.target.value)} aria-label="até"
+              className="bg-surface border border-outline/30 text-on-surface font-mono text-[11px] px-1.5 py-1" />
+            <span className="ml-auto font-mono text-[10px] text-muted">
+              {fOrigem ? `${rotuloOrigem(fOrigem)} · ` : ''}{fRede ? `${fRede} · ` : ''}
+              {fMarca ? `${marcasChip.find((m) => m.code === fMarca)?.nome ?? fMarca} · ` : ''}
+              por data de {fData === 'publicacao' ? 'PUBLICAÇÃO' : 'LEITURA'}
+            </span>
           </div>
-          <span className="font-mono text-[9px] text-muted">vale para a página · o endereço guarda a escolha</span>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className={cls + ' mr-1 shrink-0'}>origem</span>
+            {ORIGENS.map((o) => <Chip key={o.k} on={fOrigem === o.k} onClick={() => trocarOrigem(o.k)}>{o.label}</Chip>)}
+            <span className="text-[11px] text-muted ml-1">de quem é o canal — a marca vem depois, dentro da origem</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className={cls + ' mr-1 shrink-0'}>rede</span>
+            {REDES.map((r) => <Chip key={r.k} on={fRede === r.k} onClick={() => setFRede(r.k)}>{r.label}</Chip>)}
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className={cls + ' mr-1 shrink-0'}>marca</span>
+            <Chip on={fMarca === ''} onClick={() => setFMarca('')}>todas</Chip>
+            {marcasChip.filter((m) => m.origem !== 'pulso' && (!fOrigem || m.origem === fOrigem)).map((m) => (
+              <Chip key={m.code} on={fMarca === m.code} onClick={() => setFMarca(fMarca === m.code ? '' : m.code)} cor={m.cor}>{m.nome}</Chip>
+            ))}
+            {(fOrigem === '' || fOrigem === 'pulso') && marcasChip.some((m) => m.origem === 'pulso') && <>
+              <span className={cls + ' ml-1'}>pulso ▸</span>
+              {marcasChip.filter((m) => m.origem === 'pulso').map((m) => (
+                <Chip key={m.code} on={fMarca === m.code} onClick={() => setFMarca(fMarca === m.code ? '' : m.code)}>{m.nome}</Chip>
+              ))}
+            </>}
+            {fOrigem === 'limelight' && <span className="text-[11px] text-muted">a fábrica publica nos canais da Mello — marca única</span>}
+          </div>
+          {/* A LINHA QUE FALTAVA. Em 20/11 o Espelho mostrava 168k views em 961 peças e o Radar 41,8k
+              em 469 — na MESMA janela, com o mesmo rótulo. Não era a janela: um contava por data de
+              LEITURA e o outro por data de PUBLICAÇÃO. As duas contas estavam certas e respondiam a
+              perguntas diferentes. Agora a pergunta é escolhida, e o rótulo muda junto. */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className={cls + ' mr-1 shrink-0'}>data</span>
+            <Chip on={fData === 'publicacao'} onClick={() => setFData('publicacao')}>por PUBLICAÇÃO</Chip>
+            <Chip on={fData === 'leitura'} onClick={() => setFData('leitura')}>por LEITURA</Chip>
+            <span className="text-[11px] text-muted ml-1">
+              {fData === 'publicacao'
+                ? 'quanto rendeu o que a casa PUBLICOU no período'
+                : 'quanto a casa já somou do que foi MEDIDO no período — peça antiga lida ontem entra'}
+            </span>
+          </div>
+          {!periodoExato && (
+            <div className="text-[11px] text-muted">
+              Resultado, Leitura das peças e Hoje leem em janelas de <b className="text-on-surface-variant">7, 30 ou tudo</b> — é o que
+              as views deles entregam. Com {fDias} dias escolhidos, eles mostram a janela de {periodoEspelho === 'tudo' ? 'tudo' : periodoEspelho + ' dias'} e dizem isso.
+            </div>
+          )}
         </div>
 
-        {/* RESULTADO — "está dando resultado?". Quatro números de decisão na primeira linha, depois os
-            dois cartões que respondem com dado: o que o Google registra de gente indo à loja e o que
-            funciona por recorte. A cadeia e as leituras ficam abaixo, como contexto da leitura. */}
+        {/* HOJE — "o que está acontecendo, e sai hoje?". O tamanho do alcance no recorte vem do
+            Radar; a agenda e a pontualidade do dia, do motor do MKT. */}
+        {aba === 'hoje' && (
+          <div className="space-y-6">
+            <MktCrescimento aba="visao" filtros={filtros} />
+            <HojeSai periodo={periodoEspelho} />
+          </div>
+        )}
+
+        {/* RESULTADO — "está dando resultado?". Quatro números de decisão na primeira linha, depois o
+            que o Google registra de gente indo à loja. A cadeia e as leituras ficam abaixo, como
+            contexto. "O que funciona" ganhou aba própria. */}
         {aba === 'resultado' && (
           <div className="space-y-6">
             <PlacarDeDecisao pecas7d={esp?.publicadas_7d ?? null} />
-            <div className="grid grid-cols-1 2xl:grid-cols-2 gap-6 items-start">
-              <ResultadoDeNegocio />
-              <OQueFunciona />
-            </div>
-            <Central periodo={periodo} />
-            <Leituras periodo={periodo} />
+            <ResultadoDeNegocio />
+            <Central periodo={periodoEspelho} />
+            <Leituras periodo={periodoEspelho} />
           </div>
         )}
 
-        {/* AUDIÊNCIA — "quantos leram, e quanto disso a casa mede?". */}
-        {aba === 'audiencia' && (
+        {/* O QUE FUNCIONA — "que formato e que gatilho produzir mais?". O cartão do Espelho responde
+            por recorte de negócio; o bloco do Radar, por formato, gatilho e hora do dia. */}
+        {aba === 'funciona' && (
           <div className="space-y-6">
-            <LeiturasCard periodo={periodo} />
+            <OQueFunciona />
             <ResultadoConteudoCard />
+            <MktCrescimento aba="conteudo" filtros={filtros} />
           </div>
         )}
 
-        {/* DIA — "sai hoje, e dá para continuar saindo?". Pontualidade e fôlego lado a lado: um diz se
-            saiu na hora, o outro até quando ainda sai se ninguém fizer nada. */}
-        {aba === 'dia' && (
+        {/* FÔLEGO — "até quando ainda sai conteúdo se ninguém fizer nada?". */}
+        {aba === 'folego' && <EstoquePorMarca />}
+
+        {/* LEITURA DAS PEÇAS — "quantos leram, e quanto disso a casa mede?". */}
+        {aba === 'leitura' && (
           <div className="space-y-6">
-            <HojeSai periodo={periodo} />
-            <EstoquePorMarca />
+            <LeiturasCard periodo={periodoEspelho} />
           </div>
         )}
+
+        {/* MARCA × REDE, RÉGUA e TERRITÓRIO: o detalhe, direto do Radar. */}
+        {aba === 'marca-rede' && <MktCrescimento aba="audiencia" filtros={filtros} />}
+        {aba === 'regua' && <MktCrescimento aba="regua" filtros={filtros} />}
+        {aba === 'territorio' && <MktCrescimento aba="territorio" filtros={filtros} />}
 
         {carregando && <div className="text-sm text-muted py-2">Carregando…</div>}
         {(
@@ -337,7 +482,7 @@ export default function MarketingEspelho() {
                 tela — a mesma queixa que o dono fez em 18/11 sobre a tabela de motores duplicada. */}
 
             {/* Cards por marca */}
-            {aba === 'marcas' && (
+            {aba === 'folego' && (
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">Marcas operadas ({marcas.length})</span>
@@ -498,9 +643,10 @@ export default function MarketingEspelho() {
         {/* OS QUATRO MOTORES, no cartão que esta seção já usava. Antes eu tinha criado uma tabela
             nova ao lado dela, e a aba ficou com duas listas de motores — "criamos uma sessão sem
             precisar", disse o dono em 18/11. A tabela saiu e tudo o que ela mostrava entrou aqui. */}
+        {aba === 'motores' && <MktCrescimento aba="video" filtros={filtros} />}
         {aba === 'motores' && (
           <MotoresDeConteudo
-            periodo={periodo}
+            periodo={periodoEspelho}
             limelight={limelight}
             pulso={pulso}
             espMkt={esp}
@@ -515,12 +661,16 @@ export default function MarketingEspelho() {
             o frescor e onde aprofundar. Pedido do dono em 25/08 ("este espelho tem que trazer tudo que
             temos de opções") e padronizada em 19/11 ("fontes eu padronizaria também"): agora é um
             número por azulejo, agrupado por família, e traço quer dizer não medido — nunca zero. */}
-        {aba === 'fontes' && (
+        {/* SAÚDE — "dá para confiar nos números das outras abas?". A coleta por conta vem do Radar;
+            a central de fontes diz o frescor de cada fonte da casa. */}
+        {aba === 'saude' && <MktCrescimento aba="saude" filtros={filtros} />}
+        {aba === 'saude' && (
           <CentralDeFontes cadeia={cadeia} seo={seo} fila={fila} fatos={fatos}
                            pulso={pulso} limelight={limelight} blogs={blogs} />
         )}
 
-        {aba === 'fatos' && <FatosPublicaveis fatos={fatos} />}
+        {/* Os fatos publicáveis moram com as publicações: são o que pode ser dito lá fora. */}
+        {aba === 'publicacoes' && <FatosPublicaveis fatos={fatos} />}
 
         <div className="border border-outline/15 bg-surface-lowest p-3 flex items-start gap-2.5 text-[12px] text-on-surface-variant">
           <Info className="w-4 h-4 text-secondary shrink-0 mt-0.5" />

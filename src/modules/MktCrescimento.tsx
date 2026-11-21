@@ -1,12 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
-import { BarChart3, TrendingUp, Users, Eye, Bookmark, Share2, RefreshCw, Loader2, ExternalLink, Sparkles, HeartPulse, Film, Newspaper, MapPin, Gauge, ArrowUp, ArrowDown, Minus } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { TrendingUp, Eye, Bookmark, Share2, RefreshCw, Loader2, ExternalLink, Sparkles, Film, Newspaper, ArrowUp, ArrowDown, Minus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia, diaBrasilia } from '../lib/datas';
 import OsiDiasCard from '../components/OsiDiasCard';
 import MapaCobertura from '../components/MapaCobertura';
-import PageHeader from '../components/PageHeader';
 import { espelhoMotores, type PulsoContaDia, type PulsoSegDia, type PulsoConta, type LimelightDia, type LimePubDia, type BlogDia, type EspelhoBlogs } from '../lib/espelhoMotores';
-import { ultimaLeituraPorPeca, somarCampo, pecasMedidas } from '../lib/leituraPorPeca';
 import { lerTudo } from '../lib/paginar';
 
 // RADAR 360 (2026-08-25) — o analytics social completo do grupo, aprovado em mock.
@@ -29,8 +27,17 @@ type Serie = { id: string; label: string; color: string; logo: string | null; pt
 type Fila = { atrasados: number; com_erro: number; ultima_publicacao: string | null; ultima_audiencia: string | null };
 type Conta = { id: string; brand_name: string | null; platform: string; handle: string | null; status: string | null };
 type Cred = { platform: string; marca: string | null; status: string | null; expires_at: string | null };
-type Leitura = { origem: string; marca: string | null; conta: string | null; rede: string;
-  tipo: string; peca_ref: string; data: string; views: number | null };
+/** Uma peça, uma linha — a consolidação que vivia em TypeScript mudou para a view
+ *  `v_mkt_peca_consolidada` em 21/11/2026. A regra é a mesma (última leitura de cada campo, porque
+ *  `leitura_dia` guarda acumulado); o que mudou é o lugar: o banco faz a conta uma vez e manda
+ *  **473 linhas de uma janela de 30 dias** no lugar de 1.128 leituras cruas em duas páginas MAIS
+ *  3.072 publicações em quatro páginas enfileiradas. */
+type Peca = {
+  origem: string; marca: string | null; conta: string | null; rede: string; tipo: string;
+  peca_ref: string; leituras: number; primeira_leitura: string; ultima_leitura: string;
+  views: number | null; publicada_em: string | null; apagada: boolean;
+  dia_publicacao: string; publicacao_estimada: boolean;
+};
 
 // A FRONTEIRA COM O ESPELHO DO MKT, escrita em 20/11/2026 por ordem do dono ("pode fazer o corte
 // agora"), depois de ele perguntar por que existem as duas telas.
@@ -51,16 +58,10 @@ type Leitura = { origem: string; marca: string | null; conta: string | null; red
 //
 // O QUE NÃO É duplicação, e por isso ficou: "Motores" lá é ESTADO e custo de cada motor; "Vídeo &
 // motores" aqui é DESEMPENHO por plataforma. Mesmas marcas, perguntas diferentes.
-const ABAS = [
-  { k: 'visao', label: 'Visão', Icon: Eye },
-  { k: 'audiencia', label: 'Audiência', Icon: Users },
-  { k: 'conteudo', label: 'Conteúdo', Icon: Newspaper },
-  { k: 'video', label: 'Vídeo & motores', Icon: Film },
-  { k: 'regua', label: 'Régua por marca', Icon: Gauge },
-  { k: 'territorio', label: 'Território', Icon: MapPin },
-  { k: 'saude', label: 'Saúde da coleta', Icon: HeartPulse },
-] as const;
-type AbaK = typeof ABAS[number]['k'];
+// As abas que este módulo sabe desenhar. Quem escolhe é a página de Marketing — desde 21/11/2026
+// esta tela não tem endereço próprio nem barra própria: é metade de uma página só.
+export type AbaRadar = 'visao' | 'audiencia' | 'conteudo' | 'video' | 'regua' | 'territorio' | 'saude';
+type AbaK = AbaRadar;
 
 // ORIGEM × MARCA (20/11/2026, ordem do dono de 19/11: "separar origem de marca").
 //
@@ -80,24 +81,33 @@ type AbaK = typeof ABAS[number]['k'];
 // (mkt, pulso ou digiai_cortes lendo as MESMAS contas da casa) — é saúde de coleta, não dono de
 // canal. Medido em 20/11: `cortes.da.digiai` aparece com origem 'pulso' E 'digiai_cortes'; duas
 // coletas, nenhuma peça repetida (zero `peca_ref` em duas origens).
-const ORIGENS = [
+export const ORIGENS = [
   { k: '', label: 'todas' },
   { k: 'casa', label: 'casa' },
   { k: 'cortes', label: 'Cortes' },
   { k: 'pulso', label: 'Pulso' },
   { k: 'limelight', label: 'Limelight' },
 ] as const;
-type OrigemK = typeof ORIGENS[number]['k'];
+export type OrigemK = typeof ORIGENS[number]['k'];
 const ORIGEM_DA_MARCA: Record<string, OrigemK> = { bastidores: 'cortes', bastidores2: 'cortes', pulso: 'pulso' };
-const origemDaMarca = (code: string): OrigemK => ORIGEM_DA_MARCA[code] ?? 'casa';
-const rotuloOrigem = (k: OrigemK) => ORIGENS.find((o) => o.k === k)?.label ?? k;
+export const origemDaMarca = (code: string): OrigemK => ORIGEM_DA_MARCA[code] ?? 'casa';
+export const rotuloOrigem = (k: OrigemK) => ORIGENS.find((o) => o.k === k)?.label ?? k;
 
-const RANGES = [
+/** O recorte da página de Marketing inteira. Uma barra só, uma régua só — inclusive a da DATA, que
+ *  era o buraco entre as duas telas antigas: uma contava por data de publicação e a outra por data de
+ *  leitura, com o mesmo rótulo. */
+export type FiltrosMkt = {
+  dias: number; de: string; ate: string;
+  origem: OrigemK; rede: string; marca: string;
+  data: 'publicacao' | 'leitura';
+};
+
+export const RANGES = [
   { k: 1, label: 'hoje' }, { k: 7, label: '7d' }, { k: 14, label: '14d' }, { k: 30, label: '30d' },
   { k: 60, label: '60d' }, { k: 90, label: '90d' }, { k: 180, label: '6m' }, { k: 365, label: '12m' }, { k: 0, label: 'tudo' },
 ];
 // Todas as redes do grupo — inclusive as que ainda não têm coleta (aparecem "a ligar").
-const REDES = [
+export const REDES = [
   { k: '', label: 'todas' }, { k: 'instagram', label: 'Instagram' }, { k: 'facebook', label: 'Facebook' },
   { k: 'tiktok', label: 'TikTok' }, { k: 'youtube', label: 'YouTube' }, { k: 'kwai', label: 'Kwai' },
   { k: 'linkedin', label: 'LinkedIn' }, { k: 'x', label: 'X' }, { k: 'pinterest', label: 'Pinterest' },
@@ -135,8 +145,7 @@ const COR_SEC = 'var(--color-secondary)';
 // seria culpa do motor de coleta — as duas mentem, e mandam consertar o que não está quebrado.
 const FORA_DA_CASA = 'não é deste recorte — isto mede as contas da casa';
 
-export default function MktCrescimento() {
-  const [aba, setAba] = useState<AbaK>('visao');
+export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: FiltrosMkt }) {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [pubs, setPubs] = useState<Pub[]>([]);
   const [perf, setPerf] = useState<Perf[]>([]);
@@ -153,15 +162,11 @@ export default function MktCrescimento() {
   // Régua de crescimento por marca (MKT 20261005_01). Só leitura: quem calcula é o MKT, toda segunda 6h15.
   const [regua, setRegua] = useState<Nivel[]>([]);
   const [creds, setCreds] = useState<Cred[]>([]);
-  const [leituras, setLeituras] = useState<Leitura[]>([]);
+  const [pecas, setPecas] = useState<Peca[]>([]);
   const [loading, setLoading] = useState(true);
   const [sincronizando, setSincronizando] = useState(false);
-  const [fOrigem, setFOrigem] = useState<OrigemK>('');
-  const [fMarca, setFMarca] = useState('');
-  const [fRede, setFRede] = useState('');
-  const [fDias, setFDias] = useState(30);
-  const [fDe, setFDe] = useState('');
-  const [fAte, setFAte] = useState('');
+  // O recorte vem da página. Só o filtro de CONTEÚDO continua aqui: ele é de uma aba só.
+  const { origem: fOrigem, marca: fMarca, rede: fRede, dias: fDias, de: fDe, ate: fAte } = filtros;
   const [fConteudo, setFConteudo] = useState('');
   const [metrica, setMetrica] = useState<MetricaK>('seguidores');
 
@@ -179,69 +184,6 @@ export default function MktCrescimento() {
   // conserto: `segAtual` congelaria os seguidores no último dia que sobrou, `ultimoCenso` ficaria
   // velho, e o aviso "contas sem censo nos últimos 3 dias" acusaria contas que estão sendo medidas
   // todo dia. Erro falso é pior que número errado: manda consertar o que não está quebrado.
-  async function load() {
-    setLoading(true);
-    const [b, p, cp, ad, pd, psg, pct, ld, bd, lp, be, { data: fs }, { data: ac }, cr, { data: nv }, ldia] = await Promise.all([
-      supabase.schema('mkt').from('brands').select('id, code, name, accent_hex, logo_url').order('name'),
-      lerTudo<Pub>((de, ate) => supabase.schema('mkt').from('publications')
-        .select('id, brand_id, platform, url, published_at, metadata')
-        .order('published_at', { ascending: false }).order('id').range(de, ate)),
-      lerTudo<Perf>((de, ate) => supabase.schema('mkt').from('content_performance')
-        .select('publication_id, brand_id, gatilho, formato, engajamento, alcance, salvamentos, compartilhamentos, views')
-        .order('id').range(de, ate)),
-      lerTudo<Aud>((de, ate) => supabase.schema('mkt').from('audiencia_diaria')
-        .select('brand_id, platform, seguidores, dia, account_id').order('dia').order('id').range(de, ate)),
-      espelhoMotores.pulsoContasDias(),
-      espelhoMotores.pulsoSeguidoresDias(),
-      espelhoMotores.pulsoContas(),
-      espelhoMotores.limelightDias(),
-      espelhoMotores.blogsDias(),
-      espelhoMotores.limelightPubDias(),
-      espelhoMotores.blogs(),
-      supabase.from('v_mkt_fila_saude').select('atrasados, com_erro, ultima_publicacao, ultima_audiencia').maybeSingle(),
-      supabase.from('v_mkt_accounts').select('id, brand_name, platform, handle, status'),
-      supabase.from('v_mkt_credenciais_saude').select('platform, marca, status, expires_at'),
-      supabase.from('v_mkt_nivel_crescimento').select('*'),
-      lerTudo<Leitura>((de, ate) => supabase.from('v_mkt_analytics_peca_dia')
-        .select('origem, marca, conta, rede, tipo, peca_ref, data, views')
-        .order('data').order('origem').order('conta').order('rede').order('peca_ref').range(de, ate)),
-    ]);
-    setBrands((b.data ?? []) as Brand[]);
-    setPubs(p);
-    setPerf(cp);
-    setAud(ad);
-    setPulsoContasDias(pd); setPulsoSeg(psg); setPulsoContas(pct);
-    setLimeDias(ld); setBlogDias(bd); setLimePub(lp); setBlogsEsp(be);
-    setFila((fs ?? null) as Fila | null);
-    setContas((ac ?? []) as Conta[]);
-    setCreds(((cr.data ?? []) as Cred[]));
-    setRegua((nv ?? []) as Nivel[]);
-    setLeituras(ldia);
-    setLoading(false);
-  }
-  useEffect(() => { load(); }, []);
-
-  async function sincronizar() {
-    setSincronizando(true);
-    try { await supabase.functions.invoke('sync-metricas', { body: {} }); await load(); } finally { setSincronizando(false); }
-  }
-
-  // UM crivo só para marca+origem, usado por toda leitura da casa. Antes cada bloco repetia
-  // `!fMarca || code === fMarca`, e por isso o cartão do Pulso usava uma regra e a tabela de
-  // audiência outra — a mesma seleção dava respostas diferentes em abas diferentes.
-  //
-  // A marca `pulso` fica FORA de tudo que é da casa: ela existe em `mkt.brands` só como casca (0
-  // publicações, 0 censo, 0 leituras, medido em 20/11) e o dado real dela vem do espelho.
-  const marcaOk = (code?: string | null) => !!code && code !== 'pulso'
-    && (!fOrigem || origemDaMarca(code) === fOrigem) && (!fMarca || code === fMarca);
-  const marcasCasa = useMemo(() => brands.filter((b) => b.code !== 'pulso'
-    && (!fOrigem || origemDaMarca(b.code) === fOrigem)), [brands, fOrigem]);
-  const trocarOrigem = (k: OrigemK) => { setFOrigem(k); setFMarca(''); };
-
-  const brandById = useMemo(() => new Map(brands.map((b) => [b.id, b])), [brands]);
-  const brandOf = (id: string) => brandById.get(id);
-  const accent = (id: string) => brandOf(id)?.accent_hex || COR_SEC;
-
   // ---- recorte de período (presets + personalizado) ----
   const custom = fDe !== '' && fAte !== '' && fDe <= fAte;
   const corteDia = useMemo(() => {
@@ -254,6 +196,133 @@ export default function MktCrescimento() {
   const corteISO = corteDia + 'T00:00:00Z';
   const fimISO = fimDia + 'T23:59:59Z';
   const noRecorte = (dia: string) => dia >= corteDia && dia <= fimDia;
+
+  // ---- CADA ABA LÊ O QUE ELA MOSTRA, E SÓ NA PRIMEIRA VEZ (21/11/2026) ----
+  //
+  // Esta tela lia QUINZE fontes ao abrir, e duas delas vinham em páginas enfileiradas: medido no ar
+  // hoje, `publications` levava 3,9 s em 4 páginas (3.072 linhas) e a leitura por peça 4,1 s em 2.
+  // Só que a aba aberta nunca precisa de tudo — a régua não precisa de publicação, o território não
+  // precisa de nada, e a Visão não precisa das credenciais de OAuth.
+  //
+  // Duas fontes dependem do RECORTE e voltam a ser lidas quando a janela muda; as outras, uma vez só.
+  // É isso que faz a troca de período não custar a página inteira.
+  const carregadas = useRef(new Set<string>());
+
+  const FONTES: Record<string, () => Promise<void>> = {
+    async marcas() {
+      const { data } = await supabase.schema('mkt').from('brands').select('id, code, name, accent_hex, logo_url').order('name');
+      setBrands((data ?? []) as Brand[]);
+    },
+    // A consolidação mora no banco desde 21/11 (`v_mkt_peca_consolidada`): uma peça, uma linha, com
+    // a data de publicação junto. No recorte de 30 dias são 473 linhas numa página.
+    async pecas() {
+      setPecas(await lerTudo<Peca>((de, ate) => {
+        let q = supabase.from('v_mkt_peca_consolidada')
+          .select('origem, marca, conta, rede, tipo, peca_ref, leituras, primeira_leitura, ultima_leitura, views, publicada_em, apagada, dia_publicacao, publicacao_estimada');
+        if (corteDia > '2000-01-01') q = q.or(`dia_publicacao.gte.${corteDia},ultima_leitura.gte.${corteDia}`);
+        return q.order('origem').order('conta').order('rede').order('peca_ref').range(de, ate);
+      }));
+    },
+    // Só as publicações do recorte. Eram 3.072 linhas em 4 páginas enfileiradas para mostrar um
+    // total e uma lista de 12; no recorte de 30 dias são ~500, numa página.
+    async publicacoes() {
+      const [p, cp] = await Promise.all([
+        lerTudo<Pub>((de, ate) => {
+          let q = supabase.schema('mkt').from('publications')
+            .select('id, brand_id, platform, url, published_at, metadata');
+          if (corteDia > '2000-01-01') q = q.gte('published_at', corteISO).lte('published_at', fimISO);
+          return q.order('published_at', { ascending: false }).order('id').range(de, ate);
+        }),
+        lerTudo<Perf>((de, ate) => supabase.schema('mkt').from('content_performance')
+          .select('publication_id, brand_id, gatilho, formato, engajamento, alcance, salvamentos, compartilhamentos, views')
+          .order('id').range(de, ate)),
+      ]);
+      setPubs(p); setPerf(cp);
+    },
+    async audiencia() {
+      setAud(await lerTudo<Aud>((de, ate) => supabase.schema('mkt').from('audiencia_diaria')
+        .select('brand_id, platform, seguidores, dia, account_id').order('dia').order('id').range(de, ate)));
+    },
+    async pulso() {
+      const [pd, psg, pct] = await Promise.all([
+        espelhoMotores.pulsoContasDias(), espelhoMotores.pulsoSeguidoresDias(), espelhoMotores.pulsoContas(),
+      ]);
+      setPulsoContasDias(pd); setPulsoSeg(psg); setPulsoContas(pct);
+    },
+    async lime() {
+      const [ld, lp] = await Promise.all([espelhoMotores.limelightDias(), espelhoMotores.limelightPubDias()]);
+      setLimeDias(ld); setLimePub(lp);
+    },
+    async blogs() {
+      const [bd, be] = await Promise.all([espelhoMotores.blogsDias(), espelhoMotores.blogs()]);
+      setBlogDias(bd); setBlogsEsp(be);
+    },
+    async saude() {
+      const [{ data: fs }, { data: ac }, cr] = await Promise.all([
+        supabase.from('v_mkt_fila_saude').select('atrasados, com_erro, ultima_publicacao, ultima_audiencia').maybeSingle(),
+        supabase.from('v_mkt_accounts').select('id, brand_name, platform, handle, status'),
+        supabase.from('v_mkt_credenciais_saude').select('platform, marca, status, expires_at'),
+      ]);
+      setFila((fs ?? null) as Fila | null);
+      setContas((ac ?? []) as Conta[]);
+      setCreds((cr.data ?? []) as Cred[]);
+    },
+    async regua() {
+      const { data } = await supabase.from('v_mkt_nivel_crescimento').select('*');
+      setRegua((data ?? []) as Nivel[]);
+    },
+  };
+
+  /** Dependem do recorte — janela nova, leitura nova. O resto se lê uma vez. */
+  const DA_JANELA = new Set(['pecas', 'publicacoes']);
+  const FONTES_DA_ABA: Record<AbaK, string[]> = {
+    visao: ['marcas', 'pecas', 'publicacoes', 'audiencia', 'pulso', 'lime', 'blogs'],
+    audiencia: ['marcas', 'audiencia'],
+    conteudo: ['marcas', 'publicacoes', 'pecas'],
+    video: ['marcas', 'pulso', 'lime', 'blogs'],
+    regua: ['regua'],
+    territorio: [],
+    saude: ['marcas', 'audiencia', 'saude', 'pecas', 'pulso'],
+  };
+
+  const chaveDaFonte = (f: string) => (DA_JANELA.has(f) ? `${f}|${corteDia}|${fimDia}` : f);
+
+  function carregar(fontes: string[]) {
+    const faltando = fontes.filter((f) => !carregadas.current.has(chaveDaFonte(f)));
+    if (faltando.length === 0) { setLoading(false); return; }
+    faltando.forEach((f) => carregadas.current.add(chaveDaFonte(f)));
+    setLoading(true);
+    Promise.all(faltando.map((f) => FONTES[f]()))
+      .catch((e) => {
+        faltando.forEach((f) => carregadas.current.delete(chaveDaFonte(f)));
+        console.error('[radar] falha ao carregar', faltando, e);
+      })
+      .finally(() => setLoading(false));
+  }
+
+  useEffect(() => { carregar(FONTES_DA_ABA[aba] ?? []); }, [aba, corteDia, fimDia]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function sincronizar() {
+    setSincronizando(true);
+    try {
+      await supabase.functions.invoke('sync-metricas', { body: {} });
+      carregadas.current.clear();
+      carregar(FONTES_DA_ABA[aba] ?? []);
+    } finally { setSincronizando(false); }
+  }
+
+  // UM crivo só para marca+origem, usado por toda leitura da casa. Antes cada bloco repetia
+  // `!fMarca || code === fMarca`, e por isso o cartão do Pulso usava uma regra e a tabela de
+  // audiência outra — a mesma seleção dava respostas diferentes em abas diferentes.
+  //
+  // A marca `pulso` fica FORA de tudo que é da casa: ela existe em `mkt.brands` só como casca (0
+  // publicações, 0 censo, 0 leituras, medido em 20/11) e o dado real dela vem do espelho.
+  const marcaOk = (code?: string | null) => !!code && code !== 'pulso'
+    && (!fOrigem || origemDaMarca(code) === fOrigem) && (!fMarca || code === fMarca);
+  const brandById = useMemo(() => new Map(brands.map((b) => [b.id, b])), [brands]);
+  const brandOf = (id: string) => brandById.get(id);
+  const accent = (id: string) => brandOf(id)?.accent_hex || COR_SEC;
+
 
   // 05/10 (despacho do MKT): 88 publicações estão marcadas `excluido_em` — foram APAGADAS das redes na
   // limpeza dos rostos de IA e dos pins — e 2 são teste de conexão. Post que não existe mais não é alcance
@@ -282,26 +351,20 @@ export default function MktCrescimento() {
   // 43 em 19/11), vale a PRIMEIRA leitura dela. É aproximação, não medição, e está escrita no pé.
   //
   // Publicação apagada da rede continua fora, como no resto da tela.
-  const pubPorPeca = useMemo(() => {
-    const m = new Map<string, { publicada_em: string; apagada: boolean }>();
-    for (const p of pubs) {
-      const meta = (p.metadata ?? {}) as Record<string, unknown>;
-      const reg = { publicada_em: p.published_at, apagada: meta.excluido_em != null || meta.teste_de_conexao === true };
-      m.set(p.id, reg);
-      const corte = typeof meta.corte_peca_id === 'string' ? meta.corte_peca_id : '';
-      if (corte) m.set(corte, reg);
-    }
-    return m;
-  }, [pubs]);
-  const pecasLidas = useMemo(() => ultimaLeituraPorPeca(leituras), [leituras]);
-  const pecasF = useMemo(() => pecasLidas.filter((pc) => {
-    const pub = pubPorPeca.get(pc.peca_ref);
-    if (pub?.apagada) return false;
-    const dia = (pub?.publicada_em ?? pc.primeira_data).slice(0, 10);
+  // A RÉGUA DE DATA, que é escolhida na barra da página (21/11/2026):
+  //   · publicação — "quanto rendeu o que a casa PUBLICOU no período";
+  //   · leitura    — "quanto a casa já somou do que foi MEDIDO no período" (peça de julho lida
+  //     ontem entra, com tudo que acumulou).
+  // As duas contas sempre estiveram certas; o que faltava era a tela dizer qual estava usando. Era
+  // isto o 168k × 41,8k "na mesma janela" de 20/11.
+  const pecasF = useMemo(() => pecas.filter((pc) => {
+    if (pc.apagada) return false;
+    const dia = filtros.data === 'leitura' ? pc.ultima_leitura : pc.dia_publicacao;
     return dia >= corteDia && dia <= fimDia && marcaOk(pc.marca) && (!fRede || pc.rede === fRede);
-  }), [pecasLidas, pubPorPeca, corteDia, fimDia, fMarca, fOrigem, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
-  const viewsCasa = useMemo(() => somarCampo(pecasF, 'views'), [pecasF]);
-  const pecasComViews = useMemo(() => pecasMedidas(pecasF, 'views'), [pecasF]);
+  }), [pecas, corteDia, fimDia, fMarca, fOrigem, fRede, filtros.data]); // eslint-disable-line react-hooks/exhaustive-deps
+  const estimadas = useMemo(() => pecasF.filter((pc) => pc.publicacao_estimada).length, [pecasF]);
+  const viewsCasa = useMemo(() => pecasF.reduce((a, pc) => a + (pc.views ?? 0), 0), [pecasF]);
+  const pecasComViews = useMemo(() => pecasF.filter((pc) => pc.views != null).length, [pecasF]);
   const viewsCasaPorRede = useMemo(() => {
     const m = new Map<string, number>();
     for (const pc of pecasF) if (pc.views != null) m.set(pc.rede, (m.get(pc.rede) ?? 0) + pc.views);
@@ -618,70 +681,6 @@ export default function MktCrescimento() {
 
   return (
     <div>
-      <PageHeader
-        eyebrow="Analytics social · todas as redes, canais e marcas"
-        title="Radar 360"
-        subtitle={'O DETALHE da medição: por marca, por rede e por conta, mais a saúde de quem coleta. O total da casa e a decisão do dia vivem no Espelho do MKT. Estrutura completa desde já: o que ainda não tem coleta aparece como "a ligar" — nunca some.'}
-        actions={
-          <button onClick={sincronizar} disabled={sincronizando}
-            className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-outline/30 text-on-surface-variant hover:bg-surface-highest disabled:opacity-50">
-            {sincronizando ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />} sincronizar agora
-          </button>
-        }
-      />
-
-      {/* abas */}
-      <div className="flex gap-1 border-b border-outline/20 mb-4 overflow-x-auto">
-        {ABAS.map(({ k, label, Icon }) => (
-          <button key={k} onClick={() => setAba(k)}
-            className={'flex items-center gap-1.5 px-3.5 py-2 font-mono text-[11px] uppercase tracking-wider whitespace-nowrap border-b-2 -mb-px transition-colors ' +
-              (aba === k ? 'border-secondary text-on-surface' : 'border-transparent text-muted hover:text-on-surface-variant')}>
-            <Icon className="w-3.5 h-3.5" />{label}
-          </button>
-        ))}
-      </div>
-
-      {/* filtros globais */}
-      <div className="border border-outline/15 bg-surface-container px-3.5 py-3 mb-5 space-y-2.5">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className={lbl + ' mr-1 shrink-0'}>período</span>
-          {RANGES.map((r) => <Chip key={r.k} on={!custom && fDias === r.k} onClick={() => { setFDias(r.k); setFDe(''); setFAte(''); }}>{r.label}</Chip>)}
-          <input type="date" value={fDe} onChange={(e) => setFDe(e.target.value)} aria-label="de"
-            className="bg-surface border border-outline/30 text-on-surface font-mono text-[11px] px-1.5 py-1" />
-          <span className="text-muted text-xs">→</span>
-          <input type="date" value={fAte} onChange={(e) => setFAte(e.target.value)} aria-label="até"
-            className="bg-surface border border-outline/30 text-on-surface font-mono text-[11px] px-1.5 py-1" />
-          <span className="ml-auto font-mono text-[10px] text-muted">{rotuloRecorte}{fOrigem ? ` · ${rotuloOrigem(fOrigem)}` : ''}{fRede ? ` · ${platName(fRede)}` : ''}{fMarca ? ` · ${brands.find((b) => b.code === fMarca)?.name ?? fMarca}` : ''}</span>
-        </div>
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className={lbl + ' mr-1 shrink-0'}>rede</span>
-          {REDES.map((r) => <Chip key={r.k} on={fRede === r.k} onClick={() => setFRede(r.k)}>{r.label}</Chip>)}
-        </div>
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className={lbl + ' mr-1 shrink-0'}>origem</span>
-          {ORIGENS.map((o) => <Chip key={o.k} on={fOrigem === o.k} onClick={() => trocarOrigem(o.k)}>{o.label}</Chip>)}
-          <span className="text-[11px] text-muted ml-1">de quem é o canal — a marca vem depois, dentro da origem</span>
-        </div>
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className={lbl + ' mr-1 shrink-0'}>marca</span>
-          <Chip on={fMarca === ''} onClick={() => setFMarca('')}>todas</Chip>
-          {fOrigem !== 'pulso' && fOrigem !== 'limelight' && marcasCasa.map((b) =>
-            <Chip key={b.id} on={fMarca === b.code} onClick={() => setFMarca(fMarca === b.code ? '' : b.code)} cor={b.accent_hex}>{b.name}</Chip>)}
-          {(fOrigem === '' || fOrigem === 'pulso') && pulsoMarcas.length > 0 && <>
-            <span className={lbl + ' ml-1'}>pulso ▸</span>
-            {pulsoMarcas.map((m) => <Chip key={m} on={fMarca === m} onClick={() => setFMarca(fMarca === m ? '' : m)} cor={COR_SEC}>{m}</Chip>)}
-          </>}
-          {fOrigem === 'limelight' && <span className="text-[11px] text-muted">a fábrica publica nos canais da Mello — marca única</span>}
-        </div>
-        {aba === 'conteudo' && conteudos.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className={lbl + ' mr-1 shrink-0'}>conteúdo</span>
-            <Chip on={fConteudo === ''} onClick={() => setFConteudo('')}>todos</Chip>
-            {conteudos.slice(0, 10).map((c) => <Chip key={c} on={fConteudo === c} onClick={() => setFConteudo(fConteudo === c ? '' : c)}>{c.length > 26 ? c.slice(0, 26) + '…' : c}</Chip>)}
-          </div>
-        )}
-      </div>
-
       {soMotor && !loading && (
         <div className="border border-outline/15 bg-surface-container px-3.5 py-2.5 mb-4 text-[13px] text-on-surface-variant">
           Recorte <b className="text-on-surface">{rotuloOrigem(fOrigem)}</b>: são canais de fora da casa, e o dado deles vem do
@@ -719,7 +718,12 @@ export default function MktCrescimento() {
             const temMotor = viewsRecorte > 0;
             const viewsTotais = viewsRecorte + viewsCasa;
             const temViews = viewsTotais > 0;
-            const heroPostsRotulo = temViews ? 'views do que foi PUBLICADO no período (motores + contas da casa)' : 'engajamento nas redes no período';
+            // O rótulo segue a régua escolhida na barra. Era exatamente isto que faltava em 20/11:
+            // o número mudava de significado e o rótulo ficava igual.
+            const porLeitura = filtros.data === 'leitura';
+            const heroPostsRotulo = temViews
+              ? `views do que foi ${porLeitura ? 'LIDO' : 'PUBLICADO'} no período (motores + contas da casa)`
+              : 'engajamento nas redes no período';
             // share das redes das marcas: engajamento por plataforma (mkt real do recorte)
             const engPorRede = (() => {
               const m = new Map<string, number>();
@@ -750,7 +754,7 @@ export default function MktCrescimento() {
                           {mostrarPulso && pulsoTot.views > 0 && <>Pulso {nf(pulsoTot.views)} · </>}
                           {mostrarLime && limeTot.views > 0 && <>Limelight {nf(limeTot.views)} · </>}
                           {viewsCasa > 0
-                            ? <>contas da casa {nf(viewsCasa)} ({pecasComViews} de {pecasF.length} peças lidas)</>
+                            ? <>contas da casa {nf(viewsCasa)} ({pecasComViews} de {pecasF.length} peças lidas{!porLeitura && estimadas > 0 ? ` · ${estimadas} sem registro de publicação, datadas pela 1ª leitura` : ''})</>
                             : <>contas da casa sem leitura no recorte</>}
                         </>
                       : <>{linhas.length} publicações · {medidos.length} medidas{fMarca ? ' · esta marca não tem motor de vídeo — o dado dela vive nas redes' : ''}</>}
@@ -795,9 +799,9 @@ export default function MktCrescimento() {
                 <Kpi icon={<Sparkles className="w-4 h-4" />} label="engajamento redes" value={soMotor || medidos.length === 0 ? '—' : nf(engTotal)}
                   sub={soMotor ? FORA_DA_CASA : medidos.length === 0 ? 'engajamento não coletado nesta rede' : `média ${nf(Math.round(engMed))}/post`} glow={COR_OK} />
                 <Kpi icon={<Film className="w-4 h-4" />} label="views motores" value={temMotor ? nf(viewsRecorte) : '—'} sub={temMotor ? `${nf(pubsRecorte)} pubs · ${nf(engRecorte)} interações` : fMarca ? 'sem motor nesta marca' : 'sem views no recorte'} glow={COR_WARN} />
-                <Kpi icon={<Eye className="w-4 h-4" />} label="views das peças publicadas no período" value={soMotor || viewsCasa === 0 ? '—' : nf(viewsCasa)}
+                <Kpi icon={<Eye className="w-4 h-4" />} label={`views das peças ${porLeitura ? 'lidas' : 'publicadas'} no período`} value={soMotor || viewsCasa === 0 ? '—' : nf(viewsCasa)}
                   sub={soMotor ? FORA_DA_CASA
-                    : viewsCasa > 0 ? `${pecasComViews} de ${pecasF.length} peças com leitura · o Espelho conta por data de LEITURA e dá mais`
+                    : viewsCasa > 0 ? `${pecasComViews} de ${pecasF.length} peças com leitura · trocar para "por ${porLeitura ? 'PUBLICAÇÃO' : 'LEITURA'}" na barra dá outro número, e os dois estão certos`
                     : 'a coletar — despacho no MKT (sync-metricas)'} glow={COR_SEC} />
               </section>
             </>
@@ -901,6 +905,14 @@ export default function MktCrescimento() {
           {aba === 'conteudo' && (
             <>
               <Decide texto={<><b>O que se decide aqui:</b> que formato produzir mais e em que janela publicar — provado pelo engajamento real do recorte.</>} />
+              {conteudos.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1.5 border border-outline/15 bg-surface-container px-3.5 py-2.5 mb-4">
+                  <span className={lbl + ' mr-1 shrink-0'}>conteúdo</span>
+                  <Chip on={fConteudo === ''} onClick={() => setFConteudo('')}>todos</Chip>
+                  {conteudos.slice(0, 10).map((x) => <Chip key={x} on={fConteudo === x} onClick={() => setFConteudo(fConteudo === x ? '' : x)}>{x.length > 26 ? x.slice(0, 26) + '…' : x}</Chip>)}
+                  <span className="text-[11px] text-muted ml-1">vale só nesta aba</span>
+                </div>
+              )}
               <section className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
                 <Kpi icon={<TrendingUp className="w-4 h-4" />} label="engajamento" value={nf(engTotal)} sub={`${medidos.length} posts medidos · média ${nf(Math.round(engMed))}`} glow={COR_OK} />
                 <Kpi icon={<Eye className="w-4 h-4" />} label="alcance" value={temAlcance ? nf(alcanceTotal) : '🔒'} sub={temAlcance ? (taxaEng != null ? `taxa ${taxaEng.toFixed(1)}%` : '') : 'aguarda permissão Meta'} glow={COR_WARN} />
@@ -1020,6 +1032,13 @@ export default function MktCrescimento() {
           {aba === 'saude' && (
             <>
               <Decide texto={<><b>O que se decide aqui:</b> se dá para confiar nos números das outras abas. Fonte sem data fresca congela em silêncio — esta aba é o antídoto.</>} />
+              <div className="flex items-center gap-2 mb-4">
+                <button onClick={sincronizar} disabled={sincronizando}
+                  className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-outline/30 text-on-surface-variant hover:bg-surface-highest disabled:opacity-50">
+                  {sincronizando ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />} sincronizar agora
+                </button>
+                <span className="text-[11px] text-muted">chama o motor do MKT e relê — o botão mora aqui porque é aqui que se vê se adiantou</span>
+              </div>
               <section className="grid gap-2.5 mb-5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
                 <Health cor={ultimoCenso === hojeBrasilia() ? COR_OK : COR_WARN} titulo="Censo de redes" sub={`${contasMedidas || '—'} contas · último ${ultimoCenso ? fmtDM(ultimoCenso) : '—'}`} />
                 <Health cor={ultimaLeituraPulso === hojeBrasilia() ? COR_OK : COR_WARN} titulo="Pulso"
@@ -1141,7 +1160,7 @@ function Health({ cor, titulo, sub }: { cor: string; titulo: string; sub: string
   );
 }
 
-function Chip({ on, onClick, children, cor }: { on: boolean; onClick: () => void; children: React.ReactNode; cor?: string | null }) {
+export function Chip({ on, onClick, children, cor }: { on: boolean; onClick: () => void; children: React.ReactNode; cor?: string | null }) {
   return (
     <button onClick={onClick}
       className={'inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] border transition-colors ' +
