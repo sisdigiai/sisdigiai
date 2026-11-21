@@ -26,6 +26,23 @@ daí que nasceu o *168k × 41,8k "na mesma janela"* de 20/11. Agora a barra tem 
 As duas contas sempre estiveram certas. O rótulo muda junto com a escolha, e os dois números bateram
 exato com o banco antes de eu abrir a tela.
 
+### E a primeira versão do filtro estava confusa — dito pelo dono no mesmo dia
+
+*"ficamos com os filtros confusos, mas está funcionando sim."* Ele foi procurar o Pulso onde o Pulso
+sempre esteve — na linha de **marca** — e não achou: eu tinha posto **origem** numa linha e **marca**
+em outra, e as duas conversavam. Escolher "casa" fazia os canais do Pulso **desaparecerem** da linha
+de marca, sem dizer nada. Separei pela regra em vez de por como se procura.
+
+Agora é **uma linha só, `quem`**, com tudo à vista em grupos: `tudo · casa · 6 · … · Cortes · 2 · … ·
+Pulso · 3 · … · Limelight`. O grupo **ensina** a diferença entre origem e marca em vez de esconder
+chip; clicar no nome do grupo pega o grupo inteiro, clicar num canal pega só ele e já escolhe a
+origem. O estado por baixo é o mesmo — nenhuma conta mudou.
+
+Um detalhe que só apareceu com a linha pronta: dentro do grupo do Pulso os canais ficavam
+"Bastidores" e "Cortes", e **"Cortes" é também o nome de um grupo** (os canais da casa). Dois chips
+com o mesmo nome na mesma linha é trocar uma confusão por outra — o canal do Pulso passou a levar o
+sobrenome (`cortes do Pulso`, `bastidores do Pulso`, `canal principal`).
+
 ### A leitura
 
 | | antes | agora |
