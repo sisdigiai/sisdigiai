@@ -99,35 +99,53 @@ export interface BlogDia { dia: string; blog_slug: string; leituras: number; ses
 // precisa saber qual das duas, porque uma se resolve com credencial e a outra com plano ou espaço.
 export type EstadoEspelho = 'ok' | 'sem_credencial' | 'erro' | 'bloqueado';
 
-async function lerLinhasEstado<T>(base: string | undefined, anon: string | undefined, view: string):
+// O ESPELHO TAMBÉM TEM TETO. (20/11/2026) A API corta QUALQUER resposta em 1.000 linhas e devolve
+// isso como sucesso — vale para o banco do digiai e vale para o de cada motor. Medido hoje na base do
+// Pulso: `v_espelho_pulso_contas_dias` 757 linhas, `v_seguidores_pulso_dias` 683, e as duas crescem
+// todo dia. Sem página, o dia em que passarem de mil o painel some com as linhas mais novas (a ordem
+// é crescente por dia) sem erro nenhum — exatamente o que ia acontecer com a `audiencia_diaria` no
+// fim de semana. Pagina-se até vir página curta.
+//
+// A ORDEM PRECISA SER ÚNICA, e por isso `ordem` é argumento: cada página é uma consulta nova, e
+// linhas empatadas na coluna de ordenação podem repetir numa página e sumir de outra — em silêncio.
+// `dia` sozinho empata em quase tudo aqui (várias contas e redes no mesmo dia).
+const PAGINA_ESPELHO = 1000;
+
+async function lerLinhasEstado<T>(base: string | undefined, anon: string | undefined, view: string, ordem = 'dia.asc'):
   Promise<{ linhas: T[]; estado: EstadoEspelho; detalhe?: string }> {
   if (!base || !anon) {
     console.error('[espelho] %s: variavel de ambiente ausente — espelho desligado', view);
     return { linhas: [], estado: 'sem_credencial', detalhe: 'variável de ambiente ausente' };
   }
+  const todas: T[] = [];
   try {
-    const r = await fetch(`${base}/rest/v1/${view}?select=*&order=dia.asc`, {
-      headers: { apikey: anon, Authorization: `Bearer ${anon}` },
-      signal: AbortSignal.timeout(12000),
-    });
-    if (r.status === 402) {
-      console.error('[espelho] %s: projeto restrito pelo Supabase (402)', view);
-      return { linhas: [], estado: 'bloqueado', detalhe: 'banco do app está restrito pelo Supabase' };
+    for (let de = 0; de < 50000; de += PAGINA_ESPELHO) {
+      const r = await fetch(`${base}/rest/v1/${view}?select=*&order=${ordem}&limit=${PAGINA_ESPELHO}&offset=${de}`, {
+        headers: { apikey: anon, Authorization: `Bearer ${anon}` },
+        signal: AbortSignal.timeout(12000),
+      });
+      if (r.status === 402) {
+        console.error('[espelho] %s: projeto restrito pelo Supabase (402)', view);
+        return { linhas: [], estado: 'bloqueado', detalhe: 'banco do app está restrito pelo Supabase' };
+      }
+      if (!r.ok) {
+        console.error('[espelho] %s: HTTP %s', view, r.status);
+        return { linhas: [], estado: 'erro', detalhe: `HTTP ${r.status}` };
+      }
+      const rows = await r.json();
+      const lote = Array.isArray(rows) ? (rows as T[]) : [];
+      todas.push(...lote);
+      if (lote.length < PAGINA_ESPELHO) break;
     }
-    if (!r.ok) {
-      console.error('[espelho] %s: HTTP %s', view, r.status);
-      return { linhas: [], estado: 'erro', detalhe: `HTTP ${r.status}` };
-    }
-    const rows = await r.json();
-    return { linhas: Array.isArray(rows) ? (rows as T[]) : [], estado: 'ok' };
+    return { linhas: todas, estado: 'ok' };
   } catch (e) {
     console.error('[espelho] %s inacessivel', view, e);
     return { linhas: [], estado: 'erro', detalhe: e instanceof Error ? e.message : 'inacessível' };
   }
 }
 
-async function lerLinhas<T>(base: string | undefined, anon: string | undefined, view: string): Promise<T[]> {
-  return (await lerLinhasEstado<T>(base, anon, view)).linhas;
+async function lerLinhas<T>(base: string | undefined, anon: string | undefined, view: string, ordem = 'dia.asc'): Promise<T[]> {
+  return (await lerLinhasEstado<T>(base, anon, view, ordem)).linhas;
 }
 
 async function lerEspelho<T>(base: string | undefined, anon: string | undefined, view: string): Promise<T | null> {
@@ -202,23 +220,62 @@ export interface PulsoLongoDia {
   horas_exibicao: number | null; retencao_media_pct: number | null;
 }
 
+// O PULSO POR CONTA (20/11/2026, por ordem do dono: "o cartão PULSO vira três").
+//
+// `v_espelho_pulso_contas_dias` é a soma exata das duas views anteriores — `v_espelho_pulso_dias`
+// (os curtos do canal principal) mais `v_espelho_pulso_longos_dias` (cortes e longos) — e acrescenta
+// MARCA e CONTA. Conferido por mim como anon em 20/11, linha a linha: 757 linhas, 813.022 views,
+// 1.371 publicações; as 53 linhas que não são 'curto' batem com as 53 dos longos, 1.658 views, zero
+// chave divergente. Não há soma dupla — há a mesma soma, repartiível.
+//
+// Por que isso importa: o Radar lia só a `v_espelho_pulso_dias`, então os cortes e os longos do Pulso
+// (1.658 views) não entravam no número grande, e o PULSO aparecia como UM canal quando são três
+// marcas — PULSO Histórias, Cortes e Bastidores — com desempenho muito diferente.
+//
+// AS DUAS VIEWS DATAM O MESMO DIA DE FORMA DIFERENTE, e isso foi medido antes de trocar a fonte:
+// o total histórico bate exato (811.364 views nas duas), mas em 544 pares (dia, plataforma) a view
+// ANTIGA põe as mesmas views **um dia depois**. É desvio de fuso: a `v_espelho_pulso_dias` nasceu
+// datando em UTC, e as duas novas (contas e longos, feitas em 17 e 20/11) datam no dia do negócio,
+// BRT — que é a regra da casa. Consequência prática: num recorte de 30 dias a borda muda, medido
+// hoje em 107.600 → 105.452 views no canal principal. Não é view perdida, é view no dia certo.
+// Pedi ao agente do Pulso que confirme a coluna de data das três views.
+//
+// As contas da DIGIAI continuam FORA destas views, de propósito: elas já estão na
+// v_mkt_analytics_peca_dia, e somar as duas contaria a mesma peça duas vezes.
+export interface PulsoContaDia {
+  dia: string; marca: string; conta: string; plataforma: string; tipo: 'curto' | 'corte' | 'longo';
+  publicacoes: number; views: number; likes: number; comentarios: number; shares: number;
+}
+export interface PulsoSegDia { dia: string; marca: string; conta: string; rede: string; seguidores: number | null }
+/** Toda conta do Pulso, inclusive a que não mede — conta sem leitura precisa APARECER dizendo isso. */
+export interface PulsoConta {
+  marca: string; conta: string; rede: string;
+  mede_views: boolean; mede_seguidores: boolean; observacao: string | null;
+}
+
 // Leitores com motivo, para a tela do comparativo. Os sem estado continuam para as telas antigas.
 export const espelhoMotoresEstado = {
-  pulsoDias: () => lerLinhasEstado<PulsoDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_dias'),
-  pulsoLongosDias: () => lerLinhasEstado<PulsoLongoDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_longos_dias'),
-  limelightPubDias: () => lerLinhasEstado<LimePubDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_pub_dias'),
-  blogsDias: () => lerLinhasEstado<BlogDia>(BLOGS_URL, BLOGS_ANON, 'v_espelho_blogs_dias'),
-  polaDias: () => lerLinhasEstado<PolaDia>(POLA_URL, POLA_ANON, 'v_pola_redes_metricas_dia'),
+  pulsoDias: () => lerLinhasEstado<PulsoDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_dias', 'dia.asc,plataforma.asc'),
+  pulsoLongosDias: () => lerLinhasEstado<PulsoLongoDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_longos_dias', 'dia.asc,conta.asc,plataforma.asc,tipo.asc'),
+  pulsoContasDias: () => lerLinhasEstado<PulsoContaDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_contas_dias', 'dia.asc,conta.asc,plataforma.asc,tipo.asc'),
+  pulsoSeguidoresDias: () => lerLinhasEstado<PulsoSegDia>(PULSO_URL, PULSO_ANON, 'v_seguidores_pulso_dias', 'dia.asc,conta.asc,rede.asc'),
+  pulsoContas: () => lerLinhasEstado<PulsoConta>(PULSO_URL, PULSO_ANON, 'v_contas_pulso', 'marca.asc,conta.asc,rede.asc'),
+  limelightPubDias: () => lerLinhasEstado<LimePubDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_pub_dias', 'dia.asc,plataforma.asc'),
+  blogsDias: () => lerLinhasEstado<BlogDia>(BLOGS_URL, BLOGS_ANON, 'v_espelho_blogs_dias', 'dia.asc,blog_slug.asc'),
+  polaDias: () => lerLinhasEstado<PolaDia>(POLA_URL, POLA_ANON, 'v_pola_redes_metricas_dia', 'dia.asc,rede.asc'),
 };
 
 export const espelhoMotores = {
   limelight: () => lerEspelho<EspelhoLimelight>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight'),
   pulso: () => lerPulsoGateado(),
   blogs: () => lerEspelho<EspelhoBlogs>(BLOGS_URL, BLOGS_ANON, 'v_espelho_blogs'),
-  pulsoDias: () => lerLinhas<PulsoDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_dias'),
-  limelightDias: () => lerLinhas<LimelightDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_dias'),
-  limelightPubDias: () => lerLinhas<LimePubDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_pub_dias'),
-  blogsDias: () => lerLinhas<BlogDia>(BLOGS_URL, BLOGS_ANON, 'v_espelho_blogs_dias'),
+  pulsoDias: () => lerLinhas<PulsoDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_dias', 'dia.asc,plataforma.asc'),
+  pulsoContasDias: () => lerLinhas<PulsoContaDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_contas_dias', 'dia.asc,conta.asc,plataforma.asc,tipo.asc'),
+  pulsoSeguidoresDias: () => lerLinhas<PulsoSegDia>(PULSO_URL, PULSO_ANON, 'v_seguidores_pulso_dias', 'dia.asc,conta.asc,rede.asc'),
+  pulsoContas: () => lerLinhas<PulsoConta>(PULSO_URL, PULSO_ANON, 'v_contas_pulso', 'marca.asc,conta.asc,rede.asc'),
+  limelightDias: () => lerLinhas<LimelightDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_dias', 'dia.asc,plataforma.asc'),
+  limelightPubDias: () => lerLinhas<LimePubDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_pub_dias', 'dia.asc,plataforma.asc'),
+  blogsDias: () => lerLinhas<BlogDia>(BLOGS_URL, BLOGS_ANON, 'v_espelho_blogs_dias', 'dia.asc,blog_slug.asc'),
 };
 
 /**

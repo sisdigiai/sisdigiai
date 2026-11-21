@@ -5,7 +5,7 @@ import { hojeBrasilia, diaBrasilia } from '../lib/datas';
 import OsiDiasCard from '../components/OsiDiasCard';
 import MapaCobertura from '../components/MapaCobertura';
 import PageHeader from '../components/PageHeader';
-import { espelhoMotores, type PulsoDia, type LimelightDia, type LimePubDia, type BlogDia, type EspelhoBlogs } from '../lib/espelhoMotores';
+import { espelhoMotores, type PulsoContaDia, type PulsoSegDia, type PulsoConta, type LimelightDia, type LimePubDia, type BlogDia, type EspelhoBlogs } from '../lib/espelhoMotores';
 import { ultimaLeituraPorPeca, somarCampo, pecasMedidas } from '../lib/leituraPorPeca';
 import { lerTudo } from '../lib/paginar';
 
@@ -62,6 +62,36 @@ const ABAS = [
 ] as const;
 type AbaK = typeof ABAS[number]['k'];
 
+// ORIGEM × MARCA (20/11/2026, ordem do dono de 19/11: "separar origem de marca").
+//
+// Estavam no mesmo filtro e não são a mesma pergunta. "PULSO" era um chip de MARCA, e clicar nele
+// deixava a tela em branco: medido hoje, a marca `pulso` em `mkt.brands` tem ZERO publicações, ZERO
+// censo de audiência e ZERO leituras — o dado do Pulso vive no banco DELE, no espelho. E clicar
+// "Bastidores DIGIAI" escondia o cartão do Pulso, que é justamente quem publica e mede esses canais.
+// O filtro mentia nos dois sentidos.
+//
+// Origem = DE QUEM É O CANAL. São quatro, e não se sobrepõem:
+//   · casa      — contas das marcas da DIGIAI (schema mkt)
+//   · cortes    — canais de Bastidores/Cortes da casa, produzidos pelo digiai_cortes
+//   · pulso     — canais faceless do próprio Pulso (espelho; TRÊS marcas, não uma)
+//   · limelight — fábrica da Mello (espelho)
+//
+// NÃO confundir com a coluna `origem` da `v_mkt_analytics_peca_dia`: aquela diz QUEM MEDIU a peça
+// (mkt, pulso ou digiai_cortes lendo as MESMAS contas da casa) — é saúde de coleta, não dono de
+// canal. Medido em 20/11: `cortes.da.digiai` aparece com origem 'pulso' E 'digiai_cortes'; duas
+// coletas, nenhuma peça repetida (zero `peca_ref` em duas origens).
+const ORIGENS = [
+  { k: '', label: 'todas' },
+  { k: 'casa', label: 'casa' },
+  { k: 'cortes', label: 'Cortes' },
+  { k: 'pulso', label: 'Pulso' },
+  { k: 'limelight', label: 'Limelight' },
+] as const;
+type OrigemK = typeof ORIGENS[number]['k'];
+const ORIGEM_DA_MARCA: Record<string, OrigemK> = { bastidores: 'cortes', bastidores2: 'cortes', pulso: 'pulso' };
+const origemDaMarca = (code: string): OrigemK => ORIGEM_DA_MARCA[code] ?? 'casa';
+const rotuloOrigem = (k: OrigemK) => ORIGENS.find((o) => o.k === k)?.label ?? k;
+
 const RANGES = [
   { k: 1, label: 'hoje' }, { k: 7, label: '7d' }, { k: 14, label: '14d' }, { k: 30, label: '30d' },
   { k: 60, label: '60d' }, { k: 90, label: '90d' }, { k: 180, label: '6m' }, { k: 365, label: '12m' }, { k: 0, label: 'tudo' },
@@ -108,7 +138,9 @@ export default function MktCrescimento() {
   const [pubs, setPubs] = useState<Pub[]>([]);
   const [perf, setPerf] = useState<Perf[]>([]);
   const [aud, setAud] = useState<Aud[]>([]);
-  const [pulsoDias, setPulsoDias] = useState<PulsoDia[]>([]);
+  const [pulsoContasDias, setPulsoContasDias] = useState<PulsoContaDia[]>([]);
+  const [pulsoSeg, setPulsoSeg] = useState<PulsoSegDia[]>([]);
+  const [pulsoContas, setPulsoContas] = useState<PulsoConta[]>([]);
   const [limeDias, setLimeDias] = useState<LimelightDia[]>([]);
   const [limePub, setLimePub] = useState<LimePubDia[]>([]);
   const [blogDias, setBlogDias] = useState<BlogDia[]>([]);
@@ -121,6 +153,7 @@ export default function MktCrescimento() {
   const [leituras, setLeituras] = useState<Leitura[]>([]);
   const [loading, setLoading] = useState(true);
   const [sincronizando, setSincronizando] = useState(false);
+  const [fOrigem, setFOrigem] = useState<OrigemK>('');
   const [fMarca, setFMarca] = useState('');
   const [fRede, setFRede] = useState('');
   const [fDias, setFDias] = useState(30);
@@ -145,7 +178,7 @@ export default function MktCrescimento() {
   // todo dia. Erro falso é pior que número errado: manda consertar o que não está quebrado.
   async function load() {
     setLoading(true);
-    const [b, p, cp, ad, pd, ld, bd, lp, be, { data: fs }, { data: ac }, cr, { data: nv }, ldia] = await Promise.all([
+    const [b, p, cp, ad, pd, psg, pct, ld, bd, lp, be, { data: fs }, { data: ac }, cr, { data: nv }, ldia] = await Promise.all([
       supabase.schema('mkt').from('brands').select('id, code, name, accent_hex, logo_url').order('name'),
       lerTudo<Pub>((de, ate) => supabase.schema('mkt').from('publications')
         .select('id, brand_id, platform, url, published_at, metadata')
@@ -155,7 +188,9 @@ export default function MktCrescimento() {
         .order('id').range(de, ate)),
       lerTudo<Aud>((de, ate) => supabase.schema('mkt').from('audiencia_diaria')
         .select('brand_id, platform, seguidores, dia').order('dia').order('id').range(de, ate)),
-      espelhoMotores.pulsoDias(),
+      espelhoMotores.pulsoContasDias(),
+      espelhoMotores.pulsoSeguidoresDias(),
+      espelhoMotores.pulsoContas(),
       espelhoMotores.limelightDias(),
       espelhoMotores.blogsDias(),
       espelhoMotores.limelightPubDias(),
@@ -172,7 +207,8 @@ export default function MktCrescimento() {
     setPubs(p);
     setPerf(cp);
     setAud(ad);
-    setPulsoDias(pd); setLimeDias(ld); setBlogDias(bd); setLimePub(lp); setBlogsEsp(be);
+    setPulsoContasDias(pd); setPulsoSeg(psg); setPulsoContas(pct);
+    setLimeDias(ld); setBlogDias(bd); setLimePub(lp); setBlogsEsp(be);
     setFila((fs ?? null) as Fila | null);
     setContas((ac ?? []) as Conta[]);
     setCreds(((cr.data ?? []) as Cred[]));
@@ -186,6 +222,18 @@ export default function MktCrescimento() {
     setSincronizando(true);
     try { await supabase.functions.invoke('sync-metricas', { body: {} }); await load(); } finally { setSincronizando(false); }
   }
+
+  // UM crivo só para marca+origem, usado por toda leitura da casa. Antes cada bloco repetia
+  // `!fMarca || code === fMarca`, e por isso o cartão do Pulso usava uma regra e a tabela de
+  // audiência outra — a mesma seleção dava respostas diferentes em abas diferentes.
+  //
+  // A marca `pulso` fica FORA de tudo que é da casa: ela existe em `mkt.brands` só como casca (0
+  // publicações, 0 censo, 0 leituras, medido em 20/11) e o dado real dela vem do espelho.
+  const marcaOk = (code?: string | null) => !!code && code !== 'pulso'
+    && (!fOrigem || origemDaMarca(code) === fOrigem) && (!fMarca || code === fMarca);
+  const marcasCasa = useMemo(() => brands.filter((b) => b.code !== 'pulso'
+    && (!fOrigem || origemDaMarca(b.code) === fOrigem)), [brands, fOrigem]);
+  const trocarOrigem = (k: OrigemK) => { setFOrigem(k); setFMarca(''); };
 
   const brandById = useMemo(() => new Map(brands.map((b) => [b.id, b])), [brands]);
   const brandOf = (id: string) => brandById.get(id);
@@ -247,8 +295,8 @@ export default function MktCrescimento() {
     const pub = pubPorPeca.get(pc.peca_ref);
     if (pub?.apagada) return false;
     const dia = (pub?.publicada_em ?? pc.primeira_data).slice(0, 10);
-    return dia >= corteDia && dia <= fimDia && (!fMarca || pc.marca === fMarca) && (!fRede || pc.rede === fRede);
-  }), [pecasLidas, pubPorPeca, corteDia, fimDia, fMarca, fRede]);
+    return dia >= corteDia && dia <= fimDia && marcaOk(pc.marca) && (!fRede || pc.rede === fRede);
+  }), [pecasLidas, pubPorPeca, corteDia, fimDia, fMarca, fOrigem, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
   const viewsCasa = useMemo(() => somarCampo(pecasF, 'views'), [pecasF]);
   const pecasComViews = useMemo(() => pecasMedidas(pecasF, 'views'), [pecasF]);
   const viewsCasaPorRede = useMemo(() => {
@@ -283,8 +331,8 @@ export default function MktCrescimento() {
 
   const pubsF = useMemo(() => pubsVivas.filter((p) =>
     p.published_at >= corteISO && p.published_at <= fimISO &&
-    (!fMarca || brandOf(p.brand_id)?.code === fMarca) &&
-    (!fRede || p.platform === fRede)), [pubsVivas, corteISO, fimISO, fMarca, fRede, brands]); // eslint-disable-line react-hooks/exhaustive-deps
+    marcaOk(brandOf(p.brand_id)?.code) &&
+    (!fRede || p.platform === fRede)), [pubsVivas, corteISO, fimISO, fMarca, fOrigem, fRede, brands]); // eslint-disable-line react-hooks/exhaustive-deps
   const perfByPub = useMemo(() => new Map(perf.map((x) => [x.publication_id, x])), [perf]);
   const linhas = useMemo(() => pubsF.map((p) => ({ p, m: perfByPub.get(p.id) }))
     .filter((l) => !fConteudo || l.m?.gatilho === fConteudo || l.m?.formato === fConteudo), [pubsF, perfByPub, fConteudo]);
@@ -298,7 +346,7 @@ export default function MktCrescimento() {
   const taxaEng = temAlcance && alcanceTotal > 0 ? (engTotal / alcanceTotal * 100) : null;
   const engMed = medidos.length ? engTotal / medidos.length : 0;
 
-  const audF = useMemo(() => aud.filter((a) => (!fRede || a.platform === fRede) && (!fMarca || brandOf(a.brand_id)?.code === fMarca)), [aud, fRede, fMarca, brands]); // eslint-disable-line react-hooks/exhaustive-deps
+  const audF = useMemo(() => aud.filter((a) => (!fRede || a.platform === fRede) && marcaOk(brandOf(a.brand_id)?.code)), [aud, fRede, fMarca, fOrigem, brands]); // eslint-disable-line react-hooks/exhaustive-deps
   const segAtual = useMemo(() => {
     const porConta = new Map<string, Aud>();
     for (const a of audF) if (a.dia <= fimDia) porConta.set(`${a.brand_id}:${a.platform}`, a);
@@ -321,7 +369,7 @@ export default function MktCrescimento() {
   const seriesMetrica = useMemo<Serie[]>(() => {
     const out: Serie[] = [];
     for (const b of brands) {
-      if (fMarca && b.code !== fMarca) continue;
+      if (!marcaOk(b.code)) continue;
       let pts: number[];
       if (metrica === 'seguidores') {
         const contasB = [...new Set(audF.filter((a) => a.brand_id === b.id).map((a) => a.platform))];
@@ -338,7 +386,7 @@ export default function MktCrescimento() {
       out.push({ id: b.id, label: b.name, color: b.accent_hex || COR_SEC, logo: b.logo_url, pts, atual: pts.length ? pts[pts.length - 1] : 0 });
     }
     return out;
-  }, [brands, audF, linhas, diasEixo, metrica, fMarca]);
+  }, [brands, audF, linhas, diasEixo, metrica, fMarca, fOrigem]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const seriePorMarca = useMemo(() => {
     const out = new Map<string, number[]>();
@@ -360,7 +408,7 @@ export default function MktCrescimento() {
     return { b, delta: last - first, pct: first > 0 ? (last - first) / first * 100 : 0, atual: last };
   }).filter((x) => x.atual > 0).sort((a, b) => b.pct - a.pct), [brands, seriePorMarca]);
 
-  const matriz = useMemo(() => brands.filter((b) => !fMarca || b.code === fMarca).map((b) => ({
+  const matriz = useMemo(() => brands.filter((b) => marcaOk(b.code)).map((b) => ({
     b,
     cells: ALL_NETS.filter((n) => !fRede || n === fRede).map((net) => {
       const serie = audF.filter((a) => a.brand_id === b.id && a.platform === net).sort((x, y) => x.dia.localeCompare(y.dia));
@@ -371,7 +419,7 @@ export default function MktCrescimento() {
       const base = serie.find((a) => a.dia >= corteDia);
       return { net, seg, delta: base ? seg - base.seguidores : null };
     }),
-  })), [brands, audF, fMarca, fRede, corteDia, fimDia]);
+  })), [brands, audF, fMarca, fOrigem, fRede, corteDia, fimDia]); // eslint-disable-line react-hooks/exhaustive-deps
   const redesMatriz = ALL_NETS.filter((n) => !fRede || n === fRede);
 
   const rankBy = (key: 'formato' | 'gatilho') => {
@@ -403,11 +451,10 @@ export default function MktCrescimento() {
   }, [linhas]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Motores externos sob os mesmos filtros — views/pub é a coluna de decisão.
-  const codePulso = useMemo(() => brands.find((b) => /pulso/i.test(b.name))?.code ?? '__pulso', [brands]);
   const codeMello = useMemo(() => brands.find((b) => /mello/i.test(b.name))?.code ?? '__mello', [brands]);
   const codeDigiai = useMemo(() => brands.find((b) => /^digiai$/i.test(b.name))?.code ?? '__digiai', [brands]);
   const codeOsi = useMemo(() => brands.find((b) => /sem improviso/i.test(b.name))?.code ?? '__osi', [brands]);
-  const pulsoF = useMemo(() => pulsoDias.filter((d) => noRecorte(d.dia) && (!fRede || d.plataforma === fRede)), [pulsoDias, corteDia, fimDia, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
+  const pulsoF = useMemo(() => pulsoContasDias.filter((d) => noRecorte(d.dia) && (!fRede || d.plataforma === fRede)), [pulsoContasDias, corteDia, fimDia, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
   const limePubF = useMemo(() => limePub.filter((d) => noRecorte(d.dia) && (!fRede || d.plataforma === fRede)), [limePub, corteDia, fimDia, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
   const blogF = useMemo(() => blogDias.filter((d) => noRecorte(d.dia)), [blogDias, corteDia, fimDia]); // eslint-disable-line react-hooks/exhaustive-deps
   const porPlataforma = (rows: { plataforma: string; publicacoes: number; views: number; likes: number; comentarios: number; shares: number }[]) => {
@@ -421,13 +468,62 @@ export default function MktCrescimento() {
     return [...m.entries()].map(([plat, c]) => ({ plat, ...c, vpp: c.pubs > 0 ? c.views / c.pubs : 0 }))
       .sort((a, b) => b.views - a.views);
   };
-  const pulsoPlats = useMemo(() => porPlataforma(pulsoF), [pulsoF]); // eslint-disable-line react-hooks/exhaustive-deps
+  const pulsoPlats = useMemo(() => porPlataforma(pulsoF.filter((d) => !fMarca || d.marca === fMarca)), [pulsoF, fMarca]); // eslint-disable-line react-hooks/exhaustive-deps
   const limePlats = useMemo(() => porPlataforma(limePubF), [limePubF]); // eslint-disable-line react-hooks/exhaustive-deps
+  // ---- O PULSO SÃO TRÊS CANAIS, não um (20/11/2026, ordem do dono) ----
+  //
+  // A tela lia `v_espelho_pulso_dias`, que é só o canal principal e só os curtos. Passa a ler
+  // `v_espelho_pulso_contas_dias`, que reparte por marca e conta e inclui cortes e longos.
+  // Conferido linha a linha em 20/11: a view nova é a soma exata das duas antigas — **+1.658 views
+  // e +59 publicações** que o Radar não contava (o Espelho do MKT já contava, pela view dos longos,
+  // e era mais uma razão de as duas telas discordarem).
+  //
+  // UMA COISA DIMINUI, e está dito no cartão: a view nova não traz `saves`. São 169 salvamentos em
+  // ~25.750 interações do histórico inteiro. Pedi a coluna ao agente do Pulso; até ela chegar,
+  // interação aqui = curtidas + comentários + compartilhamentos, escrito onde o número aparece.
+  //
+  // A conta nasce de `v_contas_pulso`, e não das leituras: canal sem leitura no recorte tem de
+  // APARECER dizendo que não tem — inclusive o `corteshistoriaspulso`, bloqueado pela Meta desde
+  // 12/11/2026. Canal que some da tela vira canal esquecido.
+  const pulsoMarcas = useMemo(() => [...new Set([
+    ...pulsoContas.map((x) => x.marca),
+    ...pulsoContasDias.map((x) => x.marca),
+  ])].sort(), [pulsoContas, pulsoContasDias]);
+  const pulsoSegPorMarca = useMemo(() => {
+    const ult = new Map<string, PulsoSegDia>();
+    for (const s of pulsoSeg) {
+      if (s.dia > fimDia) continue;
+      if (fRede && s.rede !== fRede) continue;
+      const k = `${s.conta}|${s.rede}`;
+      const cur = ult.get(k);
+      if (!cur || s.dia > cur.dia) ult.set(k, s);
+    }
+    const m = new Map<string, number>();
+    for (const s of ult.values()) m.set(s.marca, (m.get(s.marca) ?? 0) + (s.seguidores ?? 0));
+    return m;
+  }, [pulsoSeg, fimDia, fRede]);
+  const pulsoCards = useMemo(() => pulsoMarcas
+    .filter((marca) => !fMarca || marca === fMarca)
+    .map((marca) => {
+      const rows = pulsoF.filter((d) => d.marca === marca);
+      return {
+        marca,
+        views: rows.reduce((a, d) => a + (d.views || 0), 0),
+        pubs: rows.reduce((a, d) => a + (d.publicacoes || 0), 0),
+        eng: rows.reduce((a, d) => a + (d.likes || 0) + (d.comentarios || 0) + (d.shares || 0), 0),
+        plats: porPlataforma(rows),
+        serie: serieDe(rows.map((d) => ({ dia: d.dia, v: d.views || 0 }))),
+        seguidores: pulsoSegPorMarca.get(marca) ?? 0,
+        contas: pulsoContas.filter((x) => x.marca === marca),
+      };
+    })
+    .sort((a, b) => b.views - a.views), [pulsoMarcas, pulsoF, fMarca, pulsoSegPorMarca, pulsoContas]); // eslint-disable-line react-hooks/exhaustive-deps
+  const ultimaLeituraPulso = useMemo(() => pulsoContasDias.reduce<string | null>((m, d) => (m == null || d.dia > m ? d.dia : m), null), [pulsoContasDias]);
   const pulsoTot = useMemo(() => ({
-    views: pulsoF.reduce((a, d) => a + (d.views || 0), 0),
-    pubs: pulsoF.reduce((a, d) => a + (d.publicacoes || 0), 0),
-    eng: pulsoF.reduce((a, d) => a + (d.likes || 0) + (d.comentarios || 0) + (d.shares || 0) + (d.saves || 0), 0),
-  }), [pulsoF]);
+    views: pulsoCards.reduce((a, x) => a + x.views, 0),
+    pubs: pulsoCards.reduce((a, x) => a + x.pubs, 0),
+    eng: pulsoCards.reduce((a, x) => a + x.eng, 0),
+  }), [pulsoCards]);
   const limeTot = useMemo(() => ({
     views: limePubF.reduce((a, d) => a + (d.views || 0), 0),
     pubs: limePubF.reduce((a, d) => a + (d.publicacoes || 0), 0),
@@ -455,11 +551,17 @@ export default function MktCrescimento() {
     for (const r of rows) m.set(r.dia, (m.get(r.dia) ?? 0) + r.v);
     return [...m.entries()].sort((a, b) => a[0].localeCompare(b[0]));
   };
-  const pulsoSerie = useMemo(() => serieDe(pulsoF.map((d) => ({ dia: d.dia, v: d.views || 0 }))), [pulsoF]); // eslint-disable-line react-hooks/exhaustive-deps
   const blogSerie = useMemo(() => serieDe(blogF.map((d) => ({ dia: d.dia, v: d.leituras || 0 }))), [blogF]); // eslint-disable-line react-hooks/exhaustive-deps
-  const mostrarPulso = (!fMarca || fMarca === codePulso) && pulsoDias.length > 0;
-  const mostrarLime = (!fMarca || fMarca === codeMello) && limePub.length > 0;
-  const mostrarBlogs = (!fMarca || fMarca === codeDigiai) && !fRede && blogDias.length > 0;
+  // Quem aparece agora é a ORIGEM que decide, não a marca. `fMarca` segue valendo DENTRO da origem:
+  // nas marcas do Pulso, escolhe o canal; na casa, a marca da DIGIAI.
+  const marcaEhDoPulso = fMarca !== '' && pulsoMarcas.includes(fMarca);
+  const mostrarPulso = (fOrigem === '' || fOrigem === 'pulso') && (fMarca === '' || marcaEhDoPulso) && pulsoCards.length > 0;
+  const mostrarLime = (fOrigem === '' || fOrigem === 'limelight') && (fMarca === '' || fMarca === codeMello) && limePub.length > 0;
+  const mostrarBlogs = (fOrigem === '' || fOrigem === 'casa') && (!fMarca || fMarca === codeDigiai) && !fRede && blogDias.length > 0;
+  const mostrarOsi = (fOrigem === '' || fOrigem === 'casa') && (!fMarca || fMarca === codeOsi) && !fRede;
+  // Abas que medem as contas da CASA não têm o que mostrar quando o recorte é um motor de fora.
+  // Vazio sem explicação é lido como "não aconteceu nada" — e aqui significa "não é aqui".
+  const soMotor = fOrigem === 'pulso' || fOrigem === 'limelight';
 
   // Visão: agregados do ecossistema no recorte
   const viewsRecorte = (mostrarPulso ? pulsoTot.views : 0) + (mostrarLime ? limeTot.views : 0);
@@ -531,16 +633,27 @@ export default function MktCrescimento() {
           <span className="text-muted text-xs">→</span>
           <input type="date" value={fAte} onChange={(e) => setFAte(e.target.value)} aria-label="até"
             className="bg-surface border border-outline/30 text-on-surface font-mono text-[11px] px-1.5 py-1" />
-          <span className="ml-auto font-mono text-[10px] text-muted">{rotuloRecorte}{fRede ? ` · ${platName(fRede)}` : ''}{fMarca ? ` · ${brands.find((b) => b.code === fMarca)?.name ?? fMarca}` : ''}</span>
+          <span className="ml-auto font-mono text-[10px] text-muted">{rotuloRecorte}{fOrigem ? ` · ${rotuloOrigem(fOrigem)}` : ''}{fRede ? ` · ${platName(fRede)}` : ''}{fMarca ? ` · ${brands.find((b) => b.code === fMarca)?.name ?? fMarca}` : ''}</span>
         </div>
         <div className="flex flex-wrap items-center gap-1.5">
           <span className={lbl + ' mr-1 shrink-0'}>rede</span>
           {REDES.map((r) => <Chip key={r.k} on={fRede === r.k} onClick={() => setFRede(r.k)}>{r.label}</Chip>)}
         </div>
         <div className="flex flex-wrap items-center gap-1.5">
+          <span className={lbl + ' mr-1 shrink-0'}>origem</span>
+          {ORIGENS.map((o) => <Chip key={o.k} on={fOrigem === o.k} onClick={() => trocarOrigem(o.k)}>{o.label}</Chip>)}
+          <span className="text-[11px] text-muted ml-1">de quem é o canal — a marca vem depois, dentro da origem</span>
+        </div>
+        <div className="flex flex-wrap items-center gap-1.5">
           <span className={lbl + ' mr-1 shrink-0'}>marca</span>
           <Chip on={fMarca === ''} onClick={() => setFMarca('')}>todas</Chip>
-          {brands.map((b) => <Chip key={b.id} on={fMarca === b.code} onClick={() => setFMarca(fMarca === b.code ? '' : b.code)} cor={b.accent_hex}>{b.name}</Chip>)}
+          {fOrigem !== 'pulso' && fOrigem !== 'limelight' && marcasCasa.map((b) =>
+            <Chip key={b.id} on={fMarca === b.code} onClick={() => setFMarca(fMarca === b.code ? '' : b.code)} cor={b.accent_hex}>{b.name}</Chip>)}
+          {(fOrigem === '' || fOrigem === 'pulso') && pulsoMarcas.length > 0 && <>
+            <span className={lbl + ' ml-1'}>pulso ▸</span>
+            {pulsoMarcas.map((m) => <Chip key={m} on={fMarca === m} onClick={() => setFMarca(fMarca === m ? '' : m)} cor={COR_SEC}>{m}</Chip>)}
+          </>}
+          {fOrigem === 'limelight' && <span className="text-[11px] text-muted">a fábrica publica nos canais da Mello — marca única</span>}
         </div>
         {aba === 'conteudo' && conteudos.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5">
@@ -551,6 +664,14 @@ export default function MktCrescimento() {
         )}
       </div>
 
+      {soMotor && !loading && (
+        <div className="border border-outline/15 bg-surface-container px-3.5 py-2.5 mb-4 text-[13px] text-on-surface-variant">
+          Recorte <b className="text-on-surface">{rotuloOrigem(fOrigem)}</b>: são canais de fora da casa, e o dado deles vem do
+          espelho do próprio motor — está em <b className="text-on-surface">Vídeo &amp; motores</b>. Audiência, conteúdo e
+          régua medem as contas das marcas da DIGIAI; aqui elas aparecem vazias porque não é o lugar delas, não porque
+          não houve movimento.
+        </div>
+      )}
       {loading ? <div className="py-20 text-center text-muted"><Loader2 className="w-5 h-5 animate-spin inline" /></div> : (
         <>
           {/* aviso de coleta parada — em toda aba, dado velho engana */}
@@ -673,7 +794,7 @@ export default function MktCrescimento() {
                   const serie = (seriePorMarca.get(b.id) ?? []).filter((v) => v > 0);
                   const atual = serie.length ? serie[serie.length - 1] : 0;
                   const delta = serie.length >= 2 ? atual - serie[0] : null;
-                  if (fMarca && fMarca !== b.code) return null;
+                  if (!marcaOk(b.code)) return null;
                   const semCenso = atual === 0;
                   const c = b.accent_hex || COR_SEC;
                   return (
@@ -808,30 +929,35 @@ export default function MktCrescimento() {
             <>
               <Decide texto={<><b>O que se decide aqui:</b> onde dobrar a aposta de vídeo. <b>Views/pub</b> é a coluna de decisão — mesmo esforço, retorno diferente.</>} />
               <section className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-6">
-                {mostrarPulso ? (
-                  <MotorCard titulo="Pulso · canais faceless" cor={COR_SEC}
-                    headline={`${nf(pulsoTot.views)} views`} sub={`${pulsoTot.pubs} publicações · ${nf(pulsoTot.eng)} interações no período`}
-                    serie={pulsoSerie} rotuloSerie="views/dia de publicação"
-                    plats={pulsoPlats}
-                    sacada={pulsoPlats.length >= 2 && pulsoPlats[0].pubs >= 2 ? (() => { const top = [...pulsoPlats].sort((a, b) => b.vpp - a.vpp)[0]; return `melhor eficiência: ${platName(top.plat)} (${nf(Math.round(top.vpp))} views/pub)`; })() : undefined} />
-                ) : <MotorVazio titulo="Pulso · canais faceless" motivo="filtro de marca exclui o Pulso" />}
+                {mostrarPulso ? pulsoCards.map((pc) => (
+                  <MotorCard key={pc.marca} titulo={`Pulso · ${pc.marca}`} cor={COR_SEC}
+                    headline={pc.views > 0 ? `${nf(pc.views)} views` : '—'}
+                    sub={pc.views > 0
+                      ? `${pc.pubs} publicações · ${nf(pc.eng)} interações (curtidas+comentários+compart.) · ${nf(pc.seguidores)} seguidores`
+                      : `sem leitura neste recorte · ${pc.contas.length} ${pc.contas.length === 1 ? 'conta' : 'contas'} · ${nf(pc.seguidores)} seguidores`}
+                    serie={pc.serie} rotuloSerie="views/dia de publicação"
+                    plats={pc.plats}
+                    sacada={pc.plats.length >= 2 && pc.plats[0].pubs >= 2
+                      ? (() => { const top = [...pc.plats].sort((a, b) => b.vpp - a.vpp)[0]; return `melhor eficiência: ${platName(top.plat)} (${nf(Math.round(top.vpp))} views/pub)`; })()
+                      : pc.contas.find((x) => x.observacao)?.observacao ?? undefined} />
+                )) : <MotorVazio titulo="Pulso · canais faceless" motivo={fOrigem ? `o recorte é ${rotuloOrigem(fOrigem)}` : 'o filtro de marca exclui os canais do Pulso'} />}
                 {mostrarLime ? (
                   <MotorCard titulo="Limelight · fábrica Mello" cor={COR_OK}
                     headline={`${nf(limeTot.views)} views`} sub={`${limeTot.pubs} publicações no período · ${nf(limeSegAtual)} seguidores no censo próprio`}
                     serie={serieDe(limePubF.map((d) => ({ dia: d.dia, v: d.views || 0 })))} rotuloSerie="views/dia de publicação"
                     plats={limePlats}
                     sacada={limePlats.length >= 2 && limePlats[0].pubs >= 2 ? (() => { const top = [...limePlats].sort((a, b) => b.vpp - a.vpp)[0]; return `melhor eficiência: ${platName(top.plat)} (${nf(Math.round(top.vpp))} views/pub)`; })() : undefined} />
-                ) : <MotorVazio titulo="Limelight · fábrica Mello" motivo="filtro de marca exclui o Limelight" />}
+                ) : <MotorVazio titulo="Limelight · fábrica Mello" motivo={fOrigem ? `o recorte é ${rotuloOrigem(fOrigem)}` : 'o filtro de marca exclui a fábrica'} />}
                 {mostrarBlogs ? (
                   <MotorCard titulo="Blogs regionais · 5 sites" cor={COR_WARN}
                     headline={`${nf(blogTot)} leituras`} sub="first-party, zero PII · medição desde 20/08"
                     serie={blogSerie} rotuloSerie="leituras/dia"
                     blogsDetalhe={blogPorSlug}
                     sacada={blogPorSlug.length >= 2 && blogPorSlug[0].leituras > 0 ? `${blogPorSlug[0].slug} puxa a rede (${blogPorSlug[0].leituras} leituras)` : undefined} />
-                ) : <MotorVazio titulo="Blogs regionais · 5 sites" motivo={fRede ? 'blogs não têm recorte por rede' : 'filtro de marca exclui os blogs'} />}
-                {(!fMarca || fMarca === codeOsi) && !fRede
+                ) : <MotorVazio titulo="Blogs regionais · 5 sites" motivo={fRede ? 'blogs não têm recorte por rede' : fOrigem && fOrigem !== 'casa' ? `o recorte é ${rotuloOrigem(fOrigem)}` : 'o filtro de marca exclui os blogs'} />}
+                {mostrarOsi
                   ? <OsiDiasCard desde={corteDia} ate={fimDia} cor={COR_SEC} />
-                  : <MotorVazio titulo="OSI · landing e leitor" motivo={fRede ? 'a OSI não tem recorte por rede' : 'filtro de marca exclui a OSI'} />}
+                  : <MotorVazio titulo="OSI · landing e leitor" motivo={fRede ? 'a OSI não tem recorte por rede' : fOrigem && fOrigem !== 'casa' ? `o recorte é ${rotuloOrigem(fOrigem)}` : 'o filtro de marca exclui a OSI'} />}
               </section>
             </>
           )}
@@ -871,7 +997,8 @@ export default function MktCrescimento() {
               <Decide texto={<><b>O que se decide aqui:</b> se dá para confiar nos números das outras abas. Fonte sem data fresca congela em silêncio — esta aba é o antídoto.</>} />
               <section className="grid gap-2.5 mb-5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
                 <Health cor={ultimoCenso === hojeBrasilia() ? COR_OK : COR_WARN} titulo="Censo de redes" sub={`${contasMedidas || '—'} contas · último ${ultimoCenso ? fmtDM(ultimoCenso) : '—'}`} />
-                <Health cor={pulsoDias.some((d) => d.dia === hojeBrasilia()) ? COR_OK : COR_WARN} titulo="Pulso" sub="crons Vercel · série viva" />
+                <Health cor={ultimaLeituraPulso === hojeBrasilia() ? COR_OK : COR_WARN} titulo="Pulso"
+                  sub={`${pulsoMarcas.length} canais · ${pulsoContas.length} contas · últ. leitura ${ultimaLeituraPulso ? fmtDM(ultimaLeituraPulso) : '—'}`} />
                 <Health cor={COR_OK} titulo="Limelight" sub="coleta própria da fábrica" />
                 <Health cor={COR_OK} titulo="Blogs" sub={blogsEsp ? `últ. leitura ${blogsEsp.ultima_leitura ? fmtDM(blogsEsp.ultima_leitura) : '—'}` : 'espelho indisponível'} />
                 {fila && <Health cor={fila.atrasados > 50 || fila.com_erro > 0 ? COR_DANGER : COR_OK} titulo="Fila do motor MKT" sub={`${fila.atrasados} atrasados · ${fila.com_erro} com erro`} />}
@@ -913,6 +1040,47 @@ export default function MktCrescimento() {
                   </tbody>
                 </table>
               </section>
+
+              {/* As contas do Pulso ficavam fora desta aba inteira (20/11): a cobertura lia só
+                  `v_mkt_accounts`, que é da casa. Um canal do Pulso bloqueado pela Meta desde 12/11
+                  não aparecia em lugar nenhum do painel — e conta parada sem aviso vira número
+                  congelado, que é o defeito que esta aba existe para pegar. */}
+              {pulsoContas.length > 0 && (
+                <>
+                  <div className="flex items-baseline justify-between mb-2.5 mt-6">
+                    <h2 className="text-sm text-on-surface-variant">contas do Pulso — {pulsoMarcas.length} canais, {pulsoContas.length} contas</h2>
+                    <span className={lbl}>canal de fora da casa também congela em silêncio</span>
+                  </div>
+                  <section className="border border-outline/15 bg-surface-container overflow-x-auto">
+                    <table className="w-full text-[13px]">
+                      <thead>
+                        <tr className="border-b border-outline/15">
+                          <th className={'text-left font-normal px-4 py-2 ' + lbl}>canal</th>
+                          <th className={'text-left font-normal px-4 py-2 ' + lbl}>rede</th>
+                          <th className={'text-left font-normal px-4 py-2 ' + lbl}>conta</th>
+                          <th className={'text-left font-normal px-4 py-2 ' + lbl}>coleta</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {pulsoContas.map((x, i) => (
+                          <tr key={i} className="border-b border-outline/10 hover:bg-surface-highest/50">
+                            <td className="px-4 py-2 text-on-surface">{x.marca}</td>
+                            <td className="px-4 py-2 text-on-surface-variant">{platName(x.rede)}</td>
+                            <td className="px-4 py-2 font-mono text-[12px] text-on-surface-variant">{x.conta}</td>
+                            <td className="px-4 py-2">
+                              {x.observacao
+                                ? <span style={{ color: COR_WARN }}>{x.observacao}</span>
+                                : x.mede_views && x.mede_seguidores
+                                  ? <span style={{ color: COR_OK }}>✓ views e seguidores</span>
+                                  : <span style={{ color: COR_WARN }}>{x.mede_views ? 'só views' : x.mede_seguidores ? 'só seguidores' : 'sem coleta'}</span>}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </section>
+                </>
+              )}
             </>
           )}
         </>
