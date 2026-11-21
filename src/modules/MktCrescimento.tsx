@@ -131,6 +131,9 @@ interface Nivel {
 }
 
 const COR_SEC = 'var(--color-secondary)';
+// Vale para todo número da CASA quando o recorte é um motor de fora. "0" seria medição e "a coletar"
+// seria culpa do motor de coleta — as duas mentem, e mandam consertar o que não está quebrado.
+const FORA_DA_CASA = 'não é deste recorte — isto mede as contas da casa';
 
 export default function MktCrescimento() {
   const [aba, setAba] = useState<AbaK>('visao');
@@ -756,10 +759,14 @@ export default function MktCrescimento() {
                 </div>
                 <div className="border border-outline/15 bg-surface-container p-5">
                   <div className={lbl}>seguidores (censo, fim do período)</div>
-                  <div className="font-mono tabular-nums text-2xl font-semibold" style={{ color: COR_SEC }}>{segAtual ? nf(segAtual) : '—'}</div>
-                  <div className="text-[11px] mt-0.5" style={{ color: (segDelta ?? 0) >= 0 ? COR_OK : COR_DANGER }}>{segDelta != null ? `${segDelta >= 0 ? '+' : ''}${nf(segDelta)} no período` : 'sem série no recorte'}</div>
-                  <div className={lbl + ' mt-3'}>blogs no período</div>
-                  <div className="text-[13px] text-on-surface-variant">{blogTot} leituras{blogsEsp ? ` · ${blogsEsp.posts_no_ar} posts no ar` : ''}</div>
+                  <div className="font-mono tabular-nums text-2xl font-semibold" style={{ color: COR_SEC }}>{soMotor ? '—' : segAtual ? nf(segAtual) : '—'}</div>
+                  <div className="text-[11px] mt-0.5" style={{ color: soMotor ? 'var(--color-muted)' : (segDelta ?? 0) >= 0 ? COR_OK : COR_DANGER }}>
+                    {soMotor ? 'o censo aqui é das contas da casa — os seguidores deste recorte estão no cartão de cada canal'
+                      : segDelta != null ? `${segDelta >= 0 ? '+' : ''}${nf(segDelta)} no período` : 'sem série no recorte'}</div>
+                  {!soMotor && <>
+                    <div className={lbl + ' mt-3'}>blogs no período</div>
+                    <div className="text-[13px] text-on-surface-variant">{blogTot} leituras{blogsEsp ? ` · ${blogsEsp.posts_no_ar} posts no ar` : ''}</div>
+                  </>}
                 </div>
               </div>
               <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -768,12 +775,15 @@ export default function MktCrescimento() {
                     sobrenome parecia contradição na mesma tela — visto no ar em 19/11, logo após o
                     conserto das views. E **zero é medição**: rede sem coleta de engajamento mostra traço,
                     nunca 0, senão o TikTok aparece como conteúdo que ninguém curtiu. */}
-                <Kpi icon={<Newspaper className="w-4 h-4" />} label="posts nas redes" value={nf(linhas.length)} sub={`no recorte · ${medidos.length} com engajamento medido`} glow={COR_SEC} />
-                <Kpi icon={<Sparkles className="w-4 h-4" />} label="engajamento redes" value={medidos.length === 0 ? '—' : nf(engTotal)}
-                  sub={medidos.length === 0 ? 'engajamento não coletado nesta rede' : `média ${nf(Math.round(engMed))}/post`} glow={COR_OK} />
+                <Kpi icon={<Newspaper className="w-4 h-4" />} label="posts nas redes" value={soMotor ? '—' : nf(linhas.length)}
+                  sub={soMotor ? FORA_DA_CASA : `no recorte · ${medidos.length} com engajamento medido`} glow={COR_SEC} />
+                <Kpi icon={<Sparkles className="w-4 h-4" />} label="engajamento redes" value={soMotor || medidos.length === 0 ? '—' : nf(engTotal)}
+                  sub={soMotor ? FORA_DA_CASA : medidos.length === 0 ? 'engajamento não coletado nesta rede' : `média ${nf(Math.round(engMed))}/post`} glow={COR_OK} />
                 <Kpi icon={<Film className="w-4 h-4" />} label="views motores" value={temMotor ? nf(viewsRecorte) : '—'} sub={temMotor ? `${nf(pubsRecorte)} pubs · ${nf(engRecorte)} interações` : fMarca ? 'sem motor nesta marca' : 'sem views no recorte'} glow={COR_WARN} />
-                <Kpi icon={<Eye className="w-4 h-4" />} label="views das peças publicadas no período" value={viewsCasa > 0 ? nf(viewsCasa) : '—'}
-                  sub={viewsCasa > 0 ? `${pecasComViews} de ${pecasF.length} peças com leitura · o Espelho conta por data de LEITURA e dá mais` : 'a coletar — despacho no MKT (sync-metricas)'} glow={COR_SEC} />
+                <Kpi icon={<Eye className="w-4 h-4" />} label="views das peças publicadas no período" value={soMotor || viewsCasa === 0 ? '—' : nf(viewsCasa)}
+                  sub={soMotor ? FORA_DA_CASA
+                    : viewsCasa > 0 ? `${pecasComViews} de ${pecasF.length} peças com leitura · o Espelho conta por data de LEITURA e dá mais`
+                    : 'a coletar — despacho no MKT (sync-metricas)'} glow={COR_SEC} />
               </section>
             </>
             );
