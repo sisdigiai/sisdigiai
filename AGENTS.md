@@ -249,6 +249,7 @@ Ficam no `.env` local e no painel da Cloudflare Pages (projeto `digiai-app`). To
 | `VITE_PULSO_SUPABASE_URL` · `VITE_PULSO_SUPABASE_ANON_KEY` | espelho do Pulso (séries por dia) | "espelho desligado" no console e card vazio |
 | `VITE_LIMELIGHT_SUPABASE_URL` · `VITE_LIMELIGHT_SUPABASE_ANON_KEY` | espelho do Limelight | idem |
 | `VITE_BLOGS_SUPABASE_URL` · `VITE_BLOGS_SUPABASE_ANON_KEY` | espelho dos blogs (Ecoax) | idem |
+| `VITE_POLA_SUPABASE_URL` · `VITE_POLA_SUPABASE_ANON_KEY` | espelho da Polá Petit (`v_pola_redes_metricas_dia`) | a linha da Polá diz **"falta credencial"** — e isso é verdade, não erro. **Ausentes no painel em 21/11**: o pacote no ar não carrega o projeto do Polá. |
 
 ### 9.2 Segredos de execução (só no servidor — secrets do projeto Supabase, nunca no `.env` do front)
 
