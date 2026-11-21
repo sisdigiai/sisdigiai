@@ -170,6 +170,13 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
   }, []);
 
   const trocarOrigem = (k: OrigemK) => { setFOrigem(k); setFMarca(''); };
+  // Dentro do grupo do Pulso os canais ficavam "Bastidores" e "Cortes" -- e "Cortes" e tambem o nome
+  // de um GRUPO (os canais da casa). Dois chips com o mesmo nome na mesma linha e trocar uma confusao
+  // por outra, entao o canal do Pulso leva o sobrenome.
+  const rotuloCanal = (nome: string) => nome
+    .replace(/^Bastidores PULSO Histórias$/, 'bastidores do Pulso')
+    .replace(/^Cortes PULSO Histórias$/, 'cortes do Pulso')
+    .replace(/^PULSO Histórias$/, 'canal principal');
   const cls = 'font-mono text-[10px] uppercase tracking-widest text-muted';
   const custom = fDe !== '' && fAte !== '' && fDe <= fAte;
   // As abas do Espelho leem em janelas de 7, 30 ou tudo — é o que as views delas aceitam. A barra
@@ -401,7 +408,7 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
                   {doGrupo.map((m) => (
                     <Chip key={m.code} on={fMarca === m.code}
                       onClick={() => { if (fMarca === m.code) { setFMarca(''); setFOrigem(''); } else { setFMarca(m.code); setFOrigem(k); } }}
-                      cor={m.cor}>{m.nome.replace(/ PULSO Histórias$/, '').replace(/^PULSO Histórias$/, 'canal principal')}</Chip>
+                      cor={m.cor}>{rotuloCanal(m.nome)}</Chip>
                   ))}
                 </span>
               );
