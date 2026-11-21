@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ExternalLink, RefreshCw, Info, Send, Target, CalendarClock } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { TravasBanner } from './TravasMarketing';
@@ -92,7 +92,7 @@ export default function MarketingEspelho() {
   }> | null>(null);
   const [pola, setPola] = useState<Awaited<ReturnType<typeof resumoPola>> | null>(null);
   const [seo, setSeo] = useState<{ cliques: number; impressoes: number; sites: number; medido_em: string | null } | null>(null);
-  const [loading, setLoading] = useState(true);
+
   // Página longa esconde o que importa: o dono rolava seis seções para chegar à cadeia de resultados.
   // Cada aba responde UMA pergunta; a primeira é sempre "está dando resultado?".
   // Oito abas desde 19/11, por ordem do dono: "a parte de resultado tem que trazer todas as
@@ -126,47 +126,97 @@ export default function MarketingEspelho() {
     return () => window.removeEventListener('hashchange', ouvir);
   }, []);
 
-  const load = async () => {
-    setLoading(true);
-    const [{ data: e }, { data: m }, { data: p }, ll, pu, bl, { data: f }, { data: cad }, { data: fs }, { data: se }, est] = await Promise.all([
-      supabase.from('v_mkt_espelho').select('*').maybeSingle(),
-      supabase.from('v_mkt_marcas').select('*'),
-      supabase.from('v_mkt_publicacoes_recentes').select('*'),
-      espelhoMotores.limelight(),
-      espelhoMotores.pulso(),
-      espelhoMotores.blogs(),
-      supabase.from('v_mkt_fatos').select('*'),
-      supabase.from('v_marketing_cadeia').select('*').maybeSingle(),
-      supabase.from('v_mkt_fila_saude').select('atrasados, com_erro, ultima_publicacao').maybeSingle(),
-      supabase.from('v_seo_estado').select('cliques, impressoes, medido_em'),
-      // POSIÇÃO IMPORTA: esta consulta é lida no fim do destructuring. Eu a tinha inserido no meio do
-      // array e lido no fim — o resultado é que os números de SEO passaram a ser os do estoque e os do
-      // estoque, os de SEO. Nenhum erro, nenhum aviso: só dois blocos trocados em silêncio.
-      supabase.from('v_mkt_estoque_marca').select('marca, publicadas_7d, na_fila, artes_prontas, ultima_marcada, tem_movimento'),
-    ]);
-    setCadeia((cad ?? null) as Cadeia | null);
-    setFila((fs ?? null) as { atrasados: number; com_erro: number; ultima_publicacao: string | null } | null);
-    setEstoque((est.data ?? []) as never);
-    const seoRows = (se ?? []) as { cliques: number | null; impressoes: number | null; medido_em: string | null }[];
-    setSeo(seoRows.length ? {
-      cliques: seoRows.reduce((a, r) => a + (r.cliques ?? 0), 0),
-      impressoes: seoRows.reduce((a, r) => a + (r.impressoes ?? 0), 0),
-      sites: seoRows.length,
-      medido_em: seoRows.reduce<string | null>((a, r) => (a == null || (r.medido_em ?? '') > a ? r.medido_em : a), null),
-    } : null);
-    if (e) setEsp(e as Espelho);
-    setMarcas(((m ?? []) as Marca[]).sort((a, b) => b.publicadas_7d - a.publicadas_7d || b.publicacoes - a.publicacoes));
-    setPubs((p ?? []) as Publicacao[]);
-    setLimelight(ll);
-    setPulso(pu);
-    setBlogs(bl);
-    setFatos((f ?? []) as FatoMkt[]);
-    setLoading(false);
+  // ---- CADA ABA LÊ O QUE ELA MOSTRA, E SÓ NA PRIMEIRA VEZ (21/11/2026) ----
+  //
+  // Antes esta página lia as ONZE fontes de uma vez ao abrir, e as abas filhas liam as delas por
+  // cima: medido no ar em 21/11, **23 leituras disparadas juntas e 24,6 s até a última chegar**. E
+  // não era o banco: `v_mkt_fila_saude` roda em **3,8 ms** no servidor e levava **9,8 s** para
+  // aparecer, `v_pontualidade` 11 ms contra 11,9 s. Pedido demais ao mesmo tempo não fica mais
+  // rápido — fica na fila, e o banco atende em série.
+  //
+  // Dez das onze serviam abas que nem estavam abertas (marcas, publicações, motores, fatos, fontes).
+  // Agora cada grupo carrega quando a aba dele aparece, uma vez só; `carregadas` guarda o que já veio
+  // para a aba revisitada não pagar de novo. Recarregar pela setinha limpa tudo e refaz o da aba atual.
+  const carregadas = useRef(new Set<string>());
+  const [carregando, setCarregando] = useState(false);
+
+  const GRUPOS: Record<string, () => Promise<void>> = {
+    async base() {
+      const { data } = await supabase.from('v_mkt_espelho').select('*').maybeSingle();
+      if (data) setEsp(data as Espelho);
+    },
+    async marcas() {
+      const [{ data: m }, est] = await Promise.all([
+        supabase.from('v_mkt_marcas').select('*'),
+        supabase.from('v_mkt_estoque_marca').select('marca, publicadas_7d, na_fila, artes_prontas, ultima_marcada, tem_movimento'),
+      ]);
+      setMarcas(((m ?? []) as Marca[]).sort((a, b) => b.publicadas_7d - a.publicadas_7d || b.publicacoes - a.publicacoes));
+      setEstoque((est.data ?? []) as never);
+      // A Polá vem do espelho do app dela, não do MKT: leitura própria, e o estado dela é escrito na
+      // tela (sem credencial · banco bloqueado · com dado). Nunca zero por não ter conseguido ler.
+      setPola(await resumoPola());
+    },
+    async publicacoes() {
+      const { data } = await supabase.from('v_mkt_publicacoes_recentes').select('*');
+      setPubs((data ?? []) as Publicacao[]);
+    },
+    async motores() {
+      const [ll, pu, bl] = await Promise.all([
+        espelhoMotores.limelight(), espelhoMotores.pulso(), espelhoMotores.blogs(),
+      ]);
+      setLimelight(ll); setPulso(pu); setBlogs(bl);
+    },
+    async fatos() {
+      const { data } = await supabase.from('v_mkt_fatos').select('*');
+      setFatos((data ?? []) as FatoMkt[]);
+    },
+    async fontes() {
+      const [{ data: cad }, { data: fs }, { data: se }] = await Promise.all([
+        supabase.from('v_marketing_cadeia').select('*').maybeSingle(),
+        supabase.from('v_mkt_fila_saude').select('atrasados, com_erro, ultima_publicacao').maybeSingle(),
+        supabase.from('v_seo_estado').select('cliques, impressoes, medido_em'),
+      ]);
+      setCadeia((cad ?? null) as Cadeia | null);
+      setFila((fs ?? null) as { atrasados: number; com_erro: number; ultima_publicacao: string | null } | null);
+      const seoRows = (se ?? []) as { cliques: number | null; impressoes: number | null; medido_em: string | null }[];
+      setSeo(seoRows.length ? {
+        cliques: seoRows.reduce((a, r) => a + (r.cliques ?? 0), 0),
+        impressoes: seoRows.reduce((a, r) => a + (r.impressoes ?? 0), 0),
+        sites: seoRows.length,
+        medido_em: seoRows.reduce<string | null>((a, r) => (a == null || (r.medido_em ?? '') > a ? r.medido_em : a), null),
+      } : null);
+    },
   };
-  useEffect(() => { load(); }, []);
-  // A Polá vem do espelho do app dela, não do MKT: leitura própria, e o estado dela é escrito na tela
-  // (sem credencial · banco bloqueado · com dado). Nunca zero por não ter conseguido ler.
-  useEffect(() => { resumoPola().then(setPola); }, []);
+
+  // Quem cada aba precisa. Aba que não aparece aqui tem filhas que leem sozinhas.
+  const GRUPOS_DA_ABA: Record<string, string[]> = {
+    resultado: ['base'],
+    audiencia: [],
+    dia: [],
+    marcas: ['marcas', 'motores'],
+    publicacoes: ['publicacoes'],
+    motores: ['base', 'motores'],
+    fatos: ['fatos'],
+    fontes: ['fontes', 'fatos', 'motores'],
+  };
+
+  useEffect(() => {
+    const faltando = (GRUPOS_DA_ABA[aba] ?? []).filter((g) => !carregadas.current.has(g));
+    if (faltando.length === 0) return;
+    faltando.forEach((g) => carregadas.current.add(g));
+    setCarregando(true);
+    Promise.all(faltando.map((g) => GRUPOS[g]()))
+      .catch((e) => { faltando.forEach((g) => carregadas.current.delete(g)); console.error('[espelho] falha ao carregar', faltando, e); })
+      .finally(() => setCarregando(false));
+  }, [aba]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const load = () => {
+    carregadas.current.clear();
+    const grupos = GRUPOS_DA_ABA[aba] ?? [];
+    grupos.forEach((g) => carregadas.current.add(g));
+    setCarregando(true);
+    Promise.all(grupos.map((g) => GRUPOS[g]())).finally(() => setCarregando(false));
+  };
 
   const diasDesde = (d: string | null | undefined) =>
     d ? Math.floor((Date.now() - new Date(d + 'T12:00:00').getTime()) / 86400000) : null;
@@ -272,9 +322,8 @@ export default function MarketingEspelho() {
           </div>
         )}
 
-        {loading ? (
-          <div className="text-sm text-muted py-6">Carregando espelho…</div>
-        ) : (
+        {carregando && <div className="text-sm text-muted py-2">Carregando…</div>}
+        {(
           <>
             {/* A CADEIA ANTIGA SAIU DAQUI. Ela lia janelas fixas (7 e 30 dias) e ficava na mesma
                 página que a cadeia nova, com o filtro de período em cima: 453 contra 150 e 426 contra
@@ -466,7 +515,7 @@ export default function MarketingEspelho() {
             o frescor e onde aprofundar. Pedido do dono em 25/08 ("este espelho tem que trazer tudo que
             temos de opções") e padronizada em 19/11 ("fontes eu padronizaria também"): agora é um
             número por azulejo, agrupado por família, e traço quer dizer não medido — nunca zero. */}
-        {aba === 'fontes' && !loading && (
+        {aba === 'fontes' && (
           <CentralDeFontes cadeia={cadeia} seo={seo} fila={fila} fatos={fatos}
                            pulso={pulso} limelight={limelight} blogs={blogs} />
         )}
