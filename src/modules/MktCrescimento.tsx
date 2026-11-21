@@ -24,10 +24,10 @@ type Perf = {
   engajamento: number | null; alcance: number | null; salvamentos: number | null; compartilhamentos: number | null;
   views: number | null;
 };
-type Aud = { brand_id: string; platform: string; seguidores: number; dia: string };
+type Aud = { brand_id: string; platform: string; seguidores: number; dia: string; account_id: string | null };
 type Serie = { id: string; label: string; color: string; logo: string | null; pts: number[]; atual: number };
 type Fila = { atrasados: number; com_erro: number; ultima_publicacao: string | null; ultima_audiencia: string | null };
-type Conta = { brand_name: string | null; platform: string; handle: string | null; status: string | null };
+type Conta = { id: string; brand_name: string | null; platform: string; handle: string | null; status: string | null };
 type Cred = { platform: string; marca: string | null; status: string | null; expires_at: string | null };
 type Leitura = { origem: string; marca: string | null; conta: string | null; rede: string;
   tipo: string; peca_ref: string; data: string; views: number | null };
@@ -190,7 +190,7 @@ export default function MktCrescimento() {
         .select('publication_id, brand_id, gatilho, formato, engajamento, alcance, salvamentos, compartilhamentos, views')
         .order('id').range(de, ate)),
       lerTudo<Aud>((de, ate) => supabase.schema('mkt').from('audiencia_diaria')
-        .select('brand_id, platform, seguidores, dia').order('dia').order('id').range(de, ate)),
+        .select('brand_id, platform, seguidores, dia, account_id').order('dia').order('id').range(de, ate)),
       espelhoMotores.pulsoContasDias(),
       espelhoMotores.pulsoSeguidoresDias(),
       espelhoMotores.pulsoContas(),
@@ -199,7 +199,7 @@ export default function MktCrescimento() {
       espelhoMotores.limelightPubDias(),
       espelhoMotores.blogs(),
       supabase.from('v_mkt_fila_saude').select('atrasados, com_erro, ultima_publicacao, ultima_audiencia').maybeSingle(),
-      supabase.from('v_mkt_accounts').select('brand_name, platform, handle, status'),
+      supabase.from('v_mkt_accounts').select('id, brand_name, platform, handle, status'),
       supabase.from('v_mkt_credenciais_saude').select('platform, marca, status, expires_at'),
       supabase.from('v_mkt_nivel_crescimento').select('*'),
       lerTudo<Leitura>((de, ate) => supabase.from('v_mkt_analytics_peca_dia')
@@ -581,13 +581,28 @@ export default function MktCrescimento() {
   };
 
   // Saúde: cobertura — toda conta cadastrada × existe censo recente?
+  //
+  // CASAVA POR MARCA+REDE, e por isso mentia (visto no ar em 21/11). Quando uma marca tem duas contas
+  // na mesma rede, o censo de UMA marcava as DUAS como medidas. Medido no mesmo dia: a tela dava 31
+  // contas "✓ no censo" e o censo por conta são 29. As duas que pegavam carona:
+  //   · `@pulsohistorias` no YouTube, cadastrada sob a marca Bastidores DIGIAI — é o canal do PULSO,
+  //     cadastro errado que avisei ao MKT; e
+  //   · uma segunda conta de Instagram da Lancaster, sem registro em `mkt.accounts` e parada desde
+  //     25/08.
+  // Conta que ninguém mede aparecendo como medida é o defeito exato que esta aba existe para pegar.
+  // Agora casa por `account_id`, que a `audiencia_diaria` tem, e mostra a data do último censo DELA.
+  const censoPorConta = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const a of aud) if (a.account_id && (!m.has(a.account_id) || a.dia > m.get(a.account_id)!)) m.set(a.account_id, a.dia);
+    return m;
+  }, [aud]);
   const cobertura = useMemo(() => {
-    const censoKeys = new Set(aud.filter((a) => a.dia >= diaBrasilia(new Date(Date.now() - 3 * 864e5))).map((a) => `${brandOf(a.brand_id)?.name ?? ''}|${a.platform}`));
+    const limite = diaBrasilia(new Date(Date.now() - 3 * 864e5));
     return contas
       .filter((c) => !/whats/i.test(c.platform))
-      .map((c) => ({ ...c, medida: censoKeys.has(`${c.brand_name ?? ''}|${c.platform}`) }))
+      .map((c) => { const ult = censoPorConta.get(c.id) ?? null; return { ...c, ultimoCensoConta: ult, medida: ult != null && ult >= limite }; })
       .sort((a, b) => Number(a.medida) - Number(b.medida));
-  }, [contas, aud, brands]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [contas, censoPorConta]);
   const credsVencendo = useMemo(() => creds.filter((c) => c.expires_at).map((c) => ({
     ...c, dias: Math.floor((new Date(c.expires_at!).getTime() - Date.now()) / 864e5),
   })).sort((a, b) => a.dias - b.dias), [creds]);
@@ -763,7 +778,7 @@ export default function MktCrescimento() {
                   <div className="text-[11px] mt-0.5" style={{ color: soMotor ? 'var(--color-muted)' : (segDelta ?? 0) >= 0 ? COR_OK : COR_DANGER }}>
                     {soMotor ? 'o censo aqui é das contas da casa — os seguidores deste recorte estão no cartão de cada canal'
                       : segDelta != null ? `${segDelta >= 0 ? '+' : ''}${nf(segDelta)} no período` : 'sem série no recorte'}</div>
-                  {!soMotor && <>
+                  {mostrarBlogs && <>
                     <div className={lbl + ' mt-3'}>blogs no período</div>
                     <div className="text-[13px] text-on-surface-variant">{blogTot} leituras{blogsEsp ? ` · ${blogsEsp.posts_no_ar} posts no ar` : ''}</div>
                   </>}
@@ -1041,8 +1056,10 @@ export default function MktCrescimento() {
                         <td className="px-4 py-2 font-mono text-[12px] text-on-surface-variant">{c.handle ?? '—'}</td>
                         <td className="px-4 py-2">
                           {c.medida
-                            ? <span style={{ color: COR_OK }}>✓ no censo</span>
-                            : <span style={{ color: COR_WARN }}>a ligar{c.status === 'a_configurar' ? ' · a configurar no motor' : ''}</span>}
+                            ? <span style={{ color: COR_OK }}>✓ no censo · {c.ultimoCensoConta ? fmtDM(c.ultimoCensoConta) : '—'}</span>
+                            : c.ultimoCensoConta
+                              ? <span style={{ color: COR_DANGER }}>parada — último censo {fmtDM(c.ultimoCensoConta)}</span>
+                              : <span style={{ color: COR_WARN }}>a ligar{c.status === 'a_configurar' ? ' · a configurar no motor' : ''}</span>}
                         </td>
                       </tr>
                     ))}
