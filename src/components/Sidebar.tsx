@@ -87,8 +87,10 @@ const produtos: NavItem[] = [
 const marketing: NavItem[] = [
   { id: 'google',           label: 'Google',            icon: <MapPin className="w-4 h-4" /> },
   { id: 'comparativo',      label: 'Comparativo',       icon: <Rows3 className="w-4 h-4" /> },
-  { id: 'marketing',        label: 'Espelho do MKT',    icon: <Radio className="w-4 h-4" /> },
-  { id: 'mkt-crescimento',  label: 'Radar 360',         icon: <TrendingUp className="w-4 h-4" /> },
+  // Uma entrada so desde 21/11/2026: o Espelho do MKT e o Radar 360 viraram uma pagina. Duas portas
+  // para a mesma sala era a duplicacao que o dono apontou. O endereco #/mkt-crescimento continua
+  // funcionando para quem tem link salvo.
+  { id: 'marketing',        label: 'Marketing',         icon: <Radio className="w-4 h-4" /> },
   { id: 'mkt-calc',         label: 'Calc (isca)',       icon: <Calculator className="w-4 h-4" /> },
   { id: 'travas-marketing', label: 'Travas',            icon: <ShieldCheck className="w-4 h-4" /> },
 ];

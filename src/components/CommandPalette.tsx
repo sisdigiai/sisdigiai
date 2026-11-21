@@ -17,8 +17,7 @@ const ITEMS: Item[] = [
   { id: 'academy', label: 'Academy', group: 'Operacional' },
   { id: 'marketplace', label: 'Marketplace', group: 'Operacional' },
   { id: 'clearix', label: 'Central Clearix', group: 'Operacional' },
-  { id: 'marketing', label: 'Marketing (espelho MKT)', group: 'Marketing' },
-  { id: 'mkt-crescimento', label: 'Radar 360 (analytics social)', group: 'Marketing' },
+  { id: 'marketing', label: 'Marketing (decidir e conferir)', group: 'Marketing' },
   { id: 'mkt-calc', label: 'Clearix Calc (isca)', group: 'Marketing' },
   // escondida em 30/09/2026 junto com a entrada do menu (ver Sidebar.tsx) — programa da OSI não começou
   // { id: 'marketing-engajamento', label: 'Engajamento', group: 'Marketing' },
