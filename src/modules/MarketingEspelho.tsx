@@ -16,7 +16,7 @@ import PlacarDeDecisao from './marketing/PlacarDeDecisao';
 import CentralDeFontes from './marketing/CentralDeFontes';
 import FatosPublicaveis, { type FatoMkt } from './marketing/FatosPublicaveis';
 import MktCrescimento, {
-  Chip, RANGES, REDES, ORIGENS, origemDaMarca, rotuloOrigem,
+  Chip, RANGES, REDES, origemDaMarca, rotuloOrigem,
   type AbaRadar, type FiltrosMkt, type OrigemK,
 } from './MktCrescimento';
 import { espelhoMotores as motores } from '../lib/espelhoMotores';
@@ -371,33 +371,50 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
             <input type="date" value={fAte} onChange={(e) => setFAte(e.target.value)} aria-label="até"
               className="bg-surface border border-outline/30 text-on-surface font-mono text-[11px] px-1.5 py-1" />
             <span className="ml-auto font-mono text-[10px] text-muted">
-              {fOrigem ? `${rotuloOrigem(fOrigem)} · ` : ''}{fRede ? `${fRede} · ` : ''}
-              {fMarca ? `${marcasChip.find((m) => m.code === fMarca)?.nome ?? fMarca} · ` : ''}
+              {fMarca ? `${marcasChip.find((m) => m.code === fMarca)?.nome ?? fMarca} · `
+                : fOrigem ? `${rotuloOrigem(fOrigem)} · ` : ''}{fRede ? `${fRede} · ` : ''}
               por data de {fData === 'publicacao' ? 'PUBLICAÇÃO' : 'LEITURA'}
             </span>
           </div>
+          {/* UMA LINHA SÓ PARA "QUEM" (21/11/2026, no mesmo dia). Eu tinha posto origem numa linha e
+              marca em outra, e as duas conversavam: escolher "casa" fazia os canais do Pulso
+              DESAPARECEREM da linha de marca. O dono foi procurar o Pulso onde ele sempre esteve e
+              não achou — "ficamos com os filtros confusos".
+              Separei pela regra, e não por como se procura. Agora tudo fica à vista de uma vez, em
+              grupos: o grupo ensina a diferença entre origem e marca em vez de esconder chip. O
+              estado por baixo é o mesmo — clicar num canal escolhe a origem dele junto. */}
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className={cls + ' mr-1 shrink-0'}>origem</span>
-            {ORIGENS.map((o) => <Chip key={o.k} on={fOrigem === o.k} onClick={() => trocarOrigem(o.k)}>{o.label}</Chip>)}
-            <span className="text-[11px] text-muted ml-1">de quem é o canal — a marca vem depois, dentro da origem</span>
+            <span className={cls + ' mr-1 shrink-0'}>quem</span>
+            <Chip on={fOrigem === '' && fMarca === ''} onClick={() => { setFOrigem(''); setFMarca(''); }}>tudo</Chip>
+            {([
+              ['casa', 'casa'],
+              ['cortes', 'Cortes'],
+              ['pulso', 'Pulso'],
+              ['limelight', 'Limelight'],
+            ] as const).map(([k, rotulo]) => {
+              const doGrupo = marcasChip.filter((m) => m.origem === k);
+              return (
+                <span key={k} className="inline-flex items-center gap-1.5 pl-2 ml-0.5 border-l border-outline/20">
+                  <Chip on={fOrigem === k && fMarca === ''} onClick={() => trocarOrigem(fOrigem === k && fMarca === '' ? '' : k)}>
+                    {rotulo}{doGrupo.length > 1 ? ` · ${doGrupo.length}` : ''}
+                  </Chip>
+                  {doGrupo.map((m) => (
+                    <Chip key={m.code} on={fMarca === m.code}
+                      onClick={() => { if (fMarca === m.code) { setFMarca(''); setFOrigem(''); } else { setFMarca(m.code); setFOrigem(k); } }}
+                      cor={m.cor}>{m.nome.replace(/ PULSO Histórias$/, '').replace(/^PULSO Histórias$/, 'canal principal')}</Chip>
+                  ))}
+                </span>
+              );
+            })}
+          </div>
+          <div className="text-[11px] text-muted">
+            <b className="text-on-surface-variant">casa</b> são as contas das marcas da DIGIAI; <b className="text-on-surface-variant">Cortes</b>, os
+            canais de Bastidores que o digiai_cortes abastece; <b className="text-on-surface-variant">Pulso</b> e <b className="text-on-surface-variant">Limelight</b> são
+            motores com canais próprios. Clicar no nome do grupo pega o grupo inteiro; clicar num canal pega só ele.
           </div>
           <div className="flex flex-wrap items-center gap-1.5">
             <span className={cls + ' mr-1 shrink-0'}>rede</span>
             {REDES.map((r) => <Chip key={r.k} on={fRede === r.k} onClick={() => setFRede(r.k)}>{r.label}</Chip>)}
-          </div>
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className={cls + ' mr-1 shrink-0'}>marca</span>
-            <Chip on={fMarca === ''} onClick={() => setFMarca('')}>todas</Chip>
-            {marcasChip.filter((m) => m.origem !== 'pulso' && (!fOrigem || m.origem === fOrigem)).map((m) => (
-              <Chip key={m.code} on={fMarca === m.code} onClick={() => setFMarca(fMarca === m.code ? '' : m.code)} cor={m.cor}>{m.nome}</Chip>
-            ))}
-            {(fOrigem === '' || fOrigem === 'pulso') && marcasChip.some((m) => m.origem === 'pulso') && <>
-              <span className={cls + ' ml-1'}>pulso ▸</span>
-              {marcasChip.filter((m) => m.origem === 'pulso').map((m) => (
-                <Chip key={m.code} on={fMarca === m.code} onClick={() => setFMarca(fMarca === m.code ? '' : m.code)}>{m.nome}</Chip>
-              ))}
-            </>}
-            {fOrigem === 'limelight' && <span className="text-[11px] text-muted">a fábrica publica nos canais da Mello — marca única</span>}
           </div>
           {/* A LINHA QUE FALTAVA. Em 20/11 o Espelho mostrava 168k views em 961 peças e o Radar 41,8k
               em 469 — na MESMA janela, com o mesmo rótulo. Não era a janela: um contava por data de
