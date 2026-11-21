@@ -51,6 +51,33 @@ A cobertura lia só `v_mkt_accounts`, que é da casa: as **13 contas do Pulso n�
 nenhum do painel** — inclusive `corteshistoriaspulso`, **bloqueada pela Meta desde 12/11/2026**. Conta
 parada sem aviso vira número congelado, que é o defeito que essa aba existe para pegar.
 
+### O que só apareceu depois de abrir a tela
+
+Três coisas, nenhuma delas visível antes do deploy — por isso a regra é abrir:
+
+1. **Tela em branco.** `serieDe` era chamada dentro de um `useMemo` que roda antes da declaração dela
+   (zona morta temporal). Nada renderizava. Commit `fb173d7`.
+2. **Com o recorte no Pulso, a casa continuava falando** — "posts nas redes **0**", "engajamento não
+   coletado nesta rede", "a coletar — despacho no MKT" e a caixa dos blogs. Zero é medição e "a
+   coletar" é culpa do coletor; as duas mentem quando a verdade é que a pergunta não é daquela
+   origem. Uma frase só, num lugar só. Commit `2fb7855`.
+3. **A cobertura da Saúde dava conta medida por carona.** Casava por marca+rede: quando uma marca tem
+   duas contas na mesma rede, o censo de uma marcava as duas. A tela dizia **31** contas "✓ no censo";
+   o censo por conta são **29** (de 50). Agora casa por `account_id` e mostra a data do censo de cada
+   conta — conferido no ar: 29 ✓, 21 "a ligar". Commit `ee78137`.
+
+### Dois cadastros errados que a cobertura por conta revelou
+
+- **`@pulsohistorias` no YouTube está cadastrada sob a marca Bastidores DIGIAI.** É o canal do PULSO,
+  com 524 inscritos, medido todo dia dentro do censo da casa. Avisado ao MKT; o cadastro é de lá.
+- **Uma segunda conta de Instagram da Lancaster** tem censo desde agosto (1.160 seguidores, último em
+  **25/08**) e **não existe em `mkt.accounts`** — órfã.
+
+**O número de seguidores está certo hoje, e a regra está errada.** O KPI agrupa por marca+rede e fica
+com a última linha de cada par: por sorte da ordenação, hoje ele fica com a conta certa nos dois casos
+(descarta os 524 do Pulso e o órfão de agosto). Mas a regra certa é por conta, com prazo de validade,
+e ela depende de arrumar o cadastro primeiro — anotado, não mexido.
+
 ### Os espelhos passam a paginar
 
 Mesmo teto de sempre: a API corta QUALQUER resposta em 1.000 linhas e devolve como sucesso — vale para
