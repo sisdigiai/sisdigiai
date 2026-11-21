@@ -2,6 +2,62 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-21 — Filtro de ORIGEM no Radar, e o Pulso deixa de ser um cartão só
+
+Ordem do dono (19/11, confirmada hoje): *"pode fazer o filtro de origem no radar agora"*.
+
+**O filtro mentia nos dois sentidos**, e isso foi medido antes de mexer:
+
+- **"PULSO" era um chip de MARCA.** A marca `pulso` em `mkt.brands` tem **zero publicação, zero censo
+  de audiência e zero leitura** — o dado do Pulso vive no banco dele, no espelho. Clicar no chip
+  deixava a tela em branco sem dizer por quê.
+- **Clicar "Bastidores DIGIAI" escondia o cartão do Pulso**, que é justamente quem publica e mede
+  esses canais.
+
+Agora são duas linhas de filtro: **origem** (de quem é o canal: casa · Cortes · Pulso · Limelight) e
+**marca**, dentro da origem. Um crivo só — `marcaOk` — passou a valer para toda leitura da casa, no
+lugar do `!fMarca || code === fMarca` repetido em cada bloco: era por isso que o cartão do Pulso usava
+uma regra e a tabela de audiência usava outra, e a mesma seleção dava respostas diferentes em abas
+diferentes.
+
+**Não confundir com a coluna `origem` da `v_mkt_analytics_peca_dia`**: aquela diz quem **mediu** a
+peça. Medido hoje: `cortes.da.digiai` aparece com origem `pulso` E `digiai_cortes` — duas coletas das
+MESMAS contas da casa, e nenhuma peça repetida (zero `peca_ref` em duas origens). É saúde de coleta,
+não dono de canal; está escrito no código para o próximo que abrir.
+
+### O Pulso são três canais
+
+Passou a ler `v_espelho_pulso_contas_dias`, que reparte por marca e conta. Conferida por mim como anon,
+linha a linha: é a **soma exata** das duas views antigas — `v_espelho_pulso_dias` (curtos do canal
+principal) mais `v_espelho_pulso_longos_dias` (cortes e longos) — e acrescenta marca e conta. São
+**+1.658 views e +59 publicações** que o Radar não contava (o Espelho do MKT já contava).
+
+No recorte de 30 dias: **PULSO Histórias 105.452 views / 155 pubs / 2.841 seguidores**, **Cortes PULSO
+845 / 25 / 8**, **Bastidores PULSO 810 / 32 / 6**.
+
+**Duas coisas mudam e estão ditas na tela:**
+
+1. A view nova **não traz `saves`** (169 no histórico inteiro, ~25.750 interações). Interação aqui
+   passa a ser curtidas + comentários + compartilhamentos. Pedi a coluna ao agente do Pulso.
+2. **As duas views datam o mesmo dia diferente.** O total histórico bate exato (811.364 views nas
+   duas), mas em **544 pares (dia, plataforma)** a view antiga põe as mesmas views **um dia depois**:
+   ela nasceu datando em UTC, e as duas novas datam no dia do negócio, BRT, que é a regra da casa. No
+   recorte de 30 dias o canal principal vai de **107.600 para 105.452**. Não é view perdida — é view
+   no dia certo. Pedi ao Pulso que confirme a coluna de data das três views.
+
+### A Saúde ganhou as contas do Pulso
+
+A cobertura lia só `v_mkt_accounts`, que é da casa: as **13 contas do Pulso não apareciam em lugar
+nenhum do painel** — inclusive `corteshistoriaspulso`, **bloqueada pela Meta desde 12/11/2026**. Conta
+parada sem aviso vira número congelado, que é o defeito que essa aba existe para pegar.
+
+### Os espelhos passam a paginar
+
+Mesmo teto de sempre: a API corta QUALQUER resposta em 1.000 linhas e devolve como sucesso — vale para
+o banco do digiai e vale para o de cada motor. Medido hoje no Pulso: 757, 683 e 657 linhas, crescendo
+todo dia. A ordem de cada view agora é **única**, senão página repete linha e some com outra, em
+silêncio.
+
 ## 2026-11-20 — O corte entre o Espelho do MKT e o Radar 360, e o rótulo que mentia nos dois
 
 Dono: *"porque temos espelho do MKT e radar 360, qual a diferença?"* — e, depois da medição,

@@ -457,6 +457,11 @@ export default function MktCrescimento() {
   const pulsoF = useMemo(() => pulsoContasDias.filter((d) => noRecorte(d.dia) && (!fRede || d.plataforma === fRede)), [pulsoContasDias, corteDia, fimDia, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
   const limePubF = useMemo(() => limePub.filter((d) => noRecorte(d.dia) && (!fRede || d.plataforma === fRede)), [limePub, corteDia, fimDia, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
   const blogF = useMemo(() => blogDias.filter((d) => noRecorte(d.dia)), [blogDias, corteDia, fimDia]); // eslint-disable-line react-hooks/exhaustive-deps
+  const serieDe = (rows: { dia: string; v: number }[]) => {
+    const m = new Map<string, number>();
+    for (const r of rows) m.set(r.dia, (m.get(r.dia) ?? 0) + r.v);
+    return [...m.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+  };
   const porPlataforma = (rows: { plataforma: string; publicacoes: number; views: number; likes: number; comentarios: number; shares: number }[]) => {
     const m = new Map<string, { pubs: number; views: number; eng: number }>();
     for (const r of rows) {
@@ -546,11 +551,6 @@ export default function MktCrescimento() {
     }
     return [...m.entries()].map(([slug, c]) => ({ slug, ...c })).sort((a, b) => b.leituras - a.leituras);
   }, [blogF]);
-  const serieDe = (rows: { dia: string; v: number }[]) => {
-    const m = new Map<string, number>();
-    for (const r of rows) m.set(r.dia, (m.get(r.dia) ?? 0) + r.v);
-    return [...m.entries()].sort((a, b) => a[0].localeCompare(b[0]));
-  };
   const blogSerie = useMemo(() => serieDe(blogF.map((d) => ({ dia: d.dia, v: d.leituras || 0 }))), [blogF]); // eslint-disable-line react-hooks/exhaustive-deps
   // Quem aparece agora é a ORIGEM que decide, não a marca. `fMarca` segue valendo DENTRO da origem:
   // nas marcas do Pulso, escolhe o canal; na casa, a marca da DIGIAI.
