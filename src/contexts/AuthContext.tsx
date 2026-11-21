@@ -47,9 +47,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // ninguém decide; quando a RPC responde, `null` passa a significar SEM ACESSO,
   // inclusive quando a resposta foi erro. Fechar não tranca o dono: ele é
   // super_admin ativo em `iam.users` e a RPC o resolve — conferido em 06/09.
+  // A RPC roda UMA vez por usuário, não uma por sessão. (21/11/2026)
+  //
+  // Dependia de `session`, e `onAuthStateChange` entrega um objeto NOVO a cada evento
+  // (INITIAL_SESSION, SIGNED_IN, TOKEN_REFRESHED) — referência nova, efeito de novo. Medido no ar
+  // hoje: **3 a 4 chamadas idênticas** a cada abertura do painel, e num dos carregamentos elas
+  // levaram **5,4 s cada**, antes de qualquer tela começar a ler. O papel é do USUÁRIO e não muda
+  // quando o token se renova; então a chave do efeito é o id dele.
+  const userId = session?.user?.id ?? null;
   useEffect(() => {
     let active = true;
-    if (!session) { setRole(null); setPapelCarregando(false); return; }
+    if (!userId) { setRole(null); setPapelCarregando(false); return; }
     setPapelCarregando(true);
     supabase.rpc('current_role_code').then(({ data, error }) => {
       if (!active) return;
@@ -58,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setPapelCarregando(false);
     });
     return () => { active = false; };
-  }, [session]);
+  }, [userId]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });

@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marketing — página única (mock)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --surface:#0d131f; --container:#1a202c; --highest:#2f3542;
+    --on:#dde2f3; --on-var:#c7c6cd; --muted:#909097; --outline:#2f3542;
+    --sec:#adcebd; --ok:#8fb8a1; --warn:#fcd34d; --danger:#fca5a5;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--surface);color:var(--on);font-family:Inter,system-ui,sans-serif;font-size:15px;line-height:1.5}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 16px 64px}
+  .lbl{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  h1{font-size:30px;margin:4px 0 6px;font-weight:600}
+  h2{font-size:15px;font-weight:500;color:var(--on-var);margin:0}
+  .sub{color:var(--on-var);font-size:13.5px;margin:0 0 22px;max-width:76ch}
+  .box{border:1px solid rgba(47,53,66,.55);background:var(--container)}
+  .nota{border-left:2px solid var(--sec);background:var(--container);padding:10px 16px;font-size:13.5px;color:var(--on-var);margin:0 0 20px}
+  .nota b{color:var(--on)}
+
+  .barra{padding:14px;margin-bottom:6px}
+  .linha{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:9px}
+  .linha:last-child{margin-bottom:0}
+  .linha .lbl{width:58px;flex:none}
+  .chip{border:1px solid rgba(47,53,66,.75);color:var(--on-var);background:transparent;padding:5px 10px;font-size:12px;cursor:default}
+  .chip.on{border-color:var(--sec);color:var(--on);background:var(--highest)}
+  .dica{font-size:11px;color:var(--muted);margin-left:4px}
+
+  .grupos{display:flex;flex-wrap:wrap;gap:22px;margin:18px 0 0;align-items:flex-end}
+  .grupo .lbl{display:block;margin-bottom:6px}
+  .abas{display:flex;flex-wrap:wrap;gap:2px}
+  .aba{padding:8px 13px;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;color:var(--muted);border-bottom:2px solid transparent}
+  .aba.on{color:var(--on);border-bottom-color:var(--sec);background:rgba(47,53,66,.4)}
+  .divisor{height:1px;background:rgba(47,53,66,.55);margin:0 0 20px}
+
+  .grade{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-bottom:14px}
+  .hero{grid-column:span 2;padding:20px}
+  .hero .n{font-size:clamp(30px,4.6vw,44px);font-weight:600;line-height:1.1}
+  .parc{font-size:12px;color:var(--muted);margin:4px 0 12px}
+  .barrinha{display:flex;height:22px;gap:2px;margin-bottom:8px}
+  .leg{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12px;color:var(--on-var)}
+  .pt{display:inline-block;width:9px;height:9px;margin-right:6px;vertical-align:-1px}
+  .lado{padding:20px}
+  .lado .n{font-size:24px;font-weight:600;color:var(--sec)}
+  .kpis{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+  .kpi{padding:13px 14px}
+  .kpi .t{font-size:11px;color:var(--on-var);margin-bottom:6px}
+  .kpi .v{font-size:20px;font-weight:600}
+  .kpi .s{font-size:10px;color:var(--muted);margin-top:3px}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;font-weight:400;padding:8px 14px;border-bottom:1px solid rgba(47,53,66,.55)}
+  td{padding:8px 14px;border-bottom:1px solid rgba(47,53,66,.35);color:var(--on-var)}
+  td.n{text-align:right}
+  .secao{margin-top:30px}
+  .secao h2{margin-bottom:9px}
+  ul{margin:8px 0 0;padding-left:20px;color:var(--on-var);font-size:13.5px}
+  li{margin-bottom:6px}
+  .duas{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .selo{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border:1px solid}
+  .ok{color:var(--ok);border-color:rgba(143,184,161,.5)}
+  .warn{color:var(--warn);border-color:rgba(252,211,77,.45)}
+  .dang{color:var(--danger);border-color:rgba(252,165,165,.45)}
+  @media(max-width:640px){.hero{grid-column:span 1}.linha .lbl{width:100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="lbl">mock · proposta de estrutura · 21/11/2026</div>
+  <h1>Marketing</h1>
+  <p class="sub">Uma página. Uma barra de filtro. Uma régua de data. As abas de cima são para <b>decidir</b>; as de baixo, para <b>conferir de onde o número veio</b>. Os números abaixo são os <b>reais de hoje</b>, lidos do painel no ar — não são exemplo.</p>
+
+  <div class="nota"><b>A regra que a página nasce obedecendo:</b> um número tem uma fonte e uma data. Se dois lugares mostram o mesmo número, um deles lê o outro. Aba que não obedece ao filtro de cima diz isso na primeira linha dela.</div>
+
+  <!-- BARRA ÚNICA -->
+  <div class="box barra">
+    <div class="linha">
+      <span class="lbl">período</span>
+      <span class="chip">hoje</span><span class="chip">7d</span><span class="chip">14d</span>
+      <span class="chip on">30d</span><span class="chip">90d</span><span class="chip">12m</span><span class="chip">tudo</span>
+      <span class="dica">23/10 → 21/11</span>
+    </div>
+    <div class="linha">
+      <span class="lbl">origem</span>
+      <span class="chip on">todas</span><span class="chip">casa</span><span class="chip">Cortes</span><span class="chip">Pulso</span><span class="chip">Limelight</span>
+      <span class="dica">de quem é o canal — a marca vem depois, dentro da origem</span>
+    </div>
+    <div class="linha">
+      <span class="lbl">rede</span>
+      <span class="chip on">todas</span><span class="chip">Instagram</span><span class="chip">Facebook</span><span class="chip">TikTok</span><span class="chip">YouTube</span><span class="chip">Kwai</span><span class="chip">LinkedIn</span>
+    </div>
+    <div class="linha">
+      <span class="lbl">marca</span>
+      <span class="chip on">todas</span><span class="chip">DIGIAI</span><span class="chip">Mello</span><span class="chip">Lancaster</span><span class="chip">OSI</span><span class="chip">Polá</span><span class="chip">Pessoal</span><span class="chip">Bastidores</span>
+      <span class="lbl" style="margin-left:4px">pulso ▸</span>
+      <span class="chip">PULSO Histórias</span><span class="chip">Cortes</span><span class="chip">Bastidores</span>
+    </div>
+    <div class="linha">
+      <span class="lbl">data</span>
+      <span class="chip on">por PUBLICAÇÃO</span><span class="chip">por LEITURA</span>
+      <span class="dica">a escolha que faltava: hoje o Espelho usa uma e o Radar a outra, com o mesmo rótulo</span>
+    </div>
+  </div>
+
+  <!-- ABAS EM DOIS NÍVEIS -->
+  <div class="grupos">
+    <div class="grupo">
+      <span class="lbl">decidir</span>
+      <div class="abas">
+        <span class="aba on">Hoje</span><span class="aba">Resultado</span><span class="aba">O que funciona</span><span class="aba">Fôlego</span><span class="aba">Publicações</span>
+      </div>
+    </div>
+    <div class="grupo">
+      <span class="lbl">conferir</span>
+      <div class="abas">
+        <span class="aba">Marca × rede</span><span class="aba">Audiência</span><span class="aba">Vídeo &amp; motores</span><span class="aba">Régua</span><span class="aba">Território</span><span class="aba">Saúde</span>
+      </div>
+    </div>
+  </div>
+  <div class="divisor" style="margin-top:0"></div>
+
+  <!-- CONTEÚDO DA ABA HOJE -->
+  <div class="grade">
+    <div class="box hero">
+      <div class="lbl">views do que foi publicado no período · 23/10 → 21/11</div>
+      <div class="n mono">150.494</div>
+      <div class="parc">Pulso 107.107 · contas da casa 42.479 (441 de 473 peças lidas) · Limelight 908</div>
+      <div class="barrinha">
+        <div style="width:41%;background:#3987e5"></div><div style="width:20.5%;background:#199e70"></div>
+        <div style="width:14.8%;background:#d55181"></div><div style="width:13.6%;background:#c98500"></div>
+        <div style="width:10.1%;background:#d95926"></div>
+      </div>
+      <div class="leg">
+        <span><i class="pt" style="background:#3987e5"></i>Facebook 61.644</span>
+        <span><i class="pt" style="background:#199e70"></i>TikTok 30.912</span>
+        <span><i class="pt" style="background:#d55181"></i>Instagram 22.231</span>
+        <span><i class="pt" style="background:#c98500"></i>Kwai 20.471</span>
+        <span><i class="pt" style="background:#d95926"></i>YouTube 15.236</span>
+      </div>
+      <div class="lbl" style="margin-top:9px">participação por plataforma · as mesmas parcelas do número de cima</div>
+    </div>
+    <div class="box lado">
+      <div class="lbl">seguidores (censo, fim do período)</div>
+      <div class="n mono">8.465</div>
+      <div style="font-size:11px;color:var(--ok);margin-top:2px">+84 no período</div>
+      <div class="lbl" style="margin-top:14px">blogs no período</div>
+      <div style="font-size:13px;color:var(--on-var)">180 leituras · 175 posts no ar</div>
+    </div>
+  </div>
+
+  <div class="kpis" style="margin-bottom:6px">
+    <div class="box kpi"><div class="t">posts nas redes</div><div class="v mono" style="color:var(--sec)">503</div><div class="s">no recorte · 384 com engajamento medido</div></div>
+    <div class="box kpi"><div class="t">views dos motores</div><div class="v mono" style="color:var(--warn)">108.015</div><div class="s">226 pubs · 3.098 interações</div></div>
+    <div class="box kpi"><div class="t">views das peças da casa</div><div class="v mono" style="color:var(--sec)">42.479</div><div class="s">441 de 473 peças com leitura</div></div>
+    <div class="box kpi"><div class="t">contas no censo</div><div class="v mono" style="color:var(--ok)">29 <span style="color:var(--muted);font-size:13px">de 50</span></div><div class="s">último censo 20/11 · 21 a ligar</div></div>
+  </div>
+
+  <div class="nota" style="border-color:var(--warn);border-left-color:var(--warn);margin-top:14px">
+    <b>O que a página ganha e as duas telas de hoje não têm:</b> a linha <b>data</b> na barra. É a mesma pergunta respondida de dois jeitos — “quanto rendeu o que publiquei no período” (<span class="mono">150.494</span>) e “quanto a casa já somou do que foi medido agora” (<span class="mono">284.000</span>). Hoje uma tela mostra uma e a outra mostra a outra, com o mesmo rótulo. Numa página só, vira um botão, e o rótulo muda junto.
+  </div>
+
+  <!-- CARREGAMENTO -->
+  <div class="secao">
+    <h2>O que carrega, e quando</h2>
+    <p class="sub" style="margin:6px 0 12px">Esta é a parte que resolve a lentidão medida hoje. Hoje as duas telas leem <b>tudo</b> no instante em que abrem.</p>
+    <div class="box">
+      <table>
+        <thead><tr><th>momento</th><th>o que é lido</th><th class="n">leituras</th><th class="n">alvo</th></tr></thead>
+        <tbody>
+          <tr><td>ao abrir (aba Hoje)</td><td>o total do recorte e as parcelas</td><td class="n mono">4</td><td class="n mono" style="color:var(--ok)">&lt; 1,5 s</td></tr>
+          <tr><td>ao clicar numa aba</td><td>só o que aquela aba mostra</td><td class="n mono">1 a 3</td><td class="n mono" style="color:var(--ok)">&lt; 1 s</td></tr>
+          <tr><td>nunca mais</td><td>aba já aberta antes, no mesmo recorte</td><td class="n mono">0</td><td class="n mono">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MEDIÇÃO -->
+  <div class="secao">
+    <h2>A leitura que está travando — medido hoje, no ar</h2>
+    <div class="duas" style="margin-top:10px">
+      <div class="box" style="padding:16px">
+        <div class="lbl">espelho do mkt · hoje</div>
+        <div class="mono" style="font-size:30px;font-weight:600;color:var(--danger)">24,6 s</div>
+        <div style="font-size:12.5px;color:var(--on-var);margin-top:6px">23 leituras disparadas juntas. Todas voltam no mesmo instante tardio: <b>10 a 14 s cada</b>.</div>
+      </div>
+      <div class="box" style="padding:16px">
+        <div class="lbl">radar 360 · hoje</div>
+        <div class="mono" style="font-size:30px;font-weight:600;color:var(--warn)">5,1 s</div>
+        <div style="font-size:12.5px;color:var(--on-var);margin-top:6px">24 leituras. A mais lenta sozinha leva <b>2,5 s</b>; <span class="mono">publications</span> vem em <b>4 páginas em fila</b>, 3,9 s.</div>
+      </div>
+    </div>
+    <div class="box" style="padding:16px;margin-top:12px">
+      <div class="lbl" style="margin-bottom:8px">e o banco não é o culpado — as mesmas views, medidas no servidor</div>
+      <table>
+        <tbody>
+          <tr><td class="mono">v_mkt_fila_saude</td><td class="n mono" style="color:var(--ok)">3,8 ms</td><td style="color:var(--muted)">no banco</td><td class="n mono" style="color:var(--danger)">9,8 s</td><td style="color:var(--muted)">na tela</td></tr>
+          <tr><td class="mono">v_marketing_cadeia_dia</td><td class="n mono" style="color:var(--ok)">692 ms</td><td style="color:var(--muted)">no banco</td><td class="n mono" style="color:var(--danger)">14,3 s</td><td style="color:var(--muted)">na tela</td></tr>
+          <tr><td class="mono">v_pontualidade</td><td class="n mono" style="color:var(--ok)">11 ms</td><td style="color:var(--muted)">no banco</td><td class="n mono" style="color:var(--danger)">11,9 s</td><td style="color:var(--muted)">na tela</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:13px;color:var(--on-var);margin:12px 0 0">Uma view que roda em <b>3,8 ms</b> e demora <b>9,8 s</b> para chegar não está lenta: está <b>na fila</b>. São ~20 pedidos ao mesmo tempo num banco que os atende em série. Menos pedidos, e em levas, é mais rápido que todos de uma vez.</p>
+    </div>
+    <ul>
+      <li><b>Ler por aba</b> derruba de 23 leituras para 4 na abertura — é a maior parte do ganho, e só existe se a página for uma.</li>
+      <li><b>Parar de trazer linha que vira conta:</b> o Radar baixa <span class="mono">3.072</span> publicações em 4 páginas enfileiradas (3,9 s) para mostrar um total e uma lista de 12.</li>
+      <li><b>Paginar em paralelo</b> quando precisar de muitas linhas, em vez de uma página esperando a outra.</li>
+      <li><b>Chamar o portão de papel uma vez</b> — hoje <span class="mono">current_role_code</span> é chamado 3 a 4 vezes em toda abertura (5,4 s cada no pior caso medido).</li>
+    </ul>
+  </div>
+
+  <div class="nota" style="margin-top:28px">
+    <b>Os dois endereços continuam vivos durante a troca.</b> <span class="mono">#/marketing</span> e <span class="mono">#/mkt-crescimento</span> abrem a mesma página, cada um na sua aba inicial — ninguém perde atalho salvo nem link mandado.
+  </div>
+
+</div>
+</body>
+</html>
