@@ -2,6 +2,36 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-21 — A leitura que trava: medida, e o primeiro conserto
+
+Dono: *"pode fazer a página única agora … mas mandar um mock e testar a leitura que está travando
+nestas páginas"*. Medido no ar, com o relógio do navegador:
+
+| tela | até terminar de ler | leituras |
+|---|---|---|
+| Espelho do MKT | **24,6 s** | 23 disparadas juntas, **10 a 14 s cada** |
+| Radar 360 | **5,1 s** | 24; `publications` vem em **4 páginas em fila** (3,9 s) |
+
+**E o banco não é o culpado.** As mesmas views, medidas no servidor com `explain analyze`:
+`v_mkt_fila_saude` **3,8 ms** (9,8 s na tela), `v_marketing_cadeia_dia` **692 ms** (14,3 s na tela),
+`v_pontualidade` **11 ms** (11,9 s na tela). Uma view que roda em 3,8 ms e demora 9,8 s para chegar
+não está lenta — está **na fila**: são ~20 pedidos ao mesmo tempo num banco que os atende em série.
+
+### Consertado hoje: o portão de papel era consultado 3 a 4 vezes por abertura
+
+`current_role_code` saía **3 ou 4 vezes idênticas** a cada abertura do painel, antes de qualquer tela
+começar a ler — e num dos carregamentos levaram **5,4 s cada**. O efeito dependia do objeto `session`,
+e `onAuthStateChange` entrega um objeto novo a cada evento (INITIAL_SESSION, SIGNED_IN,
+TOKEN_REFRESHED). O papel é do usuário e não muda quando o token se renova. Conferido no ar depois do
+deploy: **1 chamada, 61 ms**. Commit `73c98fc`.
+
+### O resto do conserto mora na página única
+
+Ler por aba derruba a abertura de 23 leituras para 4, e isso só existe se a página for uma. Junto vai
+parar de trazer **3.072 publicações** (4 páginas enfileiradas) para mostrar um total e uma lista de 12,
+e paginar em paralelo quando muitas linhas forem mesmo necessárias. Mock da estrutura proposta, com os
+números reais de hoje: [`docs/mock-pagina-unica-marketing.html`](mock-pagina-unica-marketing.html).
+
 ## 2026-11-21 — Filtro de ORIGEM no Radar, e o Pulso deixa de ser um cartão só
 
 Ordem do dono (19/11, confirmada hoje): *"pode fazer o filtro de origem no radar agora"*.
