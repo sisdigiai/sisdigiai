@@ -253,6 +253,26 @@ export interface PulsoConta {
   mede_views: boolean; mede_seguidores: boolean; observacao: string | null;
 }
 
+// Espelho da Polá Petit no formato de MOTOR (`v_espelho_polapetit_dias`, publicada pelo agente da
+// Polá em 21/11/2026, projeto cvqoqnjitqvuopqadfbh). Mesmas colunas dos espelhos do Pulso e do
+// Limelight — só número, leitura anon.
+//
+// ATENÇÃO, E ISTO FOI MEDIDO ANTES DE LIGAR: a Polá NÃO é um motor como o Pulso e o Limelight. Eles
+// publicam em canais PRÓPRIOS (conferido em 17/11: zero linhas cruzadas). A Polá é marca da casa, e
+// o app dela mede a **mesma conta de Instagram** que o MKT já publica e lê. Medido em 21/11: a casa
+// tem 96 peças de Instagram da Polá com **103.698 views**, e o espelho dela reporta **43.321** no
+// mesmo Instagram. Somar os dois contaria a mesma postagem duas vezes.
+//
+// Por isso o cartão da Polá fica FORA do número grande e diz isso na tela. E a divergência entre as
+// duas medições é pergunta aberta para a Polá e o MKT — não se resolve com média nem escolhendo a
+// maior.
+export interface PolaPetitDia {
+  dia: string; plataforma: string;
+  publicacoes: number | null; views: number | null;
+  likes: number | null; comentarios: number | null; shares: number | null; saves: number | null;
+  seguidores: number | null; views_conta: number | null; alcance_conta: number | null;
+}
+
 // Leitores com motivo, para a tela do comparativo. Os sem estado continuam para as telas antigas.
 export const espelhoMotoresEstado = {
   pulsoDias: () => lerLinhasEstado<PulsoDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_dias', 'dia.asc,plataforma.asc'),
@@ -263,6 +283,7 @@ export const espelhoMotoresEstado = {
   limelightPubDias: () => lerLinhasEstado<LimePubDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_pub_dias', 'dia.asc,plataforma.asc'),
   blogsDias: () => lerLinhasEstado<BlogDia>(BLOGS_URL, BLOGS_ANON, 'v_espelho_blogs_dias', 'dia.asc,blog_slug.asc'),
   polaDias: () => lerLinhasEstado<PolaDia>(POLA_URL, POLA_ANON, 'v_pola_redes_metricas_dia', 'dia.asc,rede.asc'),
+  polaPetitDias: () => lerLinhasEstado<PolaPetitDia>(POLA_URL, POLA_ANON, 'v_espelho_polapetit_dias', 'dia.asc,plataforma.asc'),
 };
 
 export const espelhoMotores = {
@@ -276,6 +297,7 @@ export const espelhoMotores = {
   limelightDias: () => lerLinhas<LimelightDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_dias', 'dia.asc,plataforma.asc'),
   limelightPubDias: () => lerLinhas<LimePubDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_pub_dias', 'dia.asc,plataforma.asc'),
   blogsDias: () => lerLinhas<BlogDia>(BLOGS_URL, BLOGS_ANON, 'v_espelho_blogs_dias', 'dia.asc,blog_slug.asc'),
+  polaPetitDias: () => lerLinhasEstado<PolaPetitDia>(POLA_URL, POLA_ANON, 'v_espelho_polapetit_dias', 'dia.asc,plataforma.asc'),
 };
 
 /**

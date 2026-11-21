@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { hojeBrasilia, diaBrasilia } from '../lib/datas';
 import OsiDiasCard from '../components/OsiDiasCard';
 import MapaCobertura from '../components/MapaCobertura';
-import { espelhoMotores, type PulsoContaDia, type PulsoSegDia, type PulsoConta, type LimelightDia, type LimePubDia, type BlogDia, type EspelhoBlogs } from '../lib/espelhoMotores';
+import { espelhoMotores, espelhoMotoresEstado, type PolaPetitDia, type EstadoEspelho, type PulsoContaDia, type PulsoSegDia, type PulsoConta, type LimelightDia, type LimePubDia, type BlogDia, type EspelhoBlogs } from '../lib/espelhoMotores';
 import { lerTudo } from '../lib/paginar';
 
 // RADAR 360 (2026-08-25) — o analytics social completo do grupo, aprovado em mock.
@@ -153,6 +153,7 @@ export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: F
   const [pulsoContasDias, setPulsoContasDias] = useState<PulsoContaDia[]>([]);
   const [pulsoSeg, setPulsoSeg] = useState<PulsoSegDia[]>([]);
   const [pulsoContas, setPulsoContas] = useState<PulsoConta[]>([]);
+  const [pola, setPola] = useState<{ linhas: PolaPetitDia[]; estado: EstadoEspelho; detalhe?: string } | null>(null);
   const [limeDias, setLimeDias] = useState<LimelightDia[]>([]);
   const [limePub, setLimePub] = useState<LimePubDia[]>([]);
   const [blogDias, setBlogDias] = useState<BlogDia[]>([]);
@@ -257,6 +258,9 @@ export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: F
       const [bd, be] = await Promise.all([espelhoMotores.blogsDias(), espelhoMotores.blogs()]);
       setBlogDias(bd); setBlogsEsp(be);
     },
+    async pola() {
+      setPola(await espelhoMotoresEstado.polaPetitDias());
+    },
     async saude() {
       const [{ data: fs }, { data: ac }, cr] = await Promise.all([
         supabase.from('v_mkt_fila_saude').select('atrasados, com_erro, ultima_publicacao, ultima_audiencia').maybeSingle(),
@@ -279,7 +283,7 @@ export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: F
     visao: ['marcas', 'pecas', 'publicacoes', 'audiencia', 'pulso', 'lime', 'blogs'],
     audiencia: ['marcas', 'audiencia'],
     conteudo: ['marcas', 'publicacoes', 'pecas'],
-    video: ['marcas', 'pulso', 'lime', 'blogs'],
+    video: ['marcas', 'pulso', 'lime', 'blogs', 'pola'],
     regua: ['regua'],
     territorio: [],
     // 'blogs' entra porque o cartao de saude dos blogs dizia "espelho indisponivel" quando a fonte
@@ -626,6 +630,19 @@ export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: F
     }
     return [...porPlat.values()].reduce((a, d) => a + (d.seguidores ?? 0), 0);
   }, [limeDias, fRede, fimDia]);
+  // A POLÁ FICA FORA DA SOMA, de propósito — ver o comentário em lib/espelhoMotores.ts: o app dela
+  // mede a mesma conta de Instagram que a casa já conta. O cartão mostra a medição DELA, e diz isso.
+  const polaF = useMemo(() => (pola?.linhas ?? []).filter((d) => noRecorte(d.dia) && (!fRede || d.plataforma === fRede)),
+    [pola, corteDia, fimDia, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
+  const polaTot = useMemo(() => ({
+    views: polaF.reduce((a, d) => a + (d.views || 0), 0),
+    pubs: polaF.reduce((a, d) => a + (d.publicacoes || 0), 0),
+    seguidores: polaF.reduce<number>((a, d) => (d.seguidores != null && d.seguidores > a ? d.seguidores : a), 0),
+  }), [polaF]);
+  const polaPlats = useMemo(() => porPlataforma(polaF.map((d) => ({
+    plataforma: d.plataforma, publicacoes: d.publicacoes ?? 0, views: d.views ?? 0,
+    likes: d.likes ?? 0, comentarios: d.comentarios ?? 0, shares: d.shares ?? 0,
+  }))), [polaF]);
   const blogTot = useMemo(() => blogF.reduce((a, d) => a + (d.leituras || 0), 0), [blogF]);
   const blogPorSlug = useMemo(() => {
     const m = new Map<string, { leituras: number; sessoes: number }>();
@@ -644,6 +661,8 @@ export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: F
   const mostrarLime = (fOrigem === '' || fOrigem === 'limelight') && (fMarca === '' || fMarca === codeMello) && limePub.length > 0;
   const mostrarBlogs = (fOrigem === '' || fOrigem === 'casa') && (!fMarca || fMarca === codeDigiai) && !fRede && blogDias.length > 0;
   const mostrarOsi = (fOrigem === '' || fOrigem === 'casa') && (!fMarca || fMarca === codeOsi) && !fRede;
+  const codePola = 'polapetit';
+  const mostrarPola = (fOrigem === '' || fOrigem === 'casa') && (!fMarca || fMarca === codePola);
   // Abas que medem as contas da CASA não têm o que mostrar quando o recorte é um motor de fora.
   // Vazio sem explicação é lido como "não aconteceu nada" — e aqui significa "não é aqui".
   const soMotor = fOrigem === 'pulso' || fOrigem === 'limelight';
@@ -1015,6 +1034,23 @@ export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: F
                     blogsDetalhe={blogPorSlug}
                     sacada={blogPorSlug.length >= 2 && blogPorSlug[0].leituras > 0 ? `${blogPorSlug[0].slug} puxa a rede (${blogPorSlug[0].leituras} leituras)` : undefined} />
                 ) : <MotorVazio titulo="Blogs regionais · 5 sites" motivo={fRede ? 'blogs não têm recorte por rede' : fOrigem && fOrigem !== 'casa' ? `o recorte é ${rotuloOrigem(fOrigem)}` : 'o filtro de marca exclui os blogs'} />}
+                {mostrarPola ? (
+                  pola && pola.estado !== 'ok'
+                    ? <MotorVazio titulo="Polá Petit · espelho próprio" motivo={pola.estado === 'sem_credencial'
+                        ? 'falta a variável VITE_POLA_SUPABASE_ANON_KEY no painel — quem cola é o dono'
+                        : `não consegui ler: ${pola.detalhe ?? pola.estado}`} />
+                    : <MotorCard titulo="Polá Petit · espelho próprio" cor={COR_WARN}
+                        headline={polaTot.views > 0 ? `${nf(polaTot.views)} views` : '—'}
+                        sub={polaTot.views > 0
+                          ? `${polaTot.pubs} publicações no período${polaTot.seguidores > 0 ? ` · ${nf(polaTot.seguidores)} seguidores` : ''}`
+                          : 'sem leitura neste recorte'}
+                        serie={serieDe(polaF.map((d) => ({ dia: d.dia, v: d.views || 0 })))} rotuloSerie="views/dia"
+                        plats={polaPlats}
+                        aviso={<><b className="text-on-surface-variant">Fora do número grande, de propósito.</b> A Polá não é motor como o Pulso e o Limelight:
+                          eles publicam em canais próprios, e o app da Polá mede a <b>mesma conta de Instagram</b> que a casa já conta.
+                          Medido em 21/11: a casa tem 96 peças de Instagram da Polá com <b>103.698 views</b>, e este espelho reporta <b>43.321</b>.
+                          Somar contaria a mesma postagem duas vezes — e a diferença entre as duas medições é pergunta aberta para a Polá e o MKT.</>} />
+                ) : <MotorVazio titulo="Polá Petit · espelho próprio" motivo={fOrigem && fOrigem !== 'casa' ? `o recorte é ${rotuloOrigem(fOrigem)}` : 'o filtro de marca exclui a Polá'} />}
                 {mostrarOsi
                   ? <OsiDiasCard desde={corteDia} ate={fimDia} cor={COR_SEC} />
                   : <MotorVazio titulo="OSI · landing e leitor" motivo={fRede ? 'a OSI não tem recorte por rede' : fOrigem && fOrigem !== 'casa' ? `o recorte é ${rotuloOrigem(fOrigem)}` : 'o filtro de marca exclui a OSI'} />}
@@ -1292,12 +1328,13 @@ function Spark({ serie, color }: { serie: number[]; color: string }) {
   );
 }
 
-function MotorCard({ titulo, cor, headline, sub, serie, rotuloSerie, plats, blogsDetalhe, sacada }: {
+function MotorCard({ titulo, cor, headline, sub, serie, rotuloSerie, plats, blogsDetalhe, sacada, aviso }: {
   titulo: string; cor: string; headline: string; sub: string;
   serie: [string, number][]; rotuloSerie: string;
   plats?: { plat: string; pubs: number; views: number; eng: number; vpp: number }[];
   blogsDetalhe?: { slug: string; leituras: number; sessoes: number }[];
   sacada?: string;
+  aviso?: React.ReactNode;
 }) {
   const max = Math.max(1, ...serie.map(([, v]) => v));
   return (
@@ -1367,6 +1404,9 @@ function MotorCard({ titulo, cor, headline, sub, serie, rotuloSerie, plats, blog
         <div className="mt-2 text-[11px] flex items-center gap-1.5" style={{ color: cor }}>
           <span>▲</span><span className="text-on-surface-variant">{sacada}</span>
         </div>
+      )}
+      {aviso && (
+        <div className="mt-2 pt-2 border-t border-outline/10 text-[11px] text-muted leading-snug">{aviso}</div>
       )}
     </div>
   );
