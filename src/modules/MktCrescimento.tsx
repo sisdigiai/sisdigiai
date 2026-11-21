@@ -287,17 +287,34 @@ export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: F
 
   const chaveDaFonte = (f: string) => (DA_JANELA.has(f) ? `${f}|${corteDia}|${fimDia}` : f);
 
+  // A TELA NÃO ESPERA A FONTE MAIS LENTA (21/11/2026). Cada fonte avisa quando chega, e o bloco que
+  // depende dela escreve "medindo…" até lá — nunca 0, nunca em branco.
+  //
+  // Por que importa: a `v_mkt_peca_consolidada` roda em 108 ms no banco e leva ~3,5 s para chegar,
+  // porque a view de baixo chama `mkt.pode_ver_marca(code)` LINHA A LINHA e, por ser SECURITY
+  // DEFINER, o Postgres não consegue embutir a função na consulta: são milhares de chamadas para
+  // responder o que seriam nove. Avisei o MKT, que é de quem é a função. Enquanto isso, a página
+  // não fica parada por causa dela.
+  const [emVoo, setEmVoo] = useState<string[]>([]);
+  const chegando = (f: string) => emVoo.includes(f);
+
   function carregar(fontes: string[]) {
     const faltando = fontes.filter((f) => !carregadas.current.has(chaveDaFonte(f)));
     if (faltando.length === 0) { setLoading(false); return; }
     faltando.forEach((f) => carregadas.current.add(chaveDaFonte(f)));
-    setLoading(true);
-    Promise.all(faltando.map((f) => FONTES[f]()))
-      .catch((e) => {
-        faltando.forEach((f) => carregadas.current.delete(chaveDaFonte(f)));
-        console.error('[radar] falha ao carregar', faltando, e);
-      })
-      .finally(() => setLoading(false));
+    setEmVoo((atual) => [...new Set([...atual, ...faltando])]);
+    if (faltando.includes('marcas')) setLoading(true);
+    faltando.forEach((f) => {
+      FONTES[f]()
+        .catch((e) => {
+          carregadas.current.delete(chaveDaFonte(f));
+          console.error('[radar] falha ao carregar', f, e);
+        })
+        .finally(() => {
+          setEmVoo((atual) => atual.filter((x) => x !== f));
+          if (f === 'marcas') setLoading(false);
+        });
+    });
   }
 
   useEffect(() => { carregar(FONTES_DA_ABA[aba] ?? []); }, [aba, corteDia, fimDia]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -753,7 +770,9 @@ export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: F
                       ? <>
                           {mostrarPulso && pulsoTot.views > 0 && <>Pulso {nf(pulsoTot.views)} · </>}
                           {mostrarLime && limeTot.views > 0 && <>Limelight {nf(limeTot.views)} · </>}
-                          {viewsCasa > 0
+                          {chegando('pecas')
+                            ? <>contas da casa <span className="animate-pulse">medindo…</span></>
+                            : viewsCasa > 0
                             ? <>contas da casa {nf(viewsCasa)} ({pecasComViews} de {pecasF.length} peças lidas{!porLeitura && estimadas > 0 ? ` · ${estimadas} sem registro de publicação, datadas pela 1ª leitura` : ''})</>
                             : <>contas da casa sem leitura no recorte</>}
                         </>
@@ -794,13 +813,15 @@ export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: F
                     sobrenome parecia contradição na mesma tela — visto no ar em 19/11, logo após o
                     conserto das views. E **zero é medição**: rede sem coleta de engajamento mostra traço,
                     nunca 0, senão o TikTok aparece como conteúdo que ninguém curtiu. */}
-                <Kpi icon={<Newspaper className="w-4 h-4" />} label="posts nas redes" value={soMotor ? '—' : nf(linhas.length)}
-                  sub={soMotor ? FORA_DA_CASA : `no recorte · ${medidos.length} com engajamento medido`} glow={COR_SEC} />
+                <Kpi icon={<Newspaper className="w-4 h-4" />} label="posts nas redes"
+                  value={chegando('publicacoes') ? '…' : soMotor ? '—' : nf(linhas.length)}
+                  sub={chegando('publicacoes') ? 'medindo…' : soMotor ? FORA_DA_CASA : `no recorte · ${medidos.length} com engajamento medido`} glow={COR_SEC} />
                 <Kpi icon={<Sparkles className="w-4 h-4" />} label="engajamento redes" value={soMotor || medidos.length === 0 ? '—' : nf(engTotal)}
                   sub={soMotor ? FORA_DA_CASA : medidos.length === 0 ? 'engajamento não coletado nesta rede' : `média ${nf(Math.round(engMed))}/post`} glow={COR_OK} />
                 <Kpi icon={<Film className="w-4 h-4" />} label="views motores" value={temMotor ? nf(viewsRecorte) : '—'} sub={temMotor ? `${nf(pubsRecorte)} pubs · ${nf(engRecorte)} interações` : fMarca ? 'sem motor nesta marca' : 'sem views no recorte'} glow={COR_WARN} />
-                <Kpi icon={<Eye className="w-4 h-4" />} label={`views das peças ${porLeitura ? 'lidas' : 'publicadas'} no período`} value={soMotor || viewsCasa === 0 ? '—' : nf(viewsCasa)}
-                  sub={soMotor ? FORA_DA_CASA
+                <Kpi icon={<Eye className="w-4 h-4" />} label={`views das peças ${porLeitura ? 'lidas' : 'publicadas'} no período`}
+                  value={chegando('pecas') ? '…' : soMotor || viewsCasa === 0 ? '—' : nf(viewsCasa)}
+                  sub={chegando('pecas') ? 'medindo…' : soMotor ? FORA_DA_CASA
                     : viewsCasa > 0 ? `${pecasComViews} de ${pecasF.length} peças com leitura · trocar para "por ${porLeitura ? 'PUBLICAÇÃO' : 'LEITURA'}" na barra dá outro número, e os dois estão certos`
                     : 'a coletar — despacho no MKT (sync-metricas)'} glow={COR_SEC} />
               </section>
