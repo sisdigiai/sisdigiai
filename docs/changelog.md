@@ -2,6 +2,70 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-21 — Uma página só de Marketing, e a leitura que parou de travar
+
+Dono: *"eu montaria uma página só, que nos traz nas abas todas as informações"* e, depois do mock,
+*"pode implantar completo e só o cuidado da leitura não ficar lenta"*.
+
+### A página
+
+O Espelho do MKT e o Radar 360 viraram **uma página**, com **onze abas em duas fileiras** — DECIDIR
+(Hoje, Resultado, O que funciona, Fôlego, Publicações) e CONFERIR (Marca × rede, Leitura das peças,
+Vídeo & motores, Régua, Território, Saúde). Nada foi perdido; o menu passou a ter **uma porta só**, e
+`#/mkt-crescimento` continua vivo abrindo em Marca × rede, para link salvo não quebrar. O endereço
+guarda aba e período (`#/marketing/saude/30`).
+
+**O ganho de verdade não foi juntar — foi a barra única.** Cada tela tinha a sua régua de data, e foi
+daí que nasceu o *168k × 41,8k "na mesma janela"* de 20/11. Agora a barra tem a linha **data**:
+
+| régua | o que responde | medido hoje, 30 dias |
+|---|---|---|
+| por **PUBLICAÇÃO** | quanto rendeu o que a casa publicou no período | **42.483** views em 473 peças |
+| por **LEITURA** | quanto a casa já somou do que foi medido no período | **170.994** views em 966 peças |
+
+As duas contas sempre estiveram certas. O rótulo muda junto com a escolha, e os dois números bateram
+exato com o banco antes de eu abrir a tela.
+
+### A leitura
+
+| | antes | agora |
+|---|---|---|
+| Espelho do MKT | 23 leituras, **24,6 s** | — |
+| Radar 360 | 24 leituras, **5,1 s** | — |
+| página única | | 18 leituras; **tudo no ar em 3,1 s**, e as views da casa em 5,3 s **sem travar a tela** |
+
+Quatro consertos, cada um medido:
+
+1. **Cada aba lê o que mostra**, dos dois lados. Dez das onze leituras do Espelho serviam abas
+   fechadas; a régua não precisa de publicação e o território não precisa de nada.
+2. **A consolidação por peça saiu do TypeScript e virou view** (`v_mkt_peca_consolidada`): uma peça,
+   uma linha, com a data de publicação junto. No recorte de 30 dias são **473 linhas numa página**,
+   no lugar de 1.128 leituras cruas em duas páginas **mais 3.072 publicações em quatro páginas
+   enfileiradas** (3,9 s só nisso). Conferida contra a regra do TypeScript linha a linha **antes** de
+   trocar: 473 peças e 42.483 views pelos dois caminhos.
+   *E a primeira versão dela estava lenta por culpa minha:* o casamento com a publicação usava
+   `pb.id::text = peca_ref` dentro de um LATERAL. Cast do lado da coluna mata o índice — eram 3,4
+   milhões de comparações para achar uma data. Virou mapa lido uma vez e hash join: **8,4 s → 3,7 s**.
+3. **Seis leituras de cada vez**, no `fetch` do próprio cliente do Supabase. ~20 pedidos no mesmo
+   instante não ficam mais rápidos: o pool atende em série e a fila inteira espera o pior. Vale para
+   toda tela do app, sem depender de cada componente se comportar.
+4. **A tela não espera a fonte mais lenta.** Cada fonte chega quando chega e o bloco que depende dela
+   escreve *"medindo…"* — nunca 0, nunca em branco.
+
+### O que sobrou, e não é meu para consertar
+
+A `v_mkt_peca_consolidada` roda em **108 ms no banco** e leva **~3,5 s** para chegar. A causa está na
+view de baixo: ela chama `mkt.pode_ver_marca(code)` **linha a linha** e, por ser `SECURITY DEFINER`, o
+Postgres não consegue embutir a função na consulta — são milhares de chamadas para responder o que
+seriam nove. A função é do MKT; está avisado, com a medição.
+
+### Dois defeitos que só apareceram com a tela aberta
+
+- O cartão de saúde dos blogs dizia **"espelho indisponível"** quando a fonte apenas não tinha sido
+  lida naquela aba. Fonte não lida não é fonte quebrada.
+- A tela em branco do dia anterior (função usada antes de existir) e o *"0 posts"* no recorte de um
+  motor de fora, ambos consertados antes deste pacote.
+
 ## 2026-11-21 — A leitura que trava: medida, e o primeiro conserto
 
 Dono: *"pode fazer a página única agora … mas mandar um mock e testar a leitura que está travando
