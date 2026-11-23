@@ -146,6 +146,9 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
   const [fRede, setFRede] = useState('');
   const [fMarca, setFMarca] = useState('');
   const [fData, setFData] = useState<'publicacao' | 'leitura'>('publicacao');
+  // O intervalo de datas só aparece quando pedido: dois campos de data vazios na barra convidavam
+  // a preencher e não diziam para quê. As janelas prontas resolvem o caso de todo dia.
+  const [intervaloAberto, setIntervaloAberto] = useState(false);
   const filtros: FiltrosMkt = { dias: fDias, de: fDe, ate: fAte, origem: fOrigem, rede: fRede, marca: fMarca, data: fData };
 
   // As marcas que entram nos chips: as da casa vêm do MKT; as do Pulso, do espelho dele (são três
@@ -397,21 +400,33 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
             <button onClick={() => setFiltroAberto(false)}
               className="ml-auto font-mono text-[10px] uppercase tracking-widest text-secondary hover:text-on-surface">fechar</button>
           </div>
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className={cls + ' mr-1 shrink-0'}>período</span>
-            {RANGES.map((r) => (
-              <Chip key={r.k} on={!custom && fDias === r.k} onClick={() => trocarPeriodo(r.k)}>{r.label}</Chip>
-            ))}
-            <input type="date" value={fDe} onChange={(e) => setFDe(e.target.value)} aria-label="de"
-              className="bg-surface border border-outline/30 text-on-surface font-mono text-[11px] px-1.5 py-1" />
-            <span className="text-muted text-xs">→</span>
-            <input type="date" value={fAte} onChange={(e) => setFAte(e.target.value)} aria-label="até"
-              className="bg-surface border border-outline/30 text-on-surface font-mono text-[11px] px-1.5 py-1" />
-            <span className="ml-auto font-mono text-[10px] text-muted">
-              {fMarca ? `${marcasChip.find((m) => m.code === fMarca)?.nome ?? fMarca} · `
-                : fOrigem ? `${rotuloOrigem(fOrigem)} · ` : ''}{fRede ? `${fRede} · ` : ''}
-              por data de {fData === 'publicacao' ? 'PUBLICAÇÃO' : 'LEITURA'}
-            </span>
+          {/* A FORMA DIZ A NATUREZA (23/11/2026). Antes as quatro linhas eram a MESMA coisa na tela:
+              48 chips iguais, soltos, em quatro fileiras — e nada na forma dizia que período é
+              escolha única, que quem tem família, que rede é um atalho que o olho já conhece, nem que
+              a régua da data não recorta nada: ela muda o que todo número da página quer dizer.
+              Agora cada linha tem o desenho do que ela faz. Isto não é enfeite — é o que deixa a
+              barra ser lida de relance, que era a queixa ("a confusão da página"). */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={cls + ' w-16 shrink-0'}>período</span>
+            <Segmento valor={custom ? '' : String(fDias)}
+              opcoes={RANGES.map((r) => ({ k: String(r.k), label: r.label }))}
+              onPick={(k) => { setIntervaloAberto(false); trocarPeriodo(Number(k)); }} />
+            <button
+              onClick={() => { if (custom) { setFDe(''); setFAte(''); setIntervaloAberto(false); } else setIntervaloAberto((v) => !v); }}
+              title={custom ? 'limpar o intervalo e voltar às janelas' : 'escolher um intervalo de datas'}
+              className={'font-mono text-[10px] uppercase tracking-widest px-2.5 py-1.5 border transition-colors ' +
+                (custom ? 'border-secondary/60 text-on-surface bg-surface-highest' : 'border-outline/20 text-muted hover:text-on-surface hover:border-outline/40')}>
+              {custom ? `${fDe} → ${fAte} ✕` : 'intervalo'}
+            </button>
+            {(intervaloAberto || custom) && (
+              <span className="inline-flex items-center gap-1.5">
+                <input type="date" value={fDe} onChange={(e) => setFDe(e.target.value)} aria-label="de"
+                  className="bg-surface border border-outline/30 text-on-surface font-mono text-[11px] px-1.5 py-1" />
+                <span className="text-muted text-xs">→</span>
+                <input type="date" value={fAte} onChange={(e) => setFAte(e.target.value)} aria-label="até"
+                  className="bg-surface border border-outline/30 text-on-surface font-mono text-[11px] px-1.5 py-1" />
+              </span>
+            )}
           </div>
           {/* UMA LINHA SÓ PARA "QUEM" (21/11/2026, no mesmo dia). Eu tinha posto origem numa linha e
               marca em outra, e as duas conversavam: escolher "casa" fazia os canais do Pulso
@@ -419,10 +434,13 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
               não achou — "ficamos com os filtros confusos".
               Separei pela regra, e não por como se procura. Agora tudo fica à vista de uma vez, em
               grupos: o grupo ensina a diferença entre origem e marca em vez de esconder chip. O
-              estado por baixo é o mesmo — clicar num canal escolhe a origem dele junto. */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className={cls + ' mr-1 shrink-0'}>quem</span>
-            <Chip on={fOrigem === '' && fMarca === ''} onClick={() => { setFOrigem(''); setFMarca(''); }}>tudo</Chip>
+              estado por baixo é o mesmo — clicar num canal escolhe a origem dele junto.
+              Desde 23/11 cada canal leva o SELO dele: logo onde existe logo de verdade, sigla na cor
+              da marca onde não existe. O nome do grupo é texto sublinhado, sem caixa — tem caixa
+              quem é canal. A família se lê sem legenda. */}
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+            <span className={cls + ' w-16 shrink-0'}>quem</span>
+            <BotaoGrupo on={fOrigem === '' && fMarca === ''} onClick={() => { setFOrigem(''); setFMarca(''); }}>tudo</BotaoGrupo>
             {([
               ['casa', 'casa'],
               ['cortes', 'Cortes'],
@@ -431,14 +449,14 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
             ] as const).map(([k, rotulo]) => {
               const doGrupo = marcasChip.filter((m) => m.origem === k);
               return (
-                <span key={k} className="inline-flex items-center gap-1.5 pl-2 ml-0.5 border-l border-outline/20">
-                  <Chip on={fOrigem === k && fMarca === ''} onClick={() => trocarOrigem(fOrigem === k && fMarca === '' ? '' : k)}>
+                <span key={k} className="inline-flex flex-nowrap items-center gap-1.5 pl-2 border-l border-outline/20">
+                  <BotaoGrupo on={fOrigem === k && fMarca === ''} onClick={() => trocarOrigem(fOrigem === k && fMarca === '' ? '' : k)}>
                     {rotulo}{doGrupo.length > 1 ? ` · ${doGrupo.length}` : ''}
-                  </Chip>
+                  </BotaoGrupo>
                   {doGrupo.map((m) => (
-                    <Chip key={m.code} on={fMarca === m.code}
-                      onClick={() => { if (fMarca === m.code) { setFMarca(''); setFOrigem(''); } else { setFMarca(m.code); setFOrigem(k); } }}
-                      cor={m.cor}>{rotuloCanal(m.nome)}</Chip>
+                    <SeloMarca key={m.code} on={fMarca === m.code} code={m.code} origem={m.origem}
+                      nome={rotuloCanal(m.nome)} cor={m.cor}
+                      onClick={() => { if (fMarca === m.code) { setFMarca(''); setFOrigem(''); } else { setFMarca(m.code); setFOrigem(k); } }} />
                   ))}
                 </span>
               );
@@ -450,22 +468,33 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
             motores com canais próprios. Clicar no nome do grupo pega o grupo inteiro; clicar num canal pega só ele.
           </div>
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className={cls + ' mr-1 shrink-0'}>rede</span>
-            {REDES.map((r) => <Chip key={r.k} on={fRede === r.k} onClick={() => setFRede(r.k)}>{r.label}</Chip>)}
+            <span className={cls + ' w-16 shrink-0'}>rede</span>
+            <BotaoGrupo on={fRede === ''} onClick={() => setFRede('')}>todas</BotaoGrupo>
+            {REDES.filter((r) => r.k).map((r) => (
+              <SeloRede key={r.k} k={r.k} label={r.label} on={fRede === r.k}
+                onClick={() => setFRede(fRede === r.k ? '' : r.k)} />
+            ))}
           </div>
-          {/* A LINHA QUE FALTAVA. Em 20/11 o Espelho mostrava 168k views em 961 peças e o Radar 41,8k
-              em 469 — na MESMA janela, com o mesmo rótulo. Não era a janela: um contava por data de
-              LEITURA e o outro por data de PUBLICAÇÃO. As duas contas estavam certas e respondiam a
-              perguntas diferentes. Agora a pergunta é escolhida, e o rótulo muda junto. */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className={cls + ' mr-1 shrink-0'}>data</span>
-            <Chip on={fData === 'publicacao'} onClick={() => setFData('publicacao')}>por PUBLICAÇÃO</Chip>
-            <Chip on={fData === 'leitura'} onClick={() => setFData('leitura')}>por LEITURA</Chip>
-            <span className="text-[11px] text-muted ml-1">
+          {/* A LINHA QUE FALTAVA, E QUE NÃO É UMA LINHA COMO AS OUTRAS. Em 20/11 o Espelho mostrava
+              168k views em 961 peças e o Radar 41,8k em 469 — na MESMA janela, com o mesmo rótulo.
+              Não era a janela: um contava por data de LEITURA e o outro por data de PUBLICAÇÃO. As
+              duas contas estavam certas e respondiam a perguntas diferentes.
+              Por isso ela ganhou MOLDURA PRÓPRIA: período, quem e rede recortam — mostram menos do
+              mesmo. Esta troca o significado de cada número da página. Misturada com as outras, ela
+              parecia um filtro a mais, e era a mais perigosa das quatro. */}
+          <div className="border border-secondary/30 bg-surface-lowest px-3 py-2.5 space-y-1.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={cls + ' shrink-0 text-on-surface-variant'}>a régua da data</span>
+              <Segmento valor={fData}
+                opcoes={[{ k: 'publicacao', label: 'por publicação' }, { k: 'leitura', label: 'por leitura' }]}
+                onPick={(k) => setFData(k as 'publicacao' | 'leitura')} />
+              <span className="font-mono text-[9px] uppercase tracking-widest text-muted">não recorta — muda o que o número quer dizer</span>
+            </div>
+            <div className="text-[11px] text-muted">
               {fData === 'publicacao'
                 ? 'quanto rendeu o que a casa PUBLICOU no período'
                 : 'quanto a casa já somou do que foi MEDIDO no período — peça antiga lida ontem entra'}
-            </span>
+            </div>
           </div>
           {!periodoExato && (
             <div className="text-[11px] text-muted">
@@ -738,5 +767,98 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
         </div>
       </div>
     </div>
+  );
+}
+
+/** ESCOLHA ÚNICA TEM FORMA DE SEGMENTO COLADO. É a mesma forma das abas logo acima, e por isso se lê
+ *  sem legenda: num segmento, um só pode estar aceso. Chip solto dizia o contrário — "marque quantos
+ *  quiser" — e era mentira tanto no período quanto na régua da data. */
+function Segmento({ opcoes, valor, onPick }: {
+  opcoes: Array<{ k: string; label: string }>; valor: string; onPick: (k: string) => void;
+}) {
+  return (
+    <div className="flex items-center border border-outline/15 w-fit p-0.5 overflow-x-auto">
+      {opcoes.map((o) => (
+        <button key={o.k} onClick={() => onPick(o.k)}
+          className={`font-mono text-[10px] uppercase tracking-widest px-2.5 py-1.5 whitespace-nowrap transition-colors ${
+            valor === o.k ? 'bg-secondary text-on-action' : 'text-muted hover:text-on-surface'}`}>
+          {o.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Nome de FAMÍLIA — texto sublinhado, sem caixa. Quem tem caixa e selo é canal. A diferença entre
+ *  "o grupo inteiro" e "este canal" passa a ser visível, em vez de explicada no rodapé. */
+function BotaoGrupo({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button onClick={onClick}
+      className={'font-mono text-[10px] uppercase tracking-widest px-1 pb-1 pt-1.5 border-b-2 transition-colors ' +
+        (on ? 'border-secondary text-on-surface' : 'border-transparent text-muted hover:text-on-surface')}>
+      {children}
+    </button>
+  );
+}
+
+/** O SELO DA MARCA — o padrão do Portfólio, trazido para o filtro: logo achatado em branco sobre a
+ *  cor da marca, ou o logo cheio quando ele é um badge redondo.
+ *  LOGO SÓ ONDE EXISTE LOGO DE VERDADE. Lancaster, Polá, Pessoal e os Bastidores não têm arquivo de
+ *  marca no app: levam a sigla na cor da marca. Desenhar um logo que a marca não tem seria inventar
+ *  um fato na tela, e é a única coisa que esta página não faz. */
+const LOGO_DA_MARCA: Record<string, { src: string; cheio: boolean }> = {
+  digiai: { src: '/brand/digiai.svg', cheio: false },
+  mello: { src: '/brand/mello.png', cheio: true },
+  osi: { src: '/brand/osi.png', cheio: true },
+};
+const SIGLA_DA_MARCA: Record<string, string> = {
+  lancaster: 'LA', pessoal: 'PE', polapetit: 'PP', bastidores: 'BD', bastidores2: 'B2',
+};
+
+function SeloMarca({ on, onClick, code, origem, nome, cor }: {
+  on: boolean; onClick: () => void; code: string; origem: OrigemK; nome: string; cor: string | null;
+}) {
+  // Os três canais do Pulso vêm do espelho dele com o nome como código — o selo é o do motor, e é
+  // honesto que sejam iguais: é a mesma marca em três canais. O nome ao lado é que os separa.
+  const logo = LOGO_DA_MARCA[code] ?? (origem === 'pulso' ? { src: '/brand/pulso.png', cheio: true } : null);
+  const sigla = SIGLA_DA_MARCA[code] ?? nome.replace(/[^A-Za-zÀ-ÿ]/g, '').slice(0, 2).toUpperCase();
+  return (
+    <button onClick={onClick} title={nome}
+      className={'inline-flex items-center gap-1.5 pl-1 pr-2.5 py-1 text-[12px] border transition-colors ' +
+        (on ? 'text-on-surface bg-surface-highest' : 'border-outline/20 text-on-surface-variant hover:text-on-surface hover:border-outline/40')}
+      style={on ? { borderColor: cor ?? 'var(--color-secondary)' } : undefined}>
+      <span className="w-5 h-5 shrink-0 flex items-center justify-center overflow-hidden font-mono text-[9px] font-bold"
+        style={logo?.cheio ? undefined : { background: cor ?? 'var(--color-muted)', color: 'var(--color-on-action)' }}>
+        {logo
+          ? <img src={logo.src} alt="" className={logo.cheio ? 'w-5 h-5 object-cover' : 'w-3.5 h-3.5 object-contain'}
+                 style={logo.cheio ? undefined : { filter: 'brightness(0) invert(1)' }} />
+          : sigla}
+      </span>
+      <span className="whitespace-nowrap">{nome}</span>
+    </button>
+  );
+}
+
+/** REDE EM SIGLA COLORIDA. Oito redes em oito quadrados do mesmo tamanho, na cor que o olho já
+ *  conhece — nenhum nome escrito, porque "Instagram" e "Pinterest" ocupavam metade da linha e não
+ *  informavam nada que o roxo e o vermelho não informem. Acesa fica preenchida: dá para ver de longe
+ *  que existe um recorte de rede valendo, que era o engano mais comum da tela antiga.
+ *  O nome completo fica no `title` e no `aria-label` — a sigla não é a única porta. */
+const REDE_SELO: Record<string, { sigla: string; cor: string }> = {
+  instagram: { sigla: 'IG', cor: '#E1306C' }, facebook: { sigla: 'FB', cor: '#1877F2' },
+  tiktok: { sigla: 'TT', cor: '#EE1D52' }, youtube: { sigla: 'YT', cor: '#FF0000' },
+  kwai: { sigla: 'KW', cor: '#FF7A00' }, linkedin: { sigla: 'LI', cor: '#0A66C2' },
+  x: { sigla: 'X', cor: '#71767B' }, pinterest: { sigla: 'PI', cor: '#E60023' },
+};
+
+function SeloRede({ k, label, on, onClick }: { k: string; label: string; on: boolean; onClick: () => void }) {
+  const s = REDE_SELO[k] ?? { sigla: k.slice(0, 2).toUpperCase(), cor: 'var(--color-muted)' };
+  return (
+    <button onClick={onClick} title={label} aria-label={label} aria-pressed={on}
+      className={'w-9 h-[30px] inline-flex items-center justify-center font-mono text-[11px] font-bold border transition-colors ' +
+        (on ? 'text-white' : 'border-outline/20 hover:border-outline/50')}
+      style={on ? { background: s.cor, borderColor: s.cor } : { color: s.cor }}>
+      {s.sigla}
+    </button>
   );
 }
