@@ -2,6 +2,34 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-23 — O topo da página de Marketing: mobília fechada, número na primeira tela
+
+Dono: *"agora nossa página de marketing tem um storytelling de usabilidade, é de fácil leitura?"* A
+resposta honesta era **não** — fácil de usar depois de aprender, não fácil de ler na primeira olhada.
+E isso foi medido, não achado:
+
+| | antes | depois |
+|---|---|---|
+| do topo ao primeiro número | **807 px** | **520 px** |
+| palavras antes do número | 262 | 104 |
+| botões na primeira tela | 48 | 14 |
+
+Numa janela de 889 px o número grande raspava a borda; num notebook comum ficava **abaixo da dobra**.
+A página explicava três vezes antes de informar uma: o subtítulo explicava a página, um parágrafo
+ensinava a diferença entre origem e marca, e a faixa verde explicava a aba.
+
+Três cortes, **nenhum escondendo informação**:
+
+1. **A barra de filtro fecha** (era 289 px, o maior bloco) e vira UMA linha que diz o recorte inteiro
+   em palavras — `30d · tudo · todas as redes · por publicação`. "ajustar" abre a caixa como estava,
+   "fechar" volta. Conferido no ar: abre, mostra as quatro linhas e os 50 chips, e fecha.
+2. **A faixa de travas vira uma linha** com "ver". São referência, não notícia — não mudam há meses.
+3. **O subtítulo cai de três linhas para uma.** A explicação da régua de DATA já vive na própria linha
+   da DATA, onde é precisa.
+
+Eu tinha estimado ~400 px e deu 520. O que sobra é o cabeçalho da página (212 px, comum a todas as
+telas) e a faixa "O que se decide aqui" — essa fica, é ela que diz para que serve a aba.
+
 ## 2026-11-21 — Uma página só de Marketing, e a leitura que parou de travar
 
 Dono: *"eu montaria uma página só, que nos traz nas abas todas as informações"* e, depois do mock,
