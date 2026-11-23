@@ -20,6 +20,7 @@ import Financeiro from './modules/Financeiro';
 import Academy from './modules/Academy';
 import Marketing from './modules/Marketing';
 import MarketingEspelho from './modules/MarketingEspelho';
+import RaioX from './modules/RaioX';
 import ComparativoMotores from './modules/ComparativoMotores';
 import Google from './modules/Google';
 import Controle from './modules/Controle';
@@ -57,6 +58,7 @@ const MODULES: ModuleId[] = [
   'hoje', 'visao', 'semana', 'portfolio', 'trilha', 'lista-mestra', 'backlog', 'comercial',
   'cadastro-empresa', 'financeiro', 'academy', 'marketplace', 'clearix', 'cobranca',
   'marketing', 'mkt-crescimento', 'mkt-calc', 'marketing-engajamento', 'fluxo-osi', 'travas-marketing',
+  'raio-x',
   'ecossistemas', 'mapa-vivo', 'decisoes', 'biblioteca', 'brand', 'guia', 'inventario', 'seo', 'vendas',
   'mapa-calor',
   'prospeccao',
@@ -85,6 +87,7 @@ const MODULE_LABEL: Record<ModuleId, string> = {
   backlog: 'Backlog Executivo', comercial: 'Comercial', 'cadastro-empresa': 'Cadastro Empresa',
   financeiro: 'Financeiro', academy: 'Academy', 'fluxo-osi': 'OSI',
   marketing: 'Marketing', 'marketing-engajamento': 'Engajamento',
+  'raio-x': 'Raio-X do eco',
   'mkt-crescimento': 'Radar 360', 'mkt-calc': 'Calc', comparativo: 'Comparativo de motores', controle: 'Controle', receita: 'Receita', lousa: 'Lousa',
   google: 'Google Meu Negócio',
   marketplace: 'Marketplace', clearix: 'Central Clearix', cobranca: 'Cobrança',
@@ -103,6 +106,7 @@ const MODULE_SECTION: Record<ModuleId, string> = {
   receita: 'Dinheiro', vendas: 'Dinheiro', financeiro: 'Dinheiro', cobranca: 'Dinheiro', marketplace: 'Dinheiro',
   comercial: 'Mercado', 'fluxo-osi': 'Mercado', 'marketing-engajamento': 'Mercado', 'mapa-calor': 'Mercado', prospeccao: 'Mercado',
   portfolio: 'Produtos', ecossistemas: 'Produtos', 'mapa-vivo': 'Produtos', clearix: 'Produtos', academy: 'Produtos', seo: 'Produtos',
+  'raio-x': 'Produtos',
   google: 'Marketing',
   marketing: 'Marketing', 'travas-marketing': 'Marketing',
   'mkt-crescimento': 'Marketing', 'mkt-calc': 'Marketing', comparativo: 'Marketing', controle: 'Hoje',
@@ -194,6 +198,7 @@ export default function App() {
       case 'financeiro': return <Financeiro />;
       case 'academy': return <Academy />;
       case 'marketing': return <MarketingEspelho />;
+      case 'raio-x': return <RaioX />;
       case 'comparativo': return <ComparativoMotores />;
       case 'google': return <Google />;
       case 'controle': return <Controle />;
