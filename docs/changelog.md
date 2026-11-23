@@ -2,6 +2,40 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-23 — A barra de filtro do Marketing: a forma diz a natureza
+
+Depois de fechar a barra por padrão (ganho medido de 289 px), o dono: *"a ideia de esconder o filtro
+já ajudou bastante"* — e pediu o acabamento do que aparece quando ela abre. O diagnóstico que ele
+mesmo deu antes: *"o que está bom são os filtros, a lógica correta, só não temos a mesma qualidade no
+front"*. Então nada de lógica mudou aqui. Mudou a forma.
+
+**O defeito era de tipografia de interface, não de regra:** as quatro fileiras eram a mesma coisa na
+tela — 48 chips iguais, soltos, em quatro linhas — e a forma não dizia nada sobre a natureza de cada
+escolha. Chip solto quer dizer "marque quantos quiser", e isso era mentira em duas das quatro linhas.
+
+1. **Período em segmento colado** (a mesma forma das abas da página): num segmento, um só pode estar
+   aceso, e isso se lê sem legenda. O intervalo de datas só aparece quando pedido — dois campos de
+   data vazios na barra convidavam a preencher sem dizer para quê. Saiu também o resumo repetido à
+   direita da linha, que já está na frase do topo.
+2. **Quem com selo por canal:** logo onde existe logo de verdade (digiai, mello, osi e os três canais
+   do Pulso), sigla na cor da marca onde não existe (Lancaster, Polá, Pessoal, Bastidores). Desenhar
+   um logo que a marca não tem seria inventar um fato na tela. Nome de família virou texto
+   sublinhado, sem caixa — caixa é de canal; a diferença entre "o grupo inteiro" e "este canal"
+   passou a ser visível em vez de explicada no rodapé.
+3. **Rede em sigla colorida:** oito quadrados iguais, na cor que o olho já conhece. "Instagram" e
+   "Pinterest" escritos ocupavam meia linha e não informavam o que o roxo e o vermelho informam.
+   Acesa fica **preenchida** — de longe se vê que há recorte de rede valendo, que era o engano mais
+   comum da tela antiga. Nome completo no `title` e no `aria-label`: a sigla não é a única porta.
+
+**E a régua da data ganhou moldura própria.** Período, quem e rede *recortam* — mostram menos do
+mesmo. A régua da data **troca o significado de cada número da página**. Misturada com as outras,
+parecia um filtro a mais, e era a mais perigosa das quatro: foi dela que veio o 168k × 41,8k de 20/11,
+dois números certos respondendo a perguntas diferentes com o mesmo rótulo.
+
+A regra que fica para o próximo filtro: **organização não é ter menos coisas, é ter menos tipos de
+coisa.** Escolha única → segmento. Muitos, com identidade → selo. Atalho conhecido → sigla colorida.
+O que muda o significado → moldura.
+
 ## 2026-11-23 — Raio-X do eco: tela nova, lendo um retrato — não o banco do Clearix
 
 Ordem do dono pelo canal do eco: *"pode o primeiro raio-x… precisamos de tudo completo… chamar o

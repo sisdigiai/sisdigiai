@@ -809,28 +809,42 @@ function BotaoGrupo({ on, onClick, children }: { on: boolean; onClick: () => voi
 const LOGO_DA_MARCA: Record<string, { src: string; cheio: boolean }> = {
   digiai: { src: '/brand/digiai.svg', cheio: false },
   mello: { src: '/brand/mello.png', cheio: true },
-  osi: { src: '/brand/osi.png', cheio: true },
+  pulso: { src: '/brand/pulso.png', cheio: true },
 };
+// A OSI TEM LOGO E MESMO ASSIM LEVA SIGLA. Conferido no ar: o arquivo dela e um LETREIRO, e letreiro
+// a 24 px vira borrao -- ocupa o lugar de uma marca sem ser uma. Logo so onde o desenho sobrevive ao
+// tamanho; nos outros, a sigla na cor da marca, que a 24 px diz mais.
 const SIGLA_DA_MARCA: Record<string, string> = {
-  lancaster: 'LA', pessoal: 'PE', polapetit: 'PP', bastidores: 'BD', bastidores2: 'B2',
+  lancaster: 'LA', pessoal: 'PE', polapetit: 'PP', osi: 'OS', bastidores: 'BD', bastidores2: 'B2',
 };
+
+/** A cor do texto da sigla sai da LUMINANCIA da cor da marca, nunca de um valor fixo. Conferido no
+ *  ar: `Pessoal` e #1F2937 e a sigla saiu cinza-escuro sobre quase-preto, ilegivel, enquanto no
+ *  dourado da Pola o mesmo valor ficava certo. Quem decide o contraste e o contraste. */
+function textoSobre(hex: string | null) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex ?? '');
+  if (!m) return '#fff';
+  const n = parseInt(m[1], 16);
+  const luz = (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+  return luz > 0.6 ? '#111827' : '#fff';
+}
 
 function SeloMarca({ on, onClick, code, origem, nome, cor }: {
   on: boolean; onClick: () => void; code: string; origem: OrigemK; nome: string; cor: string | null;
 }) {
   // Os três canais do Pulso vêm do espelho dele com o nome como código — o selo é o do motor, e é
   // honesto que sejam iguais: é a mesma marca em três canais. O nome ao lado é que os separa.
-  const logo = LOGO_DA_MARCA[code] ?? (origem === 'pulso' ? { src: '/brand/pulso.png', cheio: true } : null);
+  const logo = LOGO_DA_MARCA[code] ?? (origem === 'pulso' ? LOGO_DA_MARCA.pulso : null);
   const sigla = SIGLA_DA_MARCA[code] ?? nome.replace(/[^A-Za-zÀ-ÿ]/g, '').slice(0, 2).toUpperCase();
   return (
     <button onClick={onClick} title={nome}
       className={'inline-flex items-center gap-1.5 pl-1 pr-2.5 py-1 text-[12px] border transition-colors ' +
         (on ? 'text-on-surface bg-surface-highest' : 'border-outline/20 text-on-surface-variant hover:text-on-surface hover:border-outline/40')}
       style={on ? { borderColor: cor ?? 'var(--color-secondary)' } : undefined}>
-      <span className="w-5 h-5 shrink-0 flex items-center justify-center overflow-hidden font-mono text-[9px] font-bold"
-        style={logo?.cheio ? undefined : { background: cor ?? 'var(--color-muted)', color: 'var(--color-on-action)' }}>
+      <span className="w-6 h-6 shrink-0 flex items-center justify-center overflow-hidden font-mono text-[9px] font-bold"
+        style={logo?.cheio ? undefined : { background: cor ?? 'var(--color-muted)', color: textoSobre(cor) }}>
         {logo
-          ? <img src={logo.src} alt="" className={logo.cheio ? 'w-5 h-5 object-cover' : 'w-3.5 h-3.5 object-contain'}
+          ? <img src={logo.src} alt="" className={logo.cheio ? 'w-6 h-6 object-cover' : 'w-4 h-4 object-contain'}
                  style={logo.cheio ? undefined : { filter: 'brightness(0) invert(1)' }} />
           : sigla}
       </span>
