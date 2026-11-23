@@ -2,6 +2,45 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-23 — Raio-X do eco: tela nova, lendo um retrato — não o banco do Clearix
+
+Ordem do dono pelo canal do eco: *"pode o primeiro raio-x… precisamos de tudo completo… chamar o
+agent digiai, para resolver as telas dele"*. O agente do eco cruza o catálogo do banco do Clearix com
+o código dos 18 apps e escreve `Cockpit/raio-x/latest.json`.
+
+**O caminho, que foi a pergunta dele:** a página é estática e o Cockpit é outro repositório — ela não
+consegue ler o arquivo em tempo de execução, e embutir no build daria à tela a idade do último
+deploy, que é o defeito que este app passou a semana removendo. Então o arquivo vai para
+`ops.raiox_snapshot` (migration 236, uma linha, jsonb) por `Cockpit/scripts/raiox-carregar.mjs`, e a
+tela lê sete views `public.v_raiox_*`. **O banco do Clearix continua isolado: nada aqui fala com ele.**
+
+**Pedi quatro coisas no formato antes de começar**, e o eco atendeu: `contrato: "1"` (para a carga
+recusar formato desconhecido em vez de encher o banco), `gerado_em` em ISO com fuso (depois do UTC ×
+BRT da semana passada), todos os achados em vez de um contador de "info" que não abria, e marca de
+`conferido` para a tela não ressuscitar o que já foi descartado à mão.
+
+**A tela:** cartões do banco, tabela por app (o número de "a conferir" abre os achados daquele app),
+achados com filtro por app e gravidade, ligações entre apps, robôs com última rodada, a data de
+geração **com a idade do retrato** no alto, e o que o método não enxerga no pé.
+
+**Duas recusas de propósito:**
+
+- **"alta" aparece como "a conferir", nunca como fato.** O próprio eco avisou que esta primeira
+  versão dá falso alarme — já descartou três à mão. Cada linha traz arquivo e linha, para a
+  conferência ser possível. Dizer "132 falhas de segurança" seria repetir na tela o erro que a tela
+  existe para pegar.
+- **A carga recusa** contrato diferente de 1 e retrato com seção vazia, em vez de apagar em silêncio
+  o que estava certo.
+
+**O portão faltou na primeira migration e a tela achou:** abriu dizendo *"permission denied for table
+raiox_snapshot"*. As views nascem `security_invoker`, então quem lê é o usuário, e ele não tinha
+direito na tabela de baixo. Consertado como o Controle faz (R-037): RLS ligada + política
+`is_staff()`. Sem isso a view entregaria o retrato inteiro a qualquer portador da chave anon.
+
+**Conferido no ar:** 1.839 funções, 1.344 tabelas e visões, 49 robôs, **1.466 de 1.466** achados
+chegando (passam do teto de mil da API — lidos em páginas com ordem única, a mesma armadilha que o
+raio-x acusa 250 vezes no eco), e `rpc_iam_can_use_app_feature` usada por 14 apps.
+
 ## 2026-11-23 — O topo da página de Marketing: mobília fechada, número na primeira tela
 
 Dono: *"agora nossa página de marketing tem um storytelling de usabilidade, é de fácil leitura?"* A
