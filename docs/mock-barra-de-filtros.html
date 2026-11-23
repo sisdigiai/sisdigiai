@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Barra de filtros — quatro desenhos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --surface:#0d131f; --container:#1a202c; --highest:#2f3542; --lowest:#0a0f18;
+    --on:#dde2f3; --on-var:#c7c6cd; --muted:#909097; --outline:#2f3542;
+    --sec:#adcebd; --ok:#8fb8a1; --warn:#fcd34d; --danger:#fca5a5;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--surface);color:var(--on);font-family:Inter,system-ui,sans-serif;font-size:15px;line-height:1.55}
+  .wrap{max-width:1180px;margin:0 auto;padding:30px 16px 72px}
+  .lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+  h1{font-family:'Source Serif 4',Georgia,serif;font-size:31px;margin:6px 0 8px;font-weight:600}
+  h2{font-family:'Source Serif 4',Georgia,serif;font-size:20px;margin:30px 0 6px;font-weight:600}
+  .regra{height:2px;width:92px;background:var(--ok);margin:14px 0 18px}
+  p{margin:0 0 12px}
+  .sub{color:var(--on-var);font-size:14px;max-width:82ch}
+  .box{border:1px solid rgba(47,53,66,.55);background:var(--container)}
+  .nota{border-left:2px solid var(--sec);background:var(--container);padding:12px 16px;font-size:13.5px;color:var(--on-var);margin:0 0 22px}
+  .nota b{color:var(--on)}
+  .aviso{border-left-color:var(--warn)}
+
+  .chip{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(47,53,66,.75);color:var(--on-var);padding:4px 9px;font-size:11.5px;margin:0 3px 4px 0;white-space:nowrap}
+  .chip.on{border-color:var(--sec);color:var(--on);background:var(--highest)}
+  .chip .n{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)}
+  .chip.morto{opacity:.38}
+  .chip.morto .n{color:var(--danger)}
+  .linha{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-bottom:8px}
+  .linha .lbl{width:62px;flex:none}
+
+  .maq{margin-bottom:8px}
+  .maq .cab{padding:11px 14px;border-bottom:1px solid rgba(47,53,66,.55);background:var(--lowest);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .maq .cab h3{font-size:15px;margin:0;font-weight:600}
+  .maq .corpo{padding:14px}
+  .tela{background:var(--surface);border:1px solid rgba(47,53,66,.45);padding:12px}
+  .custo{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:12px;padding-top:10px;border-top:1px solid rgba(47,53,66,.4)}
+  .custo b{color:var(--on-var)}
+  .pro b{color:var(--ok)} .contra b{color:var(--warn)}
+  .selo{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border:1px solid}
+  .rec{border-color:var(--ok);color:var(--ok)}
+  .frase{font-size:15px;line-height:2}
+  .frase u{text-decoration:none;border-bottom:1px dashed var(--sec);color:var(--on);cursor:default;padding:1px 3px}
+  .frase u:after{content:' ▾';color:var(--sec);font-size:11px}
+  .gaveta{border:1px dashed rgba(173,206,189,.45);padding:11px;margin-top:10px;font-size:12px;color:var(--on-var)}
+  ul{margin:6px 0 0;padding-left:18px;font-size:13.5px;color:var(--on-var)}
+  li{margin-bottom:6px}
+  code{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--on-var)}
+  .barra-busca{display:flex;align-items:center;gap:8px;border:1px solid rgba(173,206,189,.5);background:var(--lowest);padding:8px 11px;font-family:'JetBrains Mono',monospace;font-size:12.5px}
+  .sugestao{font-size:12px;color:var(--muted);padding:5px 11px;border-left:2px solid rgba(47,53,66,.6);margin-top:7px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="lbl">maquete · barra de filtros · app digiai · 23/11/2026</div>
+  <h1>A barra de filtros: quatro desenhos</h1>
+  <div class="regra"></div>
+  <p class="sub">Só a barra, como tu pediste. Os números e os chips são os reais de hoje, recorte de 30 dias.</p>
+
+  <div class="nota aviso">
+    <b>O que está errado hoje, medido — e é pior que “muitos chips”:</b> de 9 chips de <b>rede</b>, só <b>4 têm alguma coisa</b> nos últimos 30 dias (Instagram 250 peças, Facebook 133, TikTok 76, YouTube 31). <b>Kwai, LinkedIn, X e Pinterest levam a nada.</b> Em <b>quem</b>, a Polá Petit também está sem peça na janela. São <b>5 chips que não levam a lugar nenhum</b>, e a barra não dá nenhum sinal: tu clicas, a tela esvazia, e não dá para saber se é filtro ou se é a casa que parou.
+  </div>
+
+  <h2>Desenho 1 — a mesma barra, com os chips dizendo o que têm</h2>
+  <p class="sub">Nada muda de lugar. Cada chip ganha o número que vai encontrar, e o que está vazio fica apagado. É a correção mais barata, e sozinha já tira a maior parte da confusão.</p>
+  <div class="box maq"><div class="corpo"><div class="tela">
+    <div class="linha"><span class="lbl">período</span>
+      <span class="chip">hoje</span><span class="chip">7d</span><span class="chip on">30d</span><span class="chip">90d</span><span class="chip">tudo</span></div>
+    <div class="linha"><span class="lbl">quem</span>
+      <span class="chip on">tudo <span class="n">490</span></span>
+      <span class="chip">casa <span class="n">395</span></span>
+      <span class="chip">Mello <span class="n">164</span></span>
+      <span class="chip">Lancaster <span class="n">139</span></span>
+      <span class="chip">OSI <span class="n">44</span></span>
+      <span class="chip">DIGIAI <span class="n">37</span></span>
+      <span class="chip">Pessoal <span class="n">11</span></span>
+      <span class="chip morto">Polá <span class="n">0</span></span>
+      <span class="chip">Cortes <span class="n">95</span></span>
+      <span class="chip">Pulso <span class="n">3 canais</span></span></div>
+    <div class="linha"><span class="lbl">rede</span>
+      <span class="chip on">todas</span>
+      <span class="chip">Instagram <span class="n">250</span></span>
+      <span class="chip">Facebook <span class="n">133</span></span>
+      <span class="chip">TikTok <span class="n">76</span></span>
+      <span class="chip">YouTube <span class="n">31</span></span>
+      <span class="chip morto">Kwai <span class="n">0</span></span>
+      <span class="chip morto">LinkedIn <span class="n">0</span></span>
+      <span class="chip morto">X <span class="n">0</span></span>
+      <span class="chip morto">Pinterest <span class="n">0</span></span></div>
+    <div style="font-size:11.5px;color:var(--muted);margin-top:4px">apagado = sem peça nesta janela. O chip continua clicável, e a tela então diz “sem peça aqui”, não “zero”.</div>
+  </div>
+  <div class="custo"><span class="pro"><b>a favor:</b> some a dúvida “é filtro ou é a casa?”; zero reaprendizado</span><span class="contra"><b>contra:</b> continua com 5 linhas quando aberta</span><span><b>obra:</b> pequena</span></div>
+  </div></div>
+
+  <h2>Desenho 2 — frase editável</h2>
+  <p class="sub">A barra deixa de ser chip e vira uma linha de texto: cada parte sublinhada abre a lista. Uma linha só, sempre, aberta ou fechada.</p>
+  <div class="box maq"><div class="corpo"><div class="tela">
+    <div class="frase">
+      Mostrando <u>30 dias</u> de <u>tudo</u> em <u>todas as redes</u>, contando <u>por publicação</u>.
+    </div>
+    <div style="font-size:11.5px;color:var(--muted);margin-top:8px">Clicar em “tudo” abre a lista com os mesmos números do desenho 1.</div>
+  </div>
+  <div class="custo"><span class="pro"><b>a favor:</b> uma linha; lê-se como frase e diz o recorte inteiro sem traduzir</span><span class="contra"><b>contra:</b> trocar dois filtros exige dois cliques em dois lugares; menos bom para comparar rápido</span><span><b>obra:</b> média</span></div>
+  </div></div>
+
+  <h2>Desenho 3 — dois níveis: o que é da página × o que é da aba</h2>
+  <p class="sub">A causa real da confusão: hoje <b>uma barra governa onze abas</b>, e três delas não obedecem a parte dela. Aqui, em cima fica só o que toda aba entende; embaixo, só o que <em>aquela</em> aba usa — e some quando não serve.</p>
+  <div class="box maq"><div class="corpo"><div class="tela">
+    <div class="linha" style="padding-bottom:9px;border-bottom:1px solid rgba(47,53,66,.45);margin-bottom:10px">
+      <span class="lbl">sempre</span>
+      <span class="chip on">30d</span><span class="chip">90d</span><span class="chip">tudo</span>
+      <span style="width:12px"></span>
+      <span class="chip on">por publicação</span><span class="chip">por leitura</span>
+    </div>
+    <div class="linha"><span class="lbl">nesta aba</span>
+      <span class="chip on">tudo <span class="n">490</span></span><span class="chip">Mello <span class="n">164</span></span><span class="chip">Lancaster <span class="n">139</span></span>
+      <span style="width:12px"></span>
+      <span class="chip">Instagram <span class="n">250</span></span><span class="chip">Facebook <span class="n">133</span></span></div>
+    <div style="font-size:11.5px;color:var(--warn);margin-top:6px">Na aba <b>Território</b> esta segunda linha some e aparece: “o mapa é da casa inteira — não obedece a marca nem rede”.</div>
+  </div>
+  <div class="custo"><span class="pro"><b>a favor:</b> ataca a causa; filtro que não vale para a aba deixa de existir em vez de mentir</span><span class="contra"><b>contra:</b> a barra muda ao trocar de aba — é preciso que isso pareça intencional, não instável</span><span><b>obra:</b> média</span></div>
+  </div></div>
+
+  <h2>Desenho 4 — uma caixa de busca</h2>
+  <p class="sub">Nenhum chip à vista. Escreve-se o recorte e ele se monta; a frase do desenho 2 fica abaixo como confirmação.</p>
+  <div class="box maq"><div class="corpo"><div class="tela">
+    <div class="barra-busca"><span style="color:var(--sec)">⌕</span><span>mello tiktok 30d</span><span style="color:var(--muted)">|</span></div>
+    <div class="sugestao">mello → <b>Mello Óticas</b> (164) · tiktok → <b>TikTok</b> (76) · 30d → <b>últimos 30 dias</b></div>
+    <div style="font-size:12px;color:var(--on-var);margin-top:9px">Lendo <b>30 dias</b> de <b>Mello Óticas</b> no <b>TikTok</b>, por publicação.</div>
+  </div>
+  <div class="custo"><span class="pro"><b>a favor:</b> a barra some de vez; quem sabe o que quer chega em três palavras</span><span class="contra"><b>contra:</b> quem não sabe o que existe fica sem saber — precisa do chip como apoio</span><span><b>obra:</b> alta</span></div>
+  </div></div>
+
+  <h2>O que eu recomendo <span class="selo rec">1 + 3</span></h2>
+  <div class="nota">
+    <b>Começar pelo desenho 1 e emendar no 3.</b> O desenho 1 é pequeno e tira hoje a pior parte — o chip que leva a nada sem avisar. O desenho 3 resolve a causa de fundo, que é a barra única governando abas que não a obedecem.
+    <ul>
+      <li><b>Período e data ficam em cima, sempre.</b> São as duas únicas coisas que toda aba entende — e a régua de data merece ficar separada do resto porque não é recorte, é <em>o que a conta significa</em>.</li>
+      <li><b>Quem e rede descem para a aba</b>, com o número ao lado e o vazio apagado.</li>
+      <li><b>Aba que não obedece diz isso na primeira linha</b>, em vez de deixar o filtro ligado fingindo que vale.</li>
+      <li><b>A frase do desenho 2 fica como o estado fechado</b> da barra — já é o que está no ar desde hoje de manhã (“30d · tudo · todas as redes · por publicação”).</li>
+    </ul>
+    O desenho 4 eu guardaria para depois: ele é bom para quem já sabe o nome do que procura, e hoje nem os chips dizem o que existe.
+  </div>
+
+  <div style="font-size:11.5px;color:var(--muted);margin-top:24px;border-top:1px solid rgba(47,53,66,.4);padding-top:12px">
+    Contagens medidas no banco em 23/11/2026, janela de 30 dias, peças não apagadas: Instagram 250, Facebook 133, TikTok 76, YouTube 31, Kwai/LinkedIn/X/Pinterest 0 nas contas da casa; Mello 164, Lancaster 139, Bastidores 51, Bastidores c2 44, OSI 44, DIGIAI 37, Pessoal 11, Polá 0. O Kwai tem número no espelho do Pulso, não nas contas da casa — por isso aparece apagado aqui e vivo no cartão do Pulso.
+  </div>
+
+</div>
+</body>
+</html>

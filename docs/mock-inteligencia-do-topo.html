@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>O topo pensa primeiro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --surface:#0d131f; --container:#1a202c; --highest:#2f3542; --lowest:#0a0f18;
+    --on:#dde2f3; --on-var:#c7c6cd; --muted:#909097; --outline:#2f3542;
+    --sec:#adcebd; --ok:#8fb8a1; --warn:#fcd34d; --danger:#fca5a5;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--surface);color:var(--on);font-family:Inter,system-ui,sans-serif;font-size:15px;line-height:1.55}
+  .wrap{max-width:1180px;margin:0 auto;padding:30px 16px 72px}
+  .lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+  h1{font-family:'Source Serif 4',Georgia,serif;font-size:31px;margin:6px 0 8px;font-weight:600}
+  h2{font-family:'Source Serif 4',Georgia,serif;font-size:20px;margin:32px 0 8px;font-weight:600}
+  .regra{height:2px;width:92px;background:var(--ok);margin:14px 0 18px}
+  p{margin:0 0 12px}
+  .sub{color:var(--on-var);font-size:14px;max-width:82ch}
+  .box{border:1px solid rgba(47,53,66,.55);background:var(--container)}
+  .nota{border-left:2px solid var(--sec);background:var(--container);padding:12px 16px;font-size:13.5px;color:var(--on-var);margin:0 0 20px}
+  .nota b{color:var(--on)}
+  .aviso{border-left-color:var(--warn)}
+  .tela{background:var(--surface);border:1px solid rgba(47,53,66,.45);padding:14px}
+  .corpo{padding:14px}
+  .cab{padding:11px 14px;border-bottom:1px solid rgba(47,53,66,.55);background:var(--lowest)}
+  .cab h3{font-size:15.5px;margin:0 0 2px;font-weight:600}
+  .cab .d{font-size:12px;color:var(--muted)}
+  .custo{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:12px;padding-top:10px;border-top:1px solid rgba(47,53,66,.4)}
+  .custo b{color:var(--on-var)}
+  .pro b{color:var(--ok)} .contra b{color:var(--warn)}
+  .selo{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border:1px solid}
+  .rec{border-color:var(--ok);color:var(--ok)}
+  .chip{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(47,53,66,.75);color:var(--on-var);padding:4px 9px;font-size:11.5px;margin:0 3px 4px 0;white-space:nowrap}
+  .chip.on{border-color:var(--sec);color:var(--on);background:var(--highest)}
+
+  /* diagnóstico */
+  .tipos{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));margin:6px 0 14px}
+  .tipo{border:1px solid rgba(47,53,66,.5);padding:12px;background:var(--container)}
+  .tipo .q{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+  .tipo .o{font-size:13px;color:var(--on-var)}
+  .tipo .hoje{font-size:11.5px;color:var(--muted);margin-top:7px;padding-top:7px;border-top:1px solid rgba(47,53,66,.4)}
+  .conta{display:flex;gap:22px;flex-wrap:wrap;margin:10px 0 2px}
+  .conta div{min-width:120px}
+  .conta .n{font-family:'JetBrains Mono',monospace;font-size:25px;font-weight:600;line-height:1.1}
+  .conta .l{font-size:11.5px;color:var(--muted)}
+
+  /* achados */
+  .achado{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid rgba(47,53,66,.3)}
+  .achado:last-child{border-bottom:0}
+  .achado .pt{width:7px;height:7px;margin-top:7px;flex:none}
+  .achado .tx{font-size:13.5px}
+  .achado .tx b{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+  .achado .ab{font-size:11px;color:var(--sec);white-space:nowrap;margin-left:auto;padding-top:2px}
+  .perg{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid rgba(47,53,66,.3);font-size:13.5px}
+  .perg:last-child{border-bottom:0}
+  .perg .c{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);white-space:nowrap}
+  ul{margin:6px 0 0;padding-left:18px;font-size:13.5px;color:var(--on-var)}
+  li{margin-bottom:6px}
+  code{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--on-var)}
+  @media(max-width:620px){.conta div{min-width:45%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="lbl">maquete · inteligência do topo · app digiai · 23/11/2026</div>
+  <h1>O topo pensa primeiro</h1>
+  <div class="regra"></div>
+  <p class="sub">Seis fileiras de controle — decidir, conferir, período, quem, rede, data — e nenhuma delas responde nada sozinha. Isto é o diagnóstico e três propostas, com os números reais de hoje.</p>
+
+  <h2>1. As seis fileiras são três coisas diferentes</h2>
+  <p class="sub">É daí que vem a sensação de bagunça: coisas de natureza diferente estão empilhadas com o mesmo peso visual, todas em chip, todas no mesmo lugar.</p>
+  <div class="tipos">
+    <div class="tipo">
+      <div class="q" style="color:var(--sec)">a pergunta</div>
+      <div class="o"><b>decidir</b> e <b>conferir</b> — 11 portas. Não é filtro: é <em>o que se quer saber</em>.</div>
+      <div class="hoje">Hoje: duas fileiras de aba, 11 botões, todos igualmente prováveis.</div>
+    </div>
+    <div class="tipo">
+      <div class="q" style="color:var(--warn)">o recorte</div>
+      <div class="o"><b>período</b>, <b>quem</b>, <b>rede</b> — 34 chips. Reduz o conjunto; não muda o que o número significa.</div>
+      <div class="hoje">Hoje: três fileiras, governando as 11 abas — e 3 delas nem obedecem.</div>
+    </div>
+    <div class="tipo">
+      <div class="q" style="color:var(--danger)">o significado</div>
+      <div class="o"><b>data</b> — publicação × leitura. Não reduz nada: <em>troca a pergunta</em> que o número responde.</div>
+      <div class="hoje">Hoje: dois chips no meio dos outros, como se fosse mais um filtro. É o mais importante da tela.</div>
+    </div>
+  </div>
+
+  <div class="nota aviso">
+    <b>O tamanho do labirinto, medido hoje:</b>
+    <div class="conta">
+      <div><div class="n">28.512</div><div class="l">telas que o topo permite montar<br>(9 períodos × 16 quem × 9 redes × 2 datas × 11 abas)</div></div>
+      <div><div class="n" style="color:var(--danger)">121</div><div class="l">dos 144 pares quem × rede<br>levam a <b>nada</b> nos últimos 30 dias</div></div>
+      <div><div class="n" style="color:var(--ok)">23</div><div class="l">pares têm alguma peça<br>— 7 marcas × 4 redes de verdade</div></div>
+    </div>
+    Pedir que alguém monte o recorte antes de ver qualquer número é pedir que ele acerte um de 23 acertos em 144 tentativas, sem mapa.
+  </div>
+
+  <h2>2. A inversão</h2>
+  <p class="sub" style="margin-bottom:16px">
+    <b style="color:var(--warn)">Hoje:</b> escolher o recorte → escolher a pergunta → ler o número → descobrir que estava vazio.<br>
+    <b style="color:var(--ok)">Proposto:</b> a página já leu tudo → diz o que mudou → tu abres o que interessa, com o recorte já posto → ajustas só se precisar.
+  </p>
+
+  <h2>3. Três propostas</h2>
+
+  <!-- A -->
+  <div class="box" style="margin-bottom:16px">
+    <div class="cab"><h3>A · “O que mudou” — a página responde antes de perguntar</h3>
+      <div class="d">O topo deixa de ser controle e passa a ser resposta. Cada linha é uma porta com o recorte já certo.</div></div>
+    <div class="corpo"><div class="tela">
+      <div class="lbl" style="margin-bottom:10px">segunda, 23 de novembro · o que mudou</div>
+      <div class="achado"><span class="pt" style="background:var(--danger)"></span>
+        <span class="tx"><b>21</b> de 50 contas estão fora do censo — parte do número de views não é medição, é o que chegou.</span>
+        <span class="ab">abrir saúde →</span></div>
+      <div class="achado"><span class="pt" style="background:var(--warn)"></span>
+        <span class="tx">O <b>Pulso</b> respondeu por <b>71%</b> das views do período. A casa inteira somou <b>42.483</b>.</span>
+        <span class="ab">abrir por origem →</span></div>
+      <div class="achado"><span class="pt" style="background:var(--warn)"></span>
+        <span class="tx"><b>32</b> peças atrasaram no mês; onde mais atrasa é <b>Pulso · TikTok</b>.</span>
+        <span class="ab">abrir o dia →</span></div>
+      <div class="achado"><span class="pt" style="background:var(--ok)"></span>
+        <span class="tx">O <b>TikTok</b> rende <b>250 views/peça</b> contra <b>46</b> do Instagram, com um terço das peças.</span>
+        <span class="ab">abrir o que funciona →</span></div>
+      <div class="achado"><span class="pt" style="background:var(--muted)"></span>
+        <span class="tx"><b>4</b> redes sem nenhuma peça no período: Kwai, LinkedIn, X, Pinterest.</span>
+        <span class="ab">abrir cobertura →</span></div>
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(47,53,66,.4)">
+        <span class="chip on">30d</span><span class="chip">por publicação</span>
+        <span style="font-size:11.5px;color:var(--muted);margin-left:8px">só estes dois ficam no topo — o resto mora em cada porta</span>
+      </div>
+    </div>
+    <div class="custo"><span class="pro"><b>a favor:</b> some o labirinto; quem abre já sabe o que olhar, e cada porta leva o recorte certo</span><span class="contra"><b>contra:</b> cada frase precisa de regra escrita — frase errada é pior que gráfico feio</span><span><b>obra:</b> média; as cinco regras do exemplo saem todas de dado que já está na tela</span></div>
+    </div>
+  </div>
+
+  <!-- B -->
+  <div class="box" style="margin-bottom:16px">
+    <div class="cab"><h3>B · “Uma pergunta, um recorte” — o filtro pertence à pergunta</h3>
+      <div class="d">Sem barra global. Cada pergunta diz o recorte com que nasce; mexer nele é mexer dentro dela.</div></div>
+    <div class="corpo"><div class="tela">
+      <div class="lbl" style="margin-bottom:10px">o que tu queres saber?</div>
+      <div class="perg"><span>Quanto rendeu o que a casa publicou?</span><span class="c">30d · por publicação</span></div>
+      <div class="perg"><span>Quanto a casa já somou do que foi medido?</span><span class="c">30d · por leitura</span></div>
+      <div class="perg"><span>Sai hoje, e dá para continuar saindo?</span><span class="c">hoje + fôlego · sem recorte de marca</span></div>
+      <div class="perg"><span>Que formato e que hora funcionam?</span><span class="c">30d · só peças medidas</span></div>
+      <div class="perg"><span>De onde veio o número?</span><span class="c">30d · por marca × rede</span></div>
+      <div class="perg"><span>Dá para confiar na medição?</span><span class="c">sem recorte — é da casa inteira</span></div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:10px">A coluna da direita é o recorte com que a pergunta nasce. Nenhuma pergunta aparece com filtro que ela não entende.</div>
+    </div>
+    <div class="custo"><span class="pro"><b>a favor:</b> acaba com filtro que vale para a página e mente em metade dela; resolve a causa</span><span class="contra"><b>contra:</b> comparar duas perguntas no mesmo recorte dá mais trabalho</span><span><b>obra:</b> média</span></div>
+    </div>
+  </div>
+
+  <!-- C -->
+  <div class="box" style="margin-bottom:16px">
+    <div class="cab"><h3>C · “Recortes salvos” — os quatro que tu realmente usas</h3>
+      <div class="d">Em vez de 28.512 possíveis, os poucos que importam viram um clique. “Montar outro” abre a barra inteira.</div></div>
+    <div class="corpo"><div class="tela">
+      <div class="lbl" style="margin-bottom:10px">recortes</div>
+      <span class="chip on">A casa nos 30 dias</span>
+      <span class="chip">Só o Pulso</span>
+      <span class="chip">O que atrasou</span>
+      <span class="chip">Mello · tudo</span>
+      <span class="chip" style="border-style:dashed">+ montar outro</span>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:10px">Cada um guarda período, quem, rede e data juntos. O nome diz o que é; o chip não pede tradução.</div>
+    </div>
+    <div class="custo"><span class="pro"><b>a favor:</b> o menor esforço de todos para o uso do dia a dia; some a barra sem tirar nada</span><span class="contra"><b>contra:</b> não resolve a aba que não obedece ao filtro; é atalho, não cura</span><span><b>obra:</b> pequena</span></div>
+    </div>
+  </div>
+
+  <h2>O que eu recomendo <span class="selo rec">A + B, com C de atalho</span></h2>
+  <div class="nota">
+    <b>A entra como topo, B como regra, C como conveniência.</b> O que resolve a confusão não é arrumar as seis fileiras — é <b>tirar cinco delas do caminho</b>:
+    <ul>
+      <li><b>Ficam no topo só duas coisas:</b> o período e a régua de data. São as únicas que toda pergunta entende — e a data fica <em>separada e nomeada</em>, porque ela não recorta, ela troca o significado do número.</li>
+      <li><b>Quem e rede descem para dentro de cada pergunta</b>, com a contagem ao lado e o vazio apagado (os 121 pares mortos param de parecer caminho).</li>
+      <li><b>As duas fileiras de aba viram a lista de perguntas</b> do desenho B — com o recorte de cada uma escrito, em vez de 11 botões igualmente prováveis.</li>
+      <li><b>O "o que mudou" ocupa o lugar que hoje é da barra.</b> A página abre respondendo; o controle aparece quando se quer outra coisa.</li>
+    </ul>
+  </div>
+  <div class="nota aviso">
+    <b>O risco desta proposta, dito antes de tu escolheres:</b> o "o que mudou" é a parte que mais ajuda e a que mais erra. Cada frase precisa de uma regra escrita e de um número que eu possa conferir — senão vira horóscopo com tabela. Eu entregaria as cinco frases do exemplo <b>uma a uma</b>, cada uma com a sua conta conferida contra o banco, em vez de todas de uma vez.
+  </div>
+
+  <div style="font-size:11.5px;color:var(--muted);margin-top:24px;border-top:1px solid rgba(47,53,66,.4);padding-top:12px">
+    Medido no banco em 23/11/2026, janela de 30 dias, peças não apagadas: 490 peças, 7 marcas e 4 redes com conteúdo, 23 dos 144 pares marca × rede com alguma peça. Views por peça: TikTok 18.972/76, Instagram 11.601/250. Censo: 29 de 50 contas medidas nos últimos 3 dias. Pontualidade e atraso: v_pontualidade, 30 dias.
+  </div>
+
+</div>
+</body>
+</html>

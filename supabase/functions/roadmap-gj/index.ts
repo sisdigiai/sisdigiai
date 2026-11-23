@@ -12,9 +12,17 @@
 // banco nenhum; e o alarme fica do lado certo: se a busca falhar, quem descobre é
 // quem precisa do dado, não quem o produz.
 //
-// SUBSTITUI a `push-ordem-gj`, que entra na fila de APAGAR (portão 54) — apagar,
-// não "deixar sem segredo": função sem segredo devolve 503 para sempre e alguém,
-// daqui a três meses, "conserta" repondo a chave-mestra por boa intenção.
+// ⚠ A SUBSTITUIÇÃO NÃO ACONTECEU — medido em 23/11/2026, e o comentário antigo dizia o
+//    contrário. A `puxar-agenda` do GJ, que leria esta função, NUNCA foi publicada; e a
+//    `push-ordem-gj` está VIVA: o cron 29 (`ordem-do-dia-push`, 04:50 UTC = 01:50 BRT, ativo)
+//    a chama todo dia e ela grava no GJ — 926 eventos, última escrita 23/11 às 01h50.
+//    Então o caminho real continua sendo o empurrão, e a categoria da agenda entrou LÁ.
+//    Este arquivo fica porque a inversão continua sendo a direção certa pelos motivos abaixo;
+//    o que mudou é que ele ainda não é o caminho, e dizer que era já enganou duas vezes.
+//
+// A INTENÇÃO (quando acontecer): substituir a `push-ordem-gj`, que entra na fila de APAGAR
+// (portão 54) — apagar, não "deixar sem segredo": função sem segredo devolve 503 para sempre
+// e alguém, daqui a três meses, "conserta" repondo a chave-mestra por boa intenção.
 //
 // CONTRATO DE RESPOSTA:
 //   200  { dia, itens: [...] } — cada item traz `estado` (aberto | cumprido | justificado):

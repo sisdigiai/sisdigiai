@@ -45,10 +45,13 @@ Deno.serve(async (req: Request) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   );
 
+  // A VISTA, não a tabela: ela traz a `categoria` já resolvida pela tabela de regra
+  // `ops.gj_categoria_regra`. A regra mora no banco de propósito — mudar o que cai em cada
+  // categoria não pode exigir deploy de edge function. (23/11/2026, contrato do Geral.)
   const { data: itens, error } = await digiai
     .schema('ops')
-    .from('ordem_do_dia')
-    .select('id, bloco, posicao, titulo, porque, dono, estado')
+    .from('ordem_do_dia_evento')
+    .select('id, bloco, posicao, titulo, porque, dono, estado, categoria')
     .eq('dia', dia)
     .eq('dono', 'humano')
     .eq('estado', 'aberto')
@@ -73,6 +76,11 @@ Deno.serve(async (req: Request) => {
       p_contexto:  'trabalho',
       p_tipo:      'tarefa',
       p_local:     null,
+      // CATEGORIA SÓ QUANDO HÁ ÁREA CLARA. Sem regra que case, o campo NÃO vai: o GJ marca
+      // `outros` e o `v_saude_origens` acusa a fonte. Mandar categoria errada é pior que não
+      // mandar — o alarme dele existe para quem esqueceu, não para quem mentiu.
+      // `p_categoria` é opcional na `fn_importar_evento` desde a migration 0038 do GJ.
+      ...(it.categoria ? { p_categoria: it.categoria } : {}),
     });
     if (e) falhas.push({ titulo: it.titulo, erro: e.message });
     else enviados.push(it.titulo);
