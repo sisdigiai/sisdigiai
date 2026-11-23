@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marketing — três modelos visuais</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --surface:#0d131f; --container:#1a202c; --highest:#2f3542; --lowest:#0a0f18;
+    --on:#dde2f3; --on-var:#c7c6cd; --muted:#909097; --outline:#2f3542;
+    --sec:#adcebd; --ok:#8fb8a1; --warn:#fcd34d; --danger:#fca5a5;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--surface);color:var(--on);font-family:Inter,system-ui,sans-serif;font-size:15px;line-height:1.55}
+  .wrap{max-width:1280px;margin:0 auto;padding:30px 16px 72px}
+  .lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+  h1{font-family:'Source Serif 4',Georgia,serif;font-size:32px;margin:6px 0 8px;font-weight:600}
+  h2{font-family:'Source Serif 4',Georgia,serif;font-size:21px;margin:0 0 4px;font-weight:600}
+  h3{font-size:14px;font-weight:600;margin:0 0 10px;color:var(--on)}
+  p{margin:0 0 12px}
+  .sub{color:var(--on-var);font-size:14px;max-width:80ch}
+  .box{border:1px solid rgba(47,53,66,.55);background:var(--container)}
+  .nota{border-left:2px solid var(--sec);background:var(--container);padding:12px 16px;font-size:13.5px;color:var(--on-var);margin:0 0 24px}
+  .nota b{color:var(--on)}
+  .aviso{border-left-color:var(--warn)}
+  .regra{height:2px;width:92px;background:var(--ok);margin:14px 0 18px}
+
+  /* ── estudo ── */
+  table.ref{width:100%;border-collapse:collapse;font-size:13.5px;margin:4px 0 8px}
+  table.ref th{text-align:left;font-weight:400;padding:8px 12px;border-bottom:1px solid rgba(47,53,66,.55);color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+  table.ref td{padding:9px 12px;border-bottom:1px solid rgba(47,53,66,.3);color:var(--on-var);vertical-align:top}
+  table.ref td b{color:var(--on)}
+
+  /* ── maquetes ── */
+  .tres{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));align-items:start}
+  .maq{padding:0;overflow:hidden}
+  .maq .cab{padding:12px 14px;border-bottom:1px solid rgba(47,53,66,.55);background:var(--lowest)}
+  .maq .corpo{padding:14px}
+  .tela{background:var(--surface);border:1px solid rgba(47,53,66,.45);padding:12px;font-size:12.5px}
+  .chip{display:inline-block;border:1px solid rgba(47,53,66,.75);color:var(--on-var);padding:3px 8px;font-size:11px;margin:0 3px 3px 0}
+  .chip.on{border-color:var(--sec);color:var(--on);background:var(--highest)}
+  .num{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-weight:600}
+  .g{font-size:30px;line-height:1.1}
+  .m{font-size:19px}
+  .cartao{border:1px solid rgba(47,53,66,.45);padding:9px 10px;margin-bottom:6px;background:var(--container)}
+  .cartao .t{font-size:11.5px;color:var(--on-var);margin-bottom:3px}
+  .cartao .s{font-size:10.5px;color:var(--muted);margin-top:2px}
+  .grade2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .custo{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:10px;padding-top:9px;border-top:1px solid rgba(47,53,66,.4)}
+  .custo b{color:var(--on-var)}
+  .pro{color:var(--ok)}
+  .contra{color:var(--warn)}
+  ul{margin:6px 0 0;padding-left:18px;font-size:13px;color:var(--on-var)}
+  li{margin-bottom:5px}
+  .selo{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border:1px solid}
+  .rec{border-color:var(--ok);color:var(--ok)}
+  code{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--on-var)}
+  .linha-tempo{border-left:2px solid rgba(47,53,66,.6);padding-left:12px;margin-left:4px}
+  .linha-tempo div{margin-bottom:9px;font-size:12.5px}
+  @media(max-width:700px){.tres{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="lbl">estudo + maquete · app digiai · 23/11/2026</div>
+  <h1>Marketing: três modelos para a mesma informação</h1>
+  <div class="regra"></div>
+  <p class="sub">A página tem <b>onze abas atrás de uma barra de filtro só</b>. O problema não é a quantidade de informação — é que tudo está no mesmo nível, e quem abre precisa decidir o recorte <em>antes</em> de saber o que quer olhar. Abaixo: o que a prática recomenda, três modelos desenhados com os números reais de hoje, e a minha recomendação.</p>
+
+  <div class="nota">
+    <b>O que eu medi nesta página, hoje:</b> 11 abas · 5 dimensões de filtro (período, quem, rede, data, conteúdo) · 36 chips quando a barra está aberta · 3 abas que <b>não obedecem</b> à barra e não dizem isso (Régua, Território, Saúde) · e 2 réguas de data que já custaram um 168k × 41,8k “na mesma janela”.
+  </div>
+
+  <h2>1. O que a prática recomenda</h2>
+  <p class="sub" style="margin-bottom:14px">Cinco fontes, e elas convergem. A terceira linha é a que contradiz o que fizemos na sexta — e vale encarar.</p>
+  <div class="box" style="margin-bottom:26px">
+    <table class="ref">
+      <thead><tr><th>recomendação</th><th>o que isso significa aqui</th></tr></thead>
+      <tbody>
+        <tr><td><b>Filtro em camadas:</b> global só para o essencial (tempo), local para o resto</td><td>Hoje tudo é global. <b>Período</b> é legitimamente global; <b>quem</b>, <b>rede</b> e <b>data</b> só valem em parte das abas — e nas outras ficam ali mentindo que valem.</td></tr>
+        <tr><td><b>Visão com 4–6 números, detalhe no clique</b>, registro no clique seguinte</td><td>É quase o que a aba Hoje já faz. Falta o resto da página obedecer à mesma regra em vez de abrir onze portas no mesmo plano.</td></tr>
+        <tr><td><b>Dashboard sobrecarregado: quebrar em páginas por público</b></td><td>Isto <b>contradiz</b> a junção de sexta. Mas o que nos obrigou a juntar não foi o número de páginas: foi haver <b>duas réguas de data com o mesmo rótulo</b>. Juntar resolveu a régua; não resolveu a sobrecarga.</td></tr>
+        <tr><td><b>Filtro avançado atrás de “mais filtros”</b></td><td>Feito hoje de manhã: a barra fecha e vira uma linha. Baixou de 807 px para 520 px até o primeiro número — mas só escondeu a mobília, não reorganizou a informação.</td></tr>
+        <tr><td><b>Esconder não custa desempenho</b></td><td>Tira o último argumento contra fechar seção por padrão: o que está fechado não pesa.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>2. Três modelos</h2>
+  <p class="sub" style="margin-bottom:16px">Mesmos dados, mesmos números de hoje (30 dias). O que muda é por onde se entra.</p>
+
+  <div class="tres">
+
+    <!-- A -->
+    <div class="box maq">
+      <div class="cab">
+        <span class="lbl">modelo A</span>
+        <h3 style="margin:4px 0 2px">Uma pergunta por tela</h3>
+        <div style="font-size:12px;color:var(--muted)">A página abre respondendo UMA pergunta. As outras ficam numa lista, cada uma com o seu recorte escrito.</div>
+      </div>
+      <div class="corpo">
+        <div class="tela">
+          <div class="lbl">quanto rendeu o que a casa publicou · 30 dias</div>
+          <div class="num g">150.998</div>
+          <div style="color:var(--muted);font-size:11px;margin:3px 0 10px">Pulso 107.597 · casa 42.483 · Limelight 918</div>
+          <div style="height:16px;display:flex;gap:2px;margin-bottom:12px">
+            <div style="width:41%;background:#3987e5"></div><div style="width:20%;background:#199e70"></div>
+            <div style="width:15%;background:#d55181"></div><div style="width:14%;background:#c98500"></div><div style="width:10%;background:#d95926"></div>
+          </div>
+          <div class="lbl" style="margin-bottom:6px">outras perguntas</div>
+          <div class="cartao"><div class="t">Quanto a casa já somou do que foi medido? <span style="color:var(--sec)">→</span></div><div class="s">por data de leitura · 279.509</div></div>
+          <div class="cartao"><div class="t">Sai hoje, e dá para continuar saindo? <span style="color:var(--sec)">→</span></div><div class="s">38 marcadas · 92% no horário</div></div>
+          <div class="cartao"><div class="t">Que formato funciona? <span style="color:var(--sec)">→</span></div><div class="s">503 posts · 384 medidos</div></div>
+          <div class="cartao"><div class="t">Dá para confiar na medição? <span style="color:var(--sec)">→</span></div><div class="s">29 de 50 contas no censo</div></div>
+        </div>
+        <div class="custo">
+          <span class="pro"><b>a favor:</b> some a barra global; cada pergunta leva o seu recorte, então nunca mente</span>
+          <span class="contra"><b>contra:</b> comparar duas perguntas exige ir e voltar</span>
+          <span><b>obra:</b> média — reorganiza, não reescreve</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- B -->
+    <div class="box maq">
+      <div class="cab">
+        <span class="lbl">modelo B</span>
+        <h3 style="margin:4px 0 2px">Painel de cartões + gaveta</h3>
+        <div style="font-size:12px;color:var(--muted)">Sem abas. Seis cartões respondem de relance; clicar abre uma gaveta com o detalhe e o filtro <em>daquele</em> assunto.</div>
+      </div>
+      <div class="corpo">
+        <div class="tela">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px">
+            <span class="lbl">marketing · 30 dias</span><span class="chip on">30d</span>
+          </div>
+          <div class="grade2">
+            <div class="cartao"><div class="t">views publicadas</div><div class="num m">150.998</div><div class="s">3 origens</div></div>
+            <div class="cartao"><div class="t">views lidas</div><div class="num m">279.509</div><div class="s">966 peças</div></div>
+            <div class="cartao"><div class="t">sai hoje</div><div class="num m" style="color:var(--warn)">38</div><div class="s">32 por sair</div></div>
+            <div class="cartao"><div class="t">pontualidade</div><div class="num m" style="color:var(--ok)">92%</div><div class="s">32 atrasadas</div></div>
+            <div class="cartao"><div class="t">seguidores</div><div class="num m">9.008</div><div class="s">+628</div></div>
+            <div class="cartao"><div class="t">confiança</div><div class="num m" style="color:var(--warn)">29/50</div><div class="s">contas no censo</div></div>
+          </div>
+          <div style="border:1px dashed rgba(173,206,189,.45);padding:9px;margin-top:9px;font-size:11.5px;color:var(--on-var)">
+            <b style="color:var(--sec)">gaveta</b> — clicou em “views publicadas”: aqui entram marca, rede, canal e a régua de data, <b>só deste assunto</b>.
+          </div>
+        </div>
+        <div class="custo">
+          <span class="pro"><b>a favor:</b> mata a fileira de abas E a barra global; o filtro nasce dentro do assunto</span>
+          <span class="contra"><b>contra:</b> o detalhe fica a um clique; gaveta em telefone é tela cheia</span>
+          <span><b>obra:</b> maior — precisa do componente de gaveta</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- C -->
+    <div class="box maq">
+      <div class="cab">
+        <span class="lbl">modelo C</span>
+        <h3 style="margin:4px 0 2px">O dia em texto</h3>
+        <div style="font-size:12px;color:var(--muted)">A página começa com três frases que dizem o estado, com os números dentro. O painel vem embaixo, para quem quiser conferir.</div>
+      </div>
+      <div class="corpo">
+        <div class="tela">
+          <div class="lbl" style="margin-bottom:8px">segunda, 23 de novembro</div>
+          <div class="linha-tempo">
+            <div>Nos últimos 30 dias a casa publicou <b class="num">503</b> peças e somou <b class="num">150.998</b> views — <b class="num">71%</b> delas do Pulso.</div>
+            <div>Hoje há <b class="num">38</b> peças marcadas, <b class="num">32</b> ainda por sair. A pontualidade do mês é <b class="num" style="color:var(--ok)">92%</b>; onde mais atrasa é <b>Pulso · TikTok</b>.</div>
+            <div style="color:var(--warn)">⚠ <b class="num">21</b> de 50 contas estão fora do censo, então parte do número acima não é medição — é o que chegou.</div>
+          </div>
+          <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(47,53,66,.4)">
+            <span class="chip">abrir o painel</span><span class="chip">o que funciona</span><span class="chip">saúde</span>
+          </div>
+        </div>
+        <div class="custo">
+          <span class="pro"><b>a favor:</b> é o único que diz o que o número <em>significa</em>, e carrega o aviso junto</span>
+          <span class="contra"><b>contra:</b> frase gerada precisa de regra; frase errada é pior que gráfico feio</span>
+          <span><b>obra:</b> média no código, alta no cuidado</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 style="margin-top:34px">3. O que eu recomendo <span class="selo rec">B + regra do A</span></h2>
+  <div class="nota" style="margin-top:12px">
+    <b>Painel de cartões como entrada, e o filtro vivendo dentro do assunto.</b> É o que resolve a causa, não o sintoma: hoje a confusão vem de <b>uma barra global governando onze perguntas</b> — e três delas nem obedecem. Com a gaveta, cada assunto carrega o seu próprio recorte, e aí deixa de existir filtro que “vale para a página” e mente em metade dela.
+    <ul>
+      <li><b>Período fica global</b> — é a única dimensão que toda pergunta entende.</li>
+      <li><b>Quem, rede e data descem</b> para dentro da gaveta de cada assunto.</li>
+      <li><b>Régua, Território e Saúde</b> viram cartões que abrem gaveta sem filtro nenhum — e param de fingir que obedecem.</li>
+      <li><b>O texto do modelo C entra depois</b>, como primeira linha do painel, quando as frases tiverem regra escrita. É ganho real, mas é o que mais erra se for apressado.</li>
+    </ul>
+  </div>
+  <div class="nota aviso">
+    <b>Uma coisa que eu não faria:</b> voltar a quebrar em duas páginas, que é o que a terceira recomendação sugere. Já tivemos duas, e o preço foi <b>duas réguas de data com o mesmo rótulo</b> — o erro mais caro desta semana. Uma página, uma régua; a separação é por <em>assunto dentro da página</em>, não por endereço.
+  </div>
+
+  <div style="font-size:11.5px;color:var(--muted);margin-top:26px;border-top:1px solid rgba(47,53,66,.4);padding-top:12px">
+    Números: medidos no painel em 23/11/2026, recorte de 30 dias. Fontes do estudo: Observable (quebrar dashboard sobrecarregado), InetSoft (filtro em camadas), UXPilot (filtro avançado escondido, arquitetura por papel), BI Book (4–6 KPIs e descida em dois passos), Qlik (informação demais cedo demais) e DataCamp/Power BI (esconder não custa desempenho).
+  </div>
+
+</div>
+</body>
+</html>
