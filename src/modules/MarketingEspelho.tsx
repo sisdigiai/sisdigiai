@@ -179,6 +179,21 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
     .replace(/^PULSO Histórias$/, 'canal principal');
   const cls = 'font-mono text-[10px] uppercase tracking-widest text-muted';
   const custom = fDe !== '' && fAte !== '' && fDe <= fAte;
+
+  // A BARRA FECHA QUANDO NÃO ESTÁ EM USO (23/11/2026). Medido no ar: do topo até o primeiro número
+  // grande eram **807 px** — numa janela de 889 px, o número ficava raspando a borda, e num notebook
+  // comum ficava abaixo da dobra. Só a barra custava 289 px, com 48 botões na primeira tela.
+  //
+  // Nada some: fechada, ela DIZ o recorte inteiro numa frase, e "ajustar" abre a caixa como estava.
+  // A regra que eu não quebro aqui é a mesma do resto da página — o que está valendo fica escrito.
+  const [filtroAberto, setFiltroAberto] = useState(false);
+  const nomeDaMarca = fMarca ? (marcasChip.find((m) => m.code === fMarca)?.nome ?? fMarca) : '';
+  const frase = [
+    custom ? `${fDe} → ${fAte}` : (RANGES.find((r) => r.k === fDias)?.label ?? `${fDias}d`),
+    nomeDaMarca || (fOrigem ? rotuloOrigem(fOrigem) : 'tudo'),
+    fRede ? (REDES.find((r) => r.k === fRede)?.label ?? fRede) : 'todas as redes',
+    fData === 'publicacao' ? 'por publicação' : 'por leitura',
+  ].join(' · ');
   // As abas do Espelho leem em janelas de 7, 30 ou tudo — é o que as views delas aceitam. A barra
   // oferece mais; quando não dá para obedecer exatamente, a aba DIZ em que janela leu.
   const periodoEspelho: Periodo = fDias === 0 ? 'tudo' : fDias <= 7 ? '7' : '30';
@@ -325,7 +340,7 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
       <PageHeader
         eyebrow="Distribuição & conteúdo"
         title="Marketing"
-        subtitle="Uma página só: em cima se decide, embaixo se confere de onde o número veio. Uma barra de filtro para as onze abas — inclusive a régua de DATA, que é o que fazia as duas telas antigas discordarem com o mesmo rótulo. Leitura apenas: a produção acontece no DIGIAI MKT."
+        subtitle="Em cima se decide, embaixo se confere de onde o número veio. Leitura apenas — a produção acontece no DIGIAI MKT."
         actions={
           <div className="flex items-center gap-2">
             <a
@@ -344,7 +359,7 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
       />
 
       <div className="space-y-6">
-        <TravasBanner />
+        <TravasBanner compacto />
 
         {/* DUAS FILEIRAS DE ABA. A de cima decide, a de baixo confere — e quem não sabe qual quer
             começa em Hoje, que é a pergunta de todo dia. */}
@@ -365,8 +380,23 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
           ))}
         </div>
 
-        {/* UMA BARRA DE FILTRO PARA AS ONZE ABAS. Cada bloco diz quando não consegue obedecê-la. */}
+        {/* UMA BARRA DE FILTRO PARA AS ONZE ABAS. Cada bloco diz quando não consegue obedecê-la.
+            Fechada por padrão desde 23/11 — ver o comentário de `filtroAberto`. */}
+        {!filtroAberto ? (
+          <button onClick={() => setFiltroAberto(true)}
+            className="w-full border border-outline/15 bg-surface-container px-3.5 py-2 flex items-center gap-2 text-left hover:bg-surface-highest/40">
+            <span className={cls + ' shrink-0'}>recorte</span>
+            <span className="text-[13px] text-on-surface truncate">{frase}</span>
+            <span className="ml-auto shrink-0 font-mono text-[10px] uppercase tracking-widest text-secondary">ajustar</span>
+          </button>
+        ) : (
         <div className="border border-outline/15 bg-surface-container px-3.5 py-3 space-y-2.5">
+          <div className="flex items-center gap-2">
+            <span className={cls}>recorte</span>
+            <span className="text-[12px] text-muted">{frase}</span>
+            <button onClick={() => setFiltroAberto(false)}
+              className="ml-auto font-mono text-[10px] uppercase tracking-widest text-secondary hover:text-on-surface">fechar</button>
+          </div>
           <div className="flex flex-wrap items-center gap-1.5">
             <span className={cls + ' mr-1 shrink-0'}>período</span>
             {RANGES.map((r) => (
@@ -444,6 +474,7 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
             </div>
           )}
         </div>
+        )}
 
         {/* HOJE — "o que está acontecendo, e sai hoje?". O tamanho do alcance no recorte vem do
             Radar; a agenda e a pontualidade do dia, do motor do MKT. */}

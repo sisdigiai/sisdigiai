@@ -88,7 +88,21 @@ export const TRAVAS: Trava[] = [
 ];
 
 // Banner compacto — plantar no topo de Marketing, Funil e Academy.
-export function TravasBanner() {
+/** `compacto` deixa a faixa em UMA linha, que abre no clique. Medido em 23/11 na página de
+ *  Marketing: a faixa custava 90 px de uma primeira tela que já levava 807 px até o primeiro número.
+ *  As travas são referência, não notícia — não mudam há meses. Quem precisa, abre. */
+export function TravasBanner({ compacto = false }: { compacto?: boolean } = {}) {
+  const [aberto, setAberto] = useState(!compacto);
+  if (compacto && !aberto) {
+    return (
+      <button onClick={() => setAberto(true)}
+        className="w-full border border-warning/20 bg-warning/[0.06] px-4 py-1.5 flex items-center gap-2 text-left hover:bg-warning/[0.1]">
+        <ShieldCheck className="w-3.5 h-3.5 text-warning shrink-0" />
+        <span className="text-[11px] text-warning/90 uppercase tracking-wide">5 travas de marketing ativas</span>
+        <span className="text-[11px] text-muted ml-auto">ver</span>
+      </button>
+    );
+  }
   return (
     <div className="border border-warning/20 bg-warning/[0.06] px-4 py-3">
       <div className="flex items-center gap-2 mb-2">
@@ -102,6 +116,7 @@ export function TravasBanner() {
         <span><b className="text-on-surface">ponte sutil pro Clearix</b></span>
         <span><b className="text-on-surface">tom humano PT-BR</b></span>
         <span className="text-muted">· detalhe em Sistema → Travas Marketing</span>
+        {compacto && <button onClick={() => setAberto(false)} className="text-muted hover:text-on-surface">· fechar</button>}
       </div>
     </div>
   );
