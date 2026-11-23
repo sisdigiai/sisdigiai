@@ -89,11 +89,14 @@ Deno.serve(async (req) => {
     const cli = createClient(SUPABASE_URL, SERVICE_ROLE);
     const { data, error } = await cli
       .schema('ops')
-      .from('ordem_do_dia')
+      // A VISTA, não a tabela: ela traz a `categoria` já resolvida pela tabela de regra
+      // (`ops.gj_categoria_regra`). A regra mora no banco de propósito — mudar o que cai em cada
+      // categoria não pode exigir deploy de edge function.
+      .from('ordem_do_dia_evento')
       // Colunas NOMEADAS, e só as que viram evento. Nada de `select('*')`:
       // a tabela pode ganhar coluna interna e ela viajaria para outro projeto
       // sem ninguém decidir.
-      .select('id, bloco, posicao, titulo, porque, estado')
+      .select('id, bloco, posicao, titulo, porque, estado, categoria')
       .eq('dia', dia)
       // O mesmo recorte da push-ordem-gj, e pelo mesmo motivo: obrigação da
       // máquina não vira compromisso de gente.
@@ -123,6 +126,10 @@ Deno.serve(async (req) => {
       local: null,
       posicao: it.posicao,
       estado: it.estado,
+      // CATEGORIA SÓ QUANDO HÁ ÁREA CLARA (contrato do Geral, 23/11/2026). Sem regra que case, o
+      // campo NÃO vai: o GJ marca `outros` e o `v_saude_origens` acusa a fonte. Mandar categoria
+      // errada é pior que não mandar — o alarme dele existe para quem esqueceu, não para quem mentiu.
+      ...(it.categoria ? { categoria: it.categoria } : {}),
     }));
 
     // `itens: []` é resposta válida (dia sem ordem humana) e vem COM `dia`:
