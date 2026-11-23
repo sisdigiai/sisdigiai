@@ -29,6 +29,7 @@ type App = {
   app: string; arquivos: number; telas: number; rotas_de_api: number; funcoes_chamadas: number;
   objetos_lidos: number; chamadas_que_gravam: number; edge_functions: number;
   gaps_altos: number; gaps_medios: number; gaps_info: number; tem_spec: boolean; tem_agents: boolean;
+  spec_onde: 'propria' | 'guarda-chuva' | 'nao' | null;
 };
 type Gap = {
   tipo: string; rotulo: string; sev: 'alta' | 'media' | 'info'; app: string | null; objeto: string;
@@ -210,8 +211,17 @@ export default function RaioX() {
                     </button>
                     <span className="text-muted font-mono text-[11px]"> · {a.gaps_medios} · {a.gaps_info}</span>
                   </td>
+                  {/* "sem spec" dizia mentira para 14 sub-apps do Clearix: elas são cobertas pela Spec
+                      guarda-chuva do eco. O defeito era do script dele e apareceu AQUI — ele corrigiu e
+                      mandou `spec_onde`, que é o que a coluna mostra agora. Dizer "sem spec" para quem
+                      tem spec é a mesma família de erro que esta página existe para pegar. */}
                   <td className="px-4 py-2 font-mono text-[11px]">
-                    <span style={{ color: a.tem_spec ? COR_OK : COR_WARN }}>{a.tem_spec ? 'spec' : 'sem spec'}</span>
+                    <span style={{ color: a.spec_onde === 'nao' || (!a.spec_onde && !a.tem_spec) ? COR_WARN : COR_OK }}>
+                      {a.spec_onde === 'guarda-chuva' ? 'spec do eco'
+                        : a.spec_onde === 'propria' ? 'spec própria'
+                        : a.spec_onde === 'nao' ? 'sem spec'
+                        : a.tem_spec ? 'spec' : 'sem spec'}
+                    </span>
                     <span className="text-muted"> · </span>
                     <span style={{ color: a.tem_agents ? COR_OK : COR_WARN }}>{a.tem_agents ? 'agents' : 'sem agents'}</span>
                   </td>
