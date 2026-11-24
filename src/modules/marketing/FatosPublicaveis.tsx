@@ -62,6 +62,14 @@ function estadoDo(f: FatoMkt): Estado {
 
 const dia = (d: string | null) => (d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '—');
 
+// O VEREDITO VEM COM HORA, E HORA TEM FUSO. `medido_em` é timestamptz: o verificador das 4h30 grava
+// em UTC, e eu rodei a medição às 22h45 de 23/11 — a tela disse **24/11**, porque eu cortei os dez
+// primeiros caracteres do ISO. É o mesmo defeito de fuso que esta casa já consertou duas vezes;
+// achei na conferência da própria entrega. Data de dia se corta do ISO; data de instante se converte.
+const diaBR = (iso: string | null) => (iso
+  ? new Date(iso).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })
+  : '—');
+
 export default function FatosPublicaveis({ fatos, medicoes = [] }: { fatos: FatoMkt[]; medicoes?: MedicaoFato[] }) {
   const medicaoDe = new Map(medicoes.map((m) => [m.chave, m]));
   const citaveis = fatos.filter((f) => f.fresco && f.publico);
@@ -146,7 +154,7 @@ export default function FatosPublicaveis({ fatos, medicoes = [] }: { fatos: Fato
                         const v = VEREDITO[m.veredito] ?? { rotulo: m.veredito, tom: 'text-muted' };
                         return (
                           <div className={`text-[10px] font-mono mt-0.5 leading-snug ${v.tom}`} title={m.detalhe ?? ''}>
-                            medido {dia(m.medido_em?.slice(0, 10) ?? null)}: {v.rotulo}
+                            medido {diaBR(m.medido_em)}: {v.rotulo}
                             {m.valor_medido !== null && m.valor_medido !== undefined
                               ? ` — ${Number(m.valor_medido).toLocaleString('pt-BR')}` : ''}
                           </div>

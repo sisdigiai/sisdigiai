@@ -2,6 +2,78 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-23 — Os fatos vencidos, "no período", e o que está no ar
+
+Cinco itens da fila numa tacada, por ordem do dono. O primeiro mudou de forma assim que eu medi.
+
+### 1. 24 fatos vencidos — e o conserto não era carimbar data
+
+Antes de reescrever qualquer número, fui ver o que o **verificador diário** (`verificar-fatos`, 4h30)
+tinha medido. Ele estava **cego de duas maneiras, e as duas se pareciam com trabalho normal na tela**:
+
+- **A `v_espelho_pulso` responde 401 desde 08/09.** O anon do Pulso foi revogado naquele dia porque a
+  view carrega custo e receita; o front migrou para a edge `espelho-pulso`, a function não. Ela
+  continuou batendo na porta antiga com a chave revogada **escrita no código** — a variável
+  `PULSO_ANON_KEY` nunca existiu no projeto, então o "fallback" era a única fonte, e estava morto. O
+  `catch` engolia o 401 e o fato saía como *"a fonte exige verificação humana"*. Dois fatos do Pulso
+  ficaram assim **109 e 84 dias**, parecendo tarefa de gente que ninguém fez — e eram leitura de máquina.
+- **Leitura que falha virava zero.** A contagem de `mkt.publications` era lida sem olhar o `error`, e
+  `?? 0` transformava falha em zero. A série mostra o degrau: 14, 8, 8 e **zero todo dia desde
+  08/09**, com o texto *"Caiu — a esteira ficou parada"*. A tabela tem **2.114 linhas em 7 dias**.
+  Era alarme falso, e do tipo que se acredita, porque vinha com número.
+
+Consertado: a medição do Pulso entra pela edge que a casa já tem (**mesma base de antes**, então o
+número continua comparável — trocar a base para arrumar a leitura seria arrumar o termômetro mudando
+a febre); existe o quarto veredito **`fonte_inacessivel`** (migration 267), porque *"não consegui ler"*
+nunca pode se parecer com *"precisa de gente"*; e zero só existe quando a leitura deu certo.
+
+Com a porta certa, os dois fatos foram **curados com o que a máquina mediu** (migration 268):
+**820.006 views em 1.325 publicações** e **543 inscritos no YouTube, +56 em 28 dias** — o crescimento
+desacelerou, e fato tem que poder **piorar**. A fonte do segundo saiu do "YouTube Studio, à mão", que
+o condenava a uma tarefa semanal que ninguém fez em quatro meses, e passou ao espelho, que coleta
+sozinho. **Rotina que depende de alguém lembrar não é rotina.**
+
+Vencidos: **24 → 22**. Os 22 não são meus de medir: 21 são números da folha única (banco do Clearix,
+que o digiai não lê em runtime) e 1 é do Limelight. Os dois donos foram avisados no mesmo turno.
+
+E o que ninguém via: a view `v_ops_fatos_verificados` **já existia** com o último veredito de cada
+fato, e **nenhuma tela lia**. Agora cada fato mostra o que a máquina mediu hoje. Medição que não chega
+a lugar nenhum é medição que ninguém confere — foi assim que o alarme falso viveu 76 dias.
+
+### 2. "No período" — 26 ocorrências em 8 arquivos
+
+Quem obedece à barra passa a dizer **"no recorte"** e deixa a barra falar (ela escreve janela e
+régua). Quem lê janela própria **diz a janela**, por `rotuloJanela()`, que agora mora num lugar só.
+Foi esse rótulo — igual nas duas telas, significando coisas diferentes — que escondeu o 168k × 41,8k
+de 20/11.
+
+### 3. As três abas que ignoram a barra agora dizem isso
+
+Régua, Território e Saúde ganharam a nota **"a barra não vale aqui"**, com o motivo de cada uma.
+A Régua, que **é** por marca, passou a **obedecer** ao recorte de quem — obedecer é sempre melhor que
+avisar. Recortar por Mello e ver o território inteiro é concluir que o território é da Mello.
+
+### 4. Raio-X: último deploy e código fora do ar
+
+Migration 269. **Três colunas, não uma**, porque o resumo "5 apps com código fora do ar" junta coisas
+que se resolvem de modo diferente: **falta deploy** (4 apps — Clinics, com deploy de 23/09, DCL,
+Estoque e Finance), **outro ramo** (RH) e **sem commit** (Finance, 3 arquivos — a única das três que
+some sozinha se a máquina morrer). E `deploy_lido` falso diz **"não lido"**, nunca "em dia": a
+diferença entre "nada pendente" e "ninguém olhou" é a diferença entre dormir tranquilo e achar que
+dormiu tranquilo.
+
+### 5. Crescimento de seguidores com data — já estava pronto, e na fonte certa
+
+A `v_mkt_conta_dia`, que estava na fila para isso, tem **17.089 linhas desde 2012** com `seguidores`
+preenchido em **6.253** (Instagram: **396 de 5.873**) e **não tem TikTok**. A `mkt.audiencia_diaria`,
+que a aba Audiência já lê, tem **1.067 linhas, todas com número**, em cinco redes, 105 dias desde
+02/07. Trocar uma pela outra seria perder medição e ganhar buraco.
+
+O que faltava era o **grão**: o painel soma as contas da mesma marca na mesma rede. Medido, isso
+acontece em **um** lugar — três canais de YouTube sob Bastidores DIGIAI, um deles o `@pulsohistorias`,
+que é do Pulso. A Saúde agora mostra as **parcelas**. Enquanto ficar somado, o total da casa está
+certo por acaso, e o cadastro é do MKT.
+
 ## 2026-11-23 — A barra de filtro do Marketing: a forma diz a natureza
 
 Depois de fechar a barra por padrão (ganho medido de 289 px), o dono: *"a ideia de esconder o filtro
