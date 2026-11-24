@@ -41,7 +41,7 @@ type Ia = { teto_mensal: number | null; teto_diario: number | null; pausado: boo
 const usd = (v: number | null) => (v == null ? '—' : `US$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
 const num = (n: number | null) => (n == null ? '—' : Number(n).toLocaleString('pt-BR'));
 
-export default function ResultadoConteudoCard() {
+export default function ResultadoConteudoCard({ recarga = 0 }: { recarga?: number }) {
   const [cob, setCob] = useState<Cobertura[] | null>(null);
   const [rec, setRec] = useState<Recorte[] | null>(null);
   // A lista canónica das marcas da casa. Sem ela, só aparecem as que têm post medido — e o dono
@@ -67,7 +67,7 @@ export default function ResultadoConteudoCard() {
       .select('valor, rede_recorte, com_views, views_mediana, views_p90, views_melhor, engaj_confiaveis, engaj_mediana, engaj_melhor, serve_de_base')
       .eq('recorte', 'marca').is('rede_recorte', null).limit(200)
       .then(({ data, error }) => { if (error) setErro(error.message); setRec((data ?? []) as Recorte[]); });
-  }, []);
+  }, [recarga]);
 
   // uma linha por marca: a cobertura somada das redes, e a mediana do recorte da marca
   const porMarca = (() => {

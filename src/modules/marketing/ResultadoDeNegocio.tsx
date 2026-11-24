@@ -25,7 +25,7 @@ const num = (n: number | null) => (n == null ? '—' : Number(n).toLocaleString(
 const dia = (s: string) =>
   new Date(s + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
 
-export default function ResultadoDeNegocio() {
+export default function ResultadoDeNegocio({ recarga = 0 }: { recarga?: number }) {
   const [linhas, setLinhas] = useState<Semana[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -37,7 +37,7 @@ export default function ResultadoDeNegocio() {
         if (error) { setErro(error.message); setLinhas([]); return; }
         setLinhas((data ?? []) as Semana[]);
       });
-  }, []);
+  }, [recarga]);
 
   const semanas = [...new Set((linhas ?? []).map((l) => l.semana))].sort().reverse().slice(0, 8);
   const marcas = [...new Set((linhas ?? []).map((l) => l.marca))];

@@ -115,7 +115,7 @@ function Pe({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function MotoresDeConteudo({ periodo, limelight, pulso, espMkt, hoje, brl, pulsoUltimaPubDias, mktUltimaPub }: Props) {
+export default function MotoresDeConteudo({ periodo, limelight, pulso, espMkt, hoje, brl, pulsoUltimaPubDias, mktUltimaPub, recarga = 0 }: Props & { recarga?: number }) {
   const dias = periodo === 'tudo' ? null : Number(periodo);
   const rotuloPeriodo = rotuloJanela(periodo);
 
@@ -154,7 +154,7 @@ export default function MotoresDeConteudo({ periodo, limelight, pulso, espMkt, h
     espelhoMotoresEstado.pulsoDias().then(setPulsoDias);
     espelhoMotoresEstado.pulsoLongosDias().then(setLongos);
     espelhoMotoresEstado.limelightPubDias().then(setLimeDias);
-  }, [periodo]);
+  }, [periodo, recarga]);
 
   const corte = dias ? diaBRT(new Date(Date.now() - dias * 86400000)) : '0000-01-01';
   const janela = <T extends { dia: string }>(l: T[] | undefined) => (l ?? []).filter((x) => x.dia >= corte);

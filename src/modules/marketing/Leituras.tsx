@@ -32,7 +32,7 @@ const DIAS_DE = (p: Periodo) => (p === 'tudo' ? null : Number(p));
 const diaBRT = (d: Date) =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
 
-export default function Leituras({ periodo }: { periodo: Periodo }) {
+export default function Leituras({ periodo, recarga = 0 }: { periodo: Periodo; recarga?: number }) {
   const [estoque, setEstoque] = useState<Estoque[] | null>(null);
   const [pont, setPont] = useState<Pont[] | null>(null);
   const [cadeia, setCadeia] = useState<Dia[] | null>(null);
@@ -52,7 +52,7 @@ export default function Leituras({ periodo }: { periodo: Periodo }) {
         .order('dia').order('marca').order('rede').order('saiu_em').order('minutos').range(de, ate);
       return corte ? q.gte('dia', corte) : q;
     }).then(setPont);
-  }, [periodo]);
+  }, [periodo, recarga]);
 
   const pronto = estoque != null && pont != null && cadeia != null;
   const leituras: Leitura[] = [];

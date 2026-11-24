@@ -55,7 +55,7 @@ const diaBRT = (d: Date) =>
 // O período é do PAI, não deste cartão. Antes ele vivia aqui e o "Resultado do conteúdo" ao lado era
 // sempre 30 dias: um filtro que vale para metade da tela é pior que nenhum, porque quem lê acredita
 // que mudou tudo. (Erro apontado pelo Geral em 18/11, item 3.)
-export default function LeiturasCard({ periodo }: { periodo: Periodo }) {
+export default function LeiturasCard({ periodo, recarga = 0 }: { periodo: Periodo; recarga?: number }) {
   const [linhas, setLinhas] = useState<Linha[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [pulso, setPulso] = useState<{ linhas: PulsoDia[]; estado: EstadoEspelho; detalhe?: string } | null>(null);
@@ -74,7 +74,7 @@ export default function LeiturasCard({ periodo }: { periodo: Periodo }) {
       if (corte) q = q.gte('data', corte);
       return q.order('data').order('origem').order('conta').order('rede').order('peca_ref').range(de, ate);
     }).then((l) => { setErro(null); setLinhas(l); });
-  }, [periodo]);
+  }, [periodo, recarga]);
 
   useEffect(() => {
     espelhoMotoresEstado.pulsoDias().then(setPulso);

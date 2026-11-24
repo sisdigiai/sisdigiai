@@ -51,12 +51,34 @@ function devolve() {
   if (proximo) proximo();
 }
 
+// ---- QUEM ESTÁ LENDO, E DESDE QUANDO (24/11/2026) ----
+//
+// A tela precisa poder DIZER que está lendo e a que horas leu pela última vez. Como toda leitura do
+// app passa por aqui, o contador vive aqui e vale para qualquer tela — inclusive para os blocos
+// filhos, que leem sozinhos e que a página de cima não enxerga.
+let abertos = 0;
+let ultimaResposta: number | null = null;
+const ouvintes = new Set<() => void>();
+const avisar = () => ouvintes.forEach((f) => f());
+
+export function observarLeitura(f: () => void): () => void {
+  ouvintes.add(f);
+  return () => { ouvintes.delete(f); };
+}
+export const lendoAgora = (): boolean => abertos > 0;
+export const ultimaLeitura = (): number | null => ultimaResposta;
+
 const fetchEmFila: typeof fetch = async (entrada, init) => {
+  abertos += 1;
+  avisar();
   await vaga();
   try {
     return await fetch(entrada, init);
   } finally {
     devolve();
+    abertos -= 1;
+    ultimaResposta = Date.now();
+    avisar();
   }
 };
 

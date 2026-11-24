@@ -22,6 +22,7 @@ import MktCrescimento, {
 import { espelhoMotores as motores } from '../lib/espelhoMotores';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia } from '../lib/datas';
+import { useLeitura, horaCurta } from '../lib/useLeitura';
 import { espelhoMotores, resumoPola, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
 
 // Cadeia de resultados (v_marketing_cadeia + espelhos + uso vivo Clearix).
@@ -240,6 +241,14 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
   // para a aba revisitada não pagar de novo. Recarregar pela setinha limpa tudo e refaz o da aba atual.
   const carregadas = useRef(new Set<string>());
   const [carregando, setCarregando] = useState(false);
+  // A SETINHA TEM QUE RECARREGAR A ABA INTEIRA, FILHAS INCLUÍDAS (24/11/2026).
+  //
+  // Medido no ar pelo Orquestrador em 24/11: clicar em Recarregar na aba Hoje não disparava NENHUM
+  // pedido ao banco. `load` só refazia os grupos desta página, e `GRUPOS_DA_ABA` é vazio em seis das
+  // onze abas — Hoje, a que abre por padrão, entre elas: quem lê nessas abas são os blocos filhos,
+  // que leem sozinhos e não ouviam o botão. `recarga` é o sinal que eles ouvem.
+  const [recarga, setRecarga] = useState(0);
+  const leitura = useLeitura();
 
   const GRUPOS: Record<string, () => Promise<void>> = {
     async base() {
@@ -328,6 +337,7 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
     grupos.forEach((g) => carregadas.current.add(g));
     setCarregando(true);
     Promise.all(grupos.map((g) => GRUPOS[g]())).finally(() => setCarregando(false));
+    setRecarga((n) => n + 1);
   };
 
   const diasDesde = (d: string | null | undefined) =>
@@ -363,8 +373,13 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
             >
               <ExternalLink size={14} /> Abrir DIGIAI MKT
             </a>
-            <button onClick={load} className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface" title="Recarregar">
-              <RefreshCw size={16} />
+            <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+              {leitura.carregando ? 'lendo…' : `lido ${horaCurta(leitura.ultima)}`}
+            </span>
+            <button onClick={load} disabled={leitura.carregando}
+              className="p-2 hover:bg-surface-highest text-on-surface-variant hover:text-on-surface disabled:opacity-50"
+              title="Recarregar esta aba">
+              <RefreshCw size={16} className={leitura.carregando ? 'animate-spin' : undefined} />
             </button>
           </div>
         }
@@ -518,8 +533,8 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
             Radar; a agenda e a pontualidade do dia, do motor do MKT. */}
         {aba === 'hoje' && (
           <div className="space-y-6">
-            <MktCrescimento aba="visao" filtros={filtros} />
-            <HojeSai periodo={periodoEspelho} />
+            <MktCrescimento aba="visao" filtros={filtros} recarga={recarga} />
+            <HojeSai periodo={periodoEspelho} recarga={recarga} />
           </div>
         )}
 
@@ -528,10 +543,10 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
             contexto. "O que funciona" ganhou aba própria. */}
         {aba === 'resultado' && (
           <div className="space-y-6">
-            <PlacarDeDecisao pecas7d={esp?.publicadas_7d ?? null} />
-            <ResultadoDeNegocio />
-            <Central periodo={periodoEspelho} />
-            <Leituras periodo={periodoEspelho} />
+            <PlacarDeDecisao pecas7d={esp?.publicadas_7d ?? null} recarga={recarga} />
+            <ResultadoDeNegocio recarga={recarga} />
+            <Central periodo={periodoEspelho} recarga={recarga} />
+            <Leituras periodo={periodoEspelho} recarga={recarga} />
           </div>
         )}
 
@@ -539,26 +554,26 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
             por recorte de negócio; o bloco do Radar, por formato, gatilho e hora do dia. */}
         {aba === 'funciona' && (
           <div className="space-y-6">
-            <OQueFunciona />
-            <ResultadoConteudoCard />
-            <MktCrescimento aba="conteudo" filtros={filtros} />
+            <OQueFunciona recarga={recarga} />
+            <ResultadoConteudoCard recarga={recarga} />
+            <MktCrescimento aba="conteudo" filtros={filtros} recarga={recarga} />
           </div>
         )}
 
         {/* FÔLEGO — "até quando ainda sai conteúdo se ninguém fizer nada?". */}
-        {aba === 'folego' && <EstoquePorMarca />}
+        {aba === 'folego' && <EstoquePorMarca recarga={recarga} />}
 
         {/* LEITURA DAS PEÇAS — "quantos leram, e quanto disso a casa mede?". */}
         {aba === 'leitura' && (
           <div className="space-y-6">
-            <LeiturasCard periodo={periodoEspelho} />
+            <LeiturasCard periodo={periodoEspelho} recarga={recarga} />
           </div>
         )}
 
         {/* MARCA × REDE, RÉGUA e TERRITÓRIO: o detalhe, direto do Radar. */}
-        {aba === 'marca-rede' && <MktCrescimento aba="audiencia" filtros={filtros} />}
-        {aba === 'regua' && <MktCrescimento aba="regua" filtros={filtros} />}
-        {aba === 'territorio' && <MktCrescimento aba="territorio" filtros={filtros} />}
+        {aba === 'marca-rede' && <MktCrescimento aba="audiencia" filtros={filtros} recarga={recarga} />}
+        {aba === 'regua' && <MktCrescimento aba="regua" filtros={filtros} recarga={recarga} />}
+        {aba === 'territorio' && <MktCrescimento aba="territorio" filtros={filtros} recarga={recarga} />}
 
         {carregando && <div className="text-sm text-muted py-2">Carregando…</div>}
         {(
@@ -680,7 +695,7 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
             {/* Publicações recentes */}
             {/* O controle por marca vem ANTES da lista: a lista diz o que saiu, o cartão diz o que
                 fazer. O dono abre esta aba para decidir, não para conferir item a item. */}
-            {aba === 'publicacoes' && <ControlePorMarca />}
+            {aba === 'publicacoes' && <ControlePorMarca recarga={recarga} />}
 
             {aba === 'publicacoes' && (
             <div className="border border-outline/15 bg-surface-container mt-6">
@@ -736,7 +751,7 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
         {/* OS QUATRO MOTORES, no cartão que esta seção já usava. Antes eu tinha criado uma tabela
             nova ao lado dela, e a aba ficou com duas listas de motores — "criamos uma sessão sem
             precisar", disse o dono em 18/11. A tabela saiu e tudo o que ela mostrava entrou aqui. */}
-        {aba === 'motores' && <MktCrescimento aba="video" filtros={filtros} />}
+        {aba === 'motores' && <MktCrescimento aba="video" filtros={filtros} recarga={recarga} />}
         {aba === 'motores' && (
           <MotoresDeConteudo
             periodo={periodoEspelho}
@@ -747,6 +762,7 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
             brl={brl}
             pulsoUltimaPubDias={pulsoUltimaPubDias}
             mktUltimaPub={relativo(esp?.ultima_publicacao ?? null)}
+            recarga={recarga}
           />
         )}
 
@@ -756,10 +772,10 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
             número por azulejo, agrupado por família, e traço quer dizer não medido — nunca zero. */}
         {/* SAÚDE — "dá para confiar nos números das outras abas?". A coleta por conta vem do Radar;
             a central de fontes diz o frescor de cada fonte da casa. */}
-        {aba === 'saude' && <MktCrescimento aba="saude" filtros={filtros} />}
+        {aba === 'saude' && <MktCrescimento aba="saude" filtros={filtros} recarga={recarga} />}
         {aba === 'saude' && (
           <CentralDeFontes cadeia={cadeia} seo={seo} fila={fila} fatos={fatos}
-                           pulso={pulso} limelight={limelight} blogs={blogs} />
+                           pulso={pulso} limelight={limelight} blogs={blogs} recarga={recarga} />
         )}
 
         {/* Os fatos publicáveis moram com as publicações: são o que pode ser dito lá fora. */}

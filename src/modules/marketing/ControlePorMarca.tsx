@@ -111,13 +111,13 @@ function estadoDaRede(r: Rede) {
   return { txt: 'em dia', tom: 'text-success' };
 }
 
-export default function ControlePorMarca() {
+export default function ControlePorMarca({ recarga = 0 }: { recarga?: number }) {
   const [redes, setRedes] = useState<Rede[] | null>(null);
   const [marcas, setMarcas] = useState<Marca[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [pola, setPola] = useState<Resumo | null>(null);
 
-  useEffect(() => { resumoPola().then(setPola); }, []);
+  useEffect(() => { resumoPola().then(setPola); }, [recarga]);
 
   useEffect(() => {
     supabase.from('v_mkt_controle_marca_rede').select('*').then(({ data, error }) => {
@@ -125,7 +125,7 @@ export default function ControlePorMarca() {
       setRedes((data ?? []) as Rede[]);
     });
     supabase.from('v_mkt_estoque_marca').select('*').then(({ data }) => setMarcas((data ?? []) as Marca[]));
-  }, []);
+  }, [recarga]);
 
   const cartoes = useMemo(() => {
     if (!redes || !marcas) return null;

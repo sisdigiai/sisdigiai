@@ -131,7 +131,7 @@ function Seta({ agora, antes }: { agora: number; antes: number }) {
   );
 }
 
-export default function Central({ periodo }: { periodo: Periodo }) {
+export default function Central({ periodo, recarga = 0 }: { periodo: Periodo; recarga?: number }) {
   const [linhas, setLinhas] = useState<Dia[] | null>(null);
   const [meta, setMeta] = useState<Meta | null | 'sem_acesso'>(null);
   const [erro, setErro] = useState<string | null>(null);
@@ -152,7 +152,7 @@ export default function Central({ periodo }: { periodo: Periodo }) {
     }).then(setLinhas).catch((e) => { setErro(String(e?.message ?? e)); setLinhas([]); });
     supabase.from('v_receita_meta').select('*').maybeSingle()
       .then(({ data, error }) => setMeta(error || !data ? 'sem_acesso' : (data as Meta)));
-  }, [periodo]);
+  }, [periodo, recarga]);
 
   const leituras = useMemo(
     () => ELOS.map((e) => ({ ...e, m: linhas ? medir(linhas, e.elo, e.medida, periodo) : null })),

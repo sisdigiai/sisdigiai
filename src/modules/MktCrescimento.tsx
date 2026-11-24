@@ -145,7 +145,7 @@ const COR_SEC = 'var(--color-secondary)';
 // seria culpa do motor de coleta — as duas mentem, e mandam consertar o que não está quebrado.
 const FORA_DA_CASA = 'não é deste recorte — isto mede as contas da casa';
 
-export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: FiltrosMkt }) {
+export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: AbaK; filtros: FiltrosMkt; recarga?: number }) {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [pubs, setPubs] = useState<Pub[]>([]);
   const [perf, setPerf] = useState<Perf[]>([]);
@@ -323,7 +323,12 @@ export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: F
     });
   }
 
-  useEffect(() => { carregar(FONTES_DA_ABA[aba] ?? []); }, [aba, corteDia, fimDia]); // eslint-disable-line react-hooks/exhaustive-deps
+  // `recarga` vem da setinha da página de cima. Sem limpar o que já veio, `carregar` não pede nada:
+  // ele pula toda fonte que está em `carregadas`. Recarregar é esquecer e ler de novo.
+  useEffect(() => {
+    if (recarga > 0) carregadas.current.clear();
+    carregar(FONTES_DA_ABA[aba] ?? []);
+  }, [aba, corteDia, fimDia, recarga]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function sincronizar() {
     setSincronizando(true);

@@ -32,7 +32,7 @@ const JA_SAIU = ['publicado'];
 const AINDA_SAI = ['agendado', 'planejado', 'no_planner'];
 const RASCUNHO = ['rascunho'];
 
-export default function HojeSai({ periodo }: { periodo: Periodo }) {
+export default function HojeSai({ periodo, recarga = 0 }: { periodo: Periodo; recarga?: number }) {
   const [pecas, setPecas] = useState<Peca[] | null>(null);
   const [pont, setPont] = useState<Pont[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
@@ -45,7 +45,7 @@ export default function HojeSai({ periodo }: { periodo: Periodo }) {
         if (error) { setErro(error.message); setPecas([]); return; }
         setPecas((data ?? []) as Peca[]);
       });
-  }, []);
+  }, [recarga]);
 
   useEffect(() => {
     const dias = periodo === 'tudo' ? null : Number(periodo);
@@ -58,7 +58,7 @@ export default function HojeSai({ periodo }: { periodo: Periodo }) {
         .order('dia').order('marca').order('rede').order('saiu_em').order('minutos').range(de, ate);
       return corte ? q.gte('dia', corte) : q;
     }).then(setPont);
-  }, [periodo]);
+  }, [periodo, recarga]);
 
   const agora = Date.now();
   const grupos = useMemo(() => {

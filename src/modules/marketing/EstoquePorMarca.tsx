@@ -32,7 +32,7 @@ type Linha = {
 
 const dias = (v: number | null) => (v == null ? '—' : v.toLocaleString('pt-BR', { maximumFractionDigits: 1 }));
 
-export default function EstoquePorMarca() {
+export default function EstoquePorMarca({ recarga = 0 }: { recarga?: number }) {
   const [linhas, setLinhas] = useState<Linha[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -48,7 +48,7 @@ export default function EstoquePorMarca() {
         return a.dias_de_estoque - b.dias_de_estoque;
       }));
     });
-  }, []);
+  }, [recarga]);
 
   const baixa = (l: Linha) => l.dias_de_estoque != null && l.publicadas_7d > 0 && l.dias_de_estoque < 7;
 

@@ -34,7 +34,7 @@ function mediana(xs: number[]): number | null {
   return o.length % 2 ? o[m] : Math.round((o[m - 1] + o[m]) / 2);
 }
 
-export default function PlacarDeDecisao({ pecas7d }: { pecas7d: number | null }) {
+export default function PlacarDeDecisao({ pecas7d, recarga = 0 }: { pecas7d: number | null; recarga?: number }) {
   const [sem, setSem] = useState<Semana[] | null>(null);
   const [interacao, setInteracao] = useState<{ v: number | null; base: number } | null>(null);
 
@@ -56,7 +56,7 @@ export default function PlacarDeDecisao({ pecas7d }: { pecas7d: number | null })
         const vs = l.filter((p) => p.engajamento_confiavel && p.engajamento != null).map((p) => Number(p.engajamento));
         setInteracao({ v: mediana(vs), base: vs.length });
       });
-  }, []);
+  }, [recarga]);
 
   const semanas = [...new Set((sem ?? []).map((s) => s.semana))].sort().reverse().slice(0, 8);
   const noPeriodo = (sem ?? []).filter((s) => semanas.includes(s.semana));

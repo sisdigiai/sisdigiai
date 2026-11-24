@@ -40,7 +40,7 @@ const num = (n: number | null) => (n == null ? '—' : Number(n).toLocaleString(
 // só vi ao abrir a tela. Falta de rótulo não é característica da peça; é falta nossa.
 const semRotulo = (valor: string) => valor.startsWith('(sem ');
 
-export default function OQueFunciona() {
+export default function OQueFunciona({ recarga = 0 }: { recarga?: number }) {
   const [linhas, setLinhas] = useState<Linha[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [rede, setRede] = useState<string | null>(null);
@@ -59,7 +59,7 @@ export default function OQueFunciona() {
         setRede([...porRede.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null);
       })
       .catch((e) => { setErro(String(e?.message ?? e)); setLinhas([]); });
-  }, []);
+  }, [recarga]);
 
   const redes = [...new Set((linhas ?? []).map((l) => l.rede_recorte).filter((r): r is string => !!r))].sort();
   const mostradas = (linhas ?? [])

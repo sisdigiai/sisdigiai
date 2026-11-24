@@ -95,7 +95,7 @@ function Grupo({ titulo, itens }: { titulo: string; itens: Azulejo[] }) {
   );
 }
 
-export default function CentralDeFontes({ cadeia, seo, fila, fatos, pulso, limelight, blogs }: Props) {
+export default function CentralDeFontes({ cadeia, seo, fila, fatos, pulso, limelight, blogs, recarga = 0 }: Props & { recarga?: number }) {
   const [cobertura, setCobertura] = useState<{ pecas: number; lidas: number } | null>(null);
 
   useEffect(() => {
@@ -107,7 +107,7 @@ export default function CentralDeFontes({ cadeia, seo, fila, fatos, pulso, limel
           lidas: l.reduce((a, x) => a + Number(x.lidas ?? 0), 0),
         });
       });
-  }, []);
+  }, [recarga]);
 
   const citaveis = fatos.filter((f) => f.fresco && f.publico).length;
 
