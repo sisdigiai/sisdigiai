@@ -2,6 +2,42 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-24 — A Remedição de 24/11 entra nos sete fatos, e uma trava minha pegou um erro meu
+
+Migration `271`. Os sete números da folha única (seção "Remedição de 24/11/2026") passam a valer em
+`mkt.fatos` com o texto remedido, a fonte e a data. Três deles — OS de 2026, WhatsApp 30d e receita
+vencida 12m — estavam desligados (`ativo = false`) desde as 16h50 de hoje: o MKT os desligou por
+precaução, porque o texto velho afirmava coisa que a medição não sustenta. Voltaram ao ar **na mesma
+transação** em que receberam o texto certo, nunca antes dele.
+
+**O que o texto velho dizia de errado**, e é o motivo de tudo isto: "1.685 criadas no balcão **no dia da
+venda**" — o critério, de setembro e de hoje, é "criada até 2 dias depois da data da venda", que só
+separa balcão de carga; "3.401 mensagens **trocadas pelo sistema**" — de 3.357 enviadas, 1.964 foram
+digitadas no celular da loja e só registradas (o registro começou em 04/11). As frases novas dizem o
+que a medição mede.
+
+**O erro que a trava pegou, e era meu.** O primeiro rascunho pendurava `uso_restrito` em quatro dos
+sete, como se fosse ressalva ao lado de um número público. `uso_restrito` é **cerca**: a trava
+`fatos_uso_restrito_nao_e_publico`, da migration 266 escrita por este mesmo app em 19/11, exige
+`publico = false`. Gravar aquilo teria tirado do ar, em silêncio, quatro dos números públicos da
+landing do Clearix. O banco recusou com 23514 e nada foi escrito. A ressalva que **muda o que se pode
+dizer** foi para dentro da frase; a de **procedência**, para `fonte`, que a tela mostra embaixo de cada
+fato.
+
+Também descoberto ao medir: `mkt.fatos` **não tem trigger de `updated_at`**. Sem carimbar à mão, quatro
+linhas ficariam com data de setembro carregando texto de novembro. As sete levam `updated_at = now()`.
+
+**Medido no ar, em produção (18h05):** fatos ativos 31 → **34**; citáveis hoje (fresco E público, que é
+o que a IA do MKT recebe) **7 → 14**; nenhum fato mudou de público para preso — os 6 presos continuam
+sendo os 6 do E02 do Pulso. Públicos vencidos: 12, que o eco remede em 30/11.
+
+Volta: `Cockpit/controle/volta-fatos-remedicao-2026-11-24.sql`, gerado do banco antes da gravação, não
+digitado. Ensaio com rollback e três sabotagens passaram antes.
+
+Fica para o dono, não feito aqui: os números mortos (5.366 e 5.635 da comissão, e as duas formas de
+frase proibidas) não ganharam trava própria. Pelo padrão da casa isso é linha própria, não-pública, com
+`uso_restrito`, como `pulso_tela_1710_nao_e_dinheiro`. Hoje quem os segura é a folha única.
+
 ## 2026-11-24 — A setinha de Recarregar não recarregava
 
 Medido no ar pelo Orquestrador às 16h36, logado como o dono, na aba Hoje: clicar na setinha
