@@ -2,6 +2,33 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-24 — A setinha de Recarregar não recarregava
+
+Medido no ar pelo Orquestrador às 16h36, logado como o dono, na aba Hoje: clicar na setinha
+**não disparava nenhum pedido ao banco**, e nada mudava na tela.
+
+A causa é de desenho, não de bug pontual. `load` só refazia `GRUPOS_DA_ABA[aba]` — e esse mapa é
+**vazio em seis das onze abas** (hoje, funciona, marca-rede, leitura, régua, território), justamente
+as desenhadas pelos blocos filhos, que leem sozinhos. O botão falava com a página de cima; quem lia
+eram as filhas, e elas não escutavam. Hoje, a aba que abre por padrão, estava nesse grupo: o caso
+mais visível do app era também o mais silencioso.
+
+**Conserto.** A setinha incrementa `recarga`, que desce para as treze filhas e entra na dependência
+de leitura de cada uma. No Radar (`MktCrescimento`, que desenha sete abas) isso sozinho não bastava:
+ele pula toda fonte que já está em `carregadas`, então `recarga` limpa esse cache antes de pedir —
+recarregar é esquecer e ler de novo.
+
+**Sinal e hora.** O "lendo…" e o "lido HH:MM" ao lado do botão vêm do `fetch` do cliente Supabase,
+não desta página: metade dos blocos lê sozinha e a página de cima não sabe quando a filha terminou.
+Contando no único lugar por onde toda leitura passa, a hora mostrada é a hora de verdade. O botão
+gira e fica desabilitado enquanto há pedido no ar.
+
+**Prova no ar** (`c6591ae`, produção, 16h44): um clique na aba **Hoje** passou de **zero** para
+**18 pedidos** nos quatro bancos (digiai, Pulso, Limelight, Blogs), e as views do período subiram de
+111.161 para 154.215 quando as contas da casa chegaram. Em **Leitura das peças**, dois GETs de
+`v_mkt_analytics_peca_dia`. Em **Marca × rede**, `brands` e `audiencia_diaria` lidos de novo depois
+do clique — o cache do Radar limpo como devia.
+
 ## 2026-11-23 — Os fatos vencidos, "no período", e o que está no ar
 
 Cinco itens da fila numa tacada, por ordem do dono. O primeiro mudou de forma assim que eu medi.
