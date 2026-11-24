@@ -15,32 +15,63 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
  * O que ele NAO faz, de proposito:
  *   - nao reescreve o texto do fato (isso e copy, e copy tem dono);
  *   - nao renova `verificado_em`: medir nao e curar. Mudar um fato e curadoria, e
- *     passa por migration do digiai (ex.: 118 e 121), nao por esta funcao;
+ *     passa por migration do digiai (ex.: 118, 121 e 240), nao por esta funcao;
  *   - nao inventa medicao para fonte que exige humano — marca nao_verificavel.
  *
  * Veredito:
- *   confirmado      — a fonte ainda sustenta o numero que o texto afirma (±15%)
- *   divergente      — mudou o bastante para o texto ficar errado (para mais OU
- *                     para menos: reverificar precisa poder PIORAR o fato)
- *   nao_verificavel — a fonte nao e alcancavel por maquina
+ *   confirmado        — a fonte ainda sustenta o numero que o texto afirma (±15%)
+ *   divergente        — mudou o bastante para o texto ficar errado (para mais OU
+ *                       para menos: reverificar precisa poder PIORAR o fato)
+ *   fonte_inacessivel — a fonte E de maquina, mas nao respondeu a esta medicao
+ *   nao_verificavel   — a fonte nao e alcancavel por maquina, ponto
+ *
+ * ──────────────────────────────────────────────────────────────────────────────
+ * CONSERTO DE 23/11/2026, depois de medir — ele estava cego de duas maneiras, e
+ * as duas se pareciam com trabalho normal na tela:
+ *
+ * 1. O ESPELHO DO PULSO RESPONDE 401 DESDE 08/09. A `v_espelho_pulso` carrega custo
+ *    e receita do Pulso e o anon foi revogado naquele dia (o front migrou para a edge
+ *    `espelho-pulso`, gateada; esta funcao nao migrou). O `catch` engolia o 401 e o
+ *    fato caia no ramo final: *"a fonte exige verificacao humana"* — mentira. A fonte
+ *    e de maquina; a PORTA e que estava fechada. Conferido em 23/11: a `v_espelho_pulso`
+ *    responde **401 permission denied**, e a `PULSO_ANON_KEY` nunca existiu nesta
+ *    function — ela rodava so no literal, que e a mesma chave revogada.
+ *    Agora a medicao entra pela porta que a casa ja abriu: a propria `espelho-pulso`,
+ *    chamada com o service_role do digiai (ela aceita service_role por desenho). Mesma
+ *    BASE de antes (`v_espelho_pulso.views_total`), entao o numero continua comparavel
+ *    — trocar a base para arrumar a leitura seria arrumar o termometro mudando a febre.
+ *    Se essa porta falhar, o veredito diz `fonte_inacessivel` com o HTTP, porque "nao
+ *    consegui ler" nunca pode se parecer com "precisa de gente".
+ *
+ * 2. LEITURA QUE FALHA VIRAVA ZERO. O `count` de `mkt.publications` era lido sem
+ *    olhar o `error`, e `?? 0` transformava falha em zero. A serie provou: 14, 8, 8
+ *    e **0 todo dia desde 08/09**, com o texto *"Caiu — a esteira ficou parada"*.
+ *    Medido hoje, a tabela tem **2.114 linhas em 7 dias**. O alarme era falso, e era
+ *    o tipo de falso que se acredita. Zero agora so existe quando a leitura deu
+ *    certo e o numero e zero.
+ *
+ * E a chave anon literal saiu: chave fixa em codigo e chave que ninguem troca, e
+ * R-021 manda rotacionar. Esta nem servia mais — estava revogada.
  */
 
-const ESPELHO_PULSO =
-  'https://nlcisbfdiokmipyihtuz.supabase.co/rest/v1/v_espelho_pulso?select=*';
-// Mesma chave anon que o front usa em src/lib/espelhoMotores.ts: e uma view
-// agregada, zero PII, so leitura. Secret opcional sobrescreve.
-const PULSO_ANON = Deno.env.get('PULSO_ANON_KEY') ??
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sY2lzYmZkaW9rbWlweWlodHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1ODk0OTksImV4cCI6MjA3OTE2NTQ5OX0.-Cfzv9ebOYB8I93zNLghWTszawJk4G3rXwiTTY9PpOI';
-
 const TOLERANCIA = 0.15;
+
+type Veredito = 'confirmado' | 'divergente' | 'fonte_inacessivel' | 'nao_verificavel';
 
 interface Medicao {
   chave: string | null;
   fonte: string | null;
   valor_texto: number | null;
   valor_medido: number | null;
-  veredito: 'confirmado' | 'divergente' | 'nao_verificavel';
+  veredito: Veredito;
   detalhe: string;
+}
+
+/** Uma fonte medida: ou tem valor, ou tem o motivo de nao ter. Nunca as duas, nunca nenhuma. */
+interface Fonte {
+  valor: number | null;
+  erro: string | null;
+  nota?: string;
 }
 
 const json = (b: unknown, s = 200) =>
@@ -51,13 +82,32 @@ function vereditoDe(afirmado: number | null, medido: number | null): 'confirmado
   return Math.abs(medido - afirmado) / afirmado <= TOLERANCIA ? 'confirmado' : 'divergente';
 }
 
+/** O agregado do Pulso pela porta da casa: a edge `espelho-pulso` do proprio digiai, que aceita o
+ *  service_role por desenho. Uma porta so para o Pulso — se a rota dele mudar, muda num lugar. */
+async function medirPulso(url: string, chave: string): Promise<Fonte> {
+  let r: Response;
+  try {
+    r = await fetch(`${url}/functions/v1/espelho-pulso`, {
+      headers: { Authorization: `Bearer ${chave}`, apikey: chave },
+      signal: AbortSignal.timeout(15000),
+    });
+  } catch (e) {
+    return { valor: null, erro: `espelho-pulso fora do ar: ${e instanceof Error ? e.name : String(e)}` };
+  }
+  if (!r.ok) return { valor: null, erro: `espelho-pulso respondeu HTTP ${r.status}` };
+  const o = await r.json() as { views_total?: number | null; publicacoes?: number | null } | null;
+  if (!o || o.views_total === null || o.views_total === undefined) {
+    return { valor: null, erro: 'espelho-pulso respondeu sem `views_total`' };
+  }
+  return { valor: Number(o.views_total), erro: null, nota: `${o.publicacoes ?? '?'} publicacoes` };
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method !== 'POST' && req.method !== 'GET') return json({ error: 'metodo nao suportado' }, 405);
 
-  const sb = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-  );
+  const URL_DIGIAI = Deno.env.get('SUPABASE_URL')!;
+  const SERVICE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const sb = createClient(URL_DIGIAI, SERVICE);
 
   // Le pela view publica, nao pela tabela: o service_role nao tem grant em mkt.fatos,
   // e a view (criada pelo MKT) e o contrato de leitura. Quem cura a tabela e o digiai.
@@ -69,41 +119,46 @@ Deno.serve(async (req: Request) => {
   if (error) return json({ error: 'falha ao ler v_mkt_fatos', detalhe: error.message }, 500);
 
   // ── fontes medidas uma vez, reaproveitadas por todos os fatos que as citam ──
-  let pulsoViews: number | null = null;
-  if (PULSO_ANON) {
-    try {
-      const r = await fetch(ESPELHO_PULSO, {
-        headers: { apikey: PULSO_ANON, Authorization: `Bearer ${PULSO_ANON}` },
-      });
-      if (r.ok) pulsoViews = (await r.json())?.[0]?.views_total ?? null;
-    } catch { /* fonte fora do ar vira nao_verificavel abaixo */ }
-  }
+  const pulso = await medirPulso(URL_DIGIAI, SERVICE);
 
-  const { count: pubs7d } = await sb
+  const { count, error: ePubs } = await sb
     .schema('mkt').from('publications')
     .select('id', { count: 'exact', head: true })
     .gte('created_at', new Date(Date.now() - 7 * 864e5).toISOString());
+  const publicacoes: Fonte = ePubs
+    ? { valor: null, erro: `mkt.publications nao respondeu: ${ePubs.message}` }
+    : { valor: count ?? 0, erro: null };
+
+  const daFonte = (f: { chave: string; fonte: string | null }, afirmado: number | null,
+                   fonte: Fonte, comoLer: string): Medicao => (
+    fonte.erro
+      ? {
+        chave: f.chave, fonte: f.fonte, valor_texto: afirmado, valor_medido: null,
+        veredito: 'fonte_inacessivel',
+        detalhe: `${comoLer} — ${fonte.erro}. NAO e "precisa de gente": a fonte e de maquina e nao respondeu.`,
+      }
+      : {
+        chave: f.chave, fonte: f.fonte, valor_texto: afirmado, valor_medido: fonte.valor,
+        veredito: vereditoDe(afirmado, fonte.valor),
+        detalhe: `${comoLer}: ${fonte.valor}${fonte.nota ? ` (${fonte.nota})` : ''}. O fato afirma ${afirmado ?? '—'}.`,
+      }
+  );
 
   const medicoes: Medicao[] = (fatos ?? []).map((f) => {
     const fonte = (f.fonte ?? '').toLowerCase();
     const afirmado = f.valor_numerico === null ? null : Number(f.valor_numerico);
 
-    if (fonte.includes('espelho_pulso') && pulsoViews !== null) {
-      return {
-        chave: f.chave, fonte: f.fonte, valor_texto: afirmado,
-        valor_medido: pulsoViews, veredito: vereditoDe(afirmado, pulsoViews),
-        detalhe: `v_espelho_pulso agora: ${pulsoViews} views. O fato afirma ${afirmado ?? '—'}.`,
-      };
+    if (fonte.includes('espelho_pulso')) {
+      return daFonte(f, afirmado, pulso, 'v_espelho_pulso agora (pela edge espelho-pulso)');
     }
 
     if (fonte.includes('publications') || fonte.includes('mkt_espelho')) {
-      const n = pubs7d ?? 0;
-      return {
-        chave: f.chave, fonte: f.fonte, valor_texto: afirmado,
-        valor_medido: n, veredito: vereditoDe(afirmado, n),
-        detalhe: `mkt.publications nos ultimos 7 dias: ${n}. O fato afirma ${afirmado ?? '—'}.` +
-          (afirmado !== null && n < afirmado ? ' Caiu — a esteira ficou parada.' : ''),
-      };
+      const m = daFonte(f, afirmado, publicacoes, 'mkt.publications nos ultimos 7 dias');
+      // "Caiu" so se pode dizer quando a leitura DEU CERTO e veio menor.
+      if (!publicacoes.erro && afirmado !== null && (publicacoes.valor ?? 0) < afirmado) {
+        m.detalhe += ' Caiu — a esteira ficou parada.';
+      }
+      return m;
     }
 
     if (fonte.includes('tenant_vida') || fonte.includes('clearix')) {
@@ -125,12 +180,13 @@ Deno.serve(async (req: Request) => {
   const { data: gravadas, error: e2 } = await sb.rpc('fn_registrar_medicao_fato', { p_linhas: medicoes });
   if (e2) return json({ error: 'falha ao gravar medicao', detalhe: e2.message }, 500);
 
-  const conta = (v: string) => medicoes.filter((m) => m.veredito === v).length;
+  const conta = (v: Veredito) => medicoes.filter((m) => m.veredito === v).length;
   return json({
     ok: true,
     medidos: gravadas ?? medicoes.length,
     confirmado: conta('confirmado'),
     divergente: conta('divergente'),
+    fonte_inacessivel: conta('fonte_inacessivel'),
     nao_verificavel: conta('nao_verificavel'),
     medido_em: new Date().toISOString(),
   });

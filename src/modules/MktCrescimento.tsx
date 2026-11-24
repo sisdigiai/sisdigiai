@@ -697,6 +697,9 @@ export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: F
     for (const a of aud) if (a.account_id && (!m.has(a.account_id) || a.dia > m.get(a.account_id)!)) m.set(a.account_id, a.dia);
     return m;
   }, [aud]);
+  // A régua É por marca, então ela PODE obedecer ao "quem" — e obedecer é sempre melhor que avisar.
+  const reguaF = useMemo(() => regua.filter((r) => marcaOk(r.marca)), [regua, fOrigem, fMarca]);
+
   const cobertura = useMemo(() => {
     const limite = diaBrasilia(new Date(Date.now() - 3 * 864e5));
     return contas
@@ -704,6 +707,48 @@ export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: F
       .map((c) => { const ult = censoPorConta.get(c.id) ?? null; return { ...c, ultimoCensoConta: ult, medida: ult != null && ult >= limite }; })
       .sort((a, b) => Number(a.medida) - Number(b.medida));
   }, [contas, censoPorConta]);
+  /** MARCA × REDE QUE SOMA MAIS DE UMA CONTA (23/11/2026).
+   *
+   *  Eu ia construir esta leitura sobre a `v_mkt_conta_dia`, que era o item da fila. Medi antes:
+   *  ela tem **17.089 linhas desde 2012** e `seguidores` preenchido em **6.253** delas (Instagram:
+   *  396 de 5.873), e **não tem TikTok**. É um join largo onde o censo é uma coluna esparsa.
+   *  A `mkt.audiencia_diaria`, que esta aba já lê, tem **1.067 linhas, todas com número**, em cinco
+   *  redes, 105 dias desde 02/07/2026. Trocar uma pela outra seria perder TikTok e trocar medição
+   *  por buraco. O crescimento de seguidores com data **já está na aba Audiência**, e na fonte certa.
+   *
+   *  O que faltava de verdade era o grão: o painel soma as contas da mesma marca na mesma rede num
+   *  número só. Medido no banco, isso acontece em **um** lugar — e é exatamente onde mora o defeito
+   *  de cadastro que eu venho anotando: três canais de YouTube sob Bastidores DIGIAI, um deles o
+   *  `@pulsohistorias`, que é do Pulso. Enquanto ficar somado, o total da casa fica certo por acaso.
+   *  Agora a tela mostra as parcelas, e quem olha decide. */
+  const contasSomadas = useMemo(() => {
+    const porConta = new Map<string, { brand_id: string; platform: string; account_id: string; seguidores: number; dia: string }>();
+    for (const a of aud) {
+      if (!a.account_id) continue;
+      const k = `${a.brand_id}:${a.platform}:${a.account_id}`;
+      const atual = porConta.get(k);
+      if (!atual || a.dia > atual.dia) porConta.set(k, { brand_id: a.brand_id, platform: a.platform, account_id: a.account_id, seguidores: a.seguidores, dia: a.dia });
+    }
+    const grupos = new Map<string, Array<{ account_id: string; seguidores: number; dia: string }>>();
+    for (const v of porConta.values()) {
+      const k = `${v.brand_id}:${v.platform}`;
+      if (!grupos.has(k)) grupos.set(k, []);
+      grupos.get(k)!.push({ account_id: v.account_id, seguidores: v.seguidores, dia: v.dia });
+    }
+    return [...grupos.entries()]
+      .filter(([, l]) => l.length > 1)
+      .map(([k, l]) => {
+        const [brand_id, platform] = k.split(':');
+        return {
+          marca: brands.find((b) => b.id === brand_id)?.name ?? brand_id,
+          platform,
+          total: l.reduce((x, y) => x + y.seguidores, 0),
+          contas: l.sort((x, y) => y.seguidores - x.seguidores),
+        };
+      })
+      .sort((a, b) => b.contas.length - a.contas.length);
+  }, [aud, brands]);
+
   const credsVencendo = useMemo(() => creds.filter((c) => c.expires_at).map((c) => ({
     ...c, dias: Math.floor((new Date(c.expires_at!).getTime() - Date.now()) / 864e5),
   })).sort((a, b) => a.dias - b.dias), [creds]);
@@ -1063,12 +1108,20 @@ export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: F
           {aba === 'regua' && (
             <>
               <Decide texto={<><b>O que se decide aqui:</b> quanto cada marca pode postar esta semana. O nível não é meta — é permissão: sobe quando a audiência aguenta, desce quando o alcance cai duas semanas seguidas.</>} />
-              {regua.length === 0 ? (
-                <div className="text-sm text-muted py-6">A régua ainda não foi calculada. O MKT recalcula toda segunda às 6h15.</div>
+              <ForaDaBarra>
+                o nível é semanal e vale <b>agora</b>: não há janela para recortar, e a régua é por marca — não existe
+                nível por rede nem por data de leitura. O recorte de <b>quem</b> a aba obedece; período, rede e a régua da data, não.
+              </ForaDaBarra>
+              {reguaF.length === 0 ? (
+                <div className="text-sm text-muted py-6">
+                  {regua.length === 0
+                    ? 'A régua ainda não foi calculada. O MKT recalcula toda segunda às 6h15.'
+                    : `A régua tem ${regua.length} marcas, e nenhuma delas está no recorte de quem. Troque o "quem" na barra.`}
+                </div>
               ) : (
                 <>
                   <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))' }}>
-                    {[...regua].sort((a, b) => b.nivel - a.nivel || b.seguidores_ig - a.seguidores_ig).map((r) => <CardNivel key={r.marca} r={r} />)}
+                    {[...reguaF].sort((a, b) => b.nivel - a.nivel || b.seguidores_ig - a.seguidores_ig).map((r) => <CardNivel key={r.marca} r={r} />)}
                   </div>
                   <p className="text-xs text-muted mt-4 leading-relaxed">
                     Lido de <code className="font-mono">v_mkt_nivel_crescimento</code>; quem calcula é o DIGIAI MKT, toda
@@ -1084,6 +1137,10 @@ export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: F
           {aba === 'territorio' && (
             <>
               <Decide texto={<><b>O que se decide aqui:</b> para onde levar a próxima raspagem. O branco manda mais que a cor — cidade sem raspagem é mercado que nem sabemos que existe.</>} />
+              <ForaDaBarra>
+                o mapa é a cobertura de raspagem <b>de agora</b>, do grupo inteiro: não tem janela, não tem rede e não tem
+                marca. Com <b>Mello</b> escolhido lá em cima, o que se vê aqui continua sendo o território de todas.
+              </ForaDaBarra>
               <MapaCobertura />
             </>
           )}
@@ -1091,6 +1148,11 @@ export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: F
           {aba === 'saude' && (
             <>
               <Decide texto={<><b>O que se decide aqui:</b> se dá para confiar nos números das outras abas. Fonte sem data fresca congela em silêncio — esta aba é o antídoto.</>} />
+              <ForaDaBarra>
+                saúde é retrato de <b>agora</b>: censo, coletas, fila e credenciais não têm janela, e a cobertura mostra
+                <b> toda conta cadastrada</b>, de propósito — esconder conta pelo recorte esconderia justamente a que parou.
+                O único cartão que obedece à barra é <b>views das peças da casa</b>, que conta as peças do recorte.
+              </ForaDaBarra>
               <div className="flex items-center gap-2 mb-4">
                 <button onClick={sincronizar} disabled={sincronizando}
                   className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-outline/30 text-on-surface-variant hover:bg-surface-highest disabled:opacity-50">
@@ -1145,6 +1207,42 @@ export default function MktCrescimento({ aba, filtros }: { aba: AbaK; filtros: F
                   </tbody>
                 </table>
               </section>
+
+              {contasSomadas.length > 0 && (
+                <>
+                  <div className="flex items-baseline justify-between mt-6 mb-2.5">
+                    <h2 className="text-sm text-on-surface-variant">uma marca, mais de uma conta na mesma rede</h2>
+                    <span className={lbl}>o painel soma — aqui ficam as parcelas</span>
+                  </div>
+                  <section className="border border-outline/15 bg-surface-container">
+                    {contasSomadas.map((g) => (
+                      <div key={g.marca + g.platform} className="px-4 py-3 border-b border-outline/10 last:border-0">
+                        <div className="text-[13px] text-on-surface">
+                          {g.marca} · {platName(g.platform)}
+                          <span className="text-muted font-mono text-[11px]"> — {g.contas.length} contas somadas em {nf(g.total)} seguidores</span>
+                        </div>
+                        <div className="mt-1.5 flex flex-wrap gap-x-5 gap-y-1">
+                          {g.contas.map((c) => {
+                            const h = contas.find((x) => x.id === c.account_id);
+                            return (
+                              <span key={c.account_id} className="font-mono text-[11px] text-on-surface-variant">
+                                {h?.handle ?? c.account_id.slice(0, 8)}
+                                <span className="text-muted"> · {nf(c.seguidores)} · censo {fmtDM(c.dia)}</span>
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </section>
+                  <p className="text-[11px] text-muted mt-2 leading-relaxed">
+                    Somar contas da mesma marca numa rede só está certo quando as contas são da marca. Hoje
+                    <b className="text-on-surface-variant"> @pulsohistorias</b> está cadastrada sob Bastidores DIGIAI e entra no censo da
+                    casa todos os dias — o cadastro é do DIGIAI MKT e o conserto é lá. Até lá, o total da casa está certo
+                    por acaso, e esta é a única tela onde dá para ver isso.
+                  </p>
+                </>
+              )}
 
               {/* As contas do Pulso ficavam fora desta aba inteira (20/11): a cobertura lia só
                   `v_mkt_accounts`, que é da casa. Um canal do Pulso bloqueado pela Meta desde 12/11
@@ -1215,6 +1313,21 @@ function Health({ cor, titulo, sub }: { cor: string; titulo: string; sub: string
         <div className="text-[13px] text-on-surface">{titulo}</div>
         <div className="text-[11.5px]" style={{ color: cor === 'var(--color-action)' ? 'var(--color-muted)' : cor }}>{sub}</div>
       </div>
+    </div>
+  );
+}
+
+/** O AVISO DE QUEM NÃO OBEDECE À BARRA (23/11/2026).
+ *
+ *  Três abas leem um retrato de AGORA e não têm janela nenhuma para recortar — mas a barra fica no
+ *  alto da página dizendo "30d · Mello · Instagram · por publicação", e quem lê acredita. Recortar por
+ *  Mello e ver o território inteiro é concluir que o território é da Mello.
+ *  O conserto certo seria obedecer; onde não dá (não existe série, não existe rede), a aba **diz**. */
+function ForaDaBarra({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="border-l-2 border-warning/50 bg-warning/5 pl-3 pr-3 py-2 mb-4 text-[11.5px] text-on-surface-variant leading-snug">
+      <b className="text-warning font-mono text-[10px] uppercase tracking-widest">a barra não vale aqui</b>
+      <span className="ml-2">{children}</span>
     </div>
   );
 }

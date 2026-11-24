@@ -30,6 +30,11 @@ type App = {
   objetos_lidos: number; chamadas_que_gravam: number; edge_functions: number;
   gaps_altos: number; gaps_medios: number; gaps_info: number; tem_spec: boolean; tem_agents: boolean;
   spec_onde: 'propria' | 'guarda-chuva' | 'nao' | null;
+  // Campos de deploy, mandados pelo eco em 23/11. As três contagens de "código fora do ar" são
+  // coisas DIFERENTES e por isso não viram um número só: falta deploy, falta integrar, pode se perder.
+  ultimo_deploy: string | null; versao_no_ar: string | null; deploy_lido: boolean;
+  commits_fora_do_ar: number | null; commits_em_outro_ramo: number | null;
+  arquivos_sem_commit: number | null; commits_inconclusivos: number | null;
 };
 type Gap = {
   tipo: string; rotulo: string; sev: 'alta' | 'media' | 'info'; app: string | null; objeto: string;
@@ -193,6 +198,8 @@ export default function RaioX() {
                 <th className={'text-right font-normal px-4 py-2 ' + lbl}>objetos que lê</th>
                 <th className={'text-right font-normal px-4 py-2 ' + lbl}>chamadas que gravam</th>
                 <th className={'text-right font-normal px-4 py-2 ' + lbl}>a conferir</th>
+                <th className={'text-left font-normal px-4 py-2 ' + lbl}>último deploy</th>
+                <th className={'text-left font-normal px-4 py-2 ' + lbl}>fora do ar</th>
                 <th className={'text-left font-normal px-4 py-2 ' + lbl}>doc</th>
               </tr>
             </thead>
@@ -210,6 +217,27 @@ export default function RaioX() {
                       {a.gaps_altos}
                     </button>
                     <span className="text-muted font-mono text-[11px]"> · {a.gaps_medios} · {a.gaps_info}</span>
+                  </td>
+                  {/* DEPLOY. Traço aqui nunca quer dizer "em dia": quando o eco não conseguiu ler o
+                      deploy do app, a célula diz **não lido**, que é desconhecido. A diferença entre
+                      "nada pendente" e "ninguém olhou" é a diferença entre dormir tranquilo e achar que
+                      dormiu tranquilo. */}
+                  <td className="px-4 py-2 font-mono text-[11px] whitespace-nowrap">
+                    {a.deploy_lido
+                      ? <span className="text-on-surface-variant" title={a.versao_no_ar ?? ''}>{(a.ultimo_deploy ?? '—').slice(0, 10).split('-').reverse().join('/')}</span>
+                      : <span style={{ color: 'var(--color-muted)' }}>não lido</span>}
+                  </td>
+                  <td className="px-4 py-2 font-mono text-[11px] whitespace-nowrap">
+                    {!a.deploy_lido ? <span className="text-muted">—</span> : (() => {
+                      const p = [];
+                      if (a.commits_fora_do_ar) p.push(<span key="d" style={{ color: COR_DANGER }} title="commitado no ramo certo e ainda não publicado — falta deploy">{a.commits_fora_do_ar} falta deploy</span>);
+                      if (a.commits_em_outro_ramo) p.push(<span key="r" style={{ color: COR_WARN }} title="existe, mas em outro ramo — falta integrar">{a.commits_em_outro_ramo} outro ramo</span>);
+                      if (a.arquivos_sem_commit) p.push(<span key="s" style={{ color: COR_DANGER }} title="nem commitado está — some se a máquina morrer">{a.arquivos_sem_commit} sem commit</span>);
+                      if (a.commits_inconclusivos) p.push(<span key="i" className="text-muted" title="o eco não conseguiu decidir se está no ar">{a.commits_inconclusivos} inconclusivo</span>);
+                      return p.length === 0
+                        ? <span style={{ color: COR_OK }}>em dia</span>
+                        : <>{p.map((x, i) => <span key={i}>{i > 0 && <span className="text-muted"> · </span>}{x}</span>)}</>;
+                    })()}
                   </td>
                   {/* "sem spec" dizia mentira para 14 sub-apps do Clearix: elas são cobertas pela Spec
                       guarda-chuva do eco. O defeito era do script dele e apareceu AQUI — ele corrigiu e
@@ -229,7 +257,12 @@ export default function RaioX() {
               ))}
             </tbody>
           </table>
-          <div className="px-4 py-2 text-[11px] text-muted">a conferir · médios · informativos — clique no primeiro número para ver os do app</div>
+          <div className="px-4 py-2 text-[11px] text-muted leading-relaxed">
+            a conferir · médios · informativos — clique no primeiro número para ver os do app.<br />
+            <b className="text-on-surface-variant">Fora do ar</b> separa três coisas que o resumo junta: <b>falta deploy</b> (está no
+            ramo certo e não subiu), <b>outro ramo</b> (existe, falta integrar) e <b>sem commit</b> (nem commitado está — some
+            se a máquina morrer). Cada uma se resolve de um jeito, e a terceira é a única que se perde sozinha.
+          </div>
         </section>
       )}
 

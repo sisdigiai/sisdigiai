@@ -14,7 +14,7 @@ import OQueFunciona from './marketing/OQueFunciona';
 import ResultadoDeNegocio from './marketing/ResultadoDeNegocio';
 import PlacarDeDecisao from './marketing/PlacarDeDecisao';
 import CentralDeFontes from './marketing/CentralDeFontes';
-import FatosPublicaveis, { type FatoMkt } from './marketing/FatosPublicaveis';
+import FatosPublicaveis, { type FatoMkt, type MedicaoFato } from './marketing/FatosPublicaveis';
 import MktCrescimento, {
   Chip, RANGES, REDES, origemDaMarca, rotuloOrigem,
   type AbaRadar, type FiltrosMkt, type OrigemK,
@@ -114,6 +114,7 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
   const [pulso, setPulso] = useState<EspelhoPulso | null>(null);
   const [blogs, setBlogs] = useState<EspelhoBlogs | null>(null);
   const [fatos, setFatos] = useState<FatoMkt[]>([]);
+  const [medicoes, setMedicoes] = useState<MedicaoFato[]>([]);
   const [cadeia, setCadeia] = useState<Cadeia | null>(null);
   const [fila, setFila] = useState<{ atrasados: number; com_erro: number; ultima_publicacao: string | null } | null>(null);
   // O que a Lousa e os espelhos sabem de cada marca. A aba Marcas lê só o MKT, e por isso dizia do
@@ -267,8 +268,16 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
       setLimelight(ll); setPulso(pu); setBlogs(bl);
     },
     async fatos() {
-      const { data } = await supabase.from('v_mkt_fatos').select('*');
+      // O veredito do dia vem JUNTO. O verificador roda às 4h30 e grava em `ops.fato_medicao` desde
+      // sempre; a view `v_ops_fatos_verificados` já existia com o último veredito de cada fato, e
+      // **nenhuma tela lia**. Medição que não chega a lugar nenhum é medição que ninguém confere —
+      // foi assim que um alarme falso ("a esteira ficou parada") viveu 76 dias sem ser visto.
+      const [{ data }, { data: med }] = await Promise.all([
+        supabase.from('v_mkt_fatos').select('*'),
+        supabase.from('v_ops_fatos_verificados').select('chave, veredito, valor_medido, detalhe, medido_em'),
+      ]);
       setFatos((data ?? []) as FatoMkt[]);
+      setMedicoes((med ?? []) as MedicaoFato[]);
     },
     async fontes() {
       const [{ data: cad }, { data: fs }, { data: se }] = await Promise.all([
@@ -754,7 +763,7 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
         )}
 
         {/* Os fatos publicáveis moram com as publicações: são o que pode ser dito lá fora. */}
-        {aba === 'publicacoes' && <FatosPublicaveis fatos={fatos} />}
+        {aba === 'publicacoes' && <FatosPublicaveis fatos={fatos} medicoes={medicoes} />}
 
         <div className="border border-outline/15 bg-surface-lowest p-3 flex items-start gap-2.5 text-[12px] text-on-surface-variant">
           <Info className="w-4 h-4 text-secondary shrink-0 mt-0.5" />

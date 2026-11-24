@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Lightbulb } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { lerTudo } from '../../lib/paginar';
-import type { Periodo } from './Central';
+import { rotuloJanela, type Periodo } from './Central';
 
 // "Leituras para escolher" — o bloco de insights que o dono pediu em 18/11: "e insights, fazer as
 // melhores escolhas e etc".
@@ -86,7 +86,7 @@ export default function Leituras({ periodo }: { periodo: Periodo }) {
     if (top && pont.length >= 4) {
       const pct = Math.round((atrasos.length / pont.length) * 100);
       leituras.push({
-        fato: `${pct}% das peças saíram fora do horário no período (${atrasos.length} de ${pont.length}); onde mais atrasa é ${top[0]}, com ${top[1]}.`,
+        fato: `${pct}% das peças saíram fora do horário em ${rotuloJanela(periodo)}, por data de publicação (${atrasos.length} de ${pont.length}); onde mais atrasa é ${top[0]}, com ${top[1]}.`,
         base: `${pont.length} peças com hora marcada e hora real`,
         escolha: top[1] >= 4 ? `Olhar a rodada de ${top[0]}: atraso concentrado numa conta é quase sempre o motor, não a agenda.` : null,
         comQuem: 'o motor da origem',
@@ -107,7 +107,7 @@ export default function Leituras({ periodo }: { periodo: Periodo }) {
     for (const [de, nDe, para, nPara] of passos) {
       if (nDe >= 4) {
         leituras.push({
-          fato: `De ${de} para ${para}: ${nDe.toLocaleString('pt-BR')} → ${nPara.toLocaleString('pt-BR')} no período.`,
+          fato: `De ${de} para ${para}: ${nDe.toLocaleString('pt-BR')} → ${nPara.toLocaleString('pt-BR')} em ${rotuloJanela(periodo)}.`,
           base: `${nDe.toLocaleString('pt-BR')} no primeiro passo`,
           escolha: nPara === 0
             ? `Nenhum resultado no passo seguinte. Ou o caminho entre os dois não existe, ou não está medido — e as duas coisas pedem conserto, não mais volume.`

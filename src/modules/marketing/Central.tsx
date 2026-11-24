@@ -33,6 +33,16 @@ type Meta = {
 export type Periodo = '7' | '30' | 'tudo';
 export const PERIODOS: Array<[Periodo, string]> = [['7', '7 dias'], ['30', '30 dias'], ['tudo', 'tudo']];
 
+/** Como se escreve a janela na tela. Existe para "no período" nunca mais aparecer sozinho.
+ *
+ *  23/11/2026: varri o app atrás da frase e achei **26 ocorrências**. A maioria era comentário, mas
+ *  as de tela diziam "no período" sem dizer QUAL período nem por QUAL régua — e foi exatamente esse
+ *  rótulo, igual nas duas telas, que escondeu o 168k × 41,8k de 20/11: um contava por data de
+ *  publicação, o outro por data de leitura, e os dois se chamavam "no período".
+ *  Quem obedece à barra diz **"no recorte"** e deixa a barra falar (ela escreve janela e régua).
+ *  Quem lê uma janela própria diz a janela, com esta função. */
+export const rotuloJanela = (p: Periodo) => (p === 'tudo' ? 'desde o início' : `${p} dias`);
+
 const DIAS_DE = (p: Periodo) => (p === 'tudo' ? null : Number(p));
 
 /** Dia do negócio em BRT. `toISOString` depois das 21h joga tudo para o dia seguinte. */

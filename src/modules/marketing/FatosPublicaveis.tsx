@@ -33,6 +33,24 @@ export type FatoMkt = {
   uso_restrito?: string | null;
 };
 
+/** O que a máquina mediu hoje na fonte que o próprio fato declara. */
+export type MedicaoFato = {
+  chave: string;
+  veredito: 'confirmado' | 'divergente' | 'fonte_inacessivel' | 'nao_verificavel' | string;
+  valor_medido: string | number | null;
+  detalhe: string | null;
+  medido_em: string | null;
+};
+
+// Quatro vereditos, quatro coisas diferentes — e a diferença entre os dois últimos é a que custou
+// 76 dias de cegueira: "a porta não abriu" estava escrito como "alguém precisa medir isso à mão".
+const VEREDITO: Record<string, { rotulo: string; tom: string }> = {
+  confirmado: { rotulo: 'a fonte confirma', tom: 'text-success' },
+  divergente: { rotulo: 'a fonte diz outro número', tom: 'text-danger' },
+  fonte_inacessivel: { rotulo: 'não deu para ler a fonte', tom: 'text-warning' },
+  nao_verificavel: { rotulo: 'só gente mede essa fonte', tom: 'text-muted' },
+};
+
 type Estado = { rotulo: string; tom: string };
 
 function estadoDo(f: FatoMkt): Estado {
@@ -44,7 +62,8 @@ function estadoDo(f: FatoMkt): Estado {
 
 const dia = (d: string | null) => (d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '—');
 
-export default function FatosPublicaveis({ fatos }: { fatos: FatoMkt[] }) {
+export default function FatosPublicaveis({ fatos, medicoes = [] }: { fatos: FatoMkt[]; medicoes?: MedicaoFato[] }) {
+  const medicaoDe = new Map(medicoes.map((m) => [m.chave, m]));
   const citaveis = fatos.filter((f) => f.fresco && f.publico);
   const vencidos = fatos.filter((f) => f.publico && !f.fresco);
   const presos = fatos.filter((f) => !!f.uso_restrito);
@@ -121,6 +140,18 @@ export default function FatosPublicaveis({ fatos }: { fatos: FatoMkt[] }) {
                       <div className="text-[10px] font-mono text-muted mt-1 leading-snug">
                         verificado {dia(f.verificado_em)} · vale até {dia(f.valido_ate)} · {f.fonte}
                       </div>
+                      {(() => {
+                        const m = medicaoDe.get(f.chave);
+                        if (!m) return null;
+                        const v = VEREDITO[m.veredito] ?? { rotulo: m.veredito, tom: 'text-muted' };
+                        return (
+                          <div className={`text-[10px] font-mono mt-0.5 leading-snug ${v.tom}`} title={m.detalhe ?? ''}>
+                            medido {dia(m.medido_em?.slice(0, 10) ?? null)}: {v.rotulo}
+                            {m.valor_medido !== null && m.valor_medido !== undefined
+                              ? ` — ${Number(m.valor_medido).toLocaleString('pt-BR')}` : ''}
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
                 );
@@ -131,7 +162,7 @@ export default function FatosPublicaveis({ fatos }: { fatos: FatoMkt[] }) {
       })}
 
       <div className="font-mono text-[9.5px] text-muted">
-        fonte: v_mkt_fatos · o gerador do MKT lê fresco E público; qualquer outro estado é silêncio por construção
+        fonte: v_mkt_fatos · veredito diário: v_ops_fatos_verificados (verificar-fatos, 4h30) · o gerador do MKT lê fresco E público; qualquer outro estado é silêncio por construção
       </div>
     </div>
   );

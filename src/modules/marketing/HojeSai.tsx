@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Clock, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { lerTudo } from '../../lib/paginar';
-import type { Periodo } from './Central';
+import { rotuloJanela, type Periodo } from './Central';
 
 // "Hoje sai" e a pontualidade — ordem do dono em 17 e 18/11: "saiu no horário o vídeo, saiu o rascunho
 // normal". A Lousa mostra o que está MARCADO; este bloco mostra o que SAIU, e se saiu na hora.
@@ -148,7 +148,7 @@ export default function HojeSai({ periodo }: { periodo: Periodo }) {
         {pont == null ? (
           <span className="text-muted">lendo…</span>
         ) : resumo.total === 0 ? (
-          <span className="text-on-surface-variant">Nenhuma peça com hora marcada <strong>e</strong> hora real no período — <span className="text-muted">sem as duas, não há pontualidade.</span></span>
+          <span className="text-on-surface-variant">Nenhuma peça com hora marcada <strong>e</strong> hora real em {rotuloJanela(periodo)}, por data de publicação — <span className="text-muted">sem as duas, não há pontualidade.</span></span>
         ) : (
           <>
             <span><strong className="text-on-surface tabular-nums">{Math.round((resumo.noHorario / resumo.total) * 100)}%</strong> no horário</span>

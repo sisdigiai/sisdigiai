@@ -8,7 +8,7 @@ import {
   type PulsoDia, type PulsoLongoDia, type LimePubDia, type EstadoEspelho,
   type EspelhoLimelight, type EspelhoPulso,
 } from '../../lib/espelhoMotores';
-import type { Periodo } from './Central';
+import { rotuloJanela, type Periodo } from './Central';
 
 // Motores de conteúdo — os QUATRO, no cartão que esta seção já usava para o Limelight e o Pulso.
 //
@@ -117,7 +117,7 @@ function Pe({ children }: { children: React.ReactNode }) {
 
 export default function MotoresDeConteudo({ periodo, limelight, pulso, espMkt, hoje, brl, pulsoUltimaPubDias, mktUltimaPub }: Props) {
   const dias = periodo === 'tudo' ? null : Number(periodo);
-  const rotuloPeriodo = periodo === 'tudo' ? 'desde o início' : `${periodo} dias`;
+  const rotuloPeriodo = rotuloJanela(periodo);
 
   const [pecasLousa, setPecas] = useState<Array<{ origem: string }> | null>(null);
   const [viewsMkt, setViewsMkt] = useState<number | null>(null);
@@ -232,7 +232,7 @@ export default function MotoresDeConteudo({ periodo, limelight, pulso, espMkt, h
             coleta de parada quando ela rodava todo dia — por isso o selo fala de publicação, e a coleta
             aparece na linha de baixo. */}
         <Cartao cor="var(--color-eco-app)" sigla="LI" titulo="Limelight Studio" sub='série da Mello · "Transforme Sua Visão"'
-                selo={limeDias && somar(limeJanela, 'publicacoes') === 0 ? 'não publicou no período' : `publicando · ${rotuloPeriodo}`}
+                selo={limeDias && somar(limeJanela, 'publicacoes') === 0 ? `não publicou em ${rotuloPeriodo}` : `publicando · ${rotuloPeriodo}`}
                 tom={limeDias && somar(limeJanela, 'publicacoes') === 0 ? 'atencao' : 'ok'}>
           {limelight ? (
             <>
