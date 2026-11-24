@@ -3,7 +3,21 @@
 # (R-025: Cloudflare e o host canonico; migracao conforme priorizacao do dono).
 # CSP permissiva de partida (R-024 A05) — endurecer apos validar em prod.
 
+# PAINEL INTERNO NAO SE INDEXA (23/11/2026, "pode" do dono). Medido antes: `app.digiai.app.br` nao
+# tinha robots proprio e herdava o robots da zona, que diz `Allow: /` -- a tela de operacao da casa
+# estava aberta para o Google.
+#
+# POR QUE CABECALHO E META, E NAO `robots.txt` COM `Disallow`: Disallow impede o RASTREIO, e quem nao
+# rastreia nao LE o noindex -- a pagina continua indexavel por links de fora, so que sem conteudo.
+# Disallow + noindex e a combinacao que nao funciona. O cabecalho vale para toda resposta, inclusive
+# as que nao sao HTML.
+#
+# O comentario fica FORA do bloco de regra de proposito: comentario indentado dentro de uma regra nao
+# e contrato documentado do `_headers`, e se o parser engasgar leva junto os cabecalhos de seguranca
+# (R-024). Nao se arrisca a baseline inteira para guardar um porque no lugar bonito.
+
 /*
+  X-Robots-Tag: noindex, nofollow
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY

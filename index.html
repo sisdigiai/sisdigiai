@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Painel interno: fora de buscador e fora de IA. O cabecalho X-Robots-Tag em
+         public/_headers diz o mesmo para toda resposta; a meta cobre quem so le o HTML. -->
+    <meta name="robots" content="noindex, nofollow" />
     <title>DIGIAI — Painel Operacional</title>
     <script>
       // Tema antes da 1ª pintura (evita flash + repaint travado de var() com transition).
