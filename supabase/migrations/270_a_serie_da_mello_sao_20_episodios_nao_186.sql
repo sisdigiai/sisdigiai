@@ -8,8 +8,18 @@
 --   São TRÊS números verdadeiros e diferentes, e só um responde "a série está no ar":
 --     ·  20 — episódios distintos publicados  ← é este
 --     ·  72 — publicações contando cada rede (episódio × rede), de 22/07 a 23/11
---     · 186 — tudo o que o espelho conta na conta da Mello, INCLUINDO post de perfil que não é
---             episódio da série (card e carrossel do MKT)
+--     · 186 — tudo o que o espelho conta na conta da Mello, de onde só 72 são desta esteira
+--
+-- ERRATA DO MESMO DIA, e ela importa porque fato errado sobre número certo também é fato errado: a
+-- primeira versão deste comentário dizia que os 186 incluíam "post de perfil, card e carrossel do
+-- MKT". Não incluíam — a view já exclui perfil. O agente do Limelight foi medir a composição antes
+-- de me deixar com a explicação torta e devolveu: **103 são da série v1 do canal antigo** (material
+-- de 2025, importado, sem `episodio_id`), **72 desta esteira**, **10 do MKT** (8 publicados, 2
+-- falhados) e **1 rascunho** que nunca virou post. 103+72+10+1 = 186.
+-- O número do fato não mudou; mudou o motivo. E o motivo verdadeiro muda a escolha: se um dia o
+-- fato quiser dizer "o canal tem X peças da série", a v1 conta e o número é outro. Este fato diz
+-- "a série nova está no ar e viva", e é por isso que ele fala em **episódios**, que é o que a data
+-- de 23/11 sustenta.
 --
 -- Eu estava lendo a `v_espelho_limelight` (agregado das 4 marcas) e teria publicado 186 como "a
 -- série", porque a Mello é a única marca publicando e o agregado parecia ser dela. Número certo da
