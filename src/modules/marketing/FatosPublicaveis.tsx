@@ -151,6 +151,18 @@ export default function FatosPublicaveis({ fatos, medicoes = [] }: { fatos: Fato
                       {(() => {
                         const m = medicaoDe.get(f.chave);
                         if (!m) return null;
+                        // VEREDITO MAIS VELHO QUE O FATO NÃO JULGA O FATO. Curei três fatos hoje às 20h e
+                        // 22h; o último veredito era das 4h30, medido contra o TEXTO ANTIGO. A tela saiu
+                        // dizendo "a fonte diz outro número — 820.006" num fato que acabara de ser curado
+                        // para exatamente 820.006. Enquanto a próxima medição não sai, o honesto é dizer
+                        // que ela não saiu — não emprestar a conclusão de ontem a um número de hoje.
+                        if (m.medido_em && new Date(m.medido_em) < new Date(f.verificado_em)) {
+                          return (
+                            <div className="text-[10px] font-mono text-muted mt-0.5 leading-snug">
+                              curado agora · o veredito da máquina sai na próxima medição (todo dia às 4h30)
+                            </div>
+                          );
+                        }
                         const v = VEREDITO[m.veredito] ?? { rotulo: m.veredito, tom: 'text-muted' };
                         return (
                           <div className={`text-[10px] font-mono mt-0.5 leading-snug ${v.tom}`} title={m.detalhe ?? ''}>

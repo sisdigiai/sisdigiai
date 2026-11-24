@@ -56,6 +56,15 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 const TOLERANCIA = 0.15;
 
+/** A fonte se casa pelo NOME DA VIEW, nao por pedaço de texto.
+ *
+ *  Custou um veredito errado no mesmo dia: curei o fato dos inscritos do YouTube e escrevi a fonte
+ *  como "v_seguidores_pulso_dias e v_espelho_pulso_contas_dias". O `includes('espelho_pulso')`
+ *  casou, e a function comparou **543 inscritos com 820.690 views** e gritou divergente. O `_` é
+ *  caractere de palavra, então `\bv_espelho_pulso\b` casa a view exata e **nao** casa
+ *  `v_espelho_pulso_contas_dias` — que é justamente a distinção que faltava. */
+const cita = (fonte: string, view: string) => new RegExp(`\\b${view}\\b`).test(fonte);
+
 type Veredito = 'confirmado' | 'divergente' | 'fonte_inacessivel' | 'nao_verificavel';
 
 interface Medicao {
@@ -102,6 +111,26 @@ async function medirPulso(url: string, chave: string): Promise<Fonte> {
   return { valor: Number(o.views_total), erro: null, nota: `${o.publicacoes ?? '?'} publicacoes` };
 }
 
+/** Inscritos do canal principal do Pulso no YouTube, pelo censo diário do espelho.
+ *  `v_seguidores_pulso_dias` é anon por desenho (só contagem, zero PII e zero financeiro) — foi a
+ *  `v_espelho_pulso`, que carrega custo e receita, que fechou em 08/09. Portas diferentes. */
+async function medirInscritosPulso(): Promise<Fonte> {
+  const K = Deno.env.get('PULSO_ANON_KEY');
+  if (!K) return { valor: null, erro: 'PULSO_ANON_KEY não configurada nesta function' };
+  const url = 'https://nlcisbfdiokmipyihtuz.supabase.co/rest/v1/v_seguidores_pulso_dias'
+    + '?select=dia,seguidores&conta=eq.pulsohistorias&rede=eq.youtube&order=dia.desc&limit=1';
+  let r: Response;
+  try {
+    r = await fetch(url, { headers: { apikey: K, Authorization: `Bearer ${K}` }, signal: AbortSignal.timeout(15000) });
+  } catch (e) {
+    return { valor: null, erro: `espelho do Pulso fora do ar: ${e instanceof Error ? e.name : String(e)}` };
+  }
+  if (!r.ok) return { valor: null, erro: `v_seguidores_pulso_dias respondeu HTTP ${r.status}` };
+  const p = await r.json() as Array<{ dia: string; seguidores: number | null }>;
+  if (!p.length || p[0].seguidores === null) return { valor: null, erro: 'o censo do canal veio sem número' };
+  return { valor: Number(p[0].seguidores), erro: null, nota: `censo de ${p[0].dia}` };
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method !== 'POST' && req.method !== 'GET') return json({ error: 'metodo nao suportado' }, 405);
 
@@ -119,7 +148,7 @@ Deno.serve(async (req: Request) => {
   if (error) return json({ error: 'falha ao ler v_mkt_fatos', detalhe: error.message }, 500);
 
   // ── fontes medidas uma vez, reaproveitadas por todos os fatos que as citam ──
-  const pulso = await medirPulso(URL_DIGIAI, SERVICE);
+  const [pulso, inscritos] = await Promise.all([medirPulso(URL_DIGIAI, SERVICE), medirInscritosPulso()]);
 
   const { count, error: ePubs } = await sb
     .schema('mkt').from('publications')
@@ -148,7 +177,11 @@ Deno.serve(async (req: Request) => {
     const fonte = (f.fonte ?? '').toLowerCase();
     const afirmado = f.valor_numerico === null ? null : Number(f.valor_numerico);
 
-    if (fonte.includes('espelho_pulso')) {
+    if (cita(fonte, 'v_seguidores_pulso_dias')) {
+      return daFonte(f, afirmado, inscritos, 'inscritos do canal do Pulso no YouTube');
+    }
+
+    if (cita(fonte, 'v_espelho_pulso')) {
       return daFonte(f, afirmado, pulso, 'v_espelho_pulso agora (pela edge espelho-pulso)');
     }
 
