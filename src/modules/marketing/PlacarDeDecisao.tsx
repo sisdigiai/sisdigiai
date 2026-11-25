@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { aplicar, type Recorte } from '../../lib/recorte';
+import NaoObedece from './NaoObedece';
 import { lerTudo } from '../../lib/paginar';
 
 // O placar de decisão — a faixa de quatro números que abre a aba Resultado.
@@ -84,6 +85,13 @@ export default function PlacarDeDecisao({ pecas7d, recorte, recarga = 0 }: { pec
 
   return (
     <div>
+      {/* Dois dos quatro números deste placar não têm rede: rota e ligação vêm da ficha do Google
+          (busca e mapa), e "peças em 7 dias" é coluna pré-somada da view do Espelho, não janela.
+          Com uma rede escolhida na barra, eles não se mexem — e calados pareceriam ter se mexido. */}
+      <div className="flex justify-end mb-1">
+        <NaoObedece recorte={recorte} rede
+          porque="rota e ligação vêm da ficha do Google (busca e mapa), que não tem rede social; a mediana de interação ao lado obedece à rede" />
+      </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-outline/15 border border-outline/15">
         {itens.map((k) => (
           <div key={k.l} className="bg-surface-container p-4">

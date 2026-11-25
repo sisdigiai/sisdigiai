@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Navigation, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import NaoObedece from './NaoObedece';
 import { aplicar, type Recorte } from '../../lib/recorte';
 
 // O resultado de NEGÓCIO: o que a ficha do Google registra de gente indo à loja.
@@ -63,6 +64,11 @@ export default function ResultadoDeNegocio({ recorte, recarga = 0 }: { recorte: 
         <span className="font-mono text-[10px] text-muted">
           pedido de rota e ligação — o que há de mais perto de dinheiro nesta página
         </span>
+        {/* A ficha do Google não acontece numa rede social: quem pede rota chegou pela busca ou pelo
+            mapa. Escolher Instagram na barra não pode mudar este número, e ficar calado faria parecer
+            que mudou. */}
+        <NaoObedece recorte={recorte} rede className="ml-auto"
+          porque="v_mkt_negocio_semana vem da ficha do Google (busca e mapa), que não tem rede social; a marca e a semana este bloco obedece" />
       </div>
 
       {erro ? (
