@@ -26,6 +26,13 @@
 -- QUANDO A PERGUNTA FECHAR: aplica-se a **273** (2.001 e 1.992) ou a sua versão com 1.999, com o
 -- "trava tirada" do Geral. Esta 274 é o estado honesto do intervalo, não o destino.
 --
+-- FUNCIONA DESLIGADO OU LIGADO, de propósito (acrescentado em 25/11 depois do aviso do Geral): ele
+-- recomendou ao MKT desligar os dois fatos por precaução até esta migration entrar, pela arbitragem
+-- de 24/11. Se isso acontecer, a linha chega aqui com `ativo = false`. A trava de entrada não olha
+-- `ativo` — olha o 2.004, que é o que identifica a linha a corrigir — e o `update` **religa na mesma
+-- transação**. Assim a migration vale nos dois estados e a ordem entre mim e o MKT deixa de
+-- importar. Ensaiado nos dois: com o fato ligado e com ele desligado de propósito.
+--
 -- Volta: `Cockpit/controle/volta-fato-comissao-2026-11-25.sql` (segunda metade, estado 2.004 das
 -- duas linhas, lido do banco antes de qualquer escrita). Nenhum delete.
 -- ============================================================
@@ -40,6 +47,7 @@ end $$;
 update mkt.fatos set
   fato = 'Em 2026, mais de 1.990 OS na loja viva da rede da casa (até 24/11/2026).',
   valor_numerico = null,
+  ativo = true,              -- religa, caso o MKT tenha desligado por precaução antes desta entrar
   fonte = 'folha única, 25/11/2026 18h45: o número exato está travado. A régua da casa, fixada pelo Vendas, é "venda cancelada = deleted_at IS NULL AND is_cancelled IS TRUE"; por ela são 2.001, mas 2 dessas OS têm só status cancelled e, se o dono disser que foram canceladas, viram 1.999. Até a resposta, a única frase pública é "mais de 1.990", verdadeira nos dois casos. O 2.004 de 24/11 contava 3 canceladas e saiu. A frase do balcão (1.995 ou 1.992) também está travada.',
   uso_restrito = null,
   updated_at = now()
@@ -48,6 +56,7 @@ where chave = 'clearix_os_2026';
 update mkt.fatos set
   fato = 'A DIGIAI opera o próprio varejo óptico dentro do Clearix: uma rede da casa, com 1 loja vendendo todo dia e mais de 1.990 OS em 2026 (até 24/11/2026).',
   valor_numerico = null,
+  ativo = true,              -- idem
   fonte = 'folha única, 25/11/2026 18h45: número exato travado (2.001 ou 1.999, conforme a resposta do dono sobre 2 OS com só status cancelled). "Mais de 1.990" é verdadeiro nos dois casos.',
   updated_at = now()
 where chave = 'digiai_prova_operacao';
