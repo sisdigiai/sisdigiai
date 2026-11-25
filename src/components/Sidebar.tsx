@@ -16,7 +16,7 @@ export type ModuleId =
   | 'visao' | 'semana' | 'portfolio' | 'trilha' | 'lista-mestra'
   | 'backlog' | 'comercial' | 'academy' | 'financeiro'
   | 'decisoes' | 'biblioteca' | 'brand' | 'cadastro-empresa'
-  | 'clearix' | 'cobranca' | 'marketing' | 'marketing-alvo'
+  | 'clearix' | 'cobranca' | 'marketing'
   | 'marketplace' | 'ecossistemas' | 'mapa-vivo' | 'travas-marketing'
   | 'fluxo-osi' | 'guia'
   | 'marketing-engajamento' | 'inventario' | 'seo' | 'vendas' | 'mapa-calor' | 'prospeccao'
@@ -92,7 +92,6 @@ const marketing: NavItem[] = [
   // para a mesma sala era a duplicacao que o dono apontou. O endereco #/mkt-crescimento continua
   // funcionando para quem tem link salvo.
   { id: 'marketing',        label: 'Marketing',         icon: <Radio className="w-4 h-4" /> },
-  { id: 'marketing-alvo',   label: 'O alvo (mock)',     icon: <Target className="w-4 h-4" /> },
   { id: 'mkt-calc',         label: 'Calc (isca)',       icon: <Calculator className="w-4 h-4" /> },
   { id: 'travas-marketing', label: 'Travas',            icon: <ShieldCheck className="w-4 h-4" /> },
 ];
