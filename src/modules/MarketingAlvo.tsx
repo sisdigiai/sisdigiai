@@ -104,18 +104,24 @@ const ALVO: Aba[] = [
   {
     k: 'vieram', titulo: '4 · Vieram?', degrau: 'Quem reagiu saiu da rede e veio para a casa — site, landing, ficha, WhatsApp?',
     blocos: [
-      { pergunta: 'Quantos cliques saíram de cada peça para a casa?', bloco: 'Tráfego por peça',
-        fonte: 'UTM com utm_content = peca_ref', estado: 'nao_existe', dono: 'MKT (começa 30/11)',
-        medido: 'nenhuma peça sai hoje com etiqueta. E, mesmo com ela, só funciona onde o link é clicável: Facebook, YouTube longo, LinkedIn, X, WhatsApp, Google Meu Negócio e Pinterest — 229 das 876 peças e 22% das views' },
+      { pergunta: 'Quantos cliques saíram de cada peça para a casa?', bloco: 'Tráfego por etiqueta',
+        fonte: 'analytics.events_log (banco DESTE app)', estado: 'parcial', dono: 'app digiai',
+        medido: 'CORREÇÃO de 25/11 15h: eu havia escrito que não existia. Existe e está vivo — 2.264 eventos desde 06/06, 5 produtos, 320 com UTM. O Facebook orgânico já traz 252 eventos e 223 sessões com a origem marcada. Falta a TELA, não o dado' },
+      { pergunta: 'A etiqueta diz qual PEÇA, ou só qual produto?', bloco: 'Choque de convenção no utm_content',
+        fonte: 'analytics.events_log.utm_content', estado: 'falta_coluna', dono: 'MKT + app digiai',
+        medido: 'hoje o `utm_content` carrega o SLUG DO PRODUTO (campanha `mello_produto`, 29 produtos distintos), não a peça. O MKT vai começar em 30/11 a escrever `utm_content = peca_ref` — os dois usos colidem no mesmo campo. Decidir antes: peça no `utm_content` e produto no `utm_term`, ou o contrário' },
+      { pergunta: 'O funil do site está medindo até o fim?', bloco: 'Eventos que pararam de chegar',
+        fonte: 'analytics.events_log', estado: 'falta_dado', dono: 'agente de cada site',
+        medido: 'as visitas continuam entrando HOJE (loja 664, site Clearix 402, site digiai 329), mas o fundo do funil parou: produto visto 10/10, clique em checkout 15/09, clique no WhatsApp do Clearix 28/09, demonstração solicitada 1 vez em 23/09. Visita sem evento de fundo não é falta de gente — é medição quebrada, e ninguém viu porque nada disso aparece em tela' },
       { pergunta: 'E nos 78% onde não dá etiqueta?', bloco: 'Tráfego sem etiqueta (dark social)',
         fonte: 'pico de "direto" após publicar + pergunta no balcão', estado: 'nao_existe', dono: 'dono + loja',
         medido: 'é a parte maior da audiência: feed e Reels do Instagram, TikTok e Shorts. Não tem solução técnica — tem estimativa e tem pergunta ao cliente' },
       { pergunta: 'A ficha do Google traz gente, e de que peça?', bloco: 'Ficha do Google com etiqueta',
         fonte: 'links da ficha com UTM', estado: 'nao_existe', dono: 'MKT',
         medido: 'sem UTM, a ficha some dentro de "direto/orgânico" no analytics. A casa já publica 268 posts na ficha — eles aceitam link com etiqueta' },
-      { pergunta: 'Quanta gente o site e as landings receberam, por origem?', bloco: 'Analytics de site',
-        fonte: 'a definir (GA4 / Cloudflare Web Analytics)', estado: 'nao_existe', dono: 'dono decide a ferramenta',
-        medido: 'não há analytics de site ligado ao painel. Sem isso, o degrau 4 não fecha nem onde a etiqueta funciona' },
+      { pergunta: 'Quanta gente o site e as landings receberam, por origem?', bloco: 'Visitas por origem',
+        fonte: 'analytics.events_log', estado: 'parcial', dono: 'app digiai',
+        medido: 'a casa tem o próprio analytics e não precisa de ferramenta nova: landing do Clearix, calculadora, loja da Mello, OSI e site digiai mandam visita, clique e lead para ESTE banco. O que falta é a tela' },
     ],
   },
   {
@@ -128,8 +134,8 @@ const ALVO: Aba[] = [
         fonte: 'v_marketing_community.attributed_post_id', estado: 'falta_dado', dono: 'MKT',
         medido: 'a coluna de atribuição JÁ EXISTE. 1 linha, 0 vendas — o funil OSI está pré-lançamento, então o zero é real, não painel cego' },
       { pergunta: 'Quanto a loja vendeu, e o que o marketing teve a ver?', bloco: 'Venda da loja por origem',
-        fonte: 'banco do Clearix (crm_erp) — isolado deste app', estado: 'nao_existe', dono: 'eco do Clearix',
-        medido: 'inventário pedido ao eco em 25/11. Sem view de contrato, a venda da loja não chega a esta tela' },
+        fonte: 'banco do Clearix (crm_erp) — isolado deste app', estado: 'falta_dado', dono: 'dono (decide a ponte) + eco',
+        medido: 'inventário do eco, 25/11: **48 de 2.019 vendas de 2026 têm origem marcada, e nenhuma é de rede ou anúncio**. Mesmo com a ponte entre os bancos, "receita por rede" não teria de onde sair. O que existe lá: página de loja com 1.151 visitas por origem, anúncio com R$ 441,48 e 1.633 cliques, e 242 de 1.579 conversas de WhatsApp virando compra' },
       { pergunta: 'Qual o custo por lead e por venda?', bloco: 'Custo por resultado',
         fonte: 'custo de IA + mídia paga ÷ resultado', estado: 'nao_existe', dono: 'app digiai',
         medido: 'o custo de IA existe (v_mkt_ai_custo). Falta o denominador — que é o degrau 5 inteiro' },
@@ -183,10 +189,11 @@ const ALVO: Aba[] = [
     k: 'clearix', titulo: '9 · Clearix', degrau: 'O funil do produto: quem viu virou demonstração, piloto, cliente pagante?',
     blocos: [
       { pergunta: 'Quantas visitas na landing, por origem?', bloco: 'Landing do Clearix',
-        fonte: 'banco do Clearix — isolado deste app', estado: 'nao_existe', dono: 'eco do Clearix',
-        medido: 'inventário pedido em 25/11' },
+        fonte: 'analytics.events_log (banco DESTE app)', estado: 'parcial', dono: 'app digiai',
+        medido: 'o eco confirmou em 25/11: a landing NÃO grava no Clearix — manda para cá. 402 visitas ao site e 146 à landing, 54 cliques de CTA. Falta a tela' },
       { pergunta: 'Quantos pediram demonstração?', bloco: 'Demonstrações',
-        fonte: 'a confirmar no inventário do eco', estado: 'nao_existe', dono: 'eco do Clearix' },
+        fonte: 'analytics.events_log (clearix_demo_solicitada)', estado: 'falta_dado', dono: 'agente da landing',
+        medido: 'o evento existe e disparou **uma vez na vida**, em 23/09 — enquanto o site recebia 402 visitas. Ou o botão não mede, ou ninguém pede demonstração. As duas respostas mudam o que se faz, e hoje não dá para saber qual é' },
       { pergunta: 'Quantos viraram piloto e quantos pagam?', bloco: 'Piloto e cliente pagante',
         fonte: 'a confirmar no inventário do eco', estado: 'nao_existe', dono: 'eco do Clearix',
         medido: 'a folha única diz: ainda sem cliente externo pagante. O número é zero e é verdadeiro' },
@@ -237,8 +244,17 @@ export default function MarketingAlvo() {
           → viram → reagiram → vieram → compraram</strong> — com o estado medido de cada bloco.
           <br /><br />
           O diagnóstico em uma frase: <strong className="text-on-surface">a casa enxerga bem os dois
-          primeiros degraus, mal o terceiro, e nada do quarto e do quinto.</strong> É por isso que a
-          tela "não dá respostas" — ela mede com precisão justamente a parte que não decide orçamento.
+          primeiros degraus, mal o terceiro, e quase nada do quinto.</strong> É por isso que a tela
+          "não dá respostas" — ela mede com precisão justamente a parte que não decide orçamento.
+          <br /><br />
+          <strong className="text-on-surface">A correção que esta tela já sofreu, às 15h de 25/11:</strong>{' '}
+          eu tinha escrito que o quarto degrau — "vieram?" — não existia. Existe, e está vivo:{' '}
+          <code className="font-mono text-[10px]">analytics.events_log</code>, no banco deste app,
+          tem <strong className="text-on-surface">2.264 eventos desde 06/06</strong>, de cinco
+          produtos, com UTM em 320. O que falta ali é <strong className="text-on-surface">a tela</strong>,
+          não o dado. Descobri porque o eco mandou o inventário e eu fui medir em vez de acreditar —
+          e o mesmo erro, de afirmar ausência sem procurar direito, eu já tinha cometido duas vezes
+          hoje. Fica escrito aqui porque é a parte mais cara de aprender.
         </div>
 
         <div className="px-4 py-3 grid grid-cols-2 sm:grid-cols-5 gap-4">
