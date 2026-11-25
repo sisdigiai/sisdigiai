@@ -2,6 +2,42 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-25 (tarde) — Dois defeitos que a varredura pegou, e a Régua que nunca tinha aparecido
+
+O dono disse, olhando a tela: *"nada funciona com os filtros"*. Varri **as onze abas**, com marca e
+sem, comparando número a número. Oito mudavam. Três não — e dessas, duas (Território e Saúde) já
+diziam na tela que não obedecem, com o motivo escrito. Sobraram dois defeitos de verdade:
+
+**1. A aba Régua estava em branco desde sempre.** `loading` nasce `true`, o Radar é remontado a cada
+troca de aba, e o código só desligava o rodopio quando a fonte `marcas` chegava — mas Régua carrega
+apenas a fonte `regua`. O corpo inteiro (`loading ? spinner : …`) ficava girando para sempre: nem os
+cartões de nível, nem a frase "a régua ainda não foi calculada", nem o aviso de que a barra não vale
+ali. Só não apareceu antes porque Território carrega lista vazia (cai no atalho que desliga) e as
+outras nove carregam `marcas`. Agora o contador é de todas as fontes da aba.
+
+**2. Duas vezes o mesmo erro meu: filtro na consulta, não no gatilho.** Fôlego e, depois, a cadeia do
+Resultado saíram com o filtro certo na consulta e sem o recorte nas dependências do efeito — a
+consulta nunca se refazia. Com Mello escolhida, o Fôlego mostrava as nove marcas; com Lancaster, a
+cadeia seguia em 959 peças. Na segunda vez parei de corrigir por amostra e **varri todos os efeitos
+do Marketing cruzando "usa o recorte no corpo" com "tem o recorte nas deps"** — era o último.
+
+**As duas colunas que o MKT abriu à tarde** (migration 20261125_02) entraram no mesmo dia:
+`fn_mkt_resultado_recorte(p_de, p_ate, p_marca, p_rede)` e `marca` em `v_marketing_cadeia_dia`.
+Conferidas por mim no banco antes de ligar, não pelo relato: função **invoker**, `anon` sem execute,
+`authenticated` com; 138 linhas sem parâmetro, 99 em 30 dias, 75 com mello; e nenhuma linha da cadeia
+com marca nula nos quatro elos com dado. Os dois selos "não separa por…" saíram junto com o motivo
+deles. Medido na tela: a cadeia vai de **959 para 269 peças** ao escolher Lancaster.
+
+**Duas coisas que a função não faz, e a tela diz:** `p_marca` é **uma** marca (escolher um grupo não
+recorta, e o bloco avisa); e a análise só tem base em Instagram (102 linhas) e Facebook (68) —
+TikTok e YouTube têm **zero**. Com TikTok escolhido o bloco vem vazio e explica que a leitura naquelas
+redes é nova demais para formar mediana. Vazio sem explicação manda consertar o que não está quebrado.
+
+**Levantamento dos buracos de medição**, a pedido do dono ("se for olhar hoje para onde seguir o
+marketing, não temos dados completos, correto?"): `Cockpit/sessoes/_PARA_MKT_2026-11-25-app-digiai-buracos-de-medicao.md`.
+A resposta medida é **correto** — a cadeia para antes do dinheiro: 3.160 peças, 222.778 seguidores,
+1.206 disparos, **5 leads**, **0 vendas**, e nada liga peça → lead → venda.
+
 ## 2026-11-25 — A barra de recorte passa a valer em toda aba (e dois defeitos velhos que o typecheck já acusava)
 
 Pedido do dono no canal do MKT, 25/11: *"preciso de filtro de data para saber qual marca performou…
