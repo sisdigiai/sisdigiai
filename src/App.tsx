@@ -20,6 +20,7 @@ import Financeiro from './modules/Financeiro';
 import Academy from './modules/Academy';
 import Marketing from './modules/Marketing';
 import MarketingEspelho from './modules/MarketingEspelho';
+import MarketingAlvo from './modules/MarketingAlvo';
 import RaioX from './modules/RaioX';
 import ComparativoMotores from './modules/ComparativoMotores';
 import Google from './modules/Google';
@@ -57,7 +58,7 @@ const PUBLIC_ROUTES = ['/osi/depoimento', '/osi'];
 const MODULES: ModuleId[] = [
   'hoje', 'visao', 'semana', 'portfolio', 'trilha', 'lista-mestra', 'backlog', 'comercial',
   'cadastro-empresa', 'financeiro', 'academy', 'marketplace', 'clearix', 'cobranca',
-  'marketing', 'mkt-crescimento', 'mkt-calc', 'marketing-engajamento', 'fluxo-osi', 'travas-marketing',
+  'marketing', 'marketing-alvo', 'mkt-crescimento', 'mkt-calc', 'marketing-engajamento', 'fluxo-osi', 'travas-marketing',
   'raio-x',
   'ecossistemas', 'mapa-vivo', 'decisoes', 'biblioteca', 'brand', 'guia', 'inventario', 'seo', 'vendas',
   'mapa-calor',
@@ -86,7 +87,7 @@ const MODULE_LABEL: Record<ModuleId, string> = {
   hoje: 'Hoje', visao: 'Visão', semana: 'Semana', portfolio: 'Portfólio', trilha: 'Roadmap', 'lista-mestra': 'Lista Mestra',
   backlog: 'Backlog Executivo', comercial: 'Comercial', 'cadastro-empresa': 'Cadastro Empresa',
   financeiro: 'Financeiro', academy: 'Academy', 'fluxo-osi': 'OSI',
-  marketing: 'Marketing', 'marketing-engajamento': 'Engajamento',
+  marketing: 'Marketing', 'marketing-alvo': 'Marketing — o alvo', 'marketing-engajamento': 'Engajamento',
   'raio-x': 'Raio-X do eco',
   'mkt-crescimento': 'Radar 360', 'mkt-calc': 'Calc', comparativo: 'Comparativo de motores', controle: 'Controle', receita: 'Receita', lousa: 'Lousa',
   google: 'Google Meu Negócio',
@@ -108,7 +109,7 @@ const MODULE_SECTION: Record<ModuleId, string> = {
   portfolio: 'Produtos', ecossistemas: 'Produtos', 'mapa-vivo': 'Produtos', clearix: 'Produtos', academy: 'Produtos', seo: 'Produtos',
   'raio-x': 'Produtos',
   google: 'Marketing',
-  marketing: 'Marketing', 'travas-marketing': 'Marketing',
+  marketing: 'Marketing', 'marketing-alvo': 'Marketing', 'travas-marketing': 'Marketing',
   'mkt-crescimento': 'Marketing', 'mkt-calc': 'Marketing', comparativo: 'Marketing', controle: 'Hoje',
   inventario: 'Empresa', 'cadastro-empresa': 'Empresa', decisoes: 'Empresa', brand: 'Empresa', biblioteca: 'Empresa', guia: 'Empresa',
 };
@@ -198,6 +199,7 @@ export default function App() {
       case 'financeiro': return <Financeiro />;
       case 'academy': return <Academy />;
       case 'marketing': return <MarketingEspelho />;
+      case 'marketing-alvo': return <MarketingAlvo />;
       case 'raio-x': return <RaioX />;
       case 'comparativo': return <ComparativoMotores />;
       case 'google': return <Google />;
