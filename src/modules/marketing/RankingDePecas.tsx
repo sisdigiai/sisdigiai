@@ -170,6 +170,23 @@ export default function RankingDePecas({ recorte, recarga = 0 }: { recorte: Reco
             {semLeitura > 0 && <>{semLeitura} peça(s) do recorte ainda sem views coletadas ficam fora da ordem, não no fim dela. </>}
             {semGatilho > 0 && <>{semGatilho} das mostradas estão <strong>sem rótulo de gatilho</strong> — isso é falta nossa de marcação, não característica da peça.</>}
           </div>
+
+          {/* ATÉ ONDE ESTA LISTA PODE CHEGAR (25/11/2026).
+              O dono cobrou a UTM por peça ao MKT hoje, para a lista deixar de ordenar por view e
+              passar a ordenar por gente que chegou. O MKT respondeu em que redes o link é clicável,
+              e medi o que isso significa no que a casa publica. O número é grande o bastante para
+              ficar escrito aqui: mesmo com o carimbo, a maior parte da audiência continua fora. */}
+          <div className="px-4 py-2.5 border-t border-outline/10 text-xs text-on-surface-variant">
+            <span className="font-mono text-[9px] uppercase tracking-widest text-muted">por que isto ainda é view, e não cliente</span>{' '}
+            Nenhuma peça sai hoje com etiqueta de origem, então não há como dizer qual delas trouxe lead
+            ou venda. A etiqueta foi cobrada ao MKT em 25/11. Mas <strong className="text-on-surface">ela
+            não vai alcançar tudo</strong>: o link só é clicável em post do Facebook, vídeo longo do
+            YouTube, LinkedIn, X, WhatsApp, Google Meu Negócio e Pinterest. No feed e no Reels do
+            Instagram, no TikTok e nos Shorts, não é — e esses são, medidos em 90 dias,{' '}
+            <strong className="text-on-surface">647 das 876 peças e 78% das views da casa</strong>.
+            Lá a pergunta "qual peça trouxe" vai continuar sem resposta por peça; o que dá é por conta
+            e por dia. Quem decidir orçamento por este bloco precisa saber disso.
+          </div>
         </>
       )}
     </section>
