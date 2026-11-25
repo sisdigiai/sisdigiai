@@ -176,7 +176,14 @@ export default function Central({ recorte, recarga = 0 }: { recorte: Recorte; re
     }).then(setLinhas).catch((e) => { setErro(String(e?.message ?? e)); setLinhas([]); });
     supabase.from('v_receita_meta').select('*').maybeSingle()
       .then(({ data, error }) => setMeta(error || !data ? 'sem_acesso' : (data as Meta)));
-  }, [dias, recarga]);
+    // `recorte` TEM de estar aqui, não só `dias`. Enquanto este bloco só obedecia à janela, `dias`
+    // bastava; quando ganhou o filtro de marca (25/11, tarde), a consulta passou a sair com o filtro
+    // certo e a nunca se refazer ao trocar de marca. Visto no ar às 14h03: com Lancaster escolhida,
+    // "produzir" seguia em 959 peças, o mesmo de "tudo".
+    //
+    // É a SEGUNDA vez no mesmo dia que isto me morde (a outra foi o Fôlego). Quem acrescentar filtro
+    // a uma consulta aqui: o gatilho do efeito muda junto, senão o filtro é decorativo.
+  }, [recorte, recarga]);
 
   const leituras = useMemo(
     () => ELOS.map((e) => ({ ...e, m: linhas ? medir(linhas, e.elo, e.medida, dias) : null })),
