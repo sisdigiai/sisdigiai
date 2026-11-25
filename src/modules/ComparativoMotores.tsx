@@ -114,9 +114,19 @@ export default function ComparativoMotores() {
       engajamento: null, views: blogs.views, viewsMedidas: blogs.views > 0 ? 1 : 0,
       estado: brutos.blogs.estado, detalhe: brutos.blogs.detalhe });
 
-    const pola = somarSemana(brutos.pola.linhas, semana, (r) => ({ pub: r.publicacoes, views: r.views }));
+    // A POLÁ NÃO TEM VIEWS, E NÃO CHAMA PUBLICAÇÃO DE `publicacoes` (corrigido em 25/11/2026).
+    // Este bloco lia `r.publicacoes` e `r.views` em `PolaDia`, que tem **`posts_no_dia`** e nenhum
+    // campo de views — tem `alcance` e `impressoes`. Em JavaScript isso não quebra: vira `undefined`,
+    // `Number(undefined ?? 0)` dá 0, e a Polá aparecia no comparativo com **zero publicações e zero
+    // views** toda semana, com cara de motor parado. O typecheck acusava os dois campos desde antes
+    // de hoje (dois dos oito erros vermelhos); ninguém tinha ligado o erro à linha da tabela.
+    //
+    // Impressão NÃO entra como view: são unidades diferentes (quantas vezes a peça apareceu na tela
+    // × quantas vezes foi assistida), e trocá-las faria a Polá parecer o maior motor da casa. Views
+    // fica como NÃO MEDIDO, que é a verdade, e `viewsMedidas: 0` já é como esta tela escreve isso.
+    const pola = somarSemana(brutos.pola.linhas, semana, (r) => ({ pub: r.posts_no_dia ?? 0, views: 0 }));
     linhas.push({ motor: 'pola', frente: 'redes', publicacoes: pola.pub, dias: pola.dias,
-      engajamento: null, views: pola.views, viewsMedidas: pola.views > 0 ? 1 : 0,
+      engajamento: null, views: null, viewsMedidas: 0,
       estado: brutos.pola.estado, detalhe: brutos.pola.detalhe });
 
     setEspelhos(linhas);

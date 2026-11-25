@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Radio } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { type Recorte } from '../../lib/recorte';
 import { lerTudo } from '../../lib/paginar';
 import { ultimaLeituraPorPeca, somarCampo, type LeituraDeDia } from '../../lib/leituraPorPeca';
 import {
@@ -28,7 +29,7 @@ import { rotuloJanela, type Periodo } from './Central';
 //   · "só para admin do MKT" é falta de acesso.
 
 type Props = {
-  periodo: Periodo;
+  recorte: Recorte;
   limelight: EspelhoLimelight | null;
   pulso: EspelhoPulso | null;
   espMkt: { ideias: number; roteiros: number; assets: number; publicacoes: number; fila_aberta: number; custo_ia_usd_mes: number | null } | null;
@@ -115,9 +116,16 @@ function Pe({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function MotoresDeConteudo({ periodo, limelight, pulso, espMkt, hoje, brl, pulsoUltimaPubDias, mktUltimaPub, recarga = 0 }: Props & { recarga?: number }) {
-  const dias = periodo === 'tudo' ? null : Number(periodo);
-  const rotuloPeriodo = rotuloJanela(periodo);
+// A JANELA DOS MOTORES PASSOU A SER A DA BARRA (25/11/2026). Antes vinha reduzida a 7, 30 ou tudo.
+// Marca e rede NÃO entram aqui: os espelhos diários do Pulso e do Limelight somam o motor inteiro
+// por dia e plataforma — não sabem de que marca é cada linha. Por isso este bloco mostra o motor,
+// e quem quiser marca olha o bloco de marca × rede.
+export default function MotoresDeConteudo({ recorte, limelight, pulso, espMkt, hoje, brl, pulsoUltimaPubDias, mktUltimaPub, recarga = 0 }: Props & { recarga?: number }) {
+  const dias = recorte.de == null ? null
+    : recorte.ate
+      ? Math.max(1, Math.round((Date.parse(recorte.ate) - Date.parse(recorte.de)) / 864e5))
+      : Math.max(1, Math.round((Date.now() - Date.parse(recorte.de)) / 864e5));
+  const rotuloPeriodo = recorte.de == null ? 'desde o início' : recorte.rotulo;
 
   const [pecasLousa, setPecas] = useState<Array<{ origem: string }> | null>(null);
   const [viewsMkt, setViewsMkt] = useState<number | null>(null);
@@ -154,12 +162,15 @@ export default function MotoresDeConteudo({ periodo, limelight, pulso, espMkt, h
     espelhoMotoresEstado.pulsoDias().then(setPulsoDias);
     espelhoMotoresEstado.pulsoLongosDias().then(setLongos);
     espelhoMotoresEstado.limelightPubDias().then(setLimeDias);
-  }, [periodo, recarga]);
+  }, [dias, recarga]);
 
   const corte = dias ? diaBRT(new Date(Date.now() - dias * 86400000)) : '0000-01-01';
   const janela = <T extends { dia: string }>(l: T[] | undefined) => (l ?? []).filter((x) => x.dia >= corte);
-  const somar = <T extends Record<string, unknown>>(l: T[], c: string) =>
-    l.reduce((a, x) => a + Number((x[c] as number) ?? 0), 0);
+  // `T extends object`, e não `Record<string, unknown>`: uma INTERFACE do TypeScript não ganha
+  // índice de string implícito, então `LimePubDia` e `PulsoDia` não casavam com o Record e o
+  // typecheck ficava vermelho (oito erros, de antes de hoje). A conversão fica dentro do helper.
+  const somar = <T extends object>(l: T[], c: string) =>
+    l.reduce((a, x) => a + Number((x as Record<string, unknown>)[c] ?? 0), 0);
   const daLousa = (origem: string) => (pecasLousa ?? []).filter((p) => p.origem === origem).length;
 
   const limeJanela = janela(limeDias?.linhas);

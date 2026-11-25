@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Lightbulb } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { aplicar, type Recorte } from '../../lib/recorte';
 import { lerTudo } from '../../lib/paginar';
 import { rotuloJanela, type Periodo } from './Central';
 
@@ -32,27 +33,42 @@ const DIAS_DE = (p: Periodo) => (p === 'tudo' ? null : Number(p));
 const diaBRT = (d: Date) =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
 
-export default function Leituras({ periodo, recarga = 0 }: { periodo: Periodo; recarga?: number }) {
+// AS TRÊS FONTES DESTA FAIXA OBEDECEM A COISAS DIFERENTES (25/11/2026, medido no banco):
+//   · `v_pontualidade`  — tem dia, marca e rede: obedece a tudo;
+//   · `v_mkt_estoque_marca` — tem marca, não tem rede nem data: obedece à marca, e o fôlego é do
+//     estado de agora (quantos dias de conteúdo existem), que não é pergunta de janela;
+//   · `v_marketing_cadeia_dia` — só tem dia: obedece à janela e confessa a marca e a rede.
+// Cada leitura abaixo diz, no próprio texto, em que régua foi medida.
+export default function Leituras({ recorte, recarga = 0 }: { recorte: Recorte; recarga?: number }) {
   const [estoque, setEstoque] = useState<Estoque[] | null>(null);
   const [pont, setPont] = useState<Pont[] | null>(null);
   const [cadeia, setCadeia] = useState<Dia[] | null>(null);
 
   useEffect(() => {
-    supabase.from('v_mkt_estoque_marca').select('marca_nome, na_fila, artes_prontas, publicadas_7d, dias_de_estoque, dias_marcados, dias_biblioteca')
-      .then(({ data }) => setEstoque((data ?? []) as Estoque[]));
-    lerTudo<Dia>((de, ate) => supabase.from('v_marketing_cadeia_dia')
-      .select('dia, elo, medida, n').order('dia').order('elo').order('medida').range(de, ate)).then(setCadeia);
-  }, []);
+    const base = supabase.from('v_mkt_estoque_marca')
+      .select('marca, marca_nome, na_fila, artes_prontas, publicadas_7d, dias_de_estoque, dias_marcados, dias_biblioteca');
+    const { q } = aplicar(base, { ...recorte, de: null, ate: null }, { marca: 'marca' });
+    q.then(({ data }: { data: unknown }) => setEstoque((data ?? []) as Estoque[]));
+    lerTudo<Dia>((de, ate) => {
+      const b = supabase.from('v_marketing_cadeia_dia').select('dia, elo, medida, n');
+      return aplicar(b, recorte, { data: 'dia' }).q
+        .order('dia').order('elo').order('medida').range(de, ate);
+    }).then(setCadeia);
+  }, [recorte, recarga]);
 
   useEffect(() => {
-    const dias = DIAS_DE(periodo);
-    const corte = dias ? diaBRT(new Date(Date.now() - dias * 86400000)) : null;
     lerTudo<Pont>((de, ate) => {
-      const q = supabase.from('v_pontualidade').select('marca, rede, pontualidade, dia')
+      const base = supabase.from('v_pontualidade').select('marca, rede, pontualidade, dia');
+      return aplicar(base, recorte, { data: 'dia', marca: 'marca', rede: 'rede' }).q
         .order('dia').order('marca').order('rede').order('saiu_em').order('minutos').range(de, ate);
-      return corte ? q.gte('dia', corte) : q;
     }).then(setPont);
-  }, [periodo, recarga]);
+  }, [recorte, recarga]);
+
+  // Quantos dias tem a janela, para as leituras que comparam com o período anterior.
+  const dias = recorte.de == null ? null
+    : recorte.ate
+      ? Math.max(1, Math.round((Date.parse(recorte.ate) - Date.parse(recorte.de)) / 864e5))
+      : Math.max(1, Math.round((Date.now() - Date.parse(recorte.de)) / 864e5));
 
   const pronto = estoque != null && pont != null && cadeia != null;
   const leituras: Leitura[] = [];
@@ -86,7 +102,7 @@ export default function Leituras({ periodo, recarga = 0 }: { periodo: Periodo; r
     if (top && pont.length >= 4) {
       const pct = Math.round((atrasos.length / pont.length) * 100);
       leituras.push({
-        fato: `${pct}% das peças saíram fora do horário em ${rotuloJanela(periodo)}, por data de publicação (${atrasos.length} de ${pont.length}); onde mais atrasa é ${top[0]}, com ${top[1]}.`,
+        fato: `${pct}% das peças saíram fora do horário em ${recorte.rotulo}, por data de publicação (${atrasos.length} de ${pont.length}); onde mais atrasa é ${top[0]}, com ${top[1]}.`,
         base: `${pont.length} peças com hora marcada e hora real`,
         escolha: top[1] >= 4 ? `Olhar a rodada de ${top[0]}: atraso concentrado numa conta é quase sempre o motor, não a agenda.` : null,
         comQuem: 'o motor da origem',
@@ -95,7 +111,6 @@ export default function Leituras({ periodo, recarga = 0 }: { periodo: Periodo; r
     }
 
     // 3. O gargalo da cadeia: onde o número mais cai de um passo para o seguinte.
-    const dias = DIAS_DE(periodo);
     const corte = dias ? diaBRT(new Date(Date.now() - dias * 86400000)) : '0000-01-01';
     const soma = (elo: string, medida: string) =>
       cadeia.filter((l) => l.elo === elo && l.medida === medida && l.dia > corte)
@@ -107,7 +122,7 @@ export default function Leituras({ periodo, recarga = 0 }: { periodo: Periodo; r
     for (const [de, nDe, para, nPara] of passos) {
       if (nDe >= 4) {
         leituras.push({
-          fato: `De ${de} para ${para}: ${nDe.toLocaleString('pt-BR')} → ${nPara.toLocaleString('pt-BR')} em ${rotuloJanela(periodo)}.`,
+          fato: `De ${de} para ${para}: ${nDe.toLocaleString('pt-BR')} → ${nPara.toLocaleString('pt-BR')} em ${recorte.rotulo}.`,
           base: `${nDe.toLocaleString('pt-BR')} no primeiro passo`,
           escolha: nPara === 0
             ? `Nenhum resultado no passo seguinte. Ou o caminho entre os dois não existe, ou não está medido — e as duas coisas pedem conserto, não mais volume.`

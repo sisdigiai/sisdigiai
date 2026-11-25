@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Eye, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import { type Periodo } from './Central';
+import { aplicar, motorNoRecorte, type Recorte } from '../../lib/recorte';
 import { ultimaLeituraPorPeca, somarCampo, pecasMedidas } from '../../lib/leituraPorPeca';
 import { lerTudo } from '../../lib/paginar';
 import { espelhoMotoresEstado, type PulsoDia, type PulsoLongoDia, type LimePubDia, type BlogDia, type EstadoEspelho } from '../../lib/espelhoMotores';
@@ -52,10 +52,19 @@ const kilo = (v: number) => (v >= 10000 ? `${(v / 1000).toFixed(0)}k` : n(v));
 const diaBRT = (d: Date) =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
 
-// O período é do PAI, não deste cartão. Antes ele vivia aqui e o "Resultado do conteúdo" ao lado era
-// sempre 30 dias: um filtro que vale para metade da tela é pior que nenhum, porque quem lê acredita
-// que mudou tudo. (Erro apontado pelo Geral em 18/11, item 3.)
-export default function LeiturasCard({ periodo, recarga = 0 }: { periodo: Periodo; recarga?: number }) {
+// O RECORTE INTEIRO É DO PAI, não só o período (25/11/2026, pedido do dono no canal do MKT).
+//
+// Antes este cartão recebia `periodo`, que a página reduzia a 7, 30 ou "tudo". O dono escolhia 12
+// meses e via o mesmo número de 30 dias; escolhia uma marca e nada mudava. Medido no banco em 25/11,
+// o defeito era duplo:
+//   · **o filtro não chegava**: marca, rede, grupo e intervalo livre paravam na barra;
+//   · **e mesmo chegando, 12 meses ≈ 30 dias**, porque a leitura mais antiga é de 16/07/2026 e só
+//     58 dias têm leitura. Consertar o primeiro sem dizer o segundo faria o dono olhar 301k → 304k e
+//     concluir que continua quebrado. Por isso o cartão agora DIZ desde quando há leitura no recorte.
+//
+// O que a marca muda de verdade, medido em 30 dias: mello 117.239 · polapetit 113.405 ·
+// lancaster 46.140 · digiai 519. Separar não é detalhe: é a diferença entre comparar e adivinhar.
+export default function LeiturasCard({ recorte, recarga = 0 }: { recorte: Recorte; recarga?: number }) {
   const [linhas, setLinhas] = useState<Linha[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [pulso, setPulso] = useState<{ linhas: PulsoDia[]; estado: EstadoEspelho; detalhe?: string } | null>(null);
@@ -65,16 +74,17 @@ export default function LeiturasCard({ periodo, recarga = 0 }: { periodo: Period
 
   useEffect(() => {
     setLinhas(null);
-    const corte = periodo === 'tudo' ? null : diaBRT(new Date(Date.now() - Number(periodo) * 86400000));
     // Em páginas de mil: a API corta a resposta nas primeiras mil linhas e devolve isso como sucesso.
     // Hoje são 921 leituras e a conta ainda fecha; na semana que vier, não fecharia — e ninguém veria.
     lerTudo<Linha>((de, ate) => {
-      let q = supabase.from('v_mkt_analytics_peca_dia')
+      const base = supabase.from('v_mkt_analytics_peca_dia')
         .select('origem, marca, conta, rede, tipo, peca_ref, data, views, curtidas, comentarios, compartilhamentos, retencao_media_pct');
-      if (corte) q = q.gte('data', corte);
+      // `marca` e `rede` existem nesta view; a coluna `origem` dela NÃO é o grupo da barra (é quem
+      // mediu a peça), por isso o grupo entra resolvido em marcas e `origem` fica fora.
+      const { q } = aplicar(base, recorte, { data: 'data', marca: 'marca', rede: 'rede' });
       return q.order('data').order('origem').order('conta').order('rede').order('peca_ref').range(de, ate);
     }).then((l) => { setErro(null); setLinhas(l); });
-  }, [periodo, recarga]);
+  }, [recorte, recarga]);
 
   useEffect(() => {
     espelhoMotoresEstado.pulsoDias().then(setPulso);
@@ -83,8 +93,16 @@ export default function LeiturasCard({ periodo, recarga = 0 }: { periodo: Period
     espelhoMotoresEstado.blogsDias().then(setBlogs);
   }, []);
 
-  const corte = periodo === 'tudo' ? '0000-01-01' : diaBRT(new Date(Date.now() - Number(periodo) * 86400000));
-  const noPeriodo = <T extends { dia: string }>(l: T[]) => l.filter((x) => x.dia >= corte);
+  // OS ESPELHOS DOS MOTORES SÓ ENTRAM QUANDO SÃO DESTE RECORTE. Eles somam o motor inteiro por dia e
+  // plataforma — não têm marca. Somá-los com "Lancaster" escolhido poria as views do Pulso dentro do
+  // número da Lancaster, calado. A rede eles sabem separar (`plataforma`), e separam.
+  const pulsoEntra = motorNoRecorte(recorte, 'pulso');
+  const limeEntra = motorNoRecorte(recorte, 'limelight');
+  const deDia = recorte.de ?? '0000-01-01';
+  const ateDia = recorte.ate ?? '9999-12-31';
+  const noPeriodo = <T extends { dia: string; plataforma?: string }>(l: T[]) =>
+    l.filter((x) => x.dia >= deDia && x.dia <= ateDia
+      && (!recorte.rede || !x.plataforma || x.plataforma === recorte.rede));
 
   // UMA PEÇA, UMA LEITURA — consertado em 19/11/2026, ao medir os dois defeitos que o dono apontou no
   // Radar 360. Isto somava TODAS as leituras diárias da mesma peça, e `mkt.leitura_dia` guarda
@@ -99,16 +117,38 @@ export default function LeiturasCard({ periodo, recarga = 0 }: { periodo: Period
   const comEngajamento = pecasMedidas(pecas, 'curtidas');
 
   const casaViews = somarCampo(pecas, 'views');
-  const pulsoViews = pulso ? noPeriodo(pulso.linhas).reduce((a, x) => a + (x.views ?? 0), 0) : 0;
-  const longosViews = longos ? noPeriodo(longos.linhas).reduce((a, x) => a + (x.views ?? 0), 0) : 0;
-  const limeViews = lime ? noPeriodo(lime.linhas).reduce((a, x) => a + (x.views ?? 0), 0) : 0;
-  const blogLeituras = blogs ? noPeriodo(blogs.linhas).reduce((a, x) => a + (x.leituras ?? 0), 0) : 0;
+  const pulsoViews = pulso && pulsoEntra ? noPeriodo(pulso.linhas).reduce((a, x) => a + (x.views ?? 0), 0) : 0;
+  const longosViews = longos && pulsoEntra ? noPeriodo(longos.linhas).reduce((a, x) => a + (x.views ?? 0), 0) : 0;
+  const limeViews = lime && limeEntra ? noPeriodo(lime.linhas).reduce((a, x) => a + (x.views ?? 0), 0) : 0;
+  // Blog não tem plataforma de rede: escolher uma rede tira os blogs do recorte, não os mantém inteiros.
+  const blogsEntram = motorNoRecorte(recorte, 'casa') && !recorte.rede;
+  const blogLeituras = blogs && blogsEntram ? noPeriodo(blogs.linhas).reduce((a, x) => a + (x.leituras ?? 0), 0) : 0;
 
+  // DESDE QUANDO HÁ LEITURA, DENTRO DESTE RECORTE. Vem das linhas que chegaram, nunca de uma
+  // constante: no dia em que o LinkedIn ligar a coleta, a frase se corrige sozinha.
+  const comecoPorRede = (() => {
+    const m = new Map<string, string>();
+    for (const l of linhas ?? []) {
+      const a = m.get(l.rede);
+      if (!a || l.data < a) m.set(l.rede, l.data);
+    }
+    return [...m.entries()].sort((a, b) => a[1].localeCompare(b[1]));
+  })();
+  const dm = (iso: string) => iso.slice(8, 10) + '/' + iso.slice(5, 7);
+
+  // Motor fora do recorte não é motor cego: dizer "não consegui ler o Pulso" quando ninguém pediu o
+  // Pulso manda consertar o que não está quebrado. Só reclama de quem deveria estar aqui.
   const cego = [
-    pulso?.estado !== 'ok' ? `Pulso (${pulso?.detalhe ?? 'não lido'})` : null,
-    longos?.estado !== 'ok' ? `cortes e longos do Pulso (${longos?.detalhe ?? 'não lido'})` : null,
-    lime?.estado !== 'ok' ? `Limelight (${lime?.detalhe ?? 'não lido'})` : null,
-    blogs?.estado !== 'ok' ? `Blogs (${blogs?.detalhe ?? 'não lido'})` : null,
+    pulsoEntra && pulso?.estado !== 'ok' ? `Pulso (${pulso?.detalhe ?? 'não lido'})` : null,
+    pulsoEntra && longos?.estado !== 'ok' ? `cortes e longos do Pulso (${longos?.detalhe ?? 'não lido'})` : null,
+    limeEntra && lime?.estado !== 'ok' ? `Limelight (${lime?.detalhe ?? 'não lido'})` : null,
+    blogsEntram && blogs?.estado !== 'ok' ? `Blogs (${blogs?.detalhe ?? 'não lido'})` : null,
+  ].filter(Boolean) as string[];
+
+  const foraDoRecorte = [
+    !pulsoEntra ? 'Pulso' : null,
+    !limeEntra ? 'Limelight' : null,
+    !blogsEntram ? 'blogs' : null,
   ].filter(Boolean) as string[];
 
   const totalViews = casaViews + pulsoViews + longosViews + limeViews;
@@ -141,7 +181,7 @@ export default function LeiturasCard({ periodo, recarga = 0 }: { periodo: Period
         <span className="text-sm font-semibold text-on-surface">Leituras do conteúdo</span>
         <span className="font-mono text-[10px] text-muted">todas as fontes que hoje se podem somar</span>
         <span className="ml-auto font-mono text-[9px] uppercase tracking-wider text-muted">
-          {periodo === 'tudo' ? 'tudo que já foi lido' : `peças LIDAS nos últimos ${periodo} dias`}
+          {recorte.de == null ? 'tudo que já foi lido' : `peças LIDAS · ${recorte.rotulo}`}
         </span>
       </div>
 
@@ -178,8 +218,27 @@ export default function LeiturasCard({ periodo, recarga = 0 }: { periodo: Period
             mesma fonte por data de PUBLICAÇÃO, e por isso dá um número menor — as duas contas estão
             certas e respondem a perguntas diferentes: aqui, "quanto a casa já somou do que foi medido
             agora"; lá, "quanto rendeu o que a casa publicou neste período".
+            {foraDoRecorte.length > 0 && <> <strong className="text-on-surface">Fora deste recorte:</strong> {foraDoRecorte.join(', ')} — o espelho diário desses motores soma o motor inteiro e não separa por marca, então eles não entram quando se escolhe uma marca.</>}
             {cego.length > 0 && <> Hoje não consegui ler: <strong className="text-danger">{cego.join(' · ')}</strong> — isso é painel cego, não motor parado.</>}
           </div>
+
+          {/* DESDE QUANDO HÁ LEITURA NESTE RECORTE (25/11/2026).
+              Sem esta linha, o filtro consertado parece quebrado: medido em 25/11, 30 dias somam
+              301.074 views e 12 meses somam 304.102 — quase o mesmo, porque a leitura mais antiga é
+              de 16/07/2026. E cada rede começou num dia: num corte de 90 dias o Instagram tem 77
+              dias de leitura e o TikTok 11. Comparar marcas "no mesmo período" compara, em parte,
+              quando o coletor foi ligado — e isso tem de estar escrito onde o número aparece. */}
+          {comecoPorRede.length > 0 && (
+            <div className="px-4 py-2 border-b border-outline/10 text-xs text-on-surface-variant">
+              <span className="font-mono text-[9px] uppercase tracking-widest text-muted">desde quando há leitura</span>{' '}
+              {comecoPorRede.map(([rede, d]) => `${rede} ${dm(d)}`).join(' · ')}.{' '}
+              <span className="text-muted">
+                A janela escolhida é {recorte.rotulo}, mas cada rede só soma a partir da sua data —
+                um recorte longo não torna o número maior onde a coleta é nova, e comparar redes ou
+                marcas com datas de início diferentes compara também a idade da coleta.
+              </span>
+            </div>
+          )}
 
           {pecas.length === 0 ? (
             <div className="px-4 py-3 text-sm text-on-surface-variant">Nenhuma leitura coletada neste período.</div>

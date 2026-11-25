@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Target, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { type Recorte } from '../../lib/recorte';
 import { lerTudo } from '../../lib/paginar';
 
 // Central de comando do marketing — ordem do dono em 18/11/2026, 14h07: "ter a central de comando do
@@ -73,11 +74,13 @@ type Leitura = {
   cestaAntes?: number | null;
 };
 
-function medir(linhas: Dia[], elo: string, medida: string, periodo: Periodo): Leitura | null {
+// `dias` vem do recorte da página (25/11/2026), não mais de um período de três valores: a barra
+// oferece 1, 7, 14, 30, 60, 90, 180, 365 e intervalo livre, e esta leitura passa a obedecer a todos.
+// `null` = tudo.
+function medir(linhas: Dia[], elo: string, medida: string, dias: number | null): Leitura | null {
   const alvo = linhas.filter((l) => l.elo === elo && l.medida === medida);
-  if (alvo.length === 0 && periodo !== 'tudo') return null;
+  if (alvo.length === 0 && dias !== null) return null;
   const natureza = (alvo[0]?.natureza ?? 'fluxo') as 'fluxo' | 'estoque';
-  const dias = DIAS_DE(periodo);
   const hoje = new Date();
 
   const janela = (de: Date, ate: Date) => {
@@ -131,16 +134,31 @@ function Seta({ agora, antes }: { agora: number; antes: number }) {
   );
 }
 
-export default function Central({ periodo, recarga = 0 }: { periodo: Periodo; recarga?: number }) {
+// A CADEIA OBEDECE À DATA E CONFESSA O RESTO (25/11/2026).
+//
+// `v_marketing_cadeia_dia` tem quatro colunas: dia, elo, medida, natureza, n. **Não tem marca nem
+// rede** — medido no banco em 25/11. Então este bloco obedece à janela (e agora a qualquer janela,
+// não só 7/30/tudo) e DIZ, na própria faixa, que a marca e a rede escolhidas não valem aqui.
+// Deixar a barra acesa sem essa frase é pior do que não ter filtro: quem vê o chip da Lancaster
+// aceso acredita que o número é da Lancaster.
+export default function Central({ recorte, recarga = 0 }: { recorte: Recorte; recarga?: number }) {
   const [linhas, setLinhas] = useState<Dia[] | null>(null);
   const [meta, setMeta] = useState<Meta | null | 'sem_acesso'>(null);
   const [erro, setErro] = useState<string | null>(null);
+
+  // Quantos dias tem a janela escolhida. Intervalo livre vira o número de dias entre as pontas, para
+  // a janela anterior ter o mesmo tamanho — comparar 30 dias com 90 seria crescimento inventado.
+  const dias = recorte.de == null ? null
+    : recorte.ate
+      ? Math.max(1, Math.round((Date.parse(recorte.ate) - Date.parse(recorte.de)) / 864e5))
+      : Math.max(1, Math.round((Date.now() - Date.parse(recorte.de)) / 864e5));
+  const naoSepara = [recorte.marcas ? 'marca' : null, recorte.rede ? 'rede' : null].filter(Boolean) as string[];
 
   useEffect(() => {
     // Pede só a janela que a tela usa (o período e o anterior, com folga), não a série inteira: a
     // view é `security_invoker`, então do lado do app ela passa pela RLS das tabelas de baixo e o
     // custo aparece. Em "tudo" não há como recortar — e aí a espera é honesta, porque é tudo mesmo.
-    const corteDias = periodo === 'tudo' ? null : Number(periodo) * 2 + 2;
+    const corteDias = dias == null ? null : dias * 2 + 2;
     const corte = corteDias ? diaBRT(maisDias(new Date(), -corteDias)) : null;
     // Paginado em 19/11: o `.limit(5000)` era fantasia — a API devolve no máximo mil linhas e chama
     // isso de sucesso. Hoje a view tem 588 linhas, longe do teto, mas "tudo" não tem recorte: o dia
@@ -152,11 +170,11 @@ export default function Central({ periodo, recarga = 0 }: { periodo: Periodo; re
     }).then(setLinhas).catch((e) => { setErro(String(e?.message ?? e)); setLinhas([]); });
     supabase.from('v_receita_meta').select('*').maybeSingle()
       .then(({ data, error }) => setMeta(error || !data ? 'sem_acesso' : (data as Meta)));
-  }, [periodo, recarga]);
+  }, [dias, recarga]);
 
   const leituras = useMemo(
-    () => ELOS.map((e) => ({ ...e, m: linhas ? medir(linhas, e.elo, e.medida, periodo) : null })),
-    [linhas, periodo],
+    () => ELOS.map((e) => ({ ...e, m: linhas ? medir(linhas, e.elo, e.medida, dias) : null })),
+    [linhas, dias],
   );
 
   return (
@@ -165,9 +183,15 @@ export default function Central({ periodo, recarga = 0 }: { periodo: Periodo; re
         <Target className="w-4 h-4 text-secondary" />
         <span className="text-sm font-semibold text-on-surface">Estamos indo bem?</span>
         <span className="font-mono text-[10px] text-muted">
-          {periodo === 'tudo' ? 'desde o início' : `últimos ${periodo} dias`}
-          {periodo !== 'tudo' && ', comparados com os anteriores'}
+          {dias == null ? 'desde o início' : recorte.rotulo}
+          {dias != null && ', comparados com os anteriores'}
         </span>
+        {naoSepara.length > 0 && (
+          <span className="ml-auto font-mono text-[9px] uppercase tracking-wider text-warning border border-warning/40 bg-warning/10 px-1.5 py-px"
+                title="v_marketing_cadeia_dia tem dia, elo, medida, natureza e n — não tem marca nem rede (medido em 25/11/2026)">
+            não separa por {naoSepara.join(' nem ')}
+          </span>
+        )}
       </div>
 
       {/* Placar do mês — o mesmo da página Receita, lido da mesma fonte e não recalculado aqui. */}
@@ -218,7 +242,7 @@ export default function Central({ periodo, recarga = 0 }: { periodo: Periodo; re
                 ) : m.nuncaHouve ? (
                   /* "Nunca houve" e "caiu 100%" levam a ações opostas: uma é esperar, a outra é correr. */
                   <span className="font-mono text-[10px] text-muted">nunca houve registro</span>
-                ) : periodo === 'tudo' ? (
+                ) : dias == null ? (
                   <span className="font-mono text-[10px] text-muted">sem período anterior</span>
                 ) : m.natureza === 'estoque' && m.cestaAgora != null && m.cestaAntes != null && m.cestaAgora !== m.cestaAntes ? (
                   /* Cesta diferente não se compara: a diferença seria da régua, não do resultado. */

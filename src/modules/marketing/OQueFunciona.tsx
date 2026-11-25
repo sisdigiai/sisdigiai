@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Trophy, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import NaoObedece from './NaoObedece';
+import type { Recorte } from '../../lib/recorte';
 import { lerTudo } from '../../lib/paginar';
 
 // "O que funciona" — o bloco que faltava. O dono, 18/11: "mostra o que saiu e bem pouco o que funciona".
@@ -40,7 +42,19 @@ const num = (n: number | null) => (n == null ? '—' : Number(n).toLocaleString(
 // só vi ao abrir a tela. Falta de rótulo não é característica da peça; é falta nossa.
 const semRotulo = (valor: string) => valor.startsWith('(sem ');
 
-export default function OQueFunciona({ recarga = 0 }: { recarga?: number }) {
+// ESTE BLOCO NÃO OBEDECE À BARRA, E DIZ ISSO (25/11/2026).
+//
+// `v_mkt_resultado_recorte` tem recorte, valor, medianas e p90 — **não tem data, nem marca, nem
+// rede** (a coluna `rede_recorte` é o rótulo do corte, não um filtro de rede). Medido no banco em
+// 25/11. A janela dela é fixa na própria view: peça com 7 a 90 dias.
+//
+// Então o prop `janela` não filtra nada aqui — serve só para o selo dizer, na cara de quem olha,
+// que o recorte escolhido não chegou. O MKT ofereceu em 25/11 fazer a versão com data; pedido
+// aberto. Até lá, confessar é a única coisa honesta a fazer.
+//
+// (O estado `recorte` lá embaixo é outra coisa: é a DIMENSÃO do corte — tipo, gatilho, hora.
+// Por isso o prop entra como `janela`.)
+export default function OQueFunciona({ recorte: janela, recarga = 0 }: { recorte: Recorte; recarga?: number }) {
   const [linhas, setLinhas] = useState<Linha[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [rede, setRede] = useState<string | null>(null);
@@ -77,6 +91,8 @@ export default function OQueFunciona({ recarga = 0 }: { recarga?: number }) {
         <span className="font-mono text-[10px] text-muted">
           peça com 7 a 90 dias · mediana sobre a leitura que existe, nunca sobre peça não medida
         </span>
+        <NaoObedece recorte={janela} data marca rede className="ml-auto"
+          porque="v_mkt_resultado_recorte não tem data, marca nem rede (medido em 25/11/2026); a janela é fixa na view: peça com 7 a 90 dias" />
       </div>
 
       {erro ? (

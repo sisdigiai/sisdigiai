@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ExternalLink, RefreshCw, Info, Send, Target, CalendarClock } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { TravasBanner } from './TravasMarketing';
@@ -14,6 +14,8 @@ import OQueFunciona from './marketing/OQueFunciona';
 import ResultadoDeNegocio from './marketing/ResultadoDeNegocio';
 import PlacarDeDecisao from './marketing/PlacarDeDecisao';
 import CentralDeFontes from './marketing/CentralDeFontes';
+import DesempenhoPorMarca from './marketing/DesempenhoPorMarca';
+import RankingDePecas from './marketing/RankingDePecas';
 import FatosPublicaveis, { type FatoMkt, type MedicaoFato } from './marketing/FatosPublicaveis';
 import MktCrescimento, {
   Chip, RANGES, REDES, origemDaMarca, rotuloOrigem,
@@ -23,6 +25,7 @@ import { espelhoMotores as motores } from '../lib/espelhoMotores';
 import { supabase } from '../lib/supabase';
 import { hojeBrasilia } from '../lib/datas';
 import { useLeitura, horaCurta } from '../lib/useLeitura';
+import { recorteDe } from '../lib/recorte';
 import { espelhoMotores, resumoPola, type EspelhoLimelight, type EspelhoPulso, type EspelhoBlogs } from '../lib/espelhoMotores';
 
 // Cadeia de resultados (v_marketing_cadeia + espelhos + uso vivo Clearix).
@@ -203,6 +206,19 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
   // oferece mais; quando não dá para obedecer exatamente, a aba DIZ em que janela leu.
   const periodoEspelho: Periodo = fDias === 0 ? 'tudo' : fDias <= 7 ? '7' : '30';
   const periodoExato = fDias === 0 || fDias === 7 || fDias === 30;
+
+  // O RECORTE INTEIRO, RESOLVIDO UMA VEZ (25/11/2026, pedido do dono no canal do MKT: "falta ligação
+  // em tudo"). Até hoje a barra montava sete filtros e os cartões do Espelho recebiam UM —
+  // `periodoEspelho`, que reduz qualquer escolha a 7, 30 ou tudo. Marca, rede, grupo e intervalo
+  // livre morriam na barra. O Radar já recebia `filtros` inteiro; eram duas metades da mesma página
+  // obedecendo a réguas diferentes, com a mesma barra acesa em cima das duas.
+  //
+  // `recorteDe` também é onde o grupo vira lista de marcas — ver o porquê em lib/recorte.ts: a coluna
+  // `origem` das views diz quem MEDIU a peça, não de quem é o canal, e ligar o filtro nela daria
+  // número certo para a pergunta errada.
+  const recorte = useMemo(() => recorteDe(filtros, marcasChip), [
+    fDias, fDe, fAte, fOrigem, fRede, fMarca, fData, marcasChip,
+  ]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // O ENDEREÇO GUARDA A ABA E O PERÍODO — o dono manda o link de uma leitura, e o botão voltar
   // funciona. Vai nos trechos do hash (`#/marketing/saude/30`) e não como `?p=30`: o roteador do app
@@ -520,12 +536,15 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
                 : 'quanto a casa já somou do que foi MEDIDO no período — peça antiga lida ontem entra'}
             </div>
           </div>
-          {!periodoExato && (
-            <div className="text-[11px] text-muted">
-              Resultado, Leitura das peças e Hoje leem em janelas de <b className="text-on-surface-variant">7, 30 ou tudo</b> — é o que
-              as views deles entregam. Com {fDias} dias escolhidos, eles mostram a janela de {periodoEspelho === 'tudo' ? 'tudo' : periodoEspelho + ' dias'} e dizem isso.
-            </div>
-          )}
+          {/* O aviso de 7/30/tudo saiu em 25/11: deixou de ser verdade. Todas as abas passaram a
+              ler a janela escolhida, inclusive 60d, 90d, 6m, 12m e o intervalo livre. O que ainda
+              não obedece não é a JANELA — é marca ou rede, e quem não obedece diz na própria faixa,
+              com o selo "não separa por…". Aviso que descreve uma limitação removida é pior que
+              nenhum: manda procurar defeito onde não há. */}
+          <div className="text-[11px] text-muted">
+            Toda aba lê a janela escolhida. Onde um bloco não puder separar por marca ou por rede,
+            ele diz isso na própria faixa — a fonte dele não tem a coluna.
+          </div>
         </div>
         )}
 
@@ -534,7 +553,7 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
         {aba === 'hoje' && (
           <div className="space-y-6">
             <MktCrescimento aba="visao" filtros={filtros} recarga={recarga} />
-            <HojeSai periodo={periodoEspelho} recarga={recarga} />
+            <HojeSai recorte={recorte} recarga={recarga} />
           </div>
         )}
 
@@ -545,8 +564,8 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
           <div className="space-y-6">
             <PlacarDeDecisao pecas7d={esp?.publicadas_7d ?? null} recarga={recarga} />
             <ResultadoDeNegocio recarga={recarga} />
-            <Central periodo={periodoEspelho} recarga={recarga} />
-            <Leituras periodo={periodoEspelho} recarga={recarga} />
+            <Central recorte={recorte} recarga={recarga} />
+            <Leituras recorte={recorte} recarga={recarga} />
           </div>
         )}
 
@@ -554,7 +573,10 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
             por recorte de negócio; o bloco do Radar, por formato, gatilho e hora do dia. */}
         {aba === 'funciona' && (
           <div className="space-y-6">
-            <OQueFunciona recarga={recarga} />
+            <OQueFunciona recorte={recorte} recarga={recarga} />
+            {/* A mediana diz que TIPO de coisa repetir; a lista diz QUAL peça foi o pico. As duas
+                perguntas se fazem no mesmo minuto, olhando o mesmo gráfico. */}
+            <RankingDePecas recorte={recorte} recarga={recarga} />
             <ResultadoConteudoCard recarga={recarga} />
             <MktCrescimento aba="conteudo" filtros={filtros} recarga={recarga} />
           </div>
@@ -566,12 +588,21 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
         {/* LEITURA DAS PEÇAS — "quantos leram, e quanto disso a casa mede?". */}
         {aba === 'leitura' && (
           <div className="space-y-6">
-            <LeiturasCard periodo={periodoEspelho} recarga={recarga} />
+            <LeiturasCard recorte={recorte} recarga={recarga} />
           </div>
         )}
 
         {/* MARCA × REDE, RÉGUA e TERRITÓRIO: o detalhe, direto do Radar. */}
-        {aba === 'marca-rede' && <MktCrescimento aba="audiencia" filtros={filtros} recarga={recarga} />}
+        {/* MARCA × REDE — duas perguntas, nesta ordem (25/11/2026, pedido do dono).
+            "O que rendeu" vem primeiro porque é o que ele foi procurar e não achou: a aba mede
+            SEGUIDORES, que é estoque — o censo de hoje é o mesmo em "hoje" e em "6m", e por isso o
+            número grande não mudava com a janela. Não era filtro quebrado; era outra pergunta. */}
+        {aba === 'marca-rede' && (
+          <div className="space-y-6">
+            <DesempenhoPorMarca recorte={recorte} recarga={recarga} />
+            <MktCrescimento aba="audiencia" filtros={filtros} recarga={recarga} />
+          </div>
+        )}
         {aba === 'regua' && <MktCrescimento aba="regua" filtros={filtros} recarga={recarga} />}
         {aba === 'territorio' && <MktCrescimento aba="territorio" filtros={filtros} recarga={recarga} />}
 
@@ -754,7 +785,7 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
         {aba === 'motores' && <MktCrescimento aba="video" filtros={filtros} recarga={recarga} />}
         {aba === 'motores' && (
           <MotoresDeConteudo
-            periodo={periodoEspelho}
+            recorte={recorte}
             limelight={limelight}
             pulso={pulso}
             espMkt={esp}

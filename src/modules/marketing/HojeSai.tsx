@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Clock, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { lerTudo } from '../../lib/paginar';
-import { rotuloJanela, type Periodo } from './Central';
+import { aplicar, type Recorte } from '../../lib/recorte';
 
 // "Hoje sai" e a pontualidade — ordem do dono em 17 e 18/11: "saiu no horário o vídeo, saiu o rascunho
 // normal". A Lousa mostra o que está MARCADO; este bloco mostra o que SAIU, e se saiu na hora.
@@ -32,33 +32,37 @@ const JA_SAIU = ['publicado'];
 const AINDA_SAI = ['agendado', 'planejado', 'no_planner'];
 const RASCUNHO = ['rascunho'];
 
-export default function HojeSai({ periodo, recarga = 0 }: { periodo: Periodo; recarga?: number }) {
+export default function HojeSai({ recorte, recarga = 0 }: { recorte: Recorte; recarga?: number }) {
   const [pecas, setPecas] = useState<Peca[] | null>(null);
   const [pont, setPont] = useState<Pont[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
+  // A AGENDA É DE HOJE POR DEFINIÇÃO — a pergunta desta faixa é "o que sai hoje?", e nenhum recorte
+  // de 90 dias muda isso. Mas marca e rede ela obedece: escolher Lancaster e continuar vendo a
+  // agenda inteira da casa é a barra acesa mentindo.
   useEffect(() => {
     const hoje = diaBRT(new Date());
-    supabase.from('v_lousa').select('*')
-      .gte('quando', `${hoje}T00:00:00-03:00`).lt('quando', `${hoje}T23:59:59-03:00`).limit(500)
-      .then(({ data, error }) => {
-        if (error) { setErro(error.message); setPecas([]); return; }
-        setPecas((data ?? []) as Peca[]);
-      });
-  }, [recarga]);
+    const base = supabase.from('v_lousa').select('*')
+      .gte('quando', `${hoje}T00:00:00-03:00`).lt('quando', `${hoje}T23:59:59-03:00`);
+    const { q } = aplicar(base, { ...recorte, de: null, ate: null }, { marca: 'marca', rede: 'rede' });
+    q.limit(500).then(({ data, error }: { data: unknown; error: { message: string } | null }) => {
+      if (error) { setErro(error.message); setPecas([]); return; }
+      setPecas((data ?? []) as Peca[]);
+    });
+  }, [recorte, recarga]);
 
   useEffect(() => {
-    const dias = periodo === 'tudo' ? null : Number(periodo);
-    const corte = dias ? diaBRT(new Date(Date.now() - dias * 86400000)) : null;
     // Paginado em 19/11: 810 linhas hoje, 17 por dia — o teto de mil da API chega em dezembro, e no
     // recorte "tudo" chegaria calado.
     lerTudo<Pont>((de, ate) => {
-      const q = supabase.from('v_pontualidade')
-        .select('origem, marca, rede, dia, minutos, pontualidade, saiu_por')
-        .order('dia').order('marca').order('rede').order('saiu_em').order('minutos').range(de, ate);
-      return corte ? q.gte('dia', corte) : q;
+      const base = supabase.from('v_pontualidade')
+        .select('origem, marca, rede, dia, minutos, pontualidade, saiu_por');
+      // `origem` existe nesta view e é QUEM PUBLICOU, não o grupo da barra: o grupo vem resolvido em
+      // marcas pelo recorte, e esta coluna não é tocada.
+      const { q } = aplicar(base, recorte, { data: 'dia', marca: 'marca', rede: 'rede' });
+      return q.order('dia').order('marca').order('rede').order('saiu_em').order('minutos').range(de, ate);
     }).then(setPont);
-  }, [periodo, recarga]);
+  }, [recorte, recarga]);
 
   const agora = Date.now();
   const grupos = useMemo(() => {
@@ -143,12 +147,12 @@ export default function HojeSai({ periodo, recarga = 0 }: { periodo: Periodo; re
       {/* Pontualidade do período — a pergunta do dono: "saiu no horário o vídeo?" */}
       <div className="px-4 py-2.5 border-t border-outline/10 flex flex-wrap items-baseline gap-x-4 gap-y-1 text-xs">
         <span className="font-mono text-[9px] uppercase tracking-widest text-muted">
-          pontualidade {periodo === 'tudo' ? 'de sempre' : `· ${periodo} dias`}
+          pontualidade {recorte.de == null ? 'de sempre' : `· ${recorte.rotulo}`}
         </span>
         {pont == null ? (
           <span className="text-muted">lendo…</span>
         ) : resumo.total === 0 ? (
-          <span className="text-on-surface-variant">Nenhuma peça com hora marcada <strong>e</strong> hora real em {rotuloJanela(periodo)}, por data de publicação — <span className="text-muted">sem as duas, não há pontualidade.</span></span>
+          <span className="text-on-surface-variant">Nenhuma peça com hora marcada <strong>e</strong> hora real em {recorte.rotulo}, por data de publicação — <span className="text-muted">sem as duas, não há pontualidade.</span></span>
         ) : (
           <>
             <span><strong className="text-on-surface tabular-nums">{Math.round((resumo.noHorario / resumo.total) * 100)}%</strong> no horário</span>
