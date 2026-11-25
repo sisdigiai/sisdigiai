@@ -481,11 +481,13 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
             <span className={cls + ' w-16 shrink-0'}>quem</span>
             <BotaoGrupo on={fOrigem === '' && fMarca === ''} onClick={() => { setFOrigem(''); setFMarca(''); }}>tudo</BotaoGrupo>
+            {/* Três grupos desde 25/11, num eixo só: QUEM PRODUZ. O Limelight saiu da lista porque
+                não é dono de canal — é fábrica de vídeo da Mello, e a Mello é da casa. Ver o porquê
+                inteiro, e por que os cortes do Pulso ficam no Pulso, em MktCrescimento (ORIGENS). */}
             {([
               ['casa', 'casa'],
-              ['cortes', 'Cortes'],
+              ['cortes', 'cortes'],
               ['pulso', 'Pulso'],
-              ['limelight', 'Limelight'],
             ] as const).map(([k, rotulo]) => {
               const doGrupo = marcasChip.filter((m) => m.origem === k);
               return (

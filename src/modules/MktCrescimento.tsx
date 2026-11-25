@@ -71,22 +71,32 @@ type AbaK = AbaRadar;
 // "Bastidores DIGIAI" escondia o cartão do Pulso, que é justamente quem publica e mede esses canais.
 // O filtro mentia nos dois sentidos.
 //
-// Origem = DE QUEM É O CANAL. São quatro, e não se sobrepõem:
-//   · casa      — contas das marcas da DIGIAI (schema mkt)
-//   · cortes    — canais de Bastidores/Cortes da casa, produzidos pelo digiai_cortes
-//   · pulso     — canais faceless do próprio Pulso (espelho; TRÊS marcas, não uma)
-//   · limelight — fábrica da Mello (espelho)
+// QUEM = **QUEM PRODUZ**. São três, e não se sobrepõem (25/11/2026, desenho do dono).
+//   · casa    — o que o MKT produz para as marcas da DIGIAI, **Limelight incluído**
+//   · cortes  — o motor digiai_cortes (publica só em Bastidores DIGIAI e canal 2)
+//   · pulso   — o Pulso, **com os cortes dele**: quem os produz é ele
+//
+// ERAM QUATRO ATÉ 25/11, e o Limelight saiu como grupo porque ele não é dono de canal: é uma
+// fábrica de vídeo que produz PARA a Mello, marca da casa, e publica nos canais dela. Grupo próprio
+// para ele obrigava a escolher "Limelight" para ver metade do que a Mello fez — e a outra metade
+// sumia. Dentro de casa, a Mello fecha inteira.
+//
+// E OS CORTES DO PULSO FICAM NO PULSO. O dono propôs juntá-los ao grupo `cortes`; medi em 25/11 e o
+// motor de cortes publica só em `bastidores` e `bastidores2`, nunca nos canais do Pulso. Juntar
+// misturaria dois eixos — casa e pulso são produtor, cortes viraria formato — e a mesma peça caberia
+// em dois chips que se excluem: escolhe `pulso` e perde os cortes dele, escolhe `cortes` e conta
+// audiência que não é da casa. As somas parariam de fechar sem ninguém notar. Quem quiser ver todos
+// os cortes juntos usa o chip de FORMATO, que atravessa os três grupos sem mexer nas somas.
 //
 // NÃO confundir com a coluna `origem` da `v_mkt_analytics_peca_dia`: aquela diz QUEM MEDIU a peça
 // (mkt, pulso ou digiai_cortes lendo as MESMAS contas da casa) — é saúde de coleta, não dono de
 // canal. Medido em 20/11: `cortes.da.digiai` aparece com origem 'pulso' E 'digiai_cortes'; duas
 // coletas, nenhuma peça repetida (zero `peca_ref` em duas origens).
 export const ORIGENS = [
-  { k: '', label: 'todas' },
+  { k: '', label: 'tudo' },
   { k: 'casa', label: 'casa' },
-  { k: 'cortes', label: 'Cortes' },
+  { k: 'cortes', label: 'cortes' },
   { k: 'pulso', label: 'Pulso' },
-  { k: 'limelight', label: 'Limelight' },
 ] as const;
 export type OrigemK = typeof ORIGENS[number]['k'];
 const ORIGEM_DA_MARCA: Record<string, OrigemK> = { bastidores: 'cortes', bastidores2: 'cortes', pulso: 'pulso' };
@@ -679,14 +689,15 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
   // nas marcas do Pulso, escolhe o canal; na casa, a marca da DIGIAI.
   const marcaEhDoPulso = fMarca !== '' && pulsoMarcas.includes(fMarca);
   const mostrarPulso = (fOrigem === '' || fOrigem === 'pulso') && (fMarca === '' || marcaEhDoPulso) && pulsoCards.length > 0;
-  const mostrarLime = (fOrigem === '' || fOrigem === 'limelight') && (fMarca === '' || fMarca === codeMello) && limePub.length > 0;
+  // O Limelight produz para a Mello e publica nos canais dela: desde 25/11 ele vive dentro de CASA.
+  const mostrarLime = (fOrigem === '' || fOrigem === 'casa') && (fMarca === '' || fMarca === codeMello) && limePub.length > 0;
   const mostrarBlogs = (fOrigem === '' || fOrigem === 'casa') && (!fMarca || fMarca === codeDigiai) && !fRede && blogDias.length > 0;
   const mostrarOsi = (fOrigem === '' || fOrigem === 'casa') && (!fMarca || fMarca === codeOsi) && !fRede;
   const codePola = 'polapetit';
   const mostrarPola = (fOrigem === '' || fOrigem === 'casa') && (!fMarca || fMarca === codePola);
   // Abas que medem as contas da CASA não têm o que mostrar quando o recorte é um motor de fora.
   // Vazio sem explicação é lido como "não aconteceu nada" — e aqui significa "não é aqui".
-  const soMotor = fOrigem === 'pulso' || fOrigem === 'limelight';
+  const soMotor = fOrigem === 'pulso';
 
   // Visão: agregados do ecossistema no recorte
   const viewsRecorte = (mostrarPulso ? pulsoTot.views : 0) + (mostrarLime ? limeTot.views : 0);

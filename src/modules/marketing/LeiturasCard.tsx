@@ -102,7 +102,8 @@ export default function LeiturasCard({ recorte, recarga = 0 }: { recorte: Recort
   // plataforma — não têm marca. Somá-los com "Lancaster" escolhido poria as views do Pulso dentro do
   // número da Lancaster, calado. A rede eles sabem separar (`plataforma`), e separam.
   const pulsoEntra = motorNoRecorte(recorte, 'pulso');
-  const limeEntra = motorNoRecorte(recorte, 'limelight');
+  // O Limelight deixou de ser grupo em 25/11: ele produz para a Mello, marca da casa.
+  const limeEntra = motorNoRecorte(recorte, 'casa');
   const deDia = recorte.de ?? '0000-01-01';
   const ateDia = recorte.ate ?? '9999-12-31';
   const noPeriodo = <T extends { dia: string; plataforma?: string }>(l: T[]) =>

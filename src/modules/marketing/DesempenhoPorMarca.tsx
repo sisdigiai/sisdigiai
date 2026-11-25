@@ -3,6 +3,7 @@ import { BarChart3, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { lerTudo } from '../../lib/paginar';
 import { aplicar, type Recorte } from '../../lib/recorte';
+import { espelhoMotoresEstado, type PulsoContaDia, type EstadoEspelho } from '../../lib/espelhoMotores';
 
 // O QUE CADA MARCA RENDEU NO RECORTE (25/11/2026).
 //
@@ -26,6 +27,9 @@ import { aplicar, type Recorte } from '../../lib/recorte';
 // de peça numa coluna só seria juntar duas unidades e chamar de desempenho.
 
 type Peca = { marca: string | null; rede: string; views: number | null; curtidas: number | null; comentarios: number | null; compartilhamentos: number | null; peca_ref: string };
+/** Quem PRODUZ a peça. Três grupos, um eixo só — ver ORIGENS em MktCrescimento. */
+const grupoDaMarca = (marca: string | null) =>
+  marca === 'bastidores' || marca === 'bastidores2' ? 'cortes' : 'casa';
 type Conta = { marca: string | null; rede: string; alcance: number | null; interacoes: number | null };
 
 const n = (v: number) => v.toLocaleString('pt-BR');
@@ -33,6 +37,7 @@ const n = (v: number) => v.toLocaleString('pt-BR');
 export default function DesempenhoPorMarca({ recorte, recarga = 0 }: { recorte: Recorte; recarga?: number }) {
   const [pecas, setPecas] = useState<Peca[] | null>(null);
   const [contas, setContas] = useState<Conta[] | null>(null);
+  const [pulso, setPulso] = useState<{ linhas: PulsoContaDia[]; estado: EstadoEspelho } | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
   const porPublicacao = recorte.data === 'publicacao';
@@ -53,6 +58,11 @@ export default function DesempenhoPorMarca({ recorte, recarga = 0 }: { recorte: 
     }).then((l) => { setErro(null); setPecas(l); })
       .catch((e) => { setErro(String(e?.message ?? e)); setPecas([]); });
   }, [recorte, recarga, porPublicacao]);
+
+  // O Pulso vive no espelho dele, e `v_espelho_pulso_contas_dias` é a soma exata das outras duas
+  // views (curtos + cortes e longos), com rede e tipo. Por isso a coluna do Pulso fecha por rede,
+  // e não só no total.
+  useEffect(() => { espelhoMotoresEstado.pulsoContasDias().then(setPulso); }, [recarga]);
 
   useEffect(() => {
     setContas(null);
@@ -100,6 +110,33 @@ export default function DesempenhoPorMarca({ recorte, recarga = 0 }: { recorte: 
     pecas: a.pecas + l.pecas, views: a.views + l.views, inter: a.inter + l.inter, alcance: a.alcance + l.alcance,
   }), { pecas: 0, views: 0, inter: 0, alcance: 0 });
 
+  // CADA LINHA NOS TRÊS GRUPOS (25/11/2026, desenho do dono). A pergunta que isto responde e a
+  // tabela de baixo não: "desta rede, quanto é da casa, quanto é dos cortes, quanto é do Pulso".
+  // A marca diz o grupo da casa e dos cortes; o Pulso vem do espelho dele, pela mesma janela.
+  const deDia = recorte.de ?? '0000-01-01';
+  const ateDia = recorte.ate ?? '9999-12-31';
+  const porGrupo = (() => {
+    const m = new Map<string, { rede: string; casa: number; cortes: number; pulso: number }>();
+    const pega = (rede: string) => {
+      const a = m.get(rede) ?? { rede, casa: 0, cortes: 0, pulso: 0 };
+      m.set(rede, a); return a;
+    };
+    for (const p of unicas) {
+      if (p.views == null) continue;
+      const a = pega(p.rede);
+      if (grupoDaMarca(p.marca) === 'cortes') a.cortes += p.views; else a.casa += p.views;
+    }
+    for (const d of pulso?.linhas ?? []) {
+      if (d.dia < deDia || d.dia > ateDia) continue;
+      if (recorte.rede && d.plataforma !== recorte.rede) continue;
+      pega(d.plataforma).pulso += d.views ?? 0;
+    }
+    // Grupo escolhido na barra: as outras colunas não somem, zeram — e a tabela diz isso em palavra.
+    return [...m.values()].sort((x, y) => (y.casa + y.cortes + y.pulso) - (x.casa + x.cortes + x.pulso));
+  })();
+  const totGrupo = porGrupo.reduce((a, l) => ({ casa: a.casa + l.casa, cortes: a.cortes + l.cortes, pulso: a.pulso + l.pulso }), { casa: 0, cortes: 0, pulso: 0 });
+  const pulsoForaDoRecorte = recorte.origem !== '' && recorte.origem !== 'pulso';
+
   return (
     <section className="border border-outline/15 bg-surface-container">
       <div className="flex items-center gap-2 flex-wrap px-4 py-2.5 border-b border-outline/10">
@@ -126,6 +163,52 @@ export default function DesempenhoPorMarca({ recorte, recarga = 0 }: { recorte: 
         </div>
       ) : (
         <>
+          {/* CADA REDE ABERTA NOS TRÊS GRUPOS. Vem antes do detalhe por marca porque é a pergunta
+              que se faz primeiro: desta rede, quanto é da casa, quanto é dos cortes, quanto é do
+              Pulso. Abaixo, a mesma coisa marca a marca. */}
+          <table className="w-full text-sm border-b border-outline/15">
+            <thead>
+              <tr className="border-b border-outline/10 font-mono text-[9px] uppercase tracking-widest text-muted">
+                <th className="px-4 py-1.5 text-left font-normal">rede</th>
+                <th className="px-4 py-1.5 text-right font-normal text-secondary">casa</th>
+                <th className="px-4 py-1.5 text-right font-normal text-secondary">cortes</th>
+                <th className="px-4 py-1.5 text-right font-normal text-secondary">Pulso</th>
+                <th className="px-4 py-1.5 text-right font-normal text-on-surface">total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {porGrupo.map((l) => (
+                <tr key={`g-${l.rede}`} className="border-b border-outline/5">
+                  <td className="px-4 py-1.5 text-on-surface">{l.rede}</td>
+                  <td className="px-4 py-1.5 text-right tabular-nums text-on-surface-variant">{l.casa === 0 ? <span className="text-muted">—</span> : n(l.casa)}</td>
+                  <td className="px-4 py-1.5 text-right tabular-nums text-on-surface-variant">{l.cortes === 0 ? <span className="text-muted">—</span> : n(l.cortes)}</td>
+                  <td className="px-4 py-1.5 text-right tabular-nums text-on-surface-variant">
+                    {pulso == null ? <span className="text-muted">lendo…</span>
+                      : pulso.estado !== 'ok' ? <span className="text-muted">espelho não lido</span>
+                      : l.pulso === 0 ? <span className="text-muted">—</span> : n(l.pulso)}
+                  </td>
+                  <td className="px-4 py-1.5 text-right tabular-nums text-on-surface font-semibold">{n(l.casa + l.cortes + l.pulso)}</td>
+                </tr>
+              ))}
+              <tr className="border-t border-outline/15 font-semibold">
+                <td className="px-4 py-1.5 text-on-surface">views no recorte</td>
+                <td className="px-4 py-1.5 text-right tabular-nums text-on-surface">{n(totGrupo.casa)}</td>
+                <td className="px-4 py-1.5 text-right tabular-nums text-on-surface">{n(totGrupo.cortes)}</td>
+                <td className="px-4 py-1.5 text-right tabular-nums text-on-surface">{n(totGrupo.pulso)}</td>
+                <td className="px-4 py-1.5 text-right tabular-nums text-on-surface">{n(totGrupo.casa + totGrupo.cortes + totGrupo.pulso)}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div className="px-4 py-2 border-b border-outline/10 text-xs text-on-surface-variant">
+            <span className="font-mono text-[9px] uppercase tracking-widest text-muted">os três grupos</span>{' '}
+            <strong className="text-on-surface">casa</strong> é o que o MKT produz para as marcas da DIGIAI,
+            Limelight incluído; <strong className="text-on-surface">cortes</strong> é o motor de cortes, que
+            publica só em Bastidores DIGIAI e no canal 2; <strong className="text-on-surface">Pulso</strong> é
+            o Pulso, com os cortes dele — quem os produz é ele, medido em 25/11.
+            {pulsoForaDoRecorte && <> Com <strong className="text-on-surface">{recorte.origem}</strong> escolhido na barra, a coluna do Pulso fica zerada de propósito: ele não é deste recorte.</>}
+          </div>
+
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-outline/10 font-mono text-[9px] uppercase tracking-widest text-muted">
