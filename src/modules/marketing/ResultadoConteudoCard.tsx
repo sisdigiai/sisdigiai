@@ -4,7 +4,6 @@ import { supabase } from '../../lib/supabase';
 // Este arquivo já tem um tipo local chamado `Recorte` (o corte do resultado: marca, formato, gatilho).
 // O recorte DA BARRA entra com outro nome para as duas coisas nunca se confundirem numa linha.
 import { aplicar, type Recorte as RecorteBarra } from '../../lib/recorte';
-import NaoObedece from './NaoObedece';
 import { resumoPola } from '../../lib/espelhoMotores';
 
 // Resultado do conteúdo e teto de IA — ordem do dono (15/09/2026): "não temos analytics ou resultado
@@ -72,10 +71,21 @@ export default function ResultadoConteudoCard({ recorte: barra, recarga = 0 }: {
       .limit(500)
       .then(({ data, error }: { data: unknown; error: { message: string } | null }) => { if (error) setErro(error.message); setCob((data ?? []) as Cobertura[]); });
 
-    supabase.from('v_mkt_resultado_recorte')
-      .select('valor, rede_recorte, com_views, views_mediana, views_p90, views_melhor, engaj_confiaveis, engaj_mediana, engaj_melhor, serve_de_base')
-      .eq('recorte', 'marca').is('rede_recorte', null).limit(200)
-      .then(({ data, error }) => { if (error) setErro(error.message); setRec((data ?? []) as Recorte[]); });
+    // 25/11, tarde: as medianas passam pela função nova do MKT, que recebe data, marca e rede. O
+    // `recorte = 'marca'` continua sendo o CORTE da análise (uma linha por marca) — outra coisa que
+    // o `p_marca`, que é o filtro da barra. Os dois convivem: a barra escolhe de quem falar, o corte
+    // escolhe como agrupar.
+    (async () => {
+      const { data, error } = await supabase.rpc('fn_mkt_resultado_recorte', {
+        p_de: barra.de, p_ate: barra.ate,
+        p_marca: barra.marcaUnica || null,
+        p_rede: barra.rede || null,
+      });
+      if (error) { setErro(error.message); setRec([]); return; }
+      const l = ((data ?? []) as Array<Recorte & { recorte: string; rede_recorte: string | null }>)
+        .filter((r) => r.recorte === 'marca' && r.rede_recorte === null);
+      setRec(l as Recorte[]);
+    })();
   }, [barra, recarga]);
 
   // uma linha por marca: a cobertura somada das redes, e a mediana do recorte da marca
@@ -117,8 +127,9 @@ export default function ResultadoConteudoCard({ recorte: barra, recarga = 0 }: {
         {/* A cobertura e o custo de IA obedecem à marca e à rede; as MEDIANAS vêm de
             `v_mkt_resultado_recorte`, que não tem data, marca nem rede. O selo diz isso em vez de
             deixar a barra acesa prometendo o que esta parte não entrega. */}
-        <NaoObedece recorte={barra} data
-          porque="as medianas vêm de v_mkt_resultado_recorte, que não tem coluna de data (medido em 25/11/2026); a cobertura e o custo de IA deste cartão obedecem à marca e à rede" />
+        {/* Em 25/11 de manhã este cartão confessava que não separava por data. À tarde o MKT publicou
+            a função com data, marca e rede, e a confissão saiu junto com o motivo dela. Selo que
+            descreve uma limitação removida mente tanto quanto filtro que não chega. */}
         {coletado && (
           <span className="ml-auto font-mono text-[10px] text-muted tabular-nums">
             coletado em {new Date(coletado).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}

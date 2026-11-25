@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Target, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import { type Recorte } from '../../lib/recorte';
+import { aplicar, type Recorte } from '../../lib/recorte';
 import { lerTudo } from '../../lib/paginar';
 
 // Central de comando do marketing — ordem do dono em 18/11/2026, 14h07: "ter a central de comando do
@@ -136,11 +136,14 @@ function Seta({ agora, antes }: { agora: number; antes: number }) {
 
 // A CADEIA OBEDECE À DATA E CONFESSA O RESTO (25/11/2026).
 //
-// `v_marketing_cadeia_dia` tem quatro colunas: dia, elo, medida, natureza, n. **Não tem marca nem
-// rede** — medido no banco em 25/11. Então este bloco obedece à janela (e agora a qualquer janela,
-// não só 7/30/tudo) e DIZ, na própria faixa, que a marca e a rede escolhidas não valem aqui.
-// Deixar a barra acesa sem essa frase é pior do que não ter filtro: quem vê o chip da Lancaster
-// aceso acredita que o número é da Lancaster.
+// `v_marketing_cadeia_dia` tinha dia, elo, medida, natureza e n — sem marca. Pedi a coluna ao MKT na
+// manhã de 25/11 e ele a entregou à tarde (migration 20261125_02), com os leads indo para o produto
+// da landing e os disparos e a Hotmart contando como osi. Conferido por mim no banco antes de ligar:
+// a view segue `security_invoker`, a coluna existe e **nenhuma linha tem marca nula** nos quatro elos
+// com dado (produzir 1.368, alcançar 988, prospectar 74, captar 4) — filtrar não perde elo.
+//
+// REDE continua de fora, e continua confessada: venda e disparo não acontecem numa rede, e inventar
+// uma faria a cadeia mentir justo no elo que decide.
 export default function Central({ recorte, recarga = 0 }: { recorte: Recorte; recarga?: number }) {
   const [linhas, setLinhas] = useState<Dia[] | null>(null);
   const [meta, setMeta] = useState<Meta | null | 'sem_acesso'>(null);
@@ -152,7 +155,10 @@ export default function Central({ recorte, recarga = 0 }: { recorte: Recorte; re
     : recorte.ate
       ? Math.max(1, Math.round((Date.parse(recorte.ate) - Date.parse(recorte.de)) / 864e5))
       : Math.max(1, Math.round((Date.now() - Date.parse(recorte.de)) / 864e5));
-  const naoSepara = [recorte.marcas ? 'marca' : null, recorte.rede ? 'rede' : null].filter(Boolean) as string[];
+  // 25/11, tarde: o MKT abriu `marca` em `v_marketing_cadeia_dia` (migration 20261125_02) e a cadeia
+  // passou a obedecer a ela. Rede continua de fora, e continua confessada: venda e disparo não têm
+  // rede, e inventar uma faria a cadeia mentir no elo que mais importa.
+  const naoSepara = [recorte.rede ? 'rede' : null].filter(Boolean) as string[];
 
   useEffect(() => {
     // Pede só a janela que a tela usa (o período e o anterior, com folga), não a série inteira: a
@@ -164,9 +170,9 @@ export default function Central({ recorte, recarga = 0 }: { recorte: Recorte; re
     // isso de sucesso. Hoje a view tem 588 linhas, longe do teto, mas "tudo" não tem recorte: o dia
     // em que passar, a série perderia a ponta sem avisar.
     lerTudo<Dia>((de, ate) => {
-      const q = supabase.from('v_marketing_cadeia_dia').select('*')
-        .order('dia').order('elo').order('medida').range(de, ate);
-      return corte ? q.gte('dia', corte) : q;
+      const base = supabase.from('v_marketing_cadeia_dia').select('*');
+      const { q } = aplicar(base, { ...recorte, de: corte, ate: null }, { data: 'dia', marca: 'marca' });
+      return q.order('dia').order('elo').order('medida').range(de, ate);
     }).then(setLinhas).catch((e) => { setErro(String(e?.message ?? e)); setLinhas([]); });
     supabase.from('v_receita_meta').select('*').maybeSingle()
       .then(({ data, error }) => setMeta(error || !data ? 'sem_acesso' : (data as Meta)));
@@ -188,7 +194,7 @@ export default function Central({ recorte, recarga = 0 }: { recorte: Recorte; re
         </span>
         {naoSepara.length > 0 && (
           <span className="ml-auto font-mono text-[9px] uppercase tracking-wider text-warning border border-warning/40 bg-warning/10 px-1.5 py-px"
-                title="v_marketing_cadeia_dia tem dia, elo, medida, natureza e n — não tem marca nem rede (medido em 25/11/2026)">
+                title="v_marketing_cadeia_dia ganhou `marca` em 25/11 (MKT); rede ela não tem — venda e disparo não acontecem numa rede">
             não separa por {naoSepara.join(' nem ')}
           </span>
         )}

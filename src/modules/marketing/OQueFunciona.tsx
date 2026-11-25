@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Trophy, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import NaoObedece from './NaoObedece';
 import type { Recorte } from '../../lib/recorte';
-import { lerTudo } from '../../lib/paginar';
 
 // "O que funciona" — o bloco que faltava. O dono, 18/11: "mostra o que saiu e bem pouco o que funciona".
 //
@@ -60,10 +58,27 @@ export default function OQueFunciona({ recorte: janela, recarga = 0 }: { recorte
   const [rede, setRede] = useState<string | null>(null);
   const [recorte, setRecorte] = useState<string>('tipo');
 
+  // 25/11, tarde: o MKT publicou `fn_mkt_resultado_recorte(p_de, p_ate, p_marca, p_rede)` e este bloco
+  // deixou de ser cego. Conferido por mim no banco antes de ligar: função **invoker**, `anon` sem
+  // execute, `authenticated` com; sem parâmetro devolve as mesmas 138 linhas da view.
+  //
+  // DUAS COISAS QUE A FUNÇÃO NÃO FAZ, e que a tela diz em vez de esconder:
+  //  · `p_marca` é UMA marca. Escolher um GRUPO (casa, cortes…) não dá — o bloco avisa e mostra tudo.
+  //  · esta análise só existe para Instagram e Facebook. Medido: instagram 102 linhas, facebook 68,
+  //    **youtube 0, tiktok 0**. Com TikTok escolhido o bloco vem vazio, e vazio sem explicação parece
+  //    coleta quebrada — por isso a frase.
+  const grupoSemMarca = !!janela.marcas && janela.marcas.length > 1;
+
   useEffect(() => {
-    lerTudo<Linha>((de, ate) => supabase.from('v_mkt_resultado_recorte')
-      .select('recorte, valor, rede_recorte, pecas, redes, lidas, com_views, views_mediana, views_p90, views_melhor, com_alcance, alcance_mediana, engaj_confiaveis, engaj_mediana, engaj_melhor, serve_de_base, mistura_redes')
-      .order('recorte').order('valor').order('rede_recorte').range(de, ate))
+    (async () => {
+      const { data, error } = await supabase.rpc('fn_mkt_resultado_recorte', {
+        p_de: janela.de, p_ate: janela.ate,
+        p_marca: janela.marcaUnica || null,
+        p_rede: janela.rede || null,
+      });
+      if (error) throw new Error(error.message);
+      return (data ?? []) as Linha[];
+    })()
       .then((todas) => {
         setLinhas(todas);
         // a rede que abre é a que tem mais leitura, não a primeira do alfabeto: abrir numa rede sem
@@ -73,7 +88,7 @@ export default function OQueFunciona({ recorte: janela, recarga = 0 }: { recorte
         setRede([...porRede.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null);
       })
       .catch((e) => { setErro(String(e?.message ?? e)); setLinhas([]); });
-  }, [recarga]);
+  }, [janela, recarga]);
 
   const redes = [...new Set((linhas ?? []).map((l) => l.rede_recorte).filter((r): r is string => !!r))].sort();
   const mostradas = (linhas ?? [])
@@ -91,8 +106,12 @@ export default function OQueFunciona({ recorte: janela, recarga = 0 }: { recorte
         <span className="font-mono text-[10px] text-muted">
           peça com 7 a 90 dias · mediana sobre a leitura que existe, nunca sobre peça não medida
         </span>
-        <NaoObedece recorte={janela} data marca rede className="ml-auto"
-          porque="v_mkt_resultado_recorte não tem data, marca nem rede (medido em 25/11/2026); a janela é fixa na view: peça com 7 a 90 dias" />
+        {grupoSemMarca && (
+          <span className="ml-auto font-mono text-[9px] uppercase tracking-wider text-warning border border-warning/40 bg-warning/10 px-1.5 py-px"
+                title="fn_mkt_resultado_recorte recebe UMA marca, não um grupo; escolha uma marca para recortar este bloco">
+            grupo não recorta aqui
+          </span>
+        )}
       </div>
 
       {erro ? (
@@ -102,6 +121,16 @@ export default function OQueFunciona({ recorte: janela, recarga = 0 }: { recorte
         </div>
       ) : linhas == null ? (
         <div className="px-4 py-3 text-sm text-muted">Carregando…</div>
+      ) : linhas.length === 0 ? (
+        /* Vazio sem explicação parece coleta quebrada e manda consertar o que não está quebrado.
+           Medido em 25/11: esta análise tem 102 linhas de Instagram e 68 de Facebook, e ZERO de
+           TikTok e YouTube — a mediana por formato e gatilho só existe onde a leitura por peça é
+           antiga o bastante para formar base. */
+        <div className="px-4 py-3 text-sm text-on-surface-variant">
+          {janela.rede && !['instagram', 'facebook'].includes(janela.rede)
+            ? <>Esta análise não existe para <strong>{janela.rede}</strong>. Hoje ela só tem base no Instagram e no Facebook — nas outras redes a leitura por peça é nova demais para formar mediana. Tire a rede da barra para ver o que há.</>
+            : <>Nenhuma peça com leitura suficiente neste recorte. A análise usa peça com <strong>7 a 90 dias</strong>: recorte mais curto que isso vem vazio por construção.</>}
+        </div>
       ) : (
         <>
           <div className="flex items-center gap-2 flex-wrap px-4 py-2 border-b border-outline/10">
