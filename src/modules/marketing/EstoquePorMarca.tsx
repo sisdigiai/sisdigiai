@@ -54,7 +54,11 @@ export default function EstoquePorMarca({ recorte, recarga = 0 }: { recorte: Rec
         return a.dias_de_estoque - b.dias_de_estoque;
       }));
     });
-  }, [recarga]);
+    // `recorte` TEM de estar aqui. Sem ele a consulta sai com o filtro certo e nunca se refaz: a
+    // barra muda, o bloco não pede nada, e a tela fica mostrando todas as marcas com uma marca
+    // escolhida — exatamente o defeito que esta entrega veio consertar, cometido por mim. Visto na
+    // tela em 25/11 às 13h47, com Mello Óticas selecionada e as nove marcas ainda na lista.
+  }, [recorte, recarga]);
 
   const baixa = (l: Linha) => l.dias_de_estoque != null && l.publicadas_7d > 0 && l.dias_de_estoque < 7;
 
