@@ -1,5 +1,5 @@
 -- ============================================================
--- 272 — o fato de comissão do Clearix sai de citável (PREPARADA, NÃO APLICADA)
+-- 272 — comissão sai de citável, e as OS de 2026 passam de 2.004 para 1.999 (PREPARADA, NÃO APLICADA)
 --
 -- DE ONDE VEM: Geral → app digiai, 25/11/2026 18h07. O dono disse no canal do RH que **a comissão do
 -- Clearix é teste e ninguém recebeu**; RH e eco conferiram no banco: 0 linhas pagas, 23 fechamentos
@@ -37,8 +37,23 @@
 -- EFEITO NO FRONT: na aba Publicações, os citáveis caem de 14 para 13; o fato passa a aparecer com o
 -- selo "preso a um uso" e a razão escrita. No gerador do MKT, o número some do prompt.
 --
+-- ─────────────────────────────────────────────────────────────────────────────
+-- SEGUNDA PARTE, do mesmo turno: AS OS DE 2026 SÃO 1.999, NÃO 2.004.
+--
+-- Geral → app digiai, 25/11 18h11: o eco remediu e achou erro de método dele — o 2.004 contava
+-- **venda cancelada**. Sem canceladas, e com venda até 24/11, são **1.999**. O 1.995 "nascidas no
+-- balcão" não muda: a frase passa a ser "1.995 das 1.999". Folha única corrigida na linha 15, com a
+-- consulta certa anotada (`status <> 'cancelled' and not is_cancelled`).
+--
+-- São 5 OS de diferença, e mesmo assim se corrige: número público que a casa sabe errado não espera
+-- a próxima remedição. Eu escrevi os dois ontem, na 271, com o número que o eco tinha medido então.
+--
+-- O que NÃO muda: a repartição 1.494 / 493 / 8 / 9 foi medida sobre 2.004 e não foi refeita sem as
+-- canceladas — por isso ela continua fora de qualquer frase, como já estava, e o `uso_restrito` do
+-- fato de OS segue dizendo que "no dia da venda" é proibido.
+--
 -- Volta: `Cockpit/controle/volta-fato-comissao-2026-11-25.sql`, lida do banco antes de qualquer
--- escrita. Nenhum delete.
+-- escrita, para as três linhas. Nenhum delete.
 -- ============================================================
 begin;
 
@@ -68,6 +83,27 @@ update mkt.fatos set
   updated_at = now()
 where chave = 'clearix_comissao_2026';
 
+-- ── as OS de 2026: 2.004 → 1.999 ──────────────────────────────────────────────
+do $$ declare n int; begin
+  select count(*) into n from mkt.fatos
+   where chave in ('clearix_os_2026','digiai_prova_operacao') and valor_numerico = 2004;
+  if n <> 2 then raise exception 'esperava os dois fatos de OS em 2004, achei %', n; end if;
+end $$;
+
+update mkt.fatos set
+  fato = 'Em 2026, 1.999 OS na loja viva da rede da casa; 1.995 nasceram no balcão, não por carga (medido em 24/11/2026, sem vendas canceladas).',
+  valor_numerico = 1999,
+  fonte = 'folha única · Remedição de 24/11/2026, corrigida em 25/11 (eco, crm_erp, sales_finance.orders): o 2.004 contava venda cancelada; a consulta certa exclui status cancelled e is_cancelled · "no dia da venda" nunca foi literal: o critério, de setembro e de hoje, é "criada até 2 dias depois da data da venda", que só separa balcão de carga.',
+  updated_at = now()
+where chave = 'clearix_os_2026';
+
+update mkt.fatos set
+  fato = 'A DIGIAI opera o próprio varejo óptico dentro do Clearix: uma rede da casa, com 1 loja vendendo todo dia e 1.999 OS em 2026 (medido em 24/11/2026, sem vendas canceladas).',
+  valor_numerico = 1999,
+  fonte = 'folha única · Remedição de 24/11/2026, corrigida em 25/11 (eco, crm_erp, sales_finance.orders): o 2.004 contava venda cancelada.',
+  updated_at = now()
+where chave = 'digiai_prova_operacao';
+
 -- ── a conferência ─────────────────────────────────────────────────────────────
 do $$ declare n int; begin
   if (select publico from mkt.fatos where chave='clearix_comissao_2026') then
@@ -91,8 +127,18 @@ do $$ declare n int; begin
 
   if (select count(*) from mkt.fatos where uso_restrito is not null and publico) <> 0 then
     raise exception 'ha fato de uso restrito publicado'; end if;
-  if exists (select 1 from mkt.fatos where uso_restrito like '%' || chr(65533) || '%') then
+  if exists (select 1 from mkt.fatos where uso_restrito like '%' || chr(65533) || '%'
+              or fato like '%' || chr(65533) || '%' or fonte like '%' || chr(65533) || '%') then
     raise exception 'acento corrompido (U+FFFD): a escrita passou por um caminho que estraga UTF-8'; end if;
+
+  -- as OS: o número velho não sobrevive em nenhum fato, e o novo diz "das 1.999"
+  if exists (select 1 from mkt.fatos where fato like '%2.004%' or valor_numerico = 2004) then
+    raise exception 'o 2.004 ainda esta em algum fato'; end if;
+  if (select count(*) from mkt.fatos where valor_numerico = 1999 and ativo) <> 2 then
+    raise exception 'esperava os dois fatos de OS em 1.999 e ativos, achei %',
+      (select count(*) from mkt.fatos where valor_numerico = 1999 and ativo); end if;
+  if not exists (select 1 from mkt.fatos where chave='clearix_os_2026' and fato like '%1.995 nasceram no balcão%') then
+    raise exception 'o fato das OS perdeu a parte que diz o que o criterio separa'; end if;
 end $$;
 
 commit;
