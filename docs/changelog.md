@@ -2,6 +2,34 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-25 (noite) — Três migrations de fato, duas aplicadas, e um número que mudou quatro vezes
+
+**Aplicadas às 20h07, com a palavra do dono.** `272`: o fato de comissão sai de citável
+(`publico = false`) com o motivo e a condição de volta escritos na própria linha — a comissão do
+Clearix é teste e ninguém recebeu. `274`: os dois fatos de OS voltam ao ar com *"mais de 1.990 OS em
+2026 (até 24/11/2026)"*, `valor_numerico` nulo, frase do balcão fora. Medido na tela: 13 citáveis,
+34 no painel, 7 presos a um uso.
+
+**O número de OS mudou quatro vezes em 24 horas:** 2.004 (24/11) → 1.999 (25/11 18h11) → 2.001
+(18h36, depois de o Vendas fixar a régua da casa: cancelada é `deleted_at IS NULL AND is_cancelled IS
+TRUE`, nunca por `status`) → **1.999 de novo** (20h33, quando o dono respondeu que as 2 OS em dúvida
+foram mesmo canceladas). A `273`, que gravava 2.001, foi preparada, ensaiada e **nunca aplicada** —
+removida hoje, porque não pode entrar em versão nenhuma. Git guarda.
+
+**A lição que custou uma recusa.** A `272` abortou às 20h06: *"esperava 13 citáveis, achei 11"*. A
+trava estava certa e nada foi escrito — **a conferência é que estava errada**. Eu tinha decorado "13
+citáveis" e "34 fatos", verdadeiros quando escrevi, às 18h; às 18h48 o MKT desligou dois fatos e o
+mundo andou. A conferência media *o mundo* em vez de medir *o efeito da própria migration*. Trocada
+por uma temporária na transação: "citáveis não mudam" e "painel ganha exatamente 1". **Número
+decorado em conferência é data de validade escondida**, e hoje toda migration demora entre escrever e
+aplicar, porque passa pelo orquestrador e pelo dono.
+
+**`275` preparada, não aplicada:** trava escrita no fato do histórico (20.375 OS). 271 marcas de
+"cancelada" em vendas de 2021 a 2025 foram postas por script e estão em disputa. O fato está vencido
+desde 14/10 e fora do gerador, então não há urgência — o risco é de **30/11**, quando eu curar os
+vencidos e renovaria às cegas. A trava vai **no dado**, não numa anotação: hoje o que me salvou três
+vezes foram as travas na linha, não o que eu tinha escrito em arquivo.
+
 ## 2026-11-25 (tarde) — Dois defeitos que a varredura pegou, e a Régua que nunca tinha aparecido
 
 O dono disse, olhando a tela: *"nada funciona com os filtros"*. Varri **as onze abas**, com marca e
