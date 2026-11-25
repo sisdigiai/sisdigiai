@@ -163,7 +163,10 @@ export default function RankingDePecas({ recorte, recarga = 0 }: { recorte: Reco
             rede a coleta lê, não por qual peça engajou. Engajamento e alcance aparecem só onde a própria
             fonte os dá por confiáveis (<code className="font-mono text-[10px]">engajamento_confiavel</code>,{' '}
             <code className="font-mono text-[10px]">alcance_e_fornecido</code>); onde não, fica escrito o motivo,
-            nunca zero. Retenção existe quase só no YouTube.{' '}
+            nunca zero. <strong className="text-on-surface">Retenção só no YouTube, e alcance só no Instagram e no
+            Facebook — porque as outras redes não entregam</strong>, não porque a casa deixou de coletar: a API do
+            TikTok devolve views e interações e nada de tempo assistido, e a de Analytics do YouTube não tem alcance
+            por vídeo (MKT, 25/11/2026). Coluna vazia aqui é limite da rede, não tarefa pendente.{' '}
             {semLeitura > 0 && <>{semLeitura} peça(s) do recorte ainda sem views coletadas ficam fora da ordem, não no fim dela. </>}
             {semGatilho > 0 && <>{semGatilho} das mostradas estão <strong>sem rótulo de gatilho</strong> — isso é falta nossa de marcação, não característica da peça.</>}
           </div>

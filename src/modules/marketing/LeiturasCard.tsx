@@ -32,6 +32,11 @@ import { espelhoMotoresEstado, type PulsoDia, type PulsoLongoDia, type LimePubDi
 //     como 0 — e a razão da ausência é diferente por rede (resposta do MKT em 17/11):
 //       · retenção e horas de exibição existem só no YouTube (coleta do `cortes-tick`);
 //       · Instagram reel e vídeo do Facebook: a rede dá, a coleta ainda não pede — "ainda não medimos";
+//       · **TikTok: a REDE não dá.** Corrigido em 25/11/2026 pelo MKT, depois que eu perguntei qual
+//         buraco era coleta e qual era a rede: a API que ele tem (`video.list`) devolve views,
+//         curtidas, comentários e compartilhamentos, e nada de tempo assistido — isso só existe no
+//         app do criador. Em 17/11 a tela dizia "a coleta ainda não pede" também para o TikTok, e
+//         isso mandava consertar o que não tem conserto;
 //       · post de imagem, carrossel e story: a rede não dá esse número;
 //       · TikTok: sai como rascunho e a coleta não lê métrica — também "ainda não medimos".
 //
@@ -252,8 +257,10 @@ export default function LeiturasCard({ recorte, recarga = 0 }: { recorte: Recort
           <div className="px-4 py-2.5 border-t border-outline/10 text-xs text-on-surface-variant">
             <span className="font-mono text-[9px] uppercase tracking-widest text-muted">por que falta número em rede</span>{' '}
             retenção e horas de exibição existem só no <strong>YouTube</strong> (coleta do <code className="font-mono text-[10px]">cortes-tick</code> aqui, e do próprio Pulso nos cortes dele).
-            Reel do Instagram, vídeo do Facebook e TikTok: a rede dá, a coleta ainda não pede — <strong>ainda não medimos</strong>.
-            Post de imagem, carrossel e story: <strong>a rede não dá</strong> esse número. (MKT, 17/11/2026.)
+            Reel do Instagram e vídeo do Facebook: a rede dá, a coleta ainda não pede — <strong>ainda não medimos</strong>.
+            <strong>TikTok: a rede não dá</strong> tempo assistido — a API de que a casa dispõe devolve views, curtidas,
+            comentários e compartilhamentos, e nada mais; retenção só no app do criador. (MKT, 17/11/2026, corrigido em 25/11.)
+            Post de imagem, carrossel e story: <strong>a rede não dá</strong> esse número.
           </div>
         </>
       )}
