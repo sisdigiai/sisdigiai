@@ -2,6 +2,55 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-25 — A barra de recorte passa a valer em toda aba (e dois defeitos velhos que o typecheck já acusava)
+
+Pedido do dono no canal do MKT, 25/11: *"preciso de filtro de data para saber qual marca performou…
+falta ligação em tudo"*.
+
+**O defeito.** A barra da página montava sete filtros — janela, intervalo livre, marca, grupo, rede e
+a régua publicação × leitura — e entregava **um** aos cartões do Espelho: `periodoEspelho`, que
+reduz qualquer escolha a 7, 30 ou tudo. Marca, rede, grupo e os atalhos de 60d/90d/6m/12m morriam na
+barra. O Radar já recebia o filtro inteiro: eram duas metades da mesma página obedecendo a réguas
+diferentes, com a mesma barra acesa em cima das duas.
+
+**O que mudou.** Novo `src/lib/recorte.ts`: um lugar só para traduzir a barra em consulta. Um lugar
+só porque a tradução tem uma armadilha que erra calado — o `origem` **da barra** é o dono do canal
+(casa, cortes, Pulso, Limelight) e o `origem` **das views** é quem MEDIU a peça. Duas perguntas com
+o mesmo nome; `.eq('origem', filtros.origem)`, o caminho óbvio, leria saúde de coleta achando que lia
+dono de canal, e devolveria número certo para a pergunta errada. Aqui o grupo vira sempre lista de
+marcas, e a coluna `origem` das views não é tocada.
+
+**Cartão que não pode obedecer diz o que ignorou**, na própria faixa (selo `NaoObedece`). Medido no
+banco: `v_mkt_resultado_recorte` não tem data, marca nem rede; `v_marketing_cadeia_dia` só tem dia.
+Esses confessam. Filtro que não chega é pior do que filtro que não existe — a barra acesa é uma
+promessa, e quem vê o chip da Lancaster aceso acredita que o número é da Lancaster.
+
+**Dois blocos novos.** *"O que rendeu no recorte"* (marca × rede: peças, views, interações e alcance)
+e *"Qual peça deu resultado"* (ranking com link). A aba Marca × Rede mede **seguidores**, que é
+estoque: o censo de hoje é o mesmo em "hoje" e em "6m" — por isso o número grande não mudava com a
+janela. Não era filtro quebrado; era outra pergunta, e faltava.
+
+**O achado que impede o conserto de parecer defeito.** A leitura mais antiga é de **16/07/2026** e só
+**58 dias** têm leitura: 30 dias somam 301.074 views e 12 meses somam 304.102 — foi o "298k repetido"
+que o dono viu. E cada rede começou num dia: **Instagram 09/09, Facebook 31/10, TikTok e YouTube
+14/11**. Num corte de 90 dias o Instagram tem 77 dias de leitura e o TikTok 11. Comparar marcas "no
+mesmo período" compara, em parte, **quando o coletor foi ligado** — e agora isso está escrito onde o
+número aparece, com as datas lidas do próprio banco, nunca de uma constante.
+
+**De quebra, dois defeitos antigos** que o typecheck acusava e ninguém tinha ligado à tela (8 erros
+→ 0):
+
+- `ComparativoMotores` lia `publicacoes` e `views` em `PolaDia`, que tem **`posts_no_dia`** e
+  **nenhum campo de views** (tem `alcance` e `impressoes`). Em JavaScript isso não quebra: vira
+  `undefined`, `Number(undefined ?? 0)` dá 0, e a **Polá aparecia com zero publicações e zero views
+  toda semana**, com cara de motor parado. Impressão não entra como view — são unidades diferentes, e
+  trocá-las faria a Polá parecer o maior motor da casa. Views fica "não medido".
+- `MotoresDeConteudo`: `T extends Record<string, unknown>` não casa com uma *interface* do
+  TypeScript, que não ganha índice de string implícito.
+
+**Pedido ao MKT** (não bloqueia nada): data, marca e rede em `v_mkt_resultado_recorte`; marca em
+`v_marketing_cadeia_dia`; gatilho e formato em `v_mkt_peca_consolidada`.
+
 ## 2026-11-24 — A Remedição de 24/11 entra nos sete fatos, e uma trava minha pegou um erro meu
 
 Migration `271`. Os sete números da folha única (seção "Remedição de 24/11/2026") passam a valer em
