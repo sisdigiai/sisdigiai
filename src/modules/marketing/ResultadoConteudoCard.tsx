@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { BarChart3, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+// Este arquivo já tem um tipo local chamado `Recorte` (o corte do resultado: marca, formato, gatilho).
+// O recorte DA BARRA entra com outro nome para as duas coisas nunca se confundirem numa linha.
+import { aplicar, type Recorte as RecorteBarra } from '../../lib/recorte';
+import NaoObedece from './NaoObedece';
 import { resumoPola } from '../../lib/espelhoMotores';
 
 // Resultado do conteúdo e teto de IA — ordem do dono (15/09/2026): "não temos analytics ou resultado
@@ -41,7 +45,7 @@ type Ia = { teto_mensal: number | null; teto_diario: number | null; pausado: boo
 const usd = (v: number | null) => (v == null ? '—' : `US$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
 const num = (n: number | null) => (n == null ? '—' : Number(n).toLocaleString('pt-BR'));
 
-export default function ResultadoConteudoCard({ recarga = 0 }: { recarga?: number }) {
+export default function ResultadoConteudoCard({ recorte: barra, recarga = 0 }: { recorte: RecorteBarra; recarga?: number }) {
   const [cob, setCob] = useState<Cobertura[] | null>(null);
   const [rec, setRec] = useState<Recorte[] | null>(null);
   // A lista canónica das marcas da casa. Sem ela, só aparecem as que têm post medido — e o dono
@@ -52,22 +56,27 @@ export default function ResultadoConteudoCard({ recarga = 0 }: { recarga?: numbe
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.from('v_mkt_estoque_marca').select('marca, marca_nome, tem_movimento')
-      .then(({ data }) => setTodas((data ?? []) as never));
+    // Nenhuma destas três tem data: são estado de agora (cobertura da coleta, custo de IA do mês,
+    // quem tem movimento). Marca e rede, onde existem, obedecem.
+    const semData = { ...barra, de: null, ate: null };
+    aplicar(supabase.from('v_mkt_estoque_marca').select('marca, marca_nome, tem_movimento'),
+      semData, { marca: 'marca' }).q
+      .then(({ data }: { data: unknown }) => setTodas((data ?? []) as never));
     resumoPola().then(setPola);
     supabase.from('v_mkt_ai_custo').select('*').maybeSingle()
       .then(({ data, error }) => { setIa(error || !data ? 'sem_acesso' : (data as Ia)); });
 
-    supabase.from('v_mkt_cobertura_leitura')
-      .select('marca, marca_nome, rede, fonte, pecas, lidas, sem_leitura, com_views, views_zero_medido, com_alcance, alcance_e_fornecido, com_causa, sem_causa, com_segunda_leitura, engaj_confiavel, engaj_sem_prova, coletado_em')
+    aplicar(supabase.from('v_mkt_cobertura_leitura')
+      .select('marca, marca_nome, rede, fonte, pecas, lidas, sem_leitura, com_views, views_zero_medido, com_alcance, alcance_e_fornecido, com_causa, sem_causa, com_segunda_leitura, engaj_confiavel, engaj_sem_prova, coletado_em'),
+      semData, { marca: 'marca', rede: 'rede' }).q
       .limit(500)
-      .then(({ data, error }) => { if (error) setErro(error.message); setCob((data ?? []) as Cobertura[]); });
+      .then(({ data, error }: { data: unknown; error: { message: string } | null }) => { if (error) setErro(error.message); setCob((data ?? []) as Cobertura[]); });
 
     supabase.from('v_mkt_resultado_recorte')
       .select('valor, rede_recorte, com_views, views_mediana, views_p90, views_melhor, engaj_confiaveis, engaj_mediana, engaj_melhor, serve_de_base')
       .eq('recorte', 'marca').is('rede_recorte', null).limit(200)
       .then(({ data, error }) => { if (error) setErro(error.message); setRec((data ?? []) as Recorte[]); });
-  }, [recarga]);
+  }, [barra, recarga]);
 
   // uma linha por marca: a cobertura somada das redes, e a mediana do recorte da marca
   const porMarca = (() => {
@@ -105,6 +114,11 @@ export default function ResultadoConteudoCard({ recarga = 0 }: { recarga?: numbe
         <span className="font-mono text-[10px] text-muted">
           mediana por peça, nunca média — e nunca contando peça não medida como zero
         </span>
+        {/* A cobertura e o custo de IA obedecem à marca e à rede; as MEDIANAS vêm de
+            `v_mkt_resultado_recorte`, que não tem data, marca nem rede. O selo diz isso em vez de
+            deixar a barra acesa prometendo o que esta parte não entrega. */}
+        <NaoObedece recorte={barra} data
+          porque="as medianas vêm de v_mkt_resultado_recorte, que não tem coluna de data (medido em 25/11/2026); a cobertura e o custo de IA deste cartão obedecem à marca e à rede" />
         {coletado && (
           <span className="ml-auto font-mono text-[10px] text-muted tabular-nums">
             coletado em {new Date(coletado).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}

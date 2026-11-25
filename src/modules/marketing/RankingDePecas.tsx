@@ -6,32 +6,39 @@ import { aplicar, type Recorte } from '../../lib/recorte';
 
 // QUAL PEÇA DEU RESULTADO (25/11/2026).
 //
-// Terceiro pedido do dono no canal do MKT, 25/11. A página sabia dizer o que funciona por FORMATO e
-// por GATILHO (medianas, no bloco ao lado) e não sabia dizer **qual peça**. Mediana responde "que
-// tipo de coisa fazer de novo"; a lista responde "o que foi esse pico" — e as duas perguntas são
-// feitas no mesmo minuto, olhando o mesmo gráfico.
+// Terceiro pedido do dono no canal do MKT, 25/11, com a lista de campos dita por ele: "views,
+// engajamento, compartilhamentos, retenção no YouTube, com marca, rede, formato e gatilho, e link
+// para a peça". A página sabia responder por FORMATO e por GATILHO em mediana (bloco ao lado) e não
+// sabia dizer **qual peça**. Mediana responde "que tipo de coisa repetir"; a lista responde "o que
+// foi esse pico" — e as duas perguntas se fazem no mesmo minuto, olhando o mesmo gráfico.
 //
-// Fonte: `v_mkt_peca_consolidada` — uma linha por peça, com link. Medido em 25/11: 1.309 peças,
-// 1.244 com data de publicação, **todas com link**, 461 publicadas nos últimos 30 dias.
+// A FONTE É `v_mkt_resultado_peca`, e a escolha dela corrigiu um erro meu do mesmo dia. Eu tinha
+// escrito este bloco sobre `v_mkt_peca_consolidada` e mandado ao MKT um pedido de coluna para
+// gatilho e formato — que **já existiam**. Medido em 25/11: `v_mkt_resultado_peca` tem 1.364 peças,
+// todas com link e com as três datas, `tema` em 503 e `formato` em 512, mais `alcance`,
+// `retencao_pct` e — o que mais importa — as travas de confiança já prontas:
+// `lida`, `engajamento_confiavel` (1.035) e `alcance_e_fornecido` (890). Pedir coluna que existe
+// custa o tempo de outro agente; medir primeiro custa uma consulta.
 //
-// TRÊS RECUSAS:
-//  1. **Peça apagada fica fora por padrão**, e o rodapé diz quantas foram. Ranking que lista o que
-//     não está mais no ar manda o dono procurar uma peça que não existe.
-//  2. **Ordenar por engajamento seria mentira hoje.** Medido em 90 dias: Instagram somou 35
-//     interações em 881 leituras, TikTok 3.961 em 593. Ordenar por isso não ordenaria por
-//     engajamento — ordenaria por "de qual rede a coleta lê interação". A ordem é por views, e a
-//     coluna de interação mostra o que existe, em branco onde não existe.
-//  3. **Retenção só onde ela é medida.** Em 90 dias há retenção em 247 leituras, todas do YouTube.
-//     Coluna vazia nas outras redes é a verdade; 0% seria um juízo sobre o vídeo.
+// TRÊS RECUSAS, e as três são da fonte, não minhas:
+//  1. **Engajamento só onde a própria view diz que é confiável.** Mostrar o número onde
+//     `engajamento_confiavel` é falso seria publicar um número que a casa já sabe que não presta.
+//  2. **Alcance só onde a rede fornece** (`alcance_e_fornecido`). Em branco não é zero.
+//  3. **A ordem é por views, nunca por engajamento.** Medido em 90 dias: Instagram somou 35
+//     interações por peça e TikTok 3.961 — ordenar por engajamento ordenaria por qual rede a coleta
+//     lê, não por qual peça engajou.
 
 type Linha = {
-  marca: string | null; rede: string; tipo: string | null; peca_ref: string;
-  views: number | null; curtidas: number | null; comentarios: number | null; compartilhamentos: number | null;
-  retencao_media_pct: number | null; link: string | null; dia_publicacao: string | null; apagada: boolean;
+  marca: string | null; marca_nome: string | null; rede: string; tipo: string | null;
+  formato: string | null; tema: string | null; peca: string; link: string | null;
+  dia: string | null; views: number | null; alcance: number | null; engajamento: number | null;
+  compartilhamentos: number | null; retencao_pct: number | null;
+  lida: boolean; engajamento_confiavel: boolean; alcance_e_fornecido: boolean;
 };
 
 const n = (v: number) => v.toLocaleString('pt-BR');
 const dm = (iso: string | null) => (iso ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}` : '—');
+const Vazio = ({ txt = '—' }: { txt?: string }) => <span className="text-muted">{txt}</span>;
 
 export default function RankingDePecas({ recorte, recarga = 0 }: { recorte: Recorte; recarga?: number }) {
   const [linhas, setLinhas] = useState<Linha[] | null>(null);
@@ -42,23 +49,26 @@ export default function RankingDePecas({ recorte, recarga = 0 }: { recorte: Reco
 
   useEffect(() => {
     setLinhas(null);
+    setQuantas(10);
     lerTudo<Linha>((de, ate) => {
-      const base = supabase.from('v_mkt_peca_consolidada')
-        .select('marca, rede, tipo, peca_ref, views, curtidas, comentarios, compartilhamentos, retencao_media_pct, link, dia_publicacao, apagada');
-      // A régua da barra escolhe a coluna de data: publicação = quando saiu; leitura = quando foi
-      // medida pela última vez. Mesma fonte, duas perguntas.
+      const base = supabase.from('v_mkt_resultado_peca')
+        .select('marca, marca_nome, rede, tipo, formato, tema, peca, link, dia, views, alcance, engajamento, compartilhamentos, retencao_pct, lida, engajamento_confiavel, alcance_e_fornecido');
+      // A régua da barra escolhe a coluna de data: publicação = o dia em que saiu; leitura = quando
+      // foi medida. Mesma fonte, duas perguntas — e foi a confusão entre as duas que produziu o
+      // 168k × 41,8k de 20/11, quando duas telas chamavam as duas coisas de "no período".
       const { q } = aplicar(base, recorte, {
-        data: porPublicacao ? 'dia_publicacao' : 'ultima_leitura', marca: 'marca', rede: 'rede',
+        data: porPublicacao ? 'dia' : 'coletado_em', marca: 'marca', rede: 'rede',
       });
-      return q.order('views', { ascending: false, nullsFirst: false }).order('peca_ref').range(de, ate);
+      return q.order('views', { ascending: false, nullsFirst: false }).order('peca').range(de, ate);
     }).then((l) => { setErro(null); setLinhas(l); })
       .catch((e) => { setErro(String(e?.message ?? e)); setLinhas([]); });
   }, [recorte, recarga, porPublicacao]);
 
-  const vivas = (linhas ?? []).filter((l) => !l.apagada);
-  const apagadas = (linhas ?? []).length - vivas.length;
-  const medidas = vivas.filter((l) => l.views != null);
+  const todas = linhas ?? [];
+  const medidas = todas.filter((l) => l.views != null);
   const mostradas = medidas.slice(0, quantas);
+  const semLeitura = todas.length - medidas.length;
+  const semGatilho = medidas.filter((l) => !l.tema).length;
 
   return (
     <section className="border border-outline/15 bg-surface-container">
@@ -79,50 +89,65 @@ export default function RankingDePecas({ recorte, recarga = 0 }: { recorte: Reco
         <div className="px-4 py-3 text-sm text-muted">Medindo…</div>
       ) : medidas.length === 0 ? (
         <div className="px-4 py-3 text-sm text-on-surface-variant">
-          Nenhuma peça com leitura neste recorte{vivas.length > 0 && ` — há ${vivas.length} peça(s), nenhuma com views coletadas`}.
+          Nenhuma peça com leitura neste recorte
+          {todas.length > 0 && ` — há ${todas.length} peça(s), nenhuma com views coletadas`}.
         </div>
       ) : (
         <>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-outline/10 font-mono text-[9px] uppercase tracking-widest text-muted">
-                <th className="px-4 py-1.5 text-left font-normal">#</th>
-                <th className="px-4 py-1.5 text-left font-normal">marca</th>
-                <th className="px-4 py-1.5 text-left font-normal">rede · formato</th>
-                <th className="px-4 py-1.5 text-left font-normal">saiu</th>
-                <th className="px-4 py-1.5 text-right font-normal">views</th>
-                <th className="px-4 py-1.5 text-right font-normal">interações</th>
-                <th className="px-4 py-1.5 text-right font-normal">retenção</th>
-                <th className="px-4 py-1.5 text-right font-normal">peça</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mostradas.map((l, i) => {
-                const temInter = l.curtidas != null || l.comentarios != null || l.compartilhamentos != null;
-                const inter = (l.curtidas ?? 0) + (l.comentarios ?? 0) + (l.compartilhamentos ?? 0);
-                return (
-                  <tr key={l.peca_ref} className="border-b border-outline/5 last:border-b-0">
-                    <td className="px-4 py-1.5 tabular-nums text-muted">{i + 1}</td>
-                    <td className="px-4 py-1.5 text-on-surface">{l.marca ?? '(sem marca)'}</td>
-                    <td className="px-4 py-1.5 text-on-surface-variant">{l.rede}{l.tipo ? ` · ${l.tipo}` : ''}</td>
-                    <td className="px-4 py-1.5 tabular-nums text-on-surface-variant">{dm(l.dia_publicacao)}</td>
-                    <td className="px-4 py-1.5 text-right tabular-nums text-on-surface font-semibold">{n(l.views ?? 0)}</td>
-                    <td className="px-4 py-1.5 text-right tabular-nums text-on-surface-variant">
-                      {temInter ? n(inter) : <span className="text-muted">—</span>}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-outline/10 font-mono text-[9px] uppercase tracking-widest text-muted">
+                  <th className="px-3 py-1.5 text-left font-normal">#</th>
+                  <th className="px-3 py-1.5 text-left font-normal">marca</th>
+                  <th className="px-3 py-1.5 text-left font-normal">rede · formato</th>
+                  <th className="px-3 py-1.5 text-left font-normal">gatilho</th>
+                  <th className="px-3 py-1.5 text-left font-normal">saiu</th>
+                  <th className="px-3 py-1.5 text-right font-normal">views</th>
+                  <th className="px-3 py-1.5 text-right font-normal">alcance</th>
+                  <th className="px-3 py-1.5 text-right font-normal">engaj.</th>
+                  <th className="px-3 py-1.5 text-right font-normal">compart.</th>
+                  <th className="px-3 py-1.5 text-right font-normal">retenção</th>
+                  <th className="px-3 py-1.5 text-right font-normal">peça</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mostradas.map((l, i) => (
+                  <tr key={l.peca} className="border-b border-outline/5 last:border-b-0">
+                    <td className="px-3 py-1.5 tabular-nums text-muted">{i + 1}</td>
+                    <td className="px-3 py-1.5 text-on-surface whitespace-nowrap">{l.marca_nome ?? l.marca ?? '(sem marca)'}</td>
+                    <td className="px-3 py-1.5 text-on-surface-variant whitespace-nowrap">
+                      {l.rede}{(l.formato ?? l.tipo) ? ` · ${l.formato ?? l.tipo}` : ''}
                     </td>
-                    <td className="px-4 py-1.5 text-right tabular-nums text-on-surface-variant">
-                      {l.retencao_media_pct != null ? `${Math.round(l.retencao_media_pct)}%` : <span className="text-muted">—</span>}
+                    {/* Gatilho em branco é falta de rótulo nossa, não característica da peça —
+                        por isso "sem rótulo", e não um traço que parece ausência de dado. */}
+                    <td className="px-3 py-1.5 text-on-surface-variant max-w-[14rem] truncate" title={l.tema ?? undefined}>
+                      {l.tema ?? <Vazio txt="sem rótulo" />}
                     </td>
-                    <td className="px-4 py-1.5 text-right">
+                    <td className="px-3 py-1.5 tabular-nums text-on-surface-variant">{dm(l.dia)}</td>
+                    <td className="px-3 py-1.5 text-right tabular-nums text-on-surface font-semibold">{n(l.views ?? 0)}</td>
+                    <td className="px-3 py-1.5 text-right tabular-nums text-on-surface-variant">
+                      {l.alcance_e_fornecido && l.alcance != null ? n(l.alcance) : <Vazio txt="a rede não dá" />}
+                    </td>
+                    <td className="px-3 py-1.5 text-right tabular-nums text-on-surface-variant">
+                      {l.engajamento_confiavel && l.engajamento != null ? n(l.engajamento) : <Vazio txt="sem prova" />}
+                    </td>
+                    <td className="px-3 py-1.5 text-right tabular-nums text-on-surface-variant">
+                      {l.compartilhamentos != null ? n(l.compartilhamentos) : <Vazio />}
+                    </td>
+                    <td className="px-3 py-1.5 text-right tabular-nums text-on-surface-variant">
+                      {l.retencao_pct != null ? `${Math.round(l.retencao_pct)}%` : <Vazio />}
+                    </td>
+                    <td className="px-3 py-1.5 text-right">
                       {l.link
                         ? <a href={l.link} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-secondary hover:underline">abrir<ExternalLink className="w-3 h-3" /></a>
-                        : <span className="text-muted">sem link</span>}
+                        : <Vazio txt="sem link" />}
                     </td>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           {medidas.length > quantas && (
             <button onClick={() => setQuantas((q) => q + 20)}
@@ -133,12 +158,14 @@ export default function RankingDePecas({ recorte, recarga = 0 }: { recorte: Reco
 
           <div className="px-4 py-2.5 border-t border-outline/10 text-xs text-on-surface-variant">
             <span className="font-mono text-[9px] uppercase tracking-widest text-muted">o que esta lista não faz</span>{' '}
-            Não ordena por engajamento: medido em 90 dias, o Instagram somou <strong>35</strong> interações
-            por peça e o TikTok <strong>3.961</strong> — ordenar por isso ordenaria por qual rede a coleta
-            lê, não por qual peça engajou. <strong className="text-on-surface">Retenção existe só no YouTube.</strong>{' '}
-            {vivas.length - medidas.length > 0 && <>{vivas.length - medidas.length} peça(s) no recorte ainda sem views coletadas ficam fora da ordem, não no fim dela. </>}
-            {apagadas > 0 && <>{apagadas} peça(s) apagada(s) ficam fora da lista. </>}
-            Gatilho e formato de campanha não estão nesta fonte — pedido aberto ao MKT em 25/11.
+            <strong className="text-on-surface">Não ordena por engajamento.</strong> Medido em 90 dias, o
+            Instagram somou 35 interações por peça e o TikTok 3.961 — ordenar por isso ordenaria por qual
+            rede a coleta lê, não por qual peça engajou. Engajamento e alcance aparecem só onde a própria
+            fonte os dá por confiáveis (<code className="font-mono text-[10px]">engajamento_confiavel</code>,{' '}
+            <code className="font-mono text-[10px]">alcance_e_fornecido</code>); onde não, fica escrito o motivo,
+            nunca zero. Retenção existe quase só no YouTube.{' '}
+            {semLeitura > 0 && <>{semLeitura} peça(s) do recorte ainda sem views coletadas ficam fora da ordem, não no fim dela. </>}
+            {semGatilho > 0 && <>{semGatilho} das mostradas estão <strong>sem rótulo de gatilho</strong> — isso é falta nossa de marcação, não característica da peça.</>}
           </div>
         </>
       )}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Package, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { aplicar, type Recorte } from '../../lib/recorte';
 
 // O "coração da empresa" — palavra do dono em 18/11: por marca, o que está pronto e quanto tempo dura,
 // "e já apareceria a parte fila baixa".
@@ -32,12 +33,17 @@ type Linha = {
 
 const dias = (v: number | null) => (v == null ? '—' : v.toLocaleString('pt-BR', { maximumFractionDigits: 1 }));
 
-export default function EstoquePorMarca({ recarga = 0 }: { recarga?: number }) {
+// FÔLEGO É ESTADO DE AGORA, NÃO JANELA (25/11/2026): "quantos dias de conteúdo ainda existem" não
+// muda com o recorte de 90 dias — por isso a data não entra aqui, e não é defeito. `v_mkt_estoque_marca`
+// tem `marca` e obedece a ela; rede ela não tem, e o selo diz.
+export default function EstoquePorMarca({ recorte, recarga = 0 }: { recorte: Recorte; recarga?: number }) {
   const [linhas, setLinhas] = useState<Linha[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.from('v_mkt_estoque_marca').select('*').then(({ data, error }) => {
+    const { q } = aplicar(supabase.from('v_mkt_estoque_marca').select('*'),
+      { ...recorte, de: null, ate: null }, { marca: 'marca' });
+    q.then(({ data, error }: { data: unknown; error: { message: string } | null }) => {
       if (error) { setErro(error.message); setLinhas([]); return; }
       const l = (data ?? []) as Linha[];
       // Quem tem menos fôlego primeiro; quem não tem ritmo vai para o fim, não para o topo — o alarme

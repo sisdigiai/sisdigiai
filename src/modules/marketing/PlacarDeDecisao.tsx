@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { aplicar, type Recorte } from '../../lib/recorte';
 import { lerTudo } from '../../lib/paginar';
 
 // O placar de decisão — a faixa de quatro números que abre a aba Resultado.
@@ -34,14 +35,18 @@ function mediana(xs: number[]): number | null {
   return o.length % 2 ? o[m] : Math.round((o[m - 1] + o[m]) / 2);
 }
 
-export default function PlacarDeDecisao({ pecas7d, recarga = 0 }: { pecas7d: number | null; recarga?: number }) {
+// As duas fontes deste placar obedecem à barra (25/11/2026): `v_mkt_negocio_semana` tem marca e
+// semana; `v_mkt_resultado_peca` tem marca, rede e dia. `pecas7d` continua sendo 7 dias fixos — é uma
+// coluna pré-somada da view do Espelho, não uma janela que dê para recortar, e o rótulo já diz "7d".
+export default function PlacarDeDecisao({ pecas7d, recorte, recarga = 0 }: { pecas7d: number | null; recorte: Recorte; recarga?: number }) {
   const [sem, setSem] = useState<Semana[] | null>(null);
   const [interacao, setInteracao] = useState<{ v: number | null; base: number } | null>(null);
 
   useEffect(() => {
-    supabase.from('v_mkt_negocio_semana').select('semana, rotas, ligacoes, semana_completa')
+    aplicar(supabase.from('v_mkt_negocio_semana').select('semana, rotas, ligacoes, semana_completa'),
+      recorte, { data: 'semana', marca: 'marca' }).q
       .order('semana', { ascending: false }).limit(400)
-      .then(({ data }) => setSem((data ?? []) as Semana[]));
+      .then(({ data }: { data: unknown }) => setSem((data ?? []) as Semana[]));
     // a mediana de interação sai das peças com leitura confiável: engajamento zero só conta quando
     // outra métrica provou que a peça foi lida (o coletor sempre escreve número, mesmo sem ler nada).
     //
@@ -49,14 +54,15 @@ export default function PlacarDeDecisao({ pecas7d, recarga = 0 }: { pecas7d: num
     // três mil, mas a API corta QUALQUER resposta em 1.000 linhas e devolve isso como sucesso. A view
     // tem **1.025 linhas** (medido 19/11, 20h12) — 25 peças nunca chegavam, e a base confiável de
     // verdade é **742**. O número que estava na tela não era errado por sorte: era certo por sorte.
-    lerTudo<Peca>((de, ate) => supabase.from('v_mkt_resultado_peca')
-      .select('engajamento, engajamento_confiavel')
+    lerTudo<Peca>((de, ate) => aplicar(
+      supabase.from('v_mkt_resultado_peca').select('engajamento, engajamento_confiavel'),
+      recorte, { data: 'dia', marca: 'marca', rede: 'rede' }).q
       .order('fonte').order('peca').order('rede').range(de, ate))
       .then((l) => {
         const vs = l.filter((p) => p.engajamento_confiavel && p.engajamento != null).map((p) => Number(p.engajamento));
         setInteracao({ v: mediana(vs), base: vs.length });
       });
-  }, [recarga]);
+  }, [recorte, recarga]);
 
   const semanas = [...new Set((sem ?? []).map((s) => s.semana))].sort().reverse().slice(0, 8);
   const noPeriodo = (sem ?? []).filter((s) => semanas.includes(s.semana));

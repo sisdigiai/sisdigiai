@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CalendarClock, Target, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { aplicar, type Recorte } from '../../lib/recorte';
 import { resumoPola } from '../../lib/espelhoMotores';
 
 // Controle por marca — ordem do dono em 18/11: primeiro o conteúdo (15h37, "publicado, pronto e em
@@ -111,7 +112,7 @@ function estadoDaRede(r: Rede) {
   return { txt: 'em dia', tom: 'text-success' };
 }
 
-export default function ControlePorMarca({ recarga = 0 }: { recarga?: number }) {
+export default function ControlePorMarca({ recorte, recarga = 0 }: { recorte: Recorte; recarga?: number }) {
   const [redes, setRedes] = useState<Rede[] | null>(null);
   const [marcas, setMarcas] = useState<Marca[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
@@ -120,12 +121,17 @@ export default function ControlePorMarca({ recarga = 0 }: { recarga?: number }) 
   useEffect(() => { resumoPola().then(setPola); }, [recarga]);
 
   useEffect(() => {
-    supabase.from('v_mkt_controle_marca_rede').select('*').then(({ data, error }) => {
-      if (error) { setErro(error.message); setRedes([]); return; }
-      setRedes((data ?? []) as Rede[]);
-    });
-    supabase.from('v_mkt_estoque_marca').select('*').then(({ data }) => setMarcas((data ?? []) as Marca[]));
-  }, [recarga]);
+    // As duas views têm `marca`, e a de redes tem `rede`. Nenhuma tem data: este bloco é o estado de
+    // agora (o que está na fila, quando saiu a última, quando sai a próxima), não uma janela.
+    const semData = { ...recorte, de: null, ate: null };
+    aplicar(supabase.from('v_mkt_controle_marca_rede').select('*'), semData, { marca: 'marca', rede: 'rede' }).q
+      .then(({ data, error }: { data: unknown; error: { message: string } | null }) => {
+        if (error) { setErro(error.message); setRedes([]); return; }
+        setRedes((data ?? []) as Rede[]);
+      });
+    aplicar(supabase.from('v_mkt_estoque_marca').select('*'), semData, { marca: 'marca' }).q
+      .then(({ data }: { data: unknown }) => setMarcas((data ?? []) as Marca[]));
+  }, [recorte, recarga]);
 
   const cartoes = useMemo(() => {
     if (!redes || !marcas) return null;

@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Navigation, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { aplicar, type Recorte } from '../../lib/recorte';
 
 // O resultado de NEGÓCIO: o que a ficha do Google registra de gente indo à loja.
 //
@@ -25,19 +26,23 @@ const num = (n: number | null) => (n == null ? '—' : Number(n).toLocaleString(
 const dia = (s: string) =>
   new Date(s + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
 
-export default function ResultadoDeNegocio({ recarga = 0 }: { recarga?: number }) {
+// `v_mkt_negocio_semana` tem `marca` e `semana`; **não tem rede** (ficha do Google não é de rede).
+// A janela aqui é em SEMANAS fechadas, que é a unidade da fonte: recortar por dia partiria semana ao
+// meio e meia semana sempre parece queda ao lado de uma semana inteira.
+export default function ResultadoDeNegocio({ recorte, recarga = 0 }: { recorte: Recorte; recarga?: number }) {
   const [linhas, setLinhas] = useState<Semana[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.from('v_mkt_negocio_semana')
-      .select('marca, marca_nome, accent_hex, semana, fichas, dias_medidos, aparicoes, ligacoes, cliques_site, rotas, publicacoes, semana_completa')
-      .order('semana', { ascending: false }).limit(400)
-      .then(({ data, error }) => {
+    const base = supabase.from('v_mkt_negocio_semana')
+      .select('marca, marca_nome, accent_hex, semana, fichas, dias_medidos, aparicoes, ligacoes, cliques_site, rotas, publicacoes, semana_completa');
+    const { q } = aplicar(base, recorte, { data: 'semana', marca: 'marca' });
+    q.order('semana', { ascending: false }).limit(400)
+      .then(({ data, error }: { data: unknown; error: { message: string } | null }) => {
         if (error) { setErro(error.message); setLinhas([]); return; }
         setLinhas((data ?? []) as Semana[]);
       });
-  }, [recarga]);
+  }, [recorte, recarga]);
 
   const semanas = [...new Set((linhas ?? []).map((l) => l.semana))].sort().reverse().slice(0, 8);
   const marcas = [...new Set((linhas ?? []).map((l) => l.marca))];

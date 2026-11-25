@@ -562,8 +562,8 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
             contexto. "O que funciona" ganhou aba própria. */}
         {aba === 'resultado' && (
           <div className="space-y-6">
-            <PlacarDeDecisao pecas7d={esp?.publicadas_7d ?? null} recarga={recarga} />
-            <ResultadoDeNegocio recarga={recarga} />
+            <PlacarDeDecisao pecas7d={esp?.publicadas_7d ?? null} recorte={recorte} recarga={recarga} />
+            <ResultadoDeNegocio recorte={recorte} recarga={recarga} />
             <Central recorte={recorte} recarga={recarga} />
             <Leituras recorte={recorte} recarga={recarga} />
           </div>
@@ -577,13 +577,13 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
             {/* A mediana diz que TIPO de coisa repetir; a lista diz QUAL peça foi o pico. As duas
                 perguntas se fazem no mesmo minuto, olhando o mesmo gráfico. */}
             <RankingDePecas recorte={recorte} recarga={recarga} />
-            <ResultadoConteudoCard recarga={recarga} />
+            <ResultadoConteudoCard recorte={recorte} recarga={recarga} />
             <MktCrescimento aba="conteudo" filtros={filtros} recarga={recarga} />
           </div>
         )}
 
         {/* FÔLEGO — "até quando ainda sai conteúdo se ninguém fizer nada?". */}
-        {aba === 'folego' && <EstoquePorMarca recarga={recarga} />}
+        {aba === 'folego' && <EstoquePorMarca recorte={recorte} recarga={recarga} />}
 
         {/* LEITURA DAS PEÇAS — "quantos leram, e quanto disso a casa mede?". */}
         {aba === 'leitura' && (
@@ -726,7 +726,7 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
             {/* Publicações recentes */}
             {/* O controle por marca vem ANTES da lista: a lista diz o que saiu, o cartão diz o que
                 fazer. O dono abre esta aba para decidir, não para conferir item a item. */}
-            {aba === 'publicacoes' && <ControlePorMarca recarga={recarga} />}
+            {aba === 'publicacoes' && <ControlePorMarca recorte={recorte} recarga={recarga} />}
 
             {aba === 'publicacoes' && (
             <div className="border border-outline/15 bg-surface-container mt-6">
