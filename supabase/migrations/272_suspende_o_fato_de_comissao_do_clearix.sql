@@ -48,6 +48,17 @@
 -- ============================================================
 begin;
 
+-- O MUNDO ANDA ENTRE ESCREVER E APLICAR (aprendido às 20h06 de 25/11, aplicando esta migration):
+-- a primeira versão conferia "13 citáveis" e "34 fatos", números verdadeiros quando eu a escrevi.
+-- Às 18h48 o MKT desligou os dois fatos de OS por precaução, e às 20h06 a trava recusou com
+-- "esperava 13, achei 11" — corretamente, e nada foi escrito. Mas a conferência estava errada: ela
+-- media o mundo, não o efeito desta migration. **Conferência boa compara antes e depois de SI
+-- MESMA**, não com um número decorado de duas horas atrás. Guardo as contagens numa tabela
+-- temporária da própria transação e comparo no fim.
+create temporary table _antes on commit drop as
+select (select count(*) from public.v_mkt_fatos where fresco and publico) as citaveis,
+       (select count(*) from public.v_mkt_fatos) as no_painel;
+
 do $$
 declare n int;
 begin
@@ -88,12 +99,14 @@ do $$ declare n int; begin
 
   -- citáveis continuam 13: o fato já não chegava ao prompt desde as 18h10. O que muda é que ele
   -- volta a aparecer no painel, com o motivo à vista.
-  if (select count(*) from public.v_mkt_fatos where fresco and publico) <> 13 then
-    raise exception 'esperava 13 citaveis, achei %',
-      (select count(*) from public.v_mkt_fatos where fresco and publico); end if;
-  if (select count(*) from public.v_mkt_fatos) <> 34 then
-    raise exception 'esperava 34 fatos no painel (o de comissao de volta), achei %',
-      (select count(*) from public.v_mkt_fatos); end if;
+  -- o efeito desta migration, medido contra ela mesma: os citáveis NÃO mudam (a comissão já não
+  -- era citável desde as 18h10) e o painel ganha exatamente UM fato (a comissão volta a ativo).
+  if (select count(*) from public.v_mkt_fatos where fresco and publico) <> (select citaveis from _antes) then
+    raise exception 'os citaveis mudaram, e esta migration nao devia mexer neles: % antes, % agora',
+      (select citaveis from _antes), (select count(*) from public.v_mkt_fatos where fresco and publico); end if;
+  if (select count(*) from public.v_mkt_fatos) <> (select no_painel from _antes) + 1 then
+    raise exception 'o painel devia ganhar exatamente 1 fato (a comissao de volta): % antes, % agora',
+      (select no_painel from _antes), (select count(*) from public.v_mkt_fatos); end if;
 
   if (select count(*) from mkt.fatos where uso_restrito is not null and publico) <> 0 then
     raise exception 'ha fato de uso restrito publicado'; end if;
