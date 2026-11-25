@@ -257,7 +257,7 @@ export default function LeiturasCard({ recorte, recarga = 0 }: { recorte: Recort
           <div className="px-4 py-2.5 border-t border-outline/10 text-xs text-on-surface-variant">
             <span className="font-mono text-[9px] uppercase tracking-widest text-muted">por que falta número em rede</span>{' '}
             retenção e horas de exibição existem só no <strong>YouTube</strong> (coleta do <code className="font-mono text-[10px]">cortes-tick</code> aqui, e do próprio Pulso nos cortes dele).
-            Reel do Instagram e vídeo do Facebook: a rede dá, a coleta ainda não pede — <strong>ainda não medimos</strong>.
+            Reel do Instagram e vídeo do Facebook: a rede dá, a coleta ainda não pede — <strong>ainda não medimos</strong>.{' '}
             <strong>TikTok: a rede não dá</strong> tempo assistido — a API de que a casa dispõe devolve views, curtidas,
             comentários e compartilhamentos, e nada mais; retenção só no app do criador. (MKT, 17/11/2026, corrigido em 25/11.)
             Post de imagem, carrossel e story: <strong>a rede não dá</strong> esse número.
