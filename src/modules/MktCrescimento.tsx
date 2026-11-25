@@ -304,12 +304,27 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
   const [emVoo, setEmVoo] = useState<string[]>([]);
   const chegando = (f: string) => emVoo.includes(f);
 
+  // O RODOPIO TEM DE PARAR COM QUALQUER FONTE, NÃO SÓ COM `marcas` (25/11/2026).
+  //
+  // Antes isto ligava e desligava o `loading` olhando **uma** fonte: `if (faltando.includes('marcas'))
+  // setLoading(true)` e, no fim, `if (f === 'marcas') setLoading(false)`. Como `loading` nasce `true`
+  // e este componente é montado de novo a cada troca de aba, qualquer aba que NÃO carregue `marcas`
+  // ficava rodopiando para sempre — o corpo inteiro do Radar é `loading ? <spinner/> : (…)`.
+  //
+  // Na prática, a aba **Régua** (`FONTES_DA_ABA.regua = ['regua']`) estava **em branco desde sempre**:
+  // nem os cartões de nível, nem o aviso de que ela não obedece à barra, nem a frase "a régua ainda
+  // não foi calculada". Só não apareceu antes porque Território carrega lista vazia (cai no
+  // `faltando.length === 0` e desliga) e as outras nove carregam `marcas`. Visto no ar em 25/11 às
+  // 13h52, ao varrer as onze abas atrás do que o dono disse que não funcionava.
+  //
+  // Agora o contador é de todas: o rodopio para quando as fontes DESTA aba chegam, quaisquer que sejam.
   function carregar(fontes: string[]) {
     const faltando = fontes.filter((f) => !carregadas.current.has(chaveDaFonte(f)));
     if (faltando.length === 0) { setLoading(false); return; }
     faltando.forEach((f) => carregadas.current.add(chaveDaFonte(f)));
     setEmVoo((atual) => [...new Set([...atual, ...faltando])]);
-    if (faltando.includes('marcas')) setLoading(true);
+    setLoading(true);
+    let restantes = faltando.length;
     faltando.forEach((f) => {
       FONTES[f]()
         .catch((e) => {
@@ -318,7 +333,8 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
         })
         .finally(() => {
           setEmVoo((atual) => atual.filter((x) => x !== f));
-          if (f === 'marcas') setLoading(false);
+          restantes -= 1;
+          if (restantes === 0) setLoading(false);
         });
     });
   }
