@@ -151,10 +151,7 @@ export default function Central({ recorte, recarga = 0 }: { recorte: Recorte; re
 
   // Quantos dias tem a janela escolhida. Intervalo livre vira o número de dias entre as pontas, para
   // a janela anterior ter o mesmo tamanho — comparar 30 dias com 90 seria crescimento inventado.
-  const dias = recorte.de == null ? null
-    : recorte.ate
-      ? Math.max(1, Math.round((Date.parse(recorte.ate) - Date.parse(recorte.de)) / 864e5))
-      : Math.max(1, Math.round((Date.now() - Date.parse(recorte.de)) / 864e5));
+  const dias = recorte.dias;   // vem pronto do recorte desde 26/11: a fórmula local dava 29 ou 30 para a mesma janela, conforme a hora
   // 25/11, tarde: o MKT abriu `marca` em `v_marketing_cadeia_dia` (migration 20261125_02) e a cadeia
   // passou a obedecer a ela. Rede continua de fora, e continua confessada: venda e disparo não têm
   // rede, e inventar uma faria a cadeia mentir no elo que mais importa.

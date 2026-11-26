@@ -121,10 +121,7 @@ function Pe({ children }: { children: React.ReactNode }) {
 // por dia e plataforma — não sabem de que marca é cada linha. Por isso este bloco mostra o motor,
 // e quem quiser marca olha o bloco de marca × rede.
 export default function MotoresDeConteudo({ recorte, limelight, pulso, espMkt, hoje, brl, pulsoUltimaPubDias, mktUltimaPub, recarga = 0 }: Props & { recarga?: number }) {
-  const dias = recorte.de == null ? null
-    : recorte.ate
-      ? Math.max(1, Math.round((Date.parse(recorte.ate) - Date.parse(recorte.de)) / 864e5))
-      : Math.max(1, Math.round((Date.now() - Date.parse(recorte.de)) / 864e5));
+  const dias = recorte.dias;   // vem pronto do recorte desde 26/11: a fórmula local dava 29 ou 30 para a mesma janela, conforme a hora
   const rotuloPeriodo = recorte.de == null ? 'desde o início' : recorte.rotulo;
 
   const [pecasLousa, setPecas] = useState<Array<{ origem: string }> | null>(null);

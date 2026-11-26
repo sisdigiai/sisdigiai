@@ -65,10 +65,7 @@ export default function Leituras({ recorte, recarga = 0 }: { recorte: Recorte; r
   }, [recorte, recarga]);
 
   // Quantos dias tem a janela, para as leituras que comparam com o período anterior.
-  const dias = recorte.de == null ? null
-    : recorte.ate
-      ? Math.max(1, Math.round((Date.parse(recorte.ate) - Date.parse(recorte.de)) / 864e5))
-      : Math.max(1, Math.round((Date.now() - Date.parse(recorte.de)) / 864e5));
+  const dias = recorte.dias;   // vem pronto do recorte desde 26/11: a fórmula local dava 29 ou 30 para a mesma janela, conforme a hora
 
   const pronto = estoque != null && pont != null && cadeia != null;
   const leituras: Leitura[] = [];

@@ -31,6 +31,10 @@ export type Recorte = {
   origem: OrigemK;              // '' = todos os grupos
   rede: string;                 // '' = todas
   data: 'publicacao' | 'leitura';
+  // QUANTOS DIAS A JANELA TEM, contados de ponta a ponta (null = tudo). Fica aqui porque três
+  // cartões derivavam esse número da mesma fórmula frágil — `Date.now() - Date.parse(de)` —, que
+  // depende da hora do dia e dava 29 ou 30 para a mesma janela de 30 dias.
+  dias: number | null;
   rotulo: string;               // a janela em palavra, para o cartão escrever o que leu
 };
 
@@ -43,8 +47,17 @@ export function recorteDe(
   marcasConhecidas: Array<{ code: string; origem: OrigemK }>,
 ): Recorte {
   const livre = f.de !== '' && f.ate !== '' && f.de <= f.ate;
-  const de = livre ? f.de : f.dias === 0 ? null : diasAtras(f.dias);
+  // JANELA DE N DIAS COMEÇA N-1 DIAS ATRÁS, não N (corrigido em 26/11/2026).
+  //
+  // Estava `diasAtras(f.dias)`, e o corte é `>= de`, inclusive: "30 dias" lia **31**, "7 dias" lia
+  // 8, e "hoje" lia **ontem e hoje**. Em 30 dias o erro era pequeno (5 peças, 142 views, medido em
+  // 26/11) e passava despercebido; em "hoje" era de 100%. O dono perguntou se a tela falava a
+  // verdade sobre as views do dia — não falava, e por isto.
+  const de = livre ? f.de : f.dias === 0 ? null : diasAtras(Math.max(0, f.dias - 1));
   const ate = livre ? f.ate : null;
+  const dias = livre
+    ? Math.max(1, Math.round((Date.parse(f.ate) - Date.parse(f.de)) / 864e5) + 1)
+    : f.dias === 0 ? null : f.dias;
 
   let marcas: string[] | null = null;
   if (f.marca) marcas = [f.marca];
@@ -63,7 +76,7 @@ export function recorteDe(
     ? (marcasConhecidas.find((m) => m.code === f.marca)?.origem ?? 'casa')
     : f.origem;
 
-  return { de, ate, marcas, marcaUnica: f.marca, origem, rede: f.rede, data: f.data, rotulo };
+  return { de, ate, marcas, marcaUnica: f.marca, origem, rede: f.rede, data: f.data, dias, rotulo };
 }
 
 /** Um motor de fora (Pulso, Limelight, blogs) entra neste recorte? Vale para fonte que soma o motor
