@@ -21,7 +21,17 @@ import { hojeBrasilia } from '../../lib/datas';
 // pública de leitura (R-042 — segredo só no app que o usa). O botão único pedido pelo dono depende de
 // cada motor expor um endereço próprio para isso; pedido mandado aos quatro em 27/11.
 
-type Motor = { nome: string; dia: string | null; estado: EstadoEspelho | 'vazio'; detalhe?: string };
+// FONTE DE COLETA E FONTE DE EVENTO NÃO SE LEEM IGUAL (27/11/2026, arbitragem do Geral com o estado
+// dos Blogs). Num motor que COLETA, dia sem linha é robô que não rodou — e a faixa está certa em
+// acender. Nos blogs a leitura chega por EVENTO, de quem abre a página: dia sem linha quer dizer
+// **ninguém leu**, não medidor parado. Pintar isso de amarelo manda consertar o que não está
+// quebrado, que é o erro que esta casa já pagou. Então a frase muda com o tipo da fonte, e os blogs
+// só sairão do "não sei dizer" quando tiverem um sinal de medidor vivo — pedido feito a eles hoje.
+type Motor = {
+  nome: string; dia: string | null; estado: EstadoEspelho | 'vazio'; detalhe?: string;
+  /** 'coleta' = robô vai buscar; 'evento' = o dado chega quando alguém lê. */
+  tipo: 'coleta' | 'evento';
+};
 
 const diasEntre = (a: string, b: string) =>
   Math.round((Date.parse(b + 'T12:00:00Z') - Date.parse(a + 'T12:00:00Z')) / 86400000);
@@ -34,16 +44,16 @@ export default function FrescorDosMotores({ recarga = 0 }: { recarga?: number })
   const [motores, setMotores] = useState<Motor[] | null>(null);
 
   useEffect(() => {
-    const maisNovo = <T extends { dia: string }>(r: { linhas: T[]; estado: EstadoEspelho; detalhe?: string }): Omit<Motor, 'nome'> => {
+    const maisNovo = <T extends { dia: string }>(r: { linhas: T[]; estado: EstadoEspelho; detalhe?: string }): Omit<Motor, 'nome' | 'tipo'> => {
       if (r.estado !== 'ok') return { dia: null, estado: r.estado, detalhe: r.detalhe };
       if (r.linhas.length === 0) return { dia: null, estado: 'vazio' };
       return { dia: r.linhas.reduce((a, l) => (l.dia > a ? l.dia : a), r.linhas[0].dia), estado: 'ok' };
     };
     Promise.all([
-      espelhoMotoresEstado.pulsoLeiturasDias().then((r) => ({ nome: 'Pulso', ...maisNovo(r) })),
-      espelhoMotoresEstado.limelightPubDias().then((r) => ({ nome: 'Limelight', ...maisNovo(r) })),
-      espelhoMotoresEstado.polaPetitDias().then((r) => ({ nome: 'Polá Petit', ...maisNovo(r) })),
-      espelhoMotoresEstado.blogsDias().then((r) => ({ nome: 'Blogs', ...maisNovo(r) })),
+      espelhoMotoresEstado.pulsoLeiturasDias().then((r) => ({ nome: 'Pulso', tipo: 'coleta' as const, ...maisNovo(r) })),
+      espelhoMotoresEstado.limelightPubDias().then((r) => ({ nome: 'Limelight', tipo: 'coleta' as const, ...maisNovo(r) })),
+      espelhoMotoresEstado.polaPetitDias().then((r) => ({ nome: 'Polá Petit', tipo: 'coleta' as const, ...maisNovo(r) })),
+      espelhoMotoresEstado.blogsDias().then((r) => ({ nome: 'Blogs', tipo: 'evento' as const, ...maisNovo(r) })),
     ]).then(setMotores).catch(() => setMotores([]));
   }, [recarga]);
 
@@ -60,25 +70,34 @@ export default function FrescorDosMotores({ recarga = 0 }: { recarga?: number })
           <span className="text-xs text-muted">não consegui ler os espelhos</span>
         ) : motores.map((m) => {
           const atraso = m.dia ? diasEntre(m.dia, hoje) : null;
-          const tarde = atraso != null && atraso > (TOLERANCIA[m.nome] ?? 1);
+          const evento = m.tipo === 'evento';
+          const tarde = !evento && atraso != null && atraso > (TOLERANCIA[m.nome] ?? 1);
+          const dm = m.dia ? `${m.dia.slice(8, 10)}/${m.dia.slice(5, 7)}` : '';
           return (
             <span key={m.nome} className="text-xs text-on-surface-variant">
               <span className="inline-block w-2 h-2 mr-1.5 align-[0px] rounded-full"
-                style={{ background: m.dia == null ? 'var(--color-error)' : tarde ? 'var(--color-warning)' : 'var(--color-success)' }} />
+                style={{ background: m.dia == null ? 'var(--color-error)' : tarde ? 'var(--color-warning)' : evento && (atraso ?? 0) > 1 ? 'var(--color-muted)' : 'var(--color-success)' }} />
               <b className="text-on-surface font-medium">{m.nome}</b>{' '}
               {m.dia == null
                 ? <span className="text-error">{m.estado === 'vazio' ? 'sem dado nenhum' : `não consegui ler${m.detalhe ? `: ${m.detalhe}` : ''}`}</span>
+                : evento
+                ? <span title="a leitura de blog chega por evento: dia sem linha é dia sem leitor, não medidor parado">
+                    {atraso === 0 ? 'leitura hoje' : atraso === 1 ? 'leitura ontem' : `sem leitura desde ${dm}`}
+                  </span>
                 : atraso === 0 ? 'hoje'
                 : atraso === 1 ? 'ontem'
-                : <span className={tarde ? 'text-warning' : undefined}>há {atraso} dias ({m.dia.slice(8, 10)}/{m.dia.slice(5, 7)})</span>}
+                : <span className="text-warning">há {atraso} dias ({dm})</span>}
             </span>
           );
         })}
       </div>
       <div className="font-mono text-[9px] text-muted mt-1.5 leading-relaxed">
         a data é o dia mais novo que cada espelho tem, não a hora em que o robô rodou — rodada que roda e
-        não traz nada deixaria a luz verde. A coleta dos motores é manual, feita no app de cada um; o
-        painel só lê. Pedido de um comando único mandado aos quatro agentes em 27/11.
+        não traz nada deixaria a luz verde. Nos <b>Blogs</b> a leitura chega por evento, de quem abre a
+        página: dia sem linha é dia sem leitor, não medidor parado, e por isso ali não acende aviso —
+        falta um sinal de medidor vivo, pedido a eles em 27/11. Quanto da coleta dos motores é agendada
+        e quanto depende de alguém clicar, cada motor vai escrever; o painel só lê. Pedido de um comando
+        único mandado aos quatro em 27/11.
       </div>
     </section>
   );
