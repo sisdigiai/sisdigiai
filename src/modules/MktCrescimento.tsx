@@ -1286,9 +1286,11 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
                         serie={serieDe(polaF.map((d) => ({ dia: d.dia, v: d.views || 0 })))} rotuloSerie="views/dia"
                         plats={polaPlats}
                         aviso={<><b className="text-on-surface-variant">Fora do número grande, de propósito.</b> A Polá não é motor como o Pulso e o Limelight:
-                          eles publicam em canais próprios, e o app da Polá mede as <b>mesmas contas</b> que a casa já conta.
-                          Medido em 27/11: a casa lê 108 peças de Instagram (<b>111.313 views</b>) e 274 de Facebook, todas com origem <code>mkt</code>, lidas uma única vez entre 19 e 25/11;
-                          o espelho dela reporta <b>42.184</b> no Instagram, com 101 das 102 peças relidas (até 39 leituras). Somar contaria a mesma postagem duas vezes.
+                          eles publicam em canais próprios, e o app da Polá mede as <b>mesmas contas</b> que a casa já conta — somar contaria a mesma postagem duas vezes.
+                          {' '}<b className="text-on-surface-variant">As duas medições não discordam: a dela é parcial.</b> Cruzado peça a peça em 27/11: das 108 peças de Instagram
+                          que a casa lê, <b>50 estão nas duas listas</b> (42.029 na casa contra 42.184 lá — a diferença é a data da leitura) e <b>58 só na casa</b>, somando 69.284,
+                          todas anteriores a 11/08/2025: o motor dela lê só as 50 mídias mais recentes. Por isso o <b>acervo</b> vale pela coleta da casa, que é completa,
+                          e o <b>ganho por dia</b> vale por este espelho, que é o único que relê — e cobre só as 50 mais recentes.
                           {polaFbCego && <> <b className="text-warning">O Facebook dela está fora desta caixa:</b> o espelho devolve <b>zero</b> views em 44 dias com post, e zero não é "não medido".</>}</>} />
                 ) : <MotorVazio titulo="Polá Petit · espelho próprio" motivo={fOrigem && fOrigem !== 'casa' ? `o recorte é ${rotuloOrigem(fOrigem)}` : 'o filtro de marca exclui a Polá'} />}
                 {mostrarOsi
