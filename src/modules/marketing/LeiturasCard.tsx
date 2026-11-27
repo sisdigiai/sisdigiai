@@ -128,7 +128,11 @@ export default function LeiturasCard({ recorte, recarga = 0 }: { recorte: Recort
   // O Limelight deixou de ser grupo em 25/11: ele produz para a Mello, marca da casa.
   const limeEntra = motorNoRecorte(recorte, 'casa');
   const deDia = recorte.de ?? '0000-01-01';
-  const ateDia = recorte.ate ?? '9999-12-31';
+  // RECORTE SEM FIM TERMINA HOJE, NÃO EM 9999 (27/11/2026). O `ateDia` servia só para filtrar, onde
+  // um teto absurdo é inofensivo; desde hoje ele também VIRA RÓTULO ("na leitura de …"), e a tela
+  // passou a escrever **31/12** num cartão aberto em 27/11 — achado pelo MKT na tela do dono, uma
+  // hora depois de eu subir. Data de rótulo é dia do negócio, em BRT (R9 da régua dos números).
+  const ateDia = recorte.ate ?? diaBRT(new Date());
   const noPeriodo = <T extends { dia: string; plataforma?: string }>(l: T[]) =>
     l.filter((x) => x.dia >= deDia && x.dia <= ateDia
       && (!recorte.rede || !x.plataforma || x.plataforma === recorte.rede));

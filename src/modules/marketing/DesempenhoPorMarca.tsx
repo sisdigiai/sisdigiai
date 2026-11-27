@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { BarChart3, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { lerTudo } from '../../lib/paginar';
+import { hojeBrasilia } from '../../lib/datas';
 import { aplicar, type Recorte } from '../../lib/recorte';
 import { espelhoMotoresEstado, type PulsoContaDia, type PulsoLeituraDia, type EstadoEspelho } from '../../lib/espelhoMotores';
 import { ultimaLeituraPorPeca, type LeituraDeDia } from '../../lib/leituraPorPeca';
@@ -129,7 +130,9 @@ export default function DesempenhoPorMarca({ recorte, recarga = 0 }: { recorte: 
   // tabela de baixo não: "desta rede, quanto é da casa, quanto é dos cortes, quanto é do Pulso".
   // A marca diz o grupo da casa e dos cortes; o Pulso vem do espelho dele, pela mesma janela.
   const deDia = recorte.de ?? '0000-01-01';
-  const ateDia = recorte.ate ?? '9999-12-31';
+  // Hoje em BRT, não 9999: aqui o valor só filtra, mas o mesmo `?? '9999-12-31'` no cartão de
+  // Leituras virou rótulo e escreveu "na leitura de 31/12" em 27/11. Tirar a mina dos dois lugares.
+  const ateDia = recorte.ate ?? hojeBrasilia();
   const porGrupo = (() => {
     const m = new Map<string, { rede: string; casa: number; cortes: number; pulso: number }>();
     const pega = (rede: string) => {
