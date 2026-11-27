@@ -119,7 +119,11 @@ export default function LeiturasCard({ recorte, recarga = 0 }: { recorte: Recort
     espelhoMotoresEstado.pulsoLeiturasDias().then(setPulsoLeituras);
     espelhoMotoresEstado.limelightPubDias().then(setLime);
     espelhoMotoresEstado.blogsDias().then(setBlogs);
-  }, []);
+    // `recarga` ENTRA AQUI (27/11/2026). A dependência era `[]`: a setinha de recarregar da página
+    // relia a casa e **deixava os espelhos dos motores como estavam** — quem clicasse depois de o
+    // Pulso coletar continuaria vendo o número velho, sem nada indicando isso. O dono perguntou se o
+    // botão atualiza todas as redes; esta metade não atualizava.
+  }, [recarga]);
 
   // OS ESPELHOS DOS MOTORES SÓ ENTRAM QUANDO SÃO DESTE RECORTE. Eles somam o motor inteiro por dia e
   // plataforma — não têm marca. Somá-los com "Lancaster" escolhido poria as views do Pulso dentro do
