@@ -59,16 +59,20 @@ export async function lerTudo<T>(
 // Pedi ao MKT `p_limit`/`p_offset` na própria função, porque depender do PostgREST aceitar offset em
 // RPC é a mesma fragilidade de depender do Range — funciona até parar, e quando parar some com peça
 // sem erro nenhum. Quando existirem, esta função troca de caminho e o resto da tela não muda.
+// 14h20: o MKT pôs `p_limit` e `p_offset` na própria função (migration 20261127_06), com a ordem
+// fixada por dentro. É o caminho certo e esta função passou a usá-lo: o corte agora é argumento, não
+// comportamento do PostgREST. Conferido que as duas páginas trazem peças diferentes — 1.000 e 910,
+// 1.910 ao todo, sem repetição.
 export async function lerRpcTudo<T>(
   url: string, anon: string, token: string, fn: string,
-  args: Record<string, unknown>, ordem: string, teto = 40000,
+  args: Record<string, unknown>, teto = 40000,
 ): Promise<T[]> {
   const todas: T[] = [];
   for (let de = 0; de < teto; de += PAGINA) {
-    const r = await fetch(`${url}/rest/v1/rpc/${fn}?limit=${PAGINA}&offset=${de}&order=${ordem}`, {
+    const r = await fetch(`${url}/rest/v1/rpc/${fn}`, {
       method: 'POST',
       headers: { apikey: anon, Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(args),
+      body: JSON.stringify({ ...args, p_limit: PAGINA, p_offset: de }),
     });
     if (!r.ok) throw new Error(`${fn}: HTTP ${r.status} ${(await r.text()).slice(0, 120)}`);
     const lote = (await r.json()) as T[];

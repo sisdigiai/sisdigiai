@@ -316,8 +316,7 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
       const linhas = await lerRpcTudo<GanhoJanela>(
         import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY, token,
         'fn_mkt_ganho_janela',
-        { p_de: corteDia, p_ate: fimDia, p_marca: null, p_rede: null },
-        'peca_ref.asc,origem.asc,conta.asc,rede.asc');
+        { p_de: corteDia, p_ate: fimDia, p_marca: null, p_rede: null });
 
       const flags = new Map(consolidada.map((p) => [chaveDaPeca(p as unknown as LeituraDeDia), p]));
       const saida: Peca[] = linhas.map((l) => {
