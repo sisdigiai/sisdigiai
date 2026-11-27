@@ -2,6 +2,31 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), simplificado.
 
+## 2026-11-27 — O Pulso parado em 1.116, e o Pulso que sumiu da soma sem avisar
+
+**Dois números iguais para duas perguntas diferentes.** Na aba Hoje, recorte 26/11 → 26/11, o bloco
+de views mostrava `Pulso 1.116` por publicação e `Pulso 1.116` por leitura. O dono viu e perguntou se
+estava certo. Não estava: o Pulso tem um número para cada régua — `v_espelho_pulso_contas_dias`
+responde *"quanto somam hoje os posts publicados naquele dia"* (1.116 em 26/11) e
+`v_espelho_pulso_leituras_dias` responde *"quanto todos os posts ganharam naquele dia"* (2.190). O
+Radar lia sempre o primeiro. Corrigido e conferido em tela: 1.669 por publicação, 14.788 por leitura.
+
+**O mesmo defeito estava em dois lugares e eu consertei um.** De manhã ele caiu em
+`DesempenhoPorMarca` e foi corrigido; `MktCrescimento` ficou quebrado ao lado, com o código
+exatamente igual. Regra que fica: achado de *"a fonte não segue a régua"* não se conserta no bloco que
+está na frente — varre-se todos os que leem espelho.
+
+**O achado que a conferência em tela entregou de brinde.** Na primeira carga do dia a view de leitura
+do Pulso devolveu **500** (`57014`, *statement timeout*) e a tela **apagou o Pulso da soma sem dizer
+nada**: título "views do que foi LIDO", número 12.598, e embaixo só Limelight e contas da casa.
+Faltavam 2.190 e não havia como saber. Número que perde uma parcela calado é pior do que número que
+não aparece — agora a linha escreve **"Pulso não medido (HTTP 500)"** com o motivo.
+
+**Medido, não suposto:** a view custa mais de 3 s a frio e o timeout do anon é 3 s. Sete leituras
+seguidas pela porta de fora: a primeira 500 em 3,61 s, as outras 200 em 0,54–1,64 s; em paralelo com
+as outras três views do Pulso, 0,46–0,51 s. Falhou nas duas primeiras cargas da página (10:25:06 e
+10:32:49). O custo da view é do banco do Pulso e foi passado ao agente deles no mesmo turno.
+
 ## 2026-11-25 (noite) — Três migrations de fato, duas aplicadas, e um número que mudou quatro vezes
 
 **Aplicadas às 20h07, com a palavra do dono.** `272`: o fato de comissão sai de citável
