@@ -6,6 +6,7 @@ import OsiDiasCard from '../components/OsiDiasCard';
 import MapaCobertura from '../components/MapaCobertura';
 import { espelhoMotores, espelhoMotoresEstado, type PolaPetitDia, type EstadoEspelho, type PulsoContaDia, type PulsoLeituraDia, type PulsoSegDia, type PulsoConta, type LimelightDia, type LimePubDia, type BlogDia, type EspelhoBlogs } from '../lib/espelhoMotores';
 import { lerTudo } from '../lib/paginar';
+import { ultimaLeituraPorPeca, chaveDaPeca, type LeituraDeDia } from '../lib/leituraPorPeca';
 
 // RADAR 360 (2026-08-25) — o analytics social completo do grupo, aprovado em mock.
 // Decisão do dono: TODAS as redes, canais e marcas presentes na estrutura desde já;
@@ -240,12 +241,50 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
     },
     // A consolidação mora no banco desde 21/11 (`v_mkt_peca_consolidada`): uma peça, uma linha, com
     // a data de publicação junto. No recorte de 30 dias são 473 linhas numa página.
+    //
+    // A RÉGUA DE LEITURA NÃO PODE USAR A CONSOLIDADA (27/11/2026). A `v_mkt_peca_consolidada` guarda
+    // a última leitura **de todos os tempos** de cada peça. Filtrar essa coluna por uma janela passada
+    // não responde "o que foi lido naquele dia": responde "quais peças foram lidas naquele dia **e
+    // nunca mais**" — ou seja, as que PARARAM de ser lidas. O dono achou pelo buraco: os Bastidores
+    // DIGIAI em 26/11 davam 138 por publicação e **zero** por leitura. Medido no banco: naquele dia
+    // 73 peças dos Bastidores foram lidas, somando 2.210 views; todas foram lidas de novo em 27/11,
+    // então a `ultima_leitura` delas é 27/11 e a janela de 26/11 ficava sem ninguém. Pela mesma razão
+    // o número de um dia passado MUDA sozinho no dia seguinte, conforme a coleta passa.
+    //
+    // Na régua de leitura a fonte passa a ser a `v_mkt_analytics_peca_dia` (uma linha por peça por
+    // dia) recortada à janela, consolidada **dentro dela** — a mesma regra que o bloco "O que rendeu
+    // no recorte" já usava. A consolidada continua entrando, só para os campos que não vivem na
+    // leitura do dia: se a peça foi apagada e qual é o dia de publicação dela.
     async pecas() {
-      setPecas(await lerTudo<Peca>((de, ate) => {
+      const consolidada = await lerTudo<Peca>((de, ate) => {
         let q = supabase.from('v_mkt_peca_consolidada')
           .select('origem, marca, conta, rede, tipo, peca_ref, leituras, primeira_leitura, ultima_leitura, views, publicada_em, apagada, dia_publicacao, publicacao_estimada');
         if (corteDia > '2000-01-01') q = q.or(`dia_publicacao.gte.${corteDia},ultima_leitura.gte.${corteDia}`);
         return q.order('origem').order('conta').order('rede').order('peca_ref').range(de, ate);
+      });
+      if (filtros.data !== 'leitura') { setPecas(consolidada); return; }
+
+      const dias = await lerTudo<LeituraDeDia & { marca: string | null; tipo: string; link: string | null }>((de, ate) => {
+        let q = supabase.from('v_mkt_analytics_peca_dia')
+          .select('origem, marca, conta, rede, tipo, peca_ref, data, views, curtidas, comentarios, compartilhamentos, retencao_media_pct, horas_exibicao, link');
+        if (corteDia > '2000-01-01') q = q.gte('data', corteDia);
+        if (fimDia < '2999-12-31') q = q.lte('data', fimDia);
+        return q.order('data').order('peca_ref').range(de, ate);
+      });
+      const flags = new Map(consolidada.map((p) => [chaveDaPeca(p as unknown as LeituraDeDia), p]));
+      setPecas(ultimaLeituraPorPeca(dias).map((l) => {
+        const c = flags.get(chaveDaPeca(l));
+        return {
+          origem: l.origem, marca: l.marca, conta: l.conta ?? null, rede: l.rede, tipo: l.tipo,
+          peca_ref: l.peca_ref, leituras: l.leituras, primeira_leitura: l.primeira_data,
+          ultima_leitura: l.data, views: l.views ?? null,
+          publicada_em: c?.publicada_em ?? null,
+          apagada: c?.apagada ?? false,
+          // Peça lida na janela que a consolidada não conhece é peça sem registro de publicação:
+          // vale a primeira leitura dela, como já valia antes — e sai marcada como estimada.
+          dia_publicacao: c?.dia_publicacao ?? l.primeira_data,
+          publicacao_estimada: c?.publicacao_estimada ?? true,
+        } satisfies Peca;
       }));
     },
     // Só as publicações do recorte. Eram 3.072 linhas em 4 páginas enfileiradas para mostrar um
@@ -316,7 +355,11 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
     saude: ['marcas', 'audiencia', 'saude', 'pecas', 'pulso', 'blogs'],
   };
 
-  const chaveDaFonte = (f: string) => (DA_JANELA.has(f) ? `${f}|${corteDia}|${fimDia}` : f);
+  // A régua entra na chave de `pecas` porque, desde 27/11, ela troca a FONTE da leitura das peças,
+  // não só o filtro. Sem isto a tela trocaria o rótulo e mostraria o número da régua anterior.
+  const chaveDaFonte = (f: string) =>
+    f === 'pecas' ? `pecas|${corteDia}|${fimDia}|${filtros.data}`
+    : DA_JANELA.has(f) ? `${f}|${corteDia}|${fimDia}` : f;
 
   // A TELA NÃO ESPERA A FONTE MAIS LENTA (21/11/2026). Cada fonte avisa quando chega, e o bloco que
   // depende dela escreve "medindo…" até lá — nunca 0, nunca em branco.

@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { lerTudo } from '../../lib/paginar';
 import { aplicar, type Recorte } from '../../lib/recorte';
 import { espelhoMotoresEstado, type PulsoContaDia, type PulsoLeituraDia, type EstadoEspelho } from '../../lib/espelhoMotores';
+import { ultimaLeituraPorPeca, type LeituraDeDia } from '../../lib/leituraPorPeca';
 
 // O QUE CADA MARCA RENDEU NO RECORTE (25/11/2026).
 //
@@ -26,7 +27,7 @@ import { espelhoMotoresEstado, type PulsoContaDia, type PulsoLeituraDia, type Es
 // marcado como medida da conta, e fica em branco onde não existe. Somar alcance de conta com views
 // de peça numa coluna só seria juntar duas unidades e chamar de desempenho.
 
-type Peca = { marca: string | null; rede: string; views: number | null; curtidas: number | null; comentarios: number | null; compartilhamentos: number | null; peca_ref: string };
+type Peca = LeituraDeDia & { marca: string | null };
 /** Quem PRODUZ a peça. Três grupos, um eixo só — ver ORIGENS em MktCrescimento. */
 const grupoDaMarca = (marca: string | null) =>
   marca === 'bastidores' || marca === 'bastidores2' ? 'cortes' : 'casa';
@@ -47,14 +48,14 @@ export default function DesempenhoPorMarca({ recorte, recarga = 0 }: { recorte: 
     lerTudo<Peca>((de, ate) => {
       const base = porPublicacao
         ? supabase.from('v_mkt_peca_consolidada')
-            .select('marca, rede, views, curtidas, comentarios, compartilhamentos, peca_ref')
+            .select('origem, conta, marca, rede, views, curtidas, comentarios, compartilhamentos, peca_ref, data:ultima_leitura')
             .eq('apagada', false)
         : supabase.from('v_mkt_analytics_peca_dia')
-            .select('marca, rede, views, curtidas, comentarios, compartilhamentos, peca_ref');
+            .select('origem, conta, marca, rede, views, curtidas, comentarios, compartilhamentos, peca_ref, data');
       const { q } = aplicar(base, recorte, {
         data: porPublicacao ? 'dia_publicacao' : 'data', marca: 'marca', rede: 'rede',
       });
-      return q.order('marca', { nullsFirst: false }).order('rede').order('peca_ref').range(de, ate);
+      return q.order('marca', { nullsFirst: false }).order('rede').order('peca_ref').order(porPublicacao ? 'ultima_leitura' : 'data').range(de, ate);
     }).then((l) => { setErro(null); setPecas(l); })
       .catch((e) => { setErro(String(e?.message ?? e)); setPecas([]); });
   }, [recorte, recarga, porPublicacao]);
@@ -85,12 +86,17 @@ export default function DesempenhoPorMarca({ recorte, recarga = 0 }: { recorte: 
   // UMA PEÇA, UMA LINHA. Na régua de leitura a mesma peça aparece em vários dias e `leitura_dia`
   // guarda ACUMULADO, não diferença: somar os dias contaria a mesma peça várias vezes. A regra é a
   // mesma do Leituras e do Radar — última leitura de cada peça.
+  //
+  // CORRIGIDO EM 27/11: a versão anterior guardava `m.set(p.peca_ref, p)` confiando que a consulta
+  // vinha ordenada por data — e ela vinha ordenada por marca, rede e peça. Dentro da mesma peça a
+  // ordem dos dias era indefinida, então podia ficar a leitura mais VELHA. E a chave era só o
+  // `peca_ref`: o mesmo corte publicado em duas contas virava uma peça só, perdendo a audiência de
+  // uma delas. A regra da casa é a do `leituraPorPeca.ts` — chave origem+conta+rede+peça, último
+  // valor medido de cada campo.
   const unicas = (() => {
     if (!pecas) return [];
     if (porPublicacao) return pecas;                     // a consolidada já traz uma linha por peça
-    const m = new Map<string, Peca>();
-    for (const p of pecas) m.set(p.peca_ref, p);         // vem ordenado por data: fica a última
-    return [...m.values()];
+    return ultimaLeituraPorPeca(pecas);
   })();
 
   const linhas = (() => {
