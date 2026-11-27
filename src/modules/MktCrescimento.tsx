@@ -1017,6 +1017,8 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
                             : mostrarLime && limeTot.views > 0 && <>Limelight {nf(limeTot.views)} · </>}
                           {chegando('pecas')
                             ? <>contas da casa <span className="animate-pulse">medindo…</span></>
+                            : porLeitura && pecasComGanho === 0 && pecasF.length > 0
+                            ? <><span className="text-error">contas da casa não medido</span> (nenhuma das {nf(pecasF.length)} peças do recorte foi lida duas vezes — sem duas leituras não existe ganho) · </>
                             : porLeitura
                             ? <>contas da casa {nf(ganhoCasa)} ({pecasComGanho} de {pecasF.length} peças com leitura anterior{pecasSemAnterior > 0 ? ` · ${pecasSemAnterior} sem anterior, ganho desconhecido` : ''})</>
                             : viewsCasa > 0
@@ -1075,9 +1077,12 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
                 <Kpi icon={<Film className="w-4 h-4" />} label="views motores" value={temMotor ? nf(viewsRecorte) : '—'} sub={temMotor ? `${nf(pubsRecorte)} pubs · ${nf(engRecorte)} interações` : fMarca ? 'sem motor nesta marca' : 'sem views no recorte'} glow={COR_WARN} />
                 <Kpi icon={<Eye className="w-4 h-4" />}
                   label={porLeitura ? 'views que as peças da casa GANHARAM no período' : 'views acumuladas do que a casa publicou no período'}
-                  value={chegando('pecas') ? '…' : soMotor || viewsCasa === 0 ? '—' : nf(porLeitura ? ganhoCasa : viewsCasa)}
+                  value={chegando('pecas') ? '…' : soMotor || viewsCasa === 0 ? '—'
+                    : porLeitura && pecasComGanho === 0 ? 'não medido'
+                    : nf(porLeitura ? ganhoCasa : viewsCasa)}
                   sub={chegando('pecas') ? 'medindo…' : soMotor ? FORA_DA_CASA
                     : viewsCasa === 0 ? 'a coletar — despacho no MKT (sync-metricas)'
+                    : porLeitura && pecasComGanho === 0 ? `nenhuma das ${nf(pecasF.length)} peças foi lida duas vezes — acervo delas: ${nf(viewsCasa)}`
                     : porLeitura ? `${pecasComGanho} de ${pecasF.length} peças com leitura anterior · acervo delas: ${nf(viewsCasa)}`
                     : `${pecasComViews} de ${pecasF.length} peças com leitura · acumulado de vida, não é o que entrou no período`} glow={COR_SEC} />
               </section>
