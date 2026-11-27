@@ -66,3 +66,56 @@ export const somarCampo = <T extends LeituraDeDia>(pecas: PecaLida<T>[], campo: 
 
 export const pecasMedidas = <T extends LeituraDeDia>(pecas: PecaLida<T>[], campo: typeof CAMPOS[number]) =>
   pecas.filter((p) => (p as Record<string, unknown>)[campo] != null).length;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// O GANHO DE UMA JANELA (27/11/2026). Mora aqui, e não em cada tela, pela mesma razão que a
+// consolidação mora: duas telas com a mesma pergunta e contas diferentes é o defeito que esta casa
+// já pagou três vezes.
+//
+// Views de rede são ACUMULADO DE VIDA. Para dizer "quanto rendeu no período" só há três respostas
+// possíveis, e a terceira é a honesta:
+//   1. a peça tem leitura ANTES da janela → ganho = leitura de dentro menos a de antes;
+//   2. a peça NASCEU na janela (registro de publicação de verdade) → ganho = tudo que acumulou;
+//   3. a peça é mais velha e só foi lida agora → **desconhecido**. Não se sabe quanto ela já tinha
+//      quando a janela começou, e inventar é o erro que a régua dos números proíbe (R2 e R6 em
+//      Cockpit/Harness/regua-dos-numeros.md).
+//
+// A data de publicação ESTIMADA (a que nasce da 1ª leitura quando não há registro) NÃO serve para o
+// caso 2: ela diz "nasceu quando eu vi", que é circular. Quem só tem data estimada cai no caso 3.
+export type GanhoDaPeca<T> = {
+  /** A última leitura DENTRO da janela — o acervo da peça no fim do recorte. */
+  dentro: PecaLida<T>;
+  /** O que entrou na janela. `null` = desconhecido (caso 3). */
+  ganho: number | null;
+  origem: 'diferenca' | 'nasceu_na_janela' | 'desconhecido';
+};
+
+export function ganhoNaJanela<T extends LeituraDeDia>(
+  linhas: T[],
+  corte: string,
+  nasceuNaJanela: (chave: string) => boolean,
+): Array<GanhoDaPeca<T>> {
+  const grupos = new Map<string, T[]>();
+  for (const l of linhas) {
+    const k = chaveDaPeca(l);
+    const a = grupos.get(k);
+    if (a) a.push(l); else grupos.set(k, [l]);
+  }
+  const saida: Array<GanhoDaPeca<T>> = [];
+  for (const [chave, ls] of grupos) {
+    const naJanela = ls.filter((l) => l.data >= corte);
+    if (naJanela.length === 0) continue;
+    const dentro = ultimaLeituraPorPeca(naJanela)[0];
+    const antes = ls.filter((l) => l.data < corte).pop();
+    if (antes != null && antes.views != null && dentro.views != null) {
+      // Sem clamp: peça que PERDE view (post apagado, correção da rede) entra negativa. Aparar para
+      // zero infla o total e esconde o que aconteceu.
+      saida.push({ dentro, ganho: dentro.views - antes.views, origem: 'diferenca' });
+    } else if (nasceuNaJanela(chave) && dentro.views != null) {
+      saida.push({ dentro, ganho: dentro.views, origem: 'nasceu_na_janela' });
+    } else {
+      saida.push({ dentro, ganho: null, origem: 'desconhecido' });
+    }
+  }
+  return saida;
+}

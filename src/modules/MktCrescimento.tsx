@@ -6,7 +6,7 @@ import OsiDiasCard from '../components/OsiDiasCard';
 import MapaCobertura from '../components/MapaCobertura';
 import { espelhoMotores, espelhoMotoresEstado, type PolaPetitDia, type EstadoEspelho, type PulsoContaDia, type PulsoLeituraDia, type PulsoSegDia, type PulsoConta, type LimelightDia, type LimePubDia, type BlogDia, type EspelhoBlogs } from '../lib/espelhoMotores';
 import { lerTudo } from '../lib/paginar';
-import { ultimaLeituraPorPeca, chaveDaPeca, type LeituraDeDia } from '../lib/leituraPorPeca';
+import { ultimaLeituraPorPeca, ganhoNaJanela, chaveDaPeca, type LeituraDeDia } from '../lib/leituraPorPeca';
 
 // RADAR 360 (2026-08-25) — o analytics social completo do grupo, aprovado em mock.
 // Decisão do dono: TODAS as redes, canais e marcas presentes na estrutura desde já;
@@ -280,53 +280,28 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
           .lte('data', fimDia)
           .order('data').order('peca_ref').range(de, ate));
 
-      const porPeca = new Map<string, Array<LeituraDeDia & { marca: string | null; tipo: string }>>();
-      for (const l of dias) {
-        const k = chaveDaPeca(l);
-        const a = porPeca.get(k);
-        if (a) a.push(l); else porPeca.set(k, [l]);
-      }
       const flags = new Map(consolidada.map((p) => [chaveDaPeca(p as unknown as LeituraDeDia), p]));
-      const saida: Peca[] = [];
-      for (const ls of porPeca.values()) {
-        const naJanela = ls.filter((l) => l.data >= corteDia);
-        if (naJanela.length === 0) continue;                       // peça não foi lida no recorte
-        const dentro = ultimaLeituraPorPeca(naJanela)[0];
-        const antes = ls.filter((l) => l.data < corteDia).pop();
+      // A conta do ganho é a de `lib/leituraPorPeca.ts`, a mesma do cartão "Leituras do conteúdo".
+      // Peça só conta como nascida na janela quando tem registro de publicação de verdade: data
+      // estimada vem da 1ª leitura e diria "nasceu quando eu vi", que é circular.
+      const saida: Peca[] = ganhoNaJanela(dias, corteDia, (chave) => {
+        const c = flags.get(chave);
+        return c != null && !c.publicacao_estimada && c.dia_publicacao >= corteDia;
+      }).map(({ dentro, ganho }) => {
         const c = flags.get(chaveDaPeca(dentro));
-        // PEÇA QUE NASCEU DENTRO DA JANELA TEM GANHO IGUAL AO ACUMULADO (corrigido em 27/11, no mesmo
-        // dia em que a primeira versão entrou). A primeira regra dizia "sem leitura anterior, ganho
-        // desconhecido" — e era conservadora demais até virar erro: peça publicada em 19/11 que chegou
-        // a 5.692 views em 27/11 ganhou os 5.692 DENTRO da janela de 30 dias. Não havia o que medir
-        // antes porque ela não existia antes.
-        //
-        // São três casos, não dois, e a tela conta os três à parte:
-        //   · tem leitura ANTES da janela  → ganho medido, diferença entre as duas;
-        //   · nasceu na janela, com registro de publicação de verdade → ganho = tudo que acumulou;
-        //   · nasceu antes e só foi lida agora → **desconhecido**. É o caso em que não se sabe quanto
-        //     ela já tinha quando a janela começou, e inventar seria o erro que a régua proíbe.
-        // A data de publicação ESTIMADA (a que vem da 1ª leitura, quando não há registro) não serve
-        // para decidir isto: ela diz "nasceu quando eu vi", que é circular. Essas ficam em desconhecido.
-        const nasceuNaJanela = c != null && !c.publicacao_estimada && c.dia_publicacao >= corteDia;
-        saida.push({
+        return {
           origem: dentro.origem, marca: dentro.marca, conta: dentro.conta ?? null, rede: dentro.rede,
           tipo: dentro.tipo, peca_ref: dentro.peca_ref, leituras: dentro.leituras,
           primeira_leitura: dentro.primeira_data, ultima_leitura: dentro.data,
-          views: dentro.views ?? null,
-          // Sem clamp: peça que PERDE view (post apagado, correção da rede) entra negativa. Aparar
-          // para zero infla o total e esconde o que aconteceu de verdade.
-          ganho: antes != null && antes.views != null && dentro.views != null
-            ? dentro.views - antes.views
-            : nasceuNaJanela ? dentro.views ?? null
-            : null,
+          views: dentro.views ?? null, ganho,
           publicada_em: c?.publicada_em ?? null,
           apagada: c?.apagada ?? false,
           // Peça lida na janela que a consolidada não conhece é peça sem registro de publicação:
           // vale a primeira leitura dela, como já valia antes — e sai marcada como estimada.
           dia_publicacao: c?.dia_publicacao ?? dentro.primeira_data,
           publicacao_estimada: c?.publicacao_estimada ?? true,
-        });
-      }
+        } satisfies Peca;
+      });
       setPecas(saida);
     },
     // Só as publicações do recorte. Eram 3.072 linhas em 4 páginas enfileiradas para mostrar um

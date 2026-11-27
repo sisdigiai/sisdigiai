@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Eye, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import { aplicar, motorNoRecorte, type Recorte } from '../../lib/recorte';
-import { ultimaLeituraPorPeca, somarCampo, pecasMedidas } from '../../lib/leituraPorPeca';
+import { motorNoRecorte, type Recorte } from '../../lib/recorte';
+import { ultimaLeituraPorPeca, ganhoNaJanela, chaveDaPeca, somarCampo, pecasMedidas, type LeituraDeDia } from '../../lib/leituraPorPeca';
 import { lerTudo } from '../../lib/paginar';
-import { espelhoMotoresEstado, type PulsoDia, type PulsoLongoDia, type LimePubDia, type BlogDia, type EstadoEspelho } from '../../lib/espelhoMotores';
+import { espelhoMotoresEstado, type PulsoDia, type PulsoLongoDia, type PulsoLeituraDia, type LimePubDia, type BlogDia, type EstadoEspelho } from '../../lib/espelhoMotores';
 
 // Leituras do conteúdo — ordem do dono em 17/11/2026: "já temos os analytics do cortes do pulso no
 // próprio pulso, precisamos agora nos analíticos total no espelho do marketing".
@@ -76,24 +76,47 @@ export default function LeiturasCard({ recorte, recarga = 0 }: { recorte: Recort
   const [longos, setLongos] = useState<{ linhas: PulsoLongoDia[]; estado: EstadoEspelho; detalhe?: string } | null>(null);
   const [lime, setLime] = useState<{ linhas: LimePubDia[]; estado: EstadoEspelho; detalhe?: string } | null>(null);
   const [blogs, setBlogs] = useState<{ linhas: BlogDia[]; estado: EstadoEspelho; detalhe?: string } | null>(null);
+  /** Data de publicação por peça, só para saber quem NASCEU na janela — quem nasceu nela ganhou
+   *  tudo o que acumulou. Vem da consolidada porque a leitura do dia não guarda essa data. */
+  const [pubs, setPubs] = useState<Map<string, { dia: string; estimada: boolean }> | null>(null);
 
   useEffect(() => {
     setLinhas(null);
     // Em páginas de mil: a API corta a resposta nas primeiras mil linhas e devolve isso como sucesso.
     // Hoje são 921 leituras e a conta ainda fecha; na semana que vier, não fecharia — e ninguém veria.
+    // A LEITURA VEM DESDE O COMEÇO, só com o teto do recorte (27/11/2026). Para dizer o que ENTROU
+    // na janela é preciso o ponto de ANTES dela — ganho é diferença, não acumulado. O recorte de
+    // marca e rede continua valendo; só o piso da data sai, e por isso `aplicar` não entra aqui.
     lerTudo<Linha>((de, ate) => {
-      const base = supabase.from('v_mkt_analytics_peca_dia')
+      let q = supabase.from('v_mkt_analytics_peca_dia')
         .select('origem, marca, conta, rede, tipo, peca_ref, data, views, curtidas, comentarios, compartilhamentos, retencao_media_pct');
+      if (recorte.ate) q = q.lte('data', recorte.ate);
       // `marca` e `rede` existem nesta view; a coluna `origem` dela NÃO é o grupo da barra (é quem
       // mediu a peça), por isso o grupo entra resolvido em marcas e `origem` fica fora.
-      const { q } = aplicar(base, recorte, { data: 'data', marca: 'marca', rede: 'rede' });
+      if (recorte.marcas) q = recorte.marcas.length === 1 ? q.eq('marca', recorte.marcas[0]) : q.in('marca', recorte.marcas);
+      if (recorte.rede) q = q.eq('rede', recorte.rede);
       return q.order('data').order('origem').order('conta').order('rede').order('peca_ref').range(de, ate);
     }).then((l) => { setErro(null); setLinhas(l); });
+
+    lerTudo<{ origem: string; conta: string | null; rede: string; peca_ref: string; dia_publicacao: string; publicacao_estimada: boolean }>((de, ate) => {
+      let q = supabase.from('v_mkt_peca_consolidada')
+        .select('origem, conta, rede, peca_ref, dia_publicacao, publicacao_estimada');
+      if (recorte.marcas) q = recorte.marcas.length === 1 ? q.eq('marca', recorte.marcas[0]) : q.in('marca', recorte.marcas);
+      if (recorte.rede) q = q.eq('rede', recorte.rede);
+      return q.order('origem').order('conta').order('rede').order('peca_ref').range(de, ate);
+    }).then((l) => setPubs(new Map(l.map((c) => [
+      chaveDaPeca(c as unknown as LeituraDeDia), { dia: c.dia_publicacao, estimada: c.publicacao_estimada },
+    ])))).catch(() => setPubs(new Map()));
   }, [recorte, recarga]);
 
+  // A FONTE DO PULSO SEGUE A RÉGUA (27/11/2026). `v_espelho_pulso_dias` e `_longos_dias` somam o
+  // total ATUAL dos posts publicados no dia — isso é "por publicação". Com a régua em LEITURA a
+  // pergunta é outra, e quem responde é `v_espelho_pulso_leituras_dias`, que dá o ganho do dia.
+  const [pulsoLeituras, setPulsoLeituras] = useState<{ linhas: PulsoLeituraDia[]; estado: EstadoEspelho; detalhe?: string } | null>(null);
   useEffect(() => {
     espelhoMotoresEstado.pulsoDias().then(setPulso);
     espelhoMotoresEstado.pulsoLongosDias().then(setLongos);
+    espelhoMotoresEstado.pulsoLeiturasDias().then(setPulsoLeituras);
     espelhoMotoresEstado.limelightPubDias().then(setLime);
     espelhoMotoresEstado.blogsDias().then(setBlogs);
   }, []);
@@ -115,14 +138,32 @@ export default function LeiturasCard({ recorte, recarga = 0 }: { recorte: Recort
   // acumulado, não diferença: a mesma peça lida 95 views e depois 103 entrava como 198. A conta velha
   // dava 48.204 views contra 45.885 reais — **2.319 a mais, 5%**. A regra agora mora em
   // lib/leituraPorPeca.ts, para esta tela e o Radar 360 nunca divergirem.
-  const pecas = ultimaLeituraPorPeca(linhas ?? []);
+  // O ACERVO é das peças LIDAS no recorte; as leituras antigas vieram junto só para existir o ponto
+  // de antes, e não podem entrar na contagem de peças do período.
+  const noRecorte = (linhas ?? []).filter((l) => l.data >= deDia && l.data <= ateDia);
+  const pecas = ultimaLeituraPorPeca(noRecorte);
   const naoMedidas = pecas.filter((p) => p.views == null);
+  // O GANHO: o que entrou na janela, pela conta única de lib/leituraPorPeca.ts.
+  const nasceuNaJanela = (chave: string) => {
+    const c = pubs?.get(chave);
+    return c != null && !c.estimada && c.dia >= deDia;
+  };
+  const ganhos = ganhoNaJanela(linhas ?? [], deDia, nasceuNaJanela);
+  const casaGanho = ganhos.reduce((a, g) => a + (g.ganho ?? 0), 0);
+  const comGanho = ganhos.filter((g) => g.ganho != null).length;
+  const semReferencia = ganhos.filter((g) => g.ganho == null).length;
   // Curtida e comentário têm cobertura MUITO menor que view (68 de 647 linhas em 30 dias, medido em
   // 17/11). Somar os nulos como zero faria a tela dizer "8 curtidas em 602 peças", que é um juízo sobre
   // o conteúdo — quando a verdade é que 534 peças nunca tiveram curtida coletada.
   const comEngajamento = pecasMedidas(pecas, 'curtidas');
 
   const casaViews = somarCampo(pecas, 'views');
+  // O Pulso entrega GANHO por dia nesta régua; somar os dias é somar ganho, que é a conta certa.
+  const pulsoGanho = pulsoLeituras && pulsoEntra && pulsoLeituras.estado === 'ok'
+    ? noPeriodo(pulsoLeituras.linhas).reduce((a, x) => a + (x.views ?? 0), 0) : 0;
+  const pulsoCego = pulsoEntra && pulsoLeituras != null && pulsoLeituras.estado !== 'ok';
+  // O acervo do Pulso (o que os posts publicados no período já juntaram) fica à parte, para a linha
+  // de acervo não somar formas diferentes.
   const pulsoViews = pulso && pulsoEntra ? noPeriodo(pulso.linhas).reduce((a, x) => a + (x.views ?? 0), 0) : 0;
   const longosViews = longos && pulsoEntra ? noPeriodo(longos.linhas).reduce((a, x) => a + (x.views ?? 0), 0) : 0;
   const limeViews = lime && limeEntra ? noPeriodo(lime.linhas).reduce((a, x) => a + (x.views ?? 0), 0) : 0;
@@ -157,7 +198,13 @@ export default function LeiturasCard({ recorte, recarga = 0 }: { recorte: Recort
     !blogsEntram ? 'blogs' : null,
   ].filter(Boolean) as string[];
 
-  const totalViews = casaViews + pulsoViews + longosViews + limeViews;
+  const acervoSomado = casaViews + pulsoViews + longosViews + limeViews;
+  // O NÚMERO GRANDE É O GANHO (27/11/2026). Era o acervo — "views somadas" com o período no cabeçalho
+  // —, e acumulado de vida não leva nome de período: foi o erro que o dono achou pelo TikTok da Mello
+  // (16.850 rotulado "hoje" num dia em que rendeu zero). Cockpit/Harness/regua-dos-numeros.md.
+  // O Limelight fica fora: o espelho dele só responde por publicação, e parcela de outra pergunta não
+  // entra na soma (R7).
+  const totalGanho = casaGanho + pulsoGanho;
 
   const agrupar = (chave: (l: Linha) => string) => {
     const m = new Map<string, { pecas: Set<string>; views: number; medidas: number }>();
@@ -200,11 +247,15 @@ export default function LeiturasCard({ recorte, recarga = 0 }: { recorte: Recort
         <div className="px-4 py-3 text-sm text-muted">Carregando…</div>
       ) : (
         <>
-          <div className="px-4 py-3 grid grid-cols-2 sm:grid-cols-4 gap-4 border-b border-outline/10">
-            <Numero valor={kilo(totalViews)} rotulo="views somadas"
-              sub={`${kilo(casaViews)} contas da casa · ${kilo(pulsoViews + longosViews)} Pulso · ${kilo(limeViews)} Limelight`} />
+          <div className="px-4 py-3 grid grid-cols-2 sm:grid-cols-5 gap-4 border-b border-outline/10">
+            <Numero valor={kilo(totalGanho)} rotulo="views GANHAS no período"
+              sub={`${kilo(casaGanho)} contas da casa · ${pulsoCego ? 'Pulso não medido' : kilo(pulsoGanho) + ' Pulso'} · Limelight fora (só sabe publicação)`} />
+            <Numero valor={kilo(acervoSomado)} rotulo={`acervo lido, na leitura de ${dm(ateDia)}`}
+              sub="o que essas peças já juntaram desde que nasceram — não é do período" />
             <Numero valor={n(pecas.length)} rotulo="peças nas contas da casa"
-              sub={naoMedidas.length > 0 ? `${naoMedidas.length} sem leitura coletada` : 'todas com leitura'} />
+              sub={semReferencia > 0
+                ? `${n(comGanho)} com ganho apurado · ${n(semReferencia)} são de antes da janela e só foram lidas agora`
+                : naoMedidas.length > 0 ? `${naoMedidas.length} sem leitura coletada` : 'todas com leitura'} />
             <Numero valor={comEngajamento === 0 ? '—' : n(somarCampo(pecas, 'curtidas'))} rotulo="curtidas"
               sub={comEngajamento === 0
                 ? 'nenhuma peça com curtida coletada'
@@ -220,10 +271,11 @@ export default function LeiturasCard({ recorte, recarga = 0 }: { recorte: Recort
             cortes e longos das contas do Pulso · Limelight. Nenhuma peça entra duas vezes: as contas da
             DIGIAI ficam fora dos espelhos do Pulso, conferido por mim em 17/11.{' '}
             <strong className="text-on-surface">O recorte aqui é por data de LEITURA</strong>: uma peça
-            publicada em julho e lida ontem entra, com todas as views que acumulou. O Radar 360 conta a
-            mesma fonte por data de PUBLICAÇÃO, e por isso dá um número menor — as duas contas estão
-            certas e respondem a perguntas diferentes: aqui, "quanto a casa já somou do que foi medido
-            agora"; lá, "quanto rendeu o que a casa publicou neste período".
+            publicada em julho e lida ontem entra. O número grande é o que ela <strong className="text-on-surface">ganhou
+            dentro da janela</strong> — a leitura de dentro menos a última de antes; peça que nasceu na
+            janela ganhou tudo o que acumulou, e peça mais velha que só foi lida agora não tem ganho
+            conhecido e fica de fora, contada à parte. O acervo, ao lado, é a outra pergunta: quanto
+            essas peças já juntaram na vida, na leitura do fim do recorte.
             {foraDoRecorte.length > 0 && <> <strong className="text-on-surface">Fora deste recorte:</strong> {foraDoRecorte.join(', ')} — o espelho diário desses motores soma o motor inteiro e não separa por marca, então eles não entram quando se escolhe uma marca.</>}
             {cego.length > 0 && <> Hoje não consegui ler: <strong className="text-danger">{cego.join(' · ')}</strong> — isso é painel cego, não motor parado.</>}
           </div>
