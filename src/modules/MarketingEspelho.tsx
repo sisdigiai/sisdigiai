@@ -4,6 +4,7 @@ import PageHeader from '../components/PageHeader';
 import { TravasBanner } from './TravasMarketing';
 import ResultadoConteudoCard from './marketing/ResultadoConteudoCard';
 import LeiturasCard from './marketing/LeiturasCard';
+import FrescorDosMotores from './marketing/FrescorDosMotores';
 import Central, { PERIODOS, type Periodo } from './marketing/Central';
 import HojeSai from './marketing/HojeSai';
 import EstoquePorMarca from './marketing/EstoquePorMarca';
@@ -549,6 +550,10 @@ export default function MarketingEspelho({ abaInicial = 'hoje' }: { abaInicial?:
           </div>
         </div>
         )}
+
+        {/* DE QUANDO É O DADO. Fica acima de tudo e em todas as abas, porque vale para todas: a
+            coleta dos motores é manual e número velho tem a mesma cara do novo (dono, 27/11). */}
+        <FrescorDosMotores recarga={recarga} />
 
         {/* HOJE — "o que está acontecendo, e sai hoje?". O tamanho do alcance no recorte vem do
             Radar; a agenda e a pontualidade do dia, do motor do MKT. */}
