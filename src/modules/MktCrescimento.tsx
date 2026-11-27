@@ -38,6 +38,10 @@ type Peca = {
   peca_ref: string; leituras: number; primeira_leitura: string; ultima_leitura: string;
   views: number | null; publicada_em: string | null; apagada: boolean;
   dia_publicacao: string; publicacao_estimada: boolean;
+  /** O QUE A PEÇA GANHOU DENTRO DA JANELA — leitura de dentro menos a última de ANTES dela.
+   *  `null` quando não há leitura anterior: aí a peça não tem ganho conhecido, e isso se conta à
+   *  parte (R2 da régua dos números). Só existe na régua de leitura. */
+  ganho?: number | null;
 };
 
 // A FRONTEIRA COM O ESPELHO DO MKT, escrita em 20/11/2026 por ordem do dono ("pode fazer o corte
@@ -264,28 +268,51 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
       });
       if (filtros.data !== 'leitura') { setPecas(consolidada); return; }
 
-      const dias = await lerTudo<LeituraDeDia & { marca: string | null; tipo: string; link: string | null }>((de, ate) => {
-        let q = supabase.from('v_mkt_analytics_peca_dia')
-          .select('origem, marca, conta, rede, tipo, peca_ref, data, views, curtidas, comentarios, compartilhamentos, retencao_media_pct, horas_exibicao, link');
-        if (corteDia > '2000-01-01') q = q.gte('data', corteDia);
-        if (fimDia < '2999-12-31') q = q.lte('data', fimDia);
-        return q.order('data').order('peca_ref').range(de, ate);
-      });
+      // A LEITURA VEM DESDE O COMEÇO, não só da janela (27/11/2026).
+      //
+      // Para dizer o que a peça GANHOU no período é preciso a leitura de ANTES dele — ganho é
+      // diferença, não acumulado (R2 e R4 da régua dos números). Sem a leitura anterior o ganho é
+      // desconhecido, e desconhecido não é zero: conta-se à parte. A medição inteira do ano são
+      // ~3.400 linhas, quatro páginas; a coleta começou em 16/07/2026.
+      const dias = await lerTudo<LeituraDeDia & { marca: string | null; tipo: string }>((de, ate) =>
+        supabase.from('v_mkt_analytics_peca_dia')
+          .select('origem, marca, conta, rede, tipo, peca_ref, data, views, curtidas, comentarios, compartilhamentos, retencao_media_pct, horas_exibicao')
+          .lte('data', fimDia)
+          .order('data').order('peca_ref').range(de, ate));
+
+      const porPeca = new Map<string, Array<LeituraDeDia & { marca: string | null; tipo: string }>>();
+      for (const l of dias) {
+        const k = chaveDaPeca(l);
+        const a = porPeca.get(k);
+        if (a) a.push(l); else porPeca.set(k, [l]);
+      }
       const flags = new Map(consolidada.map((p) => [chaveDaPeca(p as unknown as LeituraDeDia), p]));
-      setPecas(ultimaLeituraPorPeca(dias).map((l) => {
-        const c = flags.get(chaveDaPeca(l));
-        return {
-          origem: l.origem, marca: l.marca, conta: l.conta ?? null, rede: l.rede, tipo: l.tipo,
-          peca_ref: l.peca_ref, leituras: l.leituras, primeira_leitura: l.primeira_data,
-          ultima_leitura: l.data, views: l.views ?? null,
+      const saida: Peca[] = [];
+      for (const ls of porPeca.values()) {
+        const naJanela = ls.filter((l) => l.data >= corteDia);
+        if (naJanela.length === 0) continue;                       // peça não foi lida no recorte
+        const dentro = ultimaLeituraPorPeca(naJanela)[0];
+        const antes = ls.filter((l) => l.data < corteDia).pop();
+        const c = flags.get(chaveDaPeca(dentro));
+        saida.push({
+          origem: dentro.origem, marca: dentro.marca, conta: dentro.conta ?? null, rede: dentro.rede,
+          tipo: dentro.tipo, peca_ref: dentro.peca_ref, leituras: dentro.leituras,
+          primeira_leitura: dentro.primeira_data, ultima_leitura: dentro.data,
+          views: dentro.views ?? null,
+          // Sem clamp: peça que PERDE view (post apagado, correção da rede) entra negativa. Aparar
+          // para zero infla o total e esconde o que aconteceu de verdade.
+          ganho: antes == null || antes.views == null || dentro.views == null
+            ? null
+            : dentro.views - antes.views,
           publicada_em: c?.publicada_em ?? null,
           apagada: c?.apagada ?? false,
           // Peça lida na janela que a consolidada não conhece é peça sem registro de publicação:
           // vale a primeira leitura dela, como já valia antes — e sai marcada como estimada.
-          dia_publicacao: c?.dia_publicacao ?? l.primeira_data,
+          dia_publicacao: c?.dia_publicacao ?? dentro.primeira_data,
           publicacao_estimada: c?.publicacao_estimada ?? true,
-        } satisfies Peca;
-      }));
+        });
+      }
+      setPecas(saida);
     },
     // Só as publicações do recorte. Eram 3.072 linhas em 4 páginas enfileiradas para mostrar um
     // total e uma lista de 12; no recorte de 30 dias são ~500, numa página.
@@ -475,13 +502,26 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
     return dia >= corteDia && dia <= fimDia && marcaOk(pc.marca) && (!fRede || pc.rede === fRede);
   }), [pecas, corteDia, fimDia, fMarca, fOrigem, fRede, filtros.data]); // eslint-disable-line react-hooks/exhaustive-deps
   const estimadas = useMemo(() => pecasF.filter((pc) => pc.publicacao_estimada).length, [pecasF]);
+  // ACERVO: o acumulado de vida das peças do recorte, na última leitura delas. Não leva período no
+  // rótulo — leva data (R1 e a tabela das três formas, em Harness/regua-dos-numeros.md).
   const viewsCasa = useMemo(() => pecasF.reduce((a, pc) => a + (pc.views ?? 0), 0), [pecasF]);
+  // GANHO: o que entrou NA JANELA. É o único número da casa que pode se chamar "hoje".
+  const ganhoCasa = useMemo(() => pecasF.reduce((a, pc) => a + (pc.ganho ?? 0), 0), [pecasF]);
+  const pecasComGanho = useMemo(() => pecasF.filter((pc) => pc.ganho != null).length, [pecasF]);
+  const pecasSemAnterior = useMemo(() => pecasF.filter((pc) => pc.ganho == null).length, [pecasF]);
   const pecasComViews = useMemo(() => pecasF.filter((pc) => pc.views != null).length, [pecasF]);
+  // A barra por rede reparte EXATAMENTE o número grande, por isso segue a mesma régua: ganho quando
+  // o bloco mostra ganho. Barra que divide um total diferente do número de cima é a mesma mentira
+  // em outro formato.
   const viewsCasaPorRede = useMemo(() => {
     const m = new Map<string, number>();
-    for (const pc of pecasF) if (pc.views != null) m.set(pc.rede, (m.get(pc.rede) ?? 0) + pc.views);
+    const porLeitura = filtros.data === 'leitura';
+    for (const pc of pecasF) {
+      const v = porLeitura ? pc.ganho : pc.views;
+      if (v != null) m.set(pc.rede, (m.get(pc.rede) ?? 0) + v);
+    }
     return m;
-  }, [pecasF]);
+  }, [pecasF, filtros.data]);
   // Views por publicação para a lista do Conteúdo: só quando o par (peça, rede) tem UMA peça. O mesmo
   // corte sai em várias contas e a publicação aqui não guarda a conta da leitura — repartir seria
   // inventar. Sem casamento único, a linha segue com o que a `content_performance` tiver.
@@ -911,13 +951,30 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
             // Pulso lê só as contas dele e a `leitura_dia` só as da DIGIAI (conferido em 17/11, zero
             // linhas cruzadas). As parcelas ficam escritas embaixo, para a soma ser conferível.
             const temMotor = viewsRecorte > 0;
-            const viewsTotais = viewsRecorte + viewsCasa;
-            const temViews = viewsTotais > 0;
-            // O rótulo segue a régua escolhida na barra. Era exatamente isto que faltava em 20/11:
-            // o número mudava de significado e o rótulo ficava igual.
             const porLeitura = filtros.data === 'leitura';
+            // O NÚMERO DO PERÍODO É O GANHO, NÃO O ACERVO (27/11/2026).
+            //
+            // O dono viu 16.858 views do TikTok da Mello com o rótulo "hoje". Medido no banco, o
+            // acumulado das 50 peças dele foi 16.712 em 24/11 → 16.843 → 16.850 → 16.850: **hoje
+            // rendeu zero**. O número não estava bagunçado, estava com o nome errado — acumulado de
+            // vida carregando nome de período, que é o erro que a régua dos números proíbe na
+            // primeira linha (Cockpit/Harness/regua-dos-numeros.md).
+            //
+            // Na régua de LEITURA o número grande passa a ser o ganho: por peça, a leitura de dentro
+            // da janela menos a última de antes dela; e o espelho do Pulso já entrega ganho por dia,
+            // então as duas parcelas respondem a mesma pergunta. O acervo não some — desce para a
+            // linha de baixo, com a data, que é o lugar onde ele não mente.
+            //
+            // Na régua de PUBLICAÇÃO o número continua sendo acumulado, e está certo: ali o período
+            // qualifica O QUE FOI PUBLICADO, não quando as views aconteceram. O rótulo passa a dizer
+            // isso com todas as letras.
+            const viewsTotais = porLeitura ? viewsRecorte + ganhoCasa : viewsRecorte + viewsCasa;
+            const acervoTotais = viewsRecorte + viewsCasa;
+            const temViews = acervoTotais > 0;
             const heroPostsRotulo = temViews
-              ? `views do que foi ${porLeitura ? 'LIDO' : 'PUBLICADO'} no período (motores + contas da casa)`
+              ? porLeitura
+                ? 'views GANHAS no período (motores + contas da casa)'
+                : 'views acumuladas até hoje do que foi PUBLICADO no período'
               : 'engajamento nas redes no período';
             // share das redes das marcas: engajamento por plataforma (mkt real do recorte)
             const engPorRede = (() => {
@@ -954,12 +1011,21 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
                             : mostrarLime && limeTot.views > 0 && <>Limelight {nf(limeTot.views)} · </>}
                           {chegando('pecas')
                             ? <>contas da casa <span className="animate-pulse">medindo…</span></>
+                            : porLeitura
+                            ? <>contas da casa {nf(ganhoCasa)} ({pecasComGanho} de {pecasF.length} peças com leitura anterior{pecasSemAnterior > 0 ? ` · ${pecasSemAnterior} sem anterior, ganho desconhecido` : ''})</>
                             : viewsCasa > 0
-                            ? <>contas da casa {nf(viewsCasa)} ({pecasComViews} de {pecasF.length} peças lidas{!porLeitura && estimadas > 0 ? ` · ${estimadas} sem registro de publicação, datadas pela 1ª leitura` : ''})</>
+                            ? <>contas da casa {nf(viewsCasa)} ({pecasComViews} de {pecasF.length} peças lidas{estimadas > 0 ? ` · ${estimadas} sem registro de publicação, datadas pela 1ª leitura` : ''})</>
                             : <>contas da casa sem leitura no recorte</>}
                         </>
                       : <>{linhas.length} publicações · {medidos.length} medidas{fMarca ? ' · esta marca não tem motor de vídeo — o dado dela vive nas redes' : ''}</>}
                   </div>
+                  {/* O ACERVO NÃO SOME, MUDA DE LUGAR. Ele é a outra pergunta — "quanto essas peças
+                      já juntaram na vida" — e leva data, não período. Em cima fica o que entrou. */}
+                  {temViews && porLeitura && (
+                    <div className="text-[12px] text-on-surface-variant -mt-2 mb-3">
+                      acervo medido no recorte: <b className="font-mono tabular-nums">{nf(acervoTotais)}</b> views somadas desde que cada peça nasceu, na leitura de {fimDia.slice(8, 10)}/{fimDia.slice(5, 7)}
+                    </div>
+                  )}
                   {share.length > 0 ? (
                     <>
                       <div className="flex h-6 gap-0.5">
@@ -1001,11 +1067,13 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
                 <Kpi icon={<Sparkles className="w-4 h-4" />} label="engajamento redes" value={soMotor || medidos.length === 0 ? '—' : nf(engTotal)}
                   sub={soMotor ? FORA_DA_CASA : medidos.length === 0 ? 'engajamento não coletado nesta rede' : `média ${nf(Math.round(engMed))}/post`} glow={COR_OK} />
                 <Kpi icon={<Film className="w-4 h-4" />} label="views motores" value={temMotor ? nf(viewsRecorte) : '—'} sub={temMotor ? `${nf(pubsRecorte)} pubs · ${nf(engRecorte)} interações` : fMarca ? 'sem motor nesta marca' : 'sem views no recorte'} glow={COR_WARN} />
-                <Kpi icon={<Eye className="w-4 h-4" />} label={`views das peças ${porLeitura ? 'lidas' : 'publicadas'} no período`}
-                  value={chegando('pecas') ? '…' : soMotor || viewsCasa === 0 ? '—' : nf(viewsCasa)}
+                <Kpi icon={<Eye className="w-4 h-4" />}
+                  label={porLeitura ? 'views que as peças da casa GANHARAM no período' : 'views acumuladas do que a casa publicou no período'}
+                  value={chegando('pecas') ? '…' : soMotor || viewsCasa === 0 ? '—' : nf(porLeitura ? ganhoCasa : viewsCasa)}
                   sub={chegando('pecas') ? 'medindo…' : soMotor ? FORA_DA_CASA
-                    : viewsCasa > 0 ? `${pecasComViews} de ${pecasF.length} peças com leitura · trocar para "por ${porLeitura ? 'PUBLICAÇÃO' : 'LEITURA'}" na barra dá outro número, e os dois estão certos`
-                    : 'a coletar — despacho no MKT (sync-metricas)'} glow={COR_SEC} />
+                    : viewsCasa === 0 ? 'a coletar — despacho no MKT (sync-metricas)'
+                    : porLeitura ? `${pecasComGanho} de ${pecasF.length} peças com leitura anterior · acervo delas: ${nf(viewsCasa)}`
+                    : `${pecasComViews} de ${pecasF.length} peças com leitura · acumulado de vida, não é o que entrou no período`} glow={COR_SEC} />
               </section>
             </>
             );
