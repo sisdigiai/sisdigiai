@@ -196,6 +196,11 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
   const [regua, setRegua] = useState<Nivel[]>([]);
   const [creds, setCreds] = useState<Cred[]>([]);
   const [pecas, setPecas] = useState<Peca[]>([]);
+  // FONTE QUE FALHA NÃO PODE VIRAR NÚMERO (27/11/2026, 14h). A leitura das peças falhou no ar e a
+  // tela seguiu mostrando o total com o que tinha sobrado — a mesma falta que o Pulso expôs de manhã,
+  // repetida na minha própria fonte. Agora o erro fica guardado e a parcela da casa escreve "não
+  // consegui ler" em vez de somar o que não leu.
+  const [pecasErro, setPecasErro] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [sincronizando, setSincronizando] = useState(false);
   // O recorte vem da página. Só o filtro de CONTEÚDO continua aqui: ele é de uma aba só.
@@ -263,6 +268,7 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
     // no recorte" já usava. A consolidada continua entrando, só para os campos que não vivem na
     // leitura do dia: se a peça foi apagada e qual é o dia de publicação dela.
     async pecas() {
+      setPecasErro(null);
       const consolidada = await lerTudo<Peca>((de, ate) => {
         let q = supabase.from('v_mkt_peca_consolidada')
           .select('origem, marca, conta, rede, tipo, peca_ref, leituras, primeira_leitura, ultima_leitura, views, publicada_em, apagada, dia_publicacao, publicacao_estimada');
@@ -277,11 +283,24 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
       // diferença, não acumulado (R2 e R4 da régua dos números). Sem a leitura anterior o ganho é
       // desconhecido, e desconhecido não é zero: conta-se à parte. A medição inteira do ano são
       // ~3.400 linhas, quatro páginas; a coleta começou em 16/07/2026.
-      const dias = await lerTudo<LeituraDeDia & { marca: string | null; tipo: string }>((de, ate) =>
+      // SEM FILTRO DE DATA NA CONSULTA, e isto é medição, não preferência (27/11/2026, 14h).
+      //
+      // `v_mkt_analytics_peca_dia` tem 3.442 linhas e responde a leitura inteira em 4 páginas — mas
+      // **qualquer filtro na coluna `data` estoura o tempo do banco**: medido como o próprio app, a
+      // primeira página sem filtro volta em 0,8 s e a mesma consulta com `data <= hoje` devolve
+      // **57014, statement timeout**, em 8 s. Era o `.lte('data', fimDia)` que estava aqui: a régua de
+      // leitura inteira falhava no ar, e a tela mostrava número montado com o que havia sobrado.
+      // O recorte continua sendo aplicado — na memória, logo abaixo, onde custa nada. Avisei o MKT,
+      // que é de quem é a view.
+      //
+      // A ORDEM TERMINA NA CHAVE INTEIRA, não em `peca_ref`: cada página é uma consulta nova e, com
+      // ordem não única, linha empatada troca de lugar entre páginas — some de uma, repete na outra,
+      // sem erro nenhum (a lição está escrita em lib/paginar.ts e já custou dois defeitos aqui).
+      const todasAsLeituras = await lerTudo<LeituraDeDia & { marca: string | null; tipo: string }>((de, ate) =>
         supabase.from('v_mkt_analytics_peca_dia')
           .select('origem, marca, conta, rede, tipo, peca_ref, data, views, curtidas, comentarios, compartilhamentos, retencao_media_pct, horas_exibicao')
-          .lte('data', fimDia)
-          .order('data').order('peca_ref').range(de, ate));
+          .order('data').order('origem').order('conta').order('rede').order('peca_ref').range(de, ate));
+      const dias = todasAsLeituras.filter((l) => l.data <= fimDia);
 
       const flags = new Map(consolidada.map((p) => [chaveDaPeca(p as unknown as LeituraDeDia), p]));
       // A conta do ganho é a de `lib/leituraPorPeca.ts`, a mesma do cartão "Leituras do conteúdo".
@@ -418,6 +437,7 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
         .catch((e) => {
           carregadas.current.delete(chaveDaFonte(f));
           console.error('[radar] falha ao carregar', f, e);
+          if (f === 'pecas') { setPecas([]); setPecasErro(String(e?.message ?? e)); }
         })
         .finally(() => {
           setEmVoo((atual) => atual.filter((x) => x !== f));
@@ -1032,7 +1052,9 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
                           {mostrarLime && limeSoPublicacao
                             ? <><span className="text-error">Limelight fora</span> (o espelho dele só responde por publicação) · </>
                             : mostrarLime && limeTot.views > 0 && <>Limelight {nf(limeTot.views)} · </>}
-                          {chegando('pecas')
+                          {pecasErro
+                            ? <><span className="text-error">contas da casa não medido</span> (não consegui ler as peças: {pecasErro}) · </>
+                            : chegando('pecas')
                             ? <>contas da casa <span className="animate-pulse">medindo…</span></>
                             : porLeitura && pecasComGanho === 0 && pecasF.length > 0
                             ? <><span className="text-error">contas da casa não medido</span> (nenhuma das {nf(pecasF.length)} peças do recorte nasceu na janela nem tem leitura anterior) · </>
@@ -1100,7 +1122,7 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
                 <Kpi icon={<Film className="w-4 h-4" />} label="views motores" value={temMotor ? nf(viewsRecorte) : '—'} sub={temMotor ? `${nf(pubsRecorte)} pubs · ${nf(engRecorte)} interações` : fMarca ? 'sem motor nesta marca' : 'sem views no recorte'} glow={COR_WARN} />
                 <Kpi icon={<Eye className="w-4 h-4" />}
                   label={porLeitura ? 'views que as peças da casa GANHARAM no período' : 'views acumuladas do que a casa publicou no período'}
-                  value={chegando('pecas') ? '…' : soMotor || viewsCasa === 0 ? '—'
+                  value={pecasErro ? 'não medido' : chegando('pecas') ? '…' : soMotor || viewsCasa === 0 ? '—'
                     : porLeitura && pecasComGanho === 0 ? 'não medido'
                     : nf(porLeitura ? ganhoCasa : viewsCasa)}
                   sub={chegando('pecas') ? 'medindo…' : soMotor ? FORA_DA_CASA
