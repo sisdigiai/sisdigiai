@@ -717,6 +717,18 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
     pubs: pulsoCards.reduce((a, x) => a + x.pubs, 0),
     eng: pulsoCards.reduce((a, x) => a + x.eng, 0),
   }), [pulsoCards]);
+  // O LIMELIGHT SÓ SABE RESPONDER "POR PUBLICAÇÃO" (27/11/2026, R7 da régua dos números).
+  //
+  // `v_espelho_limelight_pub_dias` dá, para cada dia, o acumulado ATUAL das peças publicadas naquele
+  // dia — a mesma forma da `contas_dias` do Pulso. Não existe a irmã de leitura. Enquanto ela não
+  // existir, somar essa coluna dentro da régua de LEITURA é juntar duas perguntas no mesmo número,
+  // calado — foi exatamente o que o Pulso fazia até hoje de manhã. Então ela fica FORA da soma, e a
+  // tela escreve que ficou. Pedido mandado ao agente do Limelight em 27/11.
+  //
+  // `limeTot` continua sendo o número do Limelight como ele é — o cartão próprio dele, na aba Vídeo
+  // & motores, diz "views/dia de publicação" e está certo em qualquer régua. Quem não pode somar é a
+  // VISÃO, onde a parcela entraria ao lado de parcelas de outra pergunta.
+  const limeSoPublicacao = filtros.data === 'leitura';
   const limeTot = useMemo(() => ({
     views: limePubF.reduce((a, d) => a + (d.views || 0), 0),
     pubs: limePubF.reduce((a, d) => a + (d.publicacoes || 0), 0),
@@ -768,14 +780,14 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
   const soMotor = fOrigem === 'pulso';
 
   // Visão: agregados do ecossistema no recorte
-  const viewsRecorte = (mostrarPulso ? pulsoTot.views : 0) + (mostrarLime ? limeTot.views : 0);
+  const viewsRecorte = (mostrarPulso ? pulsoTot.views : 0) + (mostrarLime && !limeSoPublicacao ? limeTot.views : 0);
   const pubsRecorte = (mostrarPulso ? pulsoTot.pubs : 0) + (mostrarLime ? limeTot.pubs : 0);
   const engRecorte = (mostrarPulso ? pulsoTot.eng : 0) + (mostrarLime ? limePubF.reduce((a, d) => a + (d.likes || 0) + (d.comentarios || 0) + (d.shares || 0), 0) : 0);
   const sharePlats = useMemo(() => {
     const m = new Map<string, number>();
-    for (const r of [...(mostrarPulso ? pulsoPlats : []), ...(mostrarLime ? limePlats : [])]) m.set(r.plat, (m.get(r.plat) ?? 0) + r.views);
+    for (const r of [...(mostrarPulso ? pulsoPlats : []), ...(mostrarLime && !limeSoPublicacao ? limePlats : [])]) m.set(r.plat, (m.get(r.plat) ?? 0) + r.views);
     return [...m.entries()].sort((a, b) => b[1] - a[1]);
-  }, [pulsoPlats, limePlats, mostrarPulso, mostrarLime]);
+  }, [pulsoPlats, limePlats, mostrarPulso, mostrarLime, limeSoPublicacao]);
   const shareTot = Math.max(1, sharePlats.reduce((a, [, v]) => a + v, 0));
   const PLAT_COR: Record<string, string> = {
     facebook: '#3987e5', youtube: '#d95926', tiktok: '#199e70', kwai: '#c98500', instagram: '#d55181', linkedin: '#9085e9', x: 'var(--color-muted)',
@@ -937,7 +949,9 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
                           {mostrarPulso && pulsoCego
                             ? <><span className="text-error">Pulso não medido</span> (não consegui ler o espelho de leitura{pulsoLeituras?.detalhe ? `: ${pulsoLeituras.detalhe}` : ''}) · </>
                             : mostrarPulso && pulsoTot.views > 0 && <>Pulso {nf(pulsoTot.views)} · </>}
-                          {mostrarLime && limeTot.views > 0 && <>Limelight {nf(limeTot.views)} · </>}
+                          {mostrarLime && limeSoPublicacao
+                            ? <><span className="text-error">Limelight fora</span> (o espelho dele só responde por publicação) · </>
+                            : mostrarLime && limeTot.views > 0 && <>Limelight {nf(limeTot.views)} · </>}
                           {chegando('pecas')
                             ? <>contas da casa <span className="animate-pulse">medindo…</span></>
                             : viewsCasa > 0
