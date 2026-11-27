@@ -975,8 +975,8 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
             // qualifica O QUE FOI PUBLICADO, não quando as views aconteceram. O rótulo passa a dizer
             // isso com todas as letras.
             const viewsTotais = porLeitura ? viewsRecorte + ganhoCasa : viewsRecorte + viewsCasa;
-            const acervoTotais = viewsRecorte + viewsCasa;
-            const temViews = acervoTotais > 0;
+            // `temViews` olha as duas parcelas porque a pergunta aqui é só "este recorte tem views".
+            const temViews = viewsRecorte + viewsCasa > 0;
             const heroPostsRotulo = temViews
               ? porLeitura
                 ? 'views GANHAS no período (motores + contas da casa)'
@@ -1029,9 +1029,9 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
                   </div>
                   {/* O ACERVO NÃO SOME, MUDA DE LUGAR. Ele é a outra pergunta — "quanto essas peças
                       já juntaram na vida" — e leva data, não período. Em cima fica o que entrou. */}
-                  {temViews && porLeitura && (
+                  {temViews && porLeitura && viewsCasa > 0 && (
                     <div className="text-[12px] text-on-surface-variant -mt-2 mb-3">
-                      acervo medido no recorte: <b className="font-mono tabular-nums">{nf(acervoTotais)}</b> views somadas desde que cada peça nasceu, na leitura de {fimDia.slice(8, 10)}/{fimDia.slice(5, 7)}
+                      acervo das contas da casa no recorte: <b className="font-mono tabular-nums">{nf(viewsCasa)}</b> views somadas desde que cada peça nasceu, na leitura de {fimDia.slice(8, 10)}/{fimDia.slice(5, 7)} — os motores não entram aqui: o espelho deles entrega ganho, não acervo
                     </div>
                   )}
                   {share.length > 0 ? (
