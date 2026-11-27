@@ -5,8 +5,8 @@ import { hojeBrasilia, diaBrasilia } from '../lib/datas';
 import OsiDiasCard from '../components/OsiDiasCard';
 import MapaCobertura from '../components/MapaCobertura';
 import { espelhoMotores, espelhoMotoresEstado, type PolaPetitDia, type EstadoEspelho, type PulsoContaDia, type PulsoLeituraDia, type PulsoSegDia, type PulsoConta, type LimelightDia, type LimePubDia, type BlogDia, type EspelhoBlogs } from '../lib/espelhoMotores';
-import { lerTudo } from '../lib/paginar';
-import { ultimaLeituraPorPeca, ganhoNaJanela, chaveDaPeca, type LeituraDeDia } from '../lib/leituraPorPeca';
+import { lerTudo, lerRpcTudo } from '../lib/paginar';
+import { chaveDaPeca, type LeituraDeDia } from '../lib/leituraPorPeca';
 
 // RADAR 360 (2026-08-25) — o analytics social completo do grupo, aprovado em mock.
 // Decisão do dono: TODAS as redes, canais e marcas presentes na estrutura desde já;
@@ -33,6 +33,17 @@ type Cred = { platform: string; marca: string | null; status: string | null; exp
  *  `leitura_dia` guarda acumulado); o que mudou é o lugar: o banco faz a conta uma vez e manda
  *  **473 linhas de uma janela de 30 dias** no lugar de 1.128 leituras cruas em duas páginas MAIS
  *  3.072 publicações em quatro páginas enfileiradas. */
+/** Uma linha da `fn_mkt_ganho_janela`: a peça com os DOIS pontos da conta já achados pelo banco. */
+type GanhoJanela = {
+  origem: string; marca: string | null; conta: string | null; rede: string; tipo: string;
+  peca_ref: string; conta_nome: string | null; link: string | null;
+  views_no_inicio: number | null; data_inicio: string | null;
+  views_primeira_na_janela: number | null; primeira_leitura_na_janela: string;
+  views_no_fim: number | null; data_fim: string;
+  leituras_na_janela: number; dia_publicacao: string; publicacao_estimada: boolean;
+  publicada_em: string | null;
+};
+
 type Peca = {
   origem: string; marca: string | null; conta: string | null; rede: string; tipo: string;
   peca_ref: string; leituras: number; primeira_leitura: string; ultima_leitura: string;
@@ -283,45 +294,54 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
       // diferença, não acumulado (R2 e R4 da régua dos números). Sem a leitura anterior o ganho é
       // desconhecido, e desconhecido não é zero: conta-se à parte. A medição inteira do ano são
       // ~3.400 linhas, quatro páginas; a coleta começou em 16/07/2026.
-      // SEM FILTRO DE DATA NA CONSULTA, e isto é medição, não preferência (27/11/2026, 14h).
+      // O GANHO PASSA A VIR CALCULADO DO BANCO (27/11/2026, 14h, migration 20261127_05 do MKT).
       //
-      // `v_mkt_analytics_peca_dia` tem 3.442 linhas e responde a leitura inteira em 4 páginas — mas
-      // **qualquer filtro na coluna `data` estoura o tempo do banco**: medido como o próprio app, a
-      // primeira página sem filtro volta em 0,8 s e a mesma consulta com `data <= hoje` devolve
-      // **57014, statement timeout**, em 8 s. Era o `.lte('data', fimDia)` que estava aqui: a régua de
-      // leitura inteira falhava no ar, e a tela mostrava número montado com o que havia sobrado.
-      // O recorte continua sendo aplicado — na memória, logo abaixo, onde custa nada. Avisei o MKT,
-      // que é de quem é a view.
+      // Até agora esta tela lia a medição INTEIRA — 3.442 linhas em quatro páginas, 12,6 s — só para
+      // tirar uma diferença por peça. Não sobrevivia ao crescimento: com a releitura do Meta ligada
+      // hoje a medição cresce ~1.000 linhas por dia, e em dez dias seriam ~14 páginas e perto de 45 s.
+      // A `fn_mkt_ganho_janela` devolve uma linha por peça com os dois pontos já achados:
+      // **394 ms a frio, 274 ms quente**, medido com a sessão do dono.
       //
-      // A ORDEM TERMINA NA CHAVE INTEIRA, não em `peca_ref`: cada página é uma consulta nova e, com
-      // ordem não única, linha empatada troca de lugar entre páginas — some de uma, repete na outra,
-      // sem erro nenhum (a lição está escrita em lib/paginar.ts e já custou dois defeitos aqui).
-      const todasAsLeituras = await lerTudo<LeituraDeDia & { marca: string | null; tipo: string }>((de, ate) =>
-        supabase.from('v_mkt_analytics_peca_dia')
-          .select('origem, marca, conta, rede, tipo, peca_ref, data, views, curtidas, comentarios, compartilhamentos, retencao_media_pct, horas_exibicao')
-          .order('data').order('origem').order('conta').order('rede').order('peca_ref').range(de, ate));
-      const dias = todasAsLeituras.filter((l) => l.data <= fimDia);
+      // CONFERIDO À MÃO contra a view antes de trocar, duas peças com várias leituras:
+      //   · bastidores/tiktok `001b54de` — RPC: 1ª na janela 18/11 = 95, fim 27/11 = 106, 10 leituras.
+      //     A view devolve exatamente 18/11=95 e 19/11 a 27/11=106. Bate.
+      //   · bastidores2/facebook `0177a79b` — RPC: 1ª 21/11 = 0, fim 27/11 = 0, 7 leituras. A view
+      //     devolve sete linhas, todas 0. Bate, e zero medido continua sendo zero, não "não medido".
+      //
+      // Os quatro casos do ganho continuam os mesmos de `lib/leituraPorPeca.ts`; o que mudou é que os
+      // dois pontos da conta chegam prontos em vez de serem garimpados na história inteira.
+      const { data: sessao } = await supabase.auth.getSession();
+      const token = sessao.session?.access_token;
+      if (!token) throw new Error('sem sessão para ler o ganho da janela');
+      const linhas = await lerRpcTudo<GanhoJanela>(
+        import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY, token,
+        'fn_mkt_ganho_janela',
+        { p_de: corteDia, p_ate: fimDia, p_marca: null, p_rede: null },
+        'peca_ref.asc,origem.asc,conta.asc,rede.asc');
 
       const flags = new Map(consolidada.map((p) => [chaveDaPeca(p as unknown as LeituraDeDia), p]));
-      // A conta do ganho é a de `lib/leituraPorPeca.ts`, a mesma do cartão "Leituras do conteúdo".
-      // Peça só conta como nascida na janela quando tem registro de publicação de verdade: data
-      // estimada vem da 1ª leitura e diria "nasceu quando eu vi", que é circular.
-      const saida: Peca[] = ganhoNaJanela(dias, corteDia, (chave) => {
+      const saida: Peca[] = linhas.map((l) => {
+        const chave = `${l.origem}|${l.conta ?? ''}|${l.rede}|${l.peca_ref}`;
         const c = flags.get(chave);
-        return c != null && !c.publicacao_estimada && c.dia_publicacao >= corteDia;
-      }).map(({ dentro, ganho, origem: ganhoOrigem }) => {
-        const c = flags.get(chaveDaPeca(dentro));
+        const nasceuNaJanela = !l.publicacao_estimada && l.dia_publicacao >= corteDia;
+        let ganho: number | null = null;
+        let ganhoOrigem: Peca['ganhoOrigem'] = 'desconhecido';
+        if (l.views_no_inicio != null && l.views_no_fim != null) {
+          // Sem clamp: peça que PERDE view entra negativa. Aparar para zero infla e esconde.
+          ganho = l.views_no_fim - l.views_no_inicio; ganhoOrigem = 'diferenca';
+        } else if (nasceuNaJanela && l.views_no_fim != null) {
+          ganho = l.views_no_fim; ganhoOrigem = 'nasceu_na_janela';
+        } else if (l.leituras_na_janela >= 2 && l.views_no_fim != null && l.views_primeira_na_janela != null
+                   && l.primeira_leitura_na_janela !== l.data_fim) {
+          ganho = l.views_no_fim - l.views_primeira_na_janela; ganhoOrigem = 'parcial';
+        }
         return {
-          origem: dentro.origem, marca: dentro.marca, conta: dentro.conta ?? null, rede: dentro.rede,
-          tipo: dentro.tipo, peca_ref: dentro.peca_ref, leituras: dentro.leituras,
-          primeira_leitura: dentro.primeira_data, ultima_leitura: dentro.data,
-          views: dentro.views ?? null, ganho, ganhoOrigem,
-          publicada_em: c?.publicada_em ?? null,
-          apagada: c?.apagada ?? false,
-          // Peça lida na janela que a consolidada não conhece é peça sem registro de publicação:
-          // vale a primeira leitura dela, como já valia antes — e sai marcada como estimada.
-          dia_publicacao: c?.dia_publicacao ?? dentro.primeira_data,
-          publicacao_estimada: c?.publicacao_estimada ?? true,
+          origem: l.origem, marca: l.marca, conta: l.conta, rede: l.rede, tipo: l.tipo,
+          peca_ref: l.peca_ref, leituras: l.leituras_na_janela,
+          primeira_leitura: l.primeira_leitura_na_janela, ultima_leitura: l.data_fim,
+          views: l.views_no_fim, ganho, ganhoOrigem,
+          publicada_em: l.publicada_em, apagada: c?.apagada ?? false,
+          dia_publicacao: l.dia_publicacao, publicacao_estimada: l.publicacao_estimada,
         } satisfies Peca;
       });
       setPecas(saida);

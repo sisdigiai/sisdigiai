@@ -44,3 +44,36 @@ export async function lerTudo<T>(
   }
   return todas;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LER UMA RPC INTEIRA (27/11/2026). A `fn_mkt_ganho_janela` devolve o ganho já calculado pelo banco
+// — 394 ms a frio contra 12,6 s de ler a medição inteira e fazer a diferença aqui. Mas ela cai no
+// MESMO teto de mil linhas das views, **e o cabeçalho `Range` não funciona em RPC**: medido hoje,
+// `Range: 1000-1999` devolveu `content-range: 0-999/*` com a mesma primeira peça, e um laço paginando
+// por Range trouxe 21 mil linhas com mil chaves distintas — a mesma página, 21 vezes. Com
+// `Prefer: count=exact` o servidor disse `0-999/1910`: 910 peças sumiriam caladas, 48% delas.
+//
+// O que funciona é `?limit=&offset=` na query, e é por aí que esta função lê. `order` explícito não é
+// enfeite: sem ordem total, páginas por offset podem repetir e perder linha entre chamadas.
+//
+// Pedi ao MKT `p_limit`/`p_offset` na própria função, porque depender do PostgREST aceitar offset em
+// RPC é a mesma fragilidade de depender do Range — funciona até parar, e quando parar some com peça
+// sem erro nenhum. Quando existirem, esta função troca de caminho e o resto da tela não muda.
+export async function lerRpcTudo<T>(
+  url: string, anon: string, token: string, fn: string,
+  args: Record<string, unknown>, ordem: string, teto = 40000,
+): Promise<T[]> {
+  const todas: T[] = [];
+  for (let de = 0; de < teto; de += PAGINA) {
+    const r = await fetch(`${url}/rest/v1/rpc/${fn}?limit=${PAGINA}&offset=${de}&order=${ordem}`, {
+      method: 'POST',
+      headers: { apikey: anon, Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(args),
+    });
+    if (!r.ok) throw new Error(`${fn}: HTTP ${r.status} ${(await r.text()).slice(0, 120)}`);
+    const lote = (await r.json()) as T[];
+    todas.push(...lote);
+    if (lote.length < PAGINA) break;
+  }
+  return todas;
+}
