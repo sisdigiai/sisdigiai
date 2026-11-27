@@ -436,10 +436,16 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
 
   // `recarga` vem da setinha da página de cima. Sem limpar o que já veio, `carregar` não pede nada:
   // ele pula toda fonte que está em `carregadas`. Recarregar é esquecer e ler de novo.
+  //
+  // `filtros.data` ENTRA AQUI desde 27/11, e faltar era defeito em silêncio. A régua deixou de ser
+  // só um filtro: ela troca a FONTE da leitura das peças (consolidada × leitura do dia, com ganho).
+  // Sem a dependência, `carregar` nunca era chamado ao clicar na régua, a chave nova da fonte nunca
+  // era pedida e a tela mostrava o rótulo novo em cima de dados velhos — foi assim que a Mello no
+  // TikTok apareceu com "0 de 50 peças com leitura anterior" tendo as 50 leituras de ontem no banco.
   useEffect(() => {
     if (recarga > 0) carregadas.current.clear();
     carregar(FONTES_DA_ABA[aba] ?? []);
-  }, [aba, corteDia, fimDia, recarga]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [aba, corteDia, fimDia, recarga, filtros.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function sincronizar() {
     setSincronizando(true);
