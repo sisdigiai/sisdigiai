@@ -294,6 +294,20 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
         const dentro = ultimaLeituraPorPeca(naJanela)[0];
         const antes = ls.filter((l) => l.data < corteDia).pop();
         const c = flags.get(chaveDaPeca(dentro));
+        // PEÇA QUE NASCEU DENTRO DA JANELA TEM GANHO IGUAL AO ACUMULADO (corrigido em 27/11, no mesmo
+        // dia em que a primeira versão entrou). A primeira regra dizia "sem leitura anterior, ganho
+        // desconhecido" — e era conservadora demais até virar erro: peça publicada em 19/11 que chegou
+        // a 5.692 views em 27/11 ganhou os 5.692 DENTRO da janela de 30 dias. Não havia o que medir
+        // antes porque ela não existia antes.
+        //
+        // São três casos, não dois, e a tela conta os três à parte:
+        //   · tem leitura ANTES da janela  → ganho medido, diferença entre as duas;
+        //   · nasceu na janela, com registro de publicação de verdade → ganho = tudo que acumulou;
+        //   · nasceu antes e só foi lida agora → **desconhecido**. É o caso em que não se sabe quanto
+        //     ela já tinha quando a janela começou, e inventar seria o erro que a régua proíbe.
+        // A data de publicação ESTIMADA (a que vem da 1ª leitura, quando não há registro) não serve
+        // para decidir isto: ela diz "nasceu quando eu vi", que é circular. Essas ficam em desconhecido.
+        const nasceuNaJanela = c != null && !c.publicacao_estimada && c.dia_publicacao >= corteDia;
         saida.push({
           origem: dentro.origem, marca: dentro.marca, conta: dentro.conta ?? null, rede: dentro.rede,
           tipo: dentro.tipo, peca_ref: dentro.peca_ref, leituras: dentro.leituras,
@@ -301,9 +315,10 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
           views: dentro.views ?? null,
           // Sem clamp: peça que PERDE view (post apagado, correção da rede) entra negativa. Aparar
           // para zero infla o total e esconde o que aconteceu de verdade.
-          ganho: antes == null || antes.views == null || dentro.views == null
-            ? null
-            : dentro.views - antes.views,
+          ganho: antes != null && antes.views != null && dentro.views != null
+            ? dentro.views - antes.views
+            : nasceuNaJanela ? dentro.views ?? null
+            : null,
           publicada_em: c?.publicada_em ?? null,
           apagada: c?.apagada ?? false,
           // Peça lida na janela que a consolidada não conhece é peça sem registro de publicação:
@@ -1018,9 +1033,9 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
                           {chegando('pecas')
                             ? <>contas da casa <span className="animate-pulse">medindo…</span></>
                             : porLeitura && pecasComGanho === 0 && pecasF.length > 0
-                            ? <><span className="text-error">contas da casa não medido</span> (nenhuma das {nf(pecasF.length)} peças do recorte foi lida duas vezes — sem duas leituras não existe ganho) · </>
+                            ? <><span className="text-error">contas da casa não medido</span> (nenhuma das {nf(pecasF.length)} peças do recorte nasceu na janela nem tem leitura anterior) · </>
                             : porLeitura
-                            ? <>contas da casa {nf(ganhoCasa)} ({pecasComGanho} de {pecasF.length} peças com leitura anterior{pecasSemAnterior > 0 ? ` · ${pecasSemAnterior} sem anterior, ganho desconhecido` : ''})</>
+                            ? <>contas da casa {nf(ganhoCasa)} ({nf(pecasComGanho)} de {nf(pecasF.length)} peças com ganho apurado{pecasSemAnterior > 0 ? ` · ${nf(pecasSemAnterior)} são de antes da janela e só foram lidas agora: não dá para saber quanto renderam nela` : ''})</>
                             : viewsCasa > 0
                             ? <>contas da casa {nf(viewsCasa)} ({pecasComViews} de {pecasF.length} peças lidas{estimadas > 0 ? ` · ${estimadas} sem registro de publicação, datadas pela 1ª leitura` : ''})</>
                             : <>contas da casa sem leitura no recorte</>}
@@ -1082,8 +1097,8 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
                     : nf(porLeitura ? ganhoCasa : viewsCasa)}
                   sub={chegando('pecas') ? 'medindo…' : soMotor ? FORA_DA_CASA
                     : viewsCasa === 0 ? 'a coletar — despacho no MKT (sync-metricas)'
-                    : porLeitura && pecasComGanho === 0 ? `nenhuma das ${nf(pecasF.length)} peças foi lida duas vezes — acervo delas: ${nf(viewsCasa)}`
-                    : porLeitura ? `${pecasComGanho} de ${pecasF.length} peças com leitura anterior · acervo delas: ${nf(viewsCasa)}`
+                    : porLeitura && pecasComGanho === 0 ? `nenhuma peça do recorte nasceu na janela nem tem leitura anterior — acervo delas: ${nf(viewsCasa)}`
+                    : porLeitura ? `${nf(pecasComGanho)} de ${nf(pecasF.length)} peças com ganho apurado · acervo de todas: ${nf(viewsCasa)}`
                     : `${pecasComViews} de ${pecasF.length} peças com leitura · acumulado de vida, não é o que entrou no período`} glow={COR_SEC} />
               </section>
             </>
