@@ -99,9 +99,16 @@ export default function ComparativoMotores() {
     if (!brutos) return;
     const linhas: Linha[] = [];
 
-    const pulso = somarSemana(brutos.pulso.linhas, semana, (r) => ({ pub: r.publicacoes, views: r.views }));
-    linhas.push({ motor: 'pulso', frente: 'canais', publicacoes: pulso.pub, dias: pulso.dias,
-      engajamento: null, views: pulso.views, viewsMedidas: pulso.views > 0 ? 1 : 0,
+    // AS VIEWS DO PULSO SÃO O GANHO DA SEMANA (27/11/2026). `v_espelho_pulso_dias` soma o acumulado
+    // ATUAL das peças publicadas no dia — por publicação —, e esta tabela é semanal: comparar motor
+    // com motor somando acervo é comparar idade de catálogo, não trabalho da semana. A view de
+    // leitura dá o que todos os posts ganharam em cada dia, que é a pergunta da coluna.
+    const pulsoPub = somarSemana(brutos.pulso.linhas, semana, (r) => ({ pub: r.publicacoes, views: 0 }));
+    const pulsoLidas = brutos.pulsoLeituras.estado === 'ok'
+      ? somarSemana(brutos.pulsoLeituras.linhas, semana, (r) => ({ pub: 0, views: r.views ?? 0 }))
+      : null;
+    linhas.push({ motor: 'pulso', frente: 'canais', publicacoes: pulsoPub.pub, dias: pulsoPub.dias,
+      engajamento: null, views: pulsoLidas?.views ?? 0, viewsMedidas: pulsoLidas ? 1 : 0,
       estado: brutos.pulso.estado, detalhe: brutos.pulso.detalhe });
 
     const lime = somarSemana(brutos.limelight.linhas, semana, (r) => ({ pub: r.publicacoes, views: r.views }));
@@ -192,7 +199,7 @@ export default function ComparativoMotores() {
                 <th className="text-right px-3 py-2">Publicações</th>
                 <th className="text-right px-3 py-2">Medidas</th>
                 <th className="text-right px-3 py-2">Dias com publicação</th>
-                <th className="text-right px-3 py-2">Views</th>
+                <th className="text-right px-3 py-2">Views ganhas</th>
                 <th className="text-right px-3 py-2">Views/post</th>
                 <th className="text-right px-3 py-2">Engajamento</th>
               </tr>
@@ -380,11 +387,14 @@ export default function ComparativoMotores() {
             </>
           ) : (
             <>
-              <strong className="text-on-surface font-normal">Views</strong> soma as {totViewsMedidas} publicações
+              <strong className="text-on-surface font-normal">Views ganhas</strong>, no MKT, soma as {totViewsMedidas} publicações
               que têm a foto de 7 dias (<code className="text-[11px]">views_d7</code>), de {totPub} publicadas
               {ultimaFoto ? <> · última foto em {ultimaFoto.slice(8, 10)}/{ultimaFoto.slice(5, 7)}</> : null}. E{' '}
               <strong className="text-on-surface font-normal">Views/post</strong> divide por essas, não pelo total —
-              dividir pelo total faria a média parecer menor do que é.
+              dividir pelo total faria a média parecer menor do que é. No <strong className="text-on-surface font-normal">Pulso</strong> a
+              coluna é o ganho real da semana (leitura do dia menos a anterior), desde 27/11. No{' '}
+              <strong className="text-on-surface font-normal">Limelight</strong> ela ainda é o acumulado das peças
+              publicadas na semana — o espelho deles só responde por publicação, e o pedido da view de leitura está aberto.
             </>
           )}{' '}
           O engajamento ao lado está medido e vale, com a ressalva do próprio MKT de que mistura posts de idades
@@ -396,11 +406,12 @@ export default function ComparativoMotores() {
 }
 
 async function carregarEspelhos() {
-  const [pulso, limelight, blogs, pola] = await Promise.all([
+  const [pulso, pulsoLeituras, limelight, blogs, pola] = await Promise.all([
     espelhoMotoresEstado.pulsoDias(),
+    espelhoMotoresEstado.pulsoLeiturasDias(),
     espelhoMotoresEstado.limelightPubDias(),
     espelhoMotoresEstado.blogsDias(),
     espelhoMotoresEstado.polaDias(),
   ]);
-  return { pulso, limelight, blogs, pola };
+  return { pulso, pulsoLeituras, limelight, blogs, pola };
 }

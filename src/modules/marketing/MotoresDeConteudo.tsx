@@ -6,7 +6,7 @@ import { lerTudo } from '../../lib/paginar';
 import { ultimaLeituraPorPeca, somarCampo, type LeituraDeDia } from '../../lib/leituraPorPeca';
 import {
   espelhoMotoresEstado,
-  type PulsoDia, type PulsoLongoDia, type LimePubDia, type EstadoEspelho,
+  type PulsoDia, type PulsoLongoDia, type PulsoLeituraDia, type LimePubDia, type EstadoEspelho,
   type EspelhoLimelight, type EspelhoPulso,
 } from '../../lib/espelhoMotores';
 import { rotuloJanela, type Periodo } from './Central';
@@ -128,6 +128,7 @@ export default function MotoresDeConteudo({ recorte, limelight, pulso, espMkt, h
   const [viewsMkt, setViewsMkt] = useState<number | null>(null);
   const [cortes, setCortes] = useState<{ pecas: number; episodios: number; custo: number | null } | null>(null);
   const [pulsoDias, setPulsoDias] = useState<{ linhas: PulsoDia[]; estado: EstadoEspelho } | null>(null);
+  const [pulsoLeituras, setPulsoLeituras] = useState<{ linhas: PulsoLeituraDia[]; estado: EstadoEspelho } | null>(null);
   const [longos, setLongos] = useState<{ linhas: PulsoLongoDia[]; estado: EstadoEspelho } | null>(null);
   const [limeDias, setLimeDias] = useState<{ linhas: LimePubDia[]; estado: EstadoEspelho } | null>(null);
 
@@ -157,6 +158,10 @@ export default function MotoresDeConteudo({ recorte, limelight, pulso, espMkt, h
       });
     });
     espelhoMotoresEstado.pulsoDias().then(setPulsoDias);
+    // O GANHO DO PULSO, que é a única coluna deste cartão que responde "quanto entrou no período"
+    // (27/11/2026). `pulsoDias` e `pulsoLongosDias` somam o acumulado ATUAL das peças publicadas no
+    // dia: isso é "por publicação", e estava rotulado "views período". Ver Harness/regua-dos-numeros.md.
+    espelhoMotoresEstado.pulsoLeiturasDias().then(setPulsoLeituras);
     espelhoMotoresEstado.pulsoLongosDias().then(setLongos);
     espelhoMotoresEstado.limelightPubDias().then(setLimeDias);
   }, [dias, recarga]);
@@ -172,6 +177,7 @@ export default function MotoresDeConteudo({ recorte, limelight, pulso, espMkt, h
 
   const limeJanela = janela(limeDias?.linhas);
   const pulsoJanela = [...janela(pulsoDias?.linhas), ...janela(longos?.linhas)];
+  const pulsoGanho = pulsoLeituras?.estado === 'ok' ? somar(janela(pulsoLeituras.linhas), 'views') : null;
 
   return (
     <div className="border border-outline/15 bg-surface-container">
@@ -179,7 +185,7 @@ export default function MotoresDeConteudo({ recorte, limelight, pulso, espMkt, h
         <Radio className="w-3.5 h-3.5 text-secondary" />
         {/* deixou de ser "outros": são todos */}
         <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Motores de conteúdo</span>
-        <span className="font-mono text-[10px] text-muted">peças e views: {rotuloPeriodo} · custo: total</span>
+        <span className="font-mono text-[10px] text-muted">peças: {rotuloPeriodo} · views: acervo, salvo onde diz GANHAS · custo: total</span>
         <span className="ml-auto font-mono text-[10px] text-muted">fonte: Lousa, cortes e espelhos dos motores</span>
       </div>
 
@@ -191,7 +197,7 @@ export default function MotoresDeConteudo({ recorte, limelight, pulso, espMkt, h
             <>
               <Caixas itens={[
                 { v: pecasLousa ? n(daLousa('mkt')) : '—', label: `peças ${rotuloPeriodo}` },
-                { v: viewsMkt != null ? mil(viewsMkt) : '—', label: 'views' },
+                { v: viewsMkt != null ? mil(viewsMkt) : '—', label: 'views acervo' },
                 { v: n(espMkt.publicacoes), label: 'no ar' },
                 { v: n(espMkt.fila_aberta), label: 'fila' },
               ]} />
@@ -204,7 +210,7 @@ export default function MotoresDeConteudo({ recorte, limelight, pulso, espMkt, h
                     : <span className="text-muted">só para admin do MKT — não é custo zero</span>}
                 </Linha>
               </div>
-              <Pe>fila é fila ABERTA, não atraso: inclui o que já está agendado para as próximas semanas</Pe>
+              <Pe>fila é fila ABERTA, não atraso: inclui o que já está agendado para as próximas semanas. As views são <strong>acervo</strong>, não ganho do período: o Instagram e o Facebook são lidos uma vez e não são relidos, então não há segunda leitura para tirar a diferença (medido em 27/11: 1,2 leitura por peça).</Pe>
             </>
           ) : <div className="text-sm text-muted italic mt-4">Espelho indisponível.</div>}
         </Cartao>
@@ -280,7 +286,7 @@ export default function MotoresDeConteudo({ recorte, limelight, pulso, espMkt, h
             <>
               <Caixas itens={[
                 { v: pulsoDias ? n(somar(pulsoJanela, 'publicacoes')) : '—', label: `peças ${rotuloPeriodo}` },
-                { v: pulsoDias ? mil(somar(pulsoJanela, 'views')) : '—', label: 'views período' },
+                { v: pulsoGanho != null ? mil(pulsoGanho) : '—', label: `views GANHAS ${rotuloPeriodo}` },
                 { v: n(pulso.publicacoes), label: 'no ar (total)' },
                 { v: mil(pulso.views_total), label: 'views acervo' },
               ]} />
@@ -329,7 +335,7 @@ export default function MotoresDeConteudo({ recorte, limelight, pulso, espMkt, h
       </div>
 
       <div className="px-4 py-2 border-t border-outline/10 font-mono text-[9px] text-muted leading-relaxed">
-        "views" não quer dizer o mesmo nos quatro: nos espelhos são as views das peças publicadas no período, então motor que não publicou aparece com zero mesmo ganhando audiência — medida comparável pedida ao Limelight e ao Pulso em 18/11.<br />
+        "views" ainda não quer dizer o mesmo nos quatro, e a caixa diz qual é. <strong>GANHAS</strong> é o que entrou na janela (leitura do dia menos a anterior) — só o Pulso entrega isso, desde 27/11. <strong>acervo</strong> é o total de vida das peças, que não pertence a período nenhum: o MKT fica aí porque o Meta não é relido, e o Limelight porque o espelho dele só responde por publicação. Pedido aberto com os dois. Régua: Cockpit/Harness/regua-dos-numeros.md.<br />
         custo por mil views não aparece porque o custo é total e as views são do período: dividir um pelo outro daria eficiência inventada.
       </div>
     </div>
