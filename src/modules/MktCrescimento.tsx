@@ -1252,7 +1252,7 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
                 )) : <MotorVazio titulo="Pulso · canais faceless" motivo={fOrigem ? `o recorte é ${rotuloOrigem(fOrigem)}` : 'o filtro de marca exclui os canais do Pulso'} />}
                 {mostrarLime ? (
                   <MotorCard titulo="Limelight · fábrica Mello" cor={COR_OK}
-                    headline={`${nf(limeTot.views)} views`} sub={`${limeTot.pubs} publicações no período · ${nf(limeSegAtual)} seguidores no censo próprio`}
+                    headline={`${nf(limeTot.views)} views`} sub={`acervo das ${limeTot.pubs} peças publicadas no período — não é o ganho da janela · ${nf(limeSegAtual)} seguidores no censo próprio`}
                     serie={serieDe(limePubF.map((d) => ({ dia: d.dia, v: d.views || 0 })))} rotuloSerie="views/dia de publicação"
                     plats={limePlats}
                     sacada={limePlats.length >= 2 && limePlats[0].pubs >= 2 ? (() => { const top = [...limePlats].sort((a, b) => b.vpp - a.vpp)[0]; return `melhor eficiência: ${platName(top.plat)} (${nf(Math.round(top.vpp))} views/pub)`; })() : undefined} />
@@ -1272,7 +1272,7 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
                     : <MotorCard titulo="Polá Petit · espelho próprio" cor={COR_WARN}
                         headline={polaTot.views > 0 ? `${nf(polaTot.views)} views` : '—'}
                         sub={polaTot.views > 0
-                          ? `${polaTot.pubs} publicações no período${polaTot.seguidores > 0 ? ` · ${nf(polaTot.seguidores)} seguidores` : ''}`
+                          ? `acervo das ${polaTot.pubs} peças publicadas no período — não é o ganho da janela${polaTot.seguidores > 0 ? ` · ${nf(polaTot.seguidores)} seguidores` : ''}`
                           : 'sem leitura neste recorte'}
                         serie={serieDe(polaF.map((d) => ({ dia: d.dia, v: d.views || 0 })))} rotuloSerie="views/dia"
                         plats={polaPlats}

@@ -76,8 +76,14 @@ export default function RankingDePecas({ recorte, recarga = 0 }: { recorte: Reco
         <Trophy className="w-4 h-4 text-secondary" />
         <span className="text-sm font-semibold text-on-surface">Qual peça deu resultado</span>
         <span className="font-mono text-[10px] text-muted">
-          {recorte.rotulo} · {porPublicacao ? 'publicadas no recorte' : 'lidas no recorte'} · ordem por views
+          {recorte.rotulo} · {porPublicacao ? 'publicadas no recorte' : 'lidas no recorte'} · ordem por views <strong className="text-on-surface">acumuladas de vida</strong>
         </span>
+        {/* O RANKING É POR ACERVO, E ISSO PRECISA ESTAR ESCRITO (27/11/2026). `v_mkt_resultado_peca`
+            traz o acumulado de vida de cada peça; não existe ranking por GANHO enquanto o Instagram e
+            o Facebook forem lidos uma vez só (1,2 leitura por peça, medido em 27/11). Numa janela
+            curta a ordem favorece peça velha, e quem olha precisa saber disso.
+            Régua: Cockpit/Harness/regua-dos-numeros.md */}
+        <span className="font-mono text-[9px] text-muted">peça mais antiga tende a vir na frente</span>
       </div>
 
       {erro ? (
