@@ -246,6 +246,23 @@ export interface PulsoContaDia {
   dia: string; marca: string; conta: string; plataforma: string; tipo: 'curto' | 'corte' | 'longo';
   publicacoes: number; views: number; likes: number; comentarios: number; shares: number;
 }
+// O QUE OS POSTS DO PULSO GANHARAM NO DIA (27/11/2026, view nova do Pulso, `111`).
+//
+// `v_espelho_pulso_contas_dias` responde "por publicação": soma o total ATUAL dos posts publicados
+// naquele dia. Esta responde "por leitura": o que TODOS os posts, antigos e novos, ganharam naquele
+// dia — leitura do dia menos a anterior, e a primeira leitura conta inteira.
+//
+// São perguntas diferentes e o painel tem as duas réguas; até 27/11 o Pulso entrava nas duas com a
+// primeira, então a coluna dele por LEITURA mostrava outra coisa.
+//
+// `posts_com_movimento` é o que torna o número lido: 1.067 posts lidos em 26/11 e só 62 com
+// movimento. Sem ele, "1.824 views" parece vir de mil peças. Kwai fica de fora (só print manual).
+// Conferido por mim como anon em 27/11, contra os números que o Pulso declarou: batem exatos.
+export interface PulsoLeituraDia {
+  dia: string; marca: string; conta: string; plataforma: string; tipo: 'curto' | 'corte' | 'longo';
+  posts_lidos: number; posts_com_movimento: number;
+  views: number; likes: number; comentarios: number; shares: number;
+}
 export interface PulsoSegDia { dia: string; marca: string; conta: string; rede: string; seguidores: number | null }
 /** Toda conta do Pulso, inclusive a que não mede — conta sem leitura precisa APARECER dizendo isso. */
 export interface PulsoConta {
@@ -278,6 +295,7 @@ export const espelhoMotoresEstado = {
   pulsoDias: () => lerLinhasEstado<PulsoDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_dias', 'dia.asc,plataforma.asc'),
   pulsoLongosDias: () => lerLinhasEstado<PulsoLongoDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_longos_dias', 'dia.asc,conta.asc,plataforma.asc,tipo.asc'),
   pulsoContasDias: () => lerLinhasEstado<PulsoContaDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_contas_dias', 'dia.asc,conta.asc,plataforma.asc,tipo.asc'),
+  pulsoLeiturasDias: () => lerLinhasEstado<PulsoLeituraDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_leituras_dias', 'dia.asc,conta.asc,plataforma.asc,tipo.asc'),
   pulsoSeguidoresDias: () => lerLinhasEstado<PulsoSegDia>(PULSO_URL, PULSO_ANON, 'v_seguidores_pulso_dias', 'dia.asc,conta.asc,rede.asc'),
   pulsoContas: () => lerLinhasEstado<PulsoConta>(PULSO_URL, PULSO_ANON, 'v_contas_pulso', 'marca.asc,conta.asc,rede.asc'),
   limelightPubDias: () => lerLinhasEstado<LimePubDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_pub_dias', 'dia.asc,plataforma.asc'),

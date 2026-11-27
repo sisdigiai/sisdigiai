@@ -3,7 +3,7 @@ import { BarChart3, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { lerTudo } from '../../lib/paginar';
 import { aplicar, type Recorte } from '../../lib/recorte';
-import { espelhoMotoresEstado, type PulsoContaDia, type EstadoEspelho } from '../../lib/espelhoMotores';
+import { espelhoMotoresEstado, type PulsoContaDia, type PulsoLeituraDia, type EstadoEspelho } from '../../lib/espelhoMotores';
 
 // O QUE CADA MARCA RENDEU NO RECORTE (25/11/2026).
 //
@@ -37,7 +37,7 @@ const n = (v: number) => v.toLocaleString('pt-BR');
 export default function DesempenhoPorMarca({ recorte, recarga = 0 }: { recorte: Recorte; recarga?: number }) {
   const [pecas, setPecas] = useState<Peca[] | null>(null);
   const [contas, setContas] = useState<Conta[] | null>(null);
-  const [pulso, setPulso] = useState<{ linhas: PulsoContaDia[]; estado: EstadoEspelho } | null>(null);
+  const [pulso, setPulso] = useState<{ linhas: Array<PulsoContaDia | PulsoLeituraDia>; estado: EstadoEspelho } | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
   const porPublicacao = recorte.data === 'publicacao';
@@ -59,10 +59,19 @@ export default function DesempenhoPorMarca({ recorte, recarga = 0 }: { recorte: 
       .catch((e) => { setErro(String(e?.message ?? e)); setPecas([]); });
   }, [recorte, recarga, porPublicacao]);
 
-  // O Pulso vive no espelho dele, e `v_espelho_pulso_contas_dias` é a soma exata das outras duas
-  // views (curtos + cortes e longos), com rede e tipo. Por isso a coluna do Pulso fecha por rede,
-  // e não só no total.
-  useEffect(() => { espelhoMotoresEstado.pulsoContasDias().then(setPulso); }, [recarga]);
+  // A FONTE DO PULSO SEGUE A RÉGUA, como a da casa (27/11/2026).
+  //
+  // Antes a coluna dele vinha sempre de `v_espelho_pulso_contas_dias`, que soma o total ATUAL dos
+  // posts publicados no dia — isso é "por publicação". Com a régua em LEITURA, a casa trocava de
+  // fonte e o Pulso não, então a coluna dele mostrava outra pergunta, calada, ao lado das certas.
+  //
+  // O Pulso publicou `v_espelho_pulso_leituras_dias` em 27/11, a meu pedido indireto: ela dá o que
+  // TODOS os posts ganharam no dia (leitura do dia menos a anterior). Agora as duas colunas
+  // respondem à mesma pergunta que o cabeçalho anuncia.
+  useEffect(() => {
+    const ler = porPublicacao ? espelhoMotoresEstado.pulsoContasDias : espelhoMotoresEstado.pulsoLeiturasDias;
+    ler().then(setPulso);
+  }, [recarga, porPublicacao]);
 
   useEffect(() => {
     setContas(null);
@@ -206,6 +215,9 @@ export default function DesempenhoPorMarca({ recorte, recarga = 0 }: { recorte: 
             Limelight incluído; <strong className="text-on-surface">cortes</strong> é o motor de cortes, que
             publica só em Bastidores DIGIAI e no canal 2; <strong className="text-on-surface">Pulso</strong> é
             o Pulso, com os cortes dele — quem os produz é ele, medido em 25/11.
+            {' '}A coluna do Pulso segue a régua: por publicação, o total que os posts daquele dia já
+            somaram; por leitura, <strong className="text-on-surface">o que todos os posts ganharam no
+            dia</strong>. O Kwai fica de fora da leitura — lá a medição ainda é manual.
             {pulsoForaDoRecorte && <> Com <strong className="text-on-surface">{recorte.origem}</strong> escolhido na barra, a coluna do Pulso fica zerada de propósito: ele não é deste recorte.</>}
           </div>
 
