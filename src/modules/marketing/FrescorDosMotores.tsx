@@ -97,7 +97,9 @@ export default function FrescorDosMotores({ recarga = 0 }: { recarga?: number })
         página: dia sem linha é dia sem leitor, não medidor parado, e por isso ali não acende aviso —
         falta um sinal de medidor vivo, pedido a eles em 27/11. Quanto da coleta dos motores é agendada
         e quanto depende de alguém clicar, cada motor vai escrever; o painel só lê. Pedido de um comando
-        único mandado aos quatro em 27/11.
+        único mandado aos quatro em 27/11. <b>Cadência declarada pelos motores:</b> Pulso às 3h, 6h45 e
+        16h30; Limelight às 10h, uma vez ao dia — entre uma rodada e a outra o número dele não se move,
+        então "hoje" à tarde quer dizer "o que havia de manhã". Passe o mouse em cada um para ver.
       </div>
     </section>
   );
