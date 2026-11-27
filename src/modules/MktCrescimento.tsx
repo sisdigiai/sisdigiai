@@ -168,7 +168,13 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
   // que foi LIDO", o número da casa mudava (526 → 12.571 em 26/11) e **o do Pulso ficava parado em
   // 1.116** — foi assim que o dono viu, e ele tinha razão: dois números iguais em duas perguntas
   // diferentes é sinal de que um deles não é resposta.
-  const [pulsoLeiturasDias, setPulsoLeiturasDias] = useState<PulsoLeituraDia[]>([]);
+  //
+  // E ELA VEM COM O MOTIVO JUNTO, não só com as linhas. Na primeira conferência em tela a view de
+  // leitura do Pulso devolveu **500** (statement timeout) e o bloco simplesmente apagou o Pulso da
+  // soma: o título dizia "views do que foi LIDO", o número era 12.598 e a linha de baixo listava só
+  // Limelight e casa. Número que perde uma parcela calado é pior do que número que não aparece —
+  // quem lê a tela não tem como saber que faltou. Agora a falha fica escrita na própria linha.
+  const [pulsoLeituras, setPulsoLeituras] = useState<{ linhas: PulsoLeituraDia[]; estado: EstadoEspelho; detalhe?: string } | null>(null);
   const [pulsoSeg, setPulsoSeg] = useState<PulsoSegDia[]>([]);
   const [pulsoContas, setPulsoContas] = useState<PulsoConta[]>([]);
   const [pola, setPola] = useState<{ linhas: PolaPetitDia[]; estado: EstadoEspelho; detalhe?: string } | null>(null);
@@ -264,10 +270,10 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
     },
     async pulso() {
       const [pd, pld, psg, pct] = await Promise.all([
-        espelhoMotores.pulsoContasDias(), espelhoMotores.pulsoLeiturasDias(),
+        espelhoMotores.pulsoContasDias(), espelhoMotoresEstado.pulsoLeiturasDias(),
         espelhoMotores.pulsoSeguidoresDias(), espelhoMotores.pulsoContas(),
       ]);
-      setPulsoContasDias(pd); setPulsoLeiturasDias(pld); setPulsoSeg(psg); setPulsoContas(pct);
+      setPulsoContasDias(pd); setPulsoLeituras(pld); setPulsoSeg(psg); setPulsoContas(pct);
     },
     async lime() {
       const [ld, lp] = await Promise.all([espelhoMotores.limelightDias(), espelhoMotores.limelightPubDias()]);
@@ -585,7 +591,10 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
   const codeOsi = useMemo(() => brands.find((b) => /sem improviso/i.test(b.name))?.code ?? '__osi', [brands]);
   // A fonte segue a régua; as PUBLICAÇÕES continuam vindo de `contas_dias` em qualquer régua,
   // porque "quantos posts saíram" não muda conforme a data por que se olha.
-  const pulsoFonte = filtros.data === 'leitura' ? pulsoLeiturasDias : pulsoContasDias;
+  const pulsoFonte = filtros.data === 'leitura' ? (pulsoLeituras?.linhas ?? []) : pulsoContasDias;
+  // A régua em leitura depende de uma view que já falhou em produção. Quando ela falha, o Pulso
+  // **não é zero**: é desconhecido — e a linha de baixo tem de dizer isso em vez de somar sem ele.
+  const pulsoCego = filtros.data === 'leitura' && pulsoLeituras != null && pulsoLeituras.estado !== 'ok';
   const pulsoF = useMemo(() => pulsoFonte.filter((d) => noRecorte(d.dia) && (!fRede || d.plataforma === fRede)), [pulsoFonte, corteDia, fimDia, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
   const pulsoPubF = useMemo(() => pulsoContasDias.filter((d) => noRecorte(d.dia) && (!fRede || d.plataforma === fRede)), [pulsoContasDias, corteDia, fimDia, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
   const limePubF = useMemo(() => limePub.filter((d) => noRecorte(d.dia) && (!fRede || d.plataforma === fRede)), [limePub, corteDia, fimDia, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -882,7 +891,9 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
                   <div className="text-[12px] text-muted mt-1 mb-3">
                     {temViews
                       ? <>
-                          {mostrarPulso && pulsoTot.views > 0 && <>Pulso {nf(pulsoTot.views)} · </>}
+                          {mostrarPulso && pulsoCego
+                            ? <><span className="text-error">Pulso não medido</span> (não consegui ler o espelho de leitura{pulsoLeituras?.detalhe ? `: ${pulsoLeituras.detalhe}` : ''}) · </>
+                            : mostrarPulso && pulsoTot.views > 0 && <>Pulso {nf(pulsoTot.views)} · </>}
                           {mostrarLime && limeTot.views > 0 && <>Limelight {nf(limeTot.views)} · </>}
                           {chegando('pecas')
                             ? <>contas da casa <span className="animate-pulse">medindo…</span></>
