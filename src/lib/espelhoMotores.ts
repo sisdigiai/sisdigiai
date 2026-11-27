@@ -310,6 +310,7 @@ export const espelhoMotores = {
   blogs: () => lerEspelho<EspelhoBlogs>(BLOGS_URL, BLOGS_ANON, 'v_espelho_blogs'),
   pulsoDias: () => lerLinhas<PulsoDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_dias', 'dia.asc,plataforma.asc'),
   pulsoContasDias: () => lerLinhas<PulsoContaDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_contas_dias', 'dia.asc,conta.asc,plataforma.asc,tipo.asc'),
+  pulsoLeiturasDias: () => lerLinhas<PulsoLeituraDia>(PULSO_URL, PULSO_ANON, 'v_espelho_pulso_leituras_dias', 'dia.asc,conta.asc,plataforma.asc,tipo.asc'),
   pulsoSeguidoresDias: () => lerLinhas<PulsoSegDia>(PULSO_URL, PULSO_ANON, 'v_seguidores_pulso_dias', 'dia.asc,conta.asc,rede.asc'),
   pulsoContas: () => lerLinhas<PulsoConta>(PULSO_URL, PULSO_ANON, 'v_contas_pulso', 'marca.asc,conta.asc,rede.asc'),
   limelightDias: () => lerLinhas<LimelightDia>(LIMELIGHT_URL, LIMELIGHT_ANON, 'v_espelho_limelight_dias', 'dia.asc,plataforma.asc'),

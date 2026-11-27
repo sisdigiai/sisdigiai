@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { hojeBrasilia, diaBrasilia } from '../lib/datas';
 import OsiDiasCard from '../components/OsiDiasCard';
 import MapaCobertura from '../components/MapaCobertura';
-import { espelhoMotores, espelhoMotoresEstado, type PolaPetitDia, type EstadoEspelho, type PulsoContaDia, type PulsoSegDia, type PulsoConta, type LimelightDia, type LimePubDia, type BlogDia, type EspelhoBlogs } from '../lib/espelhoMotores';
+import { espelhoMotores, espelhoMotoresEstado, type PolaPetitDia, type EstadoEspelho, type PulsoContaDia, type PulsoLeituraDia, type PulsoSegDia, type PulsoConta, type LimelightDia, type LimePubDia, type BlogDia, type EspelhoBlogs } from '../lib/espelhoMotores';
 import { lerTudo } from '../lib/paginar';
 
 // RADAR 360 (2026-08-25) — o analytics social completo do grupo, aprovado em mock.
@@ -161,6 +161,14 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
   const [perf, setPerf] = useState<Perf[]>([]);
   const [aud, setAud] = useState<Aud[]>([]);
   const [pulsoContasDias, setPulsoContasDias] = useState<PulsoContaDia[]>([]);
+  // O MESMO DIA DO PULSO TEM DOIS NÚMEROS, e cada régua pede o seu (27/11/2026).
+  //   · `contas_dias`   — o total ATUAL dos posts PUBLICADOS naquele dia  → régua publicação
+  //   · `leituras_dias` — o que TODOS os posts, velhos e novos, GANHARAM naquele dia → régua leitura
+  // Até hoje este bloco usava sempre o primeiro. Com a régua em leitura, o título mudava para "do
+  // que foi LIDO", o número da casa mudava (526 → 12.571 em 26/11) e **o do Pulso ficava parado em
+  // 1.116** — foi assim que o dono viu, e ele tinha razão: dois números iguais em duas perguntas
+  // diferentes é sinal de que um deles não é resposta.
+  const [pulsoLeiturasDias, setPulsoLeiturasDias] = useState<PulsoLeituraDia[]>([]);
   const [pulsoSeg, setPulsoSeg] = useState<PulsoSegDia[]>([]);
   const [pulsoContas, setPulsoContas] = useState<PulsoConta[]>([]);
   const [pola, setPola] = useState<{ linhas: PolaPetitDia[]; estado: EstadoEspelho; detalhe?: string } | null>(null);
@@ -255,10 +263,11 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
         .select('brand_id, platform, seguidores, dia, account_id').order('dia').order('id').range(de, ate)));
     },
     async pulso() {
-      const [pd, psg, pct] = await Promise.all([
-        espelhoMotores.pulsoContasDias(), espelhoMotores.pulsoSeguidoresDias(), espelhoMotores.pulsoContas(),
+      const [pd, pld, psg, pct] = await Promise.all([
+        espelhoMotores.pulsoContasDias(), espelhoMotores.pulsoLeiturasDias(),
+        espelhoMotores.pulsoSeguidoresDias(), espelhoMotores.pulsoContas(),
       ]);
-      setPulsoContasDias(pd); setPulsoSeg(psg); setPulsoContas(pct);
+      setPulsoContasDias(pd); setPulsoLeiturasDias(pld); setPulsoSeg(psg); setPulsoContas(pct);
     },
     async lime() {
       const [ld, lp] = await Promise.all([espelhoMotores.limelightDias(), espelhoMotores.limelightPubDias()]);
@@ -574,7 +583,11 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
   const codeMello = useMemo(() => brands.find((b) => /mello/i.test(b.name))?.code ?? '__mello', [brands]);
   const codeDigiai = useMemo(() => brands.find((b) => /^digiai$/i.test(b.name))?.code ?? '__digiai', [brands]);
   const codeOsi = useMemo(() => brands.find((b) => /sem improviso/i.test(b.name))?.code ?? '__osi', [brands]);
-  const pulsoF = useMemo(() => pulsoContasDias.filter((d) => noRecorte(d.dia) && (!fRede || d.plataforma === fRede)), [pulsoContasDias, corteDia, fimDia, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
+  // A fonte segue a régua; as PUBLICAÇÕES continuam vindo de `contas_dias` em qualquer régua,
+  // porque "quantos posts saíram" não muda conforme a data por que se olha.
+  const pulsoFonte = filtros.data === 'leitura' ? pulsoLeiturasDias : pulsoContasDias;
+  const pulsoF = useMemo(() => pulsoFonte.filter((d) => noRecorte(d.dia) && (!fRede || d.plataforma === fRede)), [pulsoFonte, corteDia, fimDia, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
+  const pulsoPubF = useMemo(() => pulsoContasDias.filter((d) => noRecorte(d.dia) && (!fRede || d.plataforma === fRede)), [pulsoContasDias, corteDia, fimDia, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
   const limePubF = useMemo(() => limePub.filter((d) => noRecorte(d.dia) && (!fRede || d.plataforma === fRede)), [limePub, corteDia, fimDia, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
   const blogF = useMemo(() => blogDias.filter((d) => noRecorte(d.dia)), [blogDias, corteDia, fimDia]); // eslint-disable-line react-hooks/exhaustive-deps
   const serieDe = (rows: { dia: string; v: number }[]) => {
@@ -582,7 +595,9 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
     for (const r of rows) m.set(r.dia, (m.get(r.dia) ?? 0) + r.v);
     return [...m.entries()].sort((a, b) => a[0].localeCompare(b[0]));
   };
-  const porPlataforma = (rows: { plataforma: string; publicacoes: number; views: number; likes: number; comentarios: number; shares: number }[]) => {
+  // `publicacoes` é opcional porque a view de LEITURA do Pulso não a tem — e não deveria ter:
+  // "quantos posts saíram" é pergunta de publicação. Nessa régua a contagem vem por fora.
+  const porPlataforma = (rows: { plataforma: string; publicacoes?: number; views: number; likes: number; comentarios: number; shares: number }[]) => {
     const m = new Map<string, { pubs: number; views: number; eng: number }>();
     for (const r of rows) {
       const c = m.get(r.plataforma) ?? { pubs: 0, views: 0, eng: 0 };
@@ -631,10 +646,11 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
     .filter((marca) => !fMarca || marca === fMarca)
     .map((marca) => {
       const rows = pulsoF.filter((d) => d.marca === marca);
+      const pubRows = pulsoPubF.filter((d) => d.marca === marca);
       return {
         marca,
         views: rows.reduce((a, d) => a + (d.views || 0), 0),
-        pubs: rows.reduce((a, d) => a + (d.publicacoes || 0), 0),
+        pubs: pubRows.reduce((a, d) => a + (d.publicacoes || 0), 0),
         eng: rows.reduce((a, d) => a + (d.likes || 0) + (d.comentarios || 0) + (d.shares || 0), 0),
         plats: porPlataforma(rows),
         serie: serieDe(rows.map((d) => ({ dia: d.dia, v: d.views || 0 }))),
@@ -642,7 +658,7 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
         contas: pulsoContas.filter((x) => x.marca === marca),
       };
     })
-    .sort((a, b) => b.views - a.views), [pulsoMarcas, pulsoF, fMarca, pulsoSegPorMarca, pulsoContas]); // eslint-disable-line react-hooks/exhaustive-deps
+    .sort((a, b) => b.views - a.views), [pulsoMarcas, pulsoF, pulsoPubF, fMarca, pulsoSegPorMarca, pulsoContas]); // eslint-disable-line react-hooks/exhaustive-deps
   const ultimaLeituraPulso = useMemo(() => pulsoContasDias.reduce<string | null>((m, d) => (m == null || d.dia > m ? d.dia : m), null), [pulsoContasDias]);
   const pulsoTot = useMemo(() => ({
     views: pulsoCards.reduce((a, x) => a + x.views, 0),
