@@ -781,15 +781,24 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
   // mede a mesma conta de Instagram que a casa já conta. O cartão mostra a medição DELA, e diz isso.
   const polaF = useMemo(() => (pola?.linhas ?? []).filter((d) => noRecorte(d.dia) && (!fRede || d.plataforma === fRede)),
     [pola, corteDia, fimDia, fRede]); // eslint-disable-line react-hooks/exhaustive-deps
+  // O FACEBOOK DA POLÁ DEVOLVE ZERO ONDE DEVIA DEVOLVER NULO (27/11/2026, achado pelo Geral e
+  // conferido aqui pela porta de fora): `v_espelho_polapetit_dias` tem 83 dias de Facebook, 44 deles
+  // COM post publicado, e **views = 0 nos 44**, sem um único nulo. Zero e "não medido" levam a
+  // decisões opostas — é a regra 6 da régua dos números —, então o Facebook dela sai da soma e a
+  // tela diz por quê. Volta sozinho no dia em que a view dela entregar nulo ou o número de verdade.
+  const polaFbCego = useMemo(
+    () => polaF.some((d) => d.plataforma === 'facebook' && (d.publicacoes ?? 0) > 0 && (d.views ?? 0) === 0),
+    [polaF]);
+  const polaMedido = useMemo(() => polaF.filter((d) => d.plataforma !== 'facebook'), [polaF]);
   const polaTot = useMemo(() => ({
-    views: polaF.reduce((a, d) => a + (d.views || 0), 0),
+    views: polaMedido.reduce((a, d) => a + (d.views || 0), 0),
     pubs: polaF.reduce((a, d) => a + (d.publicacoes || 0), 0),
     seguidores: polaF.reduce<number>((a, d) => (d.seguidores != null && d.seguidores > a ? d.seguidores : a), 0),
-  }), [polaF]);
-  const polaPlats = useMemo(() => porPlataforma(polaF.map((d) => ({
+  }), [polaF, polaMedido]);
+  const polaPlats = useMemo(() => porPlataforma(polaMedido.map((d) => ({
     plataforma: d.plataforma, publicacoes: d.publicacoes ?? 0, views: d.views ?? 0,
     likes: d.likes ?? 0, comentarios: d.comentarios ?? 0, shares: d.shares ?? 0,
-  }))), [polaF]);
+  }))), [polaMedido]);
   const blogTot = useMemo(() => blogF.reduce((a, d) => a + (d.leituras || 0), 0), [blogF]);
   const blogPorSlug = useMemo(() => {
     const m = new Map<string, { leituras: number; sessoes: number }>();
@@ -1277,9 +1286,10 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
                         serie={serieDe(polaF.map((d) => ({ dia: d.dia, v: d.views || 0 })))} rotuloSerie="views/dia"
                         plats={polaPlats}
                         aviso={<><b className="text-on-surface-variant">Fora do número grande, de propósito.</b> A Polá não é motor como o Pulso e o Limelight:
-                          eles publicam em canais próprios, e o app da Polá mede a <b>mesma conta de Instagram</b> que a casa já conta.
-                          Medido em 21/11: a casa tem 96 peças de Instagram da Polá com <b>103.698 views</b>, e este espelho reporta <b>43.321</b>.
-                          Somar contaria a mesma postagem duas vezes — e a diferença entre as duas medições é pergunta aberta para a Polá e o MKT.</>} />
+                          eles publicam em canais próprios, e o app da Polá mede as <b>mesmas contas</b> que a casa já conta.
+                          Medido em 27/11: a casa lê 108 peças de Instagram (<b>111.313 views</b>) e 274 de Facebook, todas com origem <code>mkt</code>, lidas uma única vez entre 19 e 25/11;
+                          o espelho dela reporta <b>42.184</b> no Instagram, com 101 das 102 peças relidas (até 39 leituras). Somar contaria a mesma postagem duas vezes.
+                          {polaFbCego && <> <b className="text-warning">O Facebook dela está fora desta caixa:</b> o espelho devolve <b>zero</b> views em 44 dias com post, e zero não é "não medido".</>}</>} />
                 ) : <MotorVazio titulo="Polá Petit · espelho próprio" motivo={fOrigem && fOrigem !== 'casa' ? `o recorte é ${rotuloOrigem(fOrigem)}` : 'o filtro de marca exclui a Polá'} />}
                 {mostrarOsi
                   ? <OsiDiasCard desde={corteDia} ate={fimDia} cor={COR_SEC} />
