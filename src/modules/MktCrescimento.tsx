@@ -38,6 +38,9 @@ type Peca = {
   peca_ref: string; leituras: number; primeira_leitura: string; ultima_leitura: string;
   views: number | null; publicada_em: string | null; apagada: boolean;
   dia_publicacao: string; publicacao_estimada: boolean;
+  /** De onde veio o ganho: medido ponta a ponta, nascida na janela, parcial (só desde a 1ª leitura
+   *  de dentro) ou desconhecido. A tela precisa disto para não chamar parcial de completo. */
+  ganhoOrigem?: 'diferenca' | 'nasceu_na_janela' | 'parcial' | 'desconhecido';
   /** O QUE A PEÇA GANHOU DENTRO DA JANELA — leitura de dentro menos a última de ANTES dela.
    *  `null` quando não há leitura anterior: aí a peça não tem ganho conhecido, e isso se conta à
    *  parte (R2 da régua dos números). Só existe na régua de leitura. */
@@ -287,13 +290,13 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
       const saida: Peca[] = ganhoNaJanela(dias, corteDia, (chave) => {
         const c = flags.get(chave);
         return c != null && !c.publicacao_estimada && c.dia_publicacao >= corteDia;
-      }).map(({ dentro, ganho }) => {
+      }).map(({ dentro, ganho, origem: ganhoOrigem }) => {
         const c = flags.get(chaveDaPeca(dentro));
         return {
           origem: dentro.origem, marca: dentro.marca, conta: dentro.conta ?? null, rede: dentro.rede,
           tipo: dentro.tipo, peca_ref: dentro.peca_ref, leituras: dentro.leituras,
           primeira_leitura: dentro.primeira_data, ultima_leitura: dentro.data,
-          views: dentro.views ?? null, ganho,
+          views: dentro.views ?? null, ganho, ganhoOrigem,
           publicada_em: c?.publicada_em ?? null,
           apagada: c?.apagada ?? false,
           // Peça lida na janela que a consolidada não conhece é peça sem registro de publicação:
@@ -497,27 +500,42 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
     const dia = filtros.data === 'leitura' ? pc.ultima_leitura : pc.dia_publicacao;
     return dia >= corteDia && dia <= fimDia && marcaOk(pc.marca) && (!fRede || pc.rede === fRede);
   }), [pecas, corteDia, fimDia, fMarca, fOrigem, fRede, filtros.data]); // eslint-disable-line react-hooks/exhaustive-deps
-  const estimadas = useMemo(() => pecasF.filter((pc) => pc.publicacao_estimada).length, [pecasF]);
+
+  // A BASE DO "POR PUBLICAÇÃO" SÓ TEM PEÇA QUE FOI MESMO PUBLICADA NA JANELA (27/11/2026).
+  //
+  // O dono pôs a régua em uma frase: "por publicação é do dia x até o dia y, o que deu de resultado,
+  // sem contar as postagens anteriores — essa é a BASE, e tudo que vier de antes é uma soma". Estava
+  // certo, e a base estava contaminada: peça SEM registro de publicação recebe como data o dia em que
+  // o robô olhou pela primeira vez. Medido na janela de 30 dias (29/10 a 27/11): **79 peças assim,
+  // carregando 18.616 views de acervo** para dentro da base — e 50 delas são o TikTok da Mello, com
+  // os 16.850 que o dono reclamou. São vídeos antigos que só começaram a ser lidos em 19/11.
+  //
+  // Com a base limpa a aritmética volta a fazer sentido: por publicação = o que nasceu na janela;
+  // por leitura = isso MAIS o que o acervo rendeu. A leitura nunca pode ser menor.
+  const pecasBase = useMemo(() => (filtros.data === 'leitura' ? pecasF : pecasF.filter((pc) => !pc.publicacao_estimada)), [pecasF, filtros.data]);
+  const carimbadas = useMemo(() => (filtros.data === 'leitura' ? [] : pecasF.filter((pc) => pc.publicacao_estimada)), [pecasF, filtros.data]);
+  const viewsCarimbadas = useMemo(() => carimbadas.reduce((a, pc) => a + (pc.views ?? 0), 0), [carimbadas]);
   // ACERVO: o acumulado de vida das peças do recorte, na última leitura delas. Não leva período no
   // rótulo — leva data (R1 e a tabela das três formas, em Harness/regua-dos-numeros.md).
-  const viewsCasa = useMemo(() => pecasF.reduce((a, pc) => a + (pc.views ?? 0), 0), [pecasF]);
+  const viewsCasa = useMemo(() => pecasBase.reduce((a, pc) => a + (pc.views ?? 0), 0), [pecasBase]);
   // GANHO: o que entrou NA JANELA. É o único número da casa que pode se chamar "hoje".
-  const ganhoCasa = useMemo(() => pecasF.reduce((a, pc) => a + (pc.ganho ?? 0), 0), [pecasF]);
-  const pecasComGanho = useMemo(() => pecasF.filter((pc) => pc.ganho != null).length, [pecasF]);
-  const pecasSemAnterior = useMemo(() => pecasF.filter((pc) => pc.ganho == null).length, [pecasF]);
-  const pecasComViews = useMemo(() => pecasF.filter((pc) => pc.views != null).length, [pecasF]);
+  const ganhoCasa = useMemo(() => pecasBase.reduce((a, pc) => a + (pc.ganho ?? 0), 0), [pecasBase]);
+  const ganhoParcial = useMemo(() => pecasBase.filter((pc) => pc.ganhoOrigem === 'parcial'), [pecasBase]);
+  const pecasComGanho = useMemo(() => pecasBase.filter((pc) => pc.ganho != null).length, [pecasBase]);
+  const pecasSemAnterior = useMemo(() => pecasBase.filter((pc) => pc.ganho == null).length, [pecasBase]);
+  const pecasComViews = useMemo(() => pecasBase.filter((pc) => pc.views != null).length, [pecasBase]);
   // A barra por rede reparte EXATAMENTE o número grande, por isso segue a mesma régua: ganho quando
   // o bloco mostra ganho. Barra que divide um total diferente do número de cima é a mesma mentira
   // em outro formato.
   const viewsCasaPorRede = useMemo(() => {
     const m = new Map<string, number>();
     const porLeitura = filtros.data === 'leitura';
-    for (const pc of pecasF) {
+    for (const pc of pecasBase) {
       const v = porLeitura ? pc.ganho : pc.views;
       if (v != null) m.set(pc.rede, (m.get(pc.rede) ?? 0) + v);
     }
     return m;
-  }, [pecasF, filtros.data]);
+  }, [pecasBase, filtros.data]);
   // Views por publicação para a lista do Conteúdo: só quando o par (peça, rede) tem UMA peça. O mesmo
   // corte sai em várias contas e a publicação aqui não guarda a conta da leitura — repartir seria
   // inventar. Sem casamento único, a linha segue com o que a `content_performance` tiver.
@@ -979,7 +997,7 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
             const heroPostsRotulo = temViews
               ? porLeitura
                 ? 'views GANHAS no período (motores + contas da casa)'
-                : 'views acumuladas até hoje do que foi PUBLICADO no período'
+                : 'views do que foi PUBLICADO no período (a base: só peça com registro de publicação)'
               : 'engajamento nas redes no período';
             // share das redes das marcas: engajamento por plataforma (mkt real do recorte)
             const engPorRede = (() => {
@@ -1019,15 +1037,21 @@ export default function MktCrescimento({ aba, filtros, recarga = 0 }: { aba: Aba
                             : porLeitura && pecasComGanho === 0 && pecasF.length > 0
                             ? <><span className="text-error">contas da casa não medido</span> (nenhuma das {nf(pecasF.length)} peças do recorte nasceu na janela nem tem leitura anterior) · </>
                             : porLeitura
-                            ? <>contas da casa {nf(ganhoCasa)} ({nf(pecasComGanho)} de {nf(pecasF.length)} peças com ganho apurado{pecasSemAnterior > 0 ? ` · ${nf(pecasSemAnterior)} são de antes da janela e só foram lidas agora: não dá para saber quanto renderam nela` : ''})</>
+                            ? <>contas da casa {nf(ganhoCasa)} ({nf(pecasComGanho)} de {nf(pecasBase.length)} peças com ganho apurado{ganhoParcial.length > 0 ? `, ${nf(ganhoParcial.length)} só desde a 1ª leitura de dentro da janela` : ''}{pecasSemAnterior > 0 ? ` · ${nf(pecasSemAnterior)} são de antes da janela e só foram lidas uma vez: não dá para saber quanto renderam nela` : ''})</>
                             : viewsCasa > 0
-                            ? <>contas da casa {nf(viewsCasa)} ({pecasComViews} de {pecasF.length} peças lidas{estimadas > 0 ? ` · ${estimadas} sem registro de publicação, datadas pela 1ª leitura` : ''})</>
-                            : <>contas da casa sem leitura no recorte</>}
+                            ? <>contas da casa {nf(viewsCasa)} ({pecasComViews} de {nf(pecasBase.length)} peças publicadas na janela)</>
+                            : <>contas da casa sem publicação medida no recorte</>}
                         </>
                       : <>{linhas.length} publicações · {medidos.length} medidas{fMarca ? ' · esta marca não tem motor de vídeo — o dado dela vive nas redes' : ''}</>}
                   </div>
                   {/* O ACERVO NÃO SOME, MUDA DE LUGAR. Ele é a outra pergunta — "quanto essas peças
                       já juntaram na vida" — e leva data, não período. Em cima fica o que entrou. */}
+                  {!porLeitura && carimbadas.length > 0 && (
+                    <div className="text-[12px] text-on-surface-variant -mt-2 mb-3">
+                      <span className="text-warning">fora da base:</span> {nf(carimbadas.length)} peças sem registro de publicação carregam <b className="font-mono tabular-nums">{nf(viewsCarimbadas)}</b> views de acervo.
+                      A data delas é o dia em que o robô olhou pela primeira vez, não o dia em que saíram — contá-las como publicadas na janela poria vida inteira dentro do período.
+                    </div>
+                  )}
                   {temViews && porLeitura && viewsCasa > 0 && (
                     <div className="text-[12px] text-on-surface-variant -mt-2 mb-3">
                       acervo das contas da casa no recorte: <b className="font-mono tabular-nums">{nf(viewsCasa)}</b> views somadas desde que cada peça nasceu, na leitura de {fimDia.slice(8, 10)}/{fimDia.slice(5, 7)} — os motores não entram aqui: o espelho deles entrega ganho, não acervo

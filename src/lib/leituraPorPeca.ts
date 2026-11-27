@@ -76,7 +76,10 @@ export const pecasMedidas = <T extends LeituraDeDia>(pecas: PecaLida<T>[], campo
 // possíveis, e a terceira é a honesta:
 //   1. a peça tem leitura ANTES da janela → ganho = leitura de dentro menos a de antes;
 //   2. a peça NASCEU na janela (registro de publicação de verdade) → ganho = tudo que acumulou;
-//   3. a peça é mais velha e só foi lida agora → **desconhecido**. Não se sabe quanto ela já tinha
+//   3. a peça é mais velha e só foi lida agora, **mas foi lida duas vezes dentro da janela** → ganho
+//      PARCIAL: a diferença entre a primeira e a última leitura de dentro. Cobre só o pedaço da
+//      janela em que houve medição, e isso tem de ser dito — mas é medido, e medido não se descarta;
+//   4. a peça é mais velha e tem uma leitura só → **desconhecido**. Não se sabe quanto ela já tinha
 //      quando a janela começou, e inventar é o erro que a régua dos números proíbe (R2 e R6 em
 //      Cockpit/Harness/regua-dos-numeros.md).
 //
@@ -87,7 +90,9 @@ export type GanhoDaPeca<T> = {
   dentro: PecaLida<T>;
   /** O que entrou na janela. `null` = desconhecido (caso 3). */
   ganho: number | null;
-  origem: 'diferenca' | 'nasceu_na_janela' | 'desconhecido';
+  origem: 'diferenca' | 'nasceu_na_janela' | 'parcial' | 'desconhecido';
+  /** Só no caso `parcial`: desde quando a medição cobre, para a tela poder dizer. */
+  desde?: string;
 };
 
 export function ganhoNaJanela<T extends LeituraDeDia>(
@@ -113,6 +118,14 @@ export function ganhoNaJanela<T extends LeituraDeDia>(
       saida.push({ dentro, ganho: dentro.views - antes.views, origem: 'diferenca' });
     } else if (nasceuNaJanela(chave) && dentro.views != null) {
       saida.push({ dentro, ganho: dentro.views, origem: 'nasceu_na_janela' });
+    } else if (naJanela.length >= 2 && dentro.views != null) {
+      const ord = [...naJanela].sort((a, b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : 0));
+      const primeira = ord.find((l) => l.views != null);
+      if (primeira != null && primeira.data !== dentro.data) {
+        saida.push({ dentro, ganho: dentro.views - primeira.views!, origem: 'parcial', desde: primeira.data });
+      } else {
+        saida.push({ dentro, ganho: null, origem: 'desconhecido' });
+      }
     } else {
       saida.push({ dentro, ganho: null, origem: 'desconhecido' });
     }
